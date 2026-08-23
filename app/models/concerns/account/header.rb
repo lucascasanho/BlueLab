@@ -3,7 +3,7 @@
 module Account::Header
   extend ActiveSupport::Concern
 
-  MAX_DESCRIPTION_LENGTH = 150
+  MAX_DESCRIPTION_LENGTH = 2_000
   HEADER_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'].freeze
   HEADER_LIMIT = 8.megabytes
   HEADER_DIMENSIONS = [1500, 500].freeze

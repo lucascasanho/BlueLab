@@ -3,7 +3,7 @@
 module Account::Avatar
   extend ActiveSupport::Concern
 
-  MAX_DESCRIPTION_LENGTH = 150
+  MAX_DESCRIPTION_LENGTH = 2_000
   AVATAR_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'].freeze
   AVATAR_LIMIT = 8.megabytes
   AVATAR_DIMENSIONS = [400, 400].freeze
