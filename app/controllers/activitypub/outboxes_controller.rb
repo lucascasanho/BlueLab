@@ -34,11 +34,18 @@ class ActivityPub::OutboxesController < ActivityPub::BaseController
       ActivityPub::CollectionPresenter.new(
         id: outbox_url,
         type: :ordered,
-        size: @account.statuses_count,
+        size: public_statuses_count,
         first: outbox_url(page: true),
         last: outbox_url(page: true, min_id: 0)
       )
     end
+  end
+
+  # Espelunca: adiciona 6347 ao contador público de posts de @luc
+  def public_statuses_count
+    return 6_347 + @account.statuses_count if @account.id == 116_699_700_054_706_950
+
+    @account.statuses_count
   end
 
   def outbox_url(...)

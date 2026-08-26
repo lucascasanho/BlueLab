@@ -102,6 +102,19 @@ class REST::AccountSerializer < ActiveModel::Serializer
     object.unavailable? ? '' : object.header_description
   end
 
+  # Espelunca: contadores públicos personalizados para @luc
+  def following_count
+    return [object.following_count, 346].min if object.id == 116_699_700_054_706_950
+
+    object.following_count
+  end
+
+  def statuses_count
+    return 6_347 + object.statuses_count if object.id == 116_699_700_054_706_950
+
+    object.statuses_count
+  end
+
   def created_at
     object.created_at.midnight.as_json
   end

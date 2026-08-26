@@ -65,7 +65,7 @@ class FollowingAccountsController < ApplicationController
       ActivityPub::CollectionPresenter.new(
         id: page_url(params.fetch(:page, 1)),
         type: :ordered,
-        size: @account.following_count,
+        size: public_following_count,
         items: follows.map { |follow| ActivityPub::TagManager.instance.uri_for(follow.target_account) },
         part_of: ActivityPub::TagManager.instance.following_uri_for(@account),
         next: next_page_url,
@@ -75,10 +75,17 @@ class FollowingAccountsController < ApplicationController
       ActivityPub::CollectionPresenter.new(
         id: ActivityPub::TagManager.instance.following_uri_for(@account),
         type: :ordered,
-        size: @account.following_count,
+        size: public_following_count,
         first: page_url(1)
       )
     end
+  end
+
+  # Espelunca: limita publicamente o contador de seguindo de @luc
+  def public_following_count
+    return [@account.following_count, 346].min if @account.id == 116_699_700_054_706_950
+
+    @account.following_count
   end
 
   def restrict_fields_to
