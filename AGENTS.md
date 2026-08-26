@@ -13,6 +13,41 @@ Este repositório é a instância Mastodon Espelunca.
 - Distribuição: Mastodon oficial
 - A instância deve acompanhar versões estáveis recentes do Mastodon oficial.
 
+## Estrutura verificada do deploy
+
+O deploy é standalone e executado diretamente no WSL2, sem contêineres.
+
+- Usuário dos processos da aplicação: `espelunca`.
+- Diretório de trabalho das unidades: `/home/espelunca/espelunca`.
+- Rails e Sidekiq usam o Ruby gerenciado por rbenv em
+  `/home/espelunca/.rbenv`.
+- Nginx recebe HTTP local em `127.0.0.1:80` e encaminha as requisições
+  para os componentes da aplicação.
+- Puma/Rails escuta em `127.0.0.1:3001`.
+- O streaming efetivo escuta em `127.0.0.1:4001`.
+- Redis dedicado da instância escuta em `127.0.0.1:6380` e usa a unidade
+  `redis-server@espelunca.service`.
+- PostgreSQL escuta em `127.0.0.1:5432`.
+- Há um processo `cloudflared` com listener local em `127.0.0.1:20241`,
+  mas não existe uma unidade de sistema `cloudflared.service` no WSL.
+
+As portas acima foram verificadas no ambiente de produção. Não confundir
+com as portas padrão dos exemplos do repositório oficial.
+
+## Upstream e legado
+
+A política atual é acompanhar exclusivamente as versões estáveis do
+Mastodon oficial. O repositório oficial desejado como upstream é
+`https://github.com/mastodon/mastodon.git`.
+
+A branch `EspeluncaLab`, o remote `bluelab` apontando para
+`MastodonBlue/BlueLab` e o remote `origin` apontando para
+`glitch-soc/mastodon` existem por razões históricas. BlueLab e glitch-soc são
+legado, não são o upstream desejado e não devem ser usados como fonte de novas
+atualizações. Antes da próxima atualização, confirme os remotes e configure ou
+identifique explicitamente um remote para o Mastodon oficial, sem apagar o
+histórico existente.
+
 ## Objetivos principais
 
 O Codex deve auxiliar principalmente em:
@@ -129,6 +164,21 @@ Os principais incluem:
 - espelunca-web
 - espelunca-sidekiq
 - espelunca-streaming
+- espelunca-streaming@4001
+
+Função verificada de cada unidade:
+
+- `espelunca-web.service`: executa Puma/Rails em produção, porta 3001, com
+  `WEB_CONCURRENCY=1` e `MAX_THREADS=5`.
+- `espelunca-sidekiq.service`: executa Sidekiq com concorrência 3.
+- `espelunca-streaming.service`: unidade agregadora `oneshot`; aparecer como
+  `active (exited)` é normal e não comprova sozinho que o streaming funciona.
+- `espelunca-streaming@4001.service`: processo Node de streaming efetivo na
+  porta 4001.
+- `redis-server@espelunca.service`: Redis dedicado na porta 6380.
+- `nginx.service`: proxy HTTP local na porta 80.
+- `postgresql.service` é uma unidade agregadora; para diagnóstico, confirme
+  também o cluster PostgreSQL efetivo e o processo que escuta na porta 5432.
 
 Antes de operar serviços, confirme os nomes existentes com systemd.
 
@@ -142,6 +192,28 @@ Pode consultar livremente:
 - curl localhost
 - df -h
 - free -h
+
+Comandos de leitura úteis no deploy atual:
+
+- `systemctl status espelunca-web espelunca-sidekiq
+espelunca-streaming espelunca-streaming@4001 --no-pager -l`
+- `systemctl status nginx redis-server@espelunca postgresql --no-pager -l`
+- `journalctl -u espelunca-web -u espelunca-sidekiq
+-u espelunca-streaming@4001 --since "30 minutes ago" --no-pager`
+- `ss -lntp` para confirmar os listeners esperados nas portas 80, 3001, 4001,
+  5432, 6380 e 20241.
+- `curl -H 'Host: espelunca.social' http://127.0.0.1/` para testar o Nginx
+  local sem depender de DNS, Cloudflare ou da rede pública.
+- `curl -H 'Host: espelunca.social' http://127.0.0.1:3001/` para isolar
+  Puma/Rails do Nginx.
+- `curl http://127.0.0.1:4001/api/v1/streaming/health` para testar o processo
+  de streaming diretamente.
+- `df -h / /home/espelunca/espelunca` e `free -h` para verificar disco e
+  memória.
+
+Ao testar com `curl`, registre também o código HTTP. Uma falha no acesso
+público com os testes locais saudáveis direciona a investigação para Nginx,
+túnel Cloudflare, DNS ou rede, em vez de Puma e streaming.
 
 Peça autorização antes de reiniciar serviços de produção.
 
