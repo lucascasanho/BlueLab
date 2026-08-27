@@ -530,7 +530,7 @@
   "compose.visibility.quote_policy.followers": "Seguidores",
   "compose.visibility.title": "Visibilidade",
   "compose_form.direct_message_warning_learn_more": "Saiba mais",
-  "compose_form.encryption_warning": "As publicações no Mastodon não são criptografadas de ponta-a-ponta. Não compartilhe nenhuma informação sensível no Mastodon.",
+  "compose_form.encryption_warning": "As publicações e citações secretas na Espelunca não são criptografadas de ponta-a-ponta. Não compartilhe nenhuma informação sensível na Espelunca.",
   "compose_form.hashtag_warning": "Esta publicação não será exibida sob nenhuma hashtag, já que não é pública. Apenas publicações públicas podem ser pesquisadas por meio de hashtags.",
   "compose_form.lock_disclaimer": "Seu perfil não está {locked}. Qualquer um pode te seguir e ver as suas publicações privadas.",
   "compose_form.lock_disclaimer.lock": "trancado",
