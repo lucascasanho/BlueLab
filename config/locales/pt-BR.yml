@@ -2090,7 +2090,7 @@ pt-BR:
     aliases: Alias da conta
     appearance: Aparência
     authorized_apps: Aplicativos autorizados
-    back: Voltar para o Mastodon
+    back: Voltar para a Espelunca
     delete: Exclusão de conta
     development: Desenvolvimento
     edit_profile: Editar perfil
@@ -2218,7 +2218,7 @@ pt-BR:
     review_link: Revisar os termos do serviço
     title: Os termos de serviço do %{domain} estão mudando
   themes:
-    mastodon-bird-ui-auto: BlueLab
+    mastodon-bird-ui-auto: Espelunca
     default: Mastodon
   time:
     formats:
