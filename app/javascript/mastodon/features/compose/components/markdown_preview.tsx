@@ -140,7 +140,7 @@ export const MarkdownPreview: React.FC<Props> = ({
           ) : content ? (
             <div className='status__content'>
               <div
-                className='status__content__text'
+                className='status__content__text status__content__text--visible'
                 dangerouslySetInnerHTML={{ __html: content }}
               />
             </div>
