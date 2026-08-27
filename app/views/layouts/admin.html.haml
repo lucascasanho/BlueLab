@@ -15,8 +15,8 @@
             = render_logo
 
           .sidebar__toggle
-            .sidebar__toggle__logo
-              = link_to root_path do
+            .sidebar__toggle__logo{ class: ('sidebar__toggle__logo--preferences' if controller_path.start_with?('settings/preferences')) }
+              = link_to root_path, data: { title: t('settings.preferences') } do
                 = logo_as_symbol(:wordmark)
 
             = link_to '#', class: 'sidebar__toggle__icon', 'aria-label': t('navigation.toggle_menu'), 'aria-expanded': 'false' do

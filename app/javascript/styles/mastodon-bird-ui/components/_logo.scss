@@ -38,3 +38,24 @@
     }
   }
 }
+
+@media screen and (width <= 890px) {
+  .admin-wrapper .sidebar__toggle__logo--preferences {
+    a {
+      align-items: center;
+      color: var(--color-text-primary);
+      display: flex;
+      font-size: 16px;
+      line-height: 24px;
+      text-decoration: none;
+
+      &::before {
+        content: attr(data-title);
+      }
+    }
+
+    .logo {
+      display: none;
+    }
+  }
+}
