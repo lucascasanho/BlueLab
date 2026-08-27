@@ -12,6 +12,10 @@ RSpec.describe UserSettings do
       it 'returns default value' do
         expect(subject[:always_send_emails]).to be false
       end
+
+      it 'uses Markdown as the default post format' do
+        expect(subject[:default_content_type]).to eq 'text/markdown'
+      end
     end
 
     context 'when setting is set' do

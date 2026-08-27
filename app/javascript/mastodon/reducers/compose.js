@@ -72,7 +72,7 @@ const initialState = ImmutableMap({
   spoiler_text: '',
   privacy: null,
   id: null,
-  content_type: 'text/plain',
+  content_type: 'text/markdown',
   text: '',
   focusDate: null,
   caretPosition: null,
@@ -95,6 +95,7 @@ const initialState = ImmutableMap({
   default_privacy: 'public',
   default_sensitive: false,
   default_language: 'en',
+  default_content_type: 'text/markdown',
   resetFileKey: Math.floor((Math.random() * 0x10000)),
   idempotencyKey: null,
   tagHistory: ImmutableList(),
@@ -130,7 +131,7 @@ function clearAll(state) {
   return state.withMutations(map => {
     map.set('id', null);
     map.set('text', '');
-    map.set('content_type', 'text/plain');
+    map.set('content_type', state.get('default_content_type'));
     map.set('spoiler', false);
     map.set('spoiler_text', '');
     map.set('is_submitting', false);

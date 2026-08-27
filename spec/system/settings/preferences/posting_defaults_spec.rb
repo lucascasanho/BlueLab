@@ -14,9 +14,11 @@ RSpec.describe 'Settings preferences posting defaults page' do
       .to have_private_cache_control
 
     check mark_sensitive_field
+    select I18n.t('posting_defaults.content_types.plain'), from: I18n.t('posting_defaults.content_type')
 
     expect { save_changes }
       .to change { user.reload.settings.default_sensitive }.to(true)
+      .and change { user.reload.settings.default_content_type }.from('text/markdown').to('text/plain')
     expect(page)
       .to have_title(I18n.t('preferences.posting_defaults'))
   end

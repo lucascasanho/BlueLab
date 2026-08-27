@@ -83,6 +83,10 @@ module User::HasSettings
     settings['default_language']
   end
 
+  def setting_default_content_type
+    settings['default_content_type']
+  end
+
   def setting_aggregate_reblogs
     settings['aggregate_reblogs']
   end

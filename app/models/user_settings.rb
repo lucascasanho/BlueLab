@@ -13,6 +13,7 @@ class UserSettings
   setting :noindex, default: -> { ::Setting.noindex }
   setting :show_application, default: true
   setting :default_language, default: nil
+  setting :default_content_type, default: 'text/markdown', in: %w(text/plain text/markdown)
   setting :default_sensitive, default: false
   setting :default_privacy, default: nil, in: %w(public unlisted private)
   setting :default_quote_policy, default: 'public', in: %w(public followers nobody)

@@ -1,0 +1,636 @@
+af:
+  posting_defaults:
+    content_type: "Plasingformaat"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basiese teks (geen formatering)"
+an:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+ar:
+  posting_defaults:
+    content_type: "تنسيق المنشور"
+    content_types:
+      markdown: "Markdown"
+      plain: "نص أساسي (بدون تنسيق)"
+ast:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+az:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+be:
+  posting_defaults:
+    content_type: "Фармат допісу"
+    content_types:
+      markdown: "Markdown"
+      plain: "Звычайны тэкст (без фарматавання)"
+bg:
+  posting_defaults:
+    content_type: "Формат на публикацията"
+    content_types:
+      markdown: "Markdown"
+      plain: "Обикновен текст (без форматиране)"
+bn:
+  posting_defaults:
+    content_type: "পোস্টের বিন্যাস"
+    content_types:
+      markdown: "Markdown"
+      plain: "সাধারণ পাঠ্য (বিন্যাস ছাড়া)"
+br:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+bs:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+ca:
+  posting_defaults:
+    content_type: "Format de la publicació"
+    content_types:
+      markdown: "Markdown"
+      plain: "Text bàsic (sense format)"
+ckb:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+co:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+cs:
+  posting_defaults:
+    content_type: "Formát příspěvku"
+    content_types:
+      markdown: "Markdown"
+      plain: "Prostý text (bez formátování)"
+cy:
+  posting_defaults:
+    content_type: "Fformat y postiad"
+    content_types:
+      markdown: "Markdown"
+      plain: "Testun sylfaenol (dim fformatio)"
+da:
+  posting_defaults:
+    content_type: "Indlægsformat"
+    content_types:
+      markdown: "Markdown"
+      plain: "Almindelig tekst (uden formatering)"
+de:
+  posting_defaults:
+    content_type: "Beitragsformat"
+    content_types:
+      markdown: "Markdown"
+      plain: "Einfacher Text (ohne Formatierung)"
+el:
+  posting_defaults:
+    content_type: "Μορφή ανάρτησης"
+    content_types:
+      markdown: "Markdown"
+      plain: "Απλό κείμενο (χωρίς μορφοποίηση)"
+en:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+en-GB:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+eo:
+  posting_defaults:
+    content_type: "Afiŝa formato"
+    content_types:
+      markdown: "Markdown"
+      plain: "Baza teksto (sen formatado)"
+es:
+  posting_defaults:
+    content_type: "Formato de publicación"
+    content_types:
+      markdown: "Markdown"
+      plain: "Texto básico (sin formato)"
+es-AR:
+  posting_defaults:
+    content_type: "Formato de publicación"
+    content_types:
+      markdown: "Markdown"
+      plain: "Texto básico (sin formato)"
+es-MX:
+  posting_defaults:
+    content_type: "Formato de publicación"
+    content_types:
+      markdown: "Markdown"
+      plain: "Texto básico (sin formato)"
+et:
+  posting_defaults:
+    content_type: "Postituse vorming"
+    content_types:
+      markdown: "Markdown"
+      plain: "Lihttekst (vorminduseta)"
+eu:
+  posting_defaults:
+    content_type: "Argitalpenaren formatua"
+    content_types:
+      markdown: "Markdown"
+      plain: "Oinarrizko testua (formaturik gabe)"
+fa:
+  posting_defaults:
+    content_type: "قالب پست"
+    content_types:
+      markdown: "Markdown"
+      plain: "متن ساده (بدون قالب‌بندی)"
+fi:
+  posting_defaults:
+    content_type: "Julkaisun muoto"
+    content_types:
+      markdown: "Markdown"
+      plain: "Pelkkä teksti (ei muotoilua)"
+fil:
+  posting_defaults:
+    content_type: "Format ng post"
+    content_types:
+      markdown: "Markdown"
+      plain: "Pangunahing teksto (walang pag-format)"
+fo:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+fr:
+  posting_defaults:
+    content_type: "Format de la publication"
+    content_types:
+      markdown: "Markdown"
+      plain: "Texte simple (sans mise en forme)"
+fr-CA:
+  posting_defaults:
+    content_type: "Format de la publication"
+    content_types:
+      markdown: "Markdown"
+      plain: "Texte simple (sans mise en forme)"
+fy:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+ga:
+  posting_defaults:
+    content_type: "Formáid postála"
+    content_types:
+      markdown: "Markdown"
+      plain: "Gnáth-théacs (gan formáidiú)"
+gd:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+gl:
+  posting_defaults:
+    content_type: "Formato da publicación"
+    content_types:
+      markdown: "Markdown"
+      plain: "Texto básico (sen formato)"
+he:
+  posting_defaults:
+    content_type: "תבנית הפוסט"
+    content_types:
+      markdown: "Markdown"
+      plain: "טקסט בסיסי (ללא עיצוב)"
+hi:
+  posting_defaults:
+    content_type: "पोस्ट प्रारूप"
+    content_types:
+      markdown: "Markdown"
+      plain: "सादा टेक्स्ट (बिना फ़ॉर्मेटिंग)"
+hr:
+  posting_defaults:
+    content_type: "Format objave"
+    content_types:
+      markdown: "Markdown"
+      plain: "Običan tekst (bez oblikovanja)"
+hu:
+  posting_defaults:
+    content_type: "Bejegyzés formátuma"
+    content_types:
+      markdown: "Markdown"
+      plain: "Egyszerű szöveg (formázás nélkül)"
+hy:
+  posting_defaults:
+    content_type: "Գրառման ձևաչափ"
+    content_types:
+      markdown: "Markdown"
+      plain: "Պարզ տեքստ (առանց ձևաչափման)"
+ia:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+id:
+  posting_defaults:
+    content_type: "Format postingan"
+    content_types:
+      markdown: "Markdown"
+      plain: "Teks dasar (tanpa pemformatan)"
+ie:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+ig:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+io:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+is:
+  posting_defaults:
+    content_type: "Snið færslu"
+    content_types:
+      markdown: "Markdown"
+      plain: "Einfaldur texti (án sniðs)"
+it:
+  posting_defaults:
+    content_type: "Formato della pubblicazione"
+    content_types:
+      markdown: "Markdown"
+      plain: "Testo semplice (senza formattazione)"
+ja:
+  posting_defaults:
+    content_type: "投稿形式"
+    content_types:
+      markdown: "Markdown"
+      plain: "プレーンテキスト（書式なし）"
+ka:
+  posting_defaults:
+    content_type: "პოსტის ფორმატი"
+    content_types:
+      markdown: "Markdown"
+      plain: "უბრალო ტექსტი (ფორმატირების გარეშე)"
+kab:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+kk:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+kn:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+ko:
+  posting_defaults:
+    content_type: "게시물 형식"
+    content_types:
+      markdown: "Markdown"
+      plain: "일반 텍스트 (서식 없음)"
+ku:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+kw:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+la:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+lad:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+lt:
+  posting_defaults:
+    content_type: "Įrašo formatas"
+    content_types:
+      markdown: "Markdown"
+      plain: "Paprastas tekstas (be formatavimo)"
+lv:
+  posting_defaults:
+    content_type: "Ieraksta formāts"
+    content_types:
+      markdown: "Markdown"
+      plain: "Vienkāršs teksts (bez formatēšanas)"
+mk:
+  posting_defaults:
+    content_type: "Формат на објавата"
+    content_types:
+      markdown: "Markdown"
+      plain: "Основен текст (без форматирање)"
+ml:
+  posting_defaults:
+    content_type: "പോസ്റ്റ് ഫോർമാറ്റ്"
+    content_types:
+      markdown: "Markdown"
+      plain: "അടിസ്ഥാന ടെക്സ്റ്റ് (ഫോർമാറ്റിംഗ് ഇല്ല)"
+mr:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+ms:
+  posting_defaults:
+    content_type: "Format hantaran"
+    content_types:
+      markdown: "Markdown"
+      plain: "Teks asas (tanpa pemformatan)"
+my:
+  posting_defaults:
+    content_type: "ပို့စ်ပုံစံ"
+    content_types:
+      markdown: "Markdown"
+      plain: "အခြေခံစာသား (ဖော်မတ်မပါ)"
+nan-TW:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+ne:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+nl:
+  posting_defaults:
+    content_type: "Berichtformaat"
+    content_types:
+      markdown: "Markdown"
+      plain: "Platte tekst (zonder opmaak)"
+nn:
+  posting_defaults:
+    content_type: "Innleggsformat"
+    content_types:
+      markdown: "Markdown"
+      plain: "Enkel tekst (utan formatering)"
+"no":
+  posting_defaults:
+    content_type: "Innleggsformat"
+    content_types:
+      markdown: "Markdown"
+      plain: "Enkel tekst (uten formatering)"
+oc:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+pa:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+pl:
+  posting_defaults:
+    content_type: "Format wpisu"
+    content_types:
+      markdown: "Markdown"
+      plain: "Zwykły tekst (bez formatowania)"
+pt-BR:
+  posting_defaults:
+    content_type: "Formato da publicação"
+    content_types:
+      markdown: "Markdown"
+      plain: "Texto básico (sem formatação)"
+pt-PT:
+  posting_defaults:
+    content_type: "Formato da publicação"
+    content_types:
+      markdown: "Markdown"
+      plain: "Texto simples (sem formatação)"
+ro:
+  posting_defaults:
+    content_type: "Formatul postării"
+    content_types:
+      markdown: "Markdown"
+      plain: "Text simplu (fără formatare)"
+ru:
+  posting_defaults:
+    content_type: "Формат публикации"
+    content_types:
+      markdown: "Markdown"
+      plain: "Обычный текст (без форматирования)"
+ry:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+sa:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+sc:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+sco:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+si:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+sk:
+  posting_defaults:
+    content_type: "Formát príspevku"
+    content_types:
+      markdown: "Markdown"
+      plain: "Obyčajný text (bez formátovania)"
+sl:
+  posting_defaults:
+    content_type: "Oblika objave"
+    content_types:
+      markdown: "Markdown"
+      plain: "Navadno besedilo (brez oblikovanja)"
+sq:
+  posting_defaults:
+    content_type: "Formati i postimit"
+    content_types:
+      markdown: "Markdown"
+      plain: "Tekst i thjeshtë (pa formatim)"
+sr:
+  posting_defaults:
+    content_type: "Формат објаве"
+    content_types:
+      markdown: "Markdown"
+      plain: "Обичан текст (без форматирања)"
+sr-Latn:
+  posting_defaults:
+    content_type: "Format objave"
+    content_types:
+      markdown: "Markdown"
+      plain: "Običan tekst (bez formatiranja)"
+sv:
+  posting_defaults:
+    content_type: "Inläggsformat"
+    content_types:
+      markdown: "Markdown"
+      plain: "Enkel text (utan formatering)"
+szl:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+ta:
+  posting_defaults:
+    content_type: "இடுகை வடிவம்"
+    content_types:
+      markdown: "Markdown"
+      plain: "எளிய உரை (வடிவமைப்பு இல்லை)"
+tai:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+te:
+  posting_defaults:
+    content_type: "పోస్ట్ ఆకృతి"
+    content_types:
+      markdown: "Markdown"
+      plain: "సాధారణ వచనం (ఫార్మాటింగ్ లేకుండా)"
+th:
+  posting_defaults:
+    content_type: "รูปแบบโพสต์"
+    content_types:
+      markdown: "Markdown"
+      plain: "ข้อความพื้นฐาน (ไม่มีการจัดรูปแบบ)"
+tlh:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+tok:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+tr:
+  posting_defaults:
+    content_type: "Gönderi biçimi"
+    content_types:
+      markdown: "Markdown"
+      plain: "Temel metin (biçimlendirme yok)"
+tt:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+ug:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+uk:
+  posting_defaults:
+    content_type: "Формат допису"
+    content_types:
+      markdown: "Markdown"
+      plain: "Звичайний текст (без форматування)"
+ur:
+  posting_defaults:
+    content_type: "پوسٹ کی شکل"
+    content_types:
+      markdown: "Markdown"
+      plain: "سادہ متن (بغیر فارمیٹنگ)"
+uz:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+vi:
+  posting_defaults:
+    content_type: "Định dạng bài viết"
+    content_types:
+      markdown: "Markdown"
+      plain: "Văn bản cơ bản (không định dạng)"
+zgh:
+  posting_defaults:
+    content_type: "Post format"
+    content_types:
+      markdown: "Markdown"
+      plain: "Basic text (no formatting)"
+zh-CN:
+  posting_defaults:
+    content_type: "帖子格式"
+    content_types:
+      markdown: "Markdown"
+      plain: "基本文本（无格式）"
+zh-HK:
+  posting_defaults:
+    content_type: "帖文格式"
+    content_types:
+      markdown: "Markdown"
+      plain: "基本文字（無格式）"
+zh-TW:
+  posting_defaults:
+    content_type: "貼文格式"
+    content_types:
+      markdown: "Markdown"
+      plain: "基本文字（無格式）"
