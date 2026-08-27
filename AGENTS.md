@@ -37,16 +37,28 @@ com as portas padrão dos exemplos do repositório oficial.
 ## Upstream e legado
 
 A política atual é acompanhar exclusivamente as versões estáveis do
-Mastodon oficial. O repositório oficial desejado como upstream é
-`https://github.com/mastodon/mastodon.git`.
+Mastodon oficial, preservando as customizações da Espelunca em repositório
+próprio. A configuração Git atual é:
 
-A branch `EspeluncaLab`, o remote `bluelab` apontando para
-`MastodonBlue/BlueLab` e o remote `origin` apontando para
-`glitch-soc/mastodon` existem por razões históricas. BlueLab e glitch-soc são
-legado, não são o upstream desejado e não devem ser usados como fonte de novas
-atualizações. Antes da próxima atualização, confirme os remotes e configure ou
-identifique explicitamente um remote para o Mastodon oficial, sem apagar o
-histórico existente.
+- branch de trabalho e produção: `main`;
+- `origin`: `git@github.com:lucascasanho/Espelunca.git`;
+- `upstream`: `https://github.com/mastodon/mastodon.git`;
+- `bluelab`: `https://github.com/MastodonBlue/BlueLab.git`, somente legado;
+- `glitch`: `https://github.com/glitch-soc/mastodon.git`, somente legado.
+
+A branch `main` deve rastrear `origin/main`. A referência
+`backup-before-espelunca-origin-2026-08-27` preserva o estado da migração para
+o repositório próprio. As branches e os remotes legados não devem ser usados
+como fonte de novas atualizações nem removidos sem análise do histórico.
+
+Atualizações do Mastodon oficial não são automáticas. Use `git fetch upstream`
+para consultar novas versões e integre a versão estável escolhida à `main`
+somente após diagnóstico, ponto de recuperação e análise dos conflitos. Nunca
+faça merge indiscriminado de `upstream/main` na produção.
+
+O build da instância usa o metadado `Espelunca` e deve exibir uma versão como
+`4.8.0-alpha.1+Espelunca`. O link de código-fonte deve apontar para
+`lucascasanho/Espelunca`, preservando Mastodon como nome do software oficial.
 
 ## Objetivos principais
 
