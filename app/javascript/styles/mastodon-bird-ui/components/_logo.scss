@@ -59,3 +59,31 @@
     }
   }
 }
+
+.logo-container--sign-in {
+  .mastodon-auth-brand,
+  > .logo {
+    display: none;
+  }
+
+  .espelunca-auth-brand {
+    align-items: center;
+    color: var(--color-text-primary);
+    display: flex;
+    font-family: var(--font-heading);
+    font-size: 36px;
+    font-weight: 600;
+    gap: 12px;
+    line-height: 42px;
+
+    img {
+      height: 52px;
+      margin: 0;
+      width: 52px;
+    }
+  }
+}
+
+.form-container .sign-in-introduction {
+  visibility: hidden;
+}

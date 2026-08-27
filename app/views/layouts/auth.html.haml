@@ -3,11 +3,15 @@
 
 - content_for :content do
   .container-alt
-    %header.logo-container
+    %header.logo-container{ class: ('logo-container--sign-in' if controller_path == 'auth/sessions' && action_name == 'new') }
+      - if controller_path == 'auth/sessions' && action_name == 'new'
+        = link_to root_path, class: 'espelunca-auth-brand' do
+          = image_tag frontend_asset_path('images/espelunca-icon.svg'), alt: ''
+          %span espelunca
       - if within_authorization_flow?
         = logo_as_symbol(:wordmark)
       - else
-        = link_to root_path do
+        = link_to root_path, class: 'mastodon-auth-brand' do
           = logo_as_symbol(:wordmark)
 
     %main.form-container
