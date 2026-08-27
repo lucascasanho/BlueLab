@@ -134,7 +134,9 @@ const ComposeEmojiDropdown: React.FC<
         native: 'native' in rawEmoji ? rawEmoji.native : `:${rawEmoji.id}:`,
       };
 
-      if (!(event.ctrlKey || event.metaKey)) {
+      const isCustomEmoji = 'custom' in rawEmoji && rawEmoji.custom === true;
+
+      if (!isCustomEmoji && !(event.ctrlKey || event.metaKey)) {
         onClose();
       }
       dispatch(emojiUse(emoji));

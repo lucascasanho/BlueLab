@@ -216,8 +216,7 @@ class EmojiPickerMenuImpl extends PureComponent {
     if (!emoji.native) {
       emoji.native = `:${emoji.id}:`;
     }
-    if (!(event.ctrlKey || event.metaKey)) {
-
+    if (!emoji.custom && !(event.ctrlKey || event.metaKey)) {
       this.props.onClose();
     }
     this.props.onPick(emoji);
