@@ -27,6 +27,18 @@ RSpec.describe StatusLengthValidator do
     it { is_expected.to_not allow_value(over_limit_text).for(:text).with_message(too_long_message) }
   end
 
+  context 'when the author has moderation privileges' do
+    subject { Fabricate.build(:status, account: user.account) }
+
+    before { stub_const 'StatusLengthValidator::PRIVILEGED_MAX_CHARS', 200 }
+
+    let(:role) { Fabricate(:user_role, permissions_as_keys: %w(manage_reports manage_users)) }
+    let(:user) { Fabricate(:user, role: role) }
+
+    it { is_expected.to allow_value(over_limit_text).for(:text) }
+    it { is_expected.to_not allow_value('a' * 201).for(:text).with_message(I18n.t('statuses.over_character_limit', max: 200)) }
+  end
+
   context 'when content warning text is over character limit' do
     it { is_expected.to_not allow_value(over_limit_text).for(:spoiler_text).against(:text).with_message(too_long_message) }
   end

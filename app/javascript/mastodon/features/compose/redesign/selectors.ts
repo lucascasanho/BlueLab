@@ -2,6 +2,7 @@ import { length } from 'stringz';
 
 import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
 import type { StatusVisibility } from '@/mastodon/models/status';
+import { statusMaxCharacters } from '@/mastodon/initial_state';
 import type { ComposeType } from '@/mastodon/reducers/slices/composer';
 import { createAppSelector } from '@/mastodon/store';
 import { DAY, MINUTE } from '@/mastodon/utils/time';
@@ -47,7 +48,7 @@ export const selectComposeCharsCount = createAppSelector(
     return {
       text,
       allText,
-      max: maxChars ?? 5000,
+      max: statusMaxCharacters ?? maxChars ?? 500,
       current: length(allText),
     };
   },
