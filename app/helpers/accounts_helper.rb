@@ -11,6 +11,16 @@ module AccountsHelper
     end
   end
 
+  def title_display_name(account)
+    name = display_name(account)
+
+    account.emojis.each do |emoji|
+      name = name.gsub(":#{emoji.shortcode}:", '')
+    end
+
+    name.squish.presence || account.username
+  end
+
   def acct(account)
     if account.local?
       "@#{account.acct}@#{site_hostname}"

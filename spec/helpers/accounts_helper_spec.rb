@@ -3,6 +3,25 @@
 require 'rails_helper'
 
 RSpec.describe AccountsHelper do
+  describe '#title_display_name' do
+    let(:account) { Fabricate.build(:account, username: 'alice', display_name: 'Alice :party: :sparkles:') }
+    let(:party) { Fabricate.build(:custom_emoji, shortcode: 'party') }
+
+    before do
+      allow(account).to receive(:emojis).and_return([party])
+    end
+
+    it 'removes only custom emoji shortcodes from the title' do
+      expect(helper.title_display_name(account)).to eq 'Alice :sparkles:'
+    end
+
+    it 'falls back to the username when the name contains only custom emojis' do
+      account.display_name = ':party:'
+
+      expect(helper.title_display_name(account)).to eq 'alice'
+    end
+  end
+
   describe '#display_name' do
     it 'uses the display name when it exists' do
       account = Account.new(display_name: 'Display', username: 'Username')

@@ -1,4 +1,4 @@
-- content_for :page_title, t('wrapstodon.title', name: display_name(@account), year: @generated_annual_report.year)
+- content_for :page_title, t('wrapstodon.title', name: title_display_name(@account), year: @generated_annual_report.year)
 
 - content_for :header_tags do
   %meta{ name: 'robots', content: 'noindex, noarchive' }/

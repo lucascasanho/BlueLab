@@ -12,7 +12,6 @@ import {
   me,
   domain as localDomain,
 } from '@/mastodon/initial_state';
-import type { Account } from '@/mastodon/models/account';
 import { getAccountHidden } from '@/mastodon/selectors/accounts';
 import { useAppSelector, useAppDispatch } from '@/mastodon/store';
 
@@ -30,18 +29,7 @@ import { AccountNumberFields } from './number_fields';
 import classes from './styles.module.scss';
 import { AccountSubscriptionForm } from './subscription_form';
 import { AccountTabs } from './tabs';
-
-const titleFromAccount = (account: Account) => {
-  const displayName = account.display_name;
-  const acct =
-    account.acct === account.username
-      ? `${account.username}@${localDomain}`
-      : account.acct;
-  const prefix =
-    displayName.trim().length === 0 ? account.username : displayName;
-
-  return `${prefix} (@${acct})`;
-};
+import { titleFromAccount } from './title';
 
 export const AccountHeader: React.FC<{
   accountId: string;
@@ -173,7 +161,7 @@ export const AccountHeader: React.FC<{
       <div ref={observedRef} />
 
       <Helmet>
-        <title>{titleFromAccount(account)}</title>
+        <title>{titleFromAccount(account, localDomain)}</title>
         <meta
           name='robots'
           content={isLocal && !account.noindex ? 'all' : 'noindex'}
