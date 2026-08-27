@@ -132,6 +132,36 @@ RSpec.describe '/api/v1/statuses' do
       end
     end
 
+    describe 'POST /api/v1/statuses/preview' do
+      subject do
+        post '/api/v1/statuses/preview', headers: headers, params: { status: text, content_type: content_type }
+      end
+
+      let(:scopes) { 'write:statuses' }
+      let(:text) { '**Strong** and <script>alert("unsafe")</script>' }
+      let(:content_type) { 'text/markdown' }
+
+      it_behaves_like 'forbidden for wrong scope', 'read read:statuses'
+
+      it 'returns formatted and sanitized content without creating a status', :aggregate_failures do
+        expect { subject }.to_not change(Status, :count)
+
+        expect(response).to have_http_status(200)
+        expect(response.parsed_body[:content]).to include('<strong>Strong</strong>')
+        expect(response.parsed_body[:content]).to_not include('<script>')
+      end
+
+      context 'with an unsupported content type' do
+        let(:content_type) { 'text/html' }
+
+        it 'returns an unprocessable entity response' do
+          subject
+
+          expect(response).to have_http_status(422)
+        end
+      end
+    end
+
     describe 'POST /api/v1/statuses' do
       subject do
         post '/api/v1/statuses', headers: headers, params: params

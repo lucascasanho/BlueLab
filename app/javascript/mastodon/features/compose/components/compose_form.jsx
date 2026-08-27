@@ -27,6 +27,7 @@ import { countableText } from '../util/counter';
 import { CharacterCounter } from './character_counter';
 import { EditIndicator } from './edit_indicator';
 import { LanguageDropdown } from './language_dropdown';
+import { MarkdownPreview } from './markdown_preview';
 import { NavigationBar } from './navigation_bar';
 import { PollForm } from "./poll_form";
 import { ReplyIndicator } from './reply_indicator';
@@ -346,6 +347,10 @@ class ComposeForm extends ImmutablePureComponent {
                   iconComponent={MarkdownLogoIcon}
                   active={this.props.contentType === 'text/markdown'}
                   onClick={this.handleContentTypeChange}
+                />
+                <MarkdownPreview
+                  text={this.props.text}
+                  contentType={this.props.contentType}
                 />
                 <CharacterCounter max={maxChars} text={this.getFulltextForCharacterCounting()} />
               </div>

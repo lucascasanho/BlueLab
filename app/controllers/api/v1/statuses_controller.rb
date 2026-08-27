@@ -4,8 +4,8 @@ class Api::V1::StatusesController < Api::BaseController
   include Authorization
   include Api::InteractionPoliciesConcern
 
-  before_action -> { authorize_if_got_token! :read, :'read:statuses' }, except: [:create, :update, :destroy]
-  before_action -> { doorkeeper_authorize! :write, :'write:statuses' }, only:   [:create, :update, :destroy]
+  before_action -> { authorize_if_got_token! :read, :'read:statuses' }, except: [:create, :update, :destroy, :preview]
+  before_action -> { doorkeeper_authorize! :write, :'write:statuses' }, only:   [:create, :update, :destroy, :preview]
   before_action :require_user!, except:      [:index, :show]
   before_action :set_statuses, only:         [:index]
   before_action :set_status, only:           [:show]
@@ -51,6 +51,17 @@ class Api::V1::StatusesController < Api::BaseController
     render json: @status, serializer: serializer_for_status
   rescue PostStatusService::UnexpectedMentionsError => e
     render json: unexpected_accounts_error_json(e), status: 422
+  end
+
+  def preview
+    content_type = preview_params[:content_type]
+    raise Mastodon::ValidationError unless HtmlAwareFormatter::STATUS_MIME_TYPES.include?(content_type)
+
+    text = preview_params[:status].to_s
+    content = HtmlAwareFormatter.new(text, true, content_type: content_type).to_s
+    emojis = CustomEmoji.local.where(shortcode: text.scan(CustomEmoji::SCAN_RE).flatten)
+
+    render json: { content: EmojiFormatter.new(content, emojis, animate: false).to_s }
   end
 
   def update
@@ -159,6 +170,10 @@ class Api::V1::StatusesController < Api::BaseController
         options: [],
       ]
     )
+  end
+
+  def preview_params
+    params.permit(:status, :content_type)
   end
 
   def serializer_for_status

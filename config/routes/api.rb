@@ -28,6 +28,8 @@ namespace :api, format: false do
   # JSON / REST API
   namespace :v1 do
     resources :statuses, only: [:index, :create, :show, :update, :destroy] do
+      post :preview, on: :collection
+
       scope module: :statuses do
         resources :reblogged_by, controller: :reblogged_by_accounts, only: :index
         resources :favourited_by, controller: :favourited_by_accounts, only: :index
