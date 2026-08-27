@@ -4,6 +4,7 @@ import { createRef } from 'react';
 import { defineMessages } from 'react-intl';
 
 import classNames from 'classnames';
+import { MarkdownLogoIcon } from '@phosphor-icons/react';
 
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
@@ -15,6 +16,7 @@ import { missingAltTextModal } from 'mastodon/initial_state';
 import AutosuggestInput from 'mastodon/components/autosuggest_input';
 import AutosuggestTextarea from 'mastodon/components/autosuggest_textarea';
 import { Button } from 'mastodon/components/button';
+import { IconButton } from 'mastodon/components/icon_button';
 import { injectIntl } from '@/mastodon/components/intl';
 import EmojiPickerDropdown from '../containers/emoji_picker_dropdown_container';
 import PollButtonContainer from '../containers/poll_button_container';
@@ -42,6 +44,7 @@ const messages = defineMessages({
   publish: { id: 'compose_form.publish', defaultMessage: 'Post' },
   saveChanges: { id: 'compose_form.save_changes', defaultMessage: 'Update' },
   reply: { id: 'compose_form.reply', defaultMessage: 'Reply' },
+  markdown: { id: 'compose_form.markdown', defaultMessage: 'Markdown formatting' },
 });
 
 class ComposeForm extends ImmutablePureComponent {
@@ -51,6 +54,7 @@ class ComposeForm extends ImmutablePureComponent {
     suggestions: ImmutablePropTypes.list,
     spoiler: PropTypes.bool,
     privacy: PropTypes.string,
+    contentType: PropTypes.string,
     spoilerText: PropTypes.string,
     focusDate: PropTypes.instanceOf(Date),
     caretPosition: PropTypes.number,
@@ -60,6 +64,7 @@ class ComposeForm extends ImmutablePureComponent {
     isEditing: PropTypes.bool,
     isUploading: PropTypes.bool,
     onChange: PropTypes.func.isRequired,
+    onChangeContentType: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     onClearSuggestions: PropTypes.func.isRequired,
     onFetchSuggestions: PropTypes.func.isRequired,
@@ -90,6 +95,10 @@ class ComposeForm extends ImmutablePureComponent {
 
   handleChange = (e) => {
     this.props.onChange(e.target.value);
+  };
+
+  handleContentTypeChange = () => {
+    this.props.onChangeContentType(this.props.contentType === 'text/markdown' ? 'text/plain' : 'text/markdown');
   };
 
   blurOnEscape = (e) => {
@@ -331,6 +340,13 @@ class ComposeForm extends ImmutablePureComponent {
                 <PollButtonContainer />
                 <SpoilerButtonContainer />
                 <EmojiPickerDropdown onPickEmoji={this.handleEmojiPick} />
+                <IconButton
+                  title={intl.formatMessage(messages.markdown)}
+                  icon='markdown'
+                  iconComponent={MarkdownLogoIcon}
+                  active={this.props.contentType === 'text/markdown'}
+                  onClick={this.handleContentTypeChange}
+                />
                 <CharacterCounter max={maxChars} text={this.getFulltextForCharacterCounting()} />
               </div>
 

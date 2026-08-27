@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_12_154114) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_27_220000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1193,6 +1193,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_154114) do
 
   create_table "status_edits", force: :cascade do |t|
     t.bigint "account_id"
+    t.string "content_type"
     t.datetime "created_at", null: false
     t.text "media_descriptions", array: true
     t.bigint "ordered_media_attachment_ids", array: true
@@ -1243,6 +1244,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_12_154114) do
   create_table "statuses", id: :bigint, default: -> { "timestamp_id('statuses'::text)" }, force: :cascade do |t|
     t.bigint "account_id", null: false
     t.bigint "application_id"
+    t.string "content_type"
     t.bigint "conversation_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "deleted_at", precision: nil

@@ -15,6 +15,18 @@ RSpec.describe PostStatusService do
     expect(status.text).to eq text
   end
 
+  it 'stores the selected content type' do
+    status = subject.call(Fabricate(:account), text: '**Markdown**', content_type: 'text/markdown')
+
+    expect(status.content_type).to eq 'text/markdown'
+  end
+
+  it 'rejects unsupported content types' do
+    expect do
+      subject.call(Fabricate(:account), text: '<strong>HTML</strong>', content_type: 'text/html')
+    end.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
   it 'creates a new response status' do
     in_reply_to_status = Fabricate(:status)
     account = Fabricate(:account)

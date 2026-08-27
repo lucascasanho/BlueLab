@@ -13,7 +13,7 @@ RSpec.describe 'Sources' do
       get "/api/v1/statuses/#{status.id}/source", headers: headers
     end
 
-    let(:status) { Fabricate(:status) }
+    let(:status) { Fabricate(:status, content_type: 'text/markdown') }
 
     it_behaves_like 'forbidden for wrong scope', 'write write:statuses'
 
@@ -28,6 +28,7 @@ RSpec.describe 'Sources' do
           id: status.id.to_s,
           text: status.text,
           spoiler_text: status.spoiler_text,
+          content_type: status.content_type,
         })
       end
     end
@@ -61,6 +62,7 @@ RSpec.describe 'Sources' do
           id: status.id.to_s,
           text: status.text,
           spoiler_text: status.spoiler_text,
+          content_type: status.content_type,
         })
       end
     end

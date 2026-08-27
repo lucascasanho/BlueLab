@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 
 import {
   changeCompose,
+  changeComposeContentType,
   submitCompose,
   clearComposeSuggestions,
   fetchComposeSuggestions,
@@ -41,6 +42,7 @@ const mapStateToProps = state => ({
   spoiler: state.getIn(['compose', 'spoiler']),
   spoilerText: state.getIn(['compose', 'spoiler_text']),
   privacy: state.getIn(['compose', 'privacy']),
+  contentType: state.getIn(['compose', 'content_type'], 'text/plain'),
   focusDate: state.getIn(['compose', 'focusDate']),
   caretPosition: state.getIn(['compose', 'caretPosition']),
   preselectDate: state.getIn(['compose', 'preselectDate']),
@@ -64,6 +66,10 @@ const mapDispatchToProps = (dispatch, props) => ({
 
   onChange (text) {
     dispatch(changeCompose(text));
+  },
+
+  onChangeContentType (contentType) {
+    dispatch(changeComposeContentType(contentType));
   },
 
   onSubmit ({ missingAltText, quoteToPrivate }) {

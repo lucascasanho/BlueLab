@@ -73,6 +73,17 @@ RSpec.describe UpdateStatusService do
     end
   end
 
+  context 'when content type changes' do
+    let(:status) { Fabricate(:status, text: '**Foo**', content_type: 'text/plain') }
+
+    it 'updates the format and saves it in edit history' do
+      subject.call(status, status.account_id, content_type: 'text/markdown')
+
+      expect(status.reload.content_type).to eq 'text/markdown'
+      expect(status.edits.ordered.pluck(:content_type)).to eq %w(text/plain text/markdown)
+    end
+  end
+
   context 'when content warning changes' do
     let(:status) { Fabricate(:status, text: 'Foo', spoiler_text: '') }
     let(:preview_card) { Fabricate(:preview_card) }

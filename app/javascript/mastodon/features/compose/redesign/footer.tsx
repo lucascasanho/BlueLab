@@ -9,9 +9,14 @@ import {
   ImageSquareIcon,
   ChartBarHorizontalIcon,
   WarningCircleIcon,
+  MarkdownLogoIcon,
 } from '@phosphor-icons/react';
 
-import { addPoll, uploadCompose } from '@/mastodon/actions/compose';
+import {
+  addPoll,
+  changeComposeContentType,
+  uploadCompose,
+} from '@/mastodon/actions/compose';
 import { Button, IconButton } from '@/mastodon/components/button/redesign';
 import {
   createAppSelector,
@@ -43,17 +48,40 @@ export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
     (state) => !!state.compose.get('is_submitting'),
   );
   const canSubmit = useAppSelector(selectComposeCanSubmit);
+  const contentType = useAppSelector(
+    (state) => state.compose.get('content_type') as string,
+  );
 
   const dispatch = useAppDispatch();
   const handlePoll = useCallback(() => {
     dispatch(addPoll());
   }, [dispatch]);
+  const handleContentType = useCallback(() => {
+    dispatch(
+      changeComposeContentType(
+        contentType === 'text/markdown' ? 'text/plain' : 'text/markdown',
+      ),
+    );
+  }, [contentType, dispatch]);
 
   return (
     <footer className={classes.footer}>
       <ComposeUploadButton disabled={hasQuote} />
 
       <ComposeEmojiButton onPick={onEmojiPick} />
+
+      <IconButton
+        size='sm'
+        icon={MarkdownLogoIcon}
+        color={contentType === 'text/markdown' ? 'accent' : 'tonal'}
+        aria-pressed={contentType === 'text/markdown'}
+        onClick={handleContentType}
+      >
+        <FormattedMessage
+          id='compose_form.markdown'
+          defaultMessage='Markdown formatting'
+        />
+      </IconButton>
 
       <IconButton
         size='sm'

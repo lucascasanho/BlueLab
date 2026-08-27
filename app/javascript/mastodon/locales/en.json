@@ -563,6 +563,7 @@
   "compose_form.lock_disclaimer.lock": "locked",
   "compose_form.message.title.edit": "Edit message",
   "compose_form.message.title.new": "New message",
+  "compose_form.markdown": "Markdown formatting",
   "compose_form.placeholder": "What's on your mind?",
   "compose_form.poll.duration": "Poll duration",
   "compose_form.poll.multiple": "Multiple choice",

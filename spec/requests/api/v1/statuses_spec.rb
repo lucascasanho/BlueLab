@@ -154,6 +154,18 @@ RSpec.describe '/api/v1/statuses' do
         end
       end
 
+      context 'with Markdown content' do
+        let(:params) { { status: '**Hello**', content_type: 'text/markdown' } }
+
+        it 'stores and renders the Markdown safely' do
+          subject
+
+          expect(response).to have_http_status(200)
+          expect(response.parsed_body[:content]).to include('<strong>Hello</strong>')
+          expect(Status.find(response.parsed_body[:id]).content_type).to eq 'text/markdown'
+        end
+      end
+
       context 'without a quote policy' do
         let(:user) do
           Fabricate(:user, settings: { default_quote_policy: 'followers' })

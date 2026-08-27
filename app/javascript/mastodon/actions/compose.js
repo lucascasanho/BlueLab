@@ -61,6 +61,7 @@ export const COMPOSE_SPOILERNESS_CHANGE  = 'COMPOSE_SPOILERNESS_CHANGE';
 export const COMPOSE_SPOILER_TEXT_CHANGE = 'COMPOSE_SPOILER_TEXT_CHANGE';
 export const COMPOSE_COMPOSING_CHANGE    = 'COMPOSE_COMPOSING_CHANGE';
 export const COMPOSE_LANGUAGE_CHANGE     = 'COMPOSE_LANGUAGE_CHANGE';
+export const COMPOSE_CONTENT_TYPE_CHANGE = 'COMPOSE_CONTENT_TYPE_CHANGE';
 
 export const COMPOSE_EMOJI_INSERT = 'COMPOSE_EMOJI_INSERT';
 
@@ -96,7 +97,7 @@ export const ensureComposeIsVisible = (getState) => {
   }
 };
 
-export function setComposeToStatus(status, text, spoiler_text) {
+export function setComposeToStatus(status, text, spoiler_text, content_type) {
   return (dispatch, getState) => {
     const maxOptions = getState().server.server.item?.configuration.polls.max_options;
 
@@ -105,6 +106,7 @@ export function setComposeToStatus(status, text, spoiler_text) {
       status,
       text,
       spoiler_text,
+      content_type,
       maxOptions,
     });
   }
@@ -239,6 +241,7 @@ export function submitCompose(successCallback) {
       data: {
         status: statusText,
         spoiler_text,
+        content_type: getState().getIn(['compose', 'content_type']),
         in_reply_to_id: getState().getIn(['compose', 'in_reply_to'], null),
         media_ids: media.map(item => item.get('id')),
         media_attributes,
@@ -749,6 +752,11 @@ export function changeComposeSensitivity() {
 export const changeComposeLanguage = language => ({
   type: COMPOSE_LANGUAGE_CHANGE,
   language,
+});
+
+export const changeComposeContentType = value => ({
+  type: COMPOSE_CONTENT_TYPE_CHANGE,
+  value,
 });
 
 export function changeComposeSpoilerness() {
