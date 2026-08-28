@@ -1,7 +1,7 @@
 - content_for :page_title do
   = t('challenge.prompt')
 
-= simple_form_for @challenge, url: request.get? ? auth_challenge_path : '' do |f|
+= simple_form_for @challenge, url: request.get? ? auth_challenge_path : '', html: { class: 'passkey-challenge-form' } do |f|
   = f.input :return_to, as: :hidden
 
   .fields-group

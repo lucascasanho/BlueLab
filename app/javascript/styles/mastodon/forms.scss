@@ -1146,6 +1146,13 @@ code {
   }
 }
 
+.passkey-challenge-form {
+  .input.with_label .label_input > label,
+  .subtle-hint {
+    text-align: center;
+  }
+}
+
 .scope-danger {
   color: var(--color-text-error);
 }
