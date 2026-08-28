@@ -133,6 +133,16 @@ class User < ApplicationRecord
   attribute :bypass_registration_checks, :boolean, default: false
   attribute :date_of_birth, :date
 
+  def self.find_for_authentication(tainted_conditions)
+    identifier = (tainted_conditions[:email] || tainted_conditions['email']).to_s.strip
+
+    if identifier.present? && (!identifier.include?('@') || identifier.start_with?('@'))
+      Account.find_local(identifier.delete_prefix('@'))&.user
+    else
+      super
+    end
+  end
+
   def self.those_who_can(*any_of_privileges)
     matching_role_ids = UserRole.that_can(*any_of_privileges).map(&:id)
 

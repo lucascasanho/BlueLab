@@ -11,10 +11,11 @@
       %p.lead= t('auth.sign_in.preamble_html', domain: site_hostname)
     .fields-group
       = f.input :email,
+                as: :string,
                 autofocus: true,
                 required: true,
                 hint: false,
-                input_html: { 'aria-label': t('simple_form.labels.defaults.username_or_email') },
+                input_html: { 'aria-label': t('simple_form.labels.defaults.username_or_email'), autocomplete: 'username' },
                 label: t('simple_form.labels.defaults.username_or_email'),
                 wrapper: :with_label
     .fields-group
