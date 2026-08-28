@@ -6,6 +6,7 @@
 - content_for :body_classes, 'admin'
 
 - content_for :content do
+  - mobile_page_title = strip_tags(content_for(:page_title)).strip
   %a.navigation-skip-link{ href: '#content' }= t('admin.skip_to_content')
   .admin-wrapper
     %header.sidebar-wrapper
@@ -15,8 +16,8 @@
             = render_logo
 
           .sidebar__toggle
-            .sidebar__toggle__logo{ class: ('sidebar__toggle__logo--preferences' if controller_path.start_with?('settings/preferences')) }
-              = link_to root_path, data: { title: t('settings.preferences') } do
+            .sidebar__toggle__logo{ class: ('sidebar__toggle__logo--page-title' if mobile_page_title.present?) }
+              = link_to root_path, data: { title: mobile_page_title } do
                 = logo_as_symbol(:wordmark)
 
             = link_to '#', class: 'sidebar__toggle__icon', 'aria-label': t('navigation.toggle_menu'), 'aria-expanded': 'false' do
