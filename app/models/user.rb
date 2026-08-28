@@ -264,11 +264,15 @@ class User < ApplicationRecord
   end
 
   def webauthn_enabled?
-    webauthn_credentials.any?
+    webauthn_credentials.security_keys.any?
+  end
+
+  def passkeys_enabled?
+    webauthn_credentials.passkeys.any?
   end
 
   def two_factor_enabled?
-    otp_required_for_login? || webauthn_credentials.any?
+    otp_required_for_login? || webauthn_enabled?
   end
 
   def disable_two_factor!
@@ -276,7 +280,7 @@ class User < ApplicationRecord
     self.otp_secret = nil
     otp_backup_codes&.clear
 
-    webauthn_credentials.destroy_all if webauthn_enabled?
+    webauthn_credentials.security_keys.destroy_all if webauthn_enabled?
 
     save!
   end

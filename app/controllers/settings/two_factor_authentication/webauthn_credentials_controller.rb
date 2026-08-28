@@ -45,7 +45,7 @@ module Settings
             flash[:success] = I18n.t('webauthn_credentials.create.success')
             status = :ok
 
-            if current_user.webauthn_credentials.size == 1
+            if current_user.webauthn_credentials.security_keys.size == 1
               UserMailer.webauthn_enabled(current_user).deliver_later!
             else
               UserMailer.webauthn_credential_added(current_user, user_credential).deliver_later!
@@ -63,13 +63,13 @@ module Settings
       end
 
       def destroy
-        credential = current_user.webauthn_credentials.find_by(id: params[:id])
+        credential = current_user.webauthn_credentials.security_keys.find_by(id: params[:id])
         if credential
           credential.destroy
           if credential.destroyed?
             flash[:success] = I18n.t('webauthn_credentials.destroy.success')
 
-            if current_user.webauthn_credentials.empty?
+            if current_user.webauthn_credentials.security_keys.empty?
               UserMailer.webauthn_disabled(current_user).deliver_later!
             else
               UserMailer.webauthn_credential_deleted(current_user, credential).deliver_later!

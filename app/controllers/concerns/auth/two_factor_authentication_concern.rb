@@ -13,7 +13,7 @@ module Auth::TwoFactorAuthenticationConcern
   end
 
   def valid_webauthn_credential?(user, webauthn_credential)
-    user_credential = user.webauthn_credentials.find_by!(external_id: webauthn_credential.id)
+    user_credential = user.webauthn_credentials.security_keys.find_by!(external_id: webauthn_credential.id)
 
     begin
       webauthn_credential.verify(

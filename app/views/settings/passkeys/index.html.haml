@@ -1,0 +1,22 @@
+- content_for :page_title do
+  = t('passkeys.title')
+
+%p.hint= t('passkeys.description')
+
+- if current_user.webauthn_credentials.passkeys.any?
+  .table-wrapper
+    %table.table
+      %tbody
+        - current_user.webauthn_credentials.passkeys.order(created_at: :desc).each do |passkey|
+          %tr
+            %td= passkey.nickname
+            %td= t('passkeys.registered_on', date: l(passkey.created_at.to_date, format: :with_month_name))
+            %td
+              = table_link_to 'delete', t('passkeys.delete'), settings_passkey_path(passkey), method: :delete, data: { confirm: t('passkeys.delete_confirmation') }
+- else
+  %p.muted-hint= t('passkeys.empty')
+
+%hr.spacer/
+
+.simple_form
+  = link_to t('passkeys.add'), new_settings_passkey_path, class: 'button button--block'

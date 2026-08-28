@@ -4,6 +4,7 @@ class Auth::SessionsController < Devise::SessionsController
   include Redisable
 
   MAX_2FA_ATTEMPTS_PER_HOUR = 10
+  PASSKEY_CHALLENGE_TTL = 5.minutes.freeze
 
   layout 'auth'
 
@@ -36,6 +37,64 @@ class Auth::SessionsController < Devise::SessionsController
     super
     session.delete(:challenge_passed_at)
     flash.delete(:notice)
+  end
+
+  def passkey_options
+    options = WebAuthn::Credential.options_for_get(user_verification: 'required')
+
+    session[:passkey_authentication_challenge] = {
+      'challenge' => options.challenge,
+      'issued_at' => Time.now.to_i,
+    }
+
+    render json: options
+  end
+
+  def passkey
+    challenge = consume_passkey_challenge!
+    credential = WebAuthn::Credential.from_get(params[:credential])
+    stored_credential = WebauthnCredential.passkeys.includes(:user).find_by(external_id: credential.id)
+    raise PasskeyAuthenticationError if stored_credential.nil?
+
+    user = stored_credential.user
+    raise PasskeyAuthenticationError if user.nil?
+    raise PasskeyAuthenticationError unless user.active_for_authentication?
+    raise PasskeyAuthenticationError unless valid_passkey_user_handle?(credential, user)
+
+    stored_credential.with_lock do
+      credential.verify(
+        challenge,
+        public_key: stored_credential.public_key,
+        sign_count: stored_credential.sign_count,
+        user_verification: true
+      )
+      stored_credential.update!(sign_count: credential.sign_count)
+    end
+
+    self.resource = user
+    @login_is_suspicious = suspicious_sign_in?(user)
+
+    if user.two_factor_enabled?
+      register_attempt_in_session(user)
+      render json: { redirect_path: auth_passkey_two_factor_path }
+    else
+      on_authentication_success(user, :passkey)
+      render json: { redirect_path: after_sign_in_path_for(user) }
+    end
+  rescue WebAuthn::Error, PasskeyAuthenticationError, ActionController::ParameterMissing, ActiveRecord::RecordInvalid => e
+    Rails.logger.info("Passkey authentication failed: #{e.class}")
+    render json: { error: t('passkeys.authentication_error') }, status: 422
+  end
+
+  def passkey_two_factor
+    user = User.find_by(id: session[:attempt_user_id])
+
+    return restart_session if user.nil? || session[:attempt_user_updated_at] != user.updated_at.to_s || !user.two_factor_enabled?
+
+    self.resource = user
+    @webauthn_enabled = user.webauthn_enabled?
+    @scheme_type = user.webauthn_enabled? ? 'webauthn' : 'totp'
+    set_locale { render :two_factor }
   end
 
   protected
@@ -78,6 +137,26 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   private
+
+  class PasskeyAuthenticationError < StandardError; end
+
+  def consume_passkey_challenge!
+    state = session.delete(:passkey_authentication_challenge)
+    raise PasskeyAuthenticationError unless state.is_a?(Hash)
+    raise PasskeyAuthenticationError if state['challenge'].blank? || state['issued_at'].to_i < PASSKEY_CHALLENGE_TTL.ago.to_i
+
+    state['challenge']
+  end
+
+  def valid_passkey_user_handle?(credential, user)
+    user.webauthn_id.present? && credential.response.user_handle.present? &&
+      ActiveSupport::SecurityUtils.secure_compare(
+        credential.response.user_handle,
+        WebAuthn.configuration.encoder.decode(user.webauthn_id)
+      )
+  rescue ArgumentError, TypeError
+    false
+  end
 
   def preserve_stored_location
     original_stored_location = stored_location_for(:user)

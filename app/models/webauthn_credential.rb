@@ -6,6 +6,7 @@
 #
 #  id          :bigint(8)        not null, primary key
 #  nickname    :string           not null
+#  passkey     :boolean          default(FALSE), not null
 #  public_key  :string           not null
 #  sign_count  :bigint(8)        default(0), not null
 #  created_at  :datetime         not null
@@ -16,6 +17,11 @@
 
 class WebauthnCredential < ApplicationRecord
   SIGN_COUNT_LIMIT = (2**63)
+
+  belongs_to :user, optional: true
+
+  scope :passkeys, -> { where(passkey: true) }
+  scope :security_keys, -> { where(passkey: false) }
 
   validates :external_id, :public_key, :nickname, :sign_count, presence: true
   validates :external_id, uniqueness: true

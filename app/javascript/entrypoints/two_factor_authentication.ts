@@ -7,6 +7,10 @@ import 'regenerator-runtime/runtime';
 
 type PublicKeyCredentialCreationOptionsJSON =
   WebAuthnJSON.CredentialCreationOptionsJSON['publicKey'];
+type PublicKeyCredentialRequestOptionsJSON =
+  WebAuthnJSON.CredentialRequestOptionsJSON['publicKey'];
+
+let conditionalPasskeyAbortController: AbortController | undefined;
 
 function exceptionHasAxiosError(
   error: unknown,
@@ -104,6 +108,92 @@ async function handleWebauthnCredentialRegistration(nickname: string) {
   }
 }
 
+function showPasskeyError(cancelled = false) {
+  const errorMessage = document.getElementById('passkey-error-message');
+  if (!errorMessage) return;
+
+  errorMessage.textContent = cancelled
+    ? (errorMessage.dataset.cancelledMessage ?? errorMessage.textContent)
+    : (errorMessage.dataset.errorMessage ?? errorMessage.textContent);
+  errorMessage.classList.remove('hidden');
+}
+
+async function handlePasskeyRegistration(nickname: string) {
+  try {
+    const response = await axios.get<PublicKeyCredentialCreationOptionsJSON>(
+      '/settings/passkeys/options',
+    );
+    const credential = await WebAuthnJSON.create({ publicKey: response.data });
+    const result = await axios.post<{ redirect_path: string }>(
+      '/settings/passkeys',
+      { credential, nickname },
+      { headers: { 'X-CSRF-Token': getCSRFToken() } },
+    );
+
+    window.location.replace(result.data.redirect_path);
+  } catch (error) {
+    showPasskeyError(
+      error instanceof DOMException && error.name === 'NotAllowedError',
+    );
+    logAxiosResponseError(error);
+  }
+}
+
+async function requestPasskey(
+  mediation?: CredentialMediationRequirement,
+  signal?: AbortSignal,
+) {
+  const response = await axios.get<PublicKeyCredentialRequestOptionsJSON>(
+    '/auth/passkey/options',
+  );
+  const credential = await WebAuthnJSON.get({
+    publicKey: response.data,
+    ...(mediation ? { mediation } : {}),
+    ...(signal ? { signal } : {}),
+  });
+  const result = await axios.post<{ redirect_path: string }>(
+    '/auth/passkey',
+    { credential },
+    { headers: { 'X-CSRF-Token': getCSRFToken() } },
+  );
+
+  window.location.replace(result.data.redirect_path);
+}
+
+async function handlePasskeyAuthentication() {
+  try {
+    conditionalPasskeyAbortController?.abort();
+    await requestPasskey();
+  } catch (error) {
+    showPasskeyError(
+      error instanceof DOMException && error.name === 'NotAllowedError',
+    );
+    logAxiosResponseError(error);
+  }
+}
+
+async function startConditionalPasskeyAuthentication() {
+  const conditionalMediationAvailable =
+    typeof PublicKeyCredential !== 'undefined' &&
+    'isConditionalMediationAvailable' in PublicKeyCredential &&
+    (await PublicKeyCredential.isConditionalMediationAvailable());
+
+  if (!conditionalMediationAvailable) return;
+
+  conditionalPasskeyAbortController = new AbortController();
+
+  try {
+    await requestPasskey(
+      'conditional',
+      conditionalPasskeyAbortController.signal,
+    );
+  } catch (error) {
+    if (!(error instanceof DOMException && error.name === 'AbortError')) {
+      logAxiosResponseError(error);
+    }
+  }
+}
+
 async function handleWebauthnCredentialAuthentication() {
   try {
     const response = await axios.get<PublicKeyCredentialCreationOptionsJSON>(
@@ -138,10 +228,13 @@ ready(() => {
     );
     if (unsupported_browser_message) {
       unsupported_browser_message.classList.remove('hidden');
-      const button = document.querySelector<HTMLButtonElement>(
-        'button.btn.js-webauthn',
-      );
-      if (button) button.disabled = true;
+      document
+        .querySelectorAll<HTMLButtonElement>(
+          'button.btn.js-webauthn, button.btn.js-passkey-authentication, button.btn.js-passkey-registration',
+        )
+        .forEach((button) => {
+          button.disabled = true;
+        });
     }
   }
 
@@ -163,6 +256,36 @@ ready(() => {
         nickname?.focus();
       }
     });
+  }
+
+  const passkeyRegistrationForm =
+    document.querySelector<HTMLFormElement>('form#new_passkey');
+  if (passkeyRegistrationForm) {
+    passkeyRegistrationForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const nickname = passkeyRegistrationForm.querySelector<HTMLInputElement>(
+        'input[name="new_passkey[nickname]"]',
+      );
+
+      if (nickname?.value) {
+        void handlePasskeyRegistration(nickname.value);
+      } else {
+        nickname?.focus();
+      }
+    });
+  }
+
+  const passkeyAuthenticationForm = document.getElementById(
+    'passkey-authentication-form',
+  );
+  passkeyAuthenticationForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    void handlePasskeyAuthentication();
+  });
+
+  if (passkeyAuthenticationForm && WebAuthnJSON.supported()) {
+    void startConditionalPasskeyAuthentication();
   }
 
   const webAuthnCredentialAuthenticationForm =

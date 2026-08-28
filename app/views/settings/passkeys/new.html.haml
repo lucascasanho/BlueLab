@@ -1,0 +1,21 @@
+- content_for :page_title do
+  = t('passkeys.add')
+
+= simple_form_for(:new_passkey, url: settings_passkeys_path, html: { id: :new_passkey }) do |f|
+  %p.flash-message.hidden#unsupported-browser-message= t('passkeys.not_supported')
+  %p.flash-message.alert.hidden#passkey-error-message{ data: { error_message: t('passkeys.create.error'), cancelled_message: t('passkeys.cancelled') } }= t('passkeys.create.error')
+
+  %p.hint= t('passkeys.description')
+
+  .fields_group
+    = f.input :nickname,
+              wrapper: :with_block_label,
+              label: t('passkeys.nickname'),
+              hint: t('passkeys.nickname_hint'),
+              input_html: { autocomplete: 'off' },
+              required: true
+
+  .actions
+    = f.button :button, t('passkeys.add'), class: 'js-passkey-registration', type: :submit
+
+= vite_typescript_tag 'two_factor_authentication.ts', crossorigin: 'anonymous'

@@ -39,6 +39,12 @@ namespace :settings do
     end
   end
 
+  resources :passkeys, only: [:index, :new, :create, :destroy] do
+    collection do
+      get :options
+    end
+  end
+
   scope module: :two_factor_authentication do
     resource :otp_authentication, only: [:show, :create], controller: :otp_authentication
 

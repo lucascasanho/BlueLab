@@ -15,7 +15,7 @@
                 autofocus: true,
                 required: true,
                 hint: false,
-                input_html: { 'aria-label': t('simple_form.labels.defaults.username_or_email'), autocomplete: 'username' },
+                input_html: { 'aria-label': t('simple_form.labels.defaults.username_or_email'), autocomplete: 'username webauthn' },
                 label: t('simple_form.labels.defaults.username_or_email'),
                 wrapper: :with_label
     .fields-group
@@ -28,6 +28,16 @@
 
     .actions
       = f.button :button, t('auth.login'), type: :submit
+
+  .simple_form.alternative-login
+    %h2= t('auth.or_log_in_with')
+    %p.flash-message.hidden#unsupported-browser-message= t('passkeys.not_supported')
+    %p.flash-message.alert.hidden#passkey-error-message{ data: { error_message: t('passkeys.authentication_error'), cancelled_message: t('passkeys.cancelled') } }= t('passkeys.authentication_error')
+    %form#passkey-authentication-form
+      .actions
+        %button.button.btn.js-passkey-authentication{ type: 'submit' }= t('passkeys.sign_in')
+
+  = vite_typescript_tag 'two_factor_authentication.ts', crossorigin: 'anonymous'
 
 - if devise_mapping.omniauthable? && resource_class.omniauth_providers.any?
   .simple_form.alternative-login

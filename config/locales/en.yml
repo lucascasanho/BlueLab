@@ -2398,6 +2398,27 @@ en:
     verification: Verification
     verified_links: Your verified links
     website_verification: Website verification
+  passkeys:
+    add: Add passkey
+    authentication_error: We couldn't use this passkey. Please try again or use your password.
+    cancelled: Passkey authentication was cancelled.
+    create:
+      error: We couldn't add this passkey. Please try again.
+      success: Passkey added successfully.
+    delete: Delete
+    delete_confirmation: Are you sure you want to delete this passkey?
+    description: Use a passkey to sign in to Espelunca without typing your password.
+    destroy:
+      error: We couldn't delete this passkey. Please try again.
+      success: Passkey removed.
+    empty: You haven't added any passkeys yet.
+    invalid_for_account: This passkey is not valid for this account.
+    nickname: Passkey name
+    nickname_hint: For example, iPhone, Windows Hello, or YubiKey
+    not_supported: This browser doesn't support passkeys.
+    registered_on: Added on %{date}
+    sign_in: Sign in with a passkey
+    title: Passkeys
   webauthn_credentials:
     add: Add new security key
     create:

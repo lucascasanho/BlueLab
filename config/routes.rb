@@ -82,6 +82,10 @@ Rails.application.routes.draw do
         resource :security_key_options, only: :show
       end
     end
+
+    get '/auth/passkey/options', to: 'auth/sessions#passkey_options', as: :auth_passkey_options
+    post '/auth/passkey', to: 'auth/sessions#passkey', as: :auth_passkey
+    get '/auth/passkey/two_factor', to: 'auth/sessions#passkey_two_factor', as: :auth_passkey_two_factor
   end
 
   scope module: :auth do

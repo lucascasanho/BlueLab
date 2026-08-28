@@ -2399,6 +2399,27 @@ pt-BR:
     verification: Verificação
     verified_links: Seus links verificados
     website_verification: Verificação do site
+  passkeys:
+    add: Adicionar passkey
+    authentication_error: Não foi possível usar esta passkey. Tente novamente ou use sua senha.
+    cancelled: A autenticação por passkey foi cancelada.
+    create:
+      error: Não foi possível adicionar esta passkey. Tente novamente.
+      success: Passkey adicionada com sucesso.
+    delete: Excluir
+    delete_confirmation: Tem certeza de que deseja excluir esta passkey?
+    description: Use uma passkey para entrar na Espelunca sem precisar digitar sua senha.
+    destroy:
+      error: Não foi possível excluir esta passkey. Tente novamente.
+      success: Passkey removida.
+    empty: Você ainda não adicionou nenhuma passkey.
+    invalid_for_account: Esta passkey não é válida para esta conta.
+    nickname: Nome da passkey
+    nickname_hint: Por exemplo, iPhone, Windows Hello ou YubiKey
+    not_supported: Este navegador não oferece suporte a passkeys.
+    registered_on: Adicionada em %{date}
+    sign_in: Entrar com uma passkey
+    title: Passkeys
   webauthn_credentials:
     add: Adicionar nova chave de segurança
     create:

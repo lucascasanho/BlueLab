@@ -10,7 +10,7 @@ class Auth::Sessions::SecurityKeyOptionsController < ApplicationController
 
     if user&.webauthn_enabled?
       options_for_get = WebAuthn::Credential.options_for_get(
-        allow: user.webauthn_credentials.pluck(:external_id),
+        allow: user.webauthn_credentials.security_keys.pluck(:external_id),
         user_verification: 'discouraged'
       )
 

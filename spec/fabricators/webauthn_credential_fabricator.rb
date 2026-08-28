@@ -6,4 +6,5 @@ Fabricator(:webauthn_credential) do
   public_key { OpenSSL::PKey::EC.generate('prime256v1').public_key }
   nickname { sequence(:nickname) { |i| "USB Key number #{i}" } }
   sign_count 0
+  passkey false
 end
