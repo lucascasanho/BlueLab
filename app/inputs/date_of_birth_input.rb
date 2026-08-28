@@ -2,9 +2,9 @@
 
 class DateOfBirthInput < SimpleForm::Inputs::Base
   OPTIONS = {
-    day: { autocomplete: 'bday-day', maxlength: 2, pattern: '[0-9]+', placeholder: 'DD' },
-    month: { autocomplete: 'bday-month', maxlength: 2, pattern: '[0-9]+', placeholder: 'MM' },
-    year: { autocomplete: 'bday-year', maxlength: 4, pattern: '[0-9]+', placeholder: 'YYYY' },
+    day: { autocomplete: 'bday-day', maxlength: 2, pattern: '[0-9]+' },
+    month: { autocomplete: 'bday-month', maxlength: 2, pattern: '[0-9]+' },
+    year: { autocomplete: 'bday-year', maxlength: 4, pattern: '[0-9]+' },
   }.freeze
 
   def input(wrapper_options = nil)
@@ -18,6 +18,7 @@ class DateOfBirthInput < SimpleForm::Inputs::Base
           .merge(
             id: generate_id(option),
             'aria-label': I18n.t("simple_form.labels.user.date_of_birth_#{param_for(option)}"),
+            placeholder: I18n.t("simple_form.placeholders.user.date_of_birth_#{param_for(option)}"),
             value: values[option]
           )
         @builder.text_field("#{attribute_name}(#{param_for(option)})", options)

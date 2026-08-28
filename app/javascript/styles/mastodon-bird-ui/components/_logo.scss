@@ -109,6 +109,7 @@
 
     .simple_form {
       input[type='text'],
+      input[type='email'],
       input[type='password'] {
         background-color: var(--color-mud);
         border: 1px solid var(--color-mud);
@@ -136,6 +137,12 @@
 
       .input.field_with_errors input {
         border-color: var(--color-border-error);
+      }
+
+      .label_input__append {
+        padding-block: 0;
+        top: 50%;
+        transform: translateY(-50%);
       }
     }
   }

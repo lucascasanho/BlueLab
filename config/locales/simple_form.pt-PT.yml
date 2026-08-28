@@ -413,6 +413,11 @@ pt-PT:
     'no': Não
     not_recommended: Não recomendado
     overridden: Substituído
+    placeholders:
+      user:
+        date_of_birth_1i: AAAA
+        date_of_birth_2i: MM
+        date_of_birth_3i: DD
     recommended: Recomendado
     required:
       mark: "*"
