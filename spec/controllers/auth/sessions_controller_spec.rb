@@ -15,6 +15,13 @@ RSpec.describe Auth::SessionsController do
       get :new
       expect(response).to have_http_status(200)
     end
+
+    it 'labels the login field as username or email' do
+      get :new
+
+      expect(response.parsed_body)
+        .to have_css('label', text: I18n.t('simple_form.labels.defaults.username_or_email'))
+    end
   end
 
   describe 'DELETE #destroy' do
@@ -166,6 +173,28 @@ RSpec.describe Auth::SessionsController do
         it 'redirects to home and logs the user in' do
           expect(response).to redirect_to(root_path)
 
+          expect(controller.current_user).to eq user
+        end
+      end
+
+      context 'when using a username' do
+        before do
+          post :create, params: { user: { email: user.account.username, password: user.password } }
+        end
+
+        it 'redirects to home and logs the user in' do
+          expect(response).to redirect_to(root_path)
+          expect(controller.current_user).to eq user
+        end
+      end
+
+      context 'when using an @username' do
+        before do
+          post :create, params: { user: { email: "@#{user.account.username}", password: user.password } }
+        end
+
+        it 'redirects to home and logs the user in' do
+          expect(response).to redirect_to(root_path)
           expect(controller.current_user).to eq user
         end
       end

@@ -15,6 +15,7 @@ class Auth::SessionsController < Devise::SessionsController
   around_action :preserve_stored_location, only: :destroy, if: :continue_after?
 
   prepend_before_action :check_suspicious!, only: [:create]
+  prepend_before_action :resolve_login_identifier!, only: [:create]
 
   include Auth::TwoFactorAuthenticationConcern
 
@@ -78,6 +79,14 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   private
+
+  def resolve_login_identifier!
+    identifier = user_params[:email].to_s.strip
+    return if identifier.blank? || (identifier.include?('@') && !identifier.start_with?('@'))
+
+    user = Account.find_local(identifier.delete_prefix('@'))&.user
+    params[:user][:email] = user.email if user
+  end
 
   def preserve_stored_location
     original_stored_location = stored_location_for(:user)
