@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import type { Account, AccountShapeFull } from '@/mastodon/models/account';
 import { selectAccountStatus } from '@/mastodon/selectors/statuses';
 import { useAppSelector } from '@/mastodon/store';
+import { domain } from 'mastodon/initial_state';
 
 import { Avatar } from '../avatar';
 import { AvatarOverlay } from '../avatar_overlay';
@@ -40,6 +41,7 @@ export const StatusHeader: FC<StatusHeaderProps> = ({
   contentBeforeDate,
   contentAfterDate,
   onHeaderClick,
+  displayNameProps,
 }) => {
   const status = useAppSelector((state) =>
     selectAccountStatus(state, statusId),
@@ -63,6 +65,7 @@ export const StatusHeader: FC<StatusHeaderProps> = ({
         statusAccount={statusAccount}
         friendAccount={account}
         avatarSize={avatarSize}
+        displayNameProps={displayNameProps}
       />
 
       {contentBeforeDate}
@@ -112,11 +115,16 @@ const StatusDisplayName: FC<{
   statusAccount?: AccountShapeFull;
   friendAccount?: Account | AccountShapeFull;
   avatarSize: number;
-}> = ({ statusAccount, friendAccount, avatarSize }) => {
+  displayNameProps?: DisplayNameProps;
+}> = ({ statusAccount, friendAccount, avatarSize, displayNameProps }) => {
   const AccountComponent = friendAccount ? AvatarOverlay : Avatar;
   return (
     <LinkedDisplayName
-      displayProps={{ account: statusAccount }}
+      displayProps={{
+        account: statusAccount,
+        localDomain: domain,
+        ...displayNameProps,
+      }}
       className='status__display-name'
     >
       <div className='status__avatar'>

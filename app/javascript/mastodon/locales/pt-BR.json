@@ -1359,6 +1359,8 @@
   "status.revoke_quote": "Remover minha publicação de@{name} publicação",
   "status.sensitive_warning": "Mídia sensível",
   "status.share": "Compartilhar",
+  "status.hide_full_account_handle": "Ocultar instância do nome de usuário",
+  "status.show_full_account_handle": "Ver nome de usuário completo",
   "status.show_less_all": "Mostrar menos em tudo",
   "status.show_more_all": "Mostrar mais em tudo",
   "status.show_original": "Mostrar original",

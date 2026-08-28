@@ -62,6 +62,8 @@ interface StatusActionBarProps {
   withDismiss?: boolean;
   withCounters?: boolean;
   scrollKey?: string;
+  showFullAccountHandle?: boolean;
+  onToggleFullAccountHandle?: () => void;
 }
 
 const messages = defineMessages({
@@ -135,6 +137,14 @@ const messages = defineMessages({
     id: 'status.quote_policy_change',
     defaultMessage: 'Change who can quote',
   },
+  showFullAccountHandle: {
+    id: 'status.show_full_account_handle',
+    defaultMessage: 'View full username',
+  },
+  hideFullAccountHandle: {
+    id: 'status.hide_full_account_handle',
+    defaultMessage: 'Hide instance from username',
+  },
 });
 
 export const StatusActionBar: React.FC<StatusActionBarProps> = ({
@@ -143,6 +153,8 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   withDismiss,
   withCounters,
   scrollKey,
+  showFullAccountHandle,
+  onToggleFullAccountHandle,
 }) => {
   const status = useStatus(statusId);
   const quotedAccountId = useAppSelector(
@@ -236,6 +248,8 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
             contextType={contextType}
             withDismiss={withDismiss}
             scrollKey={scrollKey}
+            showFullAccountHandle={showFullAccountHandle}
+            onToggleFullAccountHandle={onToggleFullAccountHandle}
           />
         )}
       </RemoveQuoteHint>
@@ -249,7 +263,17 @@ const StatusActionMenu: React.FC<{
   contextType?: StatusContextType;
   scrollKey?: string;
   withDismiss?: boolean;
-}> = ({ status, dismissQuoteHint, contextType, scrollKey, withDismiss }) => {
+  showFullAccountHandle?: boolean;
+  onToggleFullAccountHandle?: () => void;
+}> = ({
+  status,
+  dismissQuoteHint,
+  contextType,
+  scrollKey,
+  withDismiss,
+  showFullAccountHandle,
+  onToggleFullAccountHandle,
+}) => {
   const account = useAppSelector((state) => state.accounts.get(status.account));
   const { permissions } = useIdentity();
   const relationship = useRelationship(account?.id);
@@ -286,6 +310,8 @@ const StatusActionMenu: React.FC<{
         intl,
         relationship,
         dispatch,
+        showFullAccountHandle,
+        onToggleFullAccountHandle,
       }),
     [
       status,
@@ -298,6 +324,8 @@ const StatusActionMenu: React.FC<{
       intl,
       relationship,
       dispatch,
+      showFullAccountHandle,
+      onToggleFullAccountHandle,
     ],
   );
   const handleOpen = useCallback(() => {
@@ -335,6 +363,8 @@ interface MenuItemsParams {
   intl: ReturnType<typeof useIntl>;
   relationship?: Relationship | null;
   dispatch: AppDispatch;
+  showFullAccountHandle?: boolean;
+  onToggleFullAccountHandle?: () => void;
 }
 
 function getMenuItems({
@@ -348,6 +378,8 @@ function getMenuItems({
   intl,
   relationship,
   dispatch,
+  showFullAccountHandle,
+  onToggleFullAccountHandle,
 }: MenuItemsParams) {
   const menu: MenuItem[] = [];
 
@@ -373,6 +405,17 @@ function getMenuItems({
       void navigator.clipboard.writeText(statusUrl);
     },
   });
+
+  if (onToggleFullAccountHandle) {
+    menu.push({
+      text: intl.formatMessage(
+        showFullAccountHandle
+          ? messages.hideFullAccountHandle
+          : messages.showFullAccountHandle,
+      ),
+      action: onToggleFullAccountHandle,
+    });
+  }
 
   if (isPublic && 'share' in navigator) {
     menu.push({

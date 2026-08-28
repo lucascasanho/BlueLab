@@ -65,6 +65,8 @@ const messages = defineMessages({
   openOriginalPage: { id: 'account.open_original_page', defaultMessage: 'Open original page' },
   revokeQuote: { id: 'status.revoke_quote', defaultMessage: 'Remove my post from @{name}’s post' },
   quotePolicyChange: { id: 'status.quote_policy_change', defaultMessage: 'Change who can quote' },
+  showFullAccountHandle: { id: 'status.show_full_account_handle', defaultMessage: 'View full username' },
+  hideFullAccountHandle: { id: 'status.hide_full_account_handle', defaultMessage: 'Hide instance from username' },
 });
 
 const mapStateToProps = (state, { status }) => {
@@ -108,6 +110,8 @@ class StatusActionBar extends ImmutablePureComponent {
     withDismiss: PropTypes.bool,
     withCounters: PropTypes.bool,
     scrollKey: PropTypes.string,
+    showFullAccountHandle: PropTypes.bool,
+    onToggleFullAccountHandle: PropTypes.func,
     intl: PropTypes.object.isRequired,
     ...WithRouterPropTypes,
   };
@@ -271,6 +275,13 @@ class StatusActionBar extends ImmutablePureComponent {
     }
 
     menu.push({ text: intl.formatMessage(messages.copy), action: this.handleCopy });
+
+    if (this.props.onToggleFullAccountHandle) {
+      menu.push({
+        text: intl.formatMessage(this.props.showFullAccountHandle ? messages.hideFullAccountHandle : messages.showFullAccountHandle),
+        action: this.props.onToggleFullAccountHandle,
+      });
+    }
 
     if (publicStatus && 'share' in navigator) {
       menu.push({ text: intl.formatMessage(messages.share), action: this.handleShareClick });

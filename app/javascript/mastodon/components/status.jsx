@@ -151,6 +151,7 @@ class Status extends ImmutablePureComponent {
   state = {
     showMedia: defaultMediaVisibility(this.props.status) && !(this.context?.hideMediaByDefault),
     showDespiteFilter: undefined,
+    showFullAccountHandle: false,
   };
 
   componentDidUpdate (prevProps) {
@@ -163,12 +164,17 @@ class Status extends ImmutablePureComponent {
       this.setState({
         showMedia: defaultMediaVisibility(this.props.status) && !(this.context?.hideMediaByDefault),
         showDespiteFilter: undefined,
+        showFullAccountHandle: false,
       });
     }
   }
 
   handleToggleMediaVisibility = () => {
     this.setState({ showMedia: !this.state.showMedia });
+  };
+
+  handleToggleFullAccountHandle = () => {
+    this.setState({ showFullAccountHandle: !this.state.showFullAccountHandle });
   };
 
   handleClick = e => {
@@ -586,6 +592,9 @@ class Status extends ImmutablePureComponent {
           account={account}
           avatarSize={avatarSize}
           onHeaderClick={this.handleHeaderClick}
+          displayNameProps={{
+            variant: this.state.showFullAccountHandle ? 'default' : 'shortHandle',
+          }}
         />
       );
 
@@ -635,7 +644,14 @@ class Status extends ImmutablePureComponent {
             )}
 
             {(showActions && !isQuotedPost) &&
-              <StatusActionBar scrollKey={scrollKey} status={status} account={account}  {...other} />
+              <StatusActionBar
+                scrollKey={scrollKey}
+                status={status}
+                account={account}
+                showFullAccountHandle={this.state.showFullAccountHandle}
+                onToggleFullAccountHandle={this.handleToggleFullAccountHandle}
+                {...other}
+              />
             }
           </div>
         </div>

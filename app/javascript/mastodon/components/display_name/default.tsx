@@ -18,6 +18,7 @@ const messages = defineMessages({
 export function useAccountHandle(
   account: DisplayNameProps['account'],
   localDomain: DisplayNameProps['localDomain'],
+  showDomain = true,
 ) {
   const intl = useIntl();
 
@@ -29,6 +30,10 @@ export function useAccountHandle(
     if (account.invalid_handle)
       return intl.formatMessage(messages.invalidHandle);
 
+    if (!showDomain) {
+      return `@${account.username}`;
+    }
+
     let acct = account.acct;
 
     if (!acct.includes('@') && localDomain) {
@@ -36,13 +41,14 @@ export function useAccountHandle(
     }
 
     return `@${acct}`;
-  }, [account, localDomain, intl]);
+  }, [account, localDomain, showDomain, intl]);
 }
 
 export const DisplayNameDefault: FC<
-  Omit<DisplayNameProps, 'variant'> & ComponentPropsWithoutRef<'span'>
-> = ({ account, localDomain, className, ...props }) => {
-  const username = useAccountHandle(account, localDomain);
+  Omit<DisplayNameProps, 'variant'> &
+    ComponentPropsWithoutRef<'span'> & { showDomain?: boolean }
+> = ({ account, localDomain, className, showDomain = true, ...props }) => {
+  const username = useAccountHandle(account, localDomain, showDomain);
 
   return (
     <DisplayNameWithoutDomain

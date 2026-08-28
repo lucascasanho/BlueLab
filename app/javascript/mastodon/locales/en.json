@@ -1391,6 +1391,8 @@
   "status.revoke_quote": "Remove my post from @{name}’s post",
   "status.sensitive_warning": "Sensitive content",
   "status.share": "Share",
+  "status.hide_full_account_handle": "Hide instance from username",
+  "status.show_full_account_handle": "View full username",
   "status.show_less_all": "Show less for all",
   "status.show_more_all": "Show more for all",
   "status.show_original": "Show original",

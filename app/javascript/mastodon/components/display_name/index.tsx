@@ -12,7 +12,7 @@ import { DisplayNameSimple } from './simple';
 export interface DisplayNameProps {
   account?: Account | AccountShapeFull | null;
   localDomain?: string;
-  variant?: 'default' | 'simple' | 'noDomain';
+  variant?: 'default' | 'simple' | 'noDomain' | 'shortHandle';
 }
 
 export const DisplayName: FC<
@@ -22,6 +22,8 @@ export const DisplayName: FC<
     return <DisplayNameSimple {...props} />;
   } else if (variant === 'noDomain') {
     return <DisplayNameWithoutDomain {...props} />;
+  } else if (variant === 'shortHandle') {
+    return <DisplayNameDefault {...props} showDomain={false} />;
   }
   return <DisplayNameDefault {...props} />;
 };

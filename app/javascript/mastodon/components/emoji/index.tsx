@@ -85,7 +85,6 @@ export const Emoji: FC<EmojiProps> = ({
       <img
         src={animate ? state.data.url : state.data.static_url}
         alt={shortcode}
-        title={shortcode}
         className='emojione custom-emoji'
         loading='lazy'
       />

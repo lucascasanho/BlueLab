@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import classNames from 'classnames';
 
@@ -76,6 +76,11 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
   onClick,
   showThread,
 }) => {
+  const [showFullAccountHandle, setShowFullAccountHandle] = useState(false);
+  const handleToggleFullAccountHandle = useCallback(() => {
+    setShowFullAccountHandle((value) => !value);
+  }, []);
+
   // Select data from store
   const { status, parent } = useAppSelector((state) =>
     selectStatusReblog(state, id),
@@ -158,6 +163,9 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
       account={account}
       avatarSize={avatarSize}
       onHeaderClick={onHeaderClick}
+      displayNameProps={{
+        variant: showFullAccountHandle ? 'default' : 'shortHandle',
+      }}
     />
   );
 
@@ -250,6 +258,8 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
               contextType={contextType}
               withDismiss={withDismiss}
               withCounters={withCounters}
+              showFullAccountHandle={showFullAccountHandle}
+              onToggleFullAccountHandle={handleToggleFullAccountHandle}
             />
           )}
         </StatusContentWrapper>
