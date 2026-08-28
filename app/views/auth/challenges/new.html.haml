@@ -4,12 +4,12 @@
 = simple_form_for @challenge, url: request.get? ? auth_challenge_path : '' do |f|
   = f.input :return_to, as: :hidden
 
-  .field-group
+  .fields-group
     = f.input :current_password,
               input_html: { autocomplete: 'current-password', autofocus: true },
               label: t('challenge.prompt'),
               required: true,
-              wrapper: :with_block_label
+              wrapper: :with_label
 
   .actions
     = f.button :button, t('challenge.confirm'), type: :submit

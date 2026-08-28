@@ -1135,6 +1135,15 @@ code {
   .button {
     display: block;
   }
+
+  .passkey-message {
+    box-sizing: border-box;
+    font-size: 13px;
+    line-height: 18px;
+    margin-bottom: 12px;
+    overflow-wrap: anywhere;
+    padding: 10px 12px;
+  }
 }
 
 .scope-danger {
