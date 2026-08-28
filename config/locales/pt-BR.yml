@@ -1,5 +1,7 @@
 ---
 pt-BR:
+  time_zones:
+    campo_grande: Campo Grande - Mato Grosso do Sul, Brasil
   about:
     about_mastodon_html: 'A rede social do futuro: Sem anúncios, sem vigilância corporativa, com design ético e muita descentralização! Possua seus próprios dados com o Mastodon!'
     contact_missing: Não definido

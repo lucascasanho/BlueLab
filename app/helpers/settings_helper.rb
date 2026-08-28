@@ -50,6 +50,19 @@ module SettingsHelper
   end
 
   def time_zone_options
-    ActiveSupport::TimeZone.all.map { |tz| ["(GMT#{tz.now.formatted_offset}) #{tz.name}", tz.tzinfo.name] }
+    time_zones = ActiveSupport::TimeZone.all + [ActiveSupport::TimeZone['America/Campo_Grande']]
+
+    time_zones
+      .uniq { |time_zone| time_zone.tzinfo.name }
+      .sort
+      .map do |time_zone|
+        name = if time_zone.tzinfo.name == 'America/Campo_Grande'
+                 I18n.t('time_zones.campo_grande')
+               else
+                 time_zone.name
+               end
+
+        ["(GMT#{time_zone.now.formatted_offset}) #{name}", time_zone.tzinfo.name]
+      end
   end
 end

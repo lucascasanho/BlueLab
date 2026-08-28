@@ -62,6 +62,8 @@ RSpec.describe SettingsHelper do
   describe '#time_zone_options' do
     subject { helper.time_zone_options }
 
+    it { is_expected.to include(['(GMT-04:00) Campo Grande - Mato Grosso do Sul, Brazil', 'America/Campo_Grande']) }
+
     context 'when summer time is in effect' do
       before { travel_to(Date.new(2026, 6, 1)) }
 
