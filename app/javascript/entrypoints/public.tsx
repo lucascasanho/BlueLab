@@ -21,6 +21,7 @@ import { loadLocale, getLocale } from '@/mastodon/locales';
 import { loadPolyfills } from '@/mastodon/polyfills';
 import ready from '@/mastodon/ready';
 import { assetHost } from '@/mastodon/utils/config';
+import { initializeEmojiHoverZoom } from '@/mastodon/utils/emoji_hover_zoom';
 import { getNestedProperty } from '@/mastodon/utils/objects';
 import { isDarkMode } from '@/mastodon/utils/theme';
 import { formatTime } from '@/mastodon/utils/time';
@@ -43,6 +44,8 @@ const messages = defineMessages({
 });
 
 async function loaded() {
+  initializeEmojiHoverZoom();
+
   const { messages: localeData } = getLocale();
 
   const locale = document.documentElement.lang;

@@ -70,7 +70,11 @@ export const Emoji: FC<EmojiProps> = ({
 
   if (!shouldRenderImage(state, appState.mode)) {
     if (state.type === EMOJI_TYPE_UNICODE) {
-      return state.data.unicode;
+      return (
+        <span className='emoji-native' role='img' aria-label={state.data.label}>
+          {state.data.unicode}
+        </span>
+      );
     }
     return code;
   }

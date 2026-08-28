@@ -258,6 +258,13 @@ class ComposeForm extends ImmutablePureComponent {
     const needsSpace   = data.custom && position > 0 && !allowedAroundShortCode.includes(text[position - 1]);
 
     this.props.onPickEmoji(position, data, needsSpace);
+
+    if (data.custom) {
+      const caretPosition = position + data.native.length + (needsSpace ? 2 : 1);
+      requestAnimationFrame(() => {
+        this.textareaRef.current?.setSelectionRange(caretPosition, caretPosition);
+      });
+    }
   };
 
   render () {

@@ -238,7 +238,7 @@ const insertEmoji = (state, position, emojiData, needsSpace) => {
 
   return state.merge({
     text: `${oldText.slice(0, position)}${emoji} ${oldText.slice(position)}`,
-    focusDate: new Date(),
+    focusDate: emojiData.custom ? state.get('focusDate') : new Date(),
     caretPosition: position + emoji.length + 1,
     idempotencyKey: uuid(),
   });

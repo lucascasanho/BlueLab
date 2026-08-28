@@ -1045,6 +1045,30 @@ body > [data-popover-placement] {
   }
 }
 
+.emoji-native {
+  display: inline-block;
+}
+
+.emoji-hover-zoom-preview {
+  display: block;
+  margin: 0;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  transform: translate(-50%, -50%) scale(1);
+  transform-origin: center;
+  transition:
+    opacity 100ms ease-out,
+    transform 140ms ease-out;
+  z-index: 9999;
+
+  &--visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.9);
+  }
+}
+
 .status__content--with-action {
   cursor: pointer;
 }
