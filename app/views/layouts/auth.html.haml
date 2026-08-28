@@ -1,7 +1,7 @@
 - content_for :header_tags do
   = vite_typescript_tag 'public.tsx', crossorigin: 'anonymous'
 
-- espelunca_auth_brand = (controller_path == 'auth/sessions' && action_name == 'new') || (controller_path == 'settings/passkeys' && action_name == 'new')
+- espelunca_auth_brand = %w(auth/registrations auth/setup auth/confirmations).include?(controller_path) || (controller_path == 'auth/sessions' && action_name == 'new') || (controller_path == 'settings/passkeys' && action_name == 'new')
 
 - content_for :content do
   .container-alt
