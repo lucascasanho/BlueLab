@@ -534,6 +534,7 @@ class Account < ApplicationRecord
 
   before_validation :prepare_contents, if: :local?
   before_create :generate_keys
+  after_create :reserve_local_username, if: :local?
   before_destroy :clean_feed_manager
 
   def ensure_keys!
@@ -554,6 +555,10 @@ class Account < ApplicationRecord
   def prepare_contents
     display_name&.strip!
     note&.strip!
+  end
+
+  def reserve_local_username
+    username_reservations.create!(username:)
   end
 
   def generate_keys

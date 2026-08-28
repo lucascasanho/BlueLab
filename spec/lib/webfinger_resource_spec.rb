@@ -99,6 +99,18 @@ RSpec.describe WebfingerResource do
     end
 
     describe 'with an acct value' do
+      context 'with a former local username' do
+        let(:account) { Fabricate(:account, username: 'current_name') }
+        let(:resource) { 'acct:former_name@example.com' }
+
+        before do
+          Rails.configuration.x.local_domain = 'example.com'
+          account.username_reservations.create!(username: 'former_name', relinquished_at: 1.day.ago)
+        end
+
+        it { is_expected.to eq(account) }
+      end
+
       context 'with a non-local domain' do
         let(:account) { Fabricate(:account) }
         let(:resource) { "acct:#{account.username}@remote-host.com" }

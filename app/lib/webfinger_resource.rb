@@ -33,7 +33,7 @@ class WebfingerResource
 
   def account_from_url
     if account_show_page?
-      path_params.key?(:username) ? Account.find_local!(path_params[:username]) : Account.local.find(path_params[:id])
+      path_params.key?(:username) ? find_local_or_reserved!(path_params[:username]) : Account.local.find(path_params[:id])
     elsif instance_actor_page?
       Account.representative
     else
@@ -59,7 +59,7 @@ class WebfingerResource
     username = local_username
     return Account.representative if username == Rails.configuration.x.local_domain || username == Rails.configuration.x.web_domain
 
-    Account.find_local!(username)
+    find_local_or_reserved!(username)
   end
 
   def split_acct
@@ -80,5 +80,9 @@ class WebfingerResource
 
   def domain_matches_local?
     TagManager.instance.local_domain?(local_domain) || TagManager.instance.web_domain?(local_domain) || Rails.configuration.x.alternate_domains.include?(local_domain)
+  end
+
+  def find_local_or_reserved!(username)
+    Account.find_local_or_reserved(username) || raise(ActiveRecord::RecordNotFound)
   end
 end

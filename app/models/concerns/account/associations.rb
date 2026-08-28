@@ -65,6 +65,7 @@ module Account::Associations
 
     # List records the account has been added to (not owned by the account)
     has_many :lists, through: :list_accounts
+    has_many :username_reservations, class_name: 'AccountUsernameReservation', inverse_of: :account, dependent: :nullify
 
     # Account record where account has been migrated
     belongs_to :moved_to_account, class_name: 'Account', optional: true

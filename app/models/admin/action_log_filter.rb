@@ -82,6 +82,7 @@ class Admin::ActionLogFilter
     create_username_block: { target_type: 'UsernameBlock', action: 'create' }.freeze,
     update_username_block: { target_type: 'UsernameBlock', action: 'update' }.freeze,
     destroy_username_block: { target_type: 'UsernameBlock', action: 'destroy' }.freeze,
+    username_change_account: { target_type: 'Account', action: 'username_change' }.freeze,
   }.freeze
 
   IGNORED_PARAMS = %w(page).freeze

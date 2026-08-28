@@ -12,7 +12,17 @@ class EntityCache
   end
 
   def mention(username, domain)
-    Rails.cache.fetch(to_key(:mention, username, domain), expires_in: MAX_EXPIRATION) { Account.select(:id, :username, :domain, :url).find_remote(username, domain) }
+    Rails.cache.fetch(to_key(:mention, username, domain), expires_in: MAX_EXPIRATION) do
+      if domain.nil? || TagManager.instance.local_domain?(domain) || TagManager.instance.web_domain?(domain)
+        Account.find_local_or_reserved(username)
+      else
+        Account.select(:id, :username, :domain, :url).find_remote(username, domain)
+      end
+    end
+  end
+
+  def delete_mention(username, domain)
+    Rails.cache.delete(to_key(:mention, username, domain))
   end
 
   def emoji(shortcodes, domain)

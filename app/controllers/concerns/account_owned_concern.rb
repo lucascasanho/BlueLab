@@ -18,7 +18,8 @@ module AccountOwnedConcern
   end
 
   def set_account
-    @account = username_param.present? ? Account.find_local!(username_param) : Account.local.find(account_id_param)
+    @account = username_param.present? ? Account.find_local_or_reserved(username_param) : Account.local.find(account_id_param)
+    raise ActiveRecord::RecordNotFound if @account.nil?
   end
 
   def account_id_param

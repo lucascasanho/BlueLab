@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_27_223000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_28_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -134,6 +134,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_27_223000) do
     t.string "language"
     t.boolean "sensitive", default: false, null: false
     t.index ["account_id", "language", "sensitive"], name: "idx_on_account_id_language_sensitive_250461e1eb"
+  end
+
+  create_table "account_username_reservations", force: :cascade do |t|
+    t.bigint "account_id"
+    t.datetime "created_at", null: false
+    t.datetime "relinquished_at"
+    t.datetime "updated_at", null: false
+    t.string "username", null: false
+    t.index "lower((username)::text)", name: "index_account_username_reservations_on_lower_username", unique: true
+    t.index ["account_id"], name: "index_account_username_reservations_on_account_id"
+    t.index ["account_id"], name: "index_account_username_reservations_on_current_account", unique: true, where: "(relinquished_at IS NULL)"
   end
 
   create_table "account_warning_presets", force: :cascade do |t|
@@ -1500,6 +1511,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_27_223000) do
   add_foreign_key "account_stats", "accounts", on_delete: :cascade
   add_foreign_key "account_statuses_cleanup_policies", "accounts", on_delete: :cascade
   add_foreign_key "account_summaries", "accounts", on_delete: :cascade
+  add_foreign_key "account_username_reservations", "accounts", on_delete: :nullify
   add_foreign_key "account_warnings", "accounts", column: "target_account_id", on_delete: :cascade
   add_foreign_key "account_warnings", "accounts", on_delete: :nullify
   add_foreign_key "account_warnings", "reports", on_delete: :cascade

@@ -25,6 +25,17 @@ RSpec.describe UniqueUsernameValidator do
 
       it { is_expected.to allow_value('abcDEF').for(:username) }
     end
+
+    context 'when a former local username is reserved' do
+      before do
+        account = Fabricate(:account, username: 'former_name')
+        account.username_reservations.current.update!(relinquished_at: Time.now.utc)
+        account.update_column(:username, 'current_name')
+        account.username_reservations.create!(username: 'current_name')
+      end
+
+      it { is_expected.to_not allow_value('FORMER_NAME').for(:username).with_message(:reserved) }
+    end
   end
 
   context 'when remote account' do

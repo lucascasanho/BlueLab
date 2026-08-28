@@ -19,7 +19,7 @@ class AccountsController < ApplicationController
       format.html do
         expires_in(15.seconds, public: true, stale_while_revalidate: 30.seconds, stale_if_error: 1.hour) unless user_signed_in?
 
-        redirect_to short_account_path(@account) if account_id_param.present? && username_param.blank?
+        redirect_to short_account_path(@account), status: 301 if account_id_param.present? || !username_param.casecmp(@account.username).zero?
       end
 
       format.rss do

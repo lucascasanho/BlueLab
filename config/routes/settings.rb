@@ -45,6 +45,8 @@ namespace :settings do
     end
   end
 
+  resource :username_change, only: [:show, :update]
+
   scope module: :two_factor_authentication do
     resource :otp_authentication, only: [:show, :create], controller: :otp_authentication
 

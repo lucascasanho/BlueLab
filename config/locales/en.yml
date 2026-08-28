@@ -201,6 +201,7 @@ en:
         create_unavailable_domain: Create Unavailable Domain
         create_user_role: Create Role
         create_username_block: Create Username Rule
+        username_change_account: Change Username
         demote_user: Demote User
         destroy_announcement: Delete Announcement
         destroy_canonical_email_block: Delete Email Block
@@ -295,6 +296,7 @@ en:
         enable_user_html: "%{name} enabled login for user %{target}"
         listable_tag_html: can be suggested
         memorialize_account_html: "%{name} turned %{target}'s account into a memoriam page"
+        username_change_account_html: "%{name} changed the username of %{target}"
         not_listable_tag_html: won't be suggested
         not_trendable_tag_html: won't appear under trends
         not_usable_tag_html: cannot be used
@@ -2110,6 +2112,32 @@ en:
     strikes: Moderation strikes
     two_factor_authentication: Two-factor Auth
     webauthn_authentication: Security keys
+    username_changes:
+      confirmation: I understand the consequences and want to change my username
+      cooldown: You can choose a different username after %{date}. During this period, you may only return to your immediately previous username.
+      current: 'Current username:'
+      description: Change your local username without creating or migrating an account.
+      errors:
+        conflict: Another request acquired this username at the same time. Please choose another one.
+        cooldown: You can choose a different username after %{date}.
+        incompatible_actor_id: This account uses a legacy federated identity format and cannot be renamed safely.
+        ineligible: This account is not eligible for a username change.
+        invalid: This username is not valid.
+        invalid_password: Your current password is incorrect.
+        password_unavailable: This account does not have a local password available for secure confirmation.
+        reserved: This username is already used or reserved.
+        unchanged: The new username must be different from the current username.
+        unexpected: The username could not be changed. Please try again later.
+      ineligible: This account cannot use username changes safely. It may be inactive, migrated, automated, passwordless, or use a legacy Actor ID.
+      new_username: New username
+      rollback_confirmation: I explicitly confirm that I want to return to @%{username}
+      rollback_hint: Returning also requires your password and starts a new 15-day cooldown.
+      rollback_submit: Return to @%{username}
+      rollback_title: Return to @%{username}
+      submit: Change my username
+      success: Your username was changed from @%{old_username} to @%{new_username}.
+      title: Change username
+      warning: 'Your address will change from %{current} to the new username on this server. Your account, followers, follows, posts, media, keys, and settings will remain the same. Other fediverse servers may take time to recognize the new address. Your former usernames remain reserved to your account. After changing, you must wait 15 days before choosing a third username, but you may immediately return to the previous one.'
   severed_relationships:
     download: Download (%{count})
     event_type:

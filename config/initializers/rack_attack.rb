@@ -153,6 +153,10 @@ class Rack::Attack
     req.warden_user_id if (req.put? || req.patch?) && (req.path_matches?('/auth') || req.path_matches?('/auth/password'))
   end
 
+  throttle('throttle_username_change/account', limit: 10, period: 10.minutes) do |req|
+    req.warden_user_id if req.patch? && req.path_matches?('/settings/username_change')
+  end
+
   self.throttled_responder = lambda do |request|
     now        = Time.now.utc
     match_data = request.env['rack.attack.match_data']

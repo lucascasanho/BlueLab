@@ -24,6 +24,10 @@ module Account::FinderConcern
       find_remote(username, nil)
     end
 
+    def find_local_or_reserved(username)
+      find_local(username) || AccountUsernameReservation.includes(:account).find_by('lower(username) = lower(?)', username)&.account
+    end
+
     def find_remote(username, domain)
       return if domain == 'handle.invalid'
 

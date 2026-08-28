@@ -1,0 +1,66 @@
+- content_for :page_title do
+  = t('settings.username_changes.title')
+
+%p.muted-hint= t('settings.username_changes.description')
+
+.fields-group
+  %p
+    %strong= t('settings.username_changes.current')
+    %span @#{current_account.username}@#{site_hostname}
+
+- if @eligible
+  - if @cooldown_active
+    .flash-message.warning= t('settings.username_changes.cooldown', date: l(@available_at, format: :long))
+  - else
+    = simple_form_for @username_change, url: settings_username_change_path, method: :patch do |f|
+      = render 'shared/error_messages', object: @username_change
+
+      .fields-group
+        = f.input :username,
+                  append: "@#{site_hostname}",
+                  input_html: { autocomplete: 'off', maxlength: Account::USERNAME_LENGTH_LIMIT, pattern: '[a-zA-Z0-9_]+' },
+                  label: t('settings.username_changes.new_username'),
+                  required: true,
+                  wrapper: :with_label
+        = f.input :current_password,
+                  input_html: { autocomplete: 'current-password' },
+                  label: t('simple_form.labels.defaults.current_password'),
+                  required: true,
+                  wrapper: :with_label
+
+      .flash-message.warning= t('settings.username_changes.warning', current: "@#{current_account.username}@#{site_hostname}")
+
+      .fields-group
+        = f.input :confirmation,
+                  as: :boolean,
+                  label: t('settings.username_changes.confirmation'),
+                  required: true,
+                  wrapper: :with_label
+
+      .actions
+        = f.button :button, t('settings.username_changes.submit'), type: :submit, class: 'button'
+
+  - if @previous_reservation.present?
+    %hr.spacer/
+    %h2.heading-medium= t('settings.username_changes.rollback_title', username: @previous_reservation.username)
+    %p.muted-hint= t('settings.username_changes.rollback_hint')
+
+    = simple_form_for Form::UsernameChange.new(username: @previous_reservation.username), url: settings_username_change_path, method: :patch do |f|
+      = f.input :username, as: :hidden
+
+      .fields-group
+        = f.input :current_password,
+                  input_html: { autocomplete: 'current-password' },
+                  label: t('simple_form.labels.defaults.current_password'),
+                  required: true,
+                  wrapper: :with_label
+        = f.input :confirmation,
+                  as: :boolean,
+                  label: t('settings.username_changes.rollback_confirmation', username: @previous_reservation.username),
+                  required: true,
+                  wrapper: :with_label
+
+      .actions
+        = f.button :button, t('settings.username_changes.rollback_submit', username: @previous_reservation.username), type: :submit, class: 'button button-secondary'
+- else
+  .flash-message.warning= t('settings.username_changes.ineligible')

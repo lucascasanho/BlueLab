@@ -201,6 +201,7 @@ pt-BR:
         create_unavailable_domain: Criar domínio indisponível
         create_user_role: Criar cargo
         create_username_block: Criar regra de usuário
+        username_change_account: Alterar nome de usuário
         demote_user: Rebaixar usuário
         destroy_announcement: Excluir anúncio
         destroy_canonical_email_block: Excluir bloqueio de e-mail
@@ -295,6 +296,7 @@ pt-BR:
         enable_user_html: "%{name} ativou o login para %{target}"
         listable_tag_html: pode ser sugerido
         memorialize_account_html: "%{name} transformou a conta de %{target} em um memorial"
+        username_change_account_html: "%{name} alterou o nome de usuário de %{target}"
         not_listable_tag_html: não será sugerido
         not_trendable_tag_html: não aparecerá em alta
         not_usable_tag_html: não pode ser usado
@@ -2110,6 +2112,32 @@ pt-BR:
     strikes: Avisos de moderação
     two_factor_authentication: Autenticação de dois fatores
     webauthn_authentication: Chaves de segurança
+    username_changes:
+      confirmation: Entendo as consequências e quero alterar meu nome de usuário
+      cooldown: Você poderá escolher outro nome de usuário depois de %{date}. Durante esse período, só poderá voltar para o nome imediatamente anterior.
+      current: 'Nome atual:'
+      description: Altere seu nome de usuário local sem criar ou migrar uma conta.
+      errors:
+        conflict: Outra solicitação adquiriu esse nome de usuário ao mesmo tempo. Escolha outro nome.
+        cooldown: Você poderá escolher outro nome de usuário depois de %{date}.
+        incompatible_actor_id: Esta conta usa um formato legado de identidade federada e não pode ser renomeada com segurança.
+        ineligible: Esta conta não está elegível para alteração do nome de usuário.
+        invalid: Esse nome de usuário não é válido.
+        invalid_password: Sua senha atual está incorreta.
+        password_unavailable: Esta conta não possui uma senha local disponível para confirmação segura.
+        reserved: Esse nome de usuário já está em uso ou reservado.
+        unchanged: O novo nome de usuário precisa ser diferente do atual.
+        unexpected: Não foi possível alterar o nome de usuário. Tente novamente mais tarde.
+      ineligible: Esta conta não pode usar a alteração de nome com segurança. Ela pode estar inativa, migrada, automatizada, sem senha local ou utilizar um Actor ID legado.
+      new_username: Novo nome de usuário
+      rollback_confirmation: Confirmo explicitamente que quero voltar para @%{username}
+      rollback_hint: A restauração também exige sua senha e inicia um novo período de 15 dias.
+      rollback_submit: Voltar para @%{username}
+      rollback_title: Voltar para @%{username}
+      submit: Alterar meu nome de usuário
+      success: Seu nome de usuário foi alterado de @%{old_username} para @%{new_username}.
+      title: Alterar nome de usuário
+      warning: 'Seu endereço será alterado do nome atual para o novo nome neste servidor. Sua conta continuará sendo a mesma. Seguidores, pessoas que você segue, publicações, mídias, chaves e configurações serão preservados. Outros servidores do Fediverso podem levar algum tempo para reconhecer o novo endereço. Seus nomes anteriores continuarão reservados para sua conta. Depois da alteração, você deverá esperar 15 dias para escolher um terceiro nome, mas poderá voltar imediatamente para o nome anterior.'
   severed_relationships:
     download: Download  %{count}
     event_type:

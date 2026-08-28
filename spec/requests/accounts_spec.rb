@@ -112,6 +112,19 @@ RSpec.describe 'Accounts show response' do
           it_behaves_like 'common HTML response'
         end
 
+        context 'with a former username' do
+          before do
+            account.username_reservations.create!(username: 'former_name', relinquished_at: 1.day.ago)
+            get short_account_path(username: 'former_name'), as: format
+          end
+
+          it 'redirects permanently to the current canonical profile without looping' do
+            expect(response).to redirect_to(short_account_path(account))
+            expect(response).to have_http_status(301)
+            expect(response.location).to_not include('former_name')
+          end
+        end
+
         context 'with replies' do
           before do
             get short_account_with_replies_path(username: account.username), as: format
