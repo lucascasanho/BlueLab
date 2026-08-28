@@ -97,7 +97,8 @@ export const Carousel = <
 
         const slide = wrapperElement?.children[newIndex];
         if (slide) {
-          setCurrentSlideHeight(slide.scrollHeight);
+          // Respect size constraints such as max-height on scrollable slides.
+          setCurrentSlideHeight(slide.clientHeight);
           if (slide instanceof HTMLElement) {
             onChangeSlide?.(newIndex, slide);
           }

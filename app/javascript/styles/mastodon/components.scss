@@ -8579,7 +8579,9 @@ noscript {
     overflow-wrap: break-word;
     font-weight: 400;
     max-height: 50vh;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
     flex-direction: column;
   }
 
