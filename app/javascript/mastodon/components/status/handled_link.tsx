@@ -2,10 +2,18 @@ import { useCallback } from 'react';
 import type { ComponentProps, FC } from 'react';
 
 import classNames from 'classnames';
+import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 
+import { openURL } from '@/mastodon/actions/search';
 import type { ApiMentionJSON } from '@/mastodon/api_types/statuses';
 import { getCollectionPath } from '@/mastodon/features/collections/utils';
+import { useAppDispatch } from '@/mastodon/store';
+import {
+  getLocalUrlPath,
+  handleFederatedLinkClick,
+  resolveFederatedLink,
+} from '@/mastodon/utils/federated_links';
 import type { OnElementHandler } from '@/mastodon/utils/html';
 
 export interface HandledLinkProps {
@@ -28,6 +36,31 @@ export const HandledLink: FC<HandledLinkProps & ComponentProps<'a'>> = ({
   children,
   ...props
 }) => {
+  const dispatch = useAppDispatch();
+  const history = useHistory();
+
+  const localPath = getLocalUrlPath(href);
+  const handleClick = useCallback<React.MouseEventHandler<HTMLAnchorElement>>(
+    (event) => {
+      void handleFederatedLinkClick({
+        event,
+        href,
+        resolve: (url) =>
+          resolveFederatedLink(url, async () => {
+            const result = await dispatch(openURL({ url })).unwrap();
+            return result;
+          }),
+        navigateLocal: (path) => {
+          history.push(path);
+        },
+        navigateExternal: (url) => {
+          window.location.assign(url);
+        },
+      });
+    },
+    [dispatch, history, href],
+  );
+
   // Handle hashtags
   if (
     (text.startsWith('#') ||
@@ -80,6 +113,14 @@ export const HandledLink: FC<HandledLinkProps & ComponentProps<'a'>> = ({
     );
   }
 
+  if (localPath) {
+    return (
+      <Link className={classNames('unhandled-link', className)} to={localPath}>
+        {children}
+      </Link>
+    );
+  }
+
   return (
     <a
       {...props}
@@ -89,6 +130,7 @@ export const HandledLink: FC<HandledLinkProps & ComponentProps<'a'>> = ({
       target='_blank'
       rel='noopener'
       translate='no'
+      onClick={handleClick}
     >
       {children}
     </a>

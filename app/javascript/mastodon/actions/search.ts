@@ -94,17 +94,30 @@ export const expandSearch = createDataLoadingThunk(
 
 export const openURL = createDataLoadingThunk(
   'search/openURL',
-  ({ url }: { url: string }) =>
-    apiGetSearch({
-      q: url,
-      resolve: true,
-      limit: 1,
-    }),
+  async ({ url }: { url: string }) => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 10_000);
+
+    try {
+      return await apiGetSearch(
+        {
+          q: url,
+          resolve: true,
+          limit: 1,
+        },
+        { signal: controller.signal },
+      );
+    } finally {
+      clearTimeout(timeout);
+    }
+  },
   (data, { dispatch }) => {
-    if (data.accounts.length > 0) {
-      dispatch(importFetchedAccounts(data.accounts));
-    } else if (data.statuses.length > 0) {
+    if (data.statuses.length > 0) {
       dispatch(importFetchedStatuses(data.statuses));
+    } else if (data.accounts.length > 0) {
+      dispatch(importFetchedAccounts(data.accounts));
     }
 
     return data;
