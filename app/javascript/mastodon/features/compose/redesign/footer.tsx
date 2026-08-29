@@ -74,9 +74,10 @@ export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
       <ComposeEmojiButton onPick={onEmojiPick} />
 
       <IconButton
+        as='button'
         size='sm'
         icon={MarkdownLogoIcon}
-        color={contentType === 'text/markdown' ? 'accent' : 'tonal'}
+        color={contentType === 'text/markdown' ? 'accent' : 'neutral'}
         aria-pressed={contentType === 'text/markdown'}
         onClick={handleContentType}
       >

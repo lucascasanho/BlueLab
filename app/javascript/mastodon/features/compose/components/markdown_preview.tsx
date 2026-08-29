@@ -92,11 +92,12 @@ export const MarkdownPreview: React.FC<Props> = ({
   const label = intl.formatMessage(messages.button);
   const button = redesign ? (
     <RedesignIconButton
+      as='button'
       icon={EyeIcon}
       size='sm'
       ref={setTrigger}
       aria-expanded={open}
-      color={open ? 'accent' : 'tonal'}
+      color={open ? 'accent' : 'neutral'}
       onClick={toggle}
     >
       {label}
