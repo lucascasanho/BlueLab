@@ -13,7 +13,7 @@ import {
 } from 'mastodon/actions/compose';
 import { pasteLinkCompose, PRIVATE_QUOTE_MODAL_ID } from 'mastodon/actions/compose_typed';
 import { openModal } from 'mastodon/actions/modal';
-import { me, statusMaxCharacters } from 'mastodon/initial_state';
+import { hideStatusCharacterCounter, me, statusMaxCharacters } from 'mastodon/initial_state';
 
 import ComposeForm from '../components/compose_form';
 
@@ -60,6 +60,7 @@ const mapStateToProps = state => ({
   isInReply: state.getIn(['compose', 'in_reply_to']) !== null,
   lang: state.getIn(['compose', 'language']),
   maxChars: statusMaxCharacters ?? state.getIn(['server', 'server', 'item', 'configuration', 'statuses', 'max_characters'], 500),
+  hideCharacterCounter: hideStatusCharacterCounter,
 });
 
 const mapDispatchToProps = (dispatch, props) => ({

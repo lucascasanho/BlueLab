@@ -18,12 +18,14 @@ import {
   uploadCompose,
 } from '@/mastodon/actions/compose';
 import { Button, IconButton } from '@/mastodon/components/button/redesign';
+import { hideStatusCharacterCounter } from '@/mastodon/initial_state';
 import {
   createAppSelector,
   useAppDispatch,
   useAppSelector,
 } from '@/mastodon/store';
 
+import { shouldShowCharacterCounter } from '../components/character_counter';
 import { MarkdownPreview } from '../components/markdown_preview';
 
 import type { OnEmojiPick } from './emoji';
@@ -102,19 +104,25 @@ export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
       </IconButton>
 
       <div className={classes.flexGrowWrap}>
-        <span
-          className={classNames(
-            classes.counter,
-            current > max && classes.counterError,
-          )}
-        >
-          {current > max && <WarningCircleIcon weight='fill' />}
-          <FormattedMessage
-            id='compose.counter'
-            defaultMessage='{current, number}/{max, number}'
-            values={{ current, max }}
-          />
-        </span>
+        {shouldShowCharacterCounter(
+          hideStatusCharacterCounter,
+          current,
+          max,
+        ) && (
+          <span
+            className={classNames(
+              classes.counter,
+              current > max && classes.counterError,
+            )}
+          >
+            {current > max && <WarningCircleIcon weight='fill' />}
+            <FormattedMessage
+              id='compose.counter'
+              defaultMessage='{current, number}/{max, number}'
+              values={{ current, max }}
+            />
+          </span>
+        )}
 
         <Button
           variant='solid'

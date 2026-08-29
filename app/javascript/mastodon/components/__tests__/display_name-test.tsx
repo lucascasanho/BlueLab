@@ -31,8 +31,20 @@ describe('<DisplayName />', () => {
 
   it('shows an accessible lock for a private account', () => {
     const lockedAccount = account.set('locked', true);
-    render(<DisplayName account={lockedAccount} />);
+    const { container } = render(<DisplayName account={lockedAccount} />);
 
     expect(screen.getByRole('img', { name: /manually reviews/i })).toBeTruthy();
+    expect(
+      container.querySelector('.display-name__name .display-name__locked'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('.display-name__account .display-name__locked'),
+    ).toBeNull();
+  });
+
+  it('does not reserve a lock element for a public account', () => {
+    const { container } = render(<DisplayName account={account} />);
+
+    expect(container.querySelector('.display-name__locked')).toBeNull();
   });
 });

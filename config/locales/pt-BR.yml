@@ -949,23 +949,28 @@ pt-BR:
         auth_logo: Logo da autenticação
         branding: Identidade visual
         branding_hint_html: Favicon, ícones PWA/Apple e imagem OpenGraph continuam na <a href="%{branding_path}">página Marca</a>, que já fornece armazenamento e tamanhos adequados. Logos SVG internos da SPA permanecem versionados para não permitir SVG arbitrário.
-        colors_hint: A cor é aplicada aos tokens semânticos de destaque; neutros e características próprias de cada tema são preservados. Use “Restaurar” para voltar ao azul padrão da Espelunca.
+        colors_hint: A cor é aplicada aos tokens semânticos de destaque; neutros e características próprias de cada tema são preservados.
         contrast_error: precisa atingir contraste mínimo de %{ratio}:1 contra fundo branco
-        editor: Editor e emojis
-        editor_note: Emojis Unicode já são inseridos como caracteres reais. Custom emojis continuam armazenados como shortcodes e são renderizados no preview; renderizá-los dentro do textarea exigiria substituir o editor e prejudicaria cursor, IME, mobile e desfazer/refazer.
+        effective_color: "Cor efetiva:"
         email: Emails
-        email_button_color: Cor dos botões de email
-        email_link_color: Cor dos links de email
+        email_button_color: Cor do botão principal dos emails
+        email_button_color_hint: Preenchimento dos botões de ação principais nos templates de email.
+        email_link_color: Cor dos links dos emails
+        email_link_color_hint: Links no conteúdo, ações de texto e links com seta.
         email_logo: Logo dos emails
-        email_primary_color: Cor principal dos emails
+        email_primary_color: Cor de destaque do cabeçalho dos emails
+        email_primary_color_hint: Borda e destaque estrutural do cabeçalho do email.
+        hide_admin_status_character_counter: Ocultar contador de caracteres para administradores
+        hide_status_character_counter: Ocultar contador de caracteres para usuários padrão
         image_limit: Limite de imagem (MB)
         instance_accent_color: Cor de destaque da interface
+        instance_accent_color_hint: Botões principais, links, foco, domínio de contas remotas e demais tokens semânticos de destaque.
         interface: Interface e temas
         logo_hint: PNG, JPEG ou WebP; máximo de 2 MB; imagem quadrada de pelo menos 64 × 64 px (recomendado 128 × 128 px ou maior).
         media: Mídia
         nginx_warning: "Configuração local detectada: nginx aceita no máximo %{limit} MB. Valores maiores serão recusados pelo proxy antes de chegar ao Mastodon."
         posts: Publicações
-        preamble: Configurações persistentes e validadas da personalização da Espelunca. Alterações não editam arquivos-fonte e passam a valer após salvar.
+        preamble: Configurações persistentes e validadas deste servidor. Alterações não editam arquivos-fonte e passam a valer após salvar.
         proxy_warning: O limite configurado aqui é o aceito pelo Mastodon. Proxies, CDNs ou túneis, incluindo Cloudflare, podem impor limites menores e precisam ser configurados separadamente.
         restore_default: Restaurar o valor padrão ao salvar
         status_limit: Limite de caracteres para usuário padrão

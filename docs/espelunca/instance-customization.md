@@ -24,22 +24,28 @@ concentrada para reduzir conflitos durante merges com o upstream.
 
 ## Valores e limites
 
-| Setting                        |    Padrão |                                  Faixa segura |
-| ------------------------------ | --------: | --------------------------------------------: |
-| `status_character_limit`       |       500 |                          1–100.000 caracteres |
-| `admin_status_character_limit` |    10.000 |               limite comum–100.000 caracteres |
-| `media_image_size_limit_mb`    |    100 MB |                                      1–100 MB |
-| `media_video_size_limit_mb`    |  1.024 MB |                                    1–1.024 MB |
-| `instance_accent_color`        | `#6364ff` |   hexadecimal validado e contraste mínimo 3:1 |
-| `email_primary_color`          | `#6364ff` |   hexadecimal validado e contraste mínimo 3:1 |
-| `email_button_color`           | `#6364ff` |   hexadecimal validado e contraste mínimo 3:1 |
-| `email_link_color`             | `#5638cc` | hexadecimal validado e contraste mínimo 4,5:1 |
+| Setting                               |    Padrão |                                  Faixa segura |
+| ------------------------------------- | --------: | --------------------------------------------: |
+| `status_character_limit`              |       500 |                          1–100.000 caracteres |
+| `admin_status_character_limit`        |    10.000 |               limite comum–100.000 caracteres |
+| `hide_status_character_counter`       |   `false` |                        contador comum visível |
+| `hide_admin_status_character_counter` |   `false` |               contador administrativo visível |
+| `media_image_size_limit_mb`           |    100 MB |                                      1–100 MB |
+| `media_video_size_limit_mb`           |  1.024 MB |                                    1–1.024 MB |
+| `instance_accent_color`               | `#6364ff` |   hexadecimal validado e contraste mínimo 3:1 |
+| `email_primary_color`                 | `#6364ff` |   hexadecimal validado e contraste mínimo 3:1 |
+| `email_button_color`                  | `#6364ff` |   hexadecimal validado e contraste mínimo 3:1 |
+| `email_link_color`                    | `#5638cc` | hexadecimal validado e contraste mínimo 4,5:1 |
 
 Somente `role.administrator?` recebe o limite administrativo. Permissões de
 moderação isoladas não concedem esse limite. O model `Status` continua sendo a
 barreira de segurança para web e API. A API pública anuncia o limite comum,
 pois o schema Mastodon possui apenas um campo global; o compositor autenticado
 recebe o limite efetivo pelo initial state.
+
+A visibilidade do contador também é enviada pelo initial state conforme a
+categoria da conta autenticada. Ocultá-lo não altera a validação: ao exceder o
+limite, o contador reaparece em estado de erro. As duas flags são independentes.
 
 Os limites de mídia nunca ultrapassam os tetos técnicos versionados de 100 MB
 para imagem e 1 GB para vídeo. Validadores, downloads federados, transcoder e
@@ -55,7 +61,12 @@ estritamente `#RRGGBB`, impedindo injeção de CSS.
 
 As cores de email são aplicadas a seletores estruturados, sem editor de HTML.
 O logo de email é usado no cabeçalho e rodapé; o logo de autenticação cobre os
-fluxos customizados de cadastro, confirmação e login da Espelunca.
+fluxos de cadastro, confirmação e login e também fornece o ícone da SPA nos
+temas compatíveis. Sem uploads, os fallbacks versionados são os do Mastodon.
+Os logos próprios da Espelunca em produção foram migrados para `SiteUpload`, de
+modo que não sejam defaults do futuro BlueLab.
+O nome apresentado pelo WebAuthn deriva do domínio configurado, em vez de usar
+uma marca de instância codificada no fork.
 
 ## Limitações deliberadas
 

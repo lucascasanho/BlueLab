@@ -1,7 +1,7 @@
 // Force dark theme regardless of system preference or data-color-scheme attribute
 :root,
-[data-color-scheme="light"],
-[data-color-scheme="dark"],
+[data-color-scheme='light'],
+[data-color-scheme='dark'],
 html:not([data-color-scheme]) {
   // Brand colors
   --color-brand-mastodon: #6364ff;
@@ -29,7 +29,6 @@ html:not([data-color-scheme]) {
   --color-red: #f91880;
 
   // Comes from Mastodon core
-  // stylelint-disable-next-line
   --color-red-75: #f91880bf;
   --color-yellow: #ffac33;
   --color-light-shade: #ffffff05;
@@ -84,15 +83,12 @@ html:not([data-color-scheme]) {
   --size-avatar-small: 32px;
 
   // Comes from Mastodon core
-  // stylelint-disable-next-line
   --width-main-panel: 600px;
 
   // Comes from Mastodon core
-  // stylelint-disable-next-line
   --width-side-panel: 260px;
 
   // Comes from Mastodon core
-  // stylelint-disable-next-line
   --width-compose-panel: 350px;
   --border-radius: 16px;
   --border-radius-badges: 4px;
@@ -107,7 +103,6 @@ html:not([data-color-scheme]) {
 
   // Logo
   --logo: url('data:image/svg+xml, %3Csvg class="mastodon-logo" xmlns="http://www.w3.org/2000/svg" width="28px" height="28px" viewBox="0 0 216.4144 232.00976"%3E%3Cdefs xmlns="http://www.w3.org/2000/svg"%3E%3ClinearGradient xmlns="http://www.w3.org/2000/svg" id="gradient" x2="0%25" y2="100%25" gradientUnits="userSpaceOnUse"%3E%3Cstop offset="0%25" stop-color="%23595aff"%3E%3C/stop%3E%3Cstop offset="100%25" stop-color="%23595aff"%3E%3C/stop%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath xmlns="http://www.w3.org/2000/svg" d="M211.80734 139.0875c-3.18125 16.36625-28.4925 34.2775-57.5625 37.74875-15.15875 1.80875-30.08375 3.47125-45.99875 2.74125-26.0275-1.1925-46.565-6.2125-46.565-6.2125 0 2.53375.15625 4.94625.46875 7.2025 3.38375 25.68625 25.47 27.225 46.39125 27.9425 21.11625.7225 39.91875-5.20625 39.91875-5.20625l.8675 19.09s-14.77 7.93125-41.08125 9.39c-14.50875.7975-32.52375-.365-53.50625-5.91875C9.23234 213.82 1.40609 165.31125.20859 116.09125c-.365-14.61375-.14-28.39375-.14-39.91875 0-50.33 32.97625-65.0825 32.97625-65.0825C49.67234 3.45375 78.20359.2425 107.86484 0h.72875c29.66125.2425 58.21125 3.45375 74.8375 11.09 0 0 32.975 14.7525 32.975 65.0825 0 0 .41375 37.13375-4.59875 62.915" fill="url(%23gradient)"%3E%3C/path%3E%3Cpath d="M177.50984 80.077v60.94125h-24.14375v-59.15c0-12.46875-5.24625-18.7975-15.74-18.7975-11.6025 0-17.4175 7.5075-17.4175 22.3525v32.37625H96.20734V85.42325c0-14.845-5.81625-22.3525-17.41875-22.3525-10.49375 0-15.74 6.32875-15.74 18.7975v59.15H38.90484V80.077c0-12.455 3.17125-22.3525 9.54125-29.675 6.56875-7.3225 15.17125-11.07625 25.85-11.07625 12.355 0 21.71125 4.74875 27.8975 14.2475l6.01375 10.08125 6.015-10.08125c6.185-9.49875 15.54125-14.2475 27.8975-14.2475 10.6775 0 19.28 3.75375 25.85 11.07625 6.36875 7.3225 9.54 17.22 9.54 29.675" fill="%23fff"%3E%3C/path%3E%3C/svg%3E');
-  --espelunca-logo: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"%3E%3Cpath fill="rgb(99, 100, 255)" d="M298.2 72.6C310.5 61.2 329.5 61.2 341.7 72.6L432 156.3L432 144C432 126.3 446.3 112 464 112L496 112C513.7 112 528 126.3 528 144L528 245.5L565.8 280.6C575.4 289.6 578.6 303.5 573.8 315.7C569 327.9 557.2 336 544 336L528 336L528 512C528 547.3 499.3 576 464 576L358.4 576L320 512L400.8 444.7C408.6 438.2 408.4 426.1 400.4 419.8L282.6 327.2C268 315.7 248.8 334.2 259.8 349.2L320 432L234.5 503.2C228.4 508.2 227 517 231 523.7L262.3 575.9L175.9 575.9C140.6 575.9 111.9 547.2 111.9 511.9L111.9 335.9L95.9 335.9C82.7 335.9 70.9 327.8 66.1 315.6C61.3 303.4 64.5 289.4 74.1 280.5L298.1 72.5z"/%3E%3C/svg%3E');
 
   // Icons
   --icon-boost: url("data:image/svg+xml, %3Csvg version='1.0' xmlns='http://www.w3.org/2000/svg' width='21' height='21' viewBox='0 0 136 136'%3E%3Cpath fill='%23717c9b' d='M51 23.8c0 .4 2.4 3.1 5.3 6l5.3 5.2h34.6l3.4 3.4 3.4 3.4v47.4l-6.7-6.1-6.8-6.1-4 4-4 4 13.8 13.7 13.7 13.8L122.5 99c7.4-7.4 13.5-13.7 13.5-14-.1-.3-1.7-2.3-3.6-4.4l-3.5-4-6.8 6.8-6.9 6.9-.4-25.4c-.3-23.8-.4-25.7-2.5-29.4-2.7-5.1-5.7-7.9-11.3-10.4-4.1-1.9-6.5-2.1-27.2-2.1-12.6 0-22.8.4-22.8.8zM13 37.5-.4 51l3.8 3.9 3.9 4 6.6-6.1 6.6-6 .5 24.4c.5 26.3.7 27.2 6.6 33.2 6 5.9 6.8 6.1 33.2 6.4 13.3.2 24.2-.1 24.2-.5 0-.5-2.2-3-4.8-5.6l-4.8-4.7-15.9-.1c-17.7 0-21.7-.9-24.9-5.2-2-2.7-2.1-4.2-2.3-26.5l-.2-23.6 6.7 6.7C42.5 55 46 58 46.6 58c.5 0 2.5-1.6 4.4-3.5l3.4-3.5L41 37.5C33.6 30.1 27.3 24 27 24c-.3 0-6.6 6.1-14 13.5z'/%3E%3C/svg%3E%0A");

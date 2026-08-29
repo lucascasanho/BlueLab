@@ -31,7 +31,7 @@ export const DisplayNameWithoutDomain: FC<
       as='span'
       className={classNames('display-name', className)}
     >
-      <bdi>
+      <bdi className='display-name__name'>
         {account ? (
           <EmojiHTML
             className='display-name__html'
@@ -44,19 +44,19 @@ export const DisplayNameWithoutDomain: FC<
             <Skeleton width='10ch' />
           </strong>
         )}
+        {account?.locked && (
+          <span
+            className='display-name__locked'
+            title={intl.formatMessage(messages.locked)}
+          >
+            <Icon
+              id='lock'
+              icon={LockIcon}
+              aria-label={intl.formatMessage(messages.locked)}
+            />
+          </span>
+        )}
       </bdi>
-      {account?.locked && (
-        <span
-          className='display-name__locked'
-          title={intl.formatMessage(messages.locked)}
-        >
-          <Icon
-            id='lock'
-            icon={LockIcon}
-            aria-label={intl.formatMessage(messages.locked)}
-          />
-        </span>
-      )}
       {children}
     </AnimateEmojiProvider>
   );

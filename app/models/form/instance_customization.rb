@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Espelunca customization settings intentionally live in one form object to
+# Instance customization settings intentionally live in one form object to
 # minimize the surface touched during upstream merges.
 class Form::InstanceCustomization
   include ActiveModel::Model
@@ -8,6 +8,8 @@ class Form::InstanceCustomization
   SCALAR_KEYS = %i(
     status_character_limit
     admin_status_character_limit
+    hide_status_character_counter
+    hide_admin_status_character_counter
     media_image_size_limit_mb
     media_video_size_limit_mb
     instance_accent_color
@@ -18,6 +20,7 @@ class Form::InstanceCustomization
   UPLOAD_KEYS = %i(auth_logo email_logo).freeze
   KEYS = (SCALAR_KEYS + UPLOAD_KEYS).freeze
   INTEGER_KEYS = %i(status_character_limit admin_status_character_limit media_image_size_limit_mb media_video_size_limit_mb).freeze
+  BOOLEAN_KEYS = %i(hide_status_character_counter hide_admin_status_character_counter).freeze
   COLOR_KEYS = %i(instance_accent_color email_primary_color email_button_color email_link_color).freeze
 
   STATUS_LIMIT_RANGE = (1..100_000)
@@ -100,7 +103,10 @@ class Form::InstanceCustomization
   end
 
   def typecast(key, value)
-    INTEGER_KEYS.include?(key) ? Integer(value) : value
+    return Integer(value) if INTEGER_KEYS.include?(key)
+    return ActiveModel::Type::Boolean.new.cast(value) if BOOLEAN_KEYS.include?(key)
+
+    value
   end
 
   def admin_limit_is_not_lower

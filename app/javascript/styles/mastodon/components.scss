@@ -2791,6 +2791,11 @@ a.account__display-name {
     padding: 15px;
   }
 
+  &__account-card {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
   .account {
     border-bottom: 0;
     padding: 0;
@@ -2798,9 +2803,9 @@ a.account__display-name {
     min-width: 0;
 
     &__display-name {
-      font-size: 14px;
-      line-height: 20px;
-      font-weight: 500;
+      font-size: 15px;
+      line-height: 21px;
+      font-weight: 600;
       outline-offset: 0;
 
       .display-name__account {
@@ -2825,23 +2830,37 @@ a.account__display-name {
   display: flex;
   flex: 0 1 auto;
   min-width: 0;
-  gap: 8px;
+  gap: 10px;
   color: var(--color-text-secondary);
-  font-size: 11px;
-  line-height: 16px;
+  font-size: 12px;
+  line-height: 18px;
+  margin-inline-start: 56px;
   white-space: nowrap;
 
-  span {
+  .navigation-bar__account-stat {
+    border-radius: 4px;
+    color: inherit;
+    min-width: 0;
     overflow: hidden;
+    outline-offset: 2px;
+    text-decoration: none;
     text-overflow: ellipsis;
-  }
 
-  strong {
-    color: var(--color-text-primary);
+    strong {
+      color: var(--color-text-primary);
+    }
+
+    &:hover strong {
+      color: var(--color-text-brand);
+    }
+
+    &:focus-visible {
+      outline: var(--outline-focus-default);
+    }
   }
 
   @media (width <= 420px) {
-    span:nth-child(1) {
+    .navigation-bar__account-stat--following {
       display: none;
     }
   }

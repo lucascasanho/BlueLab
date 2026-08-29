@@ -949,23 +949,28 @@ en:
         auth_logo: Authentication logo
         branding: Branding
         branding_hint_html: Favicon, PWA/Apple icons and the OpenGraph image remain on the <a href="%{branding_path}">Branding page</a>. Internal SPA SVG logos remain versioned to prevent arbitrary SVG.
-        colors_hint: The color overrides semantic accent tokens while preserving each theme's neutral palette. Use Restore to return to the Espelunca default blue.
+        colors_hint: The color overrides semantic accent tokens while preserving each theme's neutral palette.
         contrast_error: must reach a minimum contrast of %{ratio}:1 against white
-        editor: Editor and emoji
-        editor_note: Unicode emoji are already inserted as real characters. Custom emoji remain stored as shortcodes and render in preview; rendering them inside the textarea would require replacing the editor and risk cursor, IME, mobile and undo/redo behavior.
+        effective_color: "Effective color:"
         email: Email
-        email_button_color: Email button color
+        email_button_color: Primary email button color
+        email_button_color_hint: Fill color for primary action buttons in email templates.
         email_link_color: Email link color
+        email_link_color_hint: Links in content, text actions, and arrow links.
         email_logo: Email logo
-        email_primary_color: Email primary color
+        email_primary_color: Email header accent color
+        email_primary_color_hint: Border and structural accent in the email header.
+        hide_admin_status_character_counter: Hide character counter for administrators
+        hide_status_character_counter: Hide character counter for standard users
         image_limit: Image limit (MB)
         instance_accent_color: Interface accent color
+        instance_accent_color_hint: Primary buttons, links, focus, remote account domains, and other semantic accent tokens.
         interface: Interface and themes
         logo_hint: PNG, JPEG or WebP; maximum 2 MB; square image at least 64 × 64 px (128 × 128 px or larger recommended).
         media: Media
         nginx_warning: "Detected local configuration: nginx accepts at most %{limit} MB. Larger values are rejected before reaching Mastodon."
         posts: Posts
-        preamble: Persistent, validated Espelunca customization. Saving does not edit source files and changes apply immediately.
+        preamble: Persistent, validated server customization. Saving does not edit source files and changes apply immediately.
         proxy_warning: This is the Mastodon limit. Proxies, CDNs or tunnels, including Cloudflare, may impose smaller limits and must be configured separately.
         restore_default: Restore default when saving
         status_limit: Character limit for standard users

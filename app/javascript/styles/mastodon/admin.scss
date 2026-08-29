@@ -242,6 +242,11 @@ $content-width: 840px;
 
           @media screen and (max-width: $mobile-breakpoint) {
             flex: 1 0 50%;
+
+            &.instance-customization-tab {
+              flex: 0 1 auto;
+              width: auto;
+            }
           }
 
           &:hover,

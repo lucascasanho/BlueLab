@@ -34,7 +34,12 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:show_trends]       = Setting.trends && object_account_user.setting_trends
       store[:emoji_style]       = object_account_user.settings['web.emoji_style']
       store[:status_max_characters] = StatusLengthValidator.max_chars_for(object.current_account)
-      store[:wrapstodon]        = wrapstodon
+      store[:hide_status_character_counter] = if object.current_account.user&.role&.administrator?
+                                                Setting.hide_admin_status_character_counter
+                                              else
+                                                Setting.hide_status_character_counter
+                                              end
+      store[:wrapstodon] = wrapstodon
     else
       store[:auto_play_gif] = Setting.auto_play_gif
       store[:display_media] = Setting.display_media

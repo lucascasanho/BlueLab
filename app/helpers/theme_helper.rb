@@ -46,25 +46,29 @@ module ThemeHelper
     )
   end
 
-  # Validated semantic-token overrides for Espelunca. Keeping this after the
+  # Validated semantic-token overrides. Keeping this after the
   # selected theme lets every theme retain its neutral palette.
   def instance_customization_styles
     accent = safe_customization_color(:instance_accent_color, fallback: '#6364ff')
+    custom_logo = Rails.cache.fetch('site_uploads/auth_logo') { SiteUpload.find_by(var: 'auth_logo') }&.file&.url
+    custom_logo = nil unless custom_logo&.match?(%r{\A/[a-zA-Z0-9_./-]+\z})
+    logo_token = "--instance-logo: url(#{custom_logo});" if custom_logo.present?
 
     css = <<~CSS
       :root {
+        #{logo_token}
         --color-bg-brand-base: #{accent};
         --color-bg-brand-base-hover: color-mix(in srgb, #{accent}, black 15%);
         --color-bg-brand-soft: color-mix(in srgb, #{accent}, transparent 85%);
         --color-bg-brand-softest: color-mix(in srgb, #{accent}, transparent 90%);
       }
-      [data-color-scheme='dark'], html:not([data-color-scheme]) {
+      [data-color-scheme=dark], html:not([data-color-scheme]) {
         --color-text-brand: color-mix(in srgb, #{accent}, white 20%);
         --color-text-brand-soft: var(--color-text-brand);
         --color-text-status-links: var(--color-text-brand);
         --color-border-brand: var(--color-text-brand);
       }
-      [data-color-scheme='light'] {
+      [data-color-scheme=light] {
         --color-text-brand: color-mix(in srgb, #{accent}, black 20%);
         --color-text-brand-soft: var(--color-text-brand);
         --color-text-status-links: var(--color-text-brand);

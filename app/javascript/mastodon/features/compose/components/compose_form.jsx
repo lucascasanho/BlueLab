@@ -24,7 +24,7 @@ import SpoilerButtonContainer from '../containers/spoiler_button_container';
 import UploadButtonContainer from '../containers/upload_button_container';
 import { countableText } from '../util/counter';
 
-import { CharacterCounter } from './character_counter';
+import { CharacterCounter, shouldShowCharacterCounter } from './character_counter';
 import { EditIndicator } from './edit_indicator';
 import { LanguageDropdown } from './language_dropdown';
 import { MarkdownPreview } from './markdown_preview';
@@ -82,6 +82,7 @@ class ComposeForm extends ImmutablePureComponent {
     singleColumn: PropTypes.bool,
     lang: PropTypes.string,
     maxChars: PropTypes.number,
+    hideCharacterCounter: PropTypes.bool,
     redirectOnSuccess: PropTypes.bool,
   };
 
@@ -268,7 +269,7 @@ class ComposeForm extends ImmutablePureComponent {
   };
 
   render () {
-    const { intl, onPaste, onDrop, autoFocus, withoutNavigation, maxChars, isSubmitting } = this.props;
+    const { intl, onPaste, onDrop, autoFocus, withoutNavigation, maxChars, hideCharacterCounter, isSubmitting } = this.props;
 
     return (
       <form
@@ -359,7 +360,9 @@ class ComposeForm extends ImmutablePureComponent {
                   text={this.props.text}
                   contentType={this.props.contentType}
                 />
-                <CharacterCounter max={maxChars} text={this.getFulltextForCharacterCounting()} />
+                {shouldShowCharacterCounter(hideCharacterCounter, length(this.getFulltextForCharacterCounting()), maxChars) && (
+                  <CharacterCounter max={maxChars} text={this.getFulltextForCharacterCounting()} />
+                )}
               </div>
 
               <div className='compose-form__submit'>

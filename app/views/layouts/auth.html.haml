@@ -1,15 +1,15 @@
 - content_for :header_tags do
   = vite_typescript_tag 'public.tsx', crossorigin: 'anonymous'
 
-- espelunca_auth_brand = %w(auth/registrations auth/setup auth/confirmations).include?(controller_path) || (controller_path == 'auth/sessions' && action_name == 'new') || (controller_path == 'settings/passkeys' && action_name == 'new')
+- custom_auth_brand = %w(auth/registrations auth/setup auth/confirmations).include?(controller_path) || (controller_path == 'auth/sessions' && action_name == 'new') || (controller_path == 'settings/passkeys' && action_name == 'new')
 
 - content_for :content do
   .container-alt
-    %header.logo-container{ class: ('logo-container--sign-in' if espelunca_auth_brand) }
-      - if espelunca_auth_brand
-        = link_to root_path, class: 'espelunca-auth-brand' do
-          = image_tag(instance_presenter.auth_logo&.file&.url || frontend_asset_path('images/espelunca-icon.svg'), alt: '')
-          %span espelunca
+    %header.logo-container{ class: ('logo-container--sign-in' if custom_auth_brand) }
+      - if custom_auth_brand
+        = link_to root_path, class: 'instance-auth-brand' do
+          = image_tag(instance_presenter.auth_logo&.file&.url || frontend_asset_path('images/logo-symbol-icon.svg'), alt: '')
+          %span= Setting.site_title
       - elsif within_authorization_flow?
         = logo_as_symbol(:wordmark)
       - else

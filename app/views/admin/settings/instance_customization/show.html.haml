@@ -14,11 +14,19 @@
   .fields-row
     .fields-row__column.fields-row__column-6.fields-group
       = f.input :status_character_limit, as: :numeric, label: t('admin.settings.instance_customization.status_limit'), input_html: { min: 1, max: 100_000 }
+      = f.input :hide_status_character_counter, as: :boolean, wrapper: :with_label, label: t('admin.settings.instance_customization.hide_status_character_counter')
+      = label_tag 'reset_hide_status_character_counter' do
+        = check_box_tag 'reset[hide_status_character_counter]', '1', false, id: 'reset_hide_status_character_counter'
+        = t('admin.settings.instance_customization.restore_default')
       = label_tag 'reset_status_character_limit' do
         = check_box_tag 'reset[status_character_limit]', '1', false, id: 'reset_status_character_limit'
         = t('admin.settings.instance_customization.restore_default')
     .fields-row__column.fields-row__column-6.fields-group
       = f.input :admin_status_character_limit, as: :numeric, label: t('admin.settings.instance_customization.admin_status_limit'), input_html: { min: 1, max: 100_000 }
+      = f.input :hide_admin_status_character_counter, as: :boolean, wrapper: :with_label, label: t('admin.settings.instance_customization.hide_admin_status_character_counter')
+      = label_tag 'reset_hide_admin_status_character_counter' do
+        = check_box_tag 'reset[hide_admin_status_character_counter]', '1', false, id: 'reset_hide_admin_status_character_counter'
+        = t('admin.settings.instance_customization.restore_default')
       = label_tag 'reset_admin_status_character_limit' do
         = check_box_tag 'reset[admin_status_character_limit]', '1', false, id: 'reset_admin_status_character_limit'
         = t('admin.settings.instance_customization.restore_default')
@@ -42,7 +50,10 @@
   %p.hint= t('admin.settings.instance_customization.colors_hint')
   - %i(instance_accent_color).each do |key|
     .fields-group
-      = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
+      = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), hint: t("admin.settings.instance_customization.#{key}_hint"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
+      %p.hint
+        = t('admin.settings.instance_customization.effective_color')
+        %code= @instance_customization.public_send(key)
       = label_tag "reset_#{key}" do
         = check_box_tag "reset[#{key}]", '1', false, id: "reset_#{key}"
         = t('admin.settings.instance_customization.restore_default')
@@ -63,13 +74,13 @@
   .fields-row
     - %i(email_primary_color email_button_color email_link_color).each do |key|
       .fields-row__column.fields-row__column-4.fields-group
-        = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
+        = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), hint: t("admin.settings.instance_customization.#{key}_hint"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
+        %p.hint
+          = t('admin.settings.instance_customization.effective_color')
+          %code= @instance_customization.public_send(key)
         = label_tag "reset_#{key}" do
           = check_box_tag "reset[#{key}]", '1', false, id: "reset_#{key}"
           = t('admin.settings.instance_customization.restore_default')
-
-  %h2= t('admin.settings.instance_customization.editor')
-  %p.hint= t('admin.settings.instance_customization.editor_note')
 
   .actions
     = f.button :button, t('generic.save_changes'), type: :submit

@@ -6,7 +6,7 @@
 %html{ lang: I18n.locale, dir: locale_direction }
   %head
     %meta{ 'charset' => 'utf-8' }
-    %title Espelunca
+    %title= Setting.site_title
     %meta{ name: 'x-apple-disable-message-reformatting' }
     %meta{ name: 'viewport', content: 'width=device-width, initial-scale=1' }
     %meta{ name: 'format-detection', content: 'telephone=no, date=no, address=no, email=no, url=no' }
@@ -110,8 +110,8 @@
                                 /[if mso]
                                   </v:textbox></v:rect>
                                 = link_to root_url, class: 'email-header-logo-a' do
-                                  = image_tag(instance_presenter.email_logo&.file&.url || frontend_asset_url('images/mailer-new/common/espelunca-icon.png'), alt: '', width: 40, height: 40)
-                                  %span.email-header-brand-text espelunca
+                                  = image_tag(instance_presenter.email_logo&.file&.url || frontend_asset_url('images/mailer/logo.png'), alt: '', width: 40, height: 40)
+                                  %span.email-header-brand-text= Setting.site_title
 
                           -# Heading
                           = yield :heading
@@ -139,7 +139,7 @@
                     - else
                       %p.email-footer-p
                         = link_to root_url, class: 'email-footer-logo-a' do
-                          = image_tag(instance_presenter.email_logo&.file&.url || frontend_asset_url('images/mailer-new/common/espelunca-icon.png'), alt: 'Espelunca', width: 44, height: 44)
+                          = image_tag(instance_presenter.email_logo&.file&.url || frontend_asset_url('images/mailer/logo.png'), alt: Setting.site_title, width: 44, height: 44)
                       %p.email-footer-p
                         = t 'about.hosted_on', domain: site_hostname
                       %p.email-footer-p

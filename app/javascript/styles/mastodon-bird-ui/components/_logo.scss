@@ -3,7 +3,7 @@
 .layout-multiple-columns {
   .ui__header__logo,
   .column-link.column-link--logo {
-    background-image: var(--espelunca-logo);
+    background-image: var(--instance-logo, var(--logo));
     background-position: center;
     background-repeat: no-repeat;
     background-size: 32px auto;
@@ -26,7 +26,7 @@
   // explicitly in compact column headers.
   .column-header__title:has(> .logo--icon) {
     &::before {
-      background: var(--espelunca-logo) center / contain no-repeat;
+      background: var(--instance-logo, var(--logo)) center / contain no-repeat;
       content: '';
       flex: 0 0 24px;
       height: 24px;
@@ -72,7 +72,7 @@
     display: none;
   }
 
-  .espelunca-auth-brand {
+  .instance-auth-brand {
     align-items: center;
     color: var(--color-text-primary);
     display: flex;
