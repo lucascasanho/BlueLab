@@ -91,11 +91,12 @@
 }
 
 .container-alt:has(> .logo-container--sign-in) {
-  align-items: center;
+  align-items: safe center;
   box-sizing: border-box;
   display: flex;
   min-height: 100vh;
   min-height: 100dvh;
+  padding: max(112px, calc(env(safe-area-inset-top) + 88px)) 0 48px;
   position: relative;
 
   > .form-container {
@@ -152,7 +153,7 @@
   .container-alt:has(> .logo-container--sign-in) {
     align-items: flex-start;
     min-height: 100dvh;
-    padding: 96px 0 32px;
+    padding: max(96px, calc(env(safe-area-inset-top) + 72px)) 0 32px;
 
     > .form-container {
       margin: 0 auto;
