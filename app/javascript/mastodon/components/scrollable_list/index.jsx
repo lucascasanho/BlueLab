@@ -21,6 +21,7 @@ import { LoadingIndicator } from '../loading_indicator';
 import { Scrollable, ItemList } from './components';
 
 const MOUSE_IDLE_DELAY = 300;
+const TOP_THRESHOLD = 100;
 
 const listenerOptions = supportsPassiveEvents ? { passive: true } : false;
 
@@ -60,7 +61,7 @@ IOArticleContainerWrapper.propTypes =  {
   children: PropTypes.node,
 };
 
-class ScrollableList extends PureComponent {
+export class ScrollableList extends PureComponent {
 
   static propTypes = {
     scrollKey: PropTypes.string.isRequired,
@@ -218,24 +219,49 @@ class ScrollableList extends PureComponent {
     this.setScrollTop(newScrollTop);
   };
 
+  getVisualScrollAnchor = () => {
+    const viewportTop = this.props.bindToDocument ? 0 : this.node.getBoundingClientRect().top;
+    const items = this.node.querySelectorAll('.item-list > article[data-id]');
+
+    for (const item of items) {
+      const { top, bottom } = item.getBoundingClientRect();
+
+      if (bottom > viewportTop) {
+        return { node: item, top };
+      }
+    }
+
+    return null;
+  };
+
   getSnapshotBeforeUpdate (prevProps) {
     const someItemInserted = Children.count(prevProps.children) > 0 &&
       Children.count(prevProps.children) < Children.count(this.props.children) &&
       this.getFirstChildKey(prevProps) !== this.getFirstChildKey(this.props);
     const pendingChanged = (prevProps.numPending > 0) !== (this.props.numPending > 0);
 
-    if (pendingChanged || someItemInserted && (this.getScrollTop() > 0 || this.mouseMovedRecently || this.props.preventScroll)) {
-      return this.getScrollHeight() - this.getScrollTop();
+    if (pendingChanged || someItemInserted && (this.getScrollTop() >= TOP_THRESHOLD || this.props.preventScroll)) {
+      return {
+        anchor: this.getVisualScrollAnchor(),
+        bottom: this.getScrollHeight() - this.getScrollTop(),
+      };
     } else {
       return null;
     }
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
-    // Reset the scroll position when a new child comes in in order not to
-    // jerk the scrollbar around if you're already scrolled down the page.
     if (snapshot !== null) {
-      this.setScrollTop(this.getScrollHeight() - snapshot);
+      const { anchor, bottom } = snapshot;
+
+      if (anchor && this.node.contains(anchor.node)) {
+        const offset = anchor.node.getBoundingClientRect().top - anchor.top;
+        this.setScrollTop(this.getScrollTop() + offset);
+      } else {
+        // Keep the previous height-based behavior as a fallback when there is
+        // no stable rendered item to use as a visual anchor.
+        this.setScrollTop(this.getScrollHeight() - bottom);
+      }
     }
   }
 
