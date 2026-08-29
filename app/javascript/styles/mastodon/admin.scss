@@ -161,6 +161,10 @@ $content-width: 840px;
         color: var(--color-text-brand);
         border-bottom: 0;
       }
+
+      #instance_customization > a {
+        white-space: nowrap;
+      }
     }
   }
 

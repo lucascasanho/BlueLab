@@ -36,12 +36,20 @@ RSpec.describe 'Admin instance customization settings' do
     expect(response.body).to include(I18n.t('admin.settings.instance_customization.effective_color'), '#6364ff')
     expect(response.body).to include(I18n.t('admin.settings.instance_customization.hide_status_character_counter'))
     expect(response.body).to include('[data-color-scheme=dark]')
-    navigation_link = response.parsed_body.at_css(".sidebar a[href='#{admin_settings_instance_customization_path}']")
-    expect(navigation_link).to be_present
-    expect(navigation_link.text).to include(I18n.t('admin.settings.instance_customization.title'))
     expect(response.body).to_not include('content__heading__tabs')
     expect(response.body).to_not include('&#39;dark&#39;')
     expect(response.body).to_not include('Editor e emojis', 'Editor and emoji')
+  end
+
+  it 'renders a native single-line sidebar entry with an available icon' do
+    sign_in Fabricate(:admin_user)
+    get admin_settings_instance_customization_path
+
+    navigation_link = response.parsed_body.at_css(".sidebar a[href='#{admin_settings_instance_customization_path}']")
+    expect(navigation_link).to be_present
+    expect(navigation_link.parent['id']).to eq('instance_customization')
+    expect(navigation_link.text).to include(I18n.t('admin.settings.instance_customization.title'))
+    expect(navigation_link.at_css('svg.material-edit')).to be_present
   end
 
   it 'rejects users without settings permission' do
