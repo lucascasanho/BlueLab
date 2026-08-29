@@ -8,6 +8,7 @@ import { EyeIcon } from '@phosphor-icons/react';
 import api from '@/mastodon/api';
 import { IconButton as RedesignIconButton } from '@/mastodon/components/button/redesign';
 import { CircularProgress } from '@/mastodon/components/circular_progress';
+import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { IconButton } from '@/mastodon/components/icon_button';
 import { PopoverMenuCard } from '@/mastodon/components/menu/card';
 
@@ -140,9 +141,10 @@ export const MarkdownPreview: React.FC<Props> = ({
             </div>
           ) : content ? (
             <div className='status__content'>
-              <div
+              <EmojiHTML
+                as='div'
                 className='status__content__text status__content__text--visible'
-                dangerouslySetInnerHTML={{ __html: content }}
+                htmlString={content}
               />
             </div>
           ) : (
