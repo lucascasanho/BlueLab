@@ -256,6 +256,13 @@ $content-width: 840px;
             background: var(--color-bg-brand-base);
           }
         }
+
+        &--settings a {
+          @media screen and (max-width: $mobile-breakpoint) {
+            flex: 0 0 auto;
+            width: auto;
+          }
+        }
       }
 
       &__actions {

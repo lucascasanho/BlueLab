@@ -1,4 +1,4 @@
-.content__heading__tabs
+.content__heading__tabs.content__heading__tabs--settings
   = render_navigation renderer: :links do |primary|
     :ruby
       primary.item :branding, safe_join([material_symbol('edit'), t('admin.settings.branding.title')]), admin_settings_branding_path
