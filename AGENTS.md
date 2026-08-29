@@ -60,6 +60,18 @@ O build da instância usa o metadado `Espelunca` e deve exibir uma versão como
 `4.8.0-alpha.1+Espelunca`. O link de código-fonte deve apontar para
 `lucascasanho/Espelunca`, preservando Mastodon como nome do software oficial.
 
+### Fallback de bandeiras Unicode no Windows
+
+A Espelunca preserva uma correção em
+`app/javascript/mastodon/features/emoji/mode.ts` para tratar bandeiras Unicode
+como não suportadas nativamente no Chromium/Edge para Windows. Esses
+navegadores podem exibir os dois Regional Indicator Symbols como letras, e o
+teste de pixels do upstream pode dar falso positivo. A correção reutiliza o
+modo `native-flags` e os assets Twemoji já existentes, substituindo somente
+bandeiras e mantendo os demais emojis nativos. Ao integrar o upstream,
+preserve essa intenção até que o detector oficial cubra o Windows de forma
+equivalente.
+
 ## Objetivos principais
 
 O Codex deve auxiliar principalmente em:

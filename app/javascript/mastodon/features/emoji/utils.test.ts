@@ -12,6 +12,24 @@ describe('isUnicodeEmoji', () => {
   ] as const)('isUnicodeEmoji("%s") is %o', ([input, expected], { expect }) => {
     expect(isUnicodeEmoji(input)).toBe(expected);
   });
+
+  test.concurrent.for([
+    '🇧🇷',
+    '🇺🇸',
+    '🇯🇵',
+    '🇩🇪',
+    '❤️',
+    '☕',
+    '☺️',
+    '🏳️‍🌈',
+    '👨‍💻',
+    '👨‍👩‍👧',
+  ])(
+    'preserves the complete Unicode emoji sequence "%s"',
+    (emoji, { expect }) => {
+      expect(isUnicodeEmoji(emoji)).toBe(true);
+    },
+  );
 });
 
 describe('isCustomEmoji', () => {
