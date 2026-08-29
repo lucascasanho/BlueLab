@@ -228,6 +228,10 @@ $content-width: 840px;
           gap: 5px;
         }
 
+        .instance-tabs-row > div {
+          display: contents;
+        }
+
         a {
           font-size: 14px;
           display: inline-flex;
@@ -244,8 +248,7 @@ $content-width: 840px;
             flex: 1 0 50%;
 
             &.instance-customization-tab {
-              flex: 0 1 auto;
-              width: auto;
+              display: none;
             }
           }
 
@@ -259,6 +262,64 @@ $content-width: 840px;
             font-weight: 700;
             color: var(--color-text-on-brand-base);
             background: var(--color-bg-brand-base);
+          }
+        }
+
+        .instance-customization-more {
+          display: none;
+          position: relative;
+
+          @media screen and (max-width: $mobile-breakpoint) {
+            display: block;
+          }
+
+          summary {
+            align-items: center;
+            border-radius: 4px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            display: inline-flex;
+            font-size: 14px;
+            font-weight: 500;
+            gap: 5px;
+            padding: 7px 10px;
+            white-space: nowrap;
+
+            &::marker {
+              content: '';
+            }
+
+            &::-webkit-details-marker {
+              display: none;
+            }
+
+            &:hover,
+            &:focus-visible {
+              background: var(--color-bg-secondary);
+            }
+
+            &.selected {
+              color: var(--color-text-on-brand-base);
+              background: var(--color-bg-brand-base);
+            }
+          }
+
+          &__menu {
+            background: var(--color-bg-primary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: 4px;
+            box-shadow: var(--dropdown-shadow);
+            inset-inline-end: 0;
+            min-width: max-content;
+            padding: 4px;
+            position: absolute;
+            top: calc(100% + 4px);
+            z-index: 10;
+
+            a {
+              flex: none;
+              width: auto;
+            }
           }
         }
       }

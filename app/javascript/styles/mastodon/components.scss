@@ -2809,8 +2809,17 @@ a.account__display-name {
       outline-offset: 0;
 
       .display-name__account {
+        display: block;
         font-size: 14px;
         font-weight: 400;
+      }
+
+      .display-name__name {
+        display: block;
+      }
+
+      .display-name__html {
+        display: inline;
       }
     }
   }

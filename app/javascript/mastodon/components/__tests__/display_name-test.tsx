@@ -42,6 +42,17 @@ describe('<DisplayName />', () => {
     ).toBeNull();
   });
 
+  it('shows the lock beside the name in the simple profile variant', () => {
+    const lockedAccount = account.set('locked', true);
+    const { container } = render(
+      <DisplayName account={lockedAccount} variant='simple' />,
+    );
+
+    expect(
+      container.querySelector('.display-name__name .display-name__locked'),
+    ).toBeTruthy();
+  });
+
   it('does not reserve a lock element for a public account', () => {
     const { container } = render(<DisplayName account={account} />);
 
