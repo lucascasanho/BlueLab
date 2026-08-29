@@ -975,7 +975,6 @@ pt-BR:
         restore_default: Restaurar o valor padrão ao salvar
         status_limit: Limite de caracteres para usuário padrão
         title: Customização da instância
-        tab_title: Customização
         video_limit: Limite de vídeo (MB)
       about:
         manage_rules: Gerenciar regras do servidor

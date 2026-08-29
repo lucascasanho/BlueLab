@@ -975,7 +975,6 @@ en:
         restore_default: Restore default when saving
         status_limit: Character limit for standard users
         title: Instance customization
-        tab_title: Customization
         video_limit: Video limit (MB)
       about:
         manage_rules: Manage server rules

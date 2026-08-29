@@ -36,8 +36,10 @@ RSpec.describe 'Admin instance customization settings' do
     expect(response.body).to include(I18n.t('admin.settings.instance_customization.effective_color'), '#6364ff')
     expect(response.body).to include(I18n.t('admin.settings.instance_customization.hide_status_character_counter'))
     expect(response.body).to include('[data-color-scheme=dark]')
-    expect(response.body).to include(I18n.t('admin.settings.instance_customization.tab_title'))
-    expect(response.body).to include('content__heading__tabs--settings')
+    navigation_link = response.parsed_body.at_css(".sidebar a[href='#{admin_settings_instance_customization_path}']")
+    expect(navigation_link).to be_present
+    expect(navigation_link.text).to include(I18n.t('admin.settings.instance_customization.title'))
+    expect(response.body).to_not include('content__heading__tabs')
     expect(response.body).to_not include('&#39;dark&#39;')
     expect(response.body).to_not include('Editor e emojis', 'Editor and emoji')
   end
