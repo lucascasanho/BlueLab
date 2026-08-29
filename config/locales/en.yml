@@ -968,7 +968,6 @@ en:
         interface: Interface and themes
         logo_hint: PNG, JPEG or WebP; maximum 2 MB; square image at least 64 × 64 px (128 × 128 px or larger recommended).
         media: Media
-        more: More
         nginx_warning: "Detected local configuration: nginx accepts at most %{limit} MB. Larger values are rejected before reaching Mastodon."
         posts: Posts
         preamble: Persistent, validated server customization. Saving does not edit source files and changes apply immediately.
@@ -976,6 +975,7 @@ en:
         restore_default: Restore default when saving
         status_limit: Character limit for standard users
         title: Instance customization
+        tab_title: Customization
         video_limit: Video limit (MB)
       about:
         manage_rules: Manage server rules

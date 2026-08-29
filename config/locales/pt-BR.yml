@@ -968,7 +968,6 @@ pt-BR:
         interface: Interface e temas
         logo_hint: PNG, JPEG ou WebP; máximo de 2 MB; imagem quadrada de pelo menos 64 × 64 px (recomendado 128 × 128 px ou maior).
         media: Mídia
-        more: Mais
         nginx_warning: "Configuração local detectada: nginx aceita no máximo %{limit} MB. Valores maiores serão recusados pelo proxy antes de chegar ao Mastodon."
         posts: Publicações
         preamble: Configurações persistentes e validadas deste servidor. Alterações não editam arquivos-fonte e passam a valer após salvar.
@@ -976,6 +975,7 @@ pt-BR:
         restore_default: Restaurar o valor padrão ao salvar
         status_limit: Limite de caracteres para usuário padrão
         title: Customização da instância
+        tab_title: Customização
         video_limit: Limite de vídeo (MB)
       about:
         manage_rules: Gerenciar regras do servidor

@@ -2815,11 +2815,14 @@ a.account__display-name {
       }
 
       .display-name__name {
-        display: block;
+        display: flex;
+        align-items: center;
+        min-width: 0;
       }
 
       .display-name__html {
         display: inline;
+        min-width: 0;
       }
     }
   }

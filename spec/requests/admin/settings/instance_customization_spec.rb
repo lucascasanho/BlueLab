@@ -36,7 +36,7 @@ RSpec.describe 'Admin instance customization settings' do
     expect(response.body).to include(I18n.t('admin.settings.instance_customization.effective_color'), '#6364ff')
     expect(response.body).to include(I18n.t('admin.settings.instance_customization.hide_status_character_counter'))
     expect(response.body).to include('[data-color-scheme=dark]')
-    expect(response.body).to include('instance-customization-more', 'more_horiz')
+    expect(response.body).to include(I18n.t('admin.settings.instance_customization.tab_title'))
     expect(response.body).to_not include('&#39;dark&#39;')
     expect(response.body).to_not include('Editor e emojis', 'Editor and emoji')
   end
