@@ -46,6 +46,34 @@ module ThemeHelper
     )
   end
 
+  # Validated semantic-token overrides for Espelunca. Keeping this after the
+  # selected theme lets every theme retain its neutral palette.
+  def instance_customization_styles
+    accent = safe_customization_color(:instance_accent_color, fallback: '#6364ff')
+
+    css = <<~CSS
+      :root {
+        --color-bg-brand-base: #{accent};
+        --color-bg-brand-base-hover: color-mix(in srgb, #{accent}, black 15%);
+        --color-bg-brand-soft: color-mix(in srgb, #{accent}, transparent 85%);
+        --color-bg-brand-softest: color-mix(in srgb, #{accent}, transparent 90%);
+      }
+      [data-color-scheme='dark'], html:not([data-color-scheme]) {
+        --color-text-brand: color-mix(in srgb, #{accent}, white 20%);
+        --color-text-brand-soft: var(--color-text-brand);
+        --color-text-status-links: var(--color-text-brand);
+        --color-border-brand: var(--color-text-brand);
+      }
+      [data-color-scheme='light'] {
+        --color-text-brand: color-mix(in srgb, #{accent}, black 20%);
+        --color-text-brand-soft: var(--color-text-brand);
+        --color-text-status-links: var(--color-text-brand);
+        --color-border-brand: var(--color-text-brand);
+      }
+    CSS
+    tag.style(safe_join([css]), nonce: request.content_security_policy_nonce)
+  end
+
   def current_theme
     available_themes = Themes.instance.names
 

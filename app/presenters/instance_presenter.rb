@@ -93,4 +93,12 @@ class InstancePresenter < ActiveModelSerializers::Model
 
     @app_icon ||= Rails.cache.fetch('site_uploads/app_icon') { SiteUpload.find_by(var: 'app_icon') }
   end
+
+  def auth_logo
+    @auth_logo ||= Rails.cache.fetch('site_uploads/auth_logo') { SiteUpload.find_by(var: 'auth_logo') }
+  end
+
+  def email_logo
+    @email_logo ||= Rails.cache.fetch('site_uploads/email_logo') { SiteUpload.find_by(var: 'email_logo') }
+  end
 end

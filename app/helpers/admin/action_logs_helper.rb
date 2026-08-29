@@ -44,6 +44,8 @@ module Admin::ActionLogsHelper
 
   def chain_multiple_translations(action_log)
     case action_log.target_type
+    when 'Account'
+      :'admin.action_logs.instance_customization_changes' if action_log.action == :update_instance_customization
     when 'Tag'
       %i(usable trendable listable).filter_map do |key|
         fetch_key = permutation_of_key(action_log, key)

@@ -52,6 +52,7 @@ export const AccountName: FC<{ accountId: string }> = ({ accountId }) => {
   }
 
   const [username = '', domain = localDomain] = account.acct.split('@');
+  const isRemote = account.acct.includes('@');
 
   return (
     <div className={classes.nameWrapper}>
@@ -69,6 +70,7 @@ export const AccountName: FC<{ accountId: string }> = ({ accountId }) => {
           username={username}
           domain={domain}
           isSelf={account.id === me}
+          isRemote={isRemote}
         />
       )}
 
@@ -144,7 +146,8 @@ const AccountNameHelp: FC<{
   username: string;
   domain: string;
   isSelf: boolean;
-}> = ({ username, domain, isSelf }) => {
+  isRemote: boolean;
+}> = ({ username, domain, isSelf, isRemote }) => {
   const accessibilityId = useId();
   const intl = useIntl();
   const [open, setOpen] = useState(false);
@@ -167,7 +170,10 @@ const AccountNameHelp: FC<{
         aria-expanded={open}
         aria-controls={accessibilityId}
       >
-        {handle}
+        <span>@{username}</span>
+        <span className={isRemote ? 'display-name__domain' : undefined}>
+          @{domain}
+        </span>
         <Icon
           id='help'
           icon={HelpIcon}

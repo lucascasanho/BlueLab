@@ -24,7 +24,8 @@ module Remotable
           Request.new(:get, url).perform do |response|
             raise Mastodon::UnexpectedResponseError, response unless (200...300).cover?(response.code)
 
-            public_send(:"#{attachment_name}=", ResponseWithLimit.new(response, limit))
+            resolved_limit = limit.respond_to?(:call) ? instance_exec(&limit) : limit
+            public_send(:"#{attachment_name}=", ResponseWithLimit.new(response, resolved_limit))
           end
         rescue Mastodon::UnexpectedResponseError, *Mastodon::HTTP_CONNECTION_ERRORS => e
           Rails.logger.debug { "Error fetching remote #{attachment_name}: #{e}" }

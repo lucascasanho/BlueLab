@@ -8,7 +8,7 @@
     %header.logo-container{ class: ('logo-container--sign-in' if espelunca_auth_brand) }
       - if espelunca_auth_brand
         = link_to root_path, class: 'espelunca-auth-brand' do
-          = image_tag frontend_asset_path('images/espelunca-icon.svg'), alt: ''
+          = image_tag(instance_presenter.auth_logo&.file&.url || frontend_asset_path('images/espelunca-icon.svg'), alt: '')
           %span espelunca
       - elsif within_authorization_flow?
         = logo_as_symbol(:wordmark)

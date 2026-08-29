@@ -72,6 +72,17 @@ bandeiras e mantendo os demais emojis nativos. Ao integrar o upstream,
 preserve essa intenção até que o detector oficial cubra o Windows de forma
 equivalente.
 
+### Customização administrativa da instância
+
+A Espelunca concentra configurações próprias em
+`Administração → Customização da instância`. A arquitetura e os limites de
+manutenção estão documentados em
+`docs/espelunca/instance-customization.md`. Os valores escalares usam o model
+`Setting` e os logos raster usam `SiteUpload`; não editar temas ou assets
+versionados em resposta a mudanças feitas pelo painel. Em merges com upstream,
+preservar a validação backend diferenciada de publicações, os limites dinâmicos
+de mídia e os overrides de tokens semânticos.
+
 ## Objetivos principais
 
 O Codex deve auxiliar principalmente em:

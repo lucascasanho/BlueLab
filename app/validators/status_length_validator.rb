@@ -8,12 +8,15 @@ class StatusLengthValidator < ActiveModel::Validator
 
   def self.max_chars_for(account)
     role = account&.user&.role
+    role&.administrator? ? admin_max_chars : max_chars
+  end
 
-    if role&.administrator? || (role&.can?(:manage_reports) && role&.can?(:manage_users))
-      PRIVILEGED_MAX_CHARS
-    else
-      MAX_CHARS
-    end
+  def self.max_chars
+    Setting.status_character_limit.to_i.clamp(1, 100_000)
+  end
+
+  def self.admin_max_chars
+    Setting.admin_status_character_limit.to_i.clamp(max_chars, 100_000)
   end
 
   def validate(status)

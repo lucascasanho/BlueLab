@@ -81,6 +81,7 @@ class Admin::ActionLogFilter
     update_tag: { target_type: 'Tag', action: 'update' }.freeze,
     create_username_block: { target_type: 'UsernameBlock', action: 'create' }.freeze,
     update_username_block: { target_type: 'UsernameBlock', action: 'update' }.freeze,
+    update_instance_customization_account: { target_type: 'Account', action: 'update_instance_customization' }.freeze,
     destroy_username_block: { target_type: 'UsernameBlock', action: 'destroy' }.freeze,
     username_change_account: { target_type: 'Account', action: 'username_change' }.freeze,
   }.freeze

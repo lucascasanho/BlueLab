@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
+  CUSTOMIZATION_COLOR_PATTERN = /\A#[0-9a-fA-F]{6}\z/
   RTL_LOCALES = %i(
     ar
     ckb
@@ -20,6 +21,11 @@ module ApplicationHelper
     )
 
     number_to_human(number, **options)
+  end
+
+  def safe_customization_color(key, fallback:)
+    value = Setting.public_send(key)
+    value.is_a?(String) && CUSTOMIZATION_COLOR_PATTERN.match?(value) ? value : fallback
   end
 
   def open_registrations?

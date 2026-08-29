@@ -183,6 +183,7 @@ en:
       whitelisted: Allowed for federation
     action_logs:
       action_types:
+        update_instance_customization_account: Update instance customization
         approve_appeal: Approve Appeal
         approve_user: Approve User
         assigned_to_self_report: Assign Report
@@ -252,6 +253,7 @@ en:
         update_user_role: Update Role
         update_username_block: Update Username Rule
       actions:
+        update_instance_customization_account_html: "%{name} updated instance customization"
         approve_appeal_html: "%{name} approved moderation decision appeal from %{target}"
         approve_user_html: "%{name} approved sign-up from %{target}"
         assigned_to_self_report_html: "%{name} assigned report %{target} to themselves"
@@ -333,6 +335,7 @@ en:
       empty: No logs found.
       filter_by_action: Filter by action
       filter_by_user: Filter by user
+      instance_customization_changes: Previous and new values were securely recorded.
       title: Audit log
       unavailable_instance: "(domain name unavailable)"
     announcements:
@@ -941,6 +944,33 @@ en:
       translations: Translations
       translations_explanation: You can optionally add translations for the rules. The default value will be shown if no translated version is available. Please always ensure any provided translation is in sync with the default value.
     settings:
+      instance_customization:
+        admin_status_limit: Character limit for administrators
+        auth_logo: Authentication logo
+        branding: Branding
+        branding_hint_html: Favicon, PWA/Apple icons and the OpenGraph image remain on the <a href="%{branding_path}">Branding page</a>. Internal SPA SVG logos remain versioned to prevent arbitrary SVG.
+        colors_hint: The color overrides semantic accent tokens while preserving each theme's neutral palette. Use Restore to return to the Espelunca default blue.
+        contrast_error: must reach a minimum contrast of %{ratio}:1 against white
+        editor: Editor and emoji
+        editor_note: Unicode emoji are already inserted as real characters. Custom emoji remain stored as shortcodes and render in preview; rendering them inside the textarea would require replacing the editor and risk cursor, IME, mobile and undo/redo behavior.
+        email: Email
+        email_button_color: Email button color
+        email_link_color: Email link color
+        email_logo: Email logo
+        email_primary_color: Email primary color
+        image_limit: Image limit (MB)
+        instance_accent_color: Interface accent color
+        interface: Interface and themes
+        logo_hint: PNG, JPEG or WebP; maximum 2 MB; square image at least 64 × 64 px (128 × 128 px or larger recommended).
+        media: Media
+        nginx_warning: "Detected local configuration: nginx accepts at most %{limit} MB. Larger values are rejected before reaching Mastodon."
+        posts: Posts
+        preamble: Persistent, validated Espelunca customization. Saving does not edit source files and changes apply immediately.
+        proxy_warning: This is the Mastodon limit. Proxies, CDNs or tunnels, including Cloudflare, may impose smaller limits and must be configured separately.
+        restore_default: Restore default when saving
+        status_limit: Character limit for standard users
+        title: Instance customization
+        video_limit: Video limit (MB)
       about:
         manage_rules: Manage server rules
         preamble: Provide in-depth information about how the server is operated, moderated, funded.

@@ -55,13 +55,18 @@ class SiteUpload < ApplicationRecord
     }.freeze,
 
     mascot: {}.freeze,
+    auth_logo: {}.freeze,
+    email_logo: {}.freeze,
   }.freeze
 
   has_attached_file :file, styles: ->(file) { STYLES[file.instance.var.to_sym] }, convert_options: { all: '-coalesce +profile "!icc,*" +set date:modify +set date:create +set date:timestamp' }, processors: [:lazy_thumbnail, :blurhash_transcoder, :type_corrector]
 
   validates_attachment_content_type :file, content_type: %r{\Aimage/.*\z}
+  validates_attachment_content_type :file, content_type: %w(image/png image/jpeg image/webp), if: -> { %w(auth_logo email_logo).include?(var) }
+  validates_attachment_size :file, less_than: 2.megabytes, if: -> { %w(auth_logo email_logo).include?(var) }
   validates :file, presence: true
   validates :var, presence: true, uniqueness: true
+  validate :validate_branding_dimensions, if: -> { %w(auth_logo email_logo).include?(var) }
 
   before_save :set_meta
   after_commit :clear_cache
@@ -71,6 +76,17 @@ class SiteUpload < ApplicationRecord
   end
 
   private
+
+  def validate_branding_dimensions
+    tempfile = file.queued_for_write[:original]
+    return if tempfile.nil?
+
+    width, height = FastImage.size(tempfile.path)
+    return errors.add(:file, :invalid) if width.nil? || height.nil?
+
+    errors.add(:file, 'must be at least 64×64 pixels') if width < 64 || height < 64
+    errors.add(:file, 'must be approximately square') if (width.fdiv(height) - 1).abs > 0.1
+  end
 
   def set_meta
     tempfile = file.queued_for_write[:original]

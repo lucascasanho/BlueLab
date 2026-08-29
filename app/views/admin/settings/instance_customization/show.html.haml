@@ -1,0 +1,75 @@
+- content_for :page_title do
+  = t('admin.settings.instance_customization.title')
+
+- content_for :heading do
+  %h1= t('admin.settings.title')
+  = render partial: 'admin/settings/shared/links'
+
+= simple_form_for @instance_customization, url: admin_settings_instance_customization_path do |f|
+  = render 'shared/error_messages', object: @instance_customization
+
+  %p.lead= t('admin.settings.instance_customization.preamble')
+
+  %h2= t('admin.settings.instance_customization.posts')
+  .fields-row
+    .fields-row__column.fields-row__column-6.fields-group
+      = f.input :status_character_limit, as: :numeric, label: t('admin.settings.instance_customization.status_limit'), input_html: { min: 1, max: 100_000 }
+      = label_tag 'reset_status_character_limit' do
+        = check_box_tag 'reset[status_character_limit]', '1', false, id: 'reset_status_character_limit'
+        = t('admin.settings.instance_customization.restore_default')
+    .fields-row__column.fields-row__column-6.fields-group
+      = f.input :admin_status_character_limit, as: :numeric, label: t('admin.settings.instance_customization.admin_status_limit'), input_html: { min: 1, max: 100_000 }
+      = label_tag 'reset_admin_status_character_limit' do
+        = check_box_tag 'reset[admin_status_character_limit]', '1', false, id: 'reset_admin_status_character_limit'
+        = t('admin.settings.instance_customization.restore_default')
+
+  %h2= t('admin.settings.instance_customization.media')
+  %p.hint= t('admin.settings.instance_customization.proxy_warning')
+  .flash-message.warning= t('admin.settings.instance_customization.nginx_warning', limit: 99)
+  .fields-row
+    .fields-row__column.fields-row__column-6.fields-group
+      = f.input :media_image_size_limit_mb, as: :numeric, label: t('admin.settings.instance_customization.image_limit'), hint: '1–100 MB', input_html: { min: 1, max: 100 }
+      = label_tag 'reset_media_image_size_limit_mb' do
+        = check_box_tag 'reset[media_image_size_limit_mb]', '1', false, id: 'reset_media_image_size_limit_mb'
+        = t('admin.settings.instance_customization.restore_default')
+    .fields-row__column.fields-row__column-6.fields-group
+      = f.input :media_video_size_limit_mb, as: :numeric, label: t('admin.settings.instance_customization.video_limit'), hint: '1–1024 MB', input_html: { min: 1, max: 1024 }
+      = label_tag 'reset_media_video_size_limit_mb' do
+        = check_box_tag 'reset[media_video_size_limit_mb]', '1', false, id: 'reset_media_video_size_limit_mb'
+        = t('admin.settings.instance_customization.restore_default')
+
+  %h2= t('admin.settings.instance_customization.interface')
+  %p.hint= t('admin.settings.instance_customization.colors_hint')
+  - %i(instance_accent_color).each do |key|
+    .fields-group
+      = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
+      = label_tag "reset_#{key}" do
+        = check_box_tag "reset[#{key}]", '1', false, id: "reset_#{key}"
+        = t('admin.settings.instance_customization.restore_default')
+
+  %h2= t('admin.settings.instance_customization.branding')
+  %p.hint= t('admin.settings.instance_customization.branding_hint_html', branding_path: admin_settings_branding_path)
+  .fields-row
+    - %i(auth_logo email_logo).each do |key|
+      .fields-row__column.fields-row__column-6.fields-group
+        = f.input key, as: :file, label: t("admin.settings.instance_customization.#{key}"), hint: t('admin.settings.instance_customization.logo_hint'), input_html: { accept: Form::InstanceCustomization::UPLOAD_MIME_TYPES.join(',') }
+        - if @instance_customization.public_send(key).persisted?
+          = image_tag @instance_customization.public_send(key).file.url, class: 'fields-group__thumbnail', alt: ''
+        = label_tag "reset_#{key}" do
+          = check_box_tag "reset[#{key}]", '1', false, id: "reset_#{key}"
+          = t('admin.settings.instance_customization.restore_default')
+
+  %h2= t('admin.settings.instance_customization.email')
+  .fields-row
+    - %i(email_primary_color email_button_color email_link_color).each do |key|
+      .fields-row__column.fields-row__column-4.fields-group
+        = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
+        = label_tag "reset_#{key}" do
+          = check_box_tag "reset[#{key}]", '1', false, id: "reset_#{key}"
+          = t('admin.settings.instance_customization.restore_default')
+
+  %h2= t('admin.settings.instance_customization.editor')
+  %p.hint= t('admin.settings.instance_customization.editor_note')
+
+  .actions
+    = f.button :button, t('generic.save_changes'), type: :submit

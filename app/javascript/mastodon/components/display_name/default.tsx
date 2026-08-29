@@ -49,6 +49,13 @@ export const DisplayNameDefault: FC<
     ComponentPropsWithoutRef<'span'> & { showDomain?: boolean }
 > = ({ account, localDomain, className, showDomain = true, ...props }) => {
   const username = useAccountHandle(account, localDomain, showDomain);
+  const domainSeparator = account?.acct.includes('@')
+    ? (username?.indexOf('@', 1) ?? -1)
+    : -1;
+  const usernamePart =
+    domainSeparator > 0 ? username?.slice(0, domainSeparator) : username;
+  const domainPart =
+    domainSeparator > 0 ? username?.slice(domainSeparator) : null;
 
   return (
     <DisplayNameWithoutDomain
@@ -58,7 +65,16 @@ export const DisplayNameDefault: FC<
     >
       {' '}
       <span className='display-name__account'>
-        {username ?? <Skeleton width='7ch' />}
+        {username ? (
+          <>
+            {usernamePart}
+            {domainPart && (
+              <span className='display-name__domain'>{domainPart}</span>
+            )}
+          </>
+        ) : (
+          <Skeleton width='7ch' />
+        )}
       </span>
     </DisplayNameWithoutDomain>
   );

@@ -55,16 +55,16 @@ class REST::V1::InstanceSerializer < ActiveModel::Serializer
       },
 
       statuses: {
-        max_characters: StatusLengthValidator::MAX_CHARS,
+        max_characters: StatusLengthValidator.max_chars,
         max_media_attachments: Status::MEDIA_ATTACHMENTS_LIMIT,
         characters_reserved_per_url: StatusLengthValidator::URL_PLACEHOLDER_CHARS,
       },
 
       media_attachments: {
         supported_mime_types: MediaAttachment.supported_mime_types,
-        image_size_limit: MediaAttachment::IMAGE_LIMIT,
+        image_size_limit: MediaAttachment.image_limit,
         image_matrix_limit: Attachmentable::MAX_MATRIX_LIMIT,
-        video_size_limit: MediaAttachment::VIDEO_LIMIT,
+        video_size_limit: MediaAttachment.video_limit,
         video_frame_rate_limit: MediaAttachment::MAX_VIDEO_FRAME_RATE,
         video_matrix_limit: MediaAttachment::MAX_VIDEO_MATRIX_LIMIT,
       },

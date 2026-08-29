@@ -19,8 +19,20 @@ describe('<DisplayName />', () => {
   });
 
   it('still renders the complete handle with the default variant', () => {
-    render(<DisplayName account={account} />);
+    const { container } = render(<DisplayName account={account} />);
 
-    expect(screen.getByText('@alice@remote.example')).toBeTruthy();
+    expect(container.querySelector('.display-name__account')?.textContent).toBe(
+      '@alice@remote.example',
+    );
+    expect(container.querySelector('.display-name__domain')?.textContent).toBe(
+      '@remote.example',
+    );
+  });
+
+  it('shows an accessible lock for a private account', () => {
+    const lockedAccount = account.set('locked', true);
+    render(<DisplayName account={lockedAccount} />);
+
+    expect(screen.getByRole('img', { name: /manually reviews/i })).toBeTruthy();
   });
 });

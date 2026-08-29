@@ -46,6 +46,14 @@ class MediaAttachment < ApplicationRecord
   IMAGE_LIMIT = 100.megabytes
   VIDEO_LIMIT = 1.gigabyte
 
+  def self.image_limit
+    [Setting.media_image_size_limit_mb.to_i.clamp(1, 100).megabytes, IMAGE_LIMIT].min
+  end
+
+  def self.video_limit
+    [Setting.media_video_size_limit_mb.to_i.clamp(1, 1024).megabytes, VIDEO_LIMIT].min
+  end
+
   MAX_VIDEO_MATRIX_LIMIT = 8_294_400 # 3840x2160px
   MAX_VIDEO_FRAME_RATE   = 120
   MAX_VIDEO_FRAMES       = 36_000 # Approx. 5 minutes at 120 fps
@@ -192,8 +200,8 @@ class MediaAttachment < ApplicationRecord
   before_file_validate :check_video_dimensions
 
   validates_attachment_content_type :file, content_type: IMAGE_MIME_TYPES + VIDEO_MIME_TYPES + AUDIO_MIME_TYPES
-  validates_attachment_size :file, less_than: ->(m) { m.larger_media_format? ? VIDEO_LIMIT : IMAGE_LIMIT }
-  remotable_attachment :file, VIDEO_LIMIT, suppress_errors: false, download_on_assign: false, attribute_name: :remote_url
+  validates_attachment_size :file, less_than: ->(m) { m.larger_media_format? ? MediaAttachment.video_limit : MediaAttachment.image_limit }
+  remotable_attachment :file, -> { MediaAttachment.video_limit }, suppress_errors: false, download_on_assign: false, attribute_name: :remote_url
 
   has_attached_file :thumbnail,
                     styles: THUMBNAIL_STYLES,
@@ -201,8 +209,8 @@ class MediaAttachment < ApplicationRecord
                     convert_options: GLOBAL_CONVERT_OPTIONS
 
   validates_attachment_content_type :thumbnail, content_type: IMAGE_MIME_TYPES
-  validates_attachment_size :thumbnail, less_than: IMAGE_LIMIT
-  remotable_attachment :thumbnail, IMAGE_LIMIT, suppress_errors: true, download_on_assign: false
+  validates_attachment_size :thumbnail, less_than: ->(_) { MediaAttachment.image_limit }
+  remotable_attachment :thumbnail, -> { MediaAttachment.image_limit }, suppress_errors: true, download_on_assign: false
 
   validates :account, presence: true
   validates :description, length: { maximum: MAX_DESCRIPTION_LENGTH }, if: :local?

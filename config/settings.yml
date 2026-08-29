@@ -35,6 +35,16 @@ defaults: &defaults
   allow_referrer_origin: false
   landing_page: 'trends'
   wrapstodon: true
+  # Espelunca instance customization. Keep these defaults in sync with the
+  # upstream constants they replace so an unset setting preserves behaviour.
+  status_character_limit: 500
+  admin_status_character_limit: 10000
+  media_image_size_limit_mb: 100
+  media_video_size_limit_mb: 1024
+  instance_accent_color: '#6364ff'
+  email_primary_color: '#6364ff'
+  email_button_color: '#6364ff'
+  email_link_color: '#5638cc'
 
 development:
   <<: *defaults

@@ -1,3 +1,7 @@
+:ruby
+  email_button_color = safe_customization_color(:email_button_color, fallback: '#6364ff')
+  email_link_color = safe_customization_color(:email_link_color, fallback: '#5638cc')
+  email_primary_color = safe_customization_color(:email_primary_color, fallback: '#6364ff')
 !!!
 %html{ lang: I18n.locale, dir: locale_direction }
   %head
@@ -10,6 +14,12 @@
     %meta{ name: 'supported-color-schemes', content: 'light dark' }
     %style
       \table { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+      \.email-btn-table { background-color: #{email_button_color} !important; }
+      \.email-prose a,
+      \.email-status-prose a,
+      \.email-link-with-arrow,
+      \.email-column-action-td { color: #{email_link_color} !important; }
+      \.email-header-td { border-color: #{email_primary_color} !important; }
     %style{ 'data-premailer': 'ignore' }
       \:root { color-scheme: light dark; supported-color-schemes: light dark; }
       \.email a { color: inherit; text-decoration: none; }
@@ -17,12 +27,47 @@
       \.email-banner-text-td .email-btn-hover:hover { background-color: #fff !important; }
       \@media (prefers-color-scheme: dark) {
       \  body, .email { background-color: #1e2028 !important; color: #f7f9f9 !important; }
-      \  .email-card-td, .email-inner-card-td, .email-inner-card-td-without-padding, .email-inner-nested-card-td, .email-header-card-table, .email-account-banner-icon-table, .email-checklist-table, .email-mini-td, .email-feature-td { background-color: #232543 !important; border-color: #38384d !important; }
+      \  .email-card-td,
+      \  .email-inner-card-td,
+      \  .email-inner-card-td-without-padding,
+      \  .email-inner-nested-card-td,
+      \  .email-header-card-table,
+      \  .email-account-banner-icon-table,
+      \  .email-checklist-table,
+      \  .email-mini-td,
+      \  .email-feature-td { background-color: #232543 !important; border-color: #38384d !important; }
       \  .email-account-banner-table, .email-header-card-banner-td { background-color: #393f4f !important; }
       \  .email-header-td, .email-header-after-inside-div, .email-banner-table { background-color: #1e2028 !important; }
       \  .email-body-td { background-color: #232543 !important; background-image: none !important; }
-      \  .email-account-name, .email-account-stats-table b, .email-header-card-instance, .email-body-padding-td > p, .email-h2, .email-status-header-name, .email-quote-header-name, .email-status-prose p, .email-status-media, .email-checklist-text-td h3, .email-mini-follow-text-td h3, .email-mini-hashtag-td h3, .email-prose p, .email-prose ul, .email-prose ol { color: #f7f9f9 !important; }
-      \  .email-account-handle, .email-account-stats-table td, .email-header-card-description, .email-h-sub, .email-p, .email-status-header-handle, .email-quote-header-handle, .email-status-spoiler, .email-status-footer, .email-checklist-text-td p, .email-mini-follow-text-td p, .email-mini-hashtag-td p, .email-footer-p, .email-footer-p a { color: #b8b3c0 !important; }
+      \  .email-account-name,
+      \  .email-account-stats-table b,
+      \  .email-header-card-instance,
+      \  .email-body-padding-td > p,
+      \  .email-h2,
+      \  .email-status-header-name,
+      \  .email-quote-header-name,
+      \  .email-status-prose p,
+      \  .email-status-media,
+      \  .email-checklist-text-td h3,
+      \  .email-mini-follow-text-td h3,
+      \  .email-mini-hashtag-td h3,
+      \  .email-prose p,
+      \  .email-prose ul,
+      \  .email-prose ol { color: #f7f9f9 !important; }
+      \  .email-account-handle,
+      \  .email-account-stats-table td,
+      \  .email-header-card-description,
+      \  .email-h-sub,
+      \  .email-p,
+      \  .email-status-header-handle,
+      \  .email-quote-header-handle,
+      \  .email-status-spoiler,
+      \  .email-status-footer,
+      \  .email-checklist-text-td p,
+      \  .email-mini-follow-text-td p,
+      \  .email-mini-hashtag-td p,
+      \  .email-footer-p,
+      \  .email-footer-p a { color: #b8b3c0 !important; }
       \  .email-border-top, .email-border-bottom, .email-body-columns-td { border-color: #38384d !important; }
       \  .email-frame-table { background-color: #393f4f !important; }
       \  .email-checklist-checked { background-color: #193c34 !important; border-color: #00ba7c !important; }
@@ -65,7 +110,7 @@
                                 /[if mso]
                                   </v:textbox></v:rect>
                                 = link_to root_url, class: 'email-header-logo-a' do
-                                  = image_tag frontend_asset_url('images/mailer-new/common/espelunca-icon.png'), alt: '', width: 40, height: 40
+                                  = image_tag(instance_presenter.email_logo&.file&.url || frontend_asset_url('images/mailer-new/common/espelunca-icon.png'), alt: '', width: 40, height: 40)
                                   %span.email-header-brand-text espelunca
 
                           -# Heading
@@ -94,7 +139,7 @@
                     - else
                       %p.email-footer-p
                         = link_to root_url, class: 'email-footer-logo-a' do
-                          = image_tag frontend_asset_url('images/mailer-new/common/espelunca-icon.png'), alt: 'Espelunca', width: 44, height: 44
+                          = image_tag(instance_presenter.email_logo&.file&.url || frontend_asset_url('images/mailer-new/common/espelunca-icon.png'), alt: 'Espelunca', width: 44, height: 44)
                       %p.email-footer-p
                         = t 'about.hosted_on', domain: site_hostname
                       %p.email-footer-p

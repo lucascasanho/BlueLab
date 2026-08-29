@@ -5,9 +5,12 @@ require 'rails_helper'
 RSpec.describe StatusLengthValidator do
   subject { Fabricate.build :status }
 
-  before { stub_const 'StatusLengthValidator::MAX_CHARS', 100 }
+  before do
+    Setting.status_character_limit = 100
+    Setting.admin_status_character_limit = 200
+  end
 
-  let(:over_limit_text) { 'a' * described_class::MAX_CHARS * 2 }
+  let(:over_limit_text) { 'a' * described_class.max_chars * 2 }
 
   context 'when status is remote' do
     before { subject.update! account: Fabricate(:account, domain: 'host.example') }
@@ -27,16 +30,23 @@ RSpec.describe StatusLengthValidator do
     it { is_expected.to_not allow_value(over_limit_text).for(:text).with_message(too_long_message) }
   end
 
-  context 'when the author has moderation privileges' do
+  context 'when the author is an administrator' do
     subject { Fabricate.build(:status, account: user.account) }
 
-    before { stub_const 'StatusLengthValidator::PRIVILEGED_MAX_CHARS', 200 }
-
-    let(:role) { Fabricate(:user_role, permissions_as_keys: %w(manage_reports manage_users)) }
+    let(:role) { Fabricate(:user_role, permissions_as_keys: %w(administrator)) }
     let(:user) { Fabricate(:user, role: role) }
 
     it { is_expected.to allow_value(over_limit_text).for(:text) }
     it { is_expected.to_not allow_value('a' * 201).for(:text).with_message(I18n.t('statuses.over_character_limit', max: 200)) }
+  end
+
+  context 'when the author only has moderation privileges' do
+    subject { Fabricate.build(:status, account: user.account) }
+
+    let(:role) { Fabricate(:user_role, permissions_as_keys: %w(manage_reports manage_users)) }
+    let(:user) { Fabricate(:user, role: role) }
+
+    it { is_expected.to_not allow_value('a' * 101).for(:text).with_message(I18n.t('statuses.over_character_limit', max: 100)) }
   end
 
   context 'when content warning text is over character limit' do
@@ -80,8 +90,8 @@ RSpec.describe StatusLengthValidator do
   end
 
   context 'with special character strings' do
-    let(:multibyte_emoji) { '✨' * described_class::MAX_CHARS }
-    let(:zwj_sequence) { '🏳️‍⚧️' * described_class::MAX_CHARS }
+    let(:multibyte_emoji) { '✨' * described_class.max_chars }
+    let(:zwj_sequence) { '🏳️‍⚧️' * described_class.max_chars }
 
     it { is_expected.to allow_values(multibyte_emoji, zwj_sequence).for(:text) }
   end
@@ -89,7 +99,7 @@ RSpec.describe StatusLengthValidator do
   private
 
   def too_long_message
-    I18n.t('statuses.over_character_limit', max: described_class::MAX_CHARS)
+    I18n.t('statuses.over_character_limit', max: described_class.max_chars)
   end
 
   def starting_string
