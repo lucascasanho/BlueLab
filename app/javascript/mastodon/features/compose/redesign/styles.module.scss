@@ -165,6 +165,20 @@ textarea.textarea {
   border-radius: var(--radius-xs);
   outline: none;
   white-space: pre-wrap;
+
+  [data-emoji-shortcode] {
+    display: inline-flex;
+    vertical-align: middle;
+    user-select: none;
+
+    img {
+      width: 1.25em;
+      height: 1.25em;
+      object-fit: contain;
+      vertical-align: middle;
+    }
+  }
+
   overflow-wrap: anywhere;
   cursor: text;
 

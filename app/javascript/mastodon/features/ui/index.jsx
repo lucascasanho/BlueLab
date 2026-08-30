@@ -25,6 +25,7 @@ import { layoutFromWindow, transientSingleColumn } from 'mastodon/is_mobile';
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import { checkAnnualReport } from '@/mastodon/reducers/slices/annual_report';
+import { openNewComposer } from '@/mastodon/reducers/slices/composer';
 
 import { uploadCompose, resetCompose, changeComposeSpoilerness } from '../../actions/compose';
 import { clearHeight } from '../../actions/height_cache';
@@ -464,12 +465,20 @@ class UI extends PureComponent {
 
   handleHotkeyNew = e => {
     e.preventDefault();
+    this.props.dispatch(openNewComposer({ type: 'post' }));
+    setTimeout(() => {
+      const element = this.node.querySelector('[contenteditable="true"], .autosuggest-textarea__textarea');
+      element?.focus();
+    }, 0);
+  };
 
-    const element = this.node.querySelector('.autosuggest-textarea__textarea');
-
-    if (element) {
-      element.focus();
-    }
+  handleHotkeyMention = e => {
+    e.preventDefault();
+    this.props.dispatch(openNewComposer({ type: 'message' }));
+    setTimeout(() => {
+      const element = this.node.querySelector('[contenteditable="true"], .autosuggest-textarea__textarea');
+      element?.focus();
+    }, 0);
   };
 
   handleHotkeySearch = e => {
@@ -609,6 +618,7 @@ class UI extends PureComponent {
     const handlers = {
       help: this.handleHotkeyToggleHelp,
       new: this.handleHotkeyNew,
+      mention: this.handleHotkeyMention,
       search: this.handleHotkeySearch,
       forceNew: this.handleHotkeyForceNew,
       toggleComposeSpoilers: this.handleHotkeyToggleComposeSpoilers,

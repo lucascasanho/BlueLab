@@ -17,6 +17,26 @@
   margin: var(--space-md);
   box-sizing: border-box;
   border-radius: var(--radius-xl);
+  animation: composer-enter 180ms ease-out both;
+}
+
+@keyframes composer-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-md)) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .composer,
+  .composerMinimized {
+    animation: none;
+  }
 }
 
 .composer {

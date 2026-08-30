@@ -22,6 +22,7 @@ import { processPasteOrDrop } from '@/mastodon/actions/compose_typed';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { normalizeKey } from '@/mastodon/components/hotkeys/utils';
 import type { IconProp } from '@/mastodon/components/icon';
+import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import {
   COMPOSER_TEXTAREA_ID,
   dismissComposer,
@@ -32,18 +33,36 @@ import classes from './styles.module.scss';
 
 const escapeHtml = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const escapeAttribute = (value: string) =>
+  escapeHtml(value).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-const markdownToHtml = (value: string) =>
+const markdownToHtml = (
+  value: string,
+  customEmojis: Record<string, { static_url: string; url: string }>,
+) =>
   value
     .split('\n')
     .map((line) => {
+      const emojiPlaceholders: string[] = [];
       const escaped = escapeHtml(line)
+        .replace(/:([a-zA-Z0-9_+-]+):/g, (match, shortcode: string) => {
+          const emoji = customEmojis[shortcode];
+          if (!emoji) return match;
+          const index = emojiPlaceholders.push(match) - 1;
+          return `__BLUELAB_EMOJI_${index}__`;
+        })
         .replace(/`([^`]+)`/g, '<code>$1</code>')
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
         .replace(/__([^_]+)__/g, '<strong>$1</strong>')
         .replace(/~~([^~]+)~~/g, '<del>$1</del>')
         .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-        .replace(/_([^_]+)_/g, '<em>$1</em>');
+        .replace(/_([^_]+)_/g, '<em>$1</em>')
+        .replace(/__BLUELAB_EMOJI_(\d+)__/g, (_placeholder, index: string) => {
+          const shortcode = emojiPlaceholders[Number(index)] ?? '';
+          const emoji = customEmojis[shortcode.slice(1, -1)];
+          if (!emoji) return shortcode;
+          return `<span data-emoji-shortcode="${escapeAttribute(shortcode)}" contenteditable="false"><img src="${escapeAttribute(emoji.static_url)}" alt="${escapeAttribute(shortcode)}" draggable="false" /></span>`;
+        });
       return escaped || '<br />';
     })
     .join('<br />');
@@ -51,6 +70,8 @@ const markdownToHtml = (value: string) =>
 const nodeToMarkdown = (node: Node): string => {
   if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? '';
   if (!(node instanceof HTMLElement)) return '';
+  const shortcode = node.dataset.emojiShortcode;
+  if (shortcode) return shortcode;
   const content = Array.from(node.childNodes).map(nodeToMarkdown).join('');
   switch (node.tagName) {
     case 'STRONG':
@@ -103,7 +124,7 @@ const commands = [
   ['insertUnorderedList', ListBulletsIcon, 'Bulleted list'],
   ['insertOrderedList', ListNumbersIcon, 'Numbered list'],
   ['code', CodeIcon, 'Inline code'],
-  ['pre', CodeBlockIcon, 'Code block'],
+  ['formatBlock', CodeBlockIcon, 'Code block', 'pre'],
 ] as const;
 
 export const RichComposeEditor: React.FC<{
@@ -113,6 +134,7 @@ export const RichComposeEditor: React.FC<{
 }> = ({ onSubmit, children, autoFocus }) => {
   const dispatch = useAppDispatch();
   const text = useAppSelector((state) => state.compose.get('text') as string);
+  const customEmojis = useCustomEmojis();
   const ref = useRef<HTMLDivElement>(null);
   const hiddenRef = useRef<HTMLTextAreaElement>(null);
   const localValueRef = useRef<string | null>(null);
@@ -123,11 +145,11 @@ export const RichComposeEditor: React.FC<{
 
   useEffect(() => {
     if (ref.current && text !== localValueRef.current) {
-      ref.current.innerHTML = markdownToHtml(text);
+      ref.current.innerHTML = markdownToHtml(text, customEmojis);
     }
     localValueRef.current = null;
     if (hiddenRef.current) hiddenRef.current.value = text;
-  }, [text]);
+  }, [customEmojis, text]);
 
   const sync = () => {
     if (!ref.current) return;
@@ -146,23 +168,34 @@ export const RichComposeEditor: React.FC<{
   const handleCommand: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     const button = event.currentTarget;
     ref.current?.focus();
-    dispatch(changeComposeContentType('text/markdown'));
     // execCommand is the browser editing primitive for preserving selection/IME.
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    document.execCommand(
-      button.dataset.command ?? 'bold',
-      false,
-      button.dataset.value,
-    );
+     
+    if (button.dataset.command === 'code') {
+      const selection = window.getSelection()?.toString() ?? 'code';
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      document.execCommand(
+        'insertHTML',
+        false,
+        `<code>${escapeHtml(selection)}</code>`,
+      );
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      document.execCommand(
+        button.dataset.command ?? 'bold',
+        false,
+        button.dataset.value,
+      );
+    }
+    dispatch(changeComposeContentType('text/markdown'));
     sync();
   };
   const handleLink: React.MouseEventHandler<HTMLButtonElement> = () => {
     const url = window.prompt('URL');
     if (url) {
       ref.current?.focus();
-      dispatch(changeComposeContentType('text/markdown'));
       // eslint-disable-next-line @typescript-eslint/no-deprecated
       document.execCommand('createLink', false, url);
+      dispatch(changeComposeContentType('text/markdown'));
       sync();
     }
   };
@@ -197,7 +230,7 @@ export const RichComposeEditor: React.FC<{
       >
         {commands.map(([command, icon, label, value]) => (
           <IconButton
-            key={command}
+            key={`${command}-${value ?? 'default'}`}
             as='button'
             type='button'
             size='sm'
