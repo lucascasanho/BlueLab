@@ -61,7 +61,7 @@ IOArticleContainerWrapper.propTypes =  {
   children: PropTypes.node,
 };
 
-export class ScrollableList extends PureComponent {
+class ScrollableList extends PureComponent {
 
   static propTypes = {
     scrollKey: PropTypes.string.isRequired,
@@ -431,5 +431,7 @@ export class ScrollableList extends PureComponent {
   }
 
 }
+
+export { ScrollableList as ScrollableListForTest };
 
 export default connect(mapStateToProps, null, null, { forwardRef: true })(ScrollableList);
