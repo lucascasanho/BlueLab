@@ -39,6 +39,21 @@ RSpec.describe 'Admin instance customization settings' do
     expect(response.body).to_not include('content__heading__tabs')
     expect(response.body).to_not include('&#39;dark&#39;')
     expect(response.body).to_not include('Editor e emojis', 'Editor and emoji')
+    expect(response.parsed_body.css('button[type="submit"]').count).to eq(2)
+    expect(response.parsed_body.css('button[name="reset_all"]').count).to eq(1)
+    expect(response.parsed_body.css('input[name^="reset["]').count).to eq(0)
+  end
+
+  it 'restores every customization with one action' do
+    sign_in Fabricate(:admin_user)
+    Setting.status_character_limit = 750
+    Setting.instance_accent_color = '#5638cc'
+
+    put admin_settings_instance_customization_path, params: valid_params.merge(reset_all: '1')
+
+    expect(response).to redirect_to(admin_settings_instance_customization_path)
+    expect(Setting.find_by(var: :status_character_limit)).to be_nil
+    expect(Setting.find_by(var: :instance_accent_color)).to be_nil
   end
 
   it 'renders a native single-line sidebar entry with an available icon' do
@@ -50,6 +65,7 @@ RSpec.describe 'Admin instance customization settings' do
     expect(navigation_link.parent['id']).to eq('instance_customization')
     expect(navigation_link.text).to include(I18n.t('admin.settings.instance_customization.title'))
     expect(navigation_link.at_css('svg.material-edit')).to be_present
+    expect(response.body).to include(I18n.t('settings.back', site_title: Setting.site_title))
   end
 
   it 'rejects users without settings permission' do

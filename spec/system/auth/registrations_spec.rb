@@ -17,7 +17,7 @@ RSpec.describe 'Auth Registration' do
 
       click_on I18n.t('auth.rules.accept')
       expect(page)
-        .to have_text(I18n.t('auth.sign_up.preamble'))
+        .to have_text(I18n.t('auth.sign_up.preamble', site_title: Setting.site_title))
         .and have_text(I18n.t('invites.invited_by'))
     end
   end

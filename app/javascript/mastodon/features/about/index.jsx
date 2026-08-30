@@ -8,7 +8,7 @@ import { Helmet } from '@unhead/react/helmet';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 
-import { domain } from 'mastodon/initial_state';
+import { domain, title as siteTitle } from 'mastodon/initial_state';
 
 import { injectIntl } from '@/mastodon/components/intl';
 import { fetchServer, fetchExtendedDescription, fetchDomainBlocks  } from 'mastodon/actions/server';
@@ -173,7 +173,7 @@ class About extends PureComponent {
           <LinkFooter context='about' />
 
           <div className='about__footer'>
-            <p><FormattedMessage id='about.disclaimer' defaultMessage='Mastodon is free, open-source software, and a trademark of Mastodon GmbH.' /></p>
+            <p><FormattedMessage id='about.disclaimer' defaultMessage='{siteTitle} is an instance powered by the open-source Mastodon software. Mastodon is a trademark of Mastodon GmbH.' values={{ siteTitle }} /></p>
           </div>
         </div>
 

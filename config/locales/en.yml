@@ -972,7 +972,8 @@ en:
         posts: Posts
         preamble: Persistent, validated server customization. Saving does not edit source files and changes apply immediately.
         proxy_warning: This is the Mastodon limit. Proxies, CDNs or tunnels, including Cloudflare, may impose smaller limits and must be configured separately.
-        restore_default: Restore default when saving
+        restore_defaults: Restore all defaults
+        restore_defaults_confirm: This removes every customization on this page and restores the default values. Do you want to continue?
         status_limit: Character limit for standard users
         title: Instance customization
         video_limit: Video limit (MB)
@@ -2129,7 +2130,7 @@ en:
     aliases: Account aliases
     appearance: Appearance
     authorized_apps: Authorized apps
-    back: Back to Espelunca
+    back: Back to %{site_title}
     delete: Account deletion
     development: Development
     edit_profile: Edit profile
@@ -2472,7 +2473,7 @@ en:
       success: Passkey added successfully.
     delete: Delete
     delete_confirmation: Are you sure you want to delete this passkey?
-    description: Use a passkey to sign in to Espelunca without typing your password.
+    description: Use a passkey to sign in to %{site_title} without typing your password.
     destroy:
       error: We couldn't delete this passkey. Please try again.
       success: Passkey removed.

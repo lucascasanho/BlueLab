@@ -9,7 +9,7 @@ class Admin::Settings::InstanceCustomizationController < Admin::BaseController
   def update
     authorize :settings, :update?
     @instance_customization = Form::InstanceCustomization.new(customization_params)
-    reset_keys = params.fetch(:reset, {}).keys
+    reset_keys = params[:reset_all].present? ? Form::InstanceCustomization::KEYS : params.fetch(:reset, {}).keys
     previous_values = audit_values
 
     if @instance_customization.save(reset_keys: reset_keys)

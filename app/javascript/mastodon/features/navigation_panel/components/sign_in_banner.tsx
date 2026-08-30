@@ -3,7 +3,11 @@ import { useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { openModal } from 'mastodon/actions/modal';
-import { registrationsOpen, sso_redirect } from 'mastodon/initial_state';
+import {
+  registrationsOpen,
+  sso_redirect,
+  title as siteTitle,
+} from 'mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
 export const SignInBanner: React.FC = () => {
@@ -30,7 +34,8 @@ export const SignInBanner: React.FC = () => {
           <strong>
             <FormattedMessage
               id='sign_in_banner.mastodon_is'
-              defaultMessage="Mastodon is the best way to keep up with what's happening."
+              defaultMessage="{siteTitle} is the best way to keep up with what's happening."
+              values={{ siteTitle }}
             />
           </strong>
         </p>
@@ -84,7 +89,8 @@ export const SignInBanner: React.FC = () => {
         <strong>
           <FormattedMessage
             id='sign_in_banner.mastodon_is'
-            defaultMessage="Mastodon is the best way to keep up with what's happening."
+            defaultMessage="{siteTitle} is the best way to keep up with what's happening."
+            values={{ siteTitle }}
           />
         </strong>
       </p>

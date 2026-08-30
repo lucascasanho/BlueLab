@@ -4,7 +4,7 @@ import { createSelector } from '@reduxjs/toolkit';
 
 import { animated, useSpring } from '@react-spring/web';
 
-import { me } from 'mastodon/initial_state';
+import { me, title as siteTitle } from 'mastodon/initial_state';
 import { useAppSelector } from 'mastodon/store';
 import type { RootState } from 'mastodon/store';
 import { HASHTAG_PATTERN_REGEX } from 'mastodon/utils/hashtags';
@@ -60,7 +60,8 @@ export const Warning = () => {
       <WarningMessage>
         <FormattedMessage
           id='compose_form.encryption_warning'
-          defaultMessage='Posts on Mastodon are not end-to-end encrypted. Do not share any dangerous information over Mastodon.'
+          defaultMessage='Posts on {siteTitle} are not end-to-end encrypted. Do not share any sensitive information on {siteTitle}.'
+          values={{ siteTitle }}
         />{' '}
         <a
           href='https://docs.joinmastodon.org/user/posting/#private'

@@ -5,7 +5,7 @@
   %p.flash-message.hidden#unsupported-browser-message= t('passkeys.not_supported')
   %p.flash-message.alert.hidden#passkey-error-message{ data: { error_message: t('passkeys.create.error'), cancelled_message: t('passkeys.cancelled') } }= t('passkeys.create.error')
 
-  %p.hint= t('passkeys.description')
+  %p.hint= t('passkeys.description', site_title: site_title)
 
   .fields_group
     = f.input :nickname,

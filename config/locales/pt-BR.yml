@@ -972,7 +972,8 @@ pt-BR:
         posts: Publicações
         preamble: Configurações persistentes e validadas deste servidor. Alterações não editam arquivos-fonte e passam a valer após salvar.
         proxy_warning: O limite configurado aqui é o aceito pelo Mastodon. Proxies, CDNs ou túneis, incluindo Cloudflare, podem impor limites menores e precisam ser configurados separadamente.
-        restore_default: Restaurar o valor padrão ao salvar
+        restore_defaults: Restaurar todos os padrões
+        restore_defaults_confirm: Isso removerá todas as customizações desta página e restaurará os valores padrão. Deseja continuar?
         status_limit: Limite de caracteres para usuário padrão
         title: Customização da instância
         video_limit: Limite de vídeo (MB)
@@ -1475,7 +1476,7 @@ pt-BR:
       title: Entrar em %{domain}
     sign_up:
       manual_review: Inscrições no %{domain} passam pela revisão manual dos nossos moderadores. Para nos ajudar a processar o seu cadastro, escreva um pouco sobre você e por que você quer uma conta no %{domain}.
-      preamble: Com uma conta na Espelunca, você poderá seguir qualquer outra pessoa no fediverso, independentemente de onde a conta dela esteja hospedada.
+      preamble: Com uma conta em %{site_title}, você poderá seguir qualquer outra pessoa no fediverso, independentemente de onde a conta dela esteja hospedada.
       title: Então vamos lá criar uma conta em %{domain}.
     status:
       account_status: Status da conta
@@ -2129,7 +2130,7 @@ pt-BR:
     aliases: Alias da conta
     appearance: Aparência
     authorized_apps: Aplicativos autorizados
-    back: Voltar para a Espelunca
+    back: Voltar para %{site_title}
     delete: Exclusão de conta
     development: Desenvolvimento
     edit_profile: Editar perfil
@@ -2283,7 +2284,7 @@ pt-BR:
     review_link: Revisar os termos do serviço
     title: Os termos de serviço do %{domain} estão mudando
   themes:
-    mastodon-bird-ui-auto: Espelunca
+    mastodon-bird-ui-auto: "%{site_title}"
     default: Mastodon
   time:
     formats:
@@ -2473,7 +2474,7 @@ pt-BR:
       success: Passkey adicionada com sucesso.
     delete: Excluir
     delete_confirmation: Tem certeza de que deseja excluir esta passkey?
-    description: Use uma passkey para entrar na Espelunca sem precisar digitar sua senha.
+    description: Use uma passkey para entrar em %{site_title} sem precisar digitar sua senha.
     destroy:
       error: Não foi possível excluir esta passkey. Tente novamente.
       success: Passkey removida.
