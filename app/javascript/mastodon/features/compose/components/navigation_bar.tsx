@@ -57,6 +57,7 @@ export const NavigationBar: React.FC = () => {
         },
       ]
     : [];
+  const postsStat = stats[0];
 
   const handleCancelClick = useCallback(() => {
     dispatch(cancelReplyCompose());
@@ -70,22 +71,33 @@ export const NavigationBar: React.FC = () => {
     <div className='navigation-bar'>
       <div className='navigation-bar__account-card'>
         <Account id={me} minimal />
-        {account && (
+        {account && postsStat && (
           <div className='navigation-bar__account-stats'>
-            {stats.map(({ key, value, label, path }) => (
-              <Link
-                key={key}
-                to={path}
-                className={`navigation-bar__account-stat navigation-bar__account-stat--${key}`}
-                title={intl.formatNumber(value)}
-                aria-label={`${intl.formatNumber(value)} ${intl.formatMessage(label)}`}
-              >
-                <strong>
-                  <ShortNumber value={value} />
-                </strong>{' '}
-                {intl.formatMessage(label)}
-              </Link>
-            ))}
+            <Link
+              to={postsStat.path}
+              className='navigation-bar__account-stat navigation-bar__account-stat--posts'
+              title={intl.formatNumber(postsStat.value)}
+              aria-label={`${intl.formatNumber(postsStat.value)} ${intl.formatMessage(postsStat.label)}`}
+            >
+              <ShortNumber value={postsStat.value} />{' '}
+              {intl.formatMessage(postsStat.label)}
+            </Link>
+            <div className='navigation-bar__account-social-stats'>
+              {stats.slice(1).map(({ key, value, label, path }) => (
+                <Link
+                  key={key}
+                  to={path}
+                  className={`navigation-bar__account-stat navigation-bar__account-stat--${key}`}
+                  title={intl.formatNumber(value)}
+                  aria-label={`${intl.formatNumber(value)} ${intl.formatMessage(label)}`}
+                >
+                  <strong>
+                    <ShortNumber value={value} />
+                  </strong>{' '}
+                  {intl.formatMessage(label)}
+                </Link>
+              ))}
+            </div>
           </div>
         )}
       </div>
