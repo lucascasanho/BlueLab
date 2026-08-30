@@ -5,7 +5,10 @@ import classNames from 'classnames';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
 import { Header } from '@/mastodon/features/custom_homepage/components/header';
-import { CollapsibleNavigationPanel } from '@/mastodon/features/navigation_panel';
+import {
+  CollapsibleNavigationPanel,
+  NavigationPanel,
+} from '@/mastodon/features/navigation_panel';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useColumnsContext } from '@/mastodon/features/ui/util/columns_context';
 import { useAppSelector } from '@/mastodon/store';
@@ -99,13 +102,18 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
   }
 
   return (
-    <main
-      className={classNames('columns-area', { unscrollable: isModalOpen })}
-      ref={ref}
-      tabIndex={isModalOpen ? undefined : 0}
-    >
-      <MultiColumnContent>{children}</MultiColumnContent>
-    </main>
+    <div className='columns-area__panels'>
+      <div className='columns-area__panels__pane columns-area__panels__pane--navigational'>
+        <NavigationPanel />
+      </div>
+      <main
+        className={classNames('columns-area', { unscrollable: isModalOpen })}
+        ref={ref}
+        tabIndex={isModalOpen ? undefined : 0}
+      >
+        <MultiColumnContent>{children}</MultiColumnContent>
+      </main>
+    </div>
   );
 };
 

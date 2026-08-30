@@ -61,7 +61,7 @@ const markdownToHtml = (
           const shortcode = emojiPlaceholders[Number(index)] ?? '';
           const emoji = customEmojis[shortcode.slice(1, -1)];
           if (!emoji) return shortcode;
-          return `<span data-emoji-shortcode="${escapeAttribute(shortcode)}" contenteditable="false"><img src="${escapeAttribute(emoji.static_url)}" alt="${escapeAttribute(shortcode)}" draggable="false" /></span>`;
+          return `<span data-emoji-shortcode="${escapeAttribute(shortcode)}" contenteditable="false"><img src="${escapeAttribute(emoji.url)}" alt="${escapeAttribute(shortcode)}" draggable="false" /></span>`;
         });
       return escaped || '<br />';
     })
@@ -115,6 +115,24 @@ const editorText = (element: HTMLElement) =>
     .join('')
     .replace(/\n{3,}/g, '\n\n')
     .replace(/^\n|\n$/g, '');
+
+const wrapSelection = (tagName: string) => {
+  const selection = window.getSelection();
+  if (!selection?.rangeCount) return;
+  const range = selection.getRangeAt(0);
+  if (range.collapsed) return;
+  const wrapper = document.createElement(tagName);
+  try {
+    range.surroundContents(wrapper);
+  } catch {
+    wrapper.append(range.extractContents());
+    range.insertNode(wrapper);
+  }
+  selection.removeAllRanges();
+  const nextRange = document.createRange();
+  nextRange.selectNodeContents(wrapper);
+  selection.addRange(nextRange);
+};
 
 const commands = [
   ['bold', TextBIcon, 'Bold'],
@@ -178,23 +196,24 @@ export const RichComposeEditor: React.FC<{
       selection.removeAllRanges();
       selection.addRange(selectionRef.current);
     }
-    // execCommand is the browser editing primitive for preserving selection/IME.
-
-    if (button.dataset.command === 'code') {
-      const selection = window.getSelection()?.toString() ?? 'code';
+    const command = button.dataset.command ?? 'bold';
+    if (['bold', 'italic', 'strikeThrough'].includes(command)) {
+      wrapSelection(
+        command === 'bold' ? 'strong' : command === 'italic' ? 'em' : 'del',
+      );
+    } else if (command === 'formatBlock' && button.dataset.value) {
+      wrapSelection(button.dataset.value);
+    } else if (command === 'code') {
+      const selectedText = window.getSelection()?.toString() ?? 'code';
       // eslint-disable-next-line @typescript-eslint/no-deprecated
       document.execCommand(
         'insertHTML',
         false,
-        `<code>${escapeHtml(selection)}</code>`,
+        `<code>${escapeHtml(selectedText)}</code>`,
       );
     } else {
       // eslint-disable-next-line @typescript-eslint/no-deprecated
-      document.execCommand(
-        button.dataset.command ?? 'bold',
-        false,
-        button.dataset.value,
-      );
+      document.execCommand(command, false, button.dataset.value);
     }
     dispatch(changeComposeContentType('text/markdown'));
     sync();
