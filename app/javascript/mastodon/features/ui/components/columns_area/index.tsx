@@ -48,7 +48,8 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
   singleColumn,
   ref,
 }) => {
-  const renderComposePanel = !useBreakpoint('full');
+  const isFullLayout = useBreakpoint('full');
+  const renderComposePanel = !isFullLayout;
   const isModalOpen = useAppSelector(
     (state) => !state.modal.get('stack').isEmpty(),
   );
@@ -96,7 +97,13 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
           <div className='columns-area columns-area--mobile'>{children}</div>
         </main>
 
-        <CollapsibleNavigationPanel />
+        {isFullLayout ? (
+          <div className='columns-area__panels__pane columns-area__panels__pane--navigational'>
+            <NavigationPanel />
+          </div>
+        ) : (
+          <CollapsibleNavigationPanel />
+        )}
       </div>
     );
   }

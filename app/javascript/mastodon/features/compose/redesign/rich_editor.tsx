@@ -174,6 +174,7 @@ export const RichComposeEditor: React.FC<{
     if (!ref.current) return;
     const value = editorText(ref.current);
     localValueRef.current = value;
+    dispatch(changeComposeContentType('text/markdown'));
     dispatch(changeCompose(value));
     if (hiddenRef.current) {
       hiddenRef.current.value = value;
