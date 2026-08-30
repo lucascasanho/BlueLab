@@ -6,31 +6,31 @@
     position: relative;
   }
 
-  [class*="_comp_account_header__buttons"][class*="_comp_account_header__buttonsDesktop"] {
+  [class*='_comp_account_header__buttons'][class*='_comp_account_header__buttonsDesktop'] {
     position: absolute;
     right: 16px;
     top: var(--gap-default);
-  }
-
-  @media (max-width: 419px) {
-    [class*="_comp_account_header__buttons"] {
-      padding-top: 0;
-    }
   }
 
   ._comp_account_header__buttonsMobileIsStuck {
     border: 0;
   }
 
-  // On smaller viewports the absolutely positioned desktop buttons would
-  // overlap badges; let them flow normally and push badges down 16px.
-  @media (max-width: 759px) {
-    [class*="_comp_account_header__buttons"][class*="_comp_account_header__buttonsDesktop"] {
-      position: static;
-    }
-
-    ._comp_account_header__badges {
-      margin-top: 16px;
+  // Keep profile actions in the header's top-right action region on mobile,
+  // matching the Bird UI layout instead of the upstream sticky bottom bar.
+  @media (width < 420px) {
+    ._comp_account_header__buttonsMobile,
+    ._comp_account_header__buttonsMobileIsStuck {
+      position: absolute;
+      z-index: 2;
+      right: 16px;
+      top: var(--gap-default);
+      bottom: auto;
+      width: auto;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
     }
   }
 }
