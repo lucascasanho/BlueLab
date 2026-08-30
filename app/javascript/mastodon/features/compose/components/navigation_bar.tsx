@@ -79,7 +79,9 @@ export const NavigationBar: React.FC = () => {
               title={intl.formatNumber(postsStat.value)}
               aria-label={`${intl.formatNumber(postsStat.value)} ${intl.formatMessage(postsStat.label)}`}
             >
-              <ShortNumber value={postsStat.value} />{' '}
+              <strong>
+                <ShortNumber value={postsStat.value} />
+              </strong>{' '}
               {intl.formatMessage(postsStat.label)}
             </Link>
             <div className='navigation-bar__account-social-stats'>
