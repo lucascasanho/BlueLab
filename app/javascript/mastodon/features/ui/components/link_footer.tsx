@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import {
   domain,
   version,
+  source_url,
   statusPageUrl,
   profile_directory as canProfileDirectory,
   termsOfServiceEnabled,
@@ -106,11 +107,7 @@ export const LinkFooter: React.FC<{
             </Link>
           </li>
           <li>
-            <a
-              href='https://github.com/mastodon/mastodon'
-              rel='noopener'
-              target='_blank'
-            >
+            <a href={source_url} rel='noopener' target='_blank'>
               <FormattedMessage
                 id='footer.source_code'
                 defaultMessage='View source code'
