@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-bind -- editor handlers are stable closures required by contentEditable. */
 import type React from 'react';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   TextBIcon,
@@ -49,6 +49,8 @@ const inlineMarkdownToHtml = (
       return `BLUELABEMOJI${index}TOKEN`;
     })
     .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/___([^_]+)___/g, '<strong><em>$1</em></strong>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/__([^_]+)__/g, '<strong>$1</strong>')
     .replace(/~~([^~]+)~~/g, '<del>$1</del>')
@@ -115,6 +117,17 @@ export const markdownToHtml = (
   return output.join('<br />');
 };
 
+const wrapInlineMarkdown = (content: string, marker: string) => {
+  const match = /^(\s*)([\s\S]*?)(\s*)$/.exec(content);
+  if (!match) return content;
+  const [, leading = '', core = '', trailing = ''] = match;
+  if (!core) return content;
+  return `${leading}${marker}${core}${marker}${trailing}`;
+};
+
+const parentHasTag = (node: HTMLElement, tags: string[]) =>
+  node.parentElement ? tags.includes(node.parentElement.tagName) : false;
+
 const nodeToMarkdown = (node: Node): string => {
   if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? '';
   if (!(node instanceof HTMLElement)) return '';
@@ -124,15 +137,24 @@ const nodeToMarkdown = (node: Node): string => {
   switch (node.tagName) {
     case 'STRONG':
     case 'B':
-      return `**${content}**`;
+      return parentHasTag(node, ['STRONG', 'B'])
+        ? content
+        : wrapInlineMarkdown(content, '**');
     case 'EM':
     case 'I':
-      return `*${content}*`;
+      return parentHasTag(node, ['EM', 'I'])
+        ? content
+        : wrapInlineMarkdown(content, '*');
     case 'DEL':
     case 'S':
-      return `~~${content}~~`;
+    case 'STRIKE':
+      return parentHasTag(node, ['DEL', 'S', 'STRIKE'])
+        ? content
+        : wrapInlineMarkdown(content, '~~');
     case 'CODE':
-      return `\`${content}\``;
+      return parentHasTag(node, ['CODE'])
+        ? content
+        : wrapInlineMarkdown(content, '`');
     case 'PRE':
       return `\n\`\`\`\n${content}\n\`\`\``;
     case 'BLOCKQUOTE':
@@ -154,6 +176,9 @@ const nodeToMarkdown = (node: Node): string => {
       return `[${content}](${node.getAttribute('href') ?? ''})`;
     case 'BR':
       return '\n';
+    case 'DIV':
+    case 'P':
+      return `\n${content}`;
     default:
       return content;
   }
@@ -184,6 +209,37 @@ const wrapSelection = (tagName: string) => {
   selection.addRange(nextRange);
 };
 
+const selectionElement = () => {
+  const node = window.getSelection()?.anchorNode;
+  if (!node) return null;
+  return node instanceof HTMLElement ? node : node.parentElement;
+};
+
+const closestWithin = (
+  element: HTMLElement | null,
+  selector: string,
+  editor: HTMLElement,
+) => {
+  const match = element?.closest<HTMLElement>(selector) ?? null;
+  return match && editor.contains(match) ? match : null;
+};
+
+const unwrapElement = (element: HTMLElement) => {
+  const parent = element.parentNode;
+  if (!parent) return;
+  const first = element.firstChild;
+  const last = element.lastChild;
+  while (element.firstChild) parent.insertBefore(element.firstChild, element);
+  element.remove();
+  if (!first || !last) return;
+  const range = document.createRange();
+  range.setStartBefore(first);
+  range.setEndAfter(last);
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+};
+
 const focusAtEnd = (element: HTMLElement) => {
   element.focus({ preventScroll: true });
   const selection = window.getSelection();
@@ -206,6 +262,35 @@ const commands = [
   ['formatBlock', CodeBlockIcon, 'Code block', 'pre'],
 ] as const;
 
+type InlineCommand = 'bold' | 'italic' | 'strikeThrough';
+
+const inlineCommands: readonly InlineCommand[] = [
+  'bold',
+  'italic',
+  'strikeThrough',
+];
+
+export const toggleInlineCommand = (command: InlineCommand) => {
+  // execCommand remains the only interoperable browser editing primitive that
+  // keeps native selection, IME and undo/redo behavior in contentEditable.
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
+  const wasActive = document.queryCommandState(command);
+
+  if (!wasActive) {
+    for (const otherCommand of inlineCommands) {
+      if (otherCommand === command) continue;
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      if (document.queryCommandState(otherCommand)) {
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        document.execCommand(otherCommand);
+      }
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
+  document.execCommand(command);
+};
+
 export const RichComposeEditor: React.FC<{
   onSubmit: (event?: React.SubmitEvent) => void;
   children?: React.ReactNode;
@@ -219,6 +304,42 @@ export const RichComposeEditor: React.FC<{
   const selectionRef = useRef<Range | null>(null);
   const localValueRef = useRef<string | null>(null);
   const renderedTextRef = useRef<string | null>(null);
+  const [activeFormats, setActiveFormats] = useState<ReadonlySet<string>>(
+    new Set(),
+  );
+
+  const updateActiveFormats = useCallback(() => {
+    const editor = ref.current;
+    const selection = window.getSelection();
+    if (
+      !editor ||
+      !selection?.anchorNode ||
+      !editor.contains(selection.anchorNode)
+    ) {
+      setActiveFormats(new Set());
+      return;
+    }
+
+    const active = new Set<string>();
+    for (const command of [
+      'bold',
+      'italic',
+      'strikeThrough',
+      'insertUnorderedList',
+      'insertOrderedList',
+    ]) {
+      // execCommand state is still the interoperable browser editing state for contentEditable.
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      if (document.queryCommandState(command)) active.add(command);
+    }
+
+    const element = selectionElement();
+    if (closestWithin(element, 'code', editor)) active.add('code');
+    if (closestWithin(element, 'pre', editor)) active.add('pre');
+    if (closestWithin(element, 'blockquote', editor)) active.add('blockquote');
+    if (closestWithin(element, 'a', editor)) active.add('link');
+    setActiveFormats(active);
+  }, []);
 
   useEffect(() => {
     if (autoFocus && ref.current) focusAtEnd(ref.current);
@@ -237,6 +358,13 @@ export const RichComposeEditor: React.FC<{
     localValueRef.current = null;
     if (hiddenRef.current) hiddenRef.current.value = text;
   }, [customEmojis, text]);
+
+  useEffect(() => {
+    document.addEventListener('selectionchange', updateActiveFormats);
+    return () => {
+      document.removeEventListener('selectionchange', updateActiveFormats);
+    };
+  }, [updateActiveFormats]);
 
   const sync = () => {
     if (!ref.current) return;
@@ -266,35 +394,62 @@ export const RichComposeEditor: React.FC<{
       selection.addRange(selectionRef.current);
     }
     const command = button.dataset.command ?? 'bold';
-    if (['bold', 'italic', 'strikeThrough'].includes(command)) {
-      wrapSelection(
-        command === 'bold' ? 'strong' : command === 'italic' ? 'em' : 'del',
-      );
+    if (inlineCommands.includes(command as InlineCommand)) {
+      // execCommand preserves undo/redo, IME and mixed-selection toggle semantics.
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      document.execCommand('styleWithCSS', false, 'false');
+      toggleInlineCommand(command as InlineCommand);
     } else if (command === 'formatBlock' && button.dataset.value) {
-      wrapSelection(button.dataset.value);
-    } else if (command === 'code') {
-      const selectedText = window.getSelection()?.toString() ?? 'code';
       // eslint-disable-next-line @typescript-eslint/no-deprecated
       document.execCommand(
-        'insertHTML',
+        'formatBlock',
         false,
-        `<code>${escapeHtml(selectedText)}</code>`,
+        activeFormats.has(button.dataset.value) ? 'div' : button.dataset.value,
       );
+    } else if (command === 'code') {
+      const code = ref.current
+        ? closestWithin(selectionElement(), 'code', ref.current)
+        : null;
+      if (code) unwrapElement(code);
+      else wrapSelection('code');
     } else {
       // eslint-disable-next-line @typescript-eslint/no-deprecated
       document.execCommand(command, false, button.dataset.value);
     }
     dispatch(changeComposeContentType('text/markdown'));
     sync();
+    updateActiveFormats();
   };
   const handleLink: React.MouseEventHandler<HTMLButtonElement> = () => {
+    ref.current?.focus();
+    const selection = window.getSelection();
+    if (selectionRef.current && selection) {
+      selection.removeAllRanges();
+      selection.addRange(selectionRef.current);
+    }
+    const link = ref.current
+      ? closestWithin(selectionElement(), 'a', ref.current)
+      : null;
+    if (link) {
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      document.execCommand('unlink');
+      sync();
+      updateActiveFormats();
+      return;
+    }
+
     const url = window.prompt('URL');
     if (url) {
       ref.current?.focus();
+      if (selectionRef.current && selection) {
+        selection.removeAllRanges();
+        selection.addRange(selectionRef.current);
+      }
       // eslint-disable-next-line @typescript-eslint/no-deprecated
       document.execCommand('createLink', false, url);
       dispatch(changeComposeContentType('text/markdown'));
       sync();
+      updateActiveFormats();
     }
   };
   const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
@@ -340,26 +495,34 @@ export const RichComposeEditor: React.FC<{
         role='toolbar'
         aria-label='Formatting'
       >
-        {commands.map(([command, icon, label, value]) => (
-          <IconButton
-            key={`${command}-${value ?? 'default'}`}
-            as='button'
-            type='button'
-            size='sm'
-            icon={icon as IconProp}
-            data-command={command}
-            data-value={value}
-            onMouseDown={preventToolbarFocus}
-            onClick={handleCommand}
-          >
-            {label}
-          </IconButton>
-        ))}
+        {commands.map(([command, icon, label, value]) => {
+          const stateKey = value ?? command;
+          const active = activeFormats.has(stateKey);
+          return (
+            <IconButton
+              key={`${command}-${value ?? 'default'}`}
+              as='button'
+              type='button'
+              size='sm'
+              icon={icon as IconProp}
+              data-command={command}
+              data-value={value}
+              color={active ? 'accent' : 'neutral'}
+              aria-pressed={active}
+              onMouseDown={preventToolbarFocus}
+              onClick={handleCommand}
+            >
+              {label}
+            </IconButton>
+          );
+        })}
         <IconButton
           as='button'
           type='button'
           size='sm'
           icon={LinkIcon}
+          color={activeFormats.has('link') ? 'accent' : 'neutral'}
+          aria-pressed={activeFormats.has('link')}
           onMouseDown={preventToolbarFocus}
           onClick={handleLink}
         >
@@ -377,6 +540,8 @@ export const RichComposeEditor: React.FC<{
         onMouseDown={handleEditorMouseDown}
         onClick={handleEditorClick}
         onInput={sync}
+        onKeyUp={updateActiveFormats}
+        onMouseUp={updateActiveFormats}
         onKeyDown={handleKeyDown}
         onPaste={handlePasteOrDrop}
         onDrop={handlePasteOrDrop}
