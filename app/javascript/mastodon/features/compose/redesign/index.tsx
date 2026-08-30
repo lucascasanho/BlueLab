@@ -70,6 +70,7 @@ export const RedesignComposeForm: React.FC<RedesignComposeFormProps> = ({
   return (
     <form
       role='dialog'
+      data-bluelab-composer
       onSubmit={onSubmit}
       aria-labelledby={titleId}
       className={classNames(className, classes.root)}

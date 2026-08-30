@@ -184,6 +184,17 @@ const wrapSelection = (tagName: string) => {
   selection.addRange(nextRange);
 };
 
+const focusAtEnd = (element: HTMLElement) => {
+  element.focus({ preventScroll: true });
+  const selection = window.getSelection();
+  if (!selection) return;
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  range.collapse(false);
+  selection.removeAllRanges();
+  selection.addRange(range);
+};
+
 const commands = [
   ['bold', TextBIcon, 'Bold'],
   ['italic', TextItalicIcon, 'Italic'],
@@ -207,15 +218,22 @@ export const RichComposeEditor: React.FC<{
   const hiddenRef = useRef<HTMLTextAreaElement>(null);
   const selectionRef = useRef<Range | null>(null);
   const localValueRef = useRef<string | null>(null);
+  const renderedTextRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (autoFocus) ref.current?.focus();
+    if (autoFocus && ref.current) focusAtEnd(ref.current);
   }, [autoFocus]);
 
   useEffect(() => {
-    if (ref.current && text !== localValueRef.current) {
-      ref.current.innerHTML = markdownToHtml(text, customEmojis);
+    const editor = ref.current;
+    const isLocalUpdate = text === localValueRef.current;
+    const textChanged = text !== renderedTextRef.current;
+    const wasFocused = document.activeElement === editor;
+    if (editor && !isLocalUpdate && (textChanged || !wasFocused)) {
+      editor.innerHTML = markdownToHtml(text, customEmojis);
+      if (wasFocused) focusAtEnd(editor);
     }
+    renderedTextRef.current = text;
     localValueRef.current = null;
     if (hiddenRef.current) hiddenRef.current.value = text;
   }, [customEmojis, text]);
@@ -280,6 +298,7 @@ export const RichComposeEditor: React.FC<{
     }
   };
   const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
+    event.stopPropagation();
     const key = normalizeKey(event.key);
     if (key === 'enter' && (event.ctrlKey || event.metaKey)) {
       event.preventDefault();
@@ -288,6 +307,19 @@ export const RichComposeEditor: React.FC<{
       event.preventDefault();
       event.stopPropagation();
       dispatch(dismissComposer());
+    }
+  };
+  const handleEditorMouseDown: React.MouseEventHandler<HTMLDivElement> = (
+    event,
+  ) => {
+    event.stopPropagation();
+  };
+  const handleEditorClick: React.MouseEventHandler<HTMLDivElement> = (
+    event,
+  ) => {
+    event.stopPropagation();
+    if (document.activeElement !== ref.current) {
+      if (ref.current) focusAtEnd(ref.current);
     }
   };
   const handlePasteOrDrop = (
@@ -342,6 +374,8 @@ export const RichComposeEditor: React.FC<{
         role='textbox'
         aria-multiline='true'
         tabIndex={0}
+        onMouseDown={handleEditorMouseDown}
+        onClick={handleEditorClick}
         onInput={sync}
         onKeyDown={handleKeyDown}
         onPaste={handlePasteOrDrop}

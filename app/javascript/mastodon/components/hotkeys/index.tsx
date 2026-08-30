@@ -200,12 +200,21 @@ export function useHotkeys<T extends HTMLElement>(handlers: HandlerMap) {
 
     function listener(event: Event) {
       // Ignore key presses from input, textarea, or select elements
-      const tagName = (event.target as HTMLElement).tagName.toLowerCase();
+      const target =
+        event.target instanceof HTMLElement ? event.target : undefined;
+      const tagName = target?.tagName.toLowerCase() ?? '';
+      const isInsideEditable =
+        !!target?.isContentEditable ||
+        !!target?.closest('[contenteditable="true"]');
+      const isInsideBlueLabComposer = !!target?.closest(
+        '[data-bluelab-composer]',
+      );
       const shouldHandleEvent =
         isKeyboardEvent(event) &&
         !event.defaultPrevented &&
         !['input', 'textarea', 'select'].includes(tagName) &&
-        !(event.target as HTMLElement).isContentEditable &&
+        !isInsideEditable &&
+        !isInsideBlueLabComposer &&
         !(
           ['a', 'button'].includes(tagName) &&
           normalizeKey(event.key) === 'enter'

@@ -147,8 +147,10 @@ textarea.textarea {
 .richEditorWrapper {
   position: relative;
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   gap: var(--space-xs);
+  min-height: 0;
 }
 
 .richEditorToolbar {
@@ -161,6 +163,7 @@ textarea.textarea {
   @include mixins.type-body-lg;
 
   min-height: 9rem;
+  flex: 1 1 auto;
   padding: var(--space-xs);
   border-radius: var(--radius-xs);
   outline: none;
@@ -235,6 +238,7 @@ textarea.textarea {
   }
 
   overflow-wrap: anywhere;
+  overflow-y: auto;
   cursor: text;
 
   &:focus {
