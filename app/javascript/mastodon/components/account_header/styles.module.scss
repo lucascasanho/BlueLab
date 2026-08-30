@@ -108,7 +108,6 @@
   color: var(--color-text-secondary);
   font-size: 13px;
   transition: color 0.2s ease-in-out;
-  word-break: break-all;
   text-align: left;
 
   /* Allow the handle text to be selected */
@@ -123,6 +122,13 @@
   &:focus {
     color: var(--color-text-brand-soft);
   }
+}
+
+.handleText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .handleHelp {

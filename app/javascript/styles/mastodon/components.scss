@@ -2878,6 +2878,10 @@ a.account__display-name {
   }
 }
 
+.display-name__account {
+  white-space: nowrap;
+}
+
 .display-name__domain {
   color: var(--color-text-brand);
 }

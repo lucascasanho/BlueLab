@@ -170,9 +170,11 @@ const AccountNameHelp: FC<{
         aria-expanded={open}
         aria-controls={accessibilityId}
       >
-        <span>@{username}</span>
-        <span className={isRemote ? 'display-name__domain' : undefined}>
-          @{domain}
+        <span className={classes.handleText}>
+          <span>@{username}</span>
+          <span className={isRemote ? 'display-name__domain' : undefined}>
+            @{domain}
+          </span>
         </span>
         <Icon
           id='help'
