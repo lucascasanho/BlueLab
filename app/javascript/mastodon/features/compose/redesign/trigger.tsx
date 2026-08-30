@@ -41,6 +41,9 @@ export const ComposeRedesignButton: React.FC<{
   inline?: boolean;
 }> = ({ inline }) => {
   const displayState = useAppSelector((state) => state.composer.displayState);
+  const editor = useAppSelector(
+    (state) => state.compose.get('composer_editor') as string | undefined,
+  );
 
   const dispatch = useAppDispatch();
   const handleComposerOpen: React.MouseEventHandler<HTMLButtonElement> =
@@ -56,7 +59,7 @@ export const ComposeRedesignButton: React.FC<{
       [dispatch],
     );
 
-  if (!isRedesignEnabled()) {
+  if (!isRedesignEnabled() || editor === 'mastodon') {
     return null;
   }
 

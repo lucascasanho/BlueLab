@@ -78,6 +78,7 @@ interface InitialStateCompose {
   default_sensitive?: boolean;
   default_language?: string;
   default_content_type?: 'text/plain' | 'text/markdown';
+  composer_editor?: 'bluelab' | 'mastodon';
   default_quote_policy?: string;
   me?: string;
 }

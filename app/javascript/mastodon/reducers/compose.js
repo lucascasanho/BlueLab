@@ -61,7 +61,7 @@ import {
 } from '../actions/compose';
 import { REDRAFT } from '../actions/statuses';
 import { STORE_HYDRATE } from '../actions/store';
-import { me } from '../initial_state';
+import { initialState as initialStateData, me } from '../initial_state';
 import { unescapeHTML } from '../utils/html';
 import { uuid } from '../uuid';
 
@@ -96,6 +96,7 @@ const initialState = ImmutableMap({
   default_sensitive: false,
   default_language: 'en',
   default_content_type: 'text/markdown',
+  composer_editor: initialStateData?.compose?.composer_editor || 'bluelab',
   resetFileKey: Math.floor((Math.random() * 0x10000)),
   idempotencyKey: null,
   tagHistory: ImmutableList(),

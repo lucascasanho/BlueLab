@@ -2049,6 +2049,11 @@ pt-BR:
     vote: Votar
   posting_defaults:
     explanation: Estas configurações serão usadas como padrão quando você criar publicações, mas você pode editá-las por postagem no compositor.
+    composer_editor: Editor de publicação
+    composer_editor_hint: Escolha o editor usado ao criar uma nova publicação.
+    composer_editors:
+      bluelab: Composer BlueLab
+      mastodon: Composer padrão do Mastodon
   preferences:
     other: Outro
     posting_defaults: Padrões de publicação

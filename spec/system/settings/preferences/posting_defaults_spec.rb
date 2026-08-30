@@ -23,6 +23,21 @@ RSpec.describe 'Settings preferences posting defaults page' do
       .to have_title(I18n.t('preferences.posting_defaults'))
   end
 
+  it 'defaults to and persists the BlueLab composer choice' do
+    visit settings_preferences_posting_defaults_path
+
+    expect(page).to have_select(
+      I18n.t('posting_defaults.composer_editor'),
+      selected: I18n.t('posting_defaults.composer_editors.bluelab')
+    )
+
+    select I18n.t('posting_defaults.composer_editors.mastodon'),
+           from: I18n.t('posting_defaults.composer_editor')
+    save_changes
+
+    expect(user.reload.settings['composer_editor']).to eq('mastodon')
+  end
+
   def save_changes
     click_on submit_button
   end

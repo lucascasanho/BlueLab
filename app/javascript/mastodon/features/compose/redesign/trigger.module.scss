@@ -3,8 +3,8 @@
 .button {
   &:not(.buttonInline) {
     position: fixed;
-    bottom: var(--space-md);
-    right: var(--space-md);
+    bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+    right: calc(var(--space-md) + env(safe-area-inset-right));
     z-index: 2;
   }
 }

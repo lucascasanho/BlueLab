@@ -144,6 +144,50 @@ textarea.textarea {
   resize: none;
 }
 
+.richEditorWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.richEditorToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3xs);
+}
+
+.richEditor {
+  @include mixins.type-body-lg;
+
+  min-height: 9rem;
+  padding: var(--space-xs);
+  border-radius: var(--radius-xs);
+  outline: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  cursor: text;
+
+  &:focus {
+    outline: 2px solid var(--color-border-brand);
+    outline-offset: -2px;
+  }
+
+  &:empty::before {
+    content: 'What would you like to say?';
+    color: var(--color-text-tertiary);
+    pointer-events: none;
+  }
+}
+
+.richEditorTransport {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .textareaMirror {
   visibility: hidden;
   pointer-events: none;

@@ -29,13 +29,13 @@ import { ComposeFormHeader } from './header';
 import { ComposeHints } from './hints';
 import { LanguageButton } from './language';
 import { ComposeReply } from './reply';
+import { RichComposeEditor } from './rich_editor';
 import {
   selectComposeCanSubmit,
   selectComposeSensitive,
   selectComposeType,
 } from './selectors';
 import classes from './styles.module.scss';
-import { ComposeTextarea } from './textarea';
 import { ComposeVisibility } from './visibility';
 
 const messages = defineMessages({
@@ -115,13 +115,13 @@ export const RedesignComposeForm: React.FC<RedesignComposeFormProps> = ({
         />
       )}
 
-      <ComposeTextarea
+      <RichComposeEditor
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={autoFocus}
         onSubmit={onSubmit}
       >
         <ComposeAttachments className={classes.attachments} />
-      </ComposeTextarea>
+      </RichComposeEditor>
 
       <ComposeHints />
 

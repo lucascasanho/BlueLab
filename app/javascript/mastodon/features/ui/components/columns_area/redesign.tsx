@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
+import { ComposePanel } from '@/mastodon/features/ui/components/compose_panel';
 import { useAppSelector } from '@/mastodon/store';
 import { Footer } from 'mastodon/features/custom_homepage/components/footer';
 import { Header } from 'mastodon/features/custom_homepage/components/header';
@@ -40,6 +41,9 @@ export const ColumnsAreaRedesign: React.FC<{
     (state) => !state.modal.get('stack').isEmpty(),
   );
   const isMobile = useBreakpoint('openable');
+  const useMastodonComposer = useAppSelector(
+    (state) => state.compose.get('composer_editor') === 'mastodon',
+  );
 
   if (minimalShell) {
     return (
@@ -65,7 +69,13 @@ export const ColumnsAreaRedesign: React.FC<{
         <div className={classes.navigationWrapper}>
           <RedesignNavigationPanel />
         </div>
-        {isMobile ? <RedesignMobileNavigation /> : <ComposeRedesignButton />}
+        {useMastodonComposer ? (
+          <ComposePanel />
+        ) : isMobile ? (
+          <RedesignMobileNavigation />
+        ) : (
+          <ComposeRedesignButton />
+        )}
 
         <main className={classes.main}>
           <div className='tabs-bar__wrapper'>

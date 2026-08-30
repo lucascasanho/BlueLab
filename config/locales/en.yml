@@ -2049,6 +2049,11 @@ en:
     vote: Vote
   posting_defaults:
     explanation: These settings will be used as defaults when you create new posts, but you can edit them per post within the composer.
+    composer_editor: Publication editor
+    composer_editor_hint: Choose the editor used when creating a new post.
+    composer_editors:
+      bluelab: Composer BlueLab
+      mastodon: Standard Mastodon composer
   preferences:
     other: Other
     posting_defaults: Posting defaults
