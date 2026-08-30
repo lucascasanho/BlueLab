@@ -6,6 +6,7 @@ import type { NavLinkProps } from 'react-router-dom';
 
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useAccountId } from '@/mastodon/hooks/useAccountId';
+import { me } from '@/mastodon/initial_state';
 
 import { TabLink, TabList } from '../tab_list';
 
@@ -24,7 +25,8 @@ export const AccountTabs: FC = () => {
   }
 
   const { acct, show_featured, show_media } = account;
-  if (!show_featured && !show_media) {
+  const isMe = account.id === me;
+  if (!isMe && !show_featured && !show_media) {
     return <hr className={classes.noTabs} />;
   }
 
@@ -33,12 +35,12 @@ export const AccountTabs: FC = () => {
       <TabLink isActive={isActive} to={`/@${acct}`}>
         <FormattedMessage id='account.activity' defaultMessage='Activity' />
       </TabLink>
-      {show_media && (
+      {(show_media || isMe) && (
         <TabLink exact to={`/@${acct}/media`}>
           <FormattedMessage id='account.media' defaultMessage='Media' />
         </TabLink>
       )}
-      {show_featured && (
+      {(show_featured || isMe) && (
         <TabLink exact to={`/@${acct}/featured`}>
           <FormattedMessage id='account.featured' defaultMessage='Featured' />
         </TabLink>
