@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+set -u
+
+units=(
+  blue-web.service
+  blue-sidekiq.service
+  blue-streaming@4000.service
+  nginx.service
+  cloudflared.service
+  postgresql@17-main.service
+  redis-server.service
+)
+
+failed=()
+
+for unit in "${units[@]}"; do
+  if sudo systemctl restart "$unit"; then
+    if sudo systemctl is-active --quiet "$unit"; then
+      printf 'OK: %s reiniciado\n' "$unit"
+    else
+      printf 'FALHA: %s não ficou ativo após reiniciar\n' "$unit"
+      failed+=("$unit")
+    fi
+  else
+    printf 'FALHA: não foi possível reiniciar %s\n' "$unit"
+    failed+=("$unit")
+  fi
+done
+
+if ((${#failed[@]} == 0)); then
+  printf 'Sucesso: todos os serviços do Blue foram reiniciados.\n'
+  exit 0
+fi
+
+printf 'Falha: %d serviço(s) não foram reiniciados com sucesso: %s\n' "${#failed[@]}" "${failed[*]}"
+exit 1
