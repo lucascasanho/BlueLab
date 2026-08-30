@@ -2546,12 +2546,12 @@ a.account__display-name {
   // Keep the privacy indicator beside the display name and the colored
   // remote domain beside the username. The generic span rule above provides
   // ellipsis for other children, but these two elements must remain inline.
-  .display-name__locked {
+  .display-name .display-name__locked {
     display: inline-flex;
     overflow: visible;
   }
 
-  .display-name__domain {
+  .display-name__account .display-name__domain {
     display: inline;
     overflow: visible;
   }
