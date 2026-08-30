@@ -13,15 +13,48 @@ class Form::InstanceCustomization
     media_image_size_limit_mb
     media_video_size_limit_mb
     instance_accent_color
+    instance_light_background_color
+    instance_light_surface_color
+    instance_light_text_color
+    instance_dark_background_color
+    instance_dark_surface_color
+    instance_dark_text_color
     email_primary_color
     email_button_color
     email_link_color
+    email_background_color
+    email_surface_color
+    email_text_color
+    email_muted_color
+    email_dark_background_color
+    email_dark_surface_color
+    email_dark_text_color
+    email_dark_muted_color
   ).freeze
   UPLOAD_KEYS = %i(auth_logo email_logo).freeze
   KEYS = (SCALAR_KEYS + UPLOAD_KEYS).freeze
   INTEGER_KEYS = %i(status_character_limit admin_status_character_limit media_image_size_limit_mb media_video_size_limit_mb).freeze
   BOOLEAN_KEYS = %i(hide_status_character_counter hide_admin_status_character_counter).freeze
-  COLOR_KEYS = %i(instance_accent_color email_primary_color email_button_color email_link_color).freeze
+  COLOR_KEYS = %i(
+    instance_accent_color
+    instance_light_background_color
+    instance_light_surface_color
+    instance_light_text_color
+    instance_dark_background_color
+    instance_dark_surface_color
+    instance_dark_text_color
+    email_primary_color
+    email_button_color
+    email_link_color
+    email_background_color
+    email_surface_color
+    email_text_color
+    email_muted_color
+    email_dark_background_color
+    email_dark_surface_color
+    email_dark_text_color
+    email_dark_muted_color
+  ).freeze
 
   STATUS_LIMIT_RANGE = (1..100_000)
   IMAGE_LIMIT_RANGE = (1..100)
@@ -132,6 +165,22 @@ class Form::InstanceCustomization
 
       errors.add(key, I18n.t('admin.settings.instance_customization.contrast_error', ratio: minimum)) if contrast_ratio(value, '#ffffff') < minimum
     end
+
+    validate_color_pair(:instance_light_text_color, :instance_light_background_color)
+    validate_color_pair(:instance_dark_text_color, :instance_dark_background_color)
+    validate_color_pair(:email_text_color, :email_surface_color)
+    validate_color_pair(:email_muted_color, :email_surface_color)
+    validate_color_pair(:email_dark_text_color, :email_dark_surface_color)
+    validate_color_pair(:email_dark_muted_color, :email_dark_surface_color)
+  end
+
+  def validate_color_pair(foreground_key, background_key)
+    foreground = public_send(foreground_key)
+    background = public_send(background_key)
+    return unless [foreground, background].all? { |value| value.present? && value.match?(/\A#[0-9a-fA-F]{6}\z/) }
+    return if contrast_ratio(foreground, background) >= 4.5
+
+    errors.add(foreground_key, I18n.t('admin.settings.instance_customization.pair_contrast_error', ratio: 4.5))
   end
 
   def contrast_ratio(first, second)

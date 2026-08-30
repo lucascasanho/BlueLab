@@ -163,14 +163,10 @@ export function shouldReplaceFlags(): boolean {
     return false;
   }
 
-  // Espelunca: Windows does not provide native country flag glyphs. Chromium
-  // renders the regional indicators as letter codes, which can produce a false
-  // positive in the color-pixel test below. Firefox bundles its own emoji font,
-  // so keep the normal capability test for non-Chromium browsers.
-  if (
-    /\bWindows\b/i.test(navigator.userAgent) &&
-    /\b(?:Chrome|Chromium|Edg|OPR)\//.test(navigator.userAgent)
-  ) {
+  // Chromium can report color emoji support even when regional-indicator
+  // sequences render as separate letters. Keep native emoji for the rest of
+  // the interface and use the existing Twemoji flag fallback in this case.
+  if (/\b(?:Chrome|Chromium|Edg|OPR)\//.test(navigator.userAgent)) {
     return true;
   }
 

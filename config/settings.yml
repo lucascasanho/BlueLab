@@ -44,9 +44,23 @@ defaults: &defaults
   media_image_size_limit_mb: 100
   media_video_size_limit_mb: 1024
   instance_accent_color: '#6364ff'
+  instance_light_background_color: '#ffffff'
+  instance_light_surface_color: '#f7f7f9'
+  instance_light_text_color: '#1f1b23'
+  instance_dark_background_color: '#1e2028'
+  instance_dark_surface_color: '#232543'
+  instance_dark_text_color: '#f7f9f9'
   email_primary_color: '#6364ff'
   email_button_color: '#6364ff'
   email_link_color: '#5638cc'
+  email_background_color: '#f3f2f5'
+  email_surface_color: '#ffffff'
+  email_text_color: '#1f1b23'
+  email_muted_color: '#746a7e'
+  email_dark_background_color: '#1e2028'
+  email_dark_surface_color: '#232543'
+  email_dark_text_color: '#f7f9f9'
+  email_dark_muted_color: '#b8b3c0'
 
 development:
   <<: *defaults

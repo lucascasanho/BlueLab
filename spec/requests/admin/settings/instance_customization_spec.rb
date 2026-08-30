@@ -44,6 +44,17 @@ RSpec.describe 'Admin instance customization settings' do
     expect(response.parsed_body.css('input[name^="reset["]').count).to eq(0)
   end
 
+  it 'explains branding uploads and offers light, dark, and email colors' do
+    sign_in Fabricate(:admin_user)
+    get admin_settings_instance_customization_path
+
+    expect(response.body).to include(I18n.t('admin.settings.instance_customization.auth_logo_hint'))
+    expect(response.body).to include(I18n.t('admin.settings.instance_customization.email_logo_hint'))
+    expect(response.parsed_body.at_css('input[name="form_instance_customization[instance_light_background_color]"]')).to be_present
+    expect(response.parsed_body.at_css('input[name="form_instance_customization[instance_dark_background_color]"]')).to be_present
+    expect(response.parsed_body.at_css('input[name="form_instance_customization[email_dark_surface_color]"]')).to be_present
+  end
+
   it 'restores every customization with one action' do
     sign_in Fabricate(:admin_user)
     Setting.status_character_limit = 750

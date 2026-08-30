@@ -33,12 +33,30 @@
         = t('admin.settings.instance_customization.effective_color')
         %code= @instance_customization.public_send(key)
 
+  %h3= t('admin.settings.instance_customization.light_theme')
+  .fields-row
+    - %i(instance_light_background_color instance_light_surface_color instance_light_text_color).each do |key|
+      .fields-row__column.fields-row__column-4.fields-group
+        = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), hint: t("admin.settings.instance_customization.#{key}_hint"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
+        %p.hint
+          = t('admin.settings.instance_customization.effective_color')
+          %code= @instance_customization.public_send(key)
+
+  %h3= t('admin.settings.instance_customization.dark_theme')
+  .fields-row
+    - %i(instance_dark_background_color instance_dark_surface_color instance_dark_text_color).each do |key|
+      .fields-row__column.fields-row__column-4.fields-group
+        = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), hint: t("admin.settings.instance_customization.#{key}_hint"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
+        %p.hint
+          = t('admin.settings.instance_customization.effective_color')
+          %code= @instance_customization.public_send(key)
+
   %h2= t('admin.settings.instance_customization.branding')
   %p.hint= t('admin.settings.instance_customization.branding_hint_html', branding_path: admin_settings_branding_path)
   .fields-row
     - %i(auth_logo email_logo).each do |key|
       .fields-row__column.fields-row__column-6.fields-group
-        = f.input key, as: :file, label: t("admin.settings.instance_customization.#{key}"), hint: t('admin.settings.instance_customization.logo_hint'), input_html: { accept: Form::InstanceCustomization::UPLOAD_MIME_TYPES.join(',') }
+        = f.input key, as: :file, label: t("admin.settings.instance_customization.#{key}"), hint: t("admin.settings.instance_customization.#{key}_hint"), input_html: { accept: Form::InstanceCustomization::UPLOAD_MIME_TYPES.join(',') }
         - if @instance_customization.public_send(key).persisted?
           = image_tag @instance_customization.public_send(key).file.url, class: 'fields-group__thumbnail', alt: ''
 
@@ -46,6 +64,21 @@
   .fields-row
     - %i(email_primary_color email_button_color email_link_color).each do |key|
       .fields-row__column.fields-row__column-4.fields-group
+        = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), hint: t("admin.settings.instance_customization.#{key}_hint"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
+        %p.hint
+          = t('admin.settings.instance_customization.effective_color')
+          %code= @instance_customization.public_send(key)
+  .fields-row
+    - %i(email_background_color email_surface_color email_text_color email_muted_color).each do |key|
+      .fields-row__column.fields-row__column-6.fields-group
+        = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), hint: t("admin.settings.instance_customization.#{key}_hint"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
+        %p.hint
+          = t('admin.settings.instance_customization.effective_color')
+          %code= @instance_customization.public_send(key)
+  %h3= t('admin.settings.instance_customization.email_dark_theme')
+  .fields-row
+    - %i(email_dark_background_color email_dark_surface_color email_dark_text_color email_dark_muted_color).each do |key|
+      .fields-row__column.fields-row__column-6.fields-group
         = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), hint: t("admin.settings.instance_customization.#{key}_hint"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
         %p.hint
           = t('admin.settings.instance_customization.effective_color')

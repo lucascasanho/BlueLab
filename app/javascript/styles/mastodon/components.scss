@@ -2555,6 +2555,20 @@ a.account__display-name {
     display: inline;
     overflow: visible;
   }
+
+  .display-name {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .display-name__account {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: normal;
+  }
 }
 
 .muted {

@@ -14,9 +14,23 @@ RSpec.describe Form::InstanceCustomization do
       media_image_size_limit_mb: '80',
       media_video_size_limit_mb: '512',
       instance_accent_color: '#5638cc',
+      instance_light_background_color: '#ffffff',
+      instance_light_surface_color: '#f7f7f9',
+      instance_light_text_color: '#1f1b23',
+      instance_dark_background_color: '#1e2028',
+      instance_dark_surface_color: '#232543',
+      instance_dark_text_color: '#f7f9f9',
       email_primary_color: '#5638cc',
       email_button_color: '#5638cc',
       email_link_color: '#5638cc',
+      email_background_color: '#f3f2f5',
+      email_surface_color: '#ffffff',
+      email_text_color: '#1f1b23',
+      email_muted_color: '#746a7e',
+      email_dark_background_color: '#1e2028',
+      email_dark_surface_color: '#232543',
+      email_dark_text_color: '#f7f9f9',
+      email_dark_muted_color: '#b8b3c0',
     }
   end
 
@@ -38,6 +52,14 @@ RSpec.describe Form::InstanceCustomization do
     form.instance_accent_color = 'red; background:url(example)'
     form.media_video_size_limit_mb = '2048'
     expect(form).to_not be_valid
+  end
+
+  it 'rejects unreadable text and background combinations' do
+    form.instance_light_text_color = '#ffffff'
+    form.instance_light_background_color = '#ffffff'
+
+    expect(form).to_not be_valid
+    expect(form.errors[:instance_light_text_color]).to be_present
   end
 
   it 'restores a setting to its configured default' do

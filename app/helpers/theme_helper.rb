@@ -50,6 +50,12 @@ module ThemeHelper
   # selected theme lets every theme retain its neutral palette.
   def instance_customization_styles
     accent = safe_customization_color(:instance_accent_color, fallback: '#6364ff')
+    light_background = safe_customization_color(:instance_light_background_color, fallback: '#ffffff')
+    light_surface = safe_customization_color(:instance_light_surface_color, fallback: '#f7f7f9')
+    light_text = safe_customization_color(:instance_light_text_color, fallback: '#1f1b23')
+    dark_background = safe_customization_color(:instance_dark_background_color, fallback: '#1e2028')
+    dark_surface = safe_customization_color(:instance_dark_surface_color, fallback: '#232543')
+    dark_text = safe_customization_color(:instance_dark_text_color, fallback: '#f7f9f9')
     custom_logo = Rails.cache.fetch('site_uploads/auth_logo') { SiteUpload.find_by(var: 'auth_logo') }&.file&.url
     custom_logo = nil unless custom_logo&.match?(%r{\A/[a-zA-Z0-9_./-]+\z})
     logo_token = "--instance-logo: url(#{custom_logo});" if custom_logo.present?
@@ -63,12 +69,34 @@ module ThemeHelper
         --color-bg-brand-softest: color-mix(in srgb, #{accent}, transparent 90%);
       }
       [data-color-scheme=dark], html:not([data-color-scheme]) {
+        --color-bg: #{dark_background};
+        --color-bg-primary: #{dark_background};
+        --color-bg-ambient: #{dark_background};
+        --color-bg-elevated: #{dark_background};
+        --color-bg-secondary-base: #{dark_surface};
+        --color-bg-secondary: #{dark_surface};
+        --color-bg-secondary-solid: #{dark_surface};
+        --color-dark: #{dark_surface};
+        --color-fg: #{dark_text};
+        --color-light-text: #{dark_text};
+        --color-text-primary: #{dark_text};
         --color-text-brand: color-mix(in srgb, #{accent}, white 20%);
         --color-text-brand-soft: var(--color-text-brand);
         --color-text-status-links: var(--color-text-brand);
         --color-border-brand: var(--color-text-brand);
       }
       [data-color-scheme=light] {
+        --color-bg: #{light_background};
+        --color-bg-primary: #{light_background};
+        --color-bg-ambient: #{light_background};
+        --color-bg-elevated: #{light_background};
+        --color-bg-secondary-base: #{light_surface};
+        --color-bg-secondary: #{light_surface};
+        --color-bg-secondary-solid: #{light_surface};
+        --color-dark: #{light_surface};
+        --color-fg: #{light_text};
+        --color-light-text: #{light_text};
+        --color-text-primary: #{light_text};
         --color-text-brand: color-mix(in srgb, #{accent}, black 20%);
         --color-text-brand-soft: var(--color-text-brand);
         --color-text-status-links: var(--color-text-brand);

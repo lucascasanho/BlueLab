@@ -946,30 +946,63 @@ en:
     settings:
       instance_customization:
         admin_status_limit: Character limit for administrators
-        auth_logo: Authentication logo
+        auth_logo: Authentication pages logo
+        auth_logo_hint: Shown on sign-in, registration and other authentication pages. PNG, JPEG or WebP; maximum 2 MB; square image of at least 64 × 64 px (128 × 128 px or larger recommended).
         branding: Branding
         branding_hint_html: Favicon, PWA/Apple icons and the OpenGraph image remain on the <a href="%{branding_path}">Branding page</a>. Internal SPA SVG logos remain versioned to prevent arbitrary SVG.
         colors_hint: The color overrides semantic accent tokens while preserving each theme's neutral palette.
         contrast_error: must reach a minimum contrast of %{ratio}:1 against white
+        dark_theme: Dark theme
         effective_color: "Effective color:"
         email: Email
+        email_background_color: Email outer background
+        email_background_color_hint: Background around the main email card in light mode.
         email_button_color: Primary email button color
         email_button_color_hint: Fill color for primary action buttons in email templates.
         email_link_color: Email link color
         email_link_color_hint: Links in content, text actions, and arrow links.
-        email_logo: Email logo
+        email_dark_background_color: Email outer background in dark mode
+        email_dark_background_color_hint: Background around the main email card when the email client uses dark mode.
+        email_dark_muted_color: Email secondary text in dark mode
+        email_dark_muted_color_hint: Handles, metadata, descriptions and footer text in dark mode.
+        email_dark_surface_color: Email content background in dark mode
+        email_dark_surface_color_hint: Main cards and content areas in dark mode.
+        email_dark_text_color: Email primary text in dark mode
+        email_dark_text_color_hint: Headings and main content in dark mode.
+        email_dark_theme: Email dark mode
+        email_logo: Email header logo
+        email_logo_hint: Shown only in email headers beside the instance name. PNG, JPEG or WebP; maximum 2 MB; square image of at least 64 × 64 px (128 × 128 px or larger recommended).
+        email_muted_color: Email secondary text
+        email_muted_color_hint: Handles, metadata, descriptions and footer text in light mode.
         email_primary_color: Email header accent color
         email_primary_color_hint: Border and structural accent in the email header.
+        email_surface_color: Email content background
+        email_surface_color_hint: Main cards and content areas in light mode.
+        email_text_color: Email primary text
+        email_text_color_hint: Headings and main content in light mode.
         hide_admin_status_character_counter: Hide character counter for administrators
         hide_status_character_counter: Hide character counter for standard users
         image_limit: Image limit (MB)
         instance_accent_color: Interface accent color
         instance_accent_color_hint: Primary buttons, links, focus, remote account domains, and other semantic accent tokens.
+        instance_dark_background_color: Dark mode background
+        instance_dark_background_color_hint: Main page and column background in Mastodon and Bird UI dark themes.
+        instance_dark_surface_color: Dark mode surface
+        instance_dark_surface_color_hint: Cards, panels, menus and secondary areas in Mastodon and Bird UI dark themes.
+        instance_dark_text_color: Dark mode primary text
+        instance_dark_text_color_hint: Names, headings and main content in Mastodon and Bird UI dark themes.
+        instance_light_background_color: Light mode background
+        instance_light_background_color_hint: Main page and column background in Mastodon and Bird UI light themes.
+        instance_light_surface_color: Light mode surface
+        instance_light_surface_color_hint: Cards, panels, menus and secondary areas in Mastodon and Bird UI light themes.
+        instance_light_text_color: Light mode primary text
+        instance_light_text_color_hint: Names, headings and main content in Mastodon and Bird UI light themes.
         interface: Interface and themes
-        logo_hint: PNG, JPEG or WebP; maximum 2 MB; square image at least 64 × 64 px (128 × 128 px or larger recommended).
+        light_theme: Light theme
         media: Media
         nginx_warning: "Detected local configuration: nginx accepts at most %{limit} MB. Larger values are rejected before reaching Mastodon."
         posts: Posts
+        pair_contrast_error: must reach a minimum contrast of %{ratio}:1 against its corresponding background
         preamble: Persistent, validated server customization. Saving does not edit source files and changes apply immediately.
         proxy_warning: This is the Mastodon limit. Proxies, CDNs or tunnels, including Cloudflare, may impose smaller limits and must be configured separately.
         restore_defaults: Restore all defaults
