@@ -41,7 +41,19 @@
 
   .status__info .display-name {
     display: flex;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    flex-wrap: nowrap !important;
     gap: calc(var(--gap-default) / 2);
+
+    .display-name__name {
+      flex: 0 1 auto;
+    }
+
+    .display-name__account {
+      flex: 1 1 auto;
+    }
   }
 
   .status__info .status__relative-time {

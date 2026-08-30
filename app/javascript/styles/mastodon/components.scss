@@ -2699,7 +2699,19 @@ a.account__display-name {
   }
 }
 
+.display-name__name {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-width: 0;
+  vertical-align: bottom;
+}
+
 .display-name__html {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-weight: 500;
 }
 
@@ -2879,6 +2891,9 @@ a.account__display-name {
 }
 
 .display-name__account {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
