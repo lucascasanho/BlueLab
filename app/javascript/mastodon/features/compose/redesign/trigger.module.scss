@@ -12,11 +12,14 @@
 .composer,
 .composerMinimized {
   position: fixed;
+  z-index: 4;
   bottom: 0;
   right: 0;
   margin: var(--space-md);
   box-sizing: border-box;
   border-radius: var(--radius-xl);
+  pointer-events: auto;
+  isolation: isolate;
   animation: composer-enter 180ms ease-out both;
 }
 
