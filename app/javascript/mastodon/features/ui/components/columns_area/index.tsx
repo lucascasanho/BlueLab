@@ -1,8 +1,7 @@
-import { lazy, Suspense, useCallback } from 'react';
+import { useCallback } from 'react';
 
 import classNames from 'classnames';
 
-import { LoadingIndicator } from '@/mastodon/components/loading_indicator';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
 import { Header } from '@/mastodon/features/custom_homepage/components/header';
@@ -10,7 +9,6 @@ import { CollapsibleNavigationPanel } from '@/mastodon/features/navigation_panel
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useColumnsContext } from '@/mastodon/features/ui/util/columns_context';
 import { useAppSelector } from '@/mastodon/store';
-import { isRedesignEnabled } from '@/mastodon/utils/environment';
 
 import {
   ComposePanel,
@@ -18,12 +16,6 @@ import {
 } from '../compose_panel';
 
 import { MultiColumnContent } from './multi_column_content';
-
-const LazyColumnsAreaRedesign = lazy(() =>
-  import('@/mastodon/features/ui/components/columns_area/redesign').then(
-    ({ ColumnsAreaRedesign }) => ({ default: ColumnsAreaRedesign }),
-  ),
-);
 
 const TabsBarPortal = () => {
   const { setTabsBarElement } = useColumnsContext();
@@ -118,13 +110,5 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
 };
 
 export const ColumnsArea: React.FC<ColumnsAreaProps> = (props) => {
-  if (isRedesignEnabled()) {
-    return (
-      <Suspense fallback={<LoadingIndicator />}>
-        <LazyColumnsAreaRedesign {...props} />
-      </Suspense>
-    );
-  } else {
-    return <ColumnsAreaLegacy {...props} />;
-  }
+  return <ColumnsAreaLegacy {...props} />;
 };

@@ -49,7 +49,7 @@ const markdownToHtml = (
           const emoji = customEmojis[shortcode];
           if (!emoji) return match;
           const index = emojiPlaceholders.push(match) - 1;
-          return `__BLUELAB_EMOJI_${index}__`;
+          return `BLUELABEMOJI${index}TOKEN`;
         })
         .replace(/`([^`]+)`/g, '<code>$1</code>')
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
@@ -57,7 +57,7 @@ const markdownToHtml = (
         .replace(/~~([^~]+)~~/g, '<del>$1</del>')
         .replace(/\*([^*]+)\*/g, '<em>$1</em>')
         .replace(/_([^_]+)_/g, '<em>$1</em>')
-        .replace(/__BLUELAB_EMOJI_(\d+)__/g, (_placeholder, index: string) => {
+        .replace(/BLUELABEMOJI(\d+)TOKEN/g, (_placeholder, index: string) => {
           const shortcode = emojiPlaceholders[Number(index)] ?? '';
           const emoji = customEmojis[shortcode.slice(1, -1)];
           if (!emoji) return shortcode;
@@ -137,6 +137,7 @@ export const RichComposeEditor: React.FC<{
   const customEmojis = useCustomEmojis();
   const ref = useRef<HTMLDivElement>(null);
   const hiddenRef = useRef<HTMLTextAreaElement>(null);
+  const selectionRef = useRef<Range | null>(null);
   const localValueRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -164,12 +165,21 @@ export const RichComposeEditor: React.FC<{
 
   const preventToolbarFocus: React.MouseEventHandler = (event) => {
     event.preventDefault();
+    const selection = window.getSelection();
+    if (selection?.rangeCount && ref.current?.contains(selection.anchorNode)) {
+      selectionRef.current = selection.getRangeAt(0).cloneRange();
+    }
   };
   const handleCommand: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     const button = event.currentTarget;
     ref.current?.focus();
+    const selection = window.getSelection();
+    if (selectionRef.current && selection) {
+      selection.removeAllRanges();
+      selection.addRange(selectionRef.current);
+    }
     // execCommand is the browser editing primitive for preserving selection/IME.
-     
+
     if (button.dataset.command === 'code') {
       const selection = window.getSelection()?.toString() ?? 'code';
       // eslint-disable-next-line @typescript-eslint/no-deprecated
