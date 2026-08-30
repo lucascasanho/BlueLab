@@ -166,6 +166,61 @@ textarea.textarea {
   outline: none;
   white-space: pre-wrap;
 
+  b,
+  strong {
+    font-weight: 700;
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  code,
+  pre {
+    font-family: var(--font-monospace, monospace);
+  }
+
+  code {
+    padding: var(--space-3xs);
+    border-radius: var(--radius-xs);
+    background: var(--color-bg-secondary);
+  }
+
+  pre,
+  blockquote,
+  ul,
+  ol {
+    display: block;
+    margin-block: var(--space-xs);
+  }
+
+  pre {
+    padding: var(--space-xs);
+    border-radius: var(--radius-xs);
+    background: var(--color-bg-secondary);
+    white-space: pre-wrap;
+  }
+
+  blockquote {
+    padding-inline-start: var(--space-md);
+    border-inline-start: var(--border-w-strong) solid var(--color-border-brand);
+    color: var(--color-text-secondary);
+  }
+
+  ul,
+  ol {
+    padding-inline-start: var(--space-xl);
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
   [data-emoji-shortcode] {
     display: inline-flex;
     vertical-align: middle;

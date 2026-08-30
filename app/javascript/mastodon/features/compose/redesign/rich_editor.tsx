@@ -36,36 +36,84 @@ const escapeHtml = (value: string) =>
 const escapeAttribute = (value: string) =>
   escapeHtml(value).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-const markdownToHtml = (
+const inlineMarkdownToHtml = (
   value: string,
   customEmojis: Record<string, { static_url: string; url: string }>,
-) =>
-  value
-    .split('\n')
-    .map((line) => {
-      const emojiPlaceholders: string[] = [];
-      const escaped = escapeHtml(line)
-        .replace(/:([a-zA-Z0-9_+-]+):/g, (match, shortcode: string) => {
-          const emoji = customEmojis[shortcode];
-          if (!emoji) return match;
-          const index = emojiPlaceholders.push(match) - 1;
-          return `BLUELABEMOJI${index}TOKEN`;
-        })
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
-        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-        .replace(/__([^_]+)__/g, '<strong>$1</strong>')
-        .replace(/~~([^~]+)~~/g, '<del>$1</del>')
-        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-        .replace(/_([^_]+)_/g, '<em>$1</em>')
-        .replace(/BLUELABEMOJI(\d+)TOKEN/g, (_placeholder, index: string) => {
-          const shortcode = emojiPlaceholders[Number(index)] ?? '';
-          const emoji = customEmojis[shortcode.slice(1, -1)];
-          if (!emoji) return shortcode;
-          return `<span data-emoji-shortcode="${escapeAttribute(shortcode)}" contenteditable="false"><img src="${escapeAttribute(emoji.url)}" alt="${escapeAttribute(shortcode)}" draggable="false" /></span>`;
-        });
-      return escaped || '<br />';
+) => {
+  const emojiPlaceholders: string[] = [];
+  return escapeHtml(value)
+    .replace(/:([a-zA-Z0-9_+-]+):/g, (match, shortcode: string) => {
+      const emoji = customEmojis[shortcode];
+      if (!emoji) return match;
+      const index = emojiPlaceholders.push(match) - 1;
+      return `BLUELABEMOJI${index}TOKEN`;
     })
-    .join('<br />');
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/__([^_]+)__/g, '<strong>$1</strong>')
+    .replace(/~~([^~]+)~~/g, '<del>$1</del>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/_([^_]+)_/g, '<em>$1</em>')
+    .replace(/BLUELABEMOJI(\d+)TOKEN/g, (_placeholder, index: string) => {
+      const shortcode = emojiPlaceholders[Number(index)] ?? '';
+      const emoji = customEmojis[shortcode.slice(1, -1)];
+      if (!emoji) return shortcode;
+      return `<span data-emoji-shortcode="${escapeAttribute(shortcode)}" contenteditable="false"><img src="${escapeAttribute(emoji.url)}" alt="${escapeAttribute(shortcode)}" draggable="false" /></span>`;
+    });
+};
+
+export const markdownToHtml = (
+  value: string,
+  customEmojis: Record<string, { static_url: string; url: string }>,
+) => {
+  const lines = value.split('\n');
+  const output: string[] = [];
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index] ?? '';
+    if (line.trim() === '```') {
+      const code: string[] = [];
+      while (++index < lines.length && lines[index]?.trim() !== '```') {
+        code.push(lines[index] ?? '');
+      }
+      output.push(`<pre>${escapeHtml(code.join('\n'))}</pre>`);
+    } else if (line.startsWith('> ')) {
+      const quote: string[] = [];
+      while (index < lines.length && lines[index]?.startsWith('> ')) {
+        quote.push(
+          inlineMarkdownToHtml((lines[index] ?? '').slice(2), customEmojis),
+        );
+        index += 1;
+      }
+      index -= 1;
+      output.push(`<blockquote>${quote.join('<br />')}</blockquote>`);
+    } else if (/^[-*] /.test(line)) {
+      const items: string[] = [];
+      while (index < lines.length && /^[-*] /.test(lines[index] ?? '')) {
+        items.push(
+          `<li>${inlineMarkdownToHtml((lines[index] ?? '').slice(2), customEmojis)}</li>`,
+        );
+        index += 1;
+      }
+      index -= 1;
+      output.push(`<ul>${items.join('')}</ul>`);
+    } else if (/^\d+\. /.test(line)) {
+      const items: string[] = [];
+      while (index < lines.length && /^\d+\. /.test(lines[index] ?? '')) {
+        items.push(
+          `<li>${inlineMarkdownToHtml((lines[index] ?? '').replace(/^\d+\. /, ''), customEmojis)}</li>`,
+        );
+        index += 1;
+      }
+      index -= 1;
+      output.push(`<ol>${items.join('')}</ol>`);
+    } else {
+      output.push(inlineMarkdownToHtml(line, customEmojis) || '<br />');
+    }
+  }
+
+  return output.join('<br />');
+};
 
 const nodeToMarkdown = (node: Node): string => {
   if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? '';
@@ -88,18 +136,20 @@ const nodeToMarkdown = (node: Node): string => {
     case 'PRE':
       return `\n\`\`\`\n${content}\n\`\`\``;
     case 'BLOCKQUOTE':
-      return content
+      return `\n${content
         .split('\n')
         .map((line) => `> ${line}`)
-        .join('\n');
+        .join('\n')}\n`;
     case 'LI':
-      return `- ${content}\n`;
-    case 'OL':
-      return Array.from(node.children)
-        .map((child, index) => `${index + 1}. ${nodeToMarkdown(child)}`)
-        .join('');
-    case 'UL':
       return content;
+    case 'OL':
+      return `\n${Array.from(node.children)
+        .map((child, index) => `${index + 1}. ${nodeToMarkdown(child)}\n`)
+        .join('')}\n`;
+    case 'UL':
+      return `\n${Array.from(node.children)
+        .map((child) => `- ${nodeToMarkdown(child)}\n`)
+        .join('')}\n`;
     case 'A':
       return `[${content}](${node.getAttribute('href') ?? ''})`;
     case 'BR':
@@ -109,12 +159,12 @@ const nodeToMarkdown = (node: Node): string => {
   }
 };
 
-const editorText = (element: HTMLElement) =>
+export const editorText = (element: HTMLElement) =>
   Array.from(element.childNodes)
     .map(nodeToMarkdown)
     .join('')
     .replace(/\n{3,}/g, '\n\n')
-    .replace(/^\n|\n$/g, '');
+    .replace(/^\n+|\n+$/g, '');
 
 const wrapSelection = (tagName: string) => {
   const selection = window.getSelection();

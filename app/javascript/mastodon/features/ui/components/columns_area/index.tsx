@@ -5,10 +5,7 @@ import classNames from 'classnames';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
 import { Header } from '@/mastodon/features/custom_homepage/components/header';
-import {
-  CollapsibleNavigationPanel,
-  NavigationPanel,
-} from '@/mastodon/features/navigation_panel';
+import { CollapsibleNavigationPanel } from '@/mastodon/features/navigation_panel';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useColumnsContext } from '@/mastodon/features/ui/util/columns_context';
 import { useAppSelector } from '@/mastodon/store';
@@ -48,8 +45,7 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
   singleColumn,
   ref,
 }) => {
-  const isFullLayout = useBreakpoint('full');
-  const renderComposePanel = !isFullLayout;
+  const renderComposePanel = !useBreakpoint('full');
   const isModalOpen = useAppSelector(
     (state) => !state.modal.get('stack').isEmpty(),
   );
@@ -80,14 +76,14 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
       <div className='columns-area__panels'>
         <div className='columns-area__panels__pane columns-area__panels__pane--compositional'>
           <div className='columns-area__panels__pane__inner'>
-            {useBlueLabComposer ? (
-              <ComposeRedesignButton />
-            ) : (
-              renderComposePanel && <ComposePanel />
+            {renderComposePanel && (
+              <ComposePanel showComposer={!useBlueLabComposer} />
             )}
             <RedirectToMobileComposeIfNeeded />
           </div>
         </div>
+
+        {useBlueLabComposer && <ComposeRedesignButton />}
 
         <main className='columns-area__panels__main'>
           <div className='tabs-bar__wrapper'>
@@ -97,30 +93,19 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
           <div className='columns-area columns-area--mobile'>{children}</div>
         </main>
 
-        {isFullLayout ? (
-          <div className='columns-area__panels__pane columns-area__panels__pane--navigational'>
-            <NavigationPanel />
-          </div>
-        ) : (
-          <CollapsibleNavigationPanel />
-        )}
+        <CollapsibleNavigationPanel />
       </div>
     );
   }
 
   return (
-    <div className='columns-area__panels'>
-      <div className='columns-area__panels__pane columns-area__panels__pane--navigational'>
-        <NavigationPanel />
-      </div>
-      <main
-        className={classNames('columns-area', { unscrollable: isModalOpen })}
-        ref={ref}
-        tabIndex={isModalOpen ? undefined : 0}
-      >
-        <MultiColumnContent>{children}</MultiColumnContent>
-      </main>
-    </div>
+    <main
+      className={classNames('columns-area', { unscrollable: isModalOpen })}
+      ref={ref}
+      tabIndex={isModalOpen ? undefined : 0}
+    >
+      <MultiColumnContent>{children}</MultiColumnContent>
+    </main>
   );
 };
 

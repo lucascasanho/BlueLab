@@ -9,12 +9,15 @@ import {
 } from 'mastodon/actions/compose';
 import { useAppHistory } from 'mastodon/components/router';
 import ServerBanner from 'mastodon/components/server_banner';
+import { NavigationBar } from 'mastodon/features/compose/components/navigation_bar';
 import { Search } from 'mastodon/features/compose/components/search';
 import ComposeFormContainer from 'mastodon/features/compose/containers/compose_form_container';
 import { LinkFooter } from 'mastodon/features/ui/components/link_footer';
 import { useIdentity } from 'mastodon/identity_context';
 
-export const ComposePanel: React.FC = () => {
+export const ComposePanel: React.FC<{ showComposer?: boolean }> = ({
+  showComposer = true,
+}) => {
   const dispatch = useAppDispatch();
   const handleFocus = useCallback(() => {
     dispatch(changeComposing(true));
@@ -29,11 +32,12 @@ export const ComposePanel: React.FC = () => {
   });
 
   useEffect(() => {
+    if (!showComposer) return undefined;
     dispatch(mountCompose());
     return () => {
       dispatch(unmountCompose());
     };
-  }, [dispatch]);
+  }, [dispatch, showComposer]);
 
   const { singleColumn } = useLayout();
 
@@ -48,8 +52,18 @@ export const ComposePanel: React.FC = () => {
         </>
       )}
 
-      {signedIn && !hideComposer && <ComposeFormContainer singleColumn />}
-      {signedIn && hideComposer && <div className='compose-form' />}
+      {signedIn && showComposer && !hideComposer && (
+        <ComposeFormContainer singleColumn />
+      )}
+      {signedIn && showComposer && hideComposer && (
+        <div className='compose-form' />
+      )}
+      {signedIn && !showComposer && (
+        <>
+          <NavigationBar />
+          <div className='flex-spacer' />
+        </>
+      )}
 
       <LinkFooter context={singleColumn ? 'default' : 'multi-column'} />
     </div>
