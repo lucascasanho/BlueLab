@@ -58,7 +58,7 @@
 
     .fields-group
       = ff.input :composer_editor,
-                 collection: [['bluelab', I18n.t('posting_defaults.composer_editors.bluelab')], ['mastodon', I18n.t('posting_defaults.composer_editors.mastodon')]],
+                 collection: [[I18n.t('posting_defaults.composer_editors.bluelab'), 'bluelab'], [I18n.t('posting_defaults.composer_editors.mastodon'), 'mastodon']],
                  selected: current_user.settings['composer_editor'] || 'bluelab',
                  include_blank: false,
                  label: I18n.t('posting_defaults.composer_editor'),
