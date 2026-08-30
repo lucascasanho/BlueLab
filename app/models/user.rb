@@ -42,6 +42,8 @@
 #
 
 class User < ApplicationRecord
+  DEFAULT_CHOSEN_LANGUAGES = ['pt'].freeze
+
   self.ignored_columns += %w(
     admin
     encrypted_otp_secret
@@ -113,6 +115,7 @@ class User < ApplicationRecord
   scope :matches_ip, ->(value) { left_joins(:ips).merge(UserIp.contained_by(value)).group(users: [:id]) }
 
   before_validation :sanitize_role
+  before_validation :set_new_local_account_defaults, on: :create
   before_create :set_approved
   before_create :set_age_verified_at
   after_commit :send_pending_devise_notifications
@@ -121,6 +124,14 @@ class User < ApplicationRecord
   normalizes :locale, with: ->(locale) { I18n.available_locales.exclude?(locale.to_sym) ? nil : locale }
   normalizes :time_zone, with: ->(time_zone) { ActiveSupport::TimeZone[time_zone].nil? ? nil : time_zone }
   normalizes :chosen_languages, with: ->(chosen_languages) { chosen_languages.compact_blank.presence }
+
+  def set_new_local_account_defaults
+    return unless account&.local?
+
+    account.discoverable = true if account.discoverable.nil?
+    self.chosen_languages = DEFAULT_CHOSEN_LANGUAGES if chosen_languages.blank?
+    settings['web.auto_play'] = true unless settings.as_json.key?(:'web.auto_play')
+  end
 
   has_many :session_activations, dependent: :destroy
 

@@ -461,6 +461,18 @@ on('submit', '#registration_new_user,#new_user', () => {
       field.value = '';
     }
   });
+
+  const timeZoneField = document.querySelector<HTMLInputElement>(
+    'input[name="user[time_zone]"]',
+  );
+  if (timeZoneField && !timeZoneField.value) {
+    try {
+      timeZoneField.value =
+        Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    } catch {
+      // Some older browsers may not expose a time zone; the server will keep it unset.
+    }
+  }
 });
 
 // Truncate long rule hints
