@@ -22,7 +22,10 @@ import { processPasteOrDrop } from '@/mastodon/actions/compose_typed';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { normalizeKey } from '@/mastodon/components/hotkeys/utils';
 import type { IconProp } from '@/mastodon/components/icon';
-import { COMPOSER_TEXTAREA_ID } from '@/mastodon/reducers/slices/composer';
+import {
+  COMPOSER_TEXTAREA_ID,
+  dismissComposer,
+} from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import classes from './styles.module.scss';
@@ -169,7 +172,9 @@ export const RichComposeEditor: React.FC<{
       event.preventDefault();
       onSubmit();
     } else if (key === 'escape') {
-      event.currentTarget.blur();
+      event.preventDefault();
+      event.stopPropagation();
+      dispatch(dismissComposer());
     }
   };
   const handlePasteOrDrop = (

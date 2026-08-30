@@ -35,12 +35,20 @@ export function getComposerTextarea() {
  * @param defer Waits before focusing. Useful if the composer may not be focusable immediately.
  */
 export function focusComposerTextarea(defer = false) {
-  if (defer) {
-    requestAnimationFrame(() => {
-      getComposerTextarea()?.focus();
-    });
-  } else {
+  const focus = () => {
+    const editor = document.querySelector<HTMLElement>(
+      '[contenteditable="true"]',
+    );
+    if (editor) {
+      editor.focus();
+      return;
+    }
     getComposerTextarea()?.focus();
+  };
+  if (defer) {
+    requestAnimationFrame(focus);
+  } else {
+    focus();
   }
 }
 
@@ -175,6 +183,11 @@ export const closeComposer = createAppThunk((_arg, { getState, dispatch }) => {
       }),
     );
   }
+});
+
+export const dismissComposer = createAppThunk((_arg, { dispatch }) => {
+  dispatch(composerSlice.actions.hideComposer());
+  dispatch(clearComposeSuggestions());
 });
 
 export const newComposer = createAppThunk((_arg, { getState, dispatch }) => {

@@ -205,6 +205,7 @@ export function useHotkeys<T extends HTMLElement>(handlers: HandlerMap) {
         isKeyboardEvent(event) &&
         !event.defaultPrevented &&
         !['input', 'textarea', 'select'].includes(tagName) &&
+        !(event.target as HTMLElement).isContentEditable &&
         !(
           ['a', 'button'].includes(tagName) &&
           normalizeKey(event.key) === 'enter'
