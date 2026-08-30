@@ -23,7 +23,6 @@ import {
 import { MenuCard } from '@/mastodon/components/menu/card';
 import { openNewComposer } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
-import { isRedesignEnabled } from '@/mastodon/utils/environment';
 
 import { ComposeFormHeader } from './header';
 import classes from './trigger.module.scss';
@@ -59,7 +58,7 @@ export const ComposeRedesignButton: React.FC<{
       [dispatch],
     );
 
-  if (!isRedesignEnabled() || editor === 'mastodon') {
+  if (editor === 'mastodon') {
     return null;
   }
 

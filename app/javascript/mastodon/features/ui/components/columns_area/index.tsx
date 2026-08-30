@@ -3,6 +3,7 @@ import { lazy, Suspense, useCallback } from 'react';
 import classNames from 'classnames';
 
 import { LoadingIndicator } from '@/mastodon/components/loading_indicator';
+import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
 import { Header } from '@/mastodon/features/custom_homepage/components/header';
 import { CollapsibleNavigationPanel } from '@/mastodon/features/navigation_panel';
@@ -56,6 +57,9 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
   const isModalOpen = useAppSelector(
     (state) => !state.modal.get('stack').isEmpty(),
   );
+  const useBlueLabComposer = useAppSelector(
+    (state) => state.compose.get('composer_editor') !== 'mastodon',
+  );
 
   if (minimalShell) {
     return (
@@ -80,7 +84,11 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
       <div className='columns-area__panels'>
         <div className='columns-area__panels__pane columns-area__panels__pane--compositional'>
           <div className='columns-area__panels__pane__inner'>
-            {renderComposePanel && <ComposePanel />}
+            {useBlueLabComposer ? (
+              <ComposeRedesignButton />
+            ) : (
+              renderComposePanel && <ComposePanel />
+            )}
             <RedirectToMobileComposeIfNeeded />
           </div>
         </div>
