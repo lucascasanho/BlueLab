@@ -18,6 +18,7 @@ import {
   changeCompose,
   changeComposeContentType,
 } from '@/mastodon/actions/compose';
+import { processPasteOrDrop } from '@/mastodon/actions/compose_typed';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { normalizeKey } from '@/mastodon/components/hotkeys/utils';
 import type { IconProp } from '@/mastodon/components/icon';
@@ -171,6 +172,16 @@ export const RichComposeEditor: React.FC<{
       event.currentTarget.blur();
     }
   };
+  const handlePasteOrDrop = (
+    event:
+      | React.ClipboardEvent<HTMLDivElement>
+      | React.DragEvent<HTMLDivElement>,
+  ) => {
+    const data =
+      'clipboardData' in event ? event.clipboardData : event.dataTransfer;
+    if (data.files.length > 0) event.preventDefault();
+    dispatch(processPasteOrDrop(data));
+  };
 
   return (
     <div className={classes.richEditorWrapper}>
@@ -215,6 +226,8 @@ export const RichComposeEditor: React.FC<{
         tabIndex={0}
         onInput={sync}
         onKeyDown={handleKeyDown}
+        onPaste={handlePasteOrDrop}
+        onDrop={handlePasteOrDrop}
       />
       {children}
       <textarea
