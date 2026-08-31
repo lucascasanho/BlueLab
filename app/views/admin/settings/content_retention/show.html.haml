@@ -29,3 +29,14 @@
 
   .actions
     = f.button :button, t('generic.save_changes'), type: :submit
+
+%hr.spacer/
+
+%h2= t('admin.settings.content_retention.cleanup_title')
+%p= t('admin.settings.content_retention.cleanup_preamble')
+
+.actions
+  = link_to t('admin.settings.content_retention.cleanup_button'),
+            cleanup_admin_settings_content_retention_path,
+            class: 'button button--destructive',
+            data: { confirm: t('admin.settings.content_retention.cleanup_confirm'), method: :post }

@@ -26,7 +26,6 @@ import {
 } from '@/mastodon/store';
 
 import { shouldShowCharacterCounter } from '../components/character_counter';
-import { MarkdownPreview } from '../components/markdown_preview';
 
 import type { OnEmojiPick } from './emoji';
 import { ComposeEmojiButton } from './emoji';
@@ -55,8 +54,6 @@ export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
   const contentType = useAppSelector(
     (state) => state.compose.get('content_type') as string,
   );
-  const text = useAppSelector((state) => state.compose.get('text') as string);
-
   const dispatch = useAppDispatch();
   const handlePoll = useCallback(() => {
     dispatch(addPoll());
@@ -88,8 +85,6 @@ export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
           defaultMessage='Markdown formatting'
         />
       </IconButton>
-
-      <MarkdownPreview text={text} contentType={contentType} redesign />
 
       <IconButton
         size='sm'

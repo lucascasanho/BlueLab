@@ -506,6 +506,7 @@
   "compose.formatting.quote": "Quote",
   "compose.formatting.strikethrough": "Strikethrough",
   "compose.formatting.toolbar": "Formatting",
+  "compose.formatting.underline": "Underline",
   "compose.hints.followers-reply": "You're replying to a followers-only post. People not following {user} might see your reply without the context of what you’re replying to.",
   "compose.hints.language": "Change this post’s language to {language}?",
   "compose.hints.language.change": "Change",

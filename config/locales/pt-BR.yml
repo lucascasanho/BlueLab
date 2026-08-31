@@ -1028,6 +1028,11 @@ pt-BR:
         desc_html: Isso é baseado em scripts externos de hCaptcha, o que pode ser uma preocupação de segurança e privacidade. Além disso, <strong>isso pode tornar o processo de registro significativamente menos acessível para algumas pessoas (especialmente deficientes)</strong>. Por estas razões, favor considerar medidas alternativas como o registro baseado em aprovação ou em convite.
         title: Exigir que novos usuários resolvam um CAPTCHA para confirmar sua conta
       content_retention:
+        cleanup_button: Limpar mídias em cache agora
+        cleanup_confirm: Esta ação removerá mídias remotas com mais de 14 dias e todas as imagens em cache dos cards de links. Mídias e publicações locais não serão excluídas. Deseja continuar?
+        cleanup_preamble: Agende em segundo plano a limpeza de mídias remotas com mais de 14 dias e de todas as imagens em cache dos cards de links. Mídias e publicações locais são sempre preservadas.
+        cleanup_started: A limpeza do cache foi agendada ou já está em execução.
+        cleanup_title: Limpeza manual do cache
         danger_zone: Zona de perigo
         preamble: Controlar como o conteúdo gerado pelo usuário é armazenado no Mastodon.
         title: Retenção de conteúdo

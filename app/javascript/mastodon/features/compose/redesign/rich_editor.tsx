@@ -14,6 +14,7 @@ import {
   ListNumbersIcon,
   QuotesIcon,
   TextStrikethroughIcon,
+  TextUnderlineIcon,
 } from '@phosphor-icons/react';
 
 import {
@@ -31,6 +32,7 @@ import {
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
+import { selectComposeType } from './selectors';
 import classes from './styles.module.scss';
 
 const messages = defineMessages({
@@ -45,6 +47,10 @@ const messages = defineMessages({
   italic: {
     id: 'compose.formatting.italic',
     defaultMessage: 'Italic',
+  },
+  underline: {
+    id: 'compose.formatting.underline',
+    defaultMessage: 'Underline',
   },
   strikethrough: {
     id: 'compose.formatting.strikethrough',
@@ -78,6 +84,14 @@ const messages = defineMessages({
     id: 'compose.formatting.link_url',
     defaultMessage: 'Link URL',
   },
+  postPlaceholder: {
+    id: 'compose.post.placeholder',
+    defaultMessage: 'What would you like to say?',
+  },
+  messagePlaceholder: {
+    id: 'compose.message.placeholder',
+    defaultMessage: 'Add your recipients and your message.',
+  },
 });
 
 const escapeHtml = (value: string) =>
@@ -104,7 +118,7 @@ const inlineMarkdownToHtml = (
     .replace(/__([^_]+)__/g, '<strong>$1</strong>')
     .replace(/~~([^~]+)~~/g, '<del>$1</del>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/_([^_]+)_/g, '<em>$1</em>')
+    .replace(/_([^_]+)_/g, '<u>$1</u>')
     .replace(/BLUELABEMOJI(\d+)TOKEN/g, (_placeholder, index: string) => {
       const shortcode = emojiPlaceholders[Number(index)] ?? '';
       const emoji = customEmojis[shortcode.slice(1, -1)];
@@ -206,6 +220,10 @@ const nodeToMarkdown = (node: Node): string => {
       return parentHasTag(node, ['EM', 'I'])
         ? content
         : wrapInlineMarkdown(content, '*');
+    case 'U':
+      return parentHasTag(node, ['U'])
+        ? content
+        : wrapInlineMarkdown(content, '_');
     case 'DEL':
     case 'S':
     case 'STRIKE':
@@ -332,6 +350,7 @@ const focusAtEnd = (element: HTMLElement) => {
 const commands = [
   ['bold', TextBIcon, messages.bold],
   ['italic', TextItalicIcon, messages.italic],
+  ['underline', TextUnderlineIcon, messages.underline],
   ['strikeThrough', TextStrikethroughIcon, messages.strikethrough],
   ['formatBlock', QuotesIcon, messages.quote, 'blockquote'],
   ['insertUnorderedList', ListBulletsIcon, messages.bulletedList],
@@ -340,11 +359,12 @@ const commands = [
   ['formatBlock', CodeBlockIcon, messages.codeBlock, 'pre'],
 ] as const;
 
-type InlineCommand = 'bold' | 'italic' | 'strikeThrough';
+type InlineCommand = 'bold' | 'italic' | 'underline' | 'strikeThrough';
 
 const inlineCommands: readonly InlineCommand[] = [
   'bold',
   'italic',
+  'underline',
   'strikeThrough',
 ];
 
@@ -377,6 +397,7 @@ export const RichComposeEditor: React.FC<{
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const text = useAppSelector((state) => state.compose.get('text') as string);
+  const type = useAppSelector(selectComposeType);
   const contentType = useAppSelector(
     (state) => state.compose.get('content_type') as string,
   );
@@ -409,6 +430,7 @@ export const RichComposeEditor: React.FC<{
     for (const command of [
       'bold',
       'italic',
+      'underline',
       'strikeThrough',
       'insertUnorderedList',
       'insertOrderedList',
@@ -641,6 +663,11 @@ export const RichComposeEditor: React.FC<{
         suppressContentEditableWarning
         role='textbox'
         aria-multiline='true'
+        data-placeholder={intl.formatMessage(
+          type === 'message'
+            ? messages.messagePlaceholder
+            : messages.postPlaceholder,
+        )}
         tabIndex={0}
         onMouseDown={handleEditorMouseDown}
         onClick={handleEditorClick}

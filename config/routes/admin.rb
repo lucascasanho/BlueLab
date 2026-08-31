@@ -79,7 +79,9 @@ namespace :admin do
   namespace :settings do
     resource :branding, only: [:show, :update], controller: 'branding'
     resource :registrations, only: [:show, :update], controller: 'registrations'
-    resource :content_retention, only: [:show, :update], controller: 'content_retention'
+    resource :content_retention, only: [:show, :update], controller: 'content_retention' do
+      post :cleanup, on: :member
+    end
     resource :about, only: [:show, :update], controller: 'about'
     resource :appearance, only: [:show, :update], controller: 'appearance'
     resource :discovery, only: [:show, :update], controller: 'discovery'

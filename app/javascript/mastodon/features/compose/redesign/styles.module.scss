@@ -179,6 +179,10 @@ textarea.textarea {
     font-style: italic;
   }
 
+  u {
+    text-decoration: underline;
+  }
+
   code,
   pre {
     font-family: var(--font-monospace, monospace);
@@ -247,9 +251,22 @@ textarea.textarea {
   }
 
   &:empty::before {
-    content: 'What would you like to say?';
+    content: attr(data-placeholder);
     color: var(--color-text-tertiary);
     pointer-events: none;
+  }
+}
+
+@media (width < 760px), (height <= 800px) {
+  .root {
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+  }
+
+  .richEditor {
+    flex: 1 1 6rem;
+    min-height: 5.5rem;
+    max-height: 10rem;
   }
 }
 

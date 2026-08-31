@@ -2,6 +2,8 @@ import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 
+import { StackIcon } from '@phosphor-icons/react';
+
 import { Button } from '@/mastodon/components/button';
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
 import { Icon } from '@/mastodon/components/icon';
@@ -9,7 +11,6 @@ import { CollectionMenu } from '@/mastodon/features/collections/components/colle
 import { CollectionPreviewCard } from '@/mastodon/features/collections/components/collection_preview_card';
 import { useConfirmRevoke } from '@/mastodon/features/collections/detail/revoke_collection_inclusion_modal';
 import { useAccount } from '@/mastodon/hooks/useAccount';
-import CollectionsFilledIcon from '@/material-icons/400-24px/category-fill.svg?react';
 import type {
   NotificationGroupAddedToCollection,
   NotificationGroupCollectionUpdate,
@@ -41,7 +42,7 @@ export const NotificationCollection: React.FC<{
       )}
     >
       <div className='notification-group__icon'>
-        <Icon id='collection' icon={CollectionsFilledIcon} />
+        <Icon id='collection' icon={StackIcon} />
       </div>
 
       <div className='notification-group__main'>

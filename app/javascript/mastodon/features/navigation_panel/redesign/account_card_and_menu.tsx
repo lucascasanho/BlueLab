@@ -6,7 +6,7 @@ import {
   DotsThreeIcon,
   UserIcon,
   GearIcon,
-  CirclesFourIcon,
+  StackIcon,
   HeartIcon,
   UsersThreeIcon,
   ProhibitIcon,
@@ -88,10 +88,7 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
 
           <MenuItemDivider />
 
-          <MenuItemLink
-            to={`${accountBasePath}/collections`}
-            icon={CirclesFourIcon}
-          >
+          <MenuItemLink to={`${accountBasePath}/collections`} icon={StackIcon}>
             <FormattedMessage
               id='navigation_bar.collections'
               defaultMessage='Collections'

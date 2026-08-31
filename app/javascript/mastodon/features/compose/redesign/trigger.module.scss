@@ -67,6 +67,13 @@
   max-height: 80vh;
 }
 
+@media (height <= 800px) {
+  .composer {
+    min-height: min(440px, calc(100dvh - var(--space-md) * 2));
+    max-height: calc(100dvh - var(--space-md) * 2);
+  }
+}
+
 .composerMinimized {
   width: min(320px, calc(100vw - var(--space-md) * 2));
   padding: var(--space-md);
@@ -93,32 +100,47 @@
 
   .composer,
   .composerMinimized {
-    bottom: var(--mobile-bottom-nav-height);
-    max-height: calc(
-      100dvh - var(--mobile-bottom-nav-height) - var(--space-md) * 2
+    --composer-viewport-height: var(--composer-visual-viewport-height, 100dvh);
+    --composer-mobile-spacing: calc(2 * var(--space-md));
+    --composer-available-height: calc(
+      var(--composer-viewport-height) - var(--mobile-bottom-nav-height)
     );
+    --composer-mobile-height: calc(
+      var(--composer-available-height) - var(--composer-mobile-spacing)
+    );
+
+    bottom: var(--mobile-bottom-nav-height);
+    max-height: var(--composer-mobile-height);
   }
 
   .composer {
-    min-height: min(
-      520px,
-      calc(100dvh - var(--mobile-bottom-nav-height) - var(--space-md) * 2)
-    );
+    height: min(440px, var(--composer-mobile-height));
+    min-height: 0;
   }
 
   :global(.ui--mobile-chrome-hidden) .composer,
   :global(.ui--mobile-chrome-hidden) .composerMinimized {
-    bottom: env(safe-area-inset-bottom);
-    max-height: calc(
-      100dvh - env(safe-area-inset-bottom) - var(--space-md) * 2
+    --composer-available-height: calc(
+      var(--composer-viewport-height) - env(safe-area-inset-bottom)
     );
+
+    bottom: env(safe-area-inset-bottom);
+    max-height: var(--composer-mobile-height);
   }
 
   :global(.ui--mobile-chrome-hidden) .composer {
-    min-height: min(
-      520px,
-      calc(100dvh - env(safe-area-inset-bottom) - var(--space-md) * 2)
+    height: min(440px, var(--composer-mobile-height));
+    min-height: 0;
+  }
+
+  .composer[data-keyboard-open] {
+    --composer-mobile-height: calc(
+      var(--composer-viewport-height) - var(--composer-mobile-spacing)
     );
+
+    bottom: var(--composer-visual-viewport-bottom, 0);
+    height: min(440px, var(--composer-mobile-height));
+    max-height: var(--composer-mobile-height);
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -32,10 +32,14 @@ const mockEditingCommands = (query: (command: string) => boolean) => {
 
 describe('BlueLab rich editor conversion', () => {
   test('renders supported inline Markdown as semantic elements', () => {
-    const html = markdownToHtml('**bold** *italic* ~~strike~~ `code`', {});
+    const html = markdownToHtml(
+      '**bold** *italic* _underline_ ~~strike~~ `code`',
+      {},
+    );
 
     expect(html).toContain('<strong>bold</strong>');
     expect(html).toContain('<em>italic</em>');
+    expect(html).toContain('<u>underline</u>');
     expect(html).toContain('<del>strike</del>');
     expect(html).toContain('<code>code</code>');
   });
@@ -86,10 +90,10 @@ describe('BlueLab rich editor conversion', () => {
   test('serializes semantic elements back to valid Markdown', () => {
     const editor = document.createElement('div');
     editor.innerHTML =
-      '<strong>bold</strong><em>italic</em><blockquote>quote</blockquote><ul><li>first</li><li>second</li></ul><ol><li>one</li><li>two</li></ol>';
+      '<strong>bold</strong><em>italic</em><u>underline</u><blockquote>quote</blockquote><ul><li>first</li><li>second</li></ul><ol><li>one</li><li>two</li></ol>';
 
     expect(editorText(editor)).toBe(
-      '**bold***italic*\n> quote\n\n- first\n- second\n\n1. one\n2. two',
+      '**bold***italic*_underline_\n> quote\n\n- first\n- second\n\n1. one\n2. two',
     );
   });
 
@@ -148,5 +152,13 @@ describe('BlueLab rich editor conversion', () => {
 
     expect(execCommand).toHaveBeenNthCalledWith(1, 'bold');
     expect(execCommand).toHaveBeenNthCalledWith(2, 'italic');
+  });
+
+  test('uses the browser underline command for Markdown underline', () => {
+    const { execCommand } = mockEditingCommands(() => false);
+
+    toggleInlineCommand('underline');
+
+    expect(execCommand).toHaveBeenCalledWith('underline');
   });
 });

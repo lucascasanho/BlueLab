@@ -7,7 +7,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 import type { Map as ImmutableMap } from 'immutable';
 
-import { PenNibIcon } from '@phosphor-icons/react';
+import { PenNibIcon, StackIcon } from '@phosphor-icons/react';
 import { animated, useSpring } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
 
@@ -16,8 +16,6 @@ import AddIcon from '@/material-icons/400-24px/add.svg?react';
 import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
 import BookmarksActiveIcon from '@/material-icons/400-24px/bookmarks-fill.svg?react';
 import BookmarksIcon from '@/material-icons/400-24px/bookmarks.svg?react';
-import CollectionsActiveIcon from '@/material-icons/400-24px/category-fill.svg?react';
-import CollectionsIcon from '@/material-icons/400-24px/category.svg?react';
 import HomeActiveIcon from '@/material-icons/400-24px/home-fill.svg?react';
 import HomeIcon from '@/material-icons/400-24px/home.svg?react';
 import InfoIcon from '@/material-icons/400-24px/info.svg?react';
@@ -389,8 +387,8 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
                 transparent
                 to={`/@${account?.acct}/collections`}
                 icon='collections'
-                iconComponent={CollectionsIcon}
-                activeIconComponent={CollectionsActiveIcon}
+                iconComponent={StackIcon}
+                activeIconComponent={StackIcon}
                 text={intl.formatMessage(messages.collections)}
               />
             </li>

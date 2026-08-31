@@ -100,16 +100,48 @@ export const ComposeRedesignButton: React.FC<{
 
   useLayoutEffect(() => {
     const composer = composerRef.current;
-    if (!composer || !origin) return;
-    const rect = composer.getBoundingClientRect();
-    composer.style.setProperty(
-      '--composer-origin-x',
-      `${origin.x - rect.left}px`,
-    );
-    composer.style.setProperty(
-      '--composer-origin-y',
-      `${origin.y - rect.top}px`,
-    );
+    if (!composer) return;
+
+    if (origin) {
+      const rect = composer.getBoundingClientRect();
+      composer.style.setProperty(
+        '--composer-origin-x',
+        `${origin.x - rect.left}px`,
+      );
+      composer.style.setProperty(
+        '--composer-origin-y',
+        `${origin.y - rect.top}px`,
+      );
+    }
+
+    const visualViewport = window.visualViewport;
+    const updateVisualViewport = () => {
+      const viewportHeight = visualViewport?.height ?? window.innerHeight;
+      const viewportOffsetTop = visualViewport?.offsetTop ?? 0;
+      const bottomInset = Math.max(
+        0,
+        window.innerHeight - viewportOffsetTop - viewportHeight,
+      );
+
+      composer.style.setProperty(
+        '--composer-visual-viewport-height',
+        `${viewportHeight}px`,
+      );
+      composer.style.setProperty(
+        '--composer-visual-viewport-bottom',
+        `${bottomInset}px`,
+      );
+      composer.toggleAttribute('data-keyboard-open', bottomInset > 100);
+    };
+
+    updateVisualViewport();
+    visualViewport?.addEventListener('resize', updateVisualViewport);
+    visualViewport?.addEventListener('scroll', updateVisualViewport);
+
+    return () => {
+      visualViewport?.removeEventListener('resize', updateVisualViewport);
+      visualViewport?.removeEventListener('scroll', updateVisualViewport);
+    };
   }, [displayState, origin]);
 
   if (!signedIn) return null;
