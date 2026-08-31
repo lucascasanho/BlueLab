@@ -9,9 +9,10 @@
 
   // Status header
   .status .status__info {
-    align-items: flex-start;
+    align-items: center;
     gap: var(--gap-default);
-    height: calc(var(--gap-default) * 2);
+    height: auto;
+    min-height: calc(var(--gap-default) * 2);
     justify-content: flex-start;
     margin-bottom: 0;
     padding-bottom: 0;
@@ -26,9 +27,10 @@
 
   // Display name
   .status__info .status__display-name {
-    align-items: flex-start;
-    display: inline-flex;
-    gap: var(--gap-default);
+    align-items: center;
+    display: flex;
+    flex: 0 1 auto;
+    min-width: 0;
     order: 1;
     z-index: 2;
   }
@@ -39,8 +41,29 @@
     z-index: 3;
   }
 
-  .status__info .display-name {
+  .status__info .linked-display-name {
     display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    flex-wrap: nowrap !important;
+    gap: calc(var(--gap-default) / 2);
+
+    > .status__display-name {
+      flex: 0 1 auto;
+      min-width: 0;
+    }
+
+    > .account-handle {
+      flex: 0 1 auto;
+      min-width: 0;
+    }
+  }
+
+  .status__info .display-name {
+    display: inline-flex;
     min-width: 0;
     overflow: hidden;
     white-space: nowrap;
