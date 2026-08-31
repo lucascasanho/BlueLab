@@ -360,12 +360,12 @@ class ComposeForm extends ImmutablePureComponent {
                   text={this.props.text}
                   contentType={this.props.contentType}
                 />
-                {shouldShowCharacterCounter(hideCharacterCounter, length(this.getFulltextForCharacterCounting()), maxChars) && (
-                  <CharacterCounter max={maxChars} text={this.getFulltextForCharacterCounting()} />
-                )}
               </div>
 
               <div className='compose-form__submit'>
+                {shouldShowCharacterCounter(hideCharacterCounter, length(this.getFulltextForCharacterCounting()), maxChars) && (
+                  <CharacterCounter max={maxChars} text={this.getFulltextForCharacterCounting()} />
+                )}
                 <Button
                   type='submit'
                   compact

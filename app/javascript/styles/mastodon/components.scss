@@ -779,15 +779,29 @@ body > [data-popover-placement] {
   &__submit {
     display: flex;
     align-items: center;
-    flex: 0 0 auto;
-    margin-inline-start: auto;
+    flex: 1 0 max-content;
+    gap: 8px;
+    min-width: 0;
+
+    .character-counter {
+      flex: 0 1 auto;
+      margin-inline-end: auto;
+      text-align: start;
+    }
+
+    .button {
+      flex: 0 0 auto;
+      margin-inline-start: auto;
+      width: fit-content;
+      white-space: nowrap;
+    }
   }
 
   &__buttons {
     display: flex;
     gap: 8px;
     align-items: center;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     min-width: 0;
 
     & > div {
@@ -813,17 +827,9 @@ body > [data-popover-placement] {
     display: flex;
     align-items: center;
     flex: 0 0 auto;
+    flex-wrap: wrap;
     gap: 8px;
     min-width: 0;
-
-    &:has(.character-counter--long) {
-      flex-wrap: wrap;
-
-      .compose-form__submit {
-        flex-basis: 100%;
-        justify-content: flex-end;
-      }
-    }
 
     .icon-button {
       box-sizing: content-box;
@@ -10790,12 +10796,16 @@ noscript {
   }
 }
 
-.notification-group__actions,
-.compose-form__actions {
+.notification-group__actions {
   .button {
     display: block; // Otherwise text-ellipsis doesn't work
     flex: 1 1 auto;
   }
+}
+
+.compose-form__actions > .compose-form__submit .button {
+  display: block; // Otherwise text-ellipsis doesn't work
+  flex: 0 0 auto;
 }
 
 .notification-ungrouped {
