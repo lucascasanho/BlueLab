@@ -6,8 +6,6 @@
   .account-memorial-banner,
   .follow-request-banner,
   .moved-account-banner,
-  .about__meta,
-  .about__section__title,
   .announcements,
   .report-dialog-modal,
   .report-modal__target,
@@ -29,7 +27,6 @@
   .setting-text,
   .report-modal__comment,
   .report-modal__container,
-  .actions-modal,
   .block-modal,
   .boost-modal,
   .compare-history-modal,
@@ -41,24 +38,6 @@
     background-color: var(--color-bg-elevated);
     border-color: var(--color-border-primary);
     color: var(--color-light-text);
-  }
-
-  // Dropdowns should use the same tokenized surface as the page, rather than
-  // a hard-coded or elevated blue panel. The standard Mastodon selectors keep
-  // this in sync with every Bird UI color variant.
-  .dropdown-menu,
-  .dropdown-menu__arrow::before,
-  .privacy-dropdown__dropdown,
-  .language-dropdown__dropdown,
-  .visibility-dropdown__dropdown,
-  .privacy-dropdown.active .privacy-dropdown__value {
-    background-color: var(--color-bg-primary);
-    border-color: var(--color-border-primary);
-  }
-
-  .dropdown-menu__item a,
-  .dropdown-menu__item button {
-    background-color: transparent;
   }
 
   // Keep the emoji picker on the same tokenized surfaces as the rest of the
@@ -78,14 +57,6 @@
 
   .emoji-mart-search input {
     background-color: var(--color-bg-secondary);
-    border-color: var(--color-border-primary);
-    color: var(--color-text-primary);
-  }
-
-  // Keep the public About page on the tokenized Bird UI surface. This avoids
-  // the legacy dark-blue panel while preserving light, dark, and custom themes.
-  .about {
-    background-color: var(--color-bg-primary);
     border-color: var(--color-border-primary);
     color: var(--color-text-primary);
   }

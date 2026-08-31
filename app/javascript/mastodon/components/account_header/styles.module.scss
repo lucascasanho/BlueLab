@@ -55,11 +55,17 @@
 
 .displayNameWrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: nowrap;
   gap: 8px;
   margin-top: 16px;
   margin-bottom: 16px;
+
+  // AccountBadges is a sibling so actions stay beside the identity while the
+  // action group itself can wrap at narrow widths without using the badge row.
+  &:has(~ .badges) {
+    margin-bottom: 0;
+  }
 
   h1 {
     font-size: 17px;
@@ -95,7 +101,7 @@
 }
 
 .badges {
-  margin-top: 8px;
+  margin: 8px 0 16px;
 }
 
 .handleHelpButton {
@@ -126,6 +132,8 @@
 }
 
 .handleText {
+  display: block;
+  max-width: 100%;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -200,13 +208,17 @@
 }
 
 $button-breakpoint: 420px;
-$button-fallback-breakpoint: $button-breakpoint + 55px;
 
-.buttonsDesktop,
-.buttonsMobile {
+.buttons {
   display: flex;
   align-items: center;
+  align-self: flex-start;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
   gap: 8px;
+  margin-inline-start: auto;
+  max-width: 64%;
 
   :global(.button) {
     flex-shrink: 1;
@@ -224,49 +236,10 @@ $button-fallback-breakpoint: $button-breakpoint + 55px;
       border-color: var(--color-text-success);
     }
   }
-}
-
-.buttonsDesktop {
-  align-self: center;
-  flex: 0 0 auto;
-  margin-inline-start: auto;
 
   @container (width < #{$button-breakpoint}) {
-    display: none;
+    flex-wrap: wrap;
   }
-
-  @supports (not (container-type: inline-size)) {
-    @media (max-width: #{$button-fallback-breakpoint}) {
-      display: none;
-    }
-  }
-}
-
-.buttonsMobile {
-  position: sticky;
-  bottom: var(--mobile-bottom-nav-height);
-  padding: 12px 16px;
-  margin: 0 -16px;
-
-  @container (width >= #{$button-breakpoint}) {
-    display: none;
-  }
-
-  @supports (not (container-type: inline-size)) {
-    @media (min-width: ($button-fallback-breakpoint + 1px)) {
-      display: none;
-    }
-  }
-
-  // Multi-column layout
-  @media (width >= #{$button-breakpoint}) {
-    bottom: 0;
-  }
-}
-
-.buttonsMobileIsStuck {
-  background-color: var(--color-bg-primary);
-  border-top: 1px solid var(--color-border-primary);
 }
 
 .buttonMenu {

@@ -24,6 +24,7 @@
 @use 'components/column-header';
 @use 'components/panel-order';
 @use 'components/accented-items';
+@use 'components/about';
 @use 'components/content-warnings';
 @use 'components/color-overrides';
 @use 'components/status';
@@ -69,7 +70,6 @@
 @use 'components/profile/profile-bio-spacing';
 @use 'components/profile/profile-number-fields';
 @use 'components/profile/profile-tabs';
-@use 'components/profile/profile-buttons';
 @use 'components/profile/profile-avatar-wrapper';
 @use 'components/profile/profile-name';
 @use 'components/profile/profile-pinned-status';

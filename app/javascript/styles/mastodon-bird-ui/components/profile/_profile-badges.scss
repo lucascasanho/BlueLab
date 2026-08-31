@@ -61,16 +61,4 @@
   ._comp_account_header__bioButtonsWrapper {
     margin-top: 0;
   }
-
-  ._comp_account_header__badges {
-    margin-bottom: 16px;
-  }
-
-  // Upstream added margin-bottom to the display name wrapper; drop it when a
-  // badge row is present so the badge does not add extra space below.
-  ._comp_account_header__displayNameWrapper:has(
-    [class*='_comp_account_header__badges']
-  ) {
-    margin-bottom: 0;
-  }
 }

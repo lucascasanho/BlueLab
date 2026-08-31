@@ -17,7 +17,6 @@ import { Icon } from '../icon';
 import { NavigationFocusTarget } from '../navigation_focus_target';
 import { Popover } from '../popover';
 
-import { AccountBadges } from './badges';
 import classes from './styles.module.scss';
 
 const messages = defineMessages({
@@ -58,8 +57,6 @@ export const AccountName: FC<{ accountId: string }> = ({ accountId }) => {
       ) : (
         <span className={classes.handleText}>{handle}</span>
       )}
-
-      <AccountBadges accountId={accountId} />
     </div>
   );
 };

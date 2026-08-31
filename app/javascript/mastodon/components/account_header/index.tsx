@@ -5,8 +5,6 @@ import classNames from 'classnames';
 import { Helmet } from '@unhead/react/helmet';
 
 import { openModal } from '@/mastodon/actions/modal';
-import { useLayout } from '@/mastodon/hooks/useLayout';
-import { useVisibility } from '@/mastodon/hooks/useVisibility';
 import {
   autoPlayGif,
   me,
@@ -20,6 +18,7 @@ import { Avatar } from '../avatar';
 import { AnimateEmojiProvider } from '../emoji/context';
 import { FamiliarFollowers } from '../familiar_followers';
 
+import { AccountBadges } from './badges';
 import { AccountBanners } from './banners';
 import { AccountButtons } from './buttons';
 import { AccountHeaderFields } from './fields';
@@ -63,13 +62,6 @@ export const AccountHeader: React.FC<{
     },
     [dispatch, account],
   );
-
-  const { layout } = useLayout();
-  const { observedRef, isIntersecting } = useVisibility({
-    observerOptions: {
-      rootMargin: layout === 'mobile' ? '0px 0px -55px 0px' : '', // Height of bottom nav bar.
-    },
-  });
 
   if (!account) {
     return null;
@@ -117,20 +109,13 @@ export const AccountHeader: React.FC<{
             <AccountName accountId={accountId} />
             <AccountButtons
               accountId={accountId}
-              className={classes.buttonsDesktop}
+              className={classes.buttons}
               noShare={!isMe || 'share' in navigator}
               forceMenu={'share' in navigator}
             />
           </div>
 
-          <AccountButtons
-            className={classNames(
-              classes.buttonsMobile,
-              !isIntersecting && classes.buttonsMobileIsStuck,
-            )}
-            accountId={accountId}
-            noShare
-          />
+          <AccountBadges accountId={accountId} />
 
           <AccountNumberFields accountId={accountId} />
 
@@ -154,12 +139,10 @@ export const AccountHeader: React.FC<{
               )}
             </div>
           )}
-
         </div>
       </AnimateEmojiProvider>
 
       {!hideTabs && !hidden && <AccountTabs />}
-      <div ref={observedRef} />
 
       <Helmet>
         <title>{titleFromAccount(account, localDomain)}</title>
