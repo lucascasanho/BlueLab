@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import type { FC } from 'react';
+import type { FC, MouseEventHandler } from 'react';
 
 import { defineMessages, useIntl } from 'react-intl';
 
@@ -30,15 +30,24 @@ export const AccountHandle: FC<{
 }> = ({ account, localDomain, linked = false }) => {
   const intl = useIntl();
   const [expanded, setExpanded] = useState(false);
-  const toggleExpanded = useCallback(() => {
-    setExpanded((value) => !value);
-  }, []);
+  const toggleExpanded: MouseEventHandler<HTMLButtonElement> = useCallback(
+    (event) => {
+      // Account handles are also rendered inside links in timelines. Do not let
+      // the enclosing link navigate away before the expanded state is updated.
+      event.preventDefault();
+      event.stopPropagation();
+      setExpanded((value) => !value);
+    },
+    [],
+  );
 
   if (!account || account.invalid_handle) return null;
 
   const fullAcct = account.acct.includes('@')
     ? account.acct
-    : `${account.acct}@${localDomain ?? ''}`;
+    : localDomain
+      ? `${account.acct}@${localDomain}`
+      : account.acct;
   const username = `@${account.username}`;
   const fullHandle = `@${fullAcct}`;
   const handle = expanded ? fullHandle : username;

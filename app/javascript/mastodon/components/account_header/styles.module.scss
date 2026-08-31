@@ -55,7 +55,8 @@
 
 .displayNameWrapper {
   display: flex;
-  align-items: start;
+  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 16px;
   margin-top: 16px;
   margin-bottom: 16px;
@@ -78,7 +79,7 @@
 }
 
 .nameWrapper {
-  flex-grow: 1;
+  flex: 1 1 16rem;
   min-width: 0;
   overflow-wrap: break-word;
 }
@@ -226,6 +227,9 @@ $button-fallback-breakpoint: $button-breakpoint + 55px;
 }
 
 .buttonsDesktop {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+
   @container (width < #{$button-breakpoint}) {
     display: none;
   }

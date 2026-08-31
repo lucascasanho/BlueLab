@@ -33,6 +33,37 @@ describe('<DisplayName />', () => {
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
   });
 
+  it('does not add an incomplete domain when the local domain is unavailable', () => {
+    const localAccount = account.set('acct', 'alice');
+    const { container } = render(<DisplayName account={localAccount} />);
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /show full username/i }),
+    );
+
+    expect(container.querySelector('.display-name__account')?.textContent).toBe(
+      '@alice',
+    );
+  });
+
+  it('expands the handle without activating an enclosing timeline link', () => {
+    const onClick = vi.fn();
+    const { container } = render(
+      <a href='/@alice' onClick={onClick}>
+        <DisplayName account={account} />
+      </a>,
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /show full username/i }),
+    );
+
+    expect(onClick).not.toHaveBeenCalled();
+    expect(container.querySelector('.display-name__account')?.textContent).toBe(
+      '@alice@remote.example',
+    );
+  });
+
   it('shows an accessible lock for a private account', () => {
     const lockedAccount = account.set('locked', true);
     const { container } = render(<DisplayName account={lockedAccount} />);
