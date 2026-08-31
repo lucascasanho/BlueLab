@@ -9,7 +9,6 @@ import {
 } from 'mastodon/actions/compose';
 import { useAppHistory } from 'mastodon/components/router';
 import ServerBanner from 'mastodon/components/server_banner';
-import { NavigationBar } from 'mastodon/features/compose/components/navigation_bar';
 import { Search } from 'mastodon/features/compose/components/search';
 import ComposeFormContainer from 'mastodon/features/compose/containers/compose_form_container';
 import { LinkFooter } from 'mastodon/features/ui/components/link_footer';
@@ -55,7 +54,6 @@ export const ComposePanel: React.FC<{ showComposer?: boolean }> = ({
         </>
       )}
 
-      {signedIn && <NavigationBar />}
       {signedIn && showComposer && !hideComposer && (
         <ComposeFormContainer singleColumn />
       )}
