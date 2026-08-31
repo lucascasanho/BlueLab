@@ -76,7 +76,9 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
       <div className='columns-area__panels'>
         <div className='columns-area__panels__pane columns-area__panels__pane--compositional'>
           <div className='columns-area__panels__pane__inner'>
-            {renderComposePanel && !useBlueLabComposer && <ComposePanel />}
+            {renderComposePanel && (
+              <ComposePanel showComposer={!useBlueLabComposer} />
+            )}
             <RedirectToMobileComposeIfNeeded />
           </div>
         </div>
