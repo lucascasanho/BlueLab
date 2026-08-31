@@ -426,4 +426,15 @@ div.emojiRoot {
   @container (width > 400px) {
     min-height: 370px;
   }
+
+  @media screen and (width <= 759px) {
+    box-sizing: border-box;
+    width: min(300px, calc(100vw - 16px));
+    min-width: 0;
+    max-width: calc(100vw - 16px);
+
+    :global(.emoji-mart) {
+      max-width: 100%;
+    }
+  }
 }

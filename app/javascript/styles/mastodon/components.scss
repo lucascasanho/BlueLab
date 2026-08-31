@@ -5547,6 +5547,16 @@ a.status-card {
   box-shadow: var(--dropdown-shadow);
   border-radius: 5px;
 
+  @media screen and (width <= 600px) {
+    box-sizing: border-box;
+    width: min(300px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+
+    .emoji-mart {
+      max-width: 100%;
+    }
+  }
+
   .emoji-mart-scroll {
     transition: opacity 200ms ease;
   }
