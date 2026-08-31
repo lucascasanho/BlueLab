@@ -22,7 +22,7 @@
   .navigation-panel__menu {
     display: flex;
     flex-direction: column;
-    scrollbar-color: var(--color-border) transparent;
+    scrollbar-color: var(--color-border-primary) var(--color-bg-secondary);
     scrollbar-width: thin;
   }
 
@@ -35,7 +35,7 @@
   }
 
   .navigation-panel__menu::-webkit-scrollbar-thumb {
-    background-color: var(--color-border);
+    background-color: var(--color-border-primary);
     border-radius: 50px;
   }
 

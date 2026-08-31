@@ -5,7 +5,7 @@
 .dropdown-menu__container {
   max-height: calc(100vh - 16px);
   overflow-y: auto;
-  scrollbar-color: var(--color-border) transparent;
+  scrollbar-color: var(--color-border-primary) var(--color-bg-secondary);
   scrollbar-width: thin;
 }
 
