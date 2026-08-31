@@ -2877,53 +2877,6 @@ a.account__display-name {
   }
 }
 
-.navigation-bar__account-stats {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  flex: 1 1 auto;
-  min-width: 0;
-  gap: 4px;
-  color: var(--color-text-secondary);
-  font-size: 12px;
-  line-height: 18px;
-  margin-inline-start: 56px;
-
-  .navigation-bar__account-social-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    min-width: 0;
-  }
-
-  .navigation-bar__account-stat {
-    border-radius: 4px;
-    color: inherit;
-    min-width: 0;
-    overflow: hidden;
-    outline-offset: 2px;
-    text-decoration: none;
-    text-overflow: ellipsis;
-
-    strong {
-      color: var(--color-text-primary);
-      font-weight: 600;
-    }
-
-    &--posts {
-      color: var(--color-text-secondary);
-      white-space: nowrap;
-    }
-
-    &:hover strong {
-      color: var(--color-text-brand);
-    }
-
-    &:focus-visible {
-      outline: var(--outline-focus-default);
-    }
-  }
-}
 
 .display-name__account {
   min-width: 0;

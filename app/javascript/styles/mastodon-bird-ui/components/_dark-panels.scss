@@ -55,6 +55,14 @@
     color: var(--color-light-text);
   }
 
+  // Keep the public About page on the tokenized Bird UI surface. This avoids
+  // the legacy dark-blue panel while preserving light, dark, and custom themes.
+  .about {
+    background-color: var(--color-bg-primary);
+    border-color: var(--color-border-primary);
+    color: var(--color-text-primary);
+  }
+
   // Setting boxes
   .column-header__collapsible-inner {
     background-color: var(--color-bg);

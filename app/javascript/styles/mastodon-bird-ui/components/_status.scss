@@ -9,10 +9,9 @@
 
   // Status header
   .status .status__info {
-    align-items: center;
+    align-items: flex-start;
     gap: var(--gap-default);
-    height: auto;
-    min-height: calc(var(--gap-default) * 2);
+    height: calc(var(--gap-default) * 2);
     justify-content: flex-start;
     margin-bottom: 0;
     padding-bottom: 0;
@@ -27,10 +26,9 @@
 
   // Display name
   .status__info .status__display-name {
-    align-items: center;
-    display: flex;
-    flex: 0 1 auto;
-    min-width: 0;
+    align-items: flex-start;
+    display: inline-flex;
+    gap: var(--gap-default);
     order: 1;
     z-index: 2;
   }

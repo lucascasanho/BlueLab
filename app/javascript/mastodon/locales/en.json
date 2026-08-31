@@ -248,8 +248,6 @@
   "account_edit_tags.search_placeholder": "Enter a hashtag…",
   "account_edit_tags.suggestions": "Suggestions:",
   "account_edit_tags.tag_status_count": "{count, plural, one {# post} other {# posts}}",
-  "account_handle.hide_full": "Hide full username",
-  "account_handle.show_full": "Show full username",
   "account_list.hidden_notice": "This is only visible to you. To show this list to others, go to <link>{page} > {modal} > {field}</link>.",
   "account_list.total": "{total, plural, one {# account} other {# accounts}}",
   "admin.dashboard.daily_retention": "User retention rate by day after sign-up",
