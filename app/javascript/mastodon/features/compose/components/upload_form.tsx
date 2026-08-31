@@ -30,7 +30,10 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 
-import { changeMediaOrder } from 'mastodon/actions/compose';
+import {
+  cancelUploadCompose,
+  changeMediaOrder,
+} from 'mastodon/actions/compose';
 import type { MediaAttachment } from 'mastodon/models/media_attachment';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
@@ -79,6 +82,15 @@ export const UploadForm: React.FC = () => {
   const progress = useAppSelector(
     (state) => state.compose.get('progress') as number,
   );
+  const filename = useAppSelector(
+    (state) => state.compose.get('upload_filename') as string | null,
+  );
+  const loaded = useAppSelector(
+    (state) => state.compose.get('upload_loaded') as number,
+  );
+  const total = useAppSelector(
+    (state) => state.compose.get('upload_total') as number,
+  );
   const isProcessing = useAppSelector(
     (state) => state.compose.get('is_processing') as boolean,
   );
@@ -120,6 +132,10 @@ export const UploadForm: React.FC = () => {
     setActiveId(null);
   }, [setActiveId]);
 
+  const handleUploadCancel = useCallback(() => {
+    void dispatch(cancelUploadCompose());
+  }, [dispatch]);
+
   const accessibility: {
     screenReaderInstructions: ScreenReaderInstructions;
     announcements: Announcements;
@@ -156,6 +172,10 @@ export const UploadForm: React.FC = () => {
         active={active}
         progress={progress}
         isProcessing={isProcessing}
+        filename={filename}
+        loaded={loaded}
+        total={total}
+        onCancel={handleUploadCancel}
       />
 
       {mediaIds.size > 0 && (

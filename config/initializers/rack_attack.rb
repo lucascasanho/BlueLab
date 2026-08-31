@@ -82,6 +82,14 @@ class Rack::Attack
     req.authenticated_user_id if req.post? && req.path.match?(%r{\A/api/v\d+/media\z}i)
   end
 
+  throttle('throttle_resumable_media_upload_creation', limit: 10, period: 30.minutes) do |req|
+    req.authenticated_user_id if req.post? && req.path == '/api/v1/blue/resumable_media_uploads'
+  end
+
+  throttle('throttle_resumable_media_upload_chunks', limit: 200, period: 30.minutes) do |req|
+    req.authenticated_user_id if req.put? && req.path.match?(%r{\A/api/v1/blue/resumable_media_uploads/[^/]+/chunks/\d+\z})
+  end
+
   throttle('throttle_media_proxy', limit: 30, period: 10.minutes) do |req|
     req.throttleable_remote_ip if req.path.start_with?('/media_proxy')
   end

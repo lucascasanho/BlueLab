@@ -1453,6 +1453,7 @@
   "upload_form.drag_and_drop.on_drag_over": "Media attachment {item} was moved.",
   "upload_form.drag_and_drop.on_drag_start": "Picked up media attachment {item}.",
   "upload_form.edit": "Edit",
+  "upload_progress.cancel": "Cancel upload",
   "upload_progress.label": "Uploading...",
   "upload_progress.processing": "Processing…",
   "username.taken": "That username is taken. Try another",

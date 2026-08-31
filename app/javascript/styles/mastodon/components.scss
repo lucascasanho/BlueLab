@@ -2898,7 +2898,6 @@ a.account__display-name {
   }
 }
 
-
 .display-name__account {
   min-width: 0;
   overflow: hidden;
@@ -5686,6 +5685,29 @@ a.status-card {
 
 .upload-progress__message {
   flex: 1 1 auto;
+  min-width: 0;
+}
+
+.upload-progress__filename,
+.upload-progress__bytes {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upload-progress .upload-progress__filename {
+  color: var(--color-text-primary);
+  text-transform: none;
+}
+
+.upload-progress .upload-progress__bytes {
+  margin-top: 2px;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.upload-progress__cancel {
+  flex: 0 0 auto;
 }
 
 .upload-progress__backdrop {

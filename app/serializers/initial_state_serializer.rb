@@ -91,7 +91,13 @@ class InitialStateSerializer < ActiveModel::Serializer
   end
 
   def media_attachments
-    { accept_content_types: MediaAttachment.supported_file_extensions + MediaAttachment.supported_mime_types }
+    {
+      accept_content_types: MediaAttachment.supported_file_extensions + MediaAttachment.supported_mime_types,
+      resumable_uploads: {
+        enabled: ResumableMediaUpload.enabled?,
+        chunk_size: Rails.configuration.x.resumable_media_uploads.chunk_size,
+      },
+    }
   end
 
   def languages

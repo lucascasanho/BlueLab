@@ -1450,6 +1450,7 @@
   "upload_form.drag_and_drop.on_drag_over": "O anexo de mídia {item} foi movido.",
   "upload_form.drag_and_drop.on_drag_start": "Foi coletado o anexo de mídia {item}.",
   "upload_form.edit": "Editar",
+  "upload_progress.cancel": "Cancelar upload",
   "upload_progress.label": "Enviando...",
   "upload_progress.processing": "Processando…",
   "username.taken": "Esse nome de usuário já está sendo usado. Por favor, tente outro.",

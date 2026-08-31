@@ -1402,6 +1402,7 @@
   "upload_form.drag_and_drop.on_drag_over": "O anexo multimédia {item} foi movido.",
   "upload_form.drag_and_drop.on_drag_start": "O anexo multimédia {item} foi escolhido.",
   "upload_form.edit": "Editar",
+  "upload_progress.cancel": "Cancelar envio",
   "upload_progress.label": "A enviar...",
   "upload_progress.processing": "A processar…",
   "username.taken": "Esse nome de utilizador já está a ser utilizado. Por favor, tente outro",

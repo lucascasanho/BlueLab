@@ -109,6 +109,14 @@ namespace :api, format: false do
     end
 
     resources :media, only: [:create, :update, :show, :destroy]
+
+    namespace :blue do
+      resources :resumable_media_uploads, only: [:create, :show, :destroy] do
+        post :complete, on: :member
+      end
+      put 'resumable_media_uploads/:id/chunks/:index', to: 'resumable_media_upload_chunks#update'
+    end
+
     resources :blocks, only: [:index]
     resources :mutes, only: [:index]
     resources :favourites, only: [:index]
