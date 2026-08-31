@@ -2,14 +2,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { Link } from 'react-router-dom';
 
-import {
-  domain,
-  version,
-  source_url,
-  statusPageUrl,
-  profile_directory as canProfileDirectory,
-  termsOfServiceEnabled,
-} from 'mastodon/initial_state';
+import { domain, version } from 'mastodon/initial_state';
 
 import classes from './link_footer.module.scss';
 
@@ -17,38 +10,25 @@ export const LinkFooter: React.FC<{
   context?: 'default' | 'multi-column' | 'about';
 }> = ({ context = 'default' }) => {
   const multiColumn = context === 'multi-column';
+  const displayVersion = version?.match(/^\d+\.\d+\.\d+/)?.[0] ?? version ?? '';
 
   return (
     <footer className={classes.wrapper} data-context={context}>
       <section>
-        <h2 className={classes.heading}>{`${domain}:`}</h2>
         <ul className={classes.list}>
+          <li>
+            <Link to='/' target={multiColumn ? '_blank' : undefined}>
+              {domain}
+            </Link>
+          </li>
           <li>
             <Link to='/about' target={multiColumn ? '_blank' : undefined}>
               <FormattedMessage
                 id='footer.about_this_server'
                 defaultMessage='About'
               />
-              <span className='sr-only'> {domain}</span>
             </Link>
           </li>
-          {statusPageUrl && (
-            <li>
-              <a href={statusPageUrl} target='_blank' rel='noopener'>
-                <FormattedMessage id='footer.status' defaultMessage='Status' />
-              </a>
-            </li>
-          )}
-          {canProfileDirectory && (
-            <li>
-              <Link to='/directory'>
-                <FormattedMessage
-                  id='footer.directory'
-                  defaultMessage='Profiles directory'
-                />
-              </Link>
-            </li>
-          )}
           <li>
             <Link
               to='/privacy-policy'
@@ -56,35 +36,10 @@ export const LinkFooter: React.FC<{
               rel='privacy-policy'
             >
               <FormattedMessage
-                id='footer.privacy_policy'
-                defaultMessage='Privacy policy'
+                id='footer.activity_policy'
+                defaultMessage='Activity policy'
               />
             </Link>
-          </li>
-          {termsOfServiceEnabled && (
-            <li>
-              <Link
-                to='/terms-of-service'
-                target={multiColumn ? '_blank' : undefined}
-                rel='terms-of-service'
-              >
-                <FormattedMessage
-                  id='footer.terms_of_service'
-                  defaultMessage='Terms of service'
-                />
-              </Link>
-            </li>
-          )}
-        </ul>
-      </section>
-      <section>
-        <h2 className={classes.heading}>Mastodon:</h2>
-        <ul className={classes.list}>
-          <li>
-            <a href='https://joinmastodon.org' target='_blank' rel='noopener'>
-              <FormattedMessage id='footer.about' defaultMessage='About' />
-              <span className='sr-only'> Mastodon</span>
-            </a>
           </li>
           <li>
             <a
@@ -107,14 +62,24 @@ export const LinkFooter: React.FC<{
             </Link>
           </li>
           <li>
-            <a href={source_url} rel='noopener' target='_blank'>
+            <a
+              href='https://github.com/MastodonBlue/BlueLab'
+              rel='noopener'
+              target='_blank'
+            >
               <FormattedMessage
                 id='footer.source_code'
                 defaultMessage='View source code'
               />
             </a>
           </li>
-          <li className={classes.version}>v{version}</li>
+          <li className={classes.version}>
+            <FormattedMessage
+              id='footer.bluelab_version'
+              defaultMessage='Mastodon v{version} BlueLab'
+              values={{ version: displayVersion }}
+            />
+          </li>
         </ul>
       </section>
     </footer>
