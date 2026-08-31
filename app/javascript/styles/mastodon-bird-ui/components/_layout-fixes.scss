@@ -1,6 +1,12 @@
 // Small layout fixes
 .layout-single-column,
 .layout-multiple-columns {
+  // Keep the account header close to the top border of a regular timeline
+  // entry. Boosts retain their separate prepend line above the status.
+  .status {
+    padding-top: 10px;
+  }
+
   .status__prepend + .status {
     padding-top: 10px;
   }
