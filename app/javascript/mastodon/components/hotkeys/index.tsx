@@ -205,7 +205,9 @@ export function useHotkeys<T extends HTMLElement>(handlers: HandlerMap) {
       const tagName = target?.tagName.toLowerCase() ?? '';
       const isInsideEditable =
         !!target?.isContentEditable ||
-        !!target?.closest('[contenteditable="true"]');
+        !!target?.closest(
+          '[contenteditable="true"], [contenteditable="plaintext-only"]',
+        );
       const isInsideBlueLabComposer = !!target?.closest(
         '[data-bluelab-composer]',
       );

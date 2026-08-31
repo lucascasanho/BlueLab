@@ -19,6 +19,22 @@ describe('Hotkeys', () => {
     expect(onNew).not.toHaveBeenCalled();
   });
 
+  test('does not handle shortcuts from a plaintext-only editor', () => {
+    const onNew = vi.fn();
+
+    render(
+      <Hotkeys global handlers={{ new: onNew }}>
+        <div contentEditable='plaintext-only' suppressContentEditableWarning>
+          plain text
+        </div>
+      </Hotkeys>,
+    );
+
+    fireEvent.keyDown(screen.getByText('plain text'), { key: 'n' });
+
+    expect(onNew).not.toHaveBeenCalled();
+  });
+
   test('handles shortcuts outside editable controls', () => {
     const onNew = vi.fn();
 

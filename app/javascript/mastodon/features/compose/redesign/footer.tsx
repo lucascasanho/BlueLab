@@ -127,6 +127,7 @@ export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
         <Button
           variant='solid'
           type='submit'
+          className={classes.submitButton}
           disabled={!canSubmit}
           loading={isSubmitting}
         >

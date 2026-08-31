@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useLayoutEffect } from 'react';
 
+import { FormattedMessage } from 'react-intl';
+
+import { PenNibIcon } from '@phosphor-icons/react';
+
+import { Button } from '@/mastodon/components/button/redesign';
 import { useLayout } from '@/mastodon/hooks/useLayout';
+import {
+  composerOriginFromElement,
+  openPreferredComposer,
+} from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import {
   changeComposing,
@@ -14,6 +23,32 @@ import { Search } from 'mastodon/features/compose/components/search';
 import ComposeFormContainer from 'mastodon/features/compose/containers/compose_form_container';
 import { LinkFooter } from 'mastodon/features/ui/components/link_footer';
 import { useIdentity } from 'mastodon/identity_context';
+
+const NewPostButton: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      dispatch(
+        openPreferredComposer({
+          origin: composerOriginFromElement(event.currentTarget),
+        }),
+      );
+    },
+    [dispatch],
+  );
+
+  return (
+    <Button
+      variant='solid'
+      color='accent'
+      leadingIcon={PenNibIcon}
+      className='compose-panel__new-post-button'
+      onClick={handleClick}
+    >
+      <FormattedMessage id='tabs_bar.publish' defaultMessage='New Post' />
+    </Button>
+  );
+};
 
 export const ComposePanel: React.FC<{ showComposer?: boolean }> = ({
   showComposer = true,
@@ -61,6 +96,7 @@ export const ComposePanel: React.FC<{ showComposer?: boolean }> = ({
       {signedIn && !showComposer && (
         <>
           <NavigationBar />
+          <NewPostButton />
           <div className='flex-spacer' />
         </>
       )}

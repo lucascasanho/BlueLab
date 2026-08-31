@@ -14,14 +14,20 @@ import {
 
 import FediIcon from '@/images/icons/icon_fediverse.svg?react';
 import { fetchLists } from '@/mastodon/actions/lists';
+import { closeNavigation } from '@/mastodon/actions/navigation';
 import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 import { useScrollSensor } from '@/mastodon/hooks/useScrollSensor';
 import { useIdentity } from '@/mastodon/identity_context';
-import { openNewComposer } from '@/mastodon/reducers/slices/composer';
+import {
+  composerOriginFromElement,
+  openPreferredComposer,
+  selectComposerEditor,
+} from '@/mastodon/reducers/slices/composer';
 import { getOrderedLists } from '@/mastodon/selectors/lists';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import AddIcon from '@/material-icons/400-24px/add.svg?react';
 
 import { NavigationAccountCardAndMenu } from './account_card_and_menu';
 import { NavigationFooterLinks } from './footer_links';
@@ -79,10 +85,19 @@ export const RedesignNavigationPanel: React.FC<{ siteName?: string }> = ({
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
   );
+  const composerEditor = useAppSelector(selectComposerEditor);
 
-  const openComposer = useCallback(() => {
-    dispatch(openNewComposer({ type: 'post' }));
-  }, [dispatch]);
+  const openComposer = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      dispatch(closeNavigation());
+      dispatch(
+        openPreferredComposer({
+          origin: composerOriginFromElement(event.currentTarget),
+        }),
+      );
+    },
+    [dispatch],
+  );
 
   const { customFeeds } = useCustomFeeds();
   const { followedHashtags } = useFollowedHashtags();
@@ -111,8 +126,11 @@ export const RedesignNavigationPanel: React.FC<{ siteName?: string }> = ({
             <NavigationLink
               withSpaceAfter
               as='button'
+              type='button'
               onClick={openComposer}
-              iconComponent={PenNibIcon}
+              iconComponent={
+                composerEditor === 'mastodon' ? AddIcon : PenNibIcon
+              }
             >
               <FormattedMessage
                 id='tabs_bar.publish'

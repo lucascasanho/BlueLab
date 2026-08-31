@@ -4,9 +4,20 @@
   &:not(.buttonInline) {
     position: fixed;
     bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
-    right: calc(var(--space-md) + env(safe-area-inset-right));
+    inset-inline-end: max(
+      calc(var(--space-md) + env(safe-area-inset-left)),
+      calc(var(--space-md) + env(safe-area-inset-right))
+    );
     z-index: 100;
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease,
+      visibility 0s linear;
   }
+}
+
+.mastodonButton:not(.buttonInline) {
+  display: none;
 }
 
 .composer,
@@ -14,24 +25,26 @@
   position: fixed;
   z-index: 100;
   bottom: 0;
-  right: 0;
+  inset-inline-end: 0;
   margin: var(--space-md);
   box-sizing: border-box;
   border-radius: var(--radius-xl);
   pointer-events: auto;
   isolation: isolate;
-  animation: composer-enter 180ms ease-out both;
+  transform-origin: var(--composer-origin-x, 100%)
+    var(--composer-origin-y, 100%);
+  animation: composer-enter 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @keyframes composer-enter {
   from {
     opacity: 0;
-    transform: translateY(var(--space-md)) scale(0.98);
+    transform: scale(0.16);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: scale(1);
   }
 }
 
@@ -40,6 +53,11 @@
   .composerMinimized {
     animation: none;
   }
+}
+
+:global(.reduce-motion) .composer,
+:global(.reduce-motion) .composerMinimized {
+  animation: none;
 }
 
 .composer {
@@ -55,8 +73,61 @@
 }
 
 @media (width < #{variables.$mobile-menu-breakpoint}) {
+  .button:not(.buttonInline) {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transform: translateY(var(--space-md)) scale(0.9);
+  }
+
+  .mastodonButton:not(.buttonInline) {
+    display: inline-flex;
+  }
+
+  :global(.ui--mobile-chrome-hidden) .button:not(.buttonInline) {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+
   .composer,
   .composerMinimized {
     bottom: var(--mobile-bottom-nav-height);
+    max-height: calc(
+      100dvh - var(--mobile-bottom-nav-height) - var(--space-md) * 2
+    );
+  }
+
+  .composer {
+    min-height: min(
+      520px,
+      calc(100dvh - var(--mobile-bottom-nav-height) - var(--space-md) * 2)
+    );
+  }
+
+  :global(.ui--mobile-chrome-hidden) .composer,
+  :global(.ui--mobile-chrome-hidden) .composerMinimized {
+    bottom: env(safe-area-inset-bottom);
+    max-height: calc(
+      100dvh - env(safe-area-inset-bottom) - var(--space-md) * 2
+    );
+  }
+
+  :global(.ui--mobile-chrome-hidden) .composer {
+    min-height: min(
+      520px,
+      calc(100dvh - env(safe-area-inset-bottom) - var(--space-md) * 2)
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .button:not(.buttonInline) {
+      transition: none;
+    }
+  }
+
+  :global(.reduce-motion) .button:not(.buttonInline) {
+    transition: none;
   }
 }

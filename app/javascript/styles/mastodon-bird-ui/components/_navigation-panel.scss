@@ -59,7 +59,7 @@
   }
 
   // Compose button first (only present on the single-column layout).
-  .navigation-panel__menu > li:has(a.navigation-panel__compose-button) {
+  .navigation-panel__menu > li:has(.navigation-panel__compose-button) {
     order: 0;
   }
 

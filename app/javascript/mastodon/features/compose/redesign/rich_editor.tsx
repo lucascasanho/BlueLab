@@ -2,6 +2,8 @@
 import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { defineMessages, useIntl } from 'react-intl';
+
 import {
   TextBIcon,
   CodeIcon,
@@ -30,6 +32,53 @@ import {
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import classes from './styles.module.scss';
+
+const messages = defineMessages({
+  toolbar: {
+    id: 'compose.formatting.toolbar',
+    defaultMessage: 'Formatting',
+  },
+  bold: {
+    id: 'compose.formatting.bold',
+    defaultMessage: 'Bold',
+  },
+  italic: {
+    id: 'compose.formatting.italic',
+    defaultMessage: 'Italic',
+  },
+  strikethrough: {
+    id: 'compose.formatting.strikethrough',
+    defaultMessage: 'Strikethrough',
+  },
+  quote: {
+    id: 'compose.formatting.quote',
+    defaultMessage: 'Quote',
+  },
+  bulletedList: {
+    id: 'compose.formatting.bulleted_list',
+    defaultMessage: 'Bulleted list',
+  },
+  numberedList: {
+    id: 'compose.formatting.numbered_list',
+    defaultMessage: 'Numbered list',
+  },
+  inlineCode: {
+    id: 'compose.formatting.inline_code',
+    defaultMessage: 'Inline code',
+  },
+  codeBlock: {
+    id: 'compose.formatting.code_block',
+    defaultMessage: 'Code block',
+  },
+  link: {
+    id: 'compose.formatting.link',
+    defaultMessage: 'Link',
+  },
+  linkUrl: {
+    id: 'compose.formatting.link_url',
+    defaultMessage: 'Link URL',
+  },
+});
 
 const escapeHtml = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -117,6 +166,18 @@ export const markdownToHtml = (
   return output.join('<br />');
 };
 
+export const plainTextToHtml = (
+  value: string,
+  customEmojis: Record<string, { static_url: string; url: string }>,
+) =>
+  escapeHtml(value)
+    .replace(/:([a-zA-Z0-9_+-]+):/g, (shortcode, name: string) => {
+      const emoji = customEmojis[name];
+      if (!emoji) return shortcode;
+      return `<span data-emoji-shortcode="${escapeAttribute(shortcode)}" contenteditable="false"><img src="${escapeAttribute(emoji.url)}" alt="${escapeAttribute(shortcode)}" draggable="false" /></span>`;
+    })
+    .replace(/\n/g, '<br />');
+
 const wrapInlineMarkdown = (content: string, marker: string) => {
   const match = /^(\s*)([\s\S]*?)(\s*)$/.exec(content);
   if (!match) return content;
@@ -191,6 +252,23 @@ export const editorText = (element: HTMLElement) =>
     .replace(/\n{3,}/g, '\n\n')
     .replace(/^\n+|\n+$/g, '');
 
+const nodeToPlainText = (node: Node): string => {
+  if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? '';
+  if (!(node instanceof HTMLElement)) return '';
+  const shortcode = node.dataset.emojiShortcode;
+  if (shortcode) return shortcode;
+  const content = Array.from(node.childNodes).map(nodeToPlainText).join('');
+  if (node.tagName === 'BR') return '\n';
+  if (node.tagName === 'DIV' || node.tagName === 'P') return `\n${content}`;
+  return content;
+};
+
+export const editorPlainText = (element: HTMLElement) =>
+  Array.from(element.childNodes)
+    .map(nodeToPlainText)
+    .join('')
+    .replace(/^\n+|\n+$/g, '');
+
 const wrapSelection = (tagName: string) => {
   const selection = window.getSelection();
   if (!selection?.rangeCount) return;
@@ -252,14 +330,14 @@ const focusAtEnd = (element: HTMLElement) => {
 };
 
 const commands = [
-  ['bold', TextBIcon, 'Bold'],
-  ['italic', TextItalicIcon, 'Italic'],
-  ['strikeThrough', TextStrikethroughIcon, 'Strikethrough'],
-  ['formatBlock', QuotesIcon, 'Quote', 'blockquote'],
-  ['insertUnorderedList', ListBulletsIcon, 'Bulleted list'],
-  ['insertOrderedList', ListNumbersIcon, 'Numbered list'],
-  ['code', CodeIcon, 'Inline code'],
-  ['formatBlock', CodeBlockIcon, 'Code block', 'pre'],
+  ['bold', TextBIcon, messages.bold],
+  ['italic', TextItalicIcon, messages.italic],
+  ['strikeThrough', TextStrikethroughIcon, messages.strikethrough],
+  ['formatBlock', QuotesIcon, messages.quote, 'blockquote'],
+  ['insertUnorderedList', ListBulletsIcon, messages.bulletedList],
+  ['insertOrderedList', ListNumbersIcon, messages.numberedList],
+  ['code', CodeIcon, messages.inlineCode],
+  ['formatBlock', CodeBlockIcon, messages.codeBlock, 'pre'],
 ] as const;
 
 type InlineCommand = 'bold' | 'italic' | 'strikeThrough';
@@ -297,13 +375,19 @@ export const RichComposeEditor: React.FC<{
   autoFocus?: boolean;
 }> = ({ onSubmit, children, autoFocus }) => {
   const dispatch = useAppDispatch();
+  const intl = useIntl();
   const text = useAppSelector((state) => state.compose.get('text') as string);
+  const contentType = useAppSelector(
+    (state) => state.compose.get('content_type') as string,
+  );
+  const isMarkdown = contentType === 'text/markdown';
   const customEmojis = useCustomEmojis();
   const ref = useRef<HTMLDivElement>(null);
   const hiddenRef = useRef<HTMLTextAreaElement>(null);
   const selectionRef = useRef<Range | null>(null);
   const localValueRef = useRef<string | null>(null);
   const renderedTextRef = useRef<string | null>(null);
+  const renderedContentTypeRef = useRef<string | null>(null);
   const [activeFormats, setActiveFormats] = useState<ReadonlySet<string>>(
     new Set(),
   );
@@ -312,6 +396,7 @@ export const RichComposeEditor: React.FC<{
     const editor = ref.current;
     const selection = window.getSelection();
     if (
+      !isMarkdown ||
       !editor ||
       !selection?.anchorNode ||
       !editor.contains(selection.anchorNode)
@@ -339,7 +424,7 @@ export const RichComposeEditor: React.FC<{
     if (closestWithin(element, 'blockquote', editor)) active.add('blockquote');
     if (closestWithin(element, 'a', editor)) active.add('link');
     setActiveFormats(active);
-  }, []);
+  }, [isMarkdown]);
 
   useEffect(() => {
     if (autoFocus && ref.current) focusAtEnd(ref.current);
@@ -349,15 +434,22 @@ export const RichComposeEditor: React.FC<{
     const editor = ref.current;
     const isLocalUpdate = text === localValueRef.current;
     const textChanged = text !== renderedTextRef.current;
+    const contentTypeChanged = contentType !== renderedContentTypeRef.current;
     const wasFocused = document.activeElement === editor;
-    if (editor && !isLocalUpdate && (textChanged || !wasFocused)) {
-      editor.innerHTML = markdownToHtml(text, customEmojis);
+    if (
+      editor &&
+      (contentTypeChanged || (!isLocalUpdate && (textChanged || !wasFocused)))
+    ) {
+      editor.innerHTML = isMarkdown
+        ? markdownToHtml(text, customEmojis)
+        : plainTextToHtml(text, customEmojis);
       if (wasFocused) focusAtEnd(editor);
     }
     renderedTextRef.current = text;
+    renderedContentTypeRef.current = contentType;
     localValueRef.current = null;
     if (hiddenRef.current) hiddenRef.current.value = text;
-  }, [customEmojis, text]);
+  }, [contentType, customEmojis, isMarkdown, text]);
 
   useEffect(() => {
     document.addEventListener('selectionchange', updateActiveFormats);
@@ -368,9 +460,10 @@ export const RichComposeEditor: React.FC<{
 
   const sync = () => {
     if (!ref.current) return;
-    const value = editorText(ref.current);
+    const value = isMarkdown
+      ? editorText(ref.current)
+      : editorPlainText(ref.current);
     localValueRef.current = value;
-    dispatch(changeComposeContentType('text/markdown'));
     dispatch(changeCompose(value));
     if (hiddenRef.current) {
       hiddenRef.current.value = value;
@@ -438,7 +531,7 @@ export const RichComposeEditor: React.FC<{
       return;
     }
 
-    const url = window.prompt('URL');
+    const url = window.prompt(intl.formatMessage(messages.linkUrl));
     if (url) {
       ref.current?.focus();
       if (selectionRef.current && selection) {
@@ -484,55 +577,67 @@ export const RichComposeEditor: React.FC<{
   ) => {
     const data =
       'clipboardData' in event ? event.clipboardData : event.dataTransfer;
-    if (data.files.length > 0) event.preventDefault();
+    if (data.files.length > 0) {
+      event.preventDefault();
+    } else if (!isMarkdown && 'clipboardData' in event) {
+      event.preventDefault();
+      // Keep plain-text mode visually plain while preserving native undo/redo.
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
+      document.execCommand('insertText', false, data.getData('text/plain'));
+    }
     dispatch(processPasteOrDrop(data));
   };
 
   return (
     <div className={classes.richEditorWrapper}>
-      <div
-        className={classes.richEditorToolbar}
-        role='toolbar'
-        aria-label='Formatting'
-      >
-        {commands.map(([command, icon, label, value]) => {
-          const stateKey = value ?? command;
-          const active = activeFormats.has(stateKey);
-          return (
-            <IconButton
-              key={`${command}-${value ?? 'default'}`}
-              as='button'
-              type='button'
-              size='sm'
-              icon={icon as IconProp}
-              data-command={command}
-              data-value={value}
-              color={active ? 'accent' : 'neutral'}
-              aria-pressed={active}
-              onMouseDown={preventToolbarFocus}
-              onClick={handleCommand}
-            >
-              {label}
-            </IconButton>
-          );
-        })}
-        <IconButton
-          as='button'
-          type='button'
-          size='sm'
-          icon={LinkIcon}
-          color={activeFormats.has('link') ? 'accent' : 'neutral'}
-          aria-pressed={activeFormats.has('link')}
-          onMouseDown={preventToolbarFocus}
-          onClick={handleLink}
+      {isMarkdown && (
+        <div
+          className={classes.richEditorToolbar}
+          role='toolbar'
+          aria-label={intl.formatMessage(messages.toolbar)}
         >
-          Link
-        </IconButton>
-      </div>
+          {commands.map(([command, icon, message, value]) => {
+            const stateKey = value ?? command;
+            const active = activeFormats.has(stateKey);
+            const label = intl.formatMessage(message);
+            return (
+              <IconButton
+                key={`${command}-${value ?? 'default'}`}
+                as='button'
+                type='button'
+                size='sm'
+                icon={icon as IconProp}
+                title={label}
+                data-command={command}
+                data-value={value}
+                color={active ? 'accent' : 'neutral'}
+                aria-pressed={active}
+                onMouseDown={preventToolbarFocus}
+                onClick={handleCommand}
+              >
+                {label}
+              </IconButton>
+            );
+          })}
+          <IconButton
+            as='button'
+            type='button'
+            size='sm'
+            icon={LinkIcon}
+            title={intl.formatMessage(messages.link)}
+            color={activeFormats.has('link') ? 'accent' : 'neutral'}
+            aria-pressed={activeFormats.has('link')}
+            onMouseDown={preventToolbarFocus}
+            onClick={handleLink}
+          >
+            {intl.formatMessage(messages.link)}
+          </IconButton>
+        </div>
+      )}
       <div
         ref={ref}
         className={classes.richEditor}
-        contentEditable
+        contentEditable={isMarkdown ? true : 'plaintext-only'}
         suppressContentEditableWarning
         role='textbox'
         aria-multiline='true'

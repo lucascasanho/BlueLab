@@ -83,7 +83,7 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
           </div>
         </div>
 
-        {useBlueLabComposer && <ComposeRedesignButton />}
+        <ComposeRedesignButton />
 
         <main className='columns-area__panels__main'>
           <div className='tabs-bar__wrapper'>

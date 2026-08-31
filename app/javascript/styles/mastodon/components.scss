@@ -3566,6 +3566,14 @@ a.account__display-name {
 }
 
 @media screen and (width <= 759px) {
+  .tabs-bar__wrapper,
+  .ui__navigation-bar {
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease,
+      visibility 0s linear;
+  }
+
   .columns-area__panels__main {
     width: 100%;
   }
@@ -3622,6 +3630,43 @@ a.account__display-name {
 @media screen and (width >= 760px) {
   .ui__navigation-bar {
     display: none;
+  }
+}
+
+@media screen and (width <= 759px) {
+  .ui--mobile-chrome-hidden {
+    .tabs-bar__wrapper,
+    .ui__navigation-bar {
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition:
+        opacity 180ms ease,
+        transform 180ms ease,
+        visibility 0s linear 180ms;
+    }
+
+    .tabs-bar__wrapper {
+      transform: translateY(-100%);
+    }
+
+    .ui__navigation-bar {
+      transform: translateY(100%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tabs-bar__wrapper,
+    .ui__navigation-bar {
+      transition: none !important;
+    }
+  }
+
+  .reduce-motion {
+    .tabs-bar__wrapper,
+    .ui__navigation-bar {
+      transition: none !important;
+    }
   }
 }
 
@@ -3857,6 +3902,12 @@ a.account__display-name {
 
   .compose-form {
     flex: 1 1 auto;
+  }
+
+  &__new-post-button {
+    align-self: stretch;
+    flex-shrink: 0;
+    margin: 12px 8px 0;
   }
 }
 

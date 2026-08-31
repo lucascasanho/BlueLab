@@ -1,6 +1,12 @@
 import { afterEach, vi } from 'vitest';
 
-import { editorText, markdownToHtml, toggleInlineCommand } from './rich_editor';
+import {
+  editorPlainText,
+  editorText,
+  markdownToHtml,
+  plainTextToHtml,
+  toggleInlineCommand,
+} from './rich_editor';
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -64,6 +70,19 @@ describe('BlueLab rich editor conversion', () => {
     expect(html).toContain('data-emoji-shortcode=":party:"');
   });
 
+  test('keeps Markdown literal in plain-text mode while rendering custom emoji', () => {
+    const html = plainTextToHtml('**bold**\n:party:', {
+      party: {
+        static_url: 'https://example.test/static.png',
+        url: 'https://example.test/animated.gif',
+      },
+    });
+
+    expect(html).toContain('**bold**<br />');
+    expect(html).not.toContain('<strong>');
+    expect(html).toContain('src="https://example.test/animated.gif"');
+  });
+
   test('serializes semantic elements back to valid Markdown', () => {
     const editor = document.createElement('div');
     editor.innerHTML =
@@ -101,6 +120,14 @@ describe('BlueLab rich editor conversion', () => {
     editor.innerHTML = '<strong><b>bold</b></strong><em><i>italic</i></em>';
 
     expect(editorText(editor)).toBe('**bold***italic*');
+  });
+
+  test('serializes a plain editor without leaking visual markup', () => {
+    const editor = document.createElement('div');
+    editor.innerHTML =
+      '<strong>bold</strong><div>next <span data-emoji-shortcode=":party:"><img /></span></div>';
+
+    expect(editorPlainText(editor)).toBe('bold\nnext :party:');
   });
 
   test('turns the selected inline format off when it is clicked again', () => {

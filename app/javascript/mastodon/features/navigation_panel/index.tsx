@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { defineMessages, useIntl } from 'react-intl';
 
@@ -7,6 +7,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 import type { Map as ImmutableMap } from 'immutable';
 
+import { PenNibIcon } from '@phosphor-icons/react';
 import { animated, useSpring } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
 
@@ -32,6 +33,7 @@ import TrendingUpIcon from '@/material-icons/400-24px/trending_up.svg?react';
 import { fetchFollowRequests } from 'mastodon/actions/accounts';
 import { openNavigation, closeNavigation } from 'mastodon/actions/navigation';
 import { Account } from 'mastodon/components/account';
+import { Icon } from 'mastodon/components/icon';
 import { IconWithBadge } from 'mastodon/components/icon_with_badge';
 import { WordmarkLogo } from 'mastodon/components/logo';
 import { Search } from 'mastodon/features/compose/components/search';
@@ -47,6 +49,11 @@ import {
 } from 'mastodon/initial_state';
 import { transientSingleColumn } from 'mastodon/is_mobile';
 import { canViewFeed } from 'mastodon/permissions';
+import {
+  composerOriginFromElement,
+  openPreferredComposer,
+  selectComposerEditor,
+} from 'mastodon/reducers/slices/composer';
 import { selectUnreadNotificationGroupsCount } from 'mastodon/selectors/notifications';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
@@ -219,6 +226,19 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
   const location = useLocation();
   const showSearch = useBreakpoint('full') && !multiColumn;
   const account = useAccount(me);
+  const composerEditor = useAppSelector(selectComposerEditor);
+  const dispatch = useAppDispatch();
+  const handleOpenComposer = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      dispatch(closeNavigation());
+      dispatch(
+        openPreferredComposer({
+          origin: composerOriginFromElement(event.currentTarget),
+        }),
+      );
+    },
+    [dispatch],
+  );
 
   let banner: React.ReactNode;
 
@@ -262,14 +282,18 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
           <>
             {!multiColumn && (
               <li>
-                <ColumnLink
-                  to={{ pathname: '/publish', state: { focusTarget: false } }}
-                  icon='plus'
-                  iconComponent={AddIcon}
-                  activeIconComponent={AddIcon}
-                  text={intl.formatMessage(messages.compose)}
+                <button
+                  type='button'
+                  onClick={handleOpenComposer}
                   className='button navigation-panel__compose-button'
-                />
+                  data-composer-editor={composerEditor}
+                >
+                  <Icon
+                    id={composerEditor === 'mastodon' ? 'plus' : 'compose'}
+                    icon={composerEditor === 'mastodon' ? AddIcon : PenNibIcon}
+                  />
+                  <span>{intl.formatMessage(messages.compose)}</span>
+                </button>
               </li>
             )}
             <li>
@@ -520,8 +544,8 @@ export const CollapsibleNavigationPanel: React.FC = () => {
 
   useEffect(() => {
     if (open) {
-      const firstLink = document.querySelector<HTMLAnchorElement>(
-        '.navigation-panel__menu .column-link',
+      const firstLink = document.querySelector<HTMLElement>(
+        '.navigation-panel__menu .navigation-panel__compose-button, .navigation-panel__menu .column-link',
       );
       previouslyFocusedElementRef.current =
         document.activeElement as HTMLElement;
