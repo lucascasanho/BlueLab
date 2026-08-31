@@ -123,6 +123,15 @@ export const AccountHeader: React.FC<{
             />
           </div>
 
+          <AccountButtons
+            className={classNames(
+              classes.buttonsMobile,
+              !isIntersecting && classes.buttonsMobileIsStuck,
+            )}
+            accountId={accountId}
+            noShare
+          />
+
           <AccountNumberFields accountId={accountId} />
 
           {!isMe && !suspendedOrHidden && (
@@ -146,14 +155,6 @@ export const AccountHeader: React.FC<{
             </div>
           )}
 
-          <AccountButtons
-            className={classNames(
-              classes.buttonsMobile,
-              !isIntersecting && classes.buttonsMobileIsStuck,
-            )}
-            accountId={accountId}
-            noShare
-          />
         </div>
       </AnimateEmojiProvider>
 
