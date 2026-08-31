@@ -39,8 +39,9 @@
   .columns-area__panels__pane--compositional {
     flex-grow: 1;
     height: 100vh;
+    height: 100dvh;
     max-width: 350px;
-    min-height: 880px;
+    min-height: 0;
     position: sticky;
     top: 0;
   }

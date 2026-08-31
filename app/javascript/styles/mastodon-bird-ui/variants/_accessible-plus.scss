@@ -194,14 +194,20 @@ body .content-warning {
   order: 0 !important;
 }
 
-//  Show full name
+// Keep the account name, handle and menu trigger in one header row. The
+// default theme constrains this row with truncation; overriding it to wrap
+// here made the handle and menu fall below the author name in this variant.
+.status__info .linked-display-name,
 .status__info .display-name {
-  flex-wrap: wrap;
-  margin-bottom: 10px;
+  flex-wrap: nowrap !important;
+}
+
+.status__info .display-name {
+  margin-bottom: 0;
 }
 
 .status__info {
-  justify-content: space-between !important;
+  justify-content: flex-start !important;
 }
 
 .status__info::before {
