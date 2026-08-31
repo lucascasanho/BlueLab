@@ -779,8 +779,8 @@ body > [data-popover-placement] {
   &__submit {
     display: flex;
     align-items: center;
-    flex: 1 1 auto;
-    max-width: 100%;
+    flex: 0 0 auto;
+    margin-inline-start: auto;
   }
 
   &__buttons {
@@ -788,6 +788,7 @@ body > [data-popover-placement] {
     gap: 8px;
     align-items: center;
     flex: 1 1 auto;
+    min-width: 0;
 
     & > div {
       display: flex;
@@ -801,14 +802,28 @@ body > [data-popover-placement] {
       width: 20px;
       height: 20px;
     }
+
+    .character-counter {
+      flex: 0 1 auto;
+      min-width: 0;
+    }
   }
 
   &__actions {
     display: flex;
     align-items: center;
     flex: 0 0 auto;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+
+    &:has(.character-counter--long) {
+      flex-wrap: wrap;
+
+      .compose-form__submit {
+        flex-basis: 100%;
+        justify-content: flex-end;
+      }
+    }
 
     .icon-button {
       box-sizing: content-box;

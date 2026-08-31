@@ -59,6 +59,8 @@ export const ComposePanel: React.FC<{ showComposer?: boolean }> = ({
       )}
       {signedIn && showComposer && hideComposer && <div className='compose-form' />}
 
+      {!showComposer && <div className='flex-spacer' />}
+
       <LinkFooter context={singleColumn ? 'default' : 'multi-column'} />
     </div>
   );
