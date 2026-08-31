@@ -1006,6 +1006,7 @@ pt-BR:
         preamble: Configurações persistentes e validadas deste servidor. Alterações não editam arquivos-fonte e passam a valer após salvar.
         proxy_warning: O limite configurado aqui é o aceito pelo Mastodon. Proxies, CDNs ou túneis, incluindo Cloudflare, podem impor limites menores e precisam ser configurados separadamente.
         restore_defaults: Restaurar todos os padrões
+        restore_color_default: Restaurar esta cor
         restore_defaults_confirm: Isso removerá todas as customizações desta página e restaurará os valores padrão. Deseja continuar?
         status_limit: Limite de caracteres para usuário padrão
         title: Customização da instância

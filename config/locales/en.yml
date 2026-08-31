@@ -1006,6 +1006,7 @@ en:
         preamble: Persistent, validated server customization. Saving does not edit source files and changes apply immediately.
         proxy_warning: This is the Mastodon limit. Proxies, CDNs or tunnels, including Cloudflare, may impose smaller limits and must be configured separately.
         restore_defaults: Restore all defaults
+        restore_color_default: Restore this color
         restore_defaults_confirm: This removes every customization on this page and restores the default values. Do you want to continue?
         status_limit: Character limit for standard users
         title: Instance customization
