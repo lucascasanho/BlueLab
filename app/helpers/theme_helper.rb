@@ -72,7 +72,7 @@ module ThemeHelper
         --color-bg: #{dark_background};
         --color-bg-primary: #{dark_background};
         --color-bg-ambient: #{dark_background};
-        --color-bg-elevated: #{dark_background};
+        --color-bg-elevated: #{dark_surface};
         --color-bg-secondary-base: #{dark_surface};
         --color-bg-secondary: #{dark_surface};
         --color-bg-secondary-solid: #{dark_surface};
@@ -89,7 +89,7 @@ module ThemeHelper
         --color-bg: #{light_background};
         --color-bg-primary: #{light_background};
         --color-bg-ambient: #{light_background};
-        --color-bg-elevated: #{light_background};
+        --color-bg-elevated: #{light_surface};
         --color-bg-secondary-base: #{light_surface};
         --color-bg-secondary: #{light_surface};
         --color-bg-secondary-solid: #{light_surface};

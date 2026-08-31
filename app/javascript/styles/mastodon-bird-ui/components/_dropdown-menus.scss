@@ -13,3 +13,25 @@
   height: 4px;
   width: 4px;
 }
+
+// Keep contextual menus on the same semantic elevated surface as cards and
+// popovers. This also clips item hover states to the shared BlueLab radius.
+.dropdown-menu {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-primary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.dropdown-menu__item {
+  a,
+  button {
+    border-radius: calc(var(--radius-md) - 2px);
+  }
+
+  a:hover,
+  button:hover,
+  button:focus-visible {
+    background-color: var(--color-bg-highlight);
+  }
+}
