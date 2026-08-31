@@ -6,7 +6,7 @@
 
 ## Estado
 
-- Status: em andamento
+- Status: concluído
 - Atualizado em: 2026-08-31 — America/Cuiaba
 - Objetivo: implementar a política permanente de continuidade e recuperação de tarefas do BlueLab.
 - Alvo: Blue / repositório BlueLab
@@ -19,8 +19,8 @@
 - [x] Consolidar a política existente com os requisitos detalhados de recuperação segura.
 - [x] Criar `CODEX_PROGRESS.md` como checkpoint canônico do projeto.
 - [x] Validar o conteúdo e reconciliá-lo com o Git.
-- [ ] Criar commit e sincronizar com o GitHub.
-- [ ] Marcar este checkpoint como concluído e remover pendências obsoletas.
+- [x] Criar commit e sincronizar com o GitHub.
+- [x] Marcar este checkpoint como concluído e remover pendências obsoletas.
 
 ## Estado do Git no início
 
@@ -55,15 +55,23 @@
 
 ## Alterações ainda não commitadas
 
-- `CODEX_PROGRESS.md` novo no repositório.
-- `/home/blue/AGENTS.md` alterado fora do repositório, como instrução aplicável ao workspace.
+- Nenhuma alteração funcional pendente.
+- Esta atualização de encerramento do checkpoint será registrada no commit final da tarefa.
+
+## Resultado final conhecido
+
+- Commit da política: `f88f612a0a` (`docs: add Codex continuity checkpoint`).
+- O commit da política foi enviado para `origin/codex/20260830-modernize-composer-profile`.
+- `/home/blue/AGENTS.md` contém a regra permanente aplicável ao workspace.
+- `CODEX_PROGRESS.md` é o checkpoint canônico deste projeto.
+- Não há itens operacionais pendentes.
 
 ## Próximo passo seguro
 
-Revisar o diff staged, criar o commit da política e sincronizá-lo com o GitHub.
+Ao iniciar a próxima tarefa longa ou com várias etapas, conferir o Git e substituir o estado desta tarefa pelo novo objetivo, preservando somente informações ainda relevantes.
 
 ## Cuidados para retomada
 
 - Ler `/home/blue/AGENTS.md` e este arquivo antes de continuar.
 - Confirmar o estado real com `git status`, diff e commits recentes.
-- Não presumir que o commit ou push pendente já aconteceu; verificar antes de repeti-los.
+- Confirmar no remoto o commit registrado antes de repetir qualquer sincronização.
