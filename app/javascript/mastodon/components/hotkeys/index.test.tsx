@@ -49,6 +49,41 @@ describe('Hotkeys', () => {
     expect(onNew).toHaveBeenCalledOnce();
   });
 
+  test('handles the period shortcut outside editable controls', () => {
+    const onLoadNewPosts = vi.fn();
+
+    render(
+      <Hotkeys global handlers={{ loadNewPosts: onLoadNewPosts }}>
+        <div data-testid='timeline'>timeline</div>
+      </Hotkeys>,
+    );
+
+    fireEvent.keyDown(screen.getByTestId('timeline'), { key: '.' });
+
+    expect(onLoadNewPosts).toHaveBeenCalledOnce();
+  });
+
+  test.each(['input', 'textarea'])(
+    'does not handle period while typing in a %s',
+    (tag) => {
+      const onLoadNewPosts = vi.fn();
+
+      const { container } = render(
+        <Hotkeys global handlers={{ loadNewPosts: onLoadNewPosts }}>
+          {tag === 'input' ? <input /> : <textarea />}
+        </Hotkeys>,
+      );
+
+      const input = container.querySelector(tag);
+      expect(input).not.toBeNull();
+      if (input) {
+        fireEvent.keyDown(input, { key: '.' });
+      }
+
+      expect(onLoadNewPosts).not.toHaveBeenCalled();
+    },
+  );
+
   test('does not handle shortcuts from controls inside the BlueLab composer', () => {
     const onNew = vi.fn();
 

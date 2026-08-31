@@ -17,9 +17,7 @@ export const LinkFooter: React.FC<{
       <section>
         <ul className={classes.list}>
           <li>
-            <Link to='/' target={multiColumn ? '_blank' : undefined}>
-              {domain}
-            </Link>
+            <span className={classes.instanceName}>{domain}</span>
           </li>
           <li>
             <Link to='/about' target={multiColumn ? '_blank' : undefined}>

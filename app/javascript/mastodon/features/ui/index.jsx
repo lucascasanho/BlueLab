@@ -615,6 +615,18 @@ class UI extends PureComponent {
     document.querySelector('.load-more')?.focus();
   };
 
+  handleHotkeyLoadNewPosts = () => {
+    const timeline = document.querySelector('.status-list');
+    if (!timeline) return false;
+
+    // Reuse the same control that is shown for pending items. It only exists
+    // when the active timeline has items ready to be inserted, so this does
+    // not issue a redundant timeline request.
+    document.querySelector('.load-gap')?.click();
+    timeline.closest('.scrollable')?.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   handleMoveToTop = () => {
     focusFirstItem();
   };
@@ -730,6 +742,7 @@ class UI extends PureComponent {
       toggleComposeSpoilers: this.handleHotkeyToggleComposeSpoilers,
       focusColumn: this.handleHotkeyFocusColumn,
       focusLoadMore: this.handleHotkeyLoadMore,
+      loadNewPosts: this.handleHotkeyLoadNewPosts,
       moveDown: this.handleMoveDown,
       moveUp: this.handleMoveUp,
       moveToTop: this.handleMoveToTop,

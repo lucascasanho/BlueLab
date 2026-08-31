@@ -126,6 +126,7 @@ const hotkeyMatcherMap = {
   forceNew: optionPlus('n'),
   focusColumn: any('1', '2', '3', '4', '5', '6', '7', '8', '9'),
   focusLoadMore: just('l'),
+  loadNewPosts: just('.'),
   reply: just('r'),
   favourite: just('f'),
   boost: just('b'),

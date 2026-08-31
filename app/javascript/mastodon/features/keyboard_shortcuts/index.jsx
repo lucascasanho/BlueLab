@@ -108,6 +108,10 @@ class KeyboardShortcuts extends ImmutablePureComponent {
                 <td><FormattedMessage id='keyboard_shortcuts.load_more' defaultMessage='Focus "Load more" button' /></td>
               </tr>
               <tr>
+                <td><kbd>.</kbd></td>
+                <td><FormattedMessage id='keyboard_shortcuts.load_new_posts' defaultMessage='Load new posts in the current timeline and go to the top' /></td>
+              </tr>
+              <tr>
                 <td><kbd>n</kbd></td>
                 <td><FormattedMessage id='keyboard_shortcuts.compose' defaultMessage='to focus the compose textarea' /></td>
               </tr>

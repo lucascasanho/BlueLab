@@ -1,5 +1,5 @@
 import { accountFactoryImmutable } from '@/testing/factories';
-import { render, screen } from '@/testing/rendering';
+import { fireEvent, render, screen } from '@/testing/rendering';
 
 import { DisplayName } from '../display_name';
 
@@ -18,15 +18,19 @@ describe('<DisplayName />', () => {
     expect(screen.queryByText('@alice@remote.example')).toBeNull();
   });
 
-  it('still renders the complete handle with the default variant', () => {
+  it('renders a simplified handle and expands it on request', () => {
     const { container } = render(<DisplayName account={account} />);
 
     expect(container.querySelector('.display-name__account')?.textContent).toBe(
+      '@alice',
+    );
+    const toggle = screen.getByRole('button', { name: /show full username/i });
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    fireEvent.click(toggle);
+    expect(container.querySelector('.display-name__account')?.textContent).toBe(
       '@alice@remote.example',
     );
-    expect(container.querySelector('.display-name__domain')?.textContent).toBe(
-      '@remote.example',
-    );
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
   });
 
   it('shows an accessible lock for a private account', () => {

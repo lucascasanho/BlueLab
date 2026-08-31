@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 
 import type { Account, AccountShapeFull } from '@/mastodon/models/account';
 
+import { AccountHandle } from '../account_handle';
+
 import { DisplayNameDefault } from './default';
 import { DisplayNameWithoutDomain } from './no-domain';
 import { DisplayNameSimple } from './simple';
@@ -39,15 +41,24 @@ export const LinkedDisplayName: FC<
   }
 
   return (
-    <Link
-      to={`/@${account.acct}`}
-      title={`@${account.acct}`}
-      data-id={account.id}
-      data-hover-card-account={account.id}
-      {...linkProps}
-    >
-      {children}
-      <DisplayName {...displayProps} />
-    </Link>
+    <span className='linked-display-name'>
+      <Link
+        to={`/@${account.acct}`}
+        title={`@${account.acct}`}
+        data-id={account.id}
+        data-hover-card-account={account.id}
+        {...linkProps}
+      >
+        {children}
+        <DisplayName {...displayProps} variant='noDomain' />
+      </Link>
+      {displayProps.variant !== 'simple' && (
+        <AccountHandle
+          account={account}
+          localDomain={displayProps.localDomain}
+          linked
+        />
+      )}
+    </span>
   );
 };

@@ -151,6 +151,7 @@ export const ComposeRedesignButton: React.FC<{
       <IconButton
         icon={AddIcon}
         variant='solid'
+        color='accent'
         className={classNames(
           classes.button,
           classes.mastodonButton,
@@ -190,6 +191,7 @@ export const ComposeRedesignButton: React.FC<{
         as={IconButton}
         icon={PenNibIcon}
         variant='solid'
+        color='accent'
         className={classNames(classes.button, inline && classes.buttonInline)}
         size='lg'
         onPointerDown={captureLauncherPointerOrigin}
