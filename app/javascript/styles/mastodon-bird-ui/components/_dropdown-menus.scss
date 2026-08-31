@@ -14,10 +14,10 @@
   width: 4px;
 }
 
-// Keep contextual menus on the same semantic elevated surface as cards and
-// popovers. This also clips item hover states to the shared BlueLab radius.
+// Use Mastodon's standard menu surface everywhere. Some mobile menus render
+// outside the column container, so this must not rely on a scoped override.
 .dropdown-menu {
-  background: var(--color-bg-elevated);
+  background: var(--color-bg-primary);
   border-color: var(--color-border-primary);
   border-radius: var(--radius-md);
   overflow: hidden;
