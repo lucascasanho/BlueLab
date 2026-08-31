@@ -1,4 +1,6 @@
-import type { ComponentPropsWithoutRef, FC } from 'react';
+import type { ComponentPropsWithoutRef, FC, ReactNode } from 'react';
+
+import classNames from 'classnames';
 
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -33,24 +35,34 @@ export const DisplayName: FC<
 export const LinkedDisplayName: FC<
   Omit<LinkProps, 'to'> & {
     displayProps: DisplayNameProps & ComponentPropsWithoutRef<'span'>;
+    displayName?: ReactNode;
+    linkClassName?: string;
   }
-> = ({ displayProps, children, ...linkProps }) => {
+> = ({
+  displayProps,
+  children,
+  className,
+  displayName,
+  linkClassName,
+  ...linkProps
+}) => {
   const { account } = displayProps;
   if (!account) {
     return <DisplayName {...displayProps} />;
   }
 
   return (
-    <span className='linked-display-name'>
+    <span className={classNames('linked-display-name', className)}>
       <Link
         to={`/@${account.acct}`}
         title={`@${account.acct}`}
         data-id={account.id}
         data-hover-card-account={account.id}
+        className={classNames('linked-display-name__link', linkClassName)}
         {...linkProps}
       >
         {children}
-        <DisplayName {...displayProps} variant='noDomain' />
+        {displayName ?? <DisplayName {...displayProps} variant='noDomain' />}
       </Link>
       {displayProps.variant !== 'simple' && (
         <AccountHandle

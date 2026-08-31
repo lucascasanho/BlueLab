@@ -1,7 +1,7 @@
 import { accountFactoryImmutable } from '@/testing/factories';
 import { fireEvent, render, screen } from '@/testing/rendering';
 
-import { DisplayName } from '../display_name';
+import { DisplayName, LinkedDisplayName } from '../display_name';
 
 describe('<DisplayName />', () => {
   const account = accountFactoryImmutable({
@@ -63,6 +63,40 @@ describe('<DisplayName />', () => {
       '@alice@remote.example',
     );
   });
+
+  it.each([
+    'status__display-name',
+    'detailed-status__display-name',
+    'account__display-name',
+    'hover-card__name',
+  ])(
+    'keeps the linked handle in the same identity wrapper for %s',
+    (className) => {
+      const { container } = render(
+        <LinkedDisplayName
+          className={className}
+          displayProps={{ account, localDomain: 'remote.example' }}
+        >
+          <span data-testid='avatar' />
+        </LinkedDisplayName>,
+      );
+
+      const identity = container.querySelector('.linked-display-name');
+      const link = identity?.querySelector('.linked-display-name__link');
+      const handle = identity?.querySelector('.account-handle');
+
+      expect(identity?.classList.contains(className)).toBe(true);
+      expect(link?.contains(screen.getByTestId('avatar'))).toBe(true);
+      expect(handle?.parentElement).toBe(identity);
+      expect(handle?.textContent).toBe('@alice');
+
+      fireEvent.click(
+        screen.getByRole('button', { name: /show full username/i }),
+      );
+
+      expect(handle?.textContent).toBe('@alice@remote.example');
+    },
+  );
 
   it('shows an accessible lock for a private account', () => {
     const lockedAccount = account.set('locked', true);

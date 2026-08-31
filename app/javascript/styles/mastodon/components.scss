@@ -2504,7 +2504,7 @@ a .account__avatar {
 
 .status__display-name,
 .detailed-status__display-name,
-a.account__display-name {
+.account__display-name {
   &:hover .display-name strong {
     text-decoration: underline;
   }
@@ -2533,7 +2533,7 @@ a.account__display-name {
   overflow: hidden;
 
   strong,
-  span:not(.emojione) {
+  span:not(.emojione, .account-handle) {
     display: block;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -2936,14 +2936,35 @@ a.account__display-name {
   color: var(--color-text-brand);
 }
 
+.linked-display-name {
+  display: inline-flex;
+  align-items: baseline;
+  max-width: 100%;
+  min-width: 0;
+  vertical-align: middle;
+}
+
+.linked-display-name__link {
+  display: inline-flex;
+  align-items: inherit;
+  flex: 0 1 auto;
+  gap: inherit;
+  max-width: 100%;
+  min-width: 0;
+  color: inherit;
+  text-decoration: inherit;
+}
+
 .account-handle {
   display: inline-flex;
   align-items: center;
+  flex: 0 1 auto;
   max-width: 100%;
   min-width: 0;
   line-height: inherit;
   vertical-align: middle;
   color: var(--color-text-secondary);
+  white-space: nowrap;
 }
 
 .account-handle__text,

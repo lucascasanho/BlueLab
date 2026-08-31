@@ -10,21 +10,12 @@
     justify-content: flex-start;
   }
 
-  [class*='pinnedStatusHeader'] > .linked-display-name {
+  [class*='pinnedStatusHeader'] > .status__display-name {
     align-items: center;
     display: flex;
-    flex: 1 1 auto;
     gap: calc(var(--gap-default) / 2);
     min-width: 0;
     order: 1;
-    overflow: hidden;
-    white-space: nowrap;
-
-    > .status__display-name,
-    > .account-handle {
-      flex: 0 1 auto;
-      min-width: 0;
-    }
   }
 
   [class*='pinnedStatusHeader'] > .status__relative-time {
