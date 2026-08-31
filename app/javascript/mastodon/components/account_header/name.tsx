@@ -10,9 +10,9 @@ import { useRelationship } from '@/mastodon/hooks/useRelationship';
 import { useAppSelector } from '@/mastodon/store';
 import HelpIcon from '@/material-icons/400-24px/help.svg?react';
 
-import { AccountHandle } from '../account_handle';
 import { FollowsYouBadge } from '../badge';
 import { DisplayName } from '../display_name';
+import { useAccountHandle } from '../display_name/default';
 import { Icon } from '../icon';
 import { NavigationFocusTarget } from '../navigation_focus_target';
 import { Popover } from '../popover';
@@ -38,6 +38,7 @@ export const AccountName: FC<{ accountId: string }> = ({ accountId }) => {
     (state) => state.meta.get('domain') as string,
   );
   const relationship = useRelationship(accountId);
+  const handle = useAccountHandle(account, localDomain);
 
   if (!account) {
     return null;
@@ -55,7 +56,7 @@ export const AccountName: FC<{ accountId: string }> = ({ accountId }) => {
       {account.invalid_handle ? (
         <InvalidAccountHelp />
       ) : (
-        <AccountHandle account={account} localDomain={localDomain} />
+        <span className={classes.handleText}>{handle}</span>
       )}
 
       <AccountBadges accountId={accountId} />

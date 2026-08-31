@@ -3,7 +3,6 @@ import type { ComponentPropsWithoutRef, FC } from 'react';
 
 import { defineMessages, useIntl } from 'react-intl';
 
-import { AccountHandle } from '../account_handle';
 import { Skeleton } from '../skeleton';
 
 import type { DisplayNameProps } from './index';
@@ -58,15 +57,7 @@ export const DisplayNameDefault: FC<
     >
       {' '}
       <span className='display-name__account'>
-        {username ? (
-          showDomain ? (
-            <AccountHandle account={account} localDomain={localDomain} />
-          ) : (
-            username
-          )
-        ) : (
-          <Skeleton width='7ch' />
-        )}
+        {username ?? <Skeleton width='7ch' />}
       </span>
     </DisplayNameWithoutDomain>
   );

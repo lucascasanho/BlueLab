@@ -1,13 +1,9 @@
-import type { ComponentPropsWithoutRef, FC, ReactNode } from 'react';
-
-import classNames from 'classnames';
+import type { ComponentPropsWithoutRef, FC } from 'react';
 
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 import type { Account, AccountShapeFull } from '@/mastodon/models/account';
-
-import { AccountHandle } from '../account_handle';
 
 import { DisplayNameDefault } from './default';
 import { DisplayNameWithoutDomain } from './no-domain';
@@ -35,42 +31,23 @@ export const DisplayName: FC<
 export const LinkedDisplayName: FC<
   Omit<LinkProps, 'to'> & {
     displayProps: DisplayNameProps & ComponentPropsWithoutRef<'span'>;
-    displayName?: ReactNode;
-    linkClassName?: string;
   }
-> = ({
-  displayProps,
-  children,
-  className,
-  displayName,
-  linkClassName,
-  ...linkProps
-}) => {
+> = ({ displayProps, children, ...linkProps }) => {
   const { account } = displayProps;
   if (!account) {
     return <DisplayName {...displayProps} />;
   }
 
   return (
-    <span className={classNames('linked-display-name', className)}>
-      <Link
-        to={`/@${account.acct}`}
-        title={`@${account.acct}`}
-        data-id={account.id}
-        data-hover-card-account={account.id}
-        className={classNames('linked-display-name__link', linkClassName)}
-        {...linkProps}
-      >
-        {children}
-        {displayName ?? <DisplayName {...displayProps} variant='noDomain' />}
-      </Link>
-      {displayProps.variant !== 'simple' && (
-        <AccountHandle
-          account={account}
-          localDomain={displayProps.localDomain}
-          linked
-        />
-      )}
-    </span>
+    <Link
+      to={`/@${account.acct}`}
+      title={`@${account.acct}`}
+      data-id={account.id}
+      data-hover-card-account={account.id}
+      {...linkProps}
+    >
+      {children}
+      <DisplayName {...displayProps} />
+    </Link>
   );
 };

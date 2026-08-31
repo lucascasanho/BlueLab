@@ -3,6 +3,7 @@ import { useEffect, forwardRef } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
+import { Link } from 'react-router-dom';
 
 import { useFetchFamiliarFollowers } from '@/mastodon/components/familiar_followers/use_fetch_familiar_followers';
 import { fetchAccount } from 'mastodon/actions/accounts';
@@ -14,7 +15,7 @@ import {
   FollowersCounter,
   FollowersYouKnowCounter,
 } from 'mastodon/components/counters';
-import { LinkedDisplayName } from 'mastodon/components/display_name';
+import { DisplayName } from 'mastodon/components/display_name';
 import { FollowButton } from 'mastodon/components/follow_button';
 import { LoadingIndicator } from 'mastodon/components/loading_indicator';
 import { ShortNumber } from 'mastodon/components/short_number';
@@ -74,15 +75,13 @@ export const HoverCardAccount = forwardRef<
     >
       {account ? (
         <>
-          <LinkedDisplayName
-            className='hover-card__name'
-            displayProps={{ account, localDomain: domain }}
-          >
+          <Link to={`/@${account.acct}`} className='hover-card__name'>
             <Avatar
               account={isSuspendedOrHidden ? undefined : account}
               size={46}
             />
-          </LinkedDisplayName>
+            <DisplayName account={account} localDomain={domain} />
+          </Link>
 
           {isSuspendedOrHidden ? (
             <div className='hover-card__limited-account-note'>

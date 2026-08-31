@@ -3,6 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
+import { Link } from 'react-router-dom';
 
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
@@ -23,14 +24,14 @@ import { Avatar } from 'mastodon/components/avatar';
 import { VerifiedBadge } from 'mastodon/components/badge';
 import { Button } from 'mastodon/components/button';
 import { FollowersCounter } from 'mastodon/components/counters';
-import { LinkedDisplayName } from 'mastodon/components/display_name';
+import { DisplayName } from 'mastodon/components/display_name';
 import { Dropdown } from 'mastodon/components/dropdown_menu';
 import { FollowButton } from 'mastodon/components/follow_button';
 import { RelativeTimestamp } from 'mastodon/components/relative_timestamp';
 import { ShortNumber } from 'mastodon/components/short_number';
 import { Skeleton } from 'mastodon/components/skeleton';
 import { useIdentity } from 'mastodon/identity_context';
-import { domain, me } from 'mastodon/initial_state';
+import { me } from 'mastodon/initial_state';
 import type { MenuItem } from 'mastodon/models/dropdown_menu';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
@@ -305,10 +306,11 @@ export const Account: React.FC<AccountProps> = ({
         })}
       >
         <div className='account__info-wrapper'>
-          <LinkedDisplayName
+          <Link
             className='account__display-name focusable'
-            displayProps={{ account, localDomain: domain }}
-            linkClassName='focusable'
+            title={account?.acct}
+            to={`/@${account?.acct}`}
+            data-hover-card-account={id}
           >
             <div className='account__avatar-wrapper'>
               {account ? (
@@ -319,6 +321,8 @@ export const Account: React.FC<AccountProps> = ({
             </div>
 
             <div className='account__contents'>
+              <DisplayName account={account} />
+
               {!minimal && (
                 <div className='account__details'>
                   {account ? (
@@ -335,7 +339,7 @@ export const Account: React.FC<AccountProps> = ({
                 </div>
               )}
             </div>
-          </LinkedDisplayName>
+          </Link>
 
           {account &&
             withBio &&

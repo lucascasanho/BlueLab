@@ -2504,7 +2504,7 @@ a .account__avatar {
 
 .status__display-name,
 .detailed-status__display-name,
-.account__display-name {
+a.account__display-name {
   &:hover .display-name strong {
     text-decoration: underline;
   }
@@ -2533,7 +2533,7 @@ a .account__avatar {
   overflow: hidden;
 
   strong,
-  span:not(.emojione, .account-handle) {
+  span:not(.emojione) {
     display: block;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -2934,79 +2934,6 @@ a .account__avatar {
 
 .display-name__domain {
   color: var(--color-text-brand);
-}
-
-.linked-display-name {
-  display: inline-flex;
-  align-items: baseline;
-  max-width: 100%;
-  min-width: 0;
-  vertical-align: middle;
-}
-
-.linked-display-name__link {
-  display: inline-flex;
-  align-items: inherit;
-  flex: 0 1 auto;
-  gap: inherit;
-  max-width: 100%;
-  min-width: 0;
-  color: inherit;
-  text-decoration: inherit;
-}
-
-.account-handle {
-  display: inline-flex;
-  align-items: center;
-  flex: 0 1 auto;
-  max-width: 100%;
-  min-width: 0;
-  line-height: inherit;
-  vertical-align: middle;
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-}
-
-.account-handle__text,
-.account-handle__link {
-  flex: 0 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.account-handle__toggle {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 1em;
-  height: 1em;
-  padding: 0;
-  margin-inline-start: 0.2em;
-  border: 0;
-  border-radius: var(--radius-round);
-  background: transparent;
-  color: currentColor;
-  cursor: pointer;
-  line-height: 1;
-  vertical-align: middle;
-
-  .icon {
-    width: 1em;
-    height: 1em;
-    transition: transform 160ms ease;
-  }
-
-  &[aria-expanded='true'] .icon {
-    transform: rotate(180deg);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--color-bg-brand-base);
-    outline-offset: 1px;
-  }
 }
 
 .display-name__locked {

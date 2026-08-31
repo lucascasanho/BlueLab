@@ -15,7 +15,7 @@ import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?re
 import { AnimatedNumber } from 'mastodon/components/animated_number';
 import { Avatar } from 'mastodon/components/avatar';
 import { ContentWarning } from 'mastodon/components/content_warning';
-import { LinkedDisplayName } from 'mastodon/components/display_name';
+import { DisplayName } from 'mastodon/components/display_name';
 import { EditedTimestamp } from 'mastodon/components/edited_timestamp';
 import { FilterWarning } from 'mastodon/components/filter_warning';
 import { FormattedDateWrapper } from 'mastodon/components/formatted_date';
@@ -440,14 +440,18 @@ export const DetailedStatus: React.FC<{
             />
           </div>
         )}
-        <LinkedDisplayName
+        <Link
+          to={`/@${status.getIn(['account', 'acct'])}`}
+          data-hover-card-account={status.getIn(['account', 'id'])}
           className='detailed-status__display-name'
-          displayProps={{ account: status.get('account'), localDomain: domain }}
-          displayName={overrideDisplayName}
         >
           <div className='detailed-status__display-avatar'>
             <Avatar account={status.get('account')} size={46} />
           </div>
+
+          {overrideDisplayName ?? (
+            <DisplayName account={status.get('account')} localDomain={domain} />
+          )}
 
           {withLogo && (
             <>
@@ -455,7 +459,7 @@ export const DetailedStatus: React.FC<{
               <IconLogo />
             </>
           )}
-        </LinkedDisplayName>
+        </Link>
 
         {matchedFilters && (
           <FilterWarning
