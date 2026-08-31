@@ -323,6 +323,8 @@ textarea.textarea {
 
 .languageMenu {
   padding: var(--space-xs);
+  display: flex;
+  flex-direction: column;
 
   input {
     margin-bottom: var(--space-xs);
@@ -336,6 +338,21 @@ textarea.textarea {
 .languageList {
   max-height: 350px;
   overflow-y: auto;
+}
+
+@media screen and (width <= 759px) {
+  .languageMenu {
+    box-sizing: border-box;
+    width: min(280px, calc(100vw - 2 * var(--space-md)));
+    max-height: calc(100vh - 2 * var(--space-md));
+    max-height: calc(100dvh - 2 * var(--space-md));
+  }
+
+  .languageList {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
 }
 
 .languageItem {

@@ -5853,6 +5853,21 @@ a.status-card {
     width: 300px;
     padding: 0;
 
+    @media screen and (width <= 600px) {
+      box-sizing: border-box;
+      width: min(300px, calc(100vw - 16px));
+      max-height: calc(100vh - 16px);
+      max-height: calc(100dvh - 16px);
+      display: flex;
+      flex-direction: column;
+
+      .emoji-mart-scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+      }
+    }
+
     .emoji-mart-search {
       padding: 10px;
       background: var(--color-bg-primary);
