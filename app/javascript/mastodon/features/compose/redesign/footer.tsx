@@ -200,7 +200,7 @@ const ComposeUploadButton: React.FC<{ disabled?: boolean }> = ({
     (event) => {
       const files = event.target.files;
       if (files?.length) {
-        dispatch(uploadCompose(files));
+        void dispatch(uploadCompose(files));
       }
     },
     [dispatch],

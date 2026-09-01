@@ -33,6 +33,20 @@
     margin-left: calc(var(--size-avatar) + var(--gap-default));
   }
 
+  // Quote cards place media below their complete header row rather than next
+  // to the avatar used by regular timeline statuses.
+  .status.status--is-quote {
+    > .media-gallery,
+    > .video-player,
+    > .audio-player,
+    > .collection-preview,
+    > .status-card,
+    > .status__quote-author-button {
+      margin-inline-start: 0;
+      max-width: 100%;
+    }
+  }
+
   .spoiler-button + .media-gallery__item > .media-gallery__preview {
     margin-left: unset !important;
     max-height: unset !important;

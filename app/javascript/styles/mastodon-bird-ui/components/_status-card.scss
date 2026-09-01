@@ -88,6 +88,16 @@
 
   .status.status--is-quote {
     --size-avatar: 32px;
+
+    // Quote previews are cards, not timeline rows. Keep the header and body in
+    // separate rows instead of inheriting Bird UI's avatar-gutter layout.
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+
+    .status__info {
+      height: auto;
+      min-height: var(--size-avatar);
+    }
   }
 
   .status__quote.status__quote--error {

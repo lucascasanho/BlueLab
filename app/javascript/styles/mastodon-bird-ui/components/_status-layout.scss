@@ -12,6 +12,22 @@
     padding-top: 0;
   }
 
+  // A quote card has a complete header row above its body. It must not inherit
+  // the side gutter used by timeline statuses, where the avatar sits beside
+  // the post content.
+  .status.status--is-quote {
+    > .hashtag-bar,
+    > .status__content--collapsed + .status__content__read-more-button,
+    > .status__action-bar,
+    > .attachment-list,
+    > .status__content {
+      box-sizing: border-box;
+      min-width: 0;
+      padding-inline: 0;
+      width: 100%;
+    }
+  }
+
   // Collection preview card: shift and narrow the box (margin, not padding) so
   // its edge aligns with the status content. Full width in single posts.
   .status:not(.status--in-thread) .collection-preview {

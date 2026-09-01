@@ -56,7 +56,23 @@
 .mediaMenuButton {
   position: absolute;
   top: var(--space-xs);
-  right: var(--space-xs);
+  inset-inline-end: var(--space-xs);
+  z-index: 1;
+}
+
+.mediaEditButton {
+  position: absolute;
+  inset: 0;
+  appearance: none;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: var(--outline-focus-default);
+    outline-offset: -2px;
+  }
 }
 
 .mediaAlt {
@@ -69,7 +85,9 @@
   color: var(--color-text-inverted);
   position: absolute;
   bottom: var(--space-xs);
-  right: var(--space-xs);
+  inset-inline-end: var(--space-xs);
+  z-index: 1;
+  pointer-events: none;
   text-transform: uppercase;
 }
 

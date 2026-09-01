@@ -552,6 +552,7 @@
   "compose.switch_modal.title": "Convert to post?",
   "compose.upload.alt": "Alt",
   "compose.upload.audio.delete": "Remove audio",
+  "compose.upload.edit": "Edit media and alt text",
   "compose.upload.menu": "Add alt text or remove the image",
   "compose.upload.menu.add_alt": "Add alt text",
   "compose.upload.menu.delete": "Remove image",

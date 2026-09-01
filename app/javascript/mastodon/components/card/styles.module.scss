@@ -37,9 +37,11 @@ a.root {
 .title {
   @include mixins.type-label-md;
 
+  align-items: center;
   color: var(--color-text-secondary);
   display: flex;
   margin-bottom: var(--space-2xs);
+  min-width: 0;
 
   a {
     color: inherit;
@@ -52,6 +54,10 @@ a.root {
   }
 }
 
+.root:has(> .delete):not(:has(> .image)) .title {
+  padding-inline-end: calc(var(--space-xl) + var(--space-2xs));
+}
+
 .titleImage {
   border-radius: var(--radius-round);
   display: block;
@@ -59,12 +65,23 @@ a.root {
   margin-inline-end: var(--space-xs);
   overflow: hidden;
   width: var(--space-lg);
+  flex: 0 0 var(--space-lg);
+}
+
+.titleContent {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.titleAfterContent {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .body {
   @include mixins.type-body-compact;
 
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   flex-grow: 1;
 
   a {
@@ -105,10 +122,16 @@ a.body {
 
 .clamp {
   @include mixins.line-clamp(2);
+
+  // A flex/grid item stretched beyond the clamped line box reveals a sliver
+  // of the following line in Chromium. Keep the preview at its intrinsic
+  // clamped height; the card itself still owns its minimum size.
+  align-self: start;
+  flex-grow: 0;
 }
 
 .delete {
   position: absolute;
   top: var(--space-xs);
-  right: var(--space-xs);
+  inset-inline-end: var(--space-xs);
 }

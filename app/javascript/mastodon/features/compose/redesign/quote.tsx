@@ -61,7 +61,7 @@ export const ComposeQuote: React.FC<{ id: string }> = ({ id }) => {
         }
       >
         <LinkedDisplayName
-          displayProps={{ account: status.account, variant: 'noDomain' }}
+          displayProps={{ account: status.account, variant: 'shortHandle' }}
           className={classes.quoteAccountLink}
         />
       </CardTitle>

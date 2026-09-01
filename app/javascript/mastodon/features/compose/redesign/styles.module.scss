@@ -10,7 +10,7 @@
   flex-direction: column;
   gap: var(--space-md);
   padding: var(--space-md);
-  min-width: 300px;
+  min-width: min(300px, calc(100vw - var(--space-md) * 2));
   position: relative;
   overflow: hidden;
   z-index: 1; // To cover the sidebar
@@ -33,12 +33,25 @@
 .header {
   display: flex;
   align-items: start;
+  flex: 0 0 auto;
 
   h2 {
     @include mixins.type-heading-sm;
 
     flex-grow: 1;
   }
+}
+
+.content {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--space-md);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  touch-action: pan-y;
 }
 
 .toolbar {
@@ -147,10 +160,9 @@ textarea.textarea {
 .richEditorWrapper {
   position: relative;
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   flex-direction: column;
   gap: var(--space-xs);
-  min-height: 0;
 }
 
 .richEditorToolbar {
@@ -242,7 +254,6 @@ textarea.textarea {
   }
 
   overflow-wrap: anywhere;
-  overflow-y: auto;
   cursor: text;
 
   &:focus {
@@ -297,6 +308,7 @@ textarea.textarea {
 
 .footer {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: var(--space-2xs);
   flex-wrap: wrap;

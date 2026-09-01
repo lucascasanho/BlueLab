@@ -6,14 +6,15 @@ const getShouldLockBodyScroll = createAppSelector(
   [
     (state) => state.navigation.open,
     (state) => state.modal.get('stack').size > 0,
+    (state) => state.composer.displayState === 'showing',
   ],
-  (isMobileMenuOpen: boolean, isModalOpen: boolean) =>
-    isMobileMenuOpen || isModalOpen,
+  (isMobileMenuOpen: boolean, isModalOpen: boolean, isComposerOpen: boolean) =>
+    isMobileMenuOpen || isModalOpen || isComposerOpen,
 );
 
 /**
- * This component locks scrolling on the body when
- * `getShouldLockBodyScroll` returns true.
+ * This component locks scrolling on the body while a modal, the mobile menu,
+ * or the expanded BlueLab composer is open.
  */
 
 export const BodyScrollLock: React.FC = () => {

@@ -82,52 +82,57 @@ export const RedesignComposeForm: React.FC<RedesignComposeFormProps> = ({
 
       <ComposeFormHeader id={titleId} noMinimize={noMinimize} />
 
-      <ComposeReply />
+      <div className={classes.content} data-compose-scroll-container>
+        <ComposeReply />
 
-      <div className={classes.toolbar}>
-        <ComposeVisibility className={classes.flexGrowWrap} />
+        <div className={classes.toolbar}>
+          <ComposeVisibility className={classes.flexGrowWrap} />
 
-        <LanguageButton />
+          <LanguageButton />
 
-        <ToggleButton
-          size='sm'
-          active={sensitive}
-          onClick={onSensitiveChange}
-          leadingIcon={PepperIcon}
-        >
-          <FormattedMessage id='compose.sensitive' defaultMessage='Sensitive' />
-        </ToggleButton>
-      </div>
+          <ToggleButton
+            size='sm'
+            active={sensitive}
+            onClick={onSensitiveChange}
+            leadingIcon={PepperIcon}
+          >
+            <FormattedMessage
+              id='compose.sensitive'
+              defaultMessage='Sensitive'
+            />
+          </ToggleButton>
+        </div>
 
-      {type === 'message' && (
-        <p className={classes.toolbarMessage}>
-          <Icon id='lock-open' icon={LockSimpleOpenIcon} />
-          <FormattedMessage
-            id='compose.message.notice'
-            defaultMessage='Messages are not end-to-end encrypted'
+        {type === 'message' && (
+          <p className={classes.toolbarMessage}>
+            <Icon id='lock-open' icon={LockSimpleOpenIcon} />
+            <FormattedMessage
+              id='compose.message.notice'
+              defaultMessage='Messages are not end-to-end encrypted'
+            />
+          </p>
+        )}
+
+        {sensitive && (
+          <TextInputField
+            label={intl.formatMessage(messages.sensitiveText)}
+            value={sensitiveText}
+            onChange={onSensitiveTextChange}
+            // eslint-disable-next-line jsx-a11y/no-autofocus -- Focuses on open
+            autoFocus
           />
-        </p>
-      )}
+        )}
 
-      {sensitive && (
-        <TextInputField
-          label={intl.formatMessage(messages.sensitiveText)}
-          value={sensitiveText}
-          onChange={onSensitiveTextChange}
-          // eslint-disable-next-line jsx-a11y/no-autofocus -- Focuses on open
-          autoFocus
-        />
-      )}
+        <RichComposeEditor
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus={autoFocus}
+          onSubmit={onSubmit}
+        >
+          <ComposeAttachments className={classes.attachments} />
+        </RichComposeEditor>
 
-      <RichComposeEditor
-        // eslint-disable-next-line jsx-a11y/no-autofocus
-        autoFocus={autoFocus}
-        onSubmit={onSubmit}
-      >
-        <ComposeAttachments className={classes.attachments} />
-      </RichComposeEditor>
-
-      <ComposeHints />
+        <ComposeHints />
+      </div>
 
       <ComposeFooter onEmojiPick={onEmojiPick} />
     </form>

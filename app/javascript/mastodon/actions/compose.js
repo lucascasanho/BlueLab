@@ -97,8 +97,14 @@ const messages = defineMessages({
   blankPostError: { id: 'compose.error.blank_post', defaultMessage: 'Post can\'t be blank.' },
 });
 
-export const ensureComposeIsVisible = (getState) => {
-  if (!getState().getIn(['compose', 'mounted'])) {
+export const ensureComposeIsVisible = (getState, dispatch) => {
+  const state = getState();
+
+  if (state.getIn(['compose', 'composer_editor']) !== 'mastodon') {
+    if (state.composer.displayState !== 'showing') {
+      dispatch({ type: 'composer/showComposer' });
+    }
+  } else if (!state.getIn(['compose', 'mounted'])) {
     browserHistory.push('/publish', { focusTarget: false });
   }
 };
@@ -132,7 +138,7 @@ export function replyCompose(status) {
       status: status,
     });
 
-    ensureComposeIsVisible(getState);
+    ensureComposeIsVisible(getState, dispatch);
   };
 }
 
@@ -167,7 +173,7 @@ export const focusCompose = (defaultText = '', caretStart = false) => (dispatch,
     caretStart,
   });
 
-  ensureComposeIsVisible(getState);
+  ensureComposeIsVisible(getState, dispatch);
 };
 
 export function mentionCompose(account) {
@@ -177,7 +183,7 @@ export function mentionCompose(account) {
       account: account,
     });
 
-    ensureComposeIsVisible(getState);
+    ensureComposeIsVisible(getState, dispatch);
   };
 }
 
@@ -194,7 +200,7 @@ export function directCompose(account) {
       account: account,
     });
 
-    ensureComposeIsVisible(getState);
+    ensureComposeIsVisible(getState, dispatch);
   };
 }
 

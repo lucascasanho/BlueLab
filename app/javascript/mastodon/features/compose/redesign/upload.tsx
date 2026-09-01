@@ -34,6 +34,14 @@ export const ComposeUpload: React.FC<{
     selectComposeAttachment(state, id),
   );
   const sensitive = useAppSelector((state) => !!state.compose.get('spoiler'));
+  const dispatch = useAppDispatch();
+  const handleEdit = useCallback(() => {
+    if (id) {
+      dispatch(
+        openModal({ modalType: 'FOCAL_POINT', modalProps: { mediaId: id } }),
+      );
+    }
+  }, [dispatch, id]);
 
   if (!attachment || attachment.type === 'unknown') {
     return <div className={classNames(classes.mediaUpload, className)} />;
@@ -71,6 +79,19 @@ export const ComposeUpload: React.FC<{
         <Blurhash hash={attachment.blurhash} className={classes.blurHash} />
       )}
 
+      <button
+        type='button'
+        className={classes.mediaEditButton}
+        onClick={handleEdit}
+      >
+        <span className='sr-only'>
+          <FormattedMessage
+            id='compose.upload.edit'
+            defaultMessage='Edit media and alt text'
+          />
+        </span>
+      </button>
+
       <Menu>
         <MenuTrigger
           as={IconButton}
@@ -85,7 +106,11 @@ export const ComposeUpload: React.FC<{
           />
         </MenuTrigger>
 
-        <ComposeUploadMenu attachment={attachment} single={single} />
+        <ComposeUploadMenu
+          attachment={attachment}
+          single={single}
+          onEdit={handleEdit}
+        />
       </Menu>
 
       {attachment.description && (
@@ -100,15 +125,11 @@ export const ComposeUpload: React.FC<{
 const ComposeUploadMenu: React.FC<{
   attachment: ComposeAttachment;
   single?: boolean;
-}> = ({ attachment, single }) => {
+  onEdit: () => void;
+}> = ({ attachment, single, onEdit }) => {
   const dispatch = useAppDispatch();
   const id = attachment.id;
 
-  const handleEdit = useCallback(() => {
-    dispatch(
-      openModal({ modalType: 'FOCAL_POINT', modalProps: { mediaId: id } }),
-    );
-  }, [dispatch, id]);
   const handleRearrange = useCallback(() => {
     dispatch(openModal({ modalType: 'COMPOSER_REARRANGE', modalProps: {} }));
   }, [dispatch]);
@@ -118,7 +139,7 @@ const ComposeUploadMenu: React.FC<{
 
   return (
     <MenuList placement='bottom-end' offset={4} maxWidth={170}>
-      <MenuItem onClick={handleEdit}>
+      <MenuItem onClick={onEdit}>
         {attachment.description ? (
           <FormattedMessage
             id='compose.upload.menu.edit_alt'
