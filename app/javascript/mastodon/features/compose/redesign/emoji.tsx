@@ -142,6 +142,10 @@ const ComposeEmojiDropdown: React.FC<
 
       const isCustomEmoji = 'custom' in rawEmoji && rawEmoji.custom === true;
 
+      // Keep the caret aligned to the active editor state for every pick, even
+      // when the picker remains open across multiple emoji selections.
+      captureComposerSelectionOffset();
+
       if (!isCustomEmoji && !(event.ctrlKey || event.metaKey)) {
         // Keep the picker open so it can stay usable until the user clicks
         // outside or toggles it closed explicitly.
@@ -149,7 +153,7 @@ const ComposeEmojiDropdown: React.FC<
       dispatch(emojiUse(emoji));
       onPick(emoji);
     },
-    [dispatch, onPick, onClose],
+    [dispatch, onPick],
   );
 
   // Close modifier window if it's not clicked in.

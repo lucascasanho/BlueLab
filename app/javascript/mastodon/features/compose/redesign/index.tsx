@@ -216,13 +216,37 @@ function useComposeHandlers(redirectOnSuccess?: boolean) {
           editor.getAttribute('contenteditable') === 'plaintext-only');
       const savedSelectionStart = getSavedComposerSelectionOffset();
 
-      const currentEditorSelectionStart =
-        editor && isContentEditable ? getEditorSelectionOffset(editor) : 0;
+      const selectionFromEditor = (() => {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return null;
+
+        const range = selection.getRangeAt(0);
+        let container: Node | null =
+          range.startContainer instanceof Element
+            ? range.startContainer
+            : range.startContainer.parentElement;
+
+        while (container) {
+          if (
+            container instanceof HTMLElement &&
+            (container.isContentEditable ||
+              container.contentEditable === 'true' ||
+              container.contentEditable === 'plaintext-only' ||
+              container.getAttribute('contenteditable') === 'true' ||
+              container.getAttribute('contenteditable') === 'plaintext-only')
+          ) {
+            return getEditorSelectionOffset(container);
+          }
+          container = container.parentNode;
+        }
+
+        return null;
+      })();
 
       const selectionStart =
         composerTextArea && activeElement === composerTextArea
           ? composerTextArea.selectionStart || 0
-          : currentEditorSelectionStart || savedSelectionStart || 0;
+          : (selectionFromEditor ?? savedSelectionStart);
 
       const beforePosition = text[selectionStart - 1];
       const needsSpace =

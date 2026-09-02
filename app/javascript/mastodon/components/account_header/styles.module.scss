@@ -218,6 +218,8 @@ $button-breakpoint: 420px;
   justify-content: flex-end;
   gap: 8px;
   margin-inline-start: auto;
+  margin-top: -8px;
+  transform: translateY(-4px);
   max-width: 64%;
 
   :global(.button) {
