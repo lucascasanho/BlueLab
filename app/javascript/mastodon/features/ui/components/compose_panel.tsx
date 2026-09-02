@@ -58,7 +58,9 @@ export const ComposePanel: React.FC<{ showComposer?: boolean }> = ({
       {signedIn && showComposer && !hideComposer && (
         <ComposeFormContainer singleColumn />
       )}
-      {signedIn && showComposer && hideComposer && <div className='compose-form' />}
+      {signedIn && showComposer && hideComposer && (
+        <div className='compose-form' />
+      )}
 
       {signedIn && !showComposer && <NavigationBar />}
 
