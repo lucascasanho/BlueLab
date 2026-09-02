@@ -35,6 +35,38 @@ const mockEditingCommands = (query: (command: string) => boolean) => {
 };
 
 describe('BlueLab rich editor conversion', () => {
+  test('keeps the cursor offset aligned after each insertion so sequences stay in order', () => {
+    const editor = document.createElement('div');
+    editor.contentEditable = 'true';
+    editor.textContent = 'hello world';
+    document.body.appendChild(editor);
+
+    const node = editor.firstChild;
+    if (!node) {
+      throw new Error('Expected editor text node');
+    }
+
+    const range = document.createRange();
+    range.setStart(node, 6);
+    range.collapse(true);
+    const selection = window.getSelection();
+    if (!selection) {
+      throw new Error('Expected selection');
+    }
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    insertTextAtSelection('🙂');
+    expect(getSavedComposerSelectionOffset()).toBe(8);
+    expect(editor.textContent).toBe('hello 🙂world');
+
+    insertTextAtSelection('🚀');
+    expect(editor.textContent).toBe('hello 🙂🚀world');
+    expect(getSavedComposerSelectionOffset()).toBe(10);
+
+    document.body.removeChild(editor);
+  });
+
   test('renders supported inline Markdown as semantic elements', () => {
     const html = markdownToHtml(
       '**bold** *italic* _underline_ ~~strike~~ `code`',

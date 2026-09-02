@@ -396,6 +396,7 @@ export const insertTextAtSelection = (text: string) => {
   range.collapse(true);
   selection.removeAllRanges();
   selection.addRange(range);
+  captureComposerSelectionOffset();
 };
 
 const wrapSelection = (tagName: string) => {
@@ -690,15 +691,11 @@ export const RichComposeEditor: React.FC<{
       dispatch(dismissComposer());
     }
   };
-  const handleEditorMouseDown: React.MouseEventHandler<HTMLDivElement> = (
-    event,
-  ) => {
-    event.stopPropagation();
+  const handleEditorMouseDown: React.MouseEventHandler<HTMLDivElement> = () => {
+    // Keep the editor interactive without swallowing the document click that
+    // closes a floating emoji picker when the user clicks into the editable area.
   };
-  const handleEditorClick: React.MouseEventHandler<HTMLDivElement> = (
-    event,
-  ) => {
-    event.stopPropagation();
+  const handleEditorClick: React.MouseEventHandler<HTMLDivElement> = () => {
     if (document.activeElement !== ref.current) {
       if (ref.current) focusAtEnd(ref.current);
     }

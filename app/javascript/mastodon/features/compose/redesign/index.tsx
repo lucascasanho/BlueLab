@@ -31,7 +31,9 @@ import { ComposeHints } from './hints';
 import { LanguageButton } from './language';
 import { ComposeReply } from './reply';
 import {
+  captureComposerSelectionOffset,
   editorText,
+  getEditorSelectionOffset,
   getSavedComposerSelectionOffset,
   RichComposeEditor,
 } from './rich_editor';
@@ -199,6 +201,8 @@ function useComposeHandlers(redirectOnSuccess?: boolean) {
 
   const onEmojiPick: OnEmojiPick = useCallback(
     (emoji) => {
+      captureComposerSelectionOffset();
+
       const activeElement = document.activeElement;
       const editor =
         activeElement instanceof HTMLElement ? activeElement : null;
@@ -212,10 +216,13 @@ function useComposeHandlers(redirectOnSuccess?: boolean) {
           editor.getAttribute('contenteditable') === 'plaintext-only');
       const savedSelectionStart = getSavedComposerSelectionOffset();
 
+      const currentEditorSelectionStart =
+        editor && isContentEditable ? getEditorSelectionOffset(editor) : 0;
+
       const selectionStart =
         composerTextArea && activeElement === composerTextArea
           ? composerTextArea.selectionStart || 0
-          : savedSelectionStart || 0;
+          : currentEditorSelectionStart || savedSelectionStart || 0;
 
       const beforePosition = text[selectionStart - 1];
       const needsSpace =
@@ -265,6 +272,7 @@ function useComposeHandlers(redirectOnSuccess?: boolean) {
           caretRange.collapse(true);
           selection.removeAllRanges();
           selection.addRange(caretRange);
+          captureComposerSelectionOffset();
           dispatch(changeCompose(editorText(editor)));
           return;
         }
