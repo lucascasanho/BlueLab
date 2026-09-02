@@ -125,8 +125,9 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: stretch;
-  background: color-mix(in srgb, var(--blue2-bg, #000) 96%, transparent);
-  backdrop-filter: blur(12px);
+  background: var(--blue2-bg, #000);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   border-bottom: 1px solid var(--blue2-border-soft, #17232c);
   isolation: isolate;
 }
