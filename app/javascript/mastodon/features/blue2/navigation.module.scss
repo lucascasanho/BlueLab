@@ -22,10 +22,12 @@
   place-items: center;
   margin: 0 0 8px 6px;
   border-radius: 999px;
+  color: var(--blue2-text, #f7f7f8) !important;
   transition: background 120ms ease;
 
   &:hover,
   &:focus-visible {
+    color: var(--blue2-text, #f7f7f8) !important;
     background: var(--blue2-hover, #111820);
   }
 }
@@ -47,7 +49,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  color: inherit;
+  color: var(--blue2-text, #f7f7f8) !important;
   background: transparent;
   text-decoration: none;
   font-size: 18px;
@@ -58,11 +60,12 @@
 
   svg {
     flex: 0 0 27px;
+    color: currentColor;
   }
 
   &:hover,
   &:focus-visible {
-    color: inherit;
+    color: var(--blue2-text, #f7f7f8) !important;
     background: var(--blue2-hover, #111820);
     text-decoration: none;
     outline: none;
@@ -70,6 +73,7 @@
 }
 
 .itemActive {
+  color: var(--blue2-text, #f7f7f8) !important;
   font-weight: 650;
 }
 
