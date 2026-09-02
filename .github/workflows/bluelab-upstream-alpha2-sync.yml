@@ -1,0 +1,58 @@
+name: BlueLab upstream alpha2 integration
+
+on:
+  push:
+    branches:
+      - sync/20260902-mastodon-4.8.0-alpha.2
+
+permissions:
+  contents: write
+
+jobs:
+  merge-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout integration branch
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Merge pinned Mastodon upstream snapshot
+        shell: bash
+        env:
+          UPSTREAM_SHA: 171438e185139efd68df7245f39f57c880dceff6
+          WORKFLOW_FILE: .github/workflows/bluelab-upstream-alpha2-sync.yml
+        run: |
+          set -euo pipefail
+
+          git config user.name "BlueLab Upstream Sync"
+          git config user.email "actions@users.noreply.github.com"
+          git remote add mastodon-upstream https://github.com/mastodon/mastodon.git
+          git fetch --no-tags mastodon-upstream "$UPSTREAM_SHA"
+
+          set +e
+          git merge --no-ff --no-commit "$UPSTREAM_SHA"
+          merge_status=$?
+          set -e
+
+          if [ "$merge_status" -ne 0 ]; then
+            conflicts="$(git diff --name-only --diff-filter=U)"
+            if [ -z "$conflicts" ]; then
+              echo "Merge failed without ordinary file conflicts."
+              git status --short
+              exit "$merge_status"
+            fi
+
+            echo "===== CONFLICTS TO RESOLVE ====="
+            printf '%s\n' "$conflicts"
+            echo "================================"
+
+            # Keep standard conflict markers only on this isolated integration
+            # branch so they can be reviewed and resolved explicitly.
+            git add -A
+          fi
+
+          git rm -f "$WORKFLOW_FILE"
+          git add -A
+          git commit -m "Merge Mastodon upstream 4.8.0-alpha.2 snapshot"
+          git push origin HEAD
