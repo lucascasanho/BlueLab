@@ -169,10 +169,10 @@
   inset-inline-end: auto;
   width: min(600px, calc(100vw - 32px));
   max-width: 600px;
-  min-height: min(560px, calc(100dvh - 32px));
+  min-height: 0;
   max-height: calc(100dvh - 32px);
   margin: 0;
-  border: 1px solid var(--blue2-border, #26343f);
+  border: 1px solid var(--blue2-border-soft, #17232c);
   border-radius: 16px;
   transform: translate(-50%, -50%);
   animation: none;
@@ -185,7 +185,7 @@
   right: 20px;
   bottom: 20px;
   margin: 0;
-  border: 1px solid var(--blue2-border, #26343f);
+  border: 1px solid var(--blue2-border-soft, #17232c);
   background: var(--blue2-bg, #000);
 }
 
