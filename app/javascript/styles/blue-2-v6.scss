@@ -134,6 +134,46 @@ body[data-theme='blue-2'] {
   }
 }
 
+/*
+ * iOS/Safari can render the data-URI CSS masks used by the BlueLab desktop
+ * action glyphs with stray square/line artifacts. On mobile, use the real SVG
+ * components already rendered by Mastodon instead of those pseudo-elements.
+ */
+@media (max-width: 759px) {
+  body[data-theme='blue-2'] {
+    .status__action-bar__button-wrapper:nth-child(-n + 3)
+      .status__action-bar__button::before {
+      content: none !important;
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      flex: 0 0 0 !important;
+      background: none !important;
+      mask: none !important;
+      mask-image: none !important;
+      -webkit-mask: none !important;
+      -webkit-mask-image: none !important;
+    }
+
+    .status__action-bar__button-wrapper:nth-child(-n + 3)
+      .status__action-bar__button > svg {
+      display: block !important;
+      width: 21px !important;
+      height: 21px !important;
+      min-width: 21px !important;
+      min-height: 21px !important;
+      flex: 0 0 21px !important;
+      overflow: visible !important;
+      transform: none !important;
+    }
+
+    .status__action-bar__button {
+      overflow: visible !important;
+      line-height: 1 !important;
+    }
+  }
+}
+
 html[data-color-scheme='light'] body[data-theme='blue-2'] {
   .status__quote,
   .status-card,
