@@ -25,7 +25,7 @@ export const Blue2AccountMenu: React.FC = () => {
   const rootRef = useRef<HTMLDivElement>(null);
 
   const profilePath = account?.acct ? `/@${account.acct}` : '/home';
-  const displayName = account?.display_name?.trim()
+  const displayName = account?.display_name.trim()
     ? account.display_name
     : (account?.username ?? account?.acct);
 
