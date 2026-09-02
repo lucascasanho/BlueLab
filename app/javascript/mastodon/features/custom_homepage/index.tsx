@@ -7,6 +7,7 @@ import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import { Helmet } from '@unhead/react/helmet';
 
 import { NavigationFocusTarget } from '@/mastodon/components/navigation_focus_target';
+import { customAppIcon } from '@/mastodon/initial_state';
 import { fetchServer } from 'mastodon/actions/server';
 import { ServerHeroImage } from 'mastodon/components/server_hero_image';
 import { TabLink, TabList } from 'mastodon/components/tab_list';
@@ -20,10 +21,60 @@ export const CustomHomepage: React.FC = () => {
   const dispatch = useAppDispatch();
   const server = useAppSelector((state) => state.server.server);
   const { path } = useRouteMatch();
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   useEffect(() => {
     void dispatch(fetchServer());
   }, [dispatch]);
+
+  if (isBlue2) {
+    return (
+      <div className={classes.blue2Landing}>
+        <section className={classes.blue2LandingIntro}>
+          <img
+            src={customAppIcon ?? '/favicon.ico'}
+            alt=''
+            className={classes.blue2LandingIcon}
+          />
+          <NavigationFocusTarget as='h1'>
+            {server.item?.domain}
+          </NavigationFocusTarget>
+          <p>{server.item?.description}</p>
+
+          <div className={classes.blue2LandingActions}>
+            <a href='/auth/sign_in' className={classes.blue2PrimaryAction}>
+              <FormattedMessage id='auth.login' defaultMessage='Log in' />
+            </a>
+            <a href='/auth/sign_up' className={classes.blue2SecondaryAction}>
+              <FormattedMessage id='auth.register' defaultMessage='Sign up' />
+            </a>
+          </div>
+        </section>
+
+        <section className={classes.blue2LandingAbout}>
+          <ServerHeroImage
+            alt={server.item?.thumbnail.description ?? ''}
+            blurhash={server.item?.thumbnail.blurhash ?? ''}
+            src={server.item?.thumbnail.url ?? ''}
+            srcSet={Object.keys(server.item?.thumbnail.versions ?? {})
+              .map(
+                (key) =>
+                  `${server.item?.thumbnail.versions?.[key]} ${key.replace('@', '')}`,
+              )
+              .join(', ')}
+            className={classes.blue2LandingHeader}
+          />
+          <About />
+        </section>
+
+        <Helmet>
+          <title>{server.item?.domain}</title>
+          <meta name='robots' content='all' />
+        </Helmet>
+      </div>
+    );
+  }
 
   return (
     <div className={classes.page}>
