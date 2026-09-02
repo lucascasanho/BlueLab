@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
@@ -18,7 +18,9 @@ type TrendTag = {
 
 export const Blue2RightRail: React.FC = () => {
   const intl = useIntl();
+  const history = useHistory();
   const { signedIn } = useIdentity();
+  const [query, setQuery] = useState('');
   const [tags, setTags] = useState<TrendTag[]>([]);
   const [trendMenuOpen, setTrendMenuOpen] = useState(false);
   const [trendsHidden, setTrendsHidden] = useState(false);
@@ -46,13 +48,33 @@ export const Blue2RightRail: React.FC = () => {
     return () => controller.abort();
   }, []);
 
+  const searchPlaceholder = intl.formatMessage({
+    id: 'search.placeholder',
+    defaultMessage: 'Search',
+  });
+
+  const submitSearch: React.FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    const value = query.trim();
+    if (!value) return;
+    history.push(`/search?q=${encodeURIComponent(value)}`);
+  };
+
   return (
     <aside className={classes.root}>
       <div className={classes.content}>
-        <Link className={classes.search} to='/explore'>
-          <Blue2SearchIcon size={19} />
-          <FormattedMessage id='search.placeholder' defaultMessage='Search' />
-        </Link>
+        <form className={classes.search} role='search' onSubmit={submitSearch}>
+          <button type='submit' aria-label={searchPlaceholder}>
+            <Blue2SearchIcon size={19} />
+          </button>
+          <input
+            type='search'
+            value={query}
+            onChange={(event) => setQuery(event.currentTarget.value)}
+            placeholder={searchPlaceholder}
+            aria-label={searchPlaceholder}
+          />
+        </form>
 
         <nav className={classes.feeds} aria-label='Timelines'>
           {signedIn && (
