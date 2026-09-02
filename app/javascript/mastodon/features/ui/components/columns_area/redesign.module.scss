@@ -65,6 +65,7 @@
   --navigation-min-width: 240px;
   --navigation-max-width: 260px;
 
+  min-height: 100dvh;
   padding: 0;
   gap: 0;
   background: var(--blue2-bg, #000);
@@ -107,7 +108,22 @@
 
 .blue2Portal {
   min-height: 0;
-  background: var(--blue2-bg, #000);
+  background: var(--blue2-bg, #000) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+
+  :global(.column-header),
+  :global(.column-header__wrapper),
+  :global(.column-back-button),
+  :global(.notification__filter-bar),
+  :global(.account__section-headline) {
+    background: var(--blue2-bg, #000) !important;
+    border-color: var(--blue2-border-soft, #17232c) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }
 
 .blue2Home {
@@ -188,6 +204,11 @@
   }
 }
 
+.blue2MobileUtilityBar,
+.blue2MobileRailOverlay {
+  display: none;
+}
+
 @media (width < 1180px) and (min-width: $mobile-menu-breakpoint) {
   .blue2Root {
     --navigation-min-width: 76px;
@@ -200,16 +221,127 @@
 @media (max-width: ($mobile-menu-breakpoint - 1)) {
   .blue2Root {
     display: block;
+    background: var(--blue2-bg, #000);
   }
 
   .blue2Main {
     max-width: none;
     border-inline: 0;
     padding-bottom: var(--mobile-bottom-nav-height);
+    background: var(--blue2-bg, #000);
   }
 
   .blue2NavigationWrapper,
   .blue2RightRail {
     display: none;
+  }
+
+  .blue2MobileUtilityBar {
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    box-sizing: border-box;
+    height: 56px;
+    padding: 0 14px;
+    display: grid;
+    grid-template-columns: 48px 1fr 48px;
+    align-items: center;
+    background: var(--blue2-bg, #000);
+    border-bottom: 0;
+  }
+
+  .blue2MobileUtilityButton {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    color: var(--blue2-muted, #8ea0af);
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--blue2-hover, #18212a);
+      color: var(--blue2-text, #f7f7f8);
+      outline: none;
+    }
+
+    &:last-child {
+      justify-self: end;
+    }
+  }
+
+  .blue2MobileBrand {
+    width: 32px;
+    height: 32px;
+    justify-self: center;
+    border-radius: 8px;
+    object-fit: contain;
+  }
+
+  .blue2Portal {
+    top: 56px !important;
+    background: var(--blue2-bg, #000) !important;
+  }
+
+  .blue2Topbar {
+    top: 56px;
+    height: 50px;
+    background: var(--blue2-bg, #000);
+  }
+
+  .blue2Brand {
+    display: none;
+  }
+
+  .blue2Tab,
+  .blue2TabActive {
+    padding-bottom: 10px;
+  }
+
+  .blue2MobileRailOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 240;
+    display: block;
+    pointer-events: none;
+    opacity: 0;
+    background: rgb(0 0 0 / 48%);
+    transition: opacity 180ms ease;
+
+    &[data-is-open='true'] {
+      pointer-events: auto;
+      opacity: 1;
+
+      .blue2MobileRailDrawer {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  .blue2MobileRailDrawer {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    box-sizing: border-box;
+    width: min(330px, calc(100vw - 48px));
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: var(--blue2-bg, #000);
+    border-inline-start: 1px solid var(--blue2-border-soft, #17232c);
+    box-shadow: -14px 0 34px rgb(0 0 0 / 24%);
+    transform: translateX(100%);
+    transition: transform 200ms ease;
+
+    > * {
+      position: static !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: 100dvh;
+    }
   }
 }
