@@ -6,7 +6,7 @@ require 'uri'
 
 $stdout.sync = true
 
-DOMAINS = %w[
+DOMAINS = %w(
   bolha.one
   ursal.zone
   masto.donte.com.br
@@ -15,13 +15,13 @@ DOMAINS = %w[
   mastodon.com.br
   bolha.us
   mastodon.social
-].freeze
+).freeze
 
 USER_AGENT = 'EspeluncaRemoteEmojiSync/1.0 (+https://espelunca.social)'
 DELAY = 0.15
 
 def fetch_json(url, redirects_left = 5)
-  raise 'Redirecionamentos demais' if redirects_left < 0
+  raise 'Redirecionamentos demais' if redirects_left.negative?
 
   uri = URI(url)
 
@@ -45,7 +45,7 @@ def fetch_json(url, redirects_left = 5)
 
   when Net::HTTPRedirection
     location = response['location']
-    raise 'Redirecionamento sem Location' if location.nil? || location.empty?
+    raise 'Redirecionamento sem Location' if location.blank?
 
     fetch_json(
       URI.join(url, location).to_s,
@@ -60,7 +60,7 @@ end
 total_added   = 0
 total_updated = 0
 total_existing = 0
-total_failed  = 0
+total_failed = 0
 
 puts
 puts '=============================================='
@@ -70,20 +70,17 @@ puts
 
 DOMAINS.each do |domain|
   puts
-  puts "=================================================="
+  puts '=================================================='
   puts ">>> #{domain}"
-  puts "=================================================="
+  puts '=================================================='
 
   begin
     emojis = fetch_json("https://#{domain}/api/v1/custom_emojis")
 
-    unless emojis.is_a?(Array)
-      raise 'A API não retornou uma lista de emojis'
-    end
+    raise 'A API não retornou uma lista de emojis' unless emojis.is_a?(Array)
 
     puts "A API informou #{emojis.length} emojis."
     puts
-
   rescue => e
     puts "ERRO ao consultar #{domain}: #{e.class}: #{e.message}"
     total_failed += 1
@@ -133,11 +130,7 @@ DOMAINS.each do |domain|
       #
       emoji.image_remote_url = remote_url if needs_download
 
-      if emoji.changed? || new_record
-        unless emoji.save
-          raise emoji.errors.full_messages.join(', ')
-        end
-      end
+      raise emoji.errors.full_messages.join(', ') if (emoji.changed? || new_record) && !emoji.save
 
       if new_record
         total_added += 1
@@ -149,7 +142,6 @@ DOMAINS.each do |domain|
         total_existing += 1
         puts "#{prefix} JÁ EXISTE  :#{shortcode}:"
       end
-
     rescue => e
       total_failed += 1
       puts "#{prefix} FALHOU      :#{shortcode}:"
