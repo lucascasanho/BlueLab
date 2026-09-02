@@ -14,6 +14,12 @@
     color: var(--color-light-text) !important;
   }
 
+  // Keep secondary modal actions readable against the Bird UI modal surface.
+  .modal-root__modal .button.button-secondary {
+    border-color: var(--color-border) !important;
+    color: var(--color-light-text) !important;
+  }
+
   // Hide footer buttons in modals
   .picture-in-picture .picture-in-picture__footer {
     display: none;
