@@ -74,6 +74,7 @@ export const ComposeEmojiButton: React.FC<{ onPick: OnEmojiPick }> = ({
         reference={target}
         placement='top-start'
         offset={4}
+        closeOnClickOutside
       >
         {({ props, placement }) => (
           <ComposeEmojiDropdown
@@ -142,7 +143,8 @@ const ComposeEmojiDropdown: React.FC<
       const isCustomEmoji = 'custom' in rawEmoji && rawEmoji.custom === true;
 
       if (!isCustomEmoji && !(event.ctrlKey || event.metaKey)) {
-        onClose();
+        // Keep the picker open so it can stay usable until the user clicks
+        // outside or toggles it closed explicitly.
       }
       dispatch(emojiUse(emoji));
       onPick(emoji);

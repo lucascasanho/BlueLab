@@ -73,6 +73,8 @@
   // Fix focus overflow for 4.1.4-nightly
   [class*='_comp_account_header__buttons'] {
     overflow: visible;
+    margin-top: -6px;
+    transform: translateY(-4px);
   }
 
   [class*='_comp_account_header__buttons'] .icon-button {
