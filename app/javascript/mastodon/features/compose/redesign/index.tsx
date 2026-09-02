@@ -59,22 +59,18 @@ interface RedesignComposeFormProps {
   className?: string;
   noMinimize?: boolean;
   redirectOnSuccess?: boolean;
-  ref?: React.Ref<HTMLFormElement>;
 }
 
-<<<<<<< HEAD
-export const RedesignComposeForm: React.FC<RedesignComposeFormProps> = ({
+export const RedesignComposeForm: React.FC<
+  RedesignComposeFormProps & React.ComponentPropsWithRef<'form'>
+> = ({
   autoFocus,
   className,
   noMinimize,
   redirectOnSuccess,
   ref,
+  ...props
 }) => {
-=======
-export const RedesignComposeForm: React.FC<
-  RedesignComposeFormProps & React.ComponentPropsWithRef<'form'>
-> = ({ autoFocus, className, noMinimize, redirectOnSuccess, ...props }) => {
->>>>>>> 171438e185139efd68df7245f39f57c880dceff6
   const type = useAppSelector(selectComposeType);
   const { sensitive, sensitiveText } = useAppSelector(selectComposeSensitive);
 
@@ -106,11 +102,8 @@ export const RedesignComposeForm: React.FC<
 
   return (
     <form
-<<<<<<< HEAD
-      ref={ref}
-=======
       {...props}
->>>>>>> 171438e185139efd68df7245f39f57c880dceff6
+      ref={ref}
       role='dialog'
       data-bluelab-composer
       onSubmit={onSubmit}
