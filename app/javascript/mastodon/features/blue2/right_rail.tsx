@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 
 import { Link } from 'react-router-dom';
 
-import { Blue2FeedIcon, Blue2SearchIcon } from './icons';
+import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
+import PublicIcon from '@/material-icons/400-24px/public.svg?react';
+
+import { Blue2HomeIcon, Blue2SearchIcon } from './icons';
 import classes from './right_rail.module.scss';
 
 type TrendTag = {
@@ -46,21 +49,21 @@ export const Blue2RightRail: React.FC = () => {
         <nav className={classes.feeds} aria-label='Timelines'>
           <Link className={classes.feedShortcut} to='/home'>
             <span className={classes.feedIcon}>
-              <Blue2FeedIcon size={18} />
+              <Blue2HomeIcon size={18} />
             </span>
             <span>Seguindo</span>
           </Link>
 
           <Link className={classes.feedShortcut} to='/public/local'>
             <span className={classes.feedIcon}>
-              <Blue2FeedIcon size={18} />
+              <GroupsIcon />
             </span>
             <span>Federação</span>
           </Link>
 
           <Link className={classes.feedShortcut} to='/public'>
             <span className={classes.feedIcon}>
-              <Blue2FeedIcon size={18} />
+              <PublicIcon />
             </span>
             <span>Global</span>
           </Link>
