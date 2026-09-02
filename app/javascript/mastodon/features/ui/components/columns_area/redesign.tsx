@@ -7,15 +7,21 @@ import classNames from 'classnames';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import { openNavigation } from '@/mastodon/actions/navigation';
+import { setNotificationsFilter } from '@/mastodon/actions/notification_groups';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
 import { blue2Text } from '@/mastodon/features/blue2/locale';
 import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { useIdentity } from '@/mastodon/identity_context';
 import { customAppIcon } from '@/mastodon/initial_state';
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
+import {
+  selectSettingsNotificationsQuickFilterActive,
+  selectSettingsNotificationsQuickFilterAdvanced,
+} from '@/mastodon/selectors/settings';
 import { ComposePanel } from '@/mastodon/features/ui/components/compose_panel';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { Footer } from 'mastodon/features/custom_homepage/components/footer';
@@ -26,6 +32,25 @@ import { useColumnsContext } from '../../util/columns_context';
 
 import { MultiColumnContent } from './multi_column_content';
 import classes from './redesign.module.scss';
+
+const FIREHOSE_SWIPE_ROUTES = [
+  '/public/local',
+  '/public/remote',
+  '/public',
+] as const;
+
+const EXPLORE_SWIPE_ROUTES = [
+  '/explore',
+  '/explore/tags',
+  '/explore/suggestions',
+  '/explore/links',
+] as const;
+
+const EXPLORE_SIGNED_OUT_SWIPE_ROUTES = [
+  '/explore',
+  '/explore/tags',
+  '/explore/links',
+] as const;
 
 const TabsBarPortal = () => {
   const { setTabsBarElement } = useColumnsContext();
@@ -52,10 +77,21 @@ export const ColumnsAreaRedesign: React.FC<{
   const dispatch = useAppDispatch();
   const history = useHistory();
   const location = useLocation();
+  const { signedIn } = useIdentity();
   const swipeOrigin = useRef<{ x: number; y: number } | null>(null);
+  const previousPath = useRef(location.pathname);
   const [isBlue2MobileRailOpen, setIsBlue2MobileRailOpen] = useState(false);
+  const [publicSwipeMode, setPublicSwipeMode] = useState<'home' | 'firehose'>(
+    'home',
+  );
   const isModalOpen = useAppSelector(
     (state) => !state.modal.get('stack').isEmpty(),
+  );
+  const notificationsFilter = useAppSelector(
+    selectSettingsNotificationsQuickFilterActive,
+  );
+  const notificationsAdvancedMode = useAppSelector(
+    selectSettingsNotificationsQuickFilterAdvanced,
   );
   const isMobile = useBreakpoint('openable');
   const useMastodonComposer = useAppSelector(
@@ -66,8 +102,40 @@ export const ColumnsAreaRedesign: React.FC<{
   const isBlue2Home = isBlue2 && location.pathname === '/home';
   const isBlue2Global = isBlue2 && location.pathname === '/public';
   const isBlue2FeedPage = isBlue2Home || isBlue2Global;
+  const isBlue2Notifications =
+    isBlue2 &&
+    location.pathname === '/notifications' &&
+    !notificationsAdvancedMode;
+  const isBlue2Firehose =
+    isBlue2 &&
+    (location.pathname === '/public/local' ||
+      location.pathname === '/public/remote' ||
+      (isBlue2Global && publicSwipeMode === 'firehose'));
+  const isBlue2Explore =
+    isBlue2 &&
+    (location.pathname === '/explore' ||
+      location.pathname === '/explore/posts' ||
+      location.pathname === '/explore/tags' ||
+      location.pathname === '/explore/suggestions' ||
+      location.pathname === '/explore/links');
+  const isBlue2SwipePage =
+    isBlue2FeedPage ||
+    isBlue2Notifications ||
+    isBlue2Firehose ||
+    isBlue2Explore;
 
   useEffect(() => {
+    const previous = previousPath.current;
+
+    if (location.pathname === '/public') {
+      if (previous === '/public/local' || previous === '/public/remote') {
+        setPublicSwipeMode('firehose');
+      } else {
+        setPublicSwipeMode('home');
+      }
+    }
+
+    previousPath.current = location.pathname;
     setIsBlue2MobileRailOpen(false);
   }, [location.pathname]);
 
@@ -77,14 +145,43 @@ export const ColumnsAreaRedesign: React.FC<{
 
   const handleSwipeStart = useCallback(
     (event: React.TouchEvent<HTMLElement>) => {
-      if (!isBlue2FeedPage) return;
+      swipeOrigin.current = null;
+
+      if (
+        !isMobile ||
+        !isBlue2SwipePage ||
+        isModalOpen ||
+        isBlue2MobileRailOpen ||
+        event.touches.length !== 1
+      ) {
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+      if (
+        target?.closest?.(
+          'button, input, textarea, select, [contenteditable="true"], [role="slider"], [data-bluelab-composer], .video-player, .audio-player',
+        )
+      ) {
+        return;
+      }
 
       const touch = event.touches[0];
-      if (touch) {
-        swipeOrigin.current = { x: touch.clientX, y: touch.clientY };
+      if (!touch) return;
+
+      // Leave the screen edges to the browser/OS back-forward gestures.
+      if (touch.clientX <= 24 || touch.clientX >= window.innerWidth - 24) {
+        return;
       }
+
+      swipeOrigin.current = { x: touch.clientX, y: touch.clientY };
     },
-    [isBlue2FeedPage],
+    [
+      isBlue2MobileRailOpen,
+      isBlue2SwipePage,
+      isMobile,
+      isModalOpen,
+    ],
   );
 
   const handleSwipeEnd = useCallback(
@@ -92,7 +189,7 @@ export const ColumnsAreaRedesign: React.FC<{
       const origin = swipeOrigin.current;
       swipeOrigin.current = null;
 
-      if (!origin || !isBlue2FeedPage) return;
+      if (!origin || !isMobile || !isBlue2SwipePage) return;
 
       const touch = event.changedTouches[0];
       if (!touch) return;
@@ -107,13 +204,74 @@ export const ColumnsAreaRedesign: React.FC<{
         return;
       }
 
-      if (deltaX < 0 && isBlue2Home) {
+      const movingForward = deltaX < 0;
+
+      if (isBlue2Notifications) {
+        if (movingForward && notificationsFilter === 'all') {
+          void dispatch(
+            setNotificationsFilter({ filterType: 'mention' }),
+          );
+        } else if (!movingForward && notificationsFilter === 'mention') {
+          void dispatch(setNotificationsFilter({ filterType: 'all' }));
+        }
+        return;
+      }
+
+      if (isBlue2Firehose) {
+        const currentIndex = FIREHOSE_SWIPE_ROUTES.indexOf(
+          location.pathname as (typeof FIREHOSE_SWIPE_ROUTES)[number],
+        );
+        if (currentIndex === -1) return;
+
+        const nextIndex = currentIndex + (movingForward ? 1 : -1);
+        const nextRoute = FIREHOSE_SWIPE_ROUTES[nextIndex];
+        if (nextRoute) {
+          history.push(nextRoute);
+        }
+        return;
+      }
+
+      if (isBlue2Explore) {
+        const routes = signedIn
+          ? EXPLORE_SWIPE_ROUTES
+          : EXPLORE_SIGNED_OUT_SWIPE_ROUTES;
+        const normalizedPath =
+          location.pathname === '/explore/posts'
+            ? '/explore'
+            : location.pathname;
+        const currentIndex = routes.indexOf(
+          normalizedPath as (typeof routes)[number],
+        );
+        if (currentIndex === -1) return;
+
+        const nextIndex = currentIndex + (movingForward ? 1 : -1);
+        const nextRoute = routes[nextIndex];
+        if (nextRoute) {
+          history.push(nextRoute);
+        }
+        return;
+      }
+
+      if (movingForward && isBlue2Home) {
         history.push('/public');
-      } else if (deltaX > 0 && isBlue2Global) {
+      } else if (!movingForward && isBlue2Global) {
         history.push('/home');
       }
     },
-    [history, isBlue2FeedPage, isBlue2Global, isBlue2Home],
+    [
+      dispatch,
+      history,
+      isBlue2Explore,
+      isBlue2Firehose,
+      isBlue2Global,
+      isBlue2Home,
+      isBlue2Notifications,
+      isBlue2SwipePage,
+      isMobile,
+      location.pathname,
+      notificationsFilter,
+      signedIn,
+    ],
   );
 
   if (minimalShell) {
