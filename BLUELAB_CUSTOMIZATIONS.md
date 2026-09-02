@@ -17,10 +17,12 @@ When synchronizing a new Mastodon upstream version:
 
 The following behavior must survive upstream updates:
 
-- The `mastodon-bird-ui-auto` BlueLab theme remains registered and selectable alongside Vanilla/default.
+- The Bluesky-inspired BlueLab theme is the separate `blue-2` theme, currently entering through `styles/blue-2-v7.scss`; it must remain registered and selectable as **BlueLab**.
+- `mastodon-bird-ui-auto` is a separate legacy Bird UI option and must never be renamed to BlueLab or used as a replacement for the `blue-2` theme.
+- Vanilla/default remains available alongside BlueLab and Bird UI.
 - Signed-out visitors use the BlueLab custom `/overview` homepage by default, except when Trends or Local Feed is explicitly configured as the landing page.
 - The custom homepage keeps guest actions for account creation (when registrations are open), normal login, and native passkey login.
-- The public About experience keeps BlueLab/Bird UI surfaces and must not render duplicated borders between adjacent blocks.
+- The public About experience keeps the intended BlueLab surfaces and must not render duplicated borders between adjacent blocks.
 - BlueLab compose redesign fixes, including mobile internal scrolling, media/ALT access, quote-card behavior, cursor/emoji behavior, safe-area handling, and prevention of background-column scrolling, must be preserved when compose files conflict.
 - Existing BlueLab branding, limits, instance customization controls, menu/theme palette adjustments, username-display behavior, passkey additions, and other committed BlueLab features must not be removed merely to match upstream.
 
