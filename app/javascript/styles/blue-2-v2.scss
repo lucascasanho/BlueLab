@@ -327,7 +327,10 @@ body[data-theme='blue-2'] {
     min-height: 100dvh;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: minmax(230px, 280px) minmax(0, 620px) minmax(220px, 1fr);
+    grid-template-columns: minmax(230px, 280px) minmax(0, 620px) minmax(
+        220px,
+        1fr
+      );
     gap: 0;
   }
 
@@ -423,7 +426,11 @@ body[data-theme='blue-2'] {
   }
 
   .follow_requests-unlocked_explanation {
-    background: color-mix(in srgb, var(--blue2-search) 70%, transparent) !important;
+    background: color-mix(
+      in srgb,
+      var(--blue2-search) 70%,
+      transparent
+    ) !important;
     color: var(--blue2-muted) !important;
   }
 }

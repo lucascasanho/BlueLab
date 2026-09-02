@@ -22,7 +22,6 @@ body[data-theme='blue-2'] {
   --blue2-blue-hover: #0075e2;
   --blue2-green: #20bc07;
   --blue2-red: #ec4868;
-
   --color-bg: var(--blue2-bg);
   --color-bg-primary: var(--blue2-bg);
   --color-bg-ambient: var(--blue2-bg);
@@ -51,8 +50,9 @@ body[data-theme='blue-2'] {
   --radius-md: 10px;
   --radius-lg: 12px;
   --radius-xl: 16px;
-  --font-sans-serif: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Helvetica, Arial, sans-serif;
+  --font-sans-serif:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
 
   margin: 0;
   background: var(--blue2-bg);
@@ -241,12 +241,12 @@ body[data-theme='blue-2'] {
     border-radius: 999px;
   }
 
-  .button:not(.button-secondary):not(.button-tertiary) {
+  .button:not(.button-secondary, .button-tertiary) {
     background: var(--blue2-blue);
     color: #fff;
   }
 
-  .button:not(.button-secondary):not(.button-tertiary):hover {
+  .button:not(.button-secondary, .button-tertiary):hover {
     background: var(--blue2-blue-hover);
   }
 
@@ -635,15 +635,18 @@ body[data-theme='blue-2'] {
     color: var(--blue2-text) !important;
   }
 
-  .account__header__tabs__buttons .button:not(.button-secondary):not(.button-tertiary),
-  .account__relationship .button:not(.button-secondary):not(.button-tertiary) {
+  .account__header__tabs__buttons
+    .button:not(.button-secondary, .button-tertiary),
+  .account__relationship .button:not(.button-secondary, .button-tertiary) {
     border-color: transparent !important;
     background: var(--blue2-blue) !important;
     color: #fff !important;
   }
 
-  .account__header__tabs__buttons .button:not(.button-secondary):not(.button-tertiary):hover,
-  .account__relationship .button:not(.button-secondary):not(.button-tertiary):hover {
+  .account__header__tabs__buttons
+    .button:not(.button-secondary, .button-tertiary):hover,
+  .account__relationship
+    .button:not(.button-secondary, .button-tertiary):hover {
     background: var(--blue2-blue-hover) !important;
   }
 

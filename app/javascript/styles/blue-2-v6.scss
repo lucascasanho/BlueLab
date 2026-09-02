@@ -156,7 +156,7 @@ body[data-theme='blue-2'] {
  * action glyphs with stray square/line artifacts. On mobile, use the real SVG
  * components already rendered by Mastodon instead of those pseudo-elements.
  */
-@media (max-width: 759px) {
+@media (width <= 759px) {
   body[data-theme='blue-2'] {
     .status__action-bar__button-wrapper:nth-child(-n + 3)
       .status__action-bar__button::before {
@@ -173,7 +173,8 @@ body[data-theme='blue-2'] {
     }
 
     .status__action-bar__button-wrapper:nth-child(-n + 3)
-      .status__action-bar__button > svg {
+      .status__action-bar__button
+      > svg {
       display: block !important;
       width: 21px !important;
       height: 21px !important;
