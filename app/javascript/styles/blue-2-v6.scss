@@ -1,0 +1,101 @@
+@use 'blue-2-v5';
+
+/* BLUE 2.0 sixth refinement layer: repair clipped borders and unify surfaces. */
+body[data-theme='blue-2'] {
+  /* Use inset strokes for rounded cards so borders cannot disappear at clipped edges. */
+  .status__quote,
+  .status-card,
+  .account-card,
+  .conversation,
+  .follow_requests-unlocked_explanation {
+    box-sizing: border-box;
+    background-clip: padding-box;
+    border-color: transparent !important;
+    box-shadow: inset 0 0 0 1px var(--blue2-border-soft) !important;
+  }
+
+  .status__quote {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: 0 !important;
+    border: 0 !important;
+    border-radius: 12px !important;
+    overflow: clip !important;
+    background: var(--blue2-bg) !important;
+  }
+
+  .status__quote > .status,
+  .status__quote .status--is-quote {
+    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    border: 0 !important;
+    border-radius: inherit;
+    background: var(--blue2-bg) !important;
+  }
+
+  .status__quote .status__content,
+  .status__quote .status__content__text,
+  .status__quote .status__content__text--visible {
+    max-width: 100%;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .status-card,
+  .account-card,
+  .conversation {
+    overflow: clip;
+  }
+
+  /* Direct/private content must remain a single surface from prepend to actions. */
+  .status__wrapper-direct,
+  .notification-ungrouped--direct,
+  .notification-group--direct,
+  .detailed-status__wrapper-direct,
+  .detailed-status__wrapper-direct .detailed-status,
+  .detailed-status__wrapper-direct .detailed-status__action-bar,
+  .status__wrapper-direct .status,
+  .status__wrapper-direct .status__prepend {
+    background: var(--blue2-bg) !important;
+  }
+
+  .status__wrapper-direct .status__prepend,
+  .detailed-status__wrapper-direct .status__prepend,
+  .notification-ungrouped--direct .notification-ungrouped__header {
+    color: var(--blue2-muted) !important;
+  }
+
+  /* Column separators stay visible but do not look like hard black/blue cuts. */
+  .column,
+  .column > .scrollable,
+  .columns-area > .column,
+  .column-header,
+  .column-header__wrapper,
+  .tabs-bar__wrapper,
+  .account__section-headline,
+  .notification__filter-bar {
+    border-color: var(--blue2-border-soft) !important;
+  }
+
+  .column-header,
+  .column-header__wrapper {
+    box-shadow: none !important;
+  }
+
+  /* Avoid horizontal clipping in the left navigation while keeping its own scroll. */
+  [class*='blue2NavigationWrapper'] {
+    overflow-x: visible !important;
+  }
+}
+
+html[data-color-scheme='light'] body[data-theme='blue-2'] {
+  .status__quote,
+  .status-card,
+  .account-card,
+  .conversation,
+  .follow_requests-unlocked_explanation {
+    box-shadow: inset 0 0 0 1px var(--blue2-border-soft) !important;
+  }
+}
