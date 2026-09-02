@@ -1,10 +1,14 @@
 /* eslint-disable jsx-a11y/no-autofocus */
-<<<<<<< HEAD
 import type React from 'react';
-import { lazy, Suspense, useCallback, useLayoutEffect, useRef } from 'react';
-=======
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
->>>>>>> 171438e185139efd68df7245f39f57c880dceff6
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -196,17 +200,15 @@ export const ComposeRedesignButton: React.FC<{
     const style = {
       '--viewport-height': viewportHeight ? `${viewportHeight}px` : undefined,
     } as React.CSSProperties;
+
     return (
       <Suspense fallback={<CircularProgress strokeWidth={2} size={50} />}>
-<<<<<<< HEAD
         <ComposeLazyForm
           ref={composerRef}
           autoFocus
           className={classes.composer}
+          style={style}
         />
-=======
-        <ComposeLazyForm autoFocus className={classes.composer} style={style} />
->>>>>>> 171438e185139efd68df7245f39f57c880dceff6
       </Suspense>
     );
   }
