@@ -144,6 +144,11 @@ body[data-theme='blue-2'] {
   [class*='blue2NavigationWrapper'] {
     overflow-x: visible !important;
   }
+
+  /* The upstream translation contribution prompt is hidden only in BlueLab 2.0. */
+  .translation-prompt {
+    display: none !important;
+  }
 }
 
 /*
