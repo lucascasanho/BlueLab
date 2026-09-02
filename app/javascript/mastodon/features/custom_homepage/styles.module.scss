@@ -76,6 +76,10 @@
 .block {
   padding: 16px;
 
+  & + & {
+    border-top: 1px solid var(--color-border-primary);
+  }
+
   h2 {
     font-size: 16px;
     font-weight: 500;
@@ -84,9 +88,10 @@
   }
 
   :global(.account) {
-    border: 1px solid var(--color-border-primary);
+    border: 0;
     padding: 18px 16px;
     border-radius: 12px;
+    background: var(--color-bg-secondary);
 
     --avatar-border-radius: 50%;
   }
