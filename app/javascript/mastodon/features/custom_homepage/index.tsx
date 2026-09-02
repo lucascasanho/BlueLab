@@ -9,6 +9,8 @@ import { Helmet } from '@unhead/react/helmet';
 import { NavigationFocusTarget } from '@/mastodon/components/navigation_focus_target';
 import { fetchServer } from 'mastodon/actions/server';
 import { ServerHeroImage } from 'mastodon/components/server_hero_image';
+import { useIdentity } from 'mastodon/identity_context';
+import { registrationsOpen } from 'mastodon/initial_state';
 import { TabLink, TabList } from 'mastodon/components/tab_list';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
@@ -19,6 +21,10 @@ import classes from './styles.module.scss';
 export const CustomHomepage: React.FC = () => {
   const dispatch = useAppDispatch();
   const server = useAppSelector((state) => state.server.server);
+  const signupUrl = useAppSelector(
+    (state) => state.server.server.item?.registrations.url ?? '/auth/sign_up',
+  );
+  const { signedIn } = useIdentity();
   const { path } = useRouteMatch();
 
   useEffect(() => {
@@ -45,6 +51,36 @@ export const CustomHomepage: React.FC = () => {
           {server.item?.domain}
         </NavigationFocusTarget>
         <p>{server.item?.description}</p>
+
+        {!signedIn && (
+          <div className={classes.guestActions}>
+            {registrationsOpen && (
+              <a href={signupUrl} className='button'>
+                <FormattedMessage
+                  id='sign_in_banner.create_account'
+                  defaultMessage='Create account'
+                />
+              </a>
+            )}
+
+            <a href='/auth/sign_in' className='button button-secondary'>
+              <FormattedMessage
+                id='sign_in_banner.sign_in'
+                defaultMessage='Login'
+              />
+            </a>
+
+            <a
+              href='/auth/sign_in#passkey-authentication-form'
+              className='button button-secondary'
+            >
+              <FormattedMessage
+                id='passkeys.sign_in'
+                defaultMessage='Sign in with a passkey'
+              />
+            </a>
+          </div>
+        )}
       </div>
 
       <TabList>
