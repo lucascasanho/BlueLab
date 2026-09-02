@@ -28,7 +28,9 @@ import { RedesignNavigationPanel } from '.';
 import classes from './mobile_nav.module.scss';
 import { MobileNavLink } from './navigation_link';
 
-export const RedesignMobileNavigation: React.FC = () => {
+export const RedesignMobileNavigation: React.FC<{
+  hideMenuButton?: boolean;
+}> = ({ hideMenuButton = false }) => {
   const dispatch = useAppDispatch();
 
   const { accountId, signedIn } = useIdentity();
@@ -89,13 +91,15 @@ export const RedesignMobileNavigation: React.FC = () => {
           </MobileNavLink>
         </ul>
         <ComposeRedesignButton inline />
-        <IconButton // Silly placeholder – will be replaced with button in column header
-          icon={HamburgerIcon}
-          variant='solid'
-          onClick={handleOpenNavigation}
-        >
-          Menu
-        </IconButton>
+        {!hideMenuButton && (
+          <IconButton // Upstream placeholder; BlueLab 2.0 renders its own top-bar trigger.
+            icon={HamburgerIcon}
+            variant='solid'
+            onClick={handleOpenNavigation}
+          >
+            Menu
+          </IconButton>
+        )}
       </nav>
       <SlideOutNavigation />
     </>

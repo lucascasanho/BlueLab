@@ -137,3 +137,58 @@
     transition: none;
   }
 }
+
+// BLUE 2.0 uses an inline launcher in the timeline and renders the redesigned
+// composer as a centered Bluesky-like dialog. These selectors are impossible
+// to match in other themes because the body data attribute is theme-specific.
+:global(body[data-theme='blue-2']) .button:not(.buttonInline) {
+  display: none;
+}
+
+:global(body[data-theme='blue-2']) .composer {
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  inset-inline-end: auto;
+  width: min(600px, calc(100vw - 32px));
+  max-width: 600px;
+  min-height: 0;
+  max-height: calc(100dvh - 32px);
+  margin: 0;
+  border: 1px solid var(--blue2-border-soft, #17232c);
+  border-radius: 16px;
+  transform: translate(-50%, -50%);
+  animation: none;
+  box-shadow:
+    0 0 0 100vmax rgb(0 0 0 / 58%),
+    0 18px 50px rgb(0 0 0 / 35%);
+}
+
+:global(body[data-theme='blue-2']) .composerMinimized {
+  right: 20px;
+  bottom: 20px;
+  margin: 0;
+  border: 1px solid var(--blue2-border-soft, #17232c);
+  background: var(--blue2-bg, #000);
+}
+
+@media (width < #{variables.$mobile-menu-breakpoint}) {
+  :global(body[data-theme='blue-2']) .composer {
+    --composer-viewport-height: var(--composer-visual-viewport-height, 100dvh);
+
+    top: env(safe-area-inset-top);
+    left: 0;
+    right: 0;
+    bottom: var(--composer-visual-viewport-bottom, 0);
+    width: 100vw;
+    max-width: none;
+    height: calc(var(--composer-viewport-height) - env(safe-area-inset-top));
+    min-height: 0;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    transform: none;
+    box-shadow: none;
+  }
+}

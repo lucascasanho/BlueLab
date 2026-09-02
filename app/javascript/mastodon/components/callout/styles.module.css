@@ -141,3 +141,28 @@
     background-color: var(--color-bg-error-soft);
   }
 }
+
+/* BLUE 2.0: keep the callout as one continuous rounded surface. */
+:global(body[data-theme='blue-2']) .wrapper {
+  border: 1px solid var(--blue2-border-soft, #17232c);
+  background: var(--blue2-search, #111b25);
+  color: var(--blue2-text, #f7f7f8);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+:global(body[data-theme='blue-2']) .wrapper .content,
+:global(body[data-theme='blue-2']) .wrapper .body,
+:global(body[data-theme='blue-2']) .wrapper .actionWrapper {
+  background: transparent !important;
+}
+
+:global(body[data-theme='blue-2']) .wrapper .icon {
+  background: transparent;
+  color: var(--blue2-muted, #9aa8b4);
+}
+
+:global(body[data-theme='blue-2']) .wrapper a,
+:global(body[data-theme='blue-2']) .wrapper .action {
+  color: var(--blue2-blue, #0085ff);
+}

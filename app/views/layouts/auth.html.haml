@@ -2,23 +2,48 @@
   = vite_typescript_tag 'public.tsx', crossorigin: 'anonymous'
 
 - custom_auth_brand = %w(auth/registrations auth/setup auth/confirmations).include?(controller_path) || (controller_path == 'auth/sessions' && action_name == 'new') || (controller_path == 'settings/passkeys' && action_name == 'new')
+- blue2_theme = current_theme == 'blue-2'
 
 - content_for :content do
-  .container-alt
-    %header.logo-container{ class: ('logo-container--sign-in' if custom_auth_brand) }
-      - if custom_auth_brand
-        = link_to root_path, class: 'instance-auth-brand' do
-          = image_tag(instance_presenter.auth_logo&.file&.url || frontend_asset_path('images/logo-symbol-icon.svg'), alt: '')
-          %span= Setting.site_title
-      - elsif within_authorization_flow?
-        = logo_as_symbol(:wordmark)
-      - else
-        = link_to root_path, class: 'mastodon-auth-brand' do
+  - if blue2_theme
+    .container-alt.blue2-auth-shell
+      %section.blue2-auth-intro
+        .blue2-auth-intro__inner
+          = image_tag(instance_presenter.auth_logo&.file&.url || favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png'), alt: '', class: 'blue2-auth-intro__icon')
+          %h1
+            - if content_for?(:blue2_auth_title)
+              = yield :blue2_auth_title
+            - else
+              = Setting.site_title
+          - if content_for?(:blue2_auth_subtitle)
+            %p= yield :blue2_auth_subtitle
+          - else
+            %p= Setting.site_short_description.presence || Setting.site_title
+
+      %section.blue2-auth-panel
+        %header.logo-container.logo-container--sign-in
+          = link_to root_path, class: 'instance-auth-brand' do
+            = image_tag(instance_presenter.auth_logo&.file&.url || favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png'), alt: '')
+            %span= Setting.site_title
+
+        %main.form-container
+          = render 'flashes'
+          = yield
+  - else
+    .container-alt
+      %header.logo-container{ class: ('logo-container--sign-in' if custom_auth_brand) }
+        - if custom_auth_brand
+          = link_to root_path, class: 'instance-auth-brand' do
+            = image_tag(instance_presenter.auth_logo&.file&.url || favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png'), alt: '')
+            %span= Setting.site_title
+        - elsif within_authorization_flow?
           = logo_as_symbol(:wordmark)
+        - else
+          = link_to root_path, class: 'mastodon-auth-brand' do
+            = logo_as_symbol(:wordmark)
 
-    %main.form-container
-      = render 'flashes'
-
-      = yield
+      %main.form-container
+        = render 'flashes'
+        = yield
 
 = render template: 'layouts/application'

@@ -16,6 +16,7 @@ import {
 } from '../compose_panel';
 
 import { MultiColumnContent } from './multi_column_content';
+import { ColumnsAreaRedesign } from './redesign';
 
 const TabsBarPortal = () => {
   const { setTabsBarElement } = useColumnsContext();
@@ -110,5 +111,12 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
 };
 
 export const ColumnsArea: React.FC<ColumnsAreaProps> = (props) => {
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+
+  if (isBlue2) {
+    return <ColumnsAreaRedesign {...props} />;
+  }
+
   return <ColumnsAreaLegacy {...props} />;
 };

@@ -62,6 +62,8 @@ export const ComposeRedesignButton: React.FC<{
   const launcherOriginRef = useRef<ReturnType<
     typeof composerOriginFromElement
   > | null>(null);
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   // Update viewport based on visual size in order to account for the virtual keyboard.
   const [viewportHeight, setViewportHeight] = useState<null | number>(null);
@@ -168,7 +170,9 @@ export const ComposeRedesignButton: React.FC<{
 
   if (!signedIn) return null;
 
-  if (editor === 'mastodon') {
+  // BLUE 2.0 always uses the redesigned composer so the theme can provide the
+  // Bluesky-like compose experience without changing the editor used by other themes.
+  if (editor === 'mastodon' && !isBlue2) {
     return (
       <IconButton
         icon={AddIcon}

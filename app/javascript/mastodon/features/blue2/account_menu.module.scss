@@ -1,0 +1,186 @@
+.root {
+  position: relative;
+  z-index: 12;
+  width: 216px;
+  height: 54px;
+  margin-bottom: 8px;
+  overflow: visible;
+  cursor: pointer;
+}
+
+.accountButton {
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 2;
+  inset: 0 auto auto 0;
+  width: 52px;
+  min-height: 52px;
+  padding: 5px;
+  border: 0;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  background: transparent;
+  color: var(--blue2-text, #f7f7f8);
+  text-align: start;
+  cursor: pointer;
+  transition:
+    width 150ms ease,
+    padding 150ms ease,
+    background 120ms ease;
+}
+
+.root:hover .accountButton,
+.root:focus-within .accountButton,
+.accountButton[aria-expanded='true'] {
+  width: 216px;
+  padding: 5px 10px 5px 5px;
+  overflow: visible;
+  background: var(--blue2-hover, #111820);
+  outline: none;
+}
+
+.identity {
+  min-width: 0;
+  max-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-width 150ms ease,
+    opacity 100ms ease;
+
+  strong,
+  span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    color: var(--blue2-text, #f7f7f8);
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 650;
+  }
+
+  span {
+    color: var(--blue2-muted, #9aa8b4);
+    font-size: 12px;
+    line-height: 1.2;
+  }
+}
+
+.moreIcon {
+  width: 20px;
+  height: 20px;
+  max-width: 0;
+  flex: 0 0 auto;
+  overflow: hidden;
+  fill: currentColor;
+  color: var(--blue2-muted, #9aa8b4);
+  opacity: 0;
+  transition:
+    max-width 150ms ease,
+    opacity 100ms ease;
+}
+
+.root:hover .identity,
+.root:focus-within .identity,
+.accountButton[aria-expanded='true'] .identity {
+  max-width: 128px;
+  opacity: 1;
+}
+
+.root:hover .moreIcon,
+.root:focus-within .moreIcon,
+.accountButton[aria-expanded='true'] .moreIcon {
+  max-width: 20px;
+  opacity: 1;
+}
+
+.menu {
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 40;
+  top: 56px;
+  inset-inline-start: 0;
+  width: 216px;
+  max-width: 100%;
+  padding: 8px;
+  border: 1px solid var(--blue2-border-soft, #17232c);
+  border-radius: 12px;
+  background: var(--blue2-surface-raised, #101820);
+  color: var(--blue2-text, #f7f7f8);
+  box-shadow: 0 12px 36px rgb(0 0 0 / 38%);
+}
+
+.menuItem {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 42px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: transparent;
+  color: var(--blue2-text, #f7f7f8) !important;
+  text-decoration: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--blue2-hover, #18212a);
+    color: var(--blue2-text, #f7f7f8) !important;
+    text-decoration: none;
+    outline: none;
+  }
+
+  svg {
+    width: 21px;
+    height: 21px;
+    flex: 0 0 21px;
+    fill: currentColor;
+  }
+}
+
+@media (width < 1024px) {
+  .root {
+    width: 52px;
+  }
+
+  .root:hover .accountButton,
+  .root:focus-within .accountButton,
+  .accountButton[aria-expanded='true'] {
+    width: 52px;
+    padding: 5px;
+  }
+
+  .root:hover .identity,
+  .root:focus-within .identity,
+  .accountButton[aria-expanded='true'] .identity,
+  .root:hover .moreIcon,
+  .root:focus-within .moreIcon,
+  .accountButton[aria-expanded='true'] .moreIcon {
+    max-width: 0;
+    opacity: 0;
+  }
+
+  .menu {
+    width: min(216px, calc(100vw - 92px));
+    inset-inline-start: 56px;
+    top: 0;
+  }
+}
