@@ -1,4 +1,4 @@
-name: BlueLab 2.0 merge preview
+name: BlueLab 2.0 full restore
 
 on:
   push:
@@ -6,10 +6,10 @@ on:
       - sync/20260902-blue2-full-restore
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  preview:
+  restore:
     runs-on: ubuntu-24.04
     steps:
       - name: Clone repository
@@ -18,26 +18,47 @@ jobs:
           ref: sync/20260902-blue2-full-restore
           fetch-depth: 0
 
-      - name: Preview BlueLab 2.0 merge
+      - name: Set up Javascript environment
+        uses: ./.github/actions/setup-javascript
+
+      - name: Merge BlueLab 2.0 and resolve alpha2 compatibility
         run: |
-          git config user.name "BlueLab merge preview"
-          git config user.email "bluelab-preview@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch origin theme/blue-2.0
+
           set +e
           git merge --no-commit --no-ff origin/theme/blue-2.0
-          rc=$?
+          merge_rc=$?
           set -e
-          echo "===== MERGE EXIT: $rc ====="
-          echo "===== CONFLICTS ====="
-          git diff --name-only --diff-filter=U || true
-          echo "===== STATUS ====="
-          git status --short
-          if [ "$rc" -ne 0 ]; then
-            echo "===== CONFLICT MARKERS ====="
-            for f in $(git diff --name-only --diff-filter=U); do
-              echo "--- $f ---"
-              grep -n -B 4 -A 12 -E '^(<<<<<<<|=======|>>>>>>>)' "$f" || true
+
+          if [ "$merge_rc" -ne 0 ]; then
+            echo "Resolving expected compatibility conflicts..."
+            for file in \
+              app/javascript/styles/blue-2.scss \
+              app/javascript/styles/blue-2-v2.scss \
+              app/javascript/styles/blue-2-v5.scss \
+              app/javascript/styles/blue-2-v6.scss; do
+              git checkout --ours -- "$file"
+              git add "$file"
             done
+
+            git rm -f app/javascript/mastodon/features/direct_timeline/index.jsx || true
           fi
-          git merge --abort || true
-          exit "$rc"
+
+          unresolved="$(git diff --name-only --diff-filter=U)"
+          if [ -n "$unresolved" ]; then
+            echo "Unexpected unresolved conflicts:"
+            echo "$unresolved"
+            exit 1
+          fi
+
+          rm .github/workflows/blue2-merge-preview.yml
+          git add -A
+
+          yarn format
+          git add -A
+          git diff --cached --check
+
+          git commit -m "Merge BlueLab 2.0 into Mastodon 4.8.0-alpha.2"
+          git push origin HEAD:sync/20260902-blue2-full-restore
