@@ -83,15 +83,15 @@
   top: 0;
   height: 100dvh;
   z-index: 3;
-  border-inline-end: 1px solid var(--blue2-border, #202a33);
+  border-inline-end: 1px solid var(--blue2-border-soft, #17232c);
 }
 
 .blue2Main {
   grid-column: 2;
   max-width: 600px;
   min-height: 100dvh;
-  border-inline: 1px solid var(--blue2-border, #202a33);
-  border-top: 0;
+  border: 0;
+  border-inline-end: 1px solid var(--blue2-border-soft, #17232c);
   background: var(--blue2-bg, #000);
   overflow: visible;
   touch-action: pan-y;
@@ -121,14 +121,15 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: stretch;
-  background: color-mix(in srgb, var(--blue2-bg, #000) 92%, transparent);
+  background: color-mix(in srgb, var(--blue2-bg, #000) 96%, transparent);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--blue2-border, #202a33);
+  border-bottom: 1px solid var(--blue2-border-soft, #17232c);
+  isolation: isolate;
 }
 
 .blue2Brand {
   position: absolute;
-  z-index: 1;
+  z-index: 4;
   top: 7px;
   left: 50%;
   width: 28px;
@@ -142,21 +143,24 @@
 .blue2Tab,
 .blue2TabActive {
   position: relative;
+  z-index: 1;
   display: flex;
   align-items: end;
   justify-content: center;
   padding: 0 12px 10px;
   color: var(--blue2-text, #f7f7f8) !important;
-  opacity: 0.7;
+  opacity: 0.72;
+  background: transparent !important;
   text-decoration: none;
   font-size: 15px;
   font-weight: 600;
+  transition: opacity 120ms ease;
 
   &:hover,
   &:focus-visible {
     color: var(--blue2-text, #f7f7f8) !important;
     opacity: 1;
-    background: var(--blue2-hover, #0b1117);
+    background: transparent !important;
     text-decoration: none;
     outline: none;
   }
