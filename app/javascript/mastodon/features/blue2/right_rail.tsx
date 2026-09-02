@@ -149,6 +149,13 @@ export const Blue2RightRail: React.FC = () => {
             defaultMessage='Terms'
           />
         </a>
+        <span>·</span>
+        <Link to='/keyboard-shortcuts'>
+          <FormattedMessage
+            id='keyboard_shortcuts.heading'
+            defaultMessage='Keyboard shortcuts'
+          />
+        </Link>
       </footer>
 
       {trendMenuOpen && (
