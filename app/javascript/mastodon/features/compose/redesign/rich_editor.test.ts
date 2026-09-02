@@ -252,6 +252,36 @@ describe('BlueLab rich editor conversion', () => {
     document.body.removeChild(editor);
   });
 
+  test('keeps repeated emoji selections in the same order as the live cursor', () => {
+    const editor = document.createElement('div');
+    editor.contentEditable = 'true';
+    editor.textContent = 'hello';
+    document.body.appendChild(editor);
+
+    const selection = window.getSelection();
+    if (!selection) {
+      throw new Error('Expected selection');
+    }
+
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    insertTextAtSelection('🙂');
+    range.selectNodeContents(editor);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    insertTextAtSelection('😎');
+    insertTextAtSelection('🚀');
+
+    expect(editor.textContent).toBe('hello🙂😎🚀');
+    document.body.removeChild(editor);
+  });
+
   test('renders typed custom emoji shortcodes immediately without waiting for the picker', () => {
     const html = renderEmojiShortcodes('hello :party: world', {
       party: {

@@ -1977,6 +1977,8 @@ body > [data-popover-placement] {
 
   position: relative;
   overflow: visible;
+  box-sizing: border-box;
+  width: calc(100% - var(--quote-margin) - var(--thread-margin, 0px));
   margin-block-start: 16px;
   margin-inline-start: calc(var(--quote-margin) + var(--thread-margin, 0px));
   border-radius: 12px;
