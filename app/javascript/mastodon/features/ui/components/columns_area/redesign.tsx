@@ -1,10 +1,12 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { HamburgerIcon, HashIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 
+import { openNavigation } from '@/mastodon/actions/navigation';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
 import { blue2Text } from '@/mastodon/features/blue2/locale';
 import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
@@ -15,7 +17,7 @@ import { customAppIcon } from '@/mastodon/initial_state';
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
 import { ComposePanel } from '@/mastodon/features/ui/components/compose_panel';
-import { useAppSelector } from '@/mastodon/store';
+import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { Footer } from 'mastodon/features/custom_homepage/components/footer';
 import { Header } from 'mastodon/features/custom_homepage/components/header';
 
@@ -47,9 +49,11 @@ export const ColumnsAreaRedesign: React.FC<{
   ref?: React.Ref<HTMLDivElement>;
 }> = ({ children, minimalShell, singleColumn, ref }) => {
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const history = useHistory();
   const location = useLocation();
   const swipeOrigin = useRef<{ x: number; y: number } | null>(null);
+  const [isBlue2MobileRailOpen, setIsBlue2MobileRailOpen] = useState(false);
   const isModalOpen = useAppSelector(
     (state) => !state.modal.get('stack').isEmpty(),
   );
@@ -62,6 +66,14 @@ export const ColumnsAreaRedesign: React.FC<{
   const isBlue2Home = isBlue2 && location.pathname === '/home';
   const isBlue2Global = isBlue2 && location.pathname === '/public';
   const isBlue2FeedPage = isBlue2Home || isBlue2Global;
+
+  useEffect(() => {
+    setIsBlue2MobileRailOpen(false);
+  }, [location.pathname]);
+
+  const handleOpenBlue2Navigation = useCallback(() => {
+    dispatch(openNavigation());
+  }, [dispatch]);
 
   const handleSwipeStart = useCallback(
     (event: React.TouchEvent<HTMLElement>) => {
@@ -131,7 +143,11 @@ export const ColumnsAreaRedesign: React.FC<{
           </div>
         )}
 
-        {isMobile ? <RedesignMobileNavigation /> : <ComposeRedesignButton />}
+        {isMobile ? (
+          <RedesignMobileNavigation hideMenuButton />
+        ) : (
+          <ComposeRedesignButton />
+        )}
 
         <main
           className={classNames(
@@ -142,6 +158,38 @@ export const ColumnsAreaRedesign: React.FC<{
           onTouchStart={handleSwipeStart}
           onTouchEnd={handleSwipeEnd}
         >
+          {isMobile && (
+            <header className={classes.blue2MobileUtilityBar}>
+              <button
+                type='button'
+                className={classes.blue2MobileUtilityButton}
+                onClick={handleOpenBlue2Navigation}
+                aria-label={intl.formatMessage({
+                  id: 'navigation_bar.menu',
+                  defaultMessage: 'Menu',
+                })}
+              >
+                <HamburgerIcon size={28} />
+              </button>
+
+              <img
+                src={customAppIcon ?? '/favicon.ico'}
+                alt=''
+                className={classes.blue2MobileBrand}
+              />
+
+              <button
+                type='button'
+                className={classes.blue2MobileUtilityButton}
+                onClick={() => setIsBlue2MobileRailOpen(true)}
+                aria-label={blue2Text(intl.locale, 'trendingFeeds')}
+                aria-expanded={isBlue2MobileRailOpen}
+              >
+                <HashIcon size={28} />
+              </button>
+            </header>
+          )}
+
           {!isBlue2FeedPage && (
             <div
               className={classNames('tabs-bar__wrapper', classes.blue2Portal)}
@@ -189,6 +237,21 @@ export const ColumnsAreaRedesign: React.FC<{
         {!isMobile && (
           <div className={classes.blue2RightRail}>
             <Blue2RightRail />
+          </div>
+        )}
+
+        {isMobile && (
+          <div
+            className={classes.blue2MobileRailOverlay}
+            data-is-open={isBlue2MobileRailOpen}
+            onClick={() => setIsBlue2MobileRailOpen(false)}
+          >
+            <aside
+              className={classes.blue2MobileRailDrawer}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <Blue2RightRail />
+            </aside>
           </div>
         )}
 
