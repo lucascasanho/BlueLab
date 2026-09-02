@@ -2,13 +2,14 @@
   = vite_typescript_tag 'public.tsx', crossorigin: 'anonymous'
 
 - custom_auth_brand = %w(auth/registrations auth/setup auth/confirmations).include?(controller_path) || (controller_path == 'auth/sessions' && action_name == 'new') || (controller_path == 'settings/passkeys' && action_name == 'new')
+- blue2_theme = current_theme == 'blue-2'
 
 - content_for :content do
   .container-alt
-    %header.logo-container{ class: ('logo-container--sign-in' if custom_auth_brand) }
-      - if custom_auth_brand
+    %header.logo-container{ class: ('logo-container--sign-in' if custom_auth_brand || blue2_theme) }
+      - if custom_auth_brand || blue2_theme
         = link_to root_path, class: 'instance-auth-brand' do
-          = image_tag(instance_presenter.auth_logo&.file&.url || frontend_asset_path('images/logo-symbol-icon.svg'), alt: '')
+          = image_tag(instance_presenter.auth_logo&.file&.url || favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png'), alt: '')
           %span= Setting.site_title
       - elsif within_authorization_flow?
         = logo_as_symbol(:wordmark)
