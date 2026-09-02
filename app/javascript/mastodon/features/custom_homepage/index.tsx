@@ -112,7 +112,10 @@ export const CustomHomepage: React.FC = () => {
                   </a>
                 )}
 
-                <a href='/auth/sign_in' className={classes.blue2SecondaryAction}>
+                <a
+                  href='/auth/sign_in'
+                  className={classes.blue2SecondaryAction}
+                >
                   <FormattedMessage
                     id='sign_in_banner.sign_in'
                     defaultMessage='Login'

@@ -290,6 +290,15 @@
   display: none;
 }
 
+.blue2MobileRailBackdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
 @media (width < 1180px) and (min-width: $mobile-menu-breakpoint) {
   .blue2Root {
     --navigation-min-width: 76px;
@@ -406,6 +415,7 @@
 
   .blue2MobileRailDrawer {
     position: absolute;
+    z-index: 1;
     inset-block: 0;
     inset-inline-end: 0;
     box-sizing: border-box;
