@@ -4,6 +4,7 @@
   = vite_typescript_tag 'admin.tsx', crossorigin: 'anonymous'
 
 - content_for :body_classes, 'admin'
+- blue2_theme = current_theme == 'blue-2'
 
 - content_for :content do
   - mobile_page_title = strip_tags(content_for(:page_title)).strip
@@ -12,13 +13,22 @@
     %header.sidebar-wrapper
       .sidebar-wrapper__inner
         .sidebar
-          = link_to root_path do
-            = render_logo
+          - if blue2_theme
+            = link_to root_path, class: 'blue2-admin-brand' do
+              = image_tag(favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png'), alt: '')
+              %span= Setting.site_title
+          - else
+            = link_to root_path do
+              = render_logo
 
           .sidebar__toggle
             .sidebar__toggle__logo{ class: ('sidebar__toggle__logo--page-title' if mobile_page_title.present?) }
               = link_to root_path, data: { title: mobile_page_title } do
-                = logo_as_symbol(:wordmark)
+                - if blue2_theme
+                  = image_tag(favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png'), alt: '')
+                  %span= Setting.site_title
+                - else
+                  = logo_as_symbol(:wordmark)
 
             = link_to '#', class: 'sidebar__toggle__icon', 'aria-label': t('navigation.toggle_menu'), 'aria-expanded': 'false' do
               = material_symbol 'menu'
