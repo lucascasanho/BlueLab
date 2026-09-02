@@ -1,0 +1,31 @@
+# BlueLab customization invariants
+
+BlueLab is a customized Mastodon distribution. Upstream Mastodon updates are inputs to BlueLab, not replacements for BlueLab behavior.
+
+## Integration rule
+
+When synchronizing a new Mastodon upstream version:
+
+1. Start from the current `BlueLab` branch.
+2. Merge or port upstream changes into an isolated integration branch.
+3. Resolve conflicts by preserving BlueLab behavior unless the upstream change requires an adaptation for compatibility or safety.
+4. Never resolve conflicts by replacing customized BlueLab files wholesale with their upstream versions.
+5. Run the complete repository CI suite before integrating the update into `BlueLab`.
+6. Only after validation, merge the integration branch into `BlueLab` so every instance updating from this branch receives both the new Mastodon version and all BlueLab customizations.
+
+## Protected BlueLab behavior
+
+The following behavior must survive upstream updates:
+
+- The `mastodon-bird-ui-auto` BlueLab theme remains registered and selectable alongside Vanilla/default.
+- Signed-out visitors use the BlueLab custom `/overview` homepage by default, except when Trends or Local Feed is explicitly configured as the landing page.
+- The custom homepage keeps guest actions for account creation (when registrations are open), normal login, and native passkey login.
+- The public About experience keeps BlueLab/Bird UI surfaces and must not render duplicated borders between adjacent blocks.
+- BlueLab compose redesign fixes, including mobile internal scrolling, media/ALT access, quote-card behavior, cursor/emoji behavior, safe-area handling, and prevention of background-column scrolling, must be preserved when compose files conflict.
+- Existing BlueLab branding, limits, instance customization controls, menu/theme palette adjustments, username-display behavior, passkey additions, and other committed BlueLab features must not be removed merely to match upstream.
+
+## Regression guards
+
+Prefer executable regression tests for protected behavior. If an upstream update changes a guarded area, update the implementation and test together while preserving the intended BlueLab behavior.
+
+A Mastodon version bump is not complete when an upstream snapshot is merely imported. It is complete only when the resulting `BlueLab` branch contains the upstream update plus the protected BlueLab behavior and passes validation.
