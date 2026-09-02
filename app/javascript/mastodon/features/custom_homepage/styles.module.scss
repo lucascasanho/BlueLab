@@ -51,6 +51,28 @@
   }
 }
 
+.guestActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+
+  :global(.button) {
+    flex: 1 1 160px;
+    min-width: 0;
+    text-align: center;
+  }
+
+  @media screen and (width <= 600px) {
+    flex-direction: column;
+
+    :global(.button) {
+      flex: none;
+      width: 100%;
+    }
+  }
+}
+
 .block {
   padding: 16px;
 
