@@ -293,6 +293,24 @@ export const editorPlainText = (element: HTMLElement) =>
     .join('')
     .replace(/^\n+|\n+$/g, '');
 
+const selectionNodeLength = (node: Node): number => {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return node.textContent?.length ?? 0;
+  }
+
+  if (!(node instanceof HTMLElement)) return 0;
+
+  const shortcode = node.dataset.emojiShortcode;
+  if (shortcode) return shortcode.length;
+
+  if (node.tagName === 'BR') return 1;
+
+  return Array.from(node.childNodes).reduce(
+    (total, child) => total + selectionNodeLength(child),
+    0,
+  );
+};
+
 export const getEditorSelectionOffset = (
   editor: HTMLElement | null,
 ): number => {
@@ -307,18 +325,50 @@ export const getEditorSelectionOffset = (
   if (startContainer === editor) {
     return Array.from(editor.childNodes)
       .slice(0, range.startOffset)
-      .reduce((total, node) => total + (node.textContent?.length ?? 0), 0);
+      .reduce((total, node) => total + selectionNodeLength(node), 0);
   }
 
   let offset = 0;
-  const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+  const walker = document.createTreeWalker(
+    editor,
+    NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+  );
   let node = walker.nextNode();
 
   while (node) {
     if (node === startContainer) {
-      return offset + range.startOffset;
+      if (node.nodeType === Node.TEXT_NODE) {
+        return offset + range.startOffset;
+      }
+
+      if (node instanceof HTMLElement) {
+        return (
+          offset +
+          Array.from(node.childNodes)
+            .slice(0, range.startOffset)
+            .reduce((total, child) => total + selectionNodeLength(child), 0)
+        );
+      }
+
+      return offset;
     }
-    offset += node.textContent?.length ?? 0;
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      const parent = node.parentElement;
+
+      if (!parent?.closest('[data-emoji-shortcode]')) {
+        offset += node.textContent?.length ?? 0;
+      }
+    } else if (node instanceof HTMLElement) {
+      const shortcode = node.dataset.emojiShortcode;
+
+      if (shortcode) {
+        offset += shortcode.length;
+      } else if (node.tagName === 'BR') {
+        offset += 1;
+      }
+    }
+
     node = walker.nextNode();
   }
 
@@ -381,6 +431,10 @@ export const captureComposerSelectionOffset = (): number => {
 let lastComposeSelectionOffset = 0;
 
 export const getSavedComposerSelectionOffset = () => lastComposeSelectionOffset;
+
+export const setSavedComposerSelectionOffset = (offset: number) => {
+  lastComposeSelectionOffset = Math.max(0, offset);
+};
 
 export const insertTextAtSelection = (text: string) => {
   const selection = window.getSelection();

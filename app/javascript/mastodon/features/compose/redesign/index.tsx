@@ -36,6 +36,7 @@ import {
   getEditorSelectionOffset,
   getSavedComposerSelectionOffset,
   RichComposeEditor,
+  setSavedComposerSelectionOffset,
 } from './rich_editor';
 import { resolveComposeScrollTarget } from './scroll';
 import {
@@ -302,7 +303,12 @@ function useComposeHandlers(redirectOnSuccess?: boolean) {
         }
       }
 
+      const emojiText =
+        'native' in emoji && emoji.native ? emoji.native : `:${emoji.id}:`;
+      const insertedLength = emojiText.length + (needsSpace ? 1 : 0) + 1;
+
       dispatch(insertEmojiCompose(selectionStart, emoji, needsSpace));
+      setSavedComposerSelectionOffset(selectionStart + insertedLength);
     },
     [dispatch, text],
   );

@@ -4,6 +4,7 @@ import {
   captureComposerSelectionOffset,
   editorPlainText,
   editorText,
+  getEditorSelectionOffset,
   getSavedComposerSelectionOffset,
   insertTextAtSelection,
   markdownToHtml,
@@ -222,6 +223,38 @@ describe('BlueLab rich editor conversion', () => {
 
     expect(captureComposerSelectionOffset()).toBe(6);
     expect(getSavedComposerSelectionOffset()).toBe(6);
+    document.body.removeChild(editor);
+  });
+
+  test('counts consecutive rendered custom emoji shortcodes in the cursor offset', () => {
+    const editor = document.createElement('div');
+    editor.contentEditable = 'true';
+    editor.innerHTML = [
+      'hello',
+      '<span data-emoji-shortcode=":emoji1:" contenteditable="false"><img alt=":emoji1:" /></span>',
+      '<span data-emoji-shortcode=":emoji2:" contenteditable="false"><img alt=":emoji2:" /></span>',
+      '<span data-emoji-shortcode=":emoji3:" contenteditable="false"><img alt=":emoji3:" /></span>',
+    ].join('');
+    document.body.appendChild(editor);
+    editor.focus();
+
+    const selection = window.getSelection();
+    if (!selection) {
+      throw new Error('Expected selection');
+    }
+
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    const expectedOffset = 'hello:emoji1::emoji2::emoji3:'.length;
+
+    expect(getEditorSelectionOffset(editor)).toBe(expectedOffset);
+    expect(captureComposerSelectionOffset()).toBe(expectedOffset);
+    expect(getSavedComposerSelectionOffset()).toBe(expectedOffset);
+
     document.body.removeChild(editor);
   });
 
