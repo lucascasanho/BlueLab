@@ -159,5 +159,11 @@ const strings: Record<string, Blue2Strings> = {
 
 export const blue2Text = (locale: string, key: Blue2TextKey): string => {
   const language = locale.toLowerCase().split(/[-_]/)[0] ?? 'en';
-  return (strings[language] ?? strings.en)[key];
+  const fallbackStrings = strings.en;
+
+  if (!fallbackStrings) {
+    throw new Error('BLUE 2.0 English locale fallback is missing');
+  }
+
+  return (strings[language] ?? fallbackStrings)[key];
 };
