@@ -1,0 +1,73 @@
+name: BlueLab 2.0 alpha2 compatibility cleanup
+
+on:
+  push:
+    branches:
+      - sync/20260902-blue2-full-restore
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: sync/20260902-blue2-full-restore
+          fetch-depth: 0
+
+      - name: Set up Javascript environment
+        uses: ./.github/actions/setup-javascript
+
+      - name: Finish BlueLab alpha2 compatibility cleanup
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('app/javascript/mastodon/features/ui/components/columns_area/redesign.module.scss')
+          text = path.read_text()
+          marker = ".blue2MobileUtilityBar,\n.blue2MobileRailOverlay {\n  display: none;\n}\n"
+          addition = marker + "\n.blue2MobileRailBackdrop {\n  position: absolute;\n  inset: 0;\n  border: 0;\n  padding: 0;\n  background: transparent;\n  cursor: pointer;\n}\n"
+          if '.blue2MobileRailBackdrop {' not in text:
+              if marker not in text:
+                  raise SystemExit('Could not locate BlueLab mobile overlay marker')
+              text = text.replace(marker, addition, 1)
+
+          drawer_marker = "  .blue2MobileRailDrawer {\n    position: absolute;\n"
+          drawer_replacement = "  .blue2MobileRailDrawer {\n    position: absolute;\n    z-index: 1;\n"
+          if drawer_marker in text and '  .blue2MobileRailDrawer {\n    position: absolute;\n    z-index: 1;\n' not in text:
+              text = text.replace(drawer_marker, drawer_replacement, 1)
+
+          path.write_text(text)
+          PY
+
+          yarn eslint \
+            app/javascript/mastodon/features/blue2/account_menu.tsx \
+            app/javascript/mastodon/features/blue2/navigation.tsx \
+            app/javascript/mastodon/features/blue2/right_rail.tsx \
+            app/javascript/mastodon/features/blue2/scroll_to_top.tsx \
+            app/javascript/mastodon/features/custom_homepage/index.tsx \
+            app/javascript/mastodon/features/direct_timeline/index.tsx \
+            app/javascript/mastodon/features/ui/components/columns_area/redesign.tsx \
+            --fix || true
+
+          yarn format \
+            app/javascript/mastodon/features/blue2/account_menu.tsx \
+            app/javascript/mastodon/features/blue2/navigation.tsx \
+            app/javascript/mastodon/features/blue2/right_rail.tsx \
+            app/javascript/mastodon/features/blue2/scroll_to_top.tsx \
+            app/javascript/mastodon/features/custom_homepage/index.tsx \
+            app/javascript/mastodon/features/direct_timeline/index.tsx \
+            app/javascript/mastodon/features/ui/components/columns_area/redesign.tsx \
+            app/javascript/mastodon/features/ui/components/columns_area/redesign.module.scss
+
+          rm .github/workflows/bluelab-blue2-alpha2-compat.yml
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          HUSKY=0 git commit -m "Finish BlueLab 2.0 alpha2 compatibility cleanup"
+          git push origin HEAD:sync/20260902-blue2-full-restore
