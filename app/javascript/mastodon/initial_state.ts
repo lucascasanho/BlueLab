@@ -45,7 +45,7 @@ interface InitialStateMeta {
   title: string;
   custom_app_icon: string | null;
   show_trends: boolean;
-  landing_page: 'about' | 'trends' | 'local_feed';
+  landing_page: 'about' | 'overview' | 'trends' | 'local_feed';
   use_blurhash: boolean;
   use_pending_items?: boolean;
   version: string;
