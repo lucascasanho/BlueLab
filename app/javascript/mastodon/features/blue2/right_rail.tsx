@@ -1,54 +1,96 @@
+import { useEffect, useState } from 'react';
+
 import { Link } from 'react-router-dom';
 
 import { Blue2FeedIcon, Blue2SearchIcon } from './icons';
 import classes from './right_rail.module.scss';
 
-export const Blue2RightRail: React.FC = () => (
-  <aside className={classes.root}>
-    <Link className={classes.search} to='/explore'>
-      <Blue2SearchIcon size={19} />
-      <span>Pesquisar</span>
-    </Link>
+type TrendTag = {
+  name: string;
+};
 
-    <Link className={classes.feedShortcut} to='/home'>
-      <span className={classes.feedIcon}>
-        <Blue2FeedIcon size={18} />
-      </span>
-      <span>Seguindo</span>
-    </Link>
+export const Blue2RightRail: React.FC = () => {
+  const [tags, setTags] = useState<TrendTag[]>([]);
 
-    <Link className={classes.moreFeeds} to='/public/local'>
-      <span>+</span>
-      <span>Mais feeds</span>
-    </Link>
+  useEffect(() => {
+    const controller = new AbortController();
 
-    <section className={classes.card}>
-      <div className={classes.cardHeader}>
-        <strong>↗ Em alta</strong>
-        <span>•••</span>
+    void (async () => {
+      try {
+        const response = await fetch('/api/v1/trends/tags?limit=10', {
+          credentials: 'same-origin',
+          signal: controller.signal,
+        });
+
+        if (!response.ok) return;
+
+        const data = (await response.json()) as TrendTag[];
+        setTags(data.slice(0, 10));
+      } catch {
+        // Trending topics are optional decoration; keep the rail usable if
+        // the endpoint is unavailable or the request is aborted.
+      }
+    })();
+
+    return () => controller.abort();
+  }, []);
+
+  return (
+    <aside className={classes.root}>
+      <div className={classes.content}>
+        <Link className={classes.search} to='/explore'>
+          <Blue2SearchIcon size={19} />
+          <span>Pesquisar</span>
+        </Link>
+
+        <nav className={classes.feeds} aria-label='Timelines'>
+          <Link className={classes.feedShortcut} to='/home'>
+            <span className={classes.feedIcon}>
+              <Blue2FeedIcon size={18} />
+            </span>
+            <span>Seguindo</span>
+          </Link>
+
+          <Link className={classes.feedShortcut} to='/public/local'>
+            <span className={classes.feedIcon}>
+              <Blue2FeedIcon size={18} />
+            </span>
+            <span>Federação</span>
+          </Link>
+
+          <Link className={classes.feedShortcut} to='/public'>
+            <span className={classes.feedIcon}>
+              <Blue2FeedIcon size={18} />
+            </span>
+            <span>Global</span>
+          </Link>
+        </nav>
+
+        <section className={classes.card}>
+          <div className={classes.cardHeader}>
+            <strong>↗ Em alta</strong>
+          </div>
+
+          <ol className={classes.trendList}>
+            {tags.map((tag, index) => (
+              <li key={tag.name}>
+                <span className={classes.rank}>{index + 1}.</span>
+                <Link to={`/tags/${encodeURIComponent(tag.name)}`}>
+                  #{tag.name}
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </section>
       </div>
-      <ol>
-        <li>
-          <Link to='/explore'>Explorar assuntos em alta</Link>
-        </li>
-        <li>
-          <Link to='/public/local'>Publicações locais</Link>
-        </li>
-        <li>
-          <Link to='/public'>Fediverso</Link>
-        </li>
-        <li>
-          <Link to='/followed_tags'>Hashtags seguidas</Link>
-        </li>
-      </ol>
-    </section>
 
-    <footer className={classes.footer}>
-      <a href='/about'>Sobre</a>
-      <span>·</span>
-      <a href='/privacy-policy'>Privacidade</a>
-      <span>·</span>
-      <a href='/terms-of-service'>Termos</a>
-    </footer>
-  </aside>
-);
+      <footer className={classes.footer}>
+        <a href='/about'>Sobre</a>
+        <span>·</span>
+        <a href='/privacy-policy'>Privacidade</a>
+        <span>·</span>
+        <a href='/terms-of-service'>Termos</a>
+      </footer>
+    </aside>
+  );
+};
