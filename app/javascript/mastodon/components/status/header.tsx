@@ -126,6 +126,7 @@ const StatusDisplayName: FC<{
         ...displayNameProps,
       }}
       className='status__display-name'
+      reference='status'
     >
       <div className='status__avatar'>
         <AccountComponent

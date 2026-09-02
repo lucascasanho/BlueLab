@@ -1,19 +1,27 @@
 @use '@/styles/mastodon/mixins';
+@use '@/styles/mastodon/variables';
 
 .root {
-  @include mixins.elevation-2;
-
   container-type: inline-size;
-  border-radius: var(--radius-xl);
   background: var(--color-bg-primary);
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
   padding: var(--space-md);
+<<<<<<< HEAD
   min-width: min(300px, calc(100vw - var(--space-md) * 2));
   position: relative;
   overflow: hidden;
+=======
+>>>>>>> 171438e185139efd68df7245f39f57c880dceff6
   z-index: 1; // To cover the sidebar
+
+  @media (width >= #{variables.$mobile-menu-breakpoint}) {
+    @include mixins.elevation-2;
+
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+  }
 }
 
 .background {

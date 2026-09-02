@@ -1,6 +1,10 @@
 /* eslint-disable jsx-a11y/no-autofocus */
+<<<<<<< HEAD
 import type React from 'react';
 import { lazy, Suspense, useCallback, useLayoutEffect, useRef } from 'react';
+=======
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+>>>>>>> 171438e185139efd68df7245f39f57c880dceff6
 
 import { FormattedMessage } from 'react-intl';
 
@@ -54,6 +58,20 @@ export const ComposeRedesignButton: React.FC<{
   const launcherOriginRef = useRef<ReturnType<
     typeof composerOriginFromElement
   > | null>(null);
+
+  // Update viewport based on visual size in order to account for the virtual keyboard.
+  const [viewportHeight, setViewportHeight] = useState<null | number>(null);
+  useEffect(() => {
+    const updateHeight = () => {
+      setViewportHeight(visualViewport?.height ?? null);
+    };
+
+    visualViewport?.addEventListener('resize', updateHeight);
+
+    return () => {
+      visualViewport?.removeEventListener('resize', updateHeight);
+    };
+  }, []);
 
   const dispatch = useAppDispatch();
   const captureLauncherPointerOrigin: React.PointerEventHandler<HTMLButtonElement> =
@@ -174,13 +192,21 @@ export const ComposeRedesignButton: React.FC<{
   }
 
   if (displayState === 'showing') {
+    // Pass the viewport height as a CSS variable so it's only used for mobile.
+    const style = {
+      '--viewport-height': viewportHeight ? `${viewportHeight}px` : undefined,
+    } as React.CSSProperties;
     return (
       <Suspense fallback={<CircularProgress strokeWidth={2} size={50} />}>
+<<<<<<< HEAD
         <ComposeLazyForm
           ref={composerRef}
           autoFocus
           className={classes.composer}
         />
+=======
+        <ComposeLazyForm autoFocus className={classes.composer} style={style} />
+>>>>>>> 171438e185139efd68df7245f39f57c880dceff6
       </Suspense>
     );
   }

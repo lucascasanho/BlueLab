@@ -23,6 +23,7 @@
 .composer,
 .composerMinimized {
   position: fixed;
+<<<<<<< HEAD
   z-index: 100;
   bottom: 0;
   inset-inline-end: 0;
@@ -58,13 +59,38 @@
 :global(.reduce-motion) .composer,
 :global(.reduce-motion) .composerMinimized {
   animation: none;
+=======
+  right: 0;
+  box-sizing: border-box;
+>>>>>>> 171438e185139efd68df7245f39f57c880dceff6
 }
 
 .composer {
-  width: calc(100vw - var(--space-md) * 2);
-  max-width: 500px;
-  min-height: 520px;
-  max-height: 80vh;
+  width: 100%;
+  top: env(safe-area-inset-top);
+
+  // Set from the visualViewport API.
+  height: var(--viewport-height, 100vh);
+  max-height: 100vh;
+
+  @media (width >= #{variables.$mobile-menu-breakpoint}) {
+    top: auto;
+    bottom: 0;
+    min-height: 520px;
+    height: auto;
+    min-width: 300px;
+    width: calc(100vw - var(--space-md) * 2);
+    max-width: 500px;
+    margin: var(--space-md);
+  }
+}
+
+// When in the mobile view and the composer is open, disable scroll on the body element.
+// This prevents scrolling the textarea accidentally hitting the body instead.
+@media (width < #{variables.$mobile-menu-breakpoint}) {
+  body:has(.composer) {
+    overflow-y: hidden !important;
+  }
 }
 
 @media (height <= 800px) {
@@ -75,10 +101,12 @@
 }
 
 .composerMinimized {
+  bottom: 0;
   width: min(320px, calc(100vw - var(--space-md) * 2));
   padding: var(--space-md);
-}
+  margin: var(--space-md);
 
+<<<<<<< HEAD
 @media (width < #{variables.$mobile-menu-breakpoint}) {
   .button:not(.buttonInline) {
     opacity: 0;
@@ -151,5 +179,12 @@
 
   :global(.reduce-motion) .button:not(.buttonInline) {
     transition: none;
+=======
+  @media (width < #{variables.$mobile-menu-breakpoint}) {
+    bottom: var(--mobile-bottom-nav-height);
+    width: auto;
+    padding: 0;
+    border-radius: var(--radius-round);
+>>>>>>> 171438e185139efd68df7245f39f57c880dceff6
   }
 }
