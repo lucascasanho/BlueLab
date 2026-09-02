@@ -191,9 +191,7 @@ export const ColumnsAreaRedesign: React.FC<{
           )}
 
           {!isBlue2FeedPage && (
-            <div
-              className={classNames('tabs-bar__wrapper', classes.blue2Portal)}
-            >
+            <div className={classes.blue2Portal}>
               <TabsBarPortal />
             </div>
           )}
