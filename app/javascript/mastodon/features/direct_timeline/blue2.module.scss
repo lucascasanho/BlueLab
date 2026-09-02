@@ -51,6 +51,14 @@
   outline: none;
 }
 
+.headerButton svg,
+.newConversation svg {
+  width: 19px !important;
+  height: 19px !important;
+  margin: 0 !important;
+  flex: 0 0 19px;
+}
+
 .notice {
   margin: 10px 12px 0;
   padding: 10px 12px;
@@ -100,8 +108,8 @@
   box-sizing: border-box;
 }
 
-.emptyInbox svg,
-.welcomeInner svg {
+.emptyInbox > svg,
+.welcomeInner > svg {
   width: 52px;
   height: 52px;
   margin-bottom: 14px;
@@ -121,15 +129,15 @@
   min-height: 520px;
 }
 
-.welcomeInner svg {
+.welcomeInner > svg {
   width: 64px;
   height: 64px;
 }
 
 .newConversation {
   margin-top: 16px;
-  min-height: 42px;
-  padding-inline: 20px;
+  min-height: 40px;
+  padding-inline: 18px;
 }
 
 @media (width <= 759px) {
@@ -171,7 +179,7 @@
     padding: 28px 22px 96px;
   }
 
-  .welcomeInner svg {
+  .welcomeInner > svg {
     width: 70px;
     height: 70px;
   }
@@ -181,9 +189,9 @@
   }
 
   .newConversation {
-    min-height: 48px;
-    padding-inline: 24px;
-    font-size: 16px;
+    min-height: 44px;
+    padding-inline: 20px;
+    font-size: 15px;
   }
 
   .notice {
