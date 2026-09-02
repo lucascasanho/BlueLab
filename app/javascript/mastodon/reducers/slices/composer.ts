@@ -195,7 +195,9 @@ export const openNewComposer = createAppThunk(
 
 export const openPreferredComposer = createAppThunk(
   (payload: Pick<ComposeNewPayload, 'origin'>, { dispatch, getState }) => {
-    if (selectComposerEditor(getState()) === 'mastodon') {
+    const preferredEditor = selectComposerEditor(getState());
+
+    if (preferredEditor === 'mastodon') {
       browserHistory.push('/publish', { focusTarget: false });
       return;
     }

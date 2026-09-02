@@ -79,6 +79,9 @@
   // New Quote Posts feature after v4.5.0.alpha.2-2025-08-24
   .status__quote {
     --status-gutter-width: calc(var(--size-avatar) + var(--gap-default));
+
+    overflow: visible;
+    width: 100%;
   }
 
   // This is Mastodon core variable
@@ -93,10 +96,16 @@
     // separate rows instead of inheriting Bird UI's avatar-gutter layout.
     display: grid;
     grid-template-columns: minmax(0, 1fr);
+    overflow: visible;
 
     .status__info {
       height: auto;
       min-height: var(--size-avatar);
+    }
+
+    .status__content {
+      display: block;
+      overflow: visible;
     }
   }
 
