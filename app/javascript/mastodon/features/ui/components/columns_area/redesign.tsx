@@ -1,12 +1,13 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
 import classNames from 'classnames';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
 import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { customAppIcon } from '@/mastodon/initial_state';
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
 import { ComposePanel } from '@/mastodon/features/ui/components/compose_panel';
@@ -41,7 +42,9 @@ export const ColumnsAreaRedesign: React.FC<{
   children: React.ReactElement | React.ReactElement[];
   ref?: React.Ref<HTMLDivElement>;
 }> = ({ children, minimalShell, singleColumn, ref }) => {
+  const history = useHistory();
   const location = useLocation();
+  const swipeOrigin = useRef<{ x: number; y: number } | null>(null);
   const isModalOpen = useAppSelector(
     (state) => !state.modal.get('stack').isEmpty(),
   );
@@ -52,6 +55,49 @@ export const ColumnsAreaRedesign: React.FC<{
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const isBlue2Home = isBlue2 && location.pathname === '/home';
+  const isBlue2Global = isBlue2 && location.pathname === '/public';
+  const isBlue2FeedPage = isBlue2Home || isBlue2Global;
+
+  const handleSwipeStart = useCallback(
+    (event: React.TouchEvent<HTMLElement>) => {
+      if (!isBlue2FeedPage) return;
+
+      const touch = event.touches[0];
+      if (touch) {
+        swipeOrigin.current = { x: touch.clientX, y: touch.clientY };
+      }
+    },
+    [isBlue2FeedPage],
+  );
+
+  const handleSwipeEnd = useCallback(
+    (event: React.TouchEvent<HTMLElement>) => {
+      const origin = swipeOrigin.current;
+      swipeOrigin.current = null;
+
+      if (!origin || !isBlue2FeedPage) return;
+
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+
+      const deltaX = touch.clientX - origin.x;
+      const deltaY = touch.clientY - origin.y;
+
+      if (
+        Math.abs(deltaX) < 70 ||
+        Math.abs(deltaX) < Math.abs(deltaY) * 1.2
+      ) {
+        return;
+      }
+
+      if (deltaX < 0 && isBlue2Home) {
+        history.push('/public');
+      } else if (deltaX > 0 && isBlue2Global) {
+        history.push('/home');
+      }
+    },
+    [history, isBlue2FeedPage, isBlue2Global, isBlue2Home],
+  );
 
   if (minimalShell) {
     return (
@@ -86,24 +132,42 @@ export const ColumnsAreaRedesign: React.FC<{
           className={classNames(
             classes.main,
             classes.blue2Main,
-            isBlue2Home && classes.blue2Home,
+            isBlue2FeedPage && classes.blue2Home,
           )}
+          onTouchStart={handleSwipeStart}
+          onTouchEnd={handleSwipeEnd}
         >
           <div className={classNames('tabs-bar__wrapper', classes.blue2Portal)}>
             <TabsBarPortal />
           </div>
 
-          {isBlue2Home && (
+          {isBlue2FeedPage && (
             <>
               <header className={classes.blue2Topbar}>
-                <Link className={classes.blue2TabActive} to='/home'>
+                <img
+                  src={customAppIcon ?? '/favicon.ico'}
+                  alt=''
+                  className={classes.blue2Brand}
+                />
+
+                <Link
+                  className={
+                    isBlue2Home ? classes.blue2TabActive : classes.blue2Tab
+                  }
+                  to='/home'
+                >
                   Seguindo
                 </Link>
-                <Link className={classes.blue2Tab} to='/public/local'>
-                  Feeds ✨
+                <Link
+                  className={
+                    isBlue2Global ? classes.blue2TabActive : classes.blue2Tab
+                  }
+                  to='/public'
+                >
+                  Global
                 </Link>
               </header>
-              {!isMobile && <Blue2ComposeLauncher />}
+              {isBlue2Home && !isMobile && <Blue2ComposeLauncher />}
             </>
           )}
 
