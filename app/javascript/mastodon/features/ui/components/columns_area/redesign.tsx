@@ -69,12 +69,26 @@ export const ColumnsAreaRedesign: React.FC<{
   const isBlue2FeedPage = isBlue2Home || isBlue2Global;
 
   useEffect(() => {
-    setIsBlue2MobileRailOpen(false);
+    const frame = requestAnimationFrame(() => {
+      setIsBlue2MobileRailOpen(false);
+    });
+
+    return () => {
+      cancelAnimationFrame(frame);
+    };
   }, [location.pathname]);
 
   const handleOpenBlue2Navigation = useCallback(() => {
     dispatch(openNavigation());
   }, [dispatch]);
+
+  const handleOpenBlue2MobileRail = useCallback(() => {
+    setIsBlue2MobileRailOpen(true);
+  }, []);
+
+  const handleCloseBlue2MobileRail = useCallback(() => {
+    setIsBlue2MobileRailOpen(false);
+  }, []);
 
   const handleSwipeStart = useCallback(
     (event: React.TouchEvent<HTMLElement>) => {
@@ -177,7 +191,7 @@ export const ColumnsAreaRedesign: React.FC<{
               <button
                 type='button'
                 className={classes.blue2MobileUtilityButton}
-                onClick={() => setIsBlue2MobileRailOpen(true)}
+                onClick={handleOpenBlue2MobileRail}
                 aria-label={blue2Text(intl.locale, 'trendingFeeds')}
                 aria-expanded={isBlue2MobileRailOpen}
               >
@@ -238,12 +252,17 @@ export const ColumnsAreaRedesign: React.FC<{
           <div
             className={classes.blue2MobileRailOverlay}
             data-is-open={isBlue2MobileRailOpen}
-            onClick={() => setIsBlue2MobileRailOpen(false)}
           >
-            <aside
-              className={classes.blue2MobileRailDrawer}
-              onClick={(event) => event.stopPropagation()}
-            >
+            <button
+              type='button'
+              className={classes.blue2MobileRailBackdrop}
+              onClick={handleCloseBlue2MobileRail}
+              aria-label={intl.formatMessage({
+                id: 'bundle_modal_error.close',
+                defaultMessage: 'Close',
+              })}
+            />
+            <aside className={classes.blue2MobileRailDrawer}>
               <Blue2RightRail />
             </aside>
           </div>
