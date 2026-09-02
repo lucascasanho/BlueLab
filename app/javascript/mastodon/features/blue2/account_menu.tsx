@@ -3,7 +3,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { NavLink } from 'react-router-dom';
 
-import AddIcon from '@/material-icons/400-24px/add.svg?react';
 import LogoutIcon from '@/material-icons/400-24px/logout.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 import { Avatar } from '@/mastodon/components/avatar';
@@ -47,7 +46,7 @@ export const Blue2AccountMenu: React.FC = () => {
     };
   }, [open]);
 
-  const signOutAndGo = useCallback(async (target: string) => {
+  const signOut = useCallback(async () => {
     try {
       const token = csrfToken();
       await fetch('/auth/sign_out', {
@@ -56,7 +55,7 @@ export const Blue2AccountMenu: React.FC = () => {
         headers: token ? { 'X-CSRF-Token': token } : undefined,
       });
     } finally {
-      window.location.assign(target);
+      window.location.assign('/');
     }
   }, []);
 
@@ -81,29 +80,6 @@ export const Blue2AccountMenu: React.FC = () => {
 
       {open && (
         <div className={classes.menu} role='menu'>
-          <div className={classes.menuTitle}>
-            <FormattedMessage
-              id='blue2.account_menu.switch_account'
-              defaultMessage='Alterar conta'
-            />
-          </div>
-
-          <NavLink
-            to={profilePath}
-            className={classes.currentAccount}
-            onClick={() => setOpen(false)}
-            role='menuitem'
-          >
-            <Avatar account={account} size={34} />
-            <span>
-              <strong>{displayName}</strong>
-              <small>@{account.acct}</small>
-            </span>
-            <span className={classes.activeDot} aria-hidden='true' />
-          </NavLink>
-
-          <div className={classes.divider} />
-
           <NavLink
             to={profilePath}
             className={classes.menuItem}
@@ -112,32 +88,19 @@ export const Blue2AccountMenu: React.FC = () => {
           >
             <Blue2ProfileIcon size={22} />
             <FormattedMessage
-              id='blue2.account_menu.go_to_profile'
-              defaultMessage='Ir para este perfil'
+              id='account.go_to_profile'
+              defaultMessage='Go to profile'
             />
           </NavLink>
 
           <button
             type='button'
             className={classes.menuItem}
-            onClick={() => void signOutAndGo('/auth/sign_in')}
-            role='menuitem'
-          >
-            <AddIcon />
-            <FormattedMessage
-              id='blue2.account_menu.add_account'
-              defaultMessage='Adicionar outra conta'
-            />
-          </button>
-
-          <button
-            type='button'
-            className={classes.menuItem}
-            onClick={() => void signOutAndGo('/')}
+            onClick={() => void signOut()}
             role='menuitem'
           >
             <LogoutIcon />
-            <FormattedMessage id='navigation_bar.logout' defaultMessage='Sair' />
+            <FormattedMessage id='navigation_bar.logout' defaultMessage='Log out' />
           </button>
         </div>
       )}
