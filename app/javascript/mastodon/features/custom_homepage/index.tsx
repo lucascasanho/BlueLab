@@ -4,8 +4,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 
+import * as WebAuthnJSON from '@github/webauthn-json';
 import { Helmet } from '@unhead/react/helmet';
 
+import api from '@/mastodon/api';
 import { NavigationFocusTarget } from '@/mastodon/components/navigation_focus_target';
 import { customAppIcon, registrationsOpen } from '@/mastodon/initial_state';
 import { fetchServer } from 'mastodon/actions/server';
@@ -41,37 +43,91 @@ export const CustomHomepage: React.FC = () => {
     setShowBlue2Welcome(false);
   }, []);
 
+  const handlePasskeyLogin = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!WebAuthnJSON.supported()) {
+      window.location.assign('/auth/sign_in#passkey-authentication-form');
+      return;
+    }
+
+    const authenticate = async () => {
+      try {
+        const response = await api().get<
+          WebAuthnJSON.CredentialRequestOptionsJSON['publicKey']
+        >('/auth/passkey/options');
+        const credential = await WebAuthnJSON.get({ publicKey: response.data });
+        const result = await api().post<{ redirect_path: string }>(
+          '/auth/passkey',
+          { credential },
+        );
+        window.location.replace(result.data.redirect_path);
+      } catch (error) {
+        console.error('Passkey authentication failed', error);
+        window.location.assign('/auth/sign_in#passkey-authentication-form');
+      }
+    };
+
+    void authenticate();
+  }, []);
+
   if (isBlue2) {
     return (
-      <div className={classes.blue2AboutPage}>
-        <ServerHeroImage
-          alt={server.item?.thumbnail.description ?? ''}
-          blurhash={server.item?.thumbnail.blurhash ?? ''}
-          src={server.item?.thumbnail.url ?? ''}
-          srcSet={Object.keys(server.item?.thumbnail.versions ?? {})
-            .map(
-              (key) =>
-                `${server.item?.thumbnail.versions?.[key]} ${key.replace('@', '')}`,
-            )
-            .join(', ')}
-          className={classes.blue2AboutHeader}
-        />
-
-        <div className={classes.blue2AboutIdentity}>
+      <div className={classes.blue2Landing}>
+        <section className={classes.blue2LandingIntro}>
           <img
             src={customAppIcon ?? '/favicon.ico'}
             alt=''
             className={classes.blue2LandingIcon}
           />
-          <div>
-            <NavigationFocusTarget as='h1'>
-              {server.item?.domain}
-            </NavigationFocusTarget>
-            <p>{server.item?.description}</p>
-          </div>
-        </div>
+          <NavigationFocusTarget as='h1'>
+            {server.item?.domain}
+          </NavigationFocusTarget>
+          <p>{server.item?.description}</p>
 
-        <About />
+          {!signedIn && (
+            <div className={classes.blue2LandingActions}>
+              {registrationsOpen && (
+                <a href={signupUrl} className={classes.blue2PrimaryAction}>
+                  <FormattedMessage
+                    id='sign_in_banner.create_account'
+                    defaultMessage='Create account'
+                  />
+                </a>
+              )}
+
+              <a href='/auth/sign_in' className={classes.blue2SecondaryAction}>
+                <FormattedMessage id='auth.login' defaultMessage='Log in' />
+              </a>
+
+              <a
+                href='/auth/sign_in#passkey-authentication-form'
+                className={classes.blue2SecondaryAction}
+                onClick={handlePasskeyLogin}
+              >
+                <FormattedMessage
+                  id='passkeys.sign_in'
+                  defaultMessage='Sign in with a passkey'
+                />
+              </a>
+            </div>
+          )}
+        </section>
+
+        <section className={classes.blue2LandingAbout}>
+          <ServerHeroImage
+            alt={server.item?.thumbnail.description ?? ''}
+            blurhash={server.item?.thumbnail.blurhash ?? ''}
+            src={server.item?.thumbnail.url ?? ''}
+            srcSet={Object.keys(server.item?.thumbnail.versions ?? {})
+              .map(
+                (key) =>
+                  `${server.item?.thumbnail.versions?.[key]} ${key.replace('@', '')}`,
+              )
+              .join(', ')}
+            className={classes.blue2LandingHeader}
+          />
+          <About />
+        </section>
 
         {showBlue2Welcome && !signedIn && (
           <div className={classes.blue2WelcomeBackdrop}>
@@ -104,7 +160,10 @@ export const CustomHomepage: React.FC = () => {
 
               <div className={classes.blue2WelcomeActions}>
                 {registrationsOpen && (
-                  <a href={signupUrl} className={classes.blue2PrimaryAction}>
+                  <a
+                    href={signupUrl}
+                    className={classes.blue2ModalPrimaryAction}
+                  >
                     <FormattedMessage
                       id='sign_in_banner.create_account'
                       defaultMessage='Create account'
@@ -114,7 +173,7 @@ export const CustomHomepage: React.FC = () => {
 
                 <a
                   href='/auth/sign_in'
-                  className={classes.blue2SecondaryAction}
+                  className={classes.blue2ModalSecondaryAction}
                 >
                   <FormattedMessage
                     id='sign_in_banner.sign_in'
@@ -124,7 +183,8 @@ export const CustomHomepage: React.FC = () => {
 
                 <a
                   href='/auth/sign_in#passkey-authentication-form'
-                  className={classes.blue2SecondaryAction}
+                  className={classes.blue2ModalSecondaryAction}
+                  onClick={handlePasskeyLogin}
                 >
                   <FormattedMessage
                     id='passkeys.sign_in'
@@ -197,6 +257,7 @@ export const CustomHomepage: React.FC = () => {
             <a
               href='/auth/sign_in#passkey-authentication-form'
               className='button button-secondary'
+              onClick={handlePasskeyLogin}
             >
               <FormattedMessage
                 id='passkeys.sign_in'

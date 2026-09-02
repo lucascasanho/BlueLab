@@ -1165,6 +1165,7 @@
   "onboarding.profile.title": "Configuração do perfil",
   "onboarding.profile.upload_avatar": "Enviar imagem de perfil",
   "onboarding.profile.upload_header": "Carregar cabeçalho do perfil",
+  "passkeys.sign_in": "Entrar com uma chave de acesso (passkey)",
   "password_confirmation.exceeds_maxlength": "A confirmação da senha excede o tamanho máximo de senha",
   "password_confirmation.mismatching": "A confirmação de senha não corresponde",
   "picture_in_picture.restore": "Por de volta",

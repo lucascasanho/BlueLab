@@ -225,6 +225,8 @@
 }
 
 .blue2PrimaryAction,
+.blue2ModalSecondaryAction,
+.blue2ModalPrimaryAction,
 .blue2SecondaryAction {
   min-height: 44px;
   padding: 0 18px;
@@ -475,5 +477,28 @@
     padding: 74px 26px 44px;
     border: 0;
     border-radius: 0;
+  }
+}
+
+.blue2ModalPrimaryAction {
+  background: #0085ff;
+  color: #fff !important;
+
+  &:hover,
+  &:focus-visible {
+    background: #0075e2;
+    outline: none;
+  }
+}
+
+.blue2ModalSecondaryAction {
+  border: 1px solid rgb(36 55 79 / 20%);
+  background: #fff;
+  color: #24374f !important;
+
+  &:hover,
+  &:focus-visible {
+    background: #f0f6fa;
+    outline: none;
   }
 }
