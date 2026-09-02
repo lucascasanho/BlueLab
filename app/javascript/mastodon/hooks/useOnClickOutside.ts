@@ -37,13 +37,20 @@ export function useOnClickOutside(
   });
 
   useEffect(() => {
-    if (enabled) {
-      document.addEventListener('click', handleClickOutside);
-
-      return () => {
-        document.removeEventListener('click', handleClickOutside);
-      };
+    if (!enabled) {
+      return () => null;
     }
-    return () => null;
-  }, [enabled]);
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      handleClickOutside(event as MouseEvent);
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [enabled, handleClickOutside]);
 }

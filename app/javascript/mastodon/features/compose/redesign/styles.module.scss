@@ -48,7 +48,7 @@
   min-height: 0;
   flex-direction: column;
   gap: var(--space-md);
-  overflow: visible;
+  overflow: hidden;
   overscroll-behavior-y: contain;
   scrollbar-width: thin;
   touch-action: pan-y;
@@ -57,6 +57,7 @@
 .attachments,
 .richEditorWrapper,
 .richEditor {
+  min-height: 0;
   overscroll-behavior-y: contain;
 }
 
@@ -173,6 +174,7 @@ textarea.textarea {
   flex: 0 0 auto;
   flex-direction: column;
   gap: var(--space-xs);
+  min-height: 0;
 }
 
 .richEditorToolbar {
