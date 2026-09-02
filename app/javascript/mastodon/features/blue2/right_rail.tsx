@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
+import { useIdentity } from '@/mastodon/identity_context';
 
 import { Blue2HomeIcon, Blue2SearchIcon } from './icons';
 import { blue2Text } from './locale';
@@ -17,6 +18,7 @@ type TrendTag = {
 
 export const Blue2RightRail: React.FC = () => {
   const intl = useIntl();
+  const { signedIn } = useIdentity();
   const [tags, setTags] = useState<TrendTag[]>([]);
   const [trendMenuOpen, setTrendMenuOpen] = useState(false);
   const [trendsHidden, setTrendsHidden] = useState(false);
@@ -53,25 +55,27 @@ export const Blue2RightRail: React.FC = () => {
         </Link>
 
         <nav className={classes.feeds} aria-label='Timelines'>
-          <Link className={classes.feedShortcut} to='/home'>
-            <span className={classes.feedIcon}>
-              <Blue2HomeIcon size={18} />
-            </span>
-            <FormattedMessage id='account.following' defaultMessage='Following' />
-          </Link>
+          {signedIn && (
+            <Link className={classes.feedShortcut} to='/home'>
+              <span className={classes.feedIcon}>
+                <Blue2HomeIcon size={18} />
+              </span>
+              <FormattedMessage id='account.following' defaultMessage='Following' />
+            </Link>
+          )}
 
           <Link className={classes.feedShortcut} to='/public/local'>
             <span className={classes.feedIcon}>
               <GroupsIcon />
             </span>
-            <span>Federação</span>
+            <span>{blue2Text(intl.locale, 'federation')}</span>
           </Link>
 
           <Link className={classes.feedShortcut} to='/public'>
             <span className={classes.feedIcon}>
               <PublicIcon />
             </span>
-            <span>Global</span>
+            <span>{blue2Text(intl.locale, 'global')}</span>
           </Link>
         </nav>
 
