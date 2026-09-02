@@ -16,7 +16,9 @@ export const Blue2ScrollToTop: React.FC = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const update = () => setVisible(hasScrolled());
+    const update = () => {
+      setVisible(hasScrolled());
+    };
     update();
 
     window.addEventListener('scroll', update, { passive: true });
