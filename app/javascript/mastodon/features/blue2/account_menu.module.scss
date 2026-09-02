@@ -1,28 +1,41 @@
 .root {
   position: relative;
-  width: 100%;
+  z-index: 12;
+  width: 52px;
+  height: 54px;
   margin-bottom: 8px;
+  overflow: visible;
 }
 
 .accountButton {
   box-sizing: border-box;
-  width: 100%;
-  min-height: 54px;
-  padding: 6px 10px 6px 6px;
+  position: absolute;
+  z-index: 2;
+  inset: 0 auto auto 0;
+  width: 52px;
+  min-height: 52px;
+  padding: 5px;
   border: 0;
   border-radius: 999px;
   display: flex;
   align-items: center;
   gap: 10px;
+  overflow: hidden;
   background: transparent;
   color: var(--blue2-text, #f7f7f8);
   text-align: start;
   cursor: pointer;
-  transition: background 120ms ease;
+  transition:
+    width 150ms ease,
+    padding 150ms ease,
+    background 120ms ease;
 
   &:hover,
   &:focus-visible,
   &[aria-expanded='true'] {
+    width: 220px;
+    padding: 5px 10px 5px 5px;
+    overflow: visible;
     background: var(--blue2-hover, #111820);
     outline: none;
   }
@@ -30,10 +43,16 @@
 
 .identity {
   min-width: 0;
+  max-width: 0;
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 1px;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-width 150ms ease,
+    opacity 100ms ease;
 
   strong,
   span {
@@ -60,19 +79,39 @@
 .moreIcon {
   width: 20px;
   height: 20px;
-  flex: 0 0 20px;
+  max-width: 0;
+  flex: 0 0 auto;
+  overflow: hidden;
   fill: currentColor;
   color: var(--blue2-muted, #9aa8b4);
+  opacity: 0;
+  transition:
+    max-width 150ms ease,
+    opacity 100ms ease;
+}
+
+.accountButton:hover .identity,
+.accountButton:focus-visible .identity,
+.accountButton[aria-expanded='true'] .identity {
+  max-width: 132px;
+  opacity: 1;
+}
+
+.accountButton:hover .moreIcon,
+.accountButton:focus-visible .moreIcon,
+.accountButton[aria-expanded='true'] .moreIcon {
+  max-width: 20px;
+  opacity: 1;
 }
 
 .menu {
   position: absolute;
   z-index: 40;
-  top: calc(100% + 4px);
-  left: 4px;
+  top: 56px;
+  left: 0;
   width: min(250px, calc(100vw - 24px));
   padding: 8px;
-  border: 1px solid var(--blue2-border, #22303b);
+  border: 1px solid var(--blue2-border-soft, #17232c);
   border-radius: 12px;
   background: var(--blue2-surface-raised, #101820);
   color: var(--blue2-text, #f7f7f8);
@@ -153,7 +192,7 @@
 .divider {
   height: 1px;
   margin: 6px 4px;
-  background: var(--blue2-border, #22303b);
+  background: var(--blue2-border-soft, #17232c);
 }
 
 .menuItem {
@@ -169,21 +208,21 @@
 }
 
 @media (width < 1024px) {
-  .root {
+  .accountButton:hover,
+  .accountButton:focus-visible,
+  .accountButton[aria-expanded='true'] {
     width: 52px;
-  }
-
-  .accountButton {
-    width: 52px;
-    height: 52px;
-    min-height: 52px;
     padding: 5px;
-    justify-content: center;
   }
 
-  .identity,
-  .moreIcon {
-    display: none;
+  .accountButton:hover .identity,
+  .accountButton:focus-visible .identity,
+  .accountButton[aria-expanded='true'] .identity,
+  .accountButton:hover .moreIcon,
+  .accountButton:focus-visible .moreIcon,
+  .accountButton[aria-expanded='true'] .moreIcon {
+    max-width: 0;
+    opacity: 0;
   }
 
   .menu {
