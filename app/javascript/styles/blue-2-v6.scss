@@ -2,13 +2,25 @@
 
 /* BlueLab 2.0 sixth refinement layer: repair clipped borders and unify surfaces. */
 body[data-theme='blue-2'] {
-  /* Ensure no upstream page background leaks above or between BlueLab columns. */
+  /* Ensure no upstream application background leaks above or between BlueLab columns. */
   &,
+  #mastodon,
+  .app-holder,
+  .app-body,
+  .ui,
+  .layout-single-column,
   .columns-area,
   .columns-area > .column,
   .column,
-  .column > .scrollable {
+  .column > .scrollable,
+  .tabs-bar__wrapper {
     background-color: var(--blue2-bg) !important;
+  }
+
+  .tabs-bar__wrapper {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
   }
 
   /* Use inset strokes for rounded cards so borders cannot disappear at clipped edges. */
