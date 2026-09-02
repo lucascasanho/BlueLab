@@ -94,9 +94,25 @@
   min-height: 100dvh;
   border: 0;
   border-inline-end: 1px solid var(--blue2-border-soft, #17232c);
+  border-bottom: 0 !important;
   background: var(--blue2-bg, #000);
+  box-shadow: none;
   overflow: visible;
   touch-action: pan-y;
+
+  :global(.columns-area--mobile),
+  :global(.columns-area--mobile > .column),
+  :global(.column > .scrollable) {
+    box-sizing: border-box;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+    background: var(--blue2-bg, #000) !important;
+  }
+
+  :global(.columns-area--mobile) {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 }
 
 .blue2RightRail {
@@ -106,18 +122,42 @@
   background: var(--blue2-bg, #000);
 }
 
+// BLUE 2.0 owns its internal header portal instead of inheriting the upstream
+// tabs-bar__wrapper. This prevents the Mastodon sticky surface from leaking a
+// secondary background above headers on non-feed pages.
 .blue2Portal {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  box-sizing: border-box;
+  width: 100%;
   min-height: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-top: 0 !important;
   background: var(--blue2-bg, #000) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: none !important;
+  isolation: isolate;
+
+  :global(#tabs-bar__portal) {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: var(--blue2-bg, #000) !important;
+  }
 
   :global(.column-header),
   :global(.column-header__wrapper),
   :global(.column-back-button),
   :global(.notification__filter-bar),
   :global(.account__section-headline) {
+    margin-top: 0 !important;
+    border-top: 0 !important;
     background: var(--blue2-bg, #000) !important;
     border-color: var(--blue2-border-soft, #17232c) !important;
     box-shadow: none !important;
@@ -227,6 +267,7 @@
   .blue2Main {
     max-width: none;
     border-inline: 0;
+    border-bottom: 0 !important;
     padding-bottom: var(--mobile-bottom-nav-height);
     background: var(--blue2-bg, #000);
   }
@@ -283,7 +324,7 @@
   }
 
   .blue2Portal {
-    top: 56px !important;
+    top: 56px;
     background: var(--blue2-bg, #000) !important;
   }
 
