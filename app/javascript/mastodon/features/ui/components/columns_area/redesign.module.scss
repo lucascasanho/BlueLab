@@ -84,6 +84,7 @@
   height: 100dvh;
   z-index: 3;
   border-inline-end: 1px solid var(--blue2-border-soft, #17232c);
+  background: var(--blue2-bg, #000);
 }
 
 .blue2Main {
@@ -100,10 +101,13 @@
 .blue2RightRail {
   grid-column: 3;
   min-width: 0;
+  min-height: 100dvh;
+  background: var(--blue2-bg, #000);
 }
 
 .blue2Portal {
   min-height: 0;
+  background: var(--blue2-bg, #000);
 }
 
 .blue2Home {
