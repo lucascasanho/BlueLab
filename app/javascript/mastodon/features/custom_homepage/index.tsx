@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -7,12 +7,11 @@ import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import { Helmet } from '@unhead/react/helmet';
 
 import { NavigationFocusTarget } from '@/mastodon/components/navigation_focus_target';
-import { customAppIcon } from '@/mastodon/initial_state';
+import { customAppIcon, registrationsOpen } from '@/mastodon/initial_state';
 import { fetchServer } from 'mastodon/actions/server';
 import { ServerHeroImage } from 'mastodon/components/server_hero_image';
 import { TabLink, TabList } from 'mastodon/components/tab_list';
 import { useIdentity } from 'mastodon/identity_context';
-import { registrationsOpen } from 'mastodon/initial_state';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
 import { About } from './about';
@@ -37,6 +36,10 @@ export const CustomHomepage: React.FC = () => {
   useEffect(() => {
     void dispatch(fetchServer());
   }, [dispatch]);
+
+  const closeBlue2Welcome = useCallback(() => {
+    setShowBlue2Welcome(false);
+  }, []);
 
   if (isBlue2) {
     return (
@@ -81,7 +84,7 @@ export const CustomHomepage: React.FC = () => {
               <button
                 className={classes.blue2WelcomeClose}
                 type='button'
-                onClick={() => setShowBlue2Welcome(false)}
+                onClick={closeBlue2Welcome}
                 aria-label={intl.formatMessage({
                   id: 'bundle_modal_error.close',
                   defaultMessage: 'Close',
@@ -129,7 +132,7 @@ export const CustomHomepage: React.FC = () => {
                 <button
                   type='button'
                   className={classes.blue2ExploreAction}
-                  onClick={() => setShowBlue2Welcome(false)}
+                  onClick={closeBlue2Welcome}
                 >
                   <FormattedMessage
                     id='tabs_bar.explore'
