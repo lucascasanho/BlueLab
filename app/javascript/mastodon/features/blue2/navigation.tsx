@@ -31,7 +31,7 @@ import classes from './navigation.module.scss';
 
 type ItemProps = {
   to: string;
-  icon: React.FC<{ size?: number | string; weight?: string }>;
+  icon: React.ElementType;
   children: React.ReactNode;
   exact?: boolean;
   badge?: number;
