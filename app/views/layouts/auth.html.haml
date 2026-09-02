@@ -9,7 +9,7 @@
     .container-alt.blue2-auth-shell
       %section.blue2-auth-intro
         .blue2-auth-intro__inner
-          = image_tag(instance_presenter.auth_logo&.file&.url || favicon_path(96) || frontend_asset_path('icons/favicon-96x96.png'), alt: '', class: 'blue2-auth-intro__icon')
+          = image_tag(instance_presenter.auth_logo&.file&.url || favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png'), alt: '', class: 'blue2-auth-intro__icon')
           %h1
             - if content_for?(:blue2_auth_title)
               = yield :blue2_auth_title
