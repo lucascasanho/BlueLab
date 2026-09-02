@@ -34,8 +34,8 @@ export const Blue2ComposeLauncher: React.FC = () => {
       <AvatarById accountId={accountId} size={40} />
       <span className={classes.prompt}>
         <FormattedMessage
-          id='blue2.compose.prompt'
-          defaultMessage="What's up?"
+          id='compose_form.placeholder'
+          defaultMessage="What's on your mind?"
         />
       </span>
       <Blue2ComposeIcon size={22} />
