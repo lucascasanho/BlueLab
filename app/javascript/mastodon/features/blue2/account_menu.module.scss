@@ -1,10 +1,11 @@
 .root {
   position: relative;
   z-index: 12;
-  width: 52px;
+  width: 220px;
   height: 54px;
   margin-bottom: 8px;
   overflow: visible;
+  cursor: pointer;
 }
 
 .accountButton {
@@ -29,16 +30,16 @@
     width 150ms ease,
     padding 150ms ease,
     background 120ms ease;
+}
 
-  &:hover,
-  &:focus-visible,
-  &[aria-expanded='true'] {
-    width: 220px;
-    padding: 5px 10px 5px 5px;
-    overflow: visible;
-    background: var(--blue2-hover, #111820);
-    outline: none;
-  }
+.root:hover .accountButton,
+.root:focus-within .accountButton,
+.accountButton[aria-expanded='true'] {
+  width: 220px;
+  padding: 5px 10px 5px 5px;
+  overflow: visible;
+  background: var(--blue2-hover, #111820);
+  outline: none;
 }
 
 .identity {
@@ -90,15 +91,15 @@
     opacity 100ms ease;
 }
 
-.accountButton:hover .identity,
-.accountButton:focus-visible .identity,
+.root:hover .identity,
+.root:focus-within .identity,
 .accountButton[aria-expanded='true'] .identity {
   max-width: 132px;
   opacity: 1;
 }
 
-.accountButton:hover .moreIcon,
-.accountButton:focus-visible .moreIcon,
+.root:hover .moreIcon,
+.root:focus-within .moreIcon,
 .accountButton[aria-expanded='true'] .moreIcon {
   max-width: 20px;
   opacity: 1;
@@ -118,14 +119,6 @@
   box-shadow: 0 12px 36px rgb(0 0 0 / 38%);
 }
 
-.menuTitle {
-  padding: 5px 8px 7px;
-  color: var(--blue2-muted, #9aa8b4);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.currentAccount,
 .menuItem {
   box-sizing: border-box;
   width: 100%;
@@ -140,6 +133,8 @@
   color: var(--blue2-text, #f7f7f8) !important;
   text-decoration: none;
   font: inherit;
+  font-size: 13px;
+  font-weight: 600;
   text-align: start;
   cursor: pointer;
 
@@ -150,54 +145,6 @@
     text-decoration: none;
     outline: none;
   }
-}
-
-.currentAccount {
-  span:not(.activeDot) {
-    min-width: 0;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  strong,
-  small {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  strong {
-    font-size: 13px;
-    font-weight: 650;
-  }
-
-  small {
-    margin-top: 1px;
-    color: var(--blue2-muted, #9aa8b4);
-    font-size: 11px;
-  }
-}
-
-.activeDot {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 16px;
-  border: 1px solid var(--blue2-blue, #0085ff);
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 4px var(--blue2-surface-raised, #101820);
-  background: var(--blue2-blue, #0085ff);
-}
-
-.divider {
-  height: 1px;
-  margin: 6px 4px;
-  background: var(--blue2-border-soft, #17232c);
-}
-
-.menuItem {
-  font-size: 13px;
-  font-weight: 600;
 
   svg {
     width: 21px;
@@ -208,18 +155,22 @@
 }
 
 @media (width < 1024px) {
-  .accountButton:hover,
-  .accountButton:focus-visible,
+  .root {
+    width: 52px;
+  }
+
+  .root:hover .accountButton,
+  .root:focus-within .accountButton,
   .accountButton[aria-expanded='true'] {
     width: 52px;
     padding: 5px;
   }
 
-  .accountButton:hover .identity,
-  .accountButton:focus-visible .identity,
+  .root:hover .identity,
+  .root:focus-within .identity,
   .accountButton[aria-expanded='true'] .identity,
-  .accountButton:hover .moreIcon,
-  .accountButton:focus-visible .moreIcon,
+  .root:hover .moreIcon,
+  .root:focus-within .moreIcon,
   .accountButton[aria-expanded='true'] .moreIcon {
     max-width: 0;
     opacity: 0;
