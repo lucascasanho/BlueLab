@@ -56,3 +56,134 @@
     border-inline: 1px solid var(--color-border-primary);
   }
 }
+
+// BLUE 2.0 is intentionally a separate shell. These classes are only rendered
+// when the selected Mastodon theme is `blue-2`, so other themes keep the
+// upstream layout untouched.
+.blue2Root {
+  --main-column-max-width: 600px;
+  --navigation-min-width: 240px;
+  --navigation-max-width: 260px;
+
+  padding: 0;
+  gap: 0;
+  background: var(--blue2-bg, #000);
+
+  @media (min-width: $mobile-menu-breakpoint) {
+    grid-template-columns:
+      minmax(var(--navigation-min-width), 1fr)
+      minmax(0, 600px)
+      minmax(300px, 1fr);
+  }
+}
+
+.blue2NavigationWrapper {
+  grid-column: 1;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  z-index: 3;
+  border-inline-end: 1px solid var(--blue2-border, #202a33);
+}
+
+.blue2Main {
+  grid-column: 2;
+  max-width: 600px;
+  min-height: 100dvh;
+  border-inline: 1px solid var(--blue2-border, #202a33);
+  border-top: 0;
+  background: var(--blue2-bg, #000);
+  overflow: visible;
+}
+
+.blue2RightRail {
+  grid-column: 3;
+  min-width: 0;
+}
+
+.blue2Portal {
+  min-height: 0;
+}
+
+.blue2Home {
+  :global(.column-header),
+  :global(.column-header__wrapper) {
+    display: none;
+  }
+}
+
+.blue2Topbar {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  height: 58px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  background: color-mix(in srgb, var(--blue2-bg, #000) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--blue2-border, #202a33);
+}
+
+.blue2Tab,
+.blue2TabActive {
+  position: relative;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  padding: 0 12px 11px;
+  color: var(--blue2-muted, #9aa8b4);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--blue2-text, #f7f7f8);
+    background: var(--blue2-hover, #0b1117);
+    text-decoration: none;
+    outline: none;
+  }
+}
+
+.blue2TabActive {
+  color: var(--blue2-text, #f7f7f8);
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 56px;
+    height: 3px;
+    border-radius: 999px 999px 0 0;
+    background: #0085ff;
+    transform: translateX(-50%);
+  }
+}
+
+@media (width < 1180px) and (min-width: $mobile-menu-breakpoint) {
+  .blue2Root {
+    --navigation-min-width: 76px;
+    --navigation-max-width: 76px;
+
+    grid-template-columns: 76px minmax(0, 600px) minmax(270px, 1fr);
+  }
+}
+
+@media (max-width: ($mobile-menu-breakpoint - 1)) {
+  .blue2Root {
+    display: block;
+  }
+
+  .blue2Main {
+    max-width: none;
+    border-inline: 0;
+    padding-bottom: var(--mobile-bottom-nav-height);
+  }
+
+  .blue2NavigationWrapper,
+  .blue2RightRail {
+    display: none;
+  }
+}

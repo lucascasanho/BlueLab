@@ -1,7 +1,11 @@
 import { useCallback } from 'react';
 
 import classNames from 'classnames';
+import { Link, useLocation } from 'react-router-dom';
 
+import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
+import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
+import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
@@ -37,6 +41,7 @@ export const ColumnsAreaRedesign: React.FC<{
   children: React.ReactElement | React.ReactElement[];
   ref?: React.Ref<HTMLDivElement>;
 }> = ({ children, minimalShell, singleColumn, ref }) => {
+  const location = useLocation();
   const isModalOpen = useAppSelector(
     (state) => !state.modal.get('stack').isEmpty(),
   );
@@ -44,6 +49,9 @@ export const ColumnsAreaRedesign: React.FC<{
   const useMastodonComposer = useAppSelector(
     (state) => state.compose.get('composer_editor') === 'mastodon',
   );
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const isBlue2Home = isBlue2 && location.pathname === '/home';
 
   if (minimalShell) {
     return (
@@ -59,6 +67,54 @@ export const ColumnsAreaRedesign: React.FC<{
 
           <Footer />
         </div>
+      </div>
+    );
+  }
+
+  if (singleColumn && isBlue2) {
+    return (
+      <div className={classNames(classes.root, classes.blue2Root)}>
+        {!isMobile && (
+          <div className={classes.blue2NavigationWrapper}>
+            <Blue2Navigation />
+          </div>
+        )}
+
+        {isMobile ? <RedesignMobileNavigation /> : <ComposeRedesignButton />}
+
+        <main
+          className={classNames(
+            classes.main,
+            classes.blue2Main,
+            isBlue2Home && classes.blue2Home,
+          )}
+        >
+          <div className={classNames('tabs-bar__wrapper', classes.blue2Portal)}>
+            <TabsBarPortal />
+          </div>
+
+          {isBlue2Home && (
+            <>
+              <header className={classes.blue2Topbar}>
+                <Link className={classes.blue2TabActive} to='/home'>
+                  Seguindo
+                </Link>
+                <Link className={classes.blue2Tab} to='/public/local'>
+                  Feeds ✨
+                </Link>
+              </header>
+              {!isMobile && <Blue2ComposeLauncher />}
+            </>
+          )}
+
+          <div className='columns-area columns-area--mobile'>{children}</div>
+        </main>
+
+        {!isMobile && (
+          <div className={classes.blue2RightRail}>
+            <Blue2RightRail />
+          </div>
+        )}
       </div>
     );
   }

@@ -1,0 +1,32 @@
+.root {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 62px;
+  padding: 10px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--blue2-border, #202a33);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: var(--blue2-bg, #000);
+  color: var(--blue2-muted, #9aa8b4);
+  text-align: start;
+  cursor: text;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--blue2-hover, #0b1117);
+    outline: none;
+  }
+
+  > svg {
+    margin-inline-start: auto;
+    color: var(--blue2-muted, #7d8b97);
+  }
+}
+
+.prompt {
+  flex: 1 1 auto;
+  font-size: 16px;
+  line-height: 1.3;
+}

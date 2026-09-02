@@ -1,0 +1,146 @@
+.root {
+  box-sizing: border-box;
+  width: 300px;
+  height: 100dvh;
+  margin-inline-end: auto;
+  padding: 18px 12px;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  color: var(--blue2-text, #f7f7f8);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.search {
+  box-sizing: border-box;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--blue2-search, #15202b);
+  color: var(--blue2-muted, #8ea0af);
+  text-decoration: none;
+  font-size: 15px;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--blue2-muted, #8ea0af);
+    background: var(--blue2-hover, #1b2732);
+    text-decoration: none;
+    outline: none;
+  }
+}
+
+.feedShortcut,
+.moreFeeds {
+  min-height: 36px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--blue2-text, #f7f7f8);
+  text-decoration: none;
+  font-size: 14px;
+
+  &:hover,
+  &:focus-visible {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+.feedShortcut {
+  margin-top: 10px;
+  font-weight: 650;
+}
+
+.feedIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  display: grid;
+  place-items: center;
+  background: #0085ff;
+  color: #fff;
+}
+
+.moreFeeds {
+  color: var(--blue2-muted, #9aa8b4);
+
+  > span:first-child {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    display: grid;
+    place-items: center;
+    background: var(--blue2-hover, #18212a);
+    font-size: 17px;
+  }
+}
+
+.card {
+  margin-top: 18px;
+  padding: 13px 14px 15px;
+  border: 1px solid var(--blue2-border, #26343f);
+  border-radius: 12px;
+  background: var(--blue2-bg, #000);
+
+  ol {
+    margin: 10px 0 0;
+    padding-inline-start: 22px;
+  }
+
+  li {
+    padding: 3px 0;
+    color: var(--blue2-muted, #9aa8b4);
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--blue2-text, #f7f7f8);
+      text-decoration: underline;
+    }
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.footer {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  color: var(--blue2-muted, #83929f);
+  font-size: 12px;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+@media (width < 1180px) {
+  .root {
+    width: 270px;
+  }
+}

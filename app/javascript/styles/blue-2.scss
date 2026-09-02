@@ -2,578 +2,428 @@
 
 /*
  * BLUE 2.0
- *
- * A BlueLab theme inspired by the interaction density, spacing, palette and
- * navigation hierarchy of the Bluesky Social application. No Bluesky logos or
- * trademarks are included.
- *
- * Bluesky social-app is MIT licensed. This stylesheet is an original Mastodon
- * adaptation and does not copy Bluesky application code verbatim.
+ * A Mastodon theme that follows the visual grammar of the Bluesky web app
+ * while keeping Mastodon/BlueLab behavior and branding. No Bluesky logo is
+ * included. social-app visual/icon references are MIT licensed; see docs.
  */
 
-:root,
-[data-color-scheme='light'] {
-  --blue2-accent: #0085ff;
-  --blue2-accent-hover: #0062bd;
-  --blue2-accent-soft: #e8f3ff;
-  --blue2-bg: #ffffff;
-  --blue2-surface: #ffffff;
-  --blue2-surface-hover: #f3f3f8;
-  --blue2-text: #141417;
-  --blue2-text-secondary: #545664;
-  --blue2-text-tertiary: #8d8e96;
-  --blue2-border: #e2e2e4;
-  --blue2-border-soft: #f0f0f2;
-  --blue2-danger: #ec4868;
-  --blue2-success: #20bc07;
-  --blue2-radius: 12px;
-  --blue2-pill: 9999px;
+body[data-theme='blue-2'] {
+  --blue2-bg: #000;
+  --blue2-surface: #000;
+  --blue2-surface-raised: #101820;
+  --blue2-search: #15202b;
+  --blue2-hover: #0c141b;
+  --blue2-border: #25313b;
+  --blue2-border-soft: #1c2730;
+  --blue2-text: #f7f7f8;
+  --blue2-muted: #9aa8b4;
+  --blue2-muted-2: #6f7f8c;
+  --blue2-blue: #0085ff;
+  --blue2-blue-hover: #0075e2;
+  --blue2-green: #20bc07;
+  --blue2-red: #ec4868;
 
   --color-bg: var(--blue2-bg);
   --color-bg-primary: var(--blue2-bg);
   --color-bg-ambient: var(--blue2-bg);
-  --color-bg-elevated: var(--blue2-surface);
-  --color-bg-secondary-base: var(--blue2-surface-hover);
-  --color-bg-secondary: var(--blue2-surface-hover);
-  --color-bg-secondary-solid: var(--blue2-surface-hover);
-  --color-bg-brand-base: var(--blue2-accent);
-  --color-bg-brand-base-hover: var(--blue2-accent-hover);
-  --color-bg-brand-soft: var(--blue2-accent-soft);
+  --color-bg-elevated: var(--blue2-surface-raised);
+  --color-bg-secondary-base: var(--blue2-surface-raised);
+  --color-bg-secondary: var(--blue2-surface-raised);
+  --color-bg-secondary-solid: var(--blue2-surface-raised);
   --color-fg: var(--blue2-text);
   --color-text-primary: var(--blue2-text);
-  --color-light-text: var(--blue2-text-secondary);
-  --color-text-brand: var(--blue2-accent);
-  --color-text-brand-soft: var(--blue2-accent);
-  --color-text-status-links: var(--blue2-accent);
+  --color-text-secondary: var(--blue2-muted);
+  --color-text-tertiary: var(--blue2-muted-2);
+  --color-text-brand: var(--blue2-blue);
+  --color-text-brand-soft: var(--blue2-blue);
+  --color-text-status-links: var(--blue2-blue);
+  --color-bg-brand-base: var(--blue2-blue);
+  --color-bg-brand-base-hover: var(--blue2-blue-hover);
+  --color-bg-brand-soft: rgb(0 133 255 / 14%);
+  --color-bg-brand-softest: rgb(0 133 255 / 8%);
   --color-border-primary: var(--blue2-border);
-  --color-border-brand: var(--blue2-accent);
-}
+  --color-border-strong: var(--blue2-border);
+  --color-border-brand: var(--blue2-blue);
+  --color-light-text: var(--blue2-muted);
+  --color-dark: var(--blue2-bg);
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --font-sans-serif: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
 
-[data-color-scheme='dark'] {
-  --blue2-accent: #0085ff;
-  --blue2-accent-hover: #1992ff;
-  --blue2-accent-soft: #001f3d;
-  --blue2-bg: #000000;
-  --blue2-surface: #000000;
-  --blue2-surface-hover: #141417;
-  --blue2-text: #ffffff;
-  --blue2-text-secondary: #b9b9c1;
-  --blue2-text-tertiary: #8d8e96;
-  --blue2-border: #26272d;
-  --blue2-border-soft: #141417;
-  --blue2-danger: #ec4868;
-  --blue2-success: #20bc07;
-
-  --color-bg: var(--blue2-bg);
-  --color-bg-primary: var(--blue2-bg);
-  --color-bg-ambient: var(--blue2-bg);
-  --color-bg-elevated: var(--blue2-surface);
-  --color-bg-secondary-base: var(--blue2-surface-hover);
-  --color-bg-secondary: var(--blue2-surface-hover);
-  --color-bg-secondary-solid: var(--blue2-surface-hover);
-  --color-bg-brand-base: var(--blue2-accent);
-  --color-bg-brand-base-hover: var(--blue2-accent-hover);
-  --color-bg-brand-soft: var(--blue2-accent-soft);
-  --color-fg: var(--blue2-text);
-  --color-text-primary: var(--blue2-text);
-  --color-light-text: var(--blue2-text-secondary);
-  --color-text-brand: var(--blue2-accent);
-  --color-text-brand-soft: var(--blue2-accent);
-  --color-text-status-links: var(--blue2-accent);
-  --color-border-primary: var(--blue2-border);
-  --color-border-brand: var(--blue2-accent);
-}
-
-@media (prefers-color-scheme: dark) {
-  html:not([data-color-scheme]) {
-    --blue2-accent: #0085ff;
-    --blue2-accent-hover: #1992ff;
-    --blue2-accent-soft: #001f3d;
-    --blue2-bg: #000000;
-    --blue2-surface: #000000;
-    --blue2-surface-hover: #141417;
-    --blue2-text: #ffffff;
-    --blue2-text-secondary: #b9b9c1;
-    --blue2-text-tertiary: #8d8e96;
-    --blue2-border: #26272d;
-    --blue2-border-soft: #141417;
-    --blue2-danger: #ec4868;
-    --blue2-success: #20bc07;
-
-    --color-bg: var(--blue2-bg);
-    --color-bg-primary: var(--blue2-bg);
-    --color-bg-ambient: var(--blue2-bg);
-    --color-bg-elevated: var(--blue2-surface);
-    --color-bg-secondary-base: var(--blue2-surface-hover);
-    --color-bg-secondary: var(--blue2-surface-hover);
-    --color-bg-secondary-solid: var(--blue2-surface-hover);
-    --color-bg-brand-base: var(--blue2-accent);
-    --color-bg-brand-base-hover: var(--blue2-accent-hover);
-    --color-bg-brand-soft: var(--blue2-accent-soft);
-    --color-fg: var(--blue2-text);
-    --color-text-primary: var(--blue2-text);
-    --color-light-text: var(--blue2-text-secondary);
-    --color-text-brand: var(--blue2-accent);
-    --color-text-brand-soft: var(--blue2-accent);
-    --color-text-status-links: var(--blue2-accent);
-    --color-border-primary: var(--blue2-border);
-    --color-border-brand: var(--blue2-accent);
-  }
-}
-
-html,
-body,
-#mastodon,
-.ui {
-  background: var(--blue2-bg) !important;
+  margin: 0;
+  background: var(--blue2-bg);
   color: var(--blue2-text);
-}
+  font-family: var(--font-sans-serif);
+  -webkit-font-smoothing: antialiased;
 
-body,
-button,
-input,
-textarea,
-select {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-}
-
-a {
-  color: var(--blue2-accent);
-}
-
-/* Desktop shell: compact left rail + 600px conversation/feed column. */
-@media (min-width: 900px) {
-  .layout-single-column .columns-area,
-  .layout-multiple-columns .columns-area {
-    max-width: 1120px;
-    margin-inline: auto;
+  a {
+    color: var(--blue2-blue);
   }
 
-  .layout-single-column .column,
-  .layout-single-column .column > .scrollable,
-  .layout-single-column .column > .scrollable__append,
-  .layout-multiple-columns .column,
-  .layout-multiple-columns .column > .scrollable {
-    max-width: 600px;
+  ::selection {
+    background: rgb(0 133 255 / 35%);
   }
 
-  .layout-single-column .navigation-panel,
-  .layout-multiple-columns .navigation-panel {
-    width: 240px;
-    min-width: 240px;
-    padding: 12px 8px;
+  /* Defend against legacy sidebars leaking into this theme. */
+  .compose-panel,
+  .navigation-panel {
+    display: none !important;
   }
-}
 
-/* Navigation */
-.navigation-panel,
-.navigation-panel__menu,
-.navigation-panel__logo,
-.navigation-panel__menu > li {
-  background: transparent !important;
-}
-
-.navigation-panel .column-link,
-.column-link {
-  min-height: 48px;
-  padding: 8px 14px !important;
-  border-radius: var(--blue2-pill) !important;
-  color: var(--blue2-text) !important;
-  font-size: 16px !important;
-  font-weight: 400;
-  gap: 14px;
-  transition: background-color 120ms ease, color 120ms ease;
-}
-
-.navigation-panel .column-link:hover,
-.navigation-panel .column-link:focus-visible,
-.column-link:hover,
-.column-link:focus-visible {
-  background: var(--blue2-surface-hover) !important;
-}
-
-.navigation-panel .column-link.active,
-.column-link.active,
-.column-link--transparent.active {
-  color: var(--blue2-text) !important;
-  font-weight: 600 !important;
-}
-
-.navigation-panel .column-link__icon,
-.navigation-panel .icon,
-.column-link__icon {
-  color: currentColor;
-  width: 26px;
-  height: 26px;
-}
-
-.navigation-panel__compose-button,
-.button.button--block,
-.compose-form .button,
-.compose-form__publish-button-wrapper .button,
-.button.button--primary {
-  background: var(--blue2-accent) !important;
-  color: #fff !important;
-  border: 0 !important;
-  border-radius: var(--blue2-pill) !important;
-  box-shadow: none !important;
-  font-weight: 600 !important;
-}
-
-.navigation-panel__compose-button:hover,
-.button.button--primary:hover,
-.compose-form .button:hover {
-  background: var(--blue2-accent-hover) !important;
-}
-
-/* Header / tabs */
-.column-header,
-.column-header__wrapper,
-.column-header__button,
-.account__section-headline,
-.notification__filter-bar,
-.tabs-bar {
-  background: color-mix(in srgb, var(--blue2-bg) 92%, transparent) !important;
-  color: var(--blue2-text) !important;
-  border-color: var(--blue2-border) !important;
-  box-shadow: none !important;
-  backdrop-filter: blur(12px);
-}
-
-.column-header__button,
-.column-header__button.active,
-.column-header__back-button,
-.column-header__collapsible-inner,
-.account__section-headline a,
-.notification__filter-bar button,
-.tabs-bar__link {
-  color: var(--blue2-text) !important;
-}
-
-.account__section-headline a.active::after,
-.notification__filter-bar button.active::after,
-.tabs-bar__link.active::after {
-  background: var(--blue2-accent) !important;
-  height: 3px !important;
-  border-radius: var(--blue2-pill) !important;
-}
-
-/* Timelines / statuses */
-.status,
-.status__wrapper,
-.notification,
-.notification-group,
-.account,
-.account-card,
-.follow-recommendations-container,
-.directory__card,
-.detailed-status,
-.detailed-status__action-bar {
-  background: var(--blue2-bg) !important;
-  color: var(--blue2-text) !important;
-  border-color: var(--blue2-border) !important;
-  box-shadow: none !important;
-}
-
-.status,
-.notification,
-.notification-group,
-.account {
-  border-bottom: 1px solid var(--blue2-border) !important;
-}
-
-.status:hover,
-.status__wrapper:hover,
-.notification:hover,
-.account:hover {
-  background: color-mix(in srgb, var(--blue2-surface-hover) 58%, var(--blue2-bg)) !important;
-}
-
-.status__display-name,
-.display-name strong,
-.account__display-name strong,
-.detailed-status__display-name strong {
-  color: var(--blue2-text) !important;
-  font-weight: 600 !important;
-}
-
-.display-name__account,
-.status__relative-time,
-.status__prepend,
-.account__display-name span,
-.detailed-status__display-name span,
-.status__info,
-.account__header__bio .account__header__content,
-.account__header__fields dt {
-  color: var(--blue2-text-secondary) !important;
-}
-
-.status__content,
-.status__content p,
-.detailed-status__wrapper,
-.detailed-status__wrapper p {
-  color: var(--blue2-text) !important;
-  font-size: 16px;
-  line-height: 1.35;
-}
-
-.status__content a,
-.detailed-status__wrapper a {
-  color: var(--blue2-accent) !important;
-}
-
-.status__action-bar button,
-.status__action-bar a,
-.detailed-status__action-bar button,
-.detailed-status__action-bar a {
-  color: var(--blue2-text-secondary) !important;
-}
-
-.status__action-bar button:hover,
-.status__action-bar a:hover,
-.detailed-status__action-bar button:hover,
-.detailed-status__action-bar a:hover {
-  color: var(--blue2-accent) !important;
-}
-
-.media-gallery,
-.video-player,
-.audio-player,
-.status-card,
-.status-card__image,
-.status-card__content,
-.status-card__host {
-  border-color: var(--blue2-border) !important;
-}
-
-.media-gallery,
-.video-player,
-.status-card {
-  border-radius: var(--blue2-radius) !important;
-  overflow: hidden;
-}
-
-.status-card {
-  background: var(--blue2-bg) !important;
-  box-shadow: none !important;
-}
-
-.status-card:hover {
-  background: var(--blue2-surface-hover) !important;
-}
-
-/* Composer */
-.compose-form,
-.compose-form__autosuggest-wrapper,
-.compose-form__modifiers,
-.compose-form__buttons-wrapper,
-.compose-form__publish,
-.compose-form__warning,
-.compose-panel,
-.drawer__inner,
-.drawer__inner__mastodon,
-.reply-indicator,
-.compose-form .spoiler-input__input {
-  background: var(--blue2-bg) !important;
-  color: var(--blue2-text) !important;
-  border-color: var(--blue2-border) !important;
-  box-shadow: none !important;
-}
-
-.compose-form .autosuggest-textarea__textarea,
-.compose-form textarea,
-.compose-form input {
-  color: var(--blue2-text) !important;
-  background: transparent !important;
-  border-color: var(--blue2-border) !important;
-}
-
-.compose-form .autosuggest-textarea__textarea::placeholder,
-.compose-form textarea::placeholder,
-.compose-form input::placeholder {
-  color: var(--blue2-text-tertiary) !important;
-}
-
-.compose-form__buttons button,
-.compose-form__buttons .icon-button,
-.compose-form__upload-button-icon,
-.compose-form__poll-button-icon {
-  color: var(--blue2-accent) !important;
-}
-
-/* Profiles */
-.account__header,
-.account__header__image,
-.account__header__bar,
-.account__header__extra,
-.account__header__fields,
-.account__header__bio,
-.account__header__account-note,
-.account__header__tabs,
-.account__header__tabs__buttons {
-  background: var(--blue2-bg) !important;
-  color: var(--blue2-text) !important;
-  border-color: var(--blue2-border) !important;
-  box-shadow: none !important;
-}
-
-.account__header__fields dl,
-.account__header__fields dt,
-.account__header__fields dd {
-  border-color: var(--blue2-border) !important;
-}
-
-.account__header__tabs__name h1,
-.account__header__tabs__name h1 small,
-.account__header__tabs__name h1 span {
-  color: var(--blue2-text) !important;
-}
-
-.account__header__tabs__name h1 small,
-.account__header__tabs__name h1 small span {
-  color: var(--blue2-text-secondary) !important;
-}
-
-.account__header__tabs__buttons .button,
-.account__header__tabs__buttons .icon-button,
-.account__header__tabs__buttons button {
-  border-radius: var(--blue2-pill) !important;
-}
-
-/* Search / inputs */
-.search,
-.search__input,
-.search__popout,
-.search-results,
-.search-results__header,
-input[type='text'],
-input[type='search'],
-input[type='email'],
-input[type='password'],
-textarea,
-select {
-  background: var(--blue2-surface-hover) !important;
-  color: var(--blue2-text) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
-
-.search__input,
-input[type='search'] {
-  border-radius: var(--blue2-pill) !important;
-}
-
-input:focus,
-textarea:focus,
-select:focus,
-.search__input:focus {
-  outline: 2px solid var(--blue2-accent) !important;
-  outline-offset: 0;
-}
-
-/* Dropdowns, popovers and modals */
-.dropdown-menu,
-.dropdown-menu__container,
-.dropdown-menu__container__list,
-.dropdown-menu__item,
-.actions-modal,
-.boost-modal,
-.confirmation-modal,
-.report-modal,
-.modal-root__modal,
-.modal-root__modal > div,
-.emoji-picker-dropdown__menu,
-.emoji-mart,
-.privacy-dropdown__dropdown,
-.language-dropdown__dropdown {
-  background: var(--blue2-surface) !important;
-  color: var(--blue2-text) !important;
-  border-color: var(--blue2-border) !important;
-  box-shadow: 0 8px 28px rgb(0 0 0 / 18%) !important;
-}
-
-.dropdown-menu,
-.dropdown-menu__container,
-.actions-modal,
-.boost-modal,
-.confirmation-modal,
-.report-modal,
-.emoji-picker-dropdown__menu,
-.privacy-dropdown__dropdown,
-.language-dropdown__dropdown {
-  border: 1px solid var(--blue2-border) !important;
-  border-radius: var(--blue2-radius) !important;
-  overflow: hidden;
-}
-
-.dropdown-menu__item a,
-.dropdown-menu__item button,
-.actions-modal button,
-.privacy-dropdown__option,
-.language-dropdown__dropdown__results__item {
-  color: var(--blue2-text) !important;
-}
-
-.dropdown-menu__item a:hover,
-.dropdown-menu__item button:hover,
-.actions-modal button:hover,
-.privacy-dropdown__option:hover,
-.language-dropdown__dropdown__results__item:hover {
-  background: var(--blue2-surface-hover) !important;
-}
-
-/* Alerts and common panels */
-.flash-message,
-.warning-banner,
-.dismissable-banner,
-.trends__item,
-.server-banner,
-.getting-started__wrapper,
-.empty-column-indicator {
-  background: var(--blue2-surface) !important;
-  color: var(--blue2-text) !important;
-  border-color: var(--blue2-border) !important;
-  box-shadow: none !important;
-}
-
-/* Mobile: Bluesky-like full-width feed and simple bottom chrome. */
-@media (max-width: 899px) {
+  .ui,
   .columns-area,
+  .columns-area--mobile,
   .column,
   .scrollable,
-  .scrollable__append {
-    width: 100% !important;
-    max-width: 100% !important;
+  .item-list,
+  .regeneration-indicator {
+    background: var(--blue2-bg);
   }
 
+  /* Feed geometry: flat rows with thin separators, like bsky.app. */
   .status,
   .notification,
   .notification-group,
-  .account {
-    padding-inline: 12px !important;
+  .account,
+  .conversation {
+    background: var(--blue2-bg);
+    border-color: var(--blue2-border);
   }
 
-  .navigation-bar,
-  .ui__header,
-  .tabs-bar,
-  .column-header {
-    background: color-mix(in srgb, var(--blue2-bg) 94%, transparent) !important;
-    border-color: var(--blue2-border) !important;
-    backdrop-filter: blur(14px);
+  .status,
+  .notification-group,
+  .notification {
+    padding-inline: 14px;
   }
 
-  .ui__header,
-  .column-header {
-    box-shadow: none !important;
+  .status {
+    padding-block: 10px;
+    border-bottom: 1px solid var(--blue2-border);
   }
 
+  .status:hover,
+  .notification:hover,
+  .notification-group:hover {
+    background: #030609;
+  }
+
+  .status__info,
+  .status__display-name,
+  .status__relative-time,
+  .display-name,
+  .account__display-name,
+  .account__header__tabs__name h1 {
+    font-family: var(--font-sans-serif);
+  }
+
+  .display-name__html,
+  .status__display-name strong,
+  .account__display-name strong {
+    color: var(--blue2-text);
+    font-weight: 650;
+  }
+
+  .display-name__account,
+  .status__relative-time,
+  .status__prepend,
+  .account__display-name span,
+  .account__header__tabs__name h1 small {
+    color: var(--blue2-muted);
+  }
+
+  .status__content,
+  .status__content p {
+    color: var(--blue2-text);
+    font-size: 15.5px;
+    line-height: 1.35;
+  }
+
+  .status__content a {
+    color: var(--blue2-blue);
+  }
+
+  .account__avatar,
+  .account__avatar img {
+    border-radius: 999px !important;
+  }
+
+  .status__action-bar,
+  .detailed-status__action-bar {
+    color: var(--blue2-muted);
+  }
+
+  .status__action-bar-button,
+  .icon-button {
+    color: var(--blue2-muted);
+  }
+
+  .status__action-bar-button:hover,
+  .icon-button:hover {
+    color: var(--blue2-blue);
+  }
+
+  .status__action-bar-button.star-icon.active,
+  .icon-button.star-icon.active {
+    color: var(--blue2-red);
+  }
+
+  .status__action-bar-button.active,
+  .icon-button.active {
+    color: var(--blue2-blue);
+  }
+
+  /* Media and embeds. */
+  .media-gallery,
+  .video-player,
+  .audio-player,
+  .status-card,
+  .media-gallery__item,
+  .media-gallery__item img,
+  .status-card__image,
+  .status-card__image-image {
+    border-radius: 12px;
+  }
+
+  .media-gallery,
+  .status-card,
+  .video-player {
+    border: 1px solid var(--blue2-border);
+    overflow: hidden;
+  }
+
+  .status-card {
+    background: var(--blue2-bg);
+    color: var(--blue2-text);
+  }
+
+  .status-card:hover {
+    background: var(--blue2-hover);
+  }
+
+  /* Remove the purple Mastodon/Bird recommendation surfaces visible in v1. */
+  .follow-recommendations,
+  .follow-recommendations__body,
+  .account-card,
+  .account-card__header,
+  .account-card__bio,
+  .trends__item,
+  .getting-started__trends,
+  .explore__search-results {
+    background: var(--blue2-bg) !important;
+    color: var(--blue2-text);
+    border-color: var(--blue2-border);
+  }
+
+  .account-card {
+    border: 1px solid var(--blue2-border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  /* Mastodon buttons become Bluesky-style pills. */
+  .button,
+  button.button,
+  .account__relationship .button,
+  .account__header__tabs__buttons .button {
+    border-radius: 999px;
+    border: 0;
+    box-shadow: none;
+    font-weight: 650;
+  }
+
+  .button.button--block,
+  .button.logo-button,
+  .button.button-tertiary {
+    border-radius: 999px;
+  }
+
+  .button:not(.button-secondary):not(.button-tertiary) {
+    background: var(--blue2-blue);
+    color: #fff;
+  }
+
+  .button:not(.button-secondary):not(.button-tertiary):hover {
+    background: var(--blue2-blue-hover);
+  }
+
+  /* Headers and tab bars are thin, flat and translucent. */
+  .column-header,
+  .column-header__wrapper,
+  .account__section-headline,
+  .notification__filter-bar,
+  .tabs-bar {
+    background: color-mix(in srgb, var(--blue2-bg) 94%, transparent);
+    color: var(--blue2-text);
+    border-color: var(--blue2-border);
+    box-shadow: none;
+    backdrop-filter: blur(12px);
+  }
+
+  .column-header__button,
+  .column-header__back-button,
+  .column-header__collapsible-inner {
+    color: var(--blue2-text);
+  }
+
+  .account__section-headline a,
+  .account__section-headline button,
+  .notification__filter-bar a,
+  .notification__filter-bar button {
+    color: var(--blue2-muted);
+    font-weight: 600;
+  }
+
+  .account__section-headline a.active,
+  .account__section-headline button.active,
+  .notification__filter-bar a.active,
+  .notification__filter-bar button.active {
+    color: var(--blue2-text);
+  }
+
+  .account__section-headline a.active::after,
+  .account__section-headline button.active::after,
+  .notification__filter-bar a.active::after,
+  .notification__filter-bar button.active::after {
+    background: var(--blue2-blue);
+  }
+
+  /* Menus / dialogs. */
+  .dropdown-menu,
+  .dropdown-menu__container,
+  .dropdown-menu__container__list,
   .modal-root__modal,
-  .compose-form {
-    border-radius: 0 !important;
+  .confirmation-modal,
+  .boost-modal,
+  .report-dialog-modal,
+  .picture-in-picture,
+  .privacy-dropdown__dropdown {
+    background: var(--blue2-bg);
+    color: var(--blue2-text);
+    border-color: var(--blue2-border);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgb(0 0 0 / 45%);
+  }
+
+  .dropdown-menu__item a,
+  .dropdown-menu__item button {
+    color: var(--blue2-text);
+  }
+
+  .dropdown-menu__item a:hover,
+  .dropdown-menu__item button:hover,
+  .dropdown-menu__item button:focus {
+    background: var(--blue2-hover);
+  }
+
+  /* Search/input surfaces. */
+  input,
+  textarea,
+  .search__input,
+  .setting-text,
+  .compose-form__autosuggest-wrapper textarea {
+    color: var(--blue2-text);
+    background: var(--blue2-search);
+    border-color: var(--blue2-border);
+    border-radius: 10px;
+  }
+
+  input::placeholder,
+  textarea::placeholder,
+  .search__input::placeholder {
+    color: var(--blue2-muted);
+  }
+
+  /* Profiles. */
+  .account__header,
+  .account__header__bar,
+  .account__header__tabs,
+  .account__header__extra,
+  .account__header__bio .account__header__fields {
+    background: var(--blue2-bg);
+    color: var(--blue2-text);
+    border-color: var(--blue2-border);
+  }
+
+  .account__header__image {
+    background: var(--blue2-search);
+  }
+
+  .account__header__tabs__name h1,
+  .account__header__content,
+  .account__header__content p {
+    color: var(--blue2-text);
+  }
+
+  .account__header__fields dl {
+    border-color: var(--blue2-border);
+  }
+
+  /* Polls / CW / quotes. */
+  .poll__option input[type='text'],
+  .spoiler-input__input,
+  .status__content__text--quote,
+  .quote-status {
+    background: var(--blue2-bg);
+    color: var(--blue2-text);
+    border-color: var(--blue2-border);
+  }
+
+  /* Scrollbars are intentionally nearly invisible, like the reference UI. */
+  * {
+    scrollbar-color: var(--blue2-border) transparent;
+    scrollbar-width: thin;
   }
 }
 
-/* Focus visibility */
-:focus-visible {
-  outline-color: var(--blue2-accent) !important;
+html[data-color-scheme='light'] body[data-theme='blue-2'] {
+  --blue2-bg: #fff;
+  --blue2-surface: #fff;
+  --blue2-surface-raised: #f3f3f8;
+  --blue2-search: #f0f4f8;
+  --blue2-hover: #f3f6f9;
+  --blue2-border: #e2e2e4;
+  --blue2-border-soft: #ececef;
+  --blue2-text: #101114;
+  --blue2-muted: #626b75;
+  --blue2-muted-2: #87909a;
+}
+
+@media (prefers-color-scheme: light) {
+  html:not([data-color-scheme]) body[data-theme='blue-2'] {
+    --blue2-bg: #fff;
+    --blue2-surface: #fff;
+    --blue2-surface-raised: #f3f3f8;
+    --blue2-search: #f0f4f8;
+    --blue2-hover: #f3f6f9;
+    --blue2-border: #e2e2e4;
+    --blue2-border-soft: #ececef;
+    --blue2-text: #101114;
+    --blue2-muted: #626b75;
+    --blue2-muted-2: #87909a;
+  }
+}
+
+@media (width <= 759px) {
+  body[data-theme='blue-2'] {
+    .status,
+    .notification,
+    .notification-group {
+      padding-inline: 12px;
+    }
+
+    .status__content,
+    .status__content p {
+      font-size: 15px;
+    }
+
+    .media-gallery,
+    .video-player,
+    .status-card {
+      border-radius: 10px;
+    }
+  }
 }
