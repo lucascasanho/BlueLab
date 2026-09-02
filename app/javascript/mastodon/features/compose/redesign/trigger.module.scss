@@ -60,10 +60,7 @@
 .composer {
   top: env(safe-area-inset-top);
   width: 100%;
-  height: var(
-    --viewport-height,
-    var(--composer-visual-viewport-height, 100vh)
-  );
+  height: var(--viewport-height, var(--composer-visual-viewport-height, 100vh));
   max-height: 100vh;
   margin: 0;
   border-radius: 0;
