@@ -142,9 +142,13 @@ export const ColumnsAreaRedesign: React.FC<{
           onTouchStart={handleSwipeStart}
           onTouchEnd={handleSwipeEnd}
         >
-          <div className={classNames('tabs-bar__wrapper', classes.blue2Portal)}>
-            <TabsBarPortal />
-          </div>
+          {!isBlue2FeedPage && (
+            <div
+              className={classNames('tabs-bar__wrapper', classes.blue2Portal)}
+            >
+              <TabsBarPortal />
+            </div>
+          )}
 
           {isBlue2FeedPage && (
             <>
