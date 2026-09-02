@@ -1,0 +1,41 @@
+name: BlueLab 2.0 merge preview
+
+on:
+  push:
+    branches:
+      - sync/20260902-blue2-full-restore
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: sync/20260902-blue2-full-restore
+          fetch-depth: 0
+
+      - name: Preview BlueLab 2.0 merge
+        run: |
+          git fetch origin theme/blue-2.0
+          set +e
+          git merge --no-commit --no-ff origin/theme/blue-2.0
+          rc=$?
+          set -e
+          echo "===== MERGE EXIT: $rc ====="
+          echo "===== CONFLICTS ====="
+          git diff --name-only --diff-filter=U || true
+          echo "===== STATUS ====="
+          git status --short
+          if [ "$rc" -ne 0 ]; then
+            echo "===== CONFLICT MARKERS ====="
+            for f in $(git diff --name-only --diff-filter=U); do
+              echo "--- $f ---"
+              grep -n -B 4 -A 12 -E '^(<<<<<<<|=======|>>>>>>>)' "$f" || true
+            done
+          fi
+          git merge --abort || true
+          exit "$rc"
