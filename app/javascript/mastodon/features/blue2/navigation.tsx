@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { NavLink } from 'react-router-dom';
 
 import { StackIcon } from '@phosphor-icons/react';
@@ -28,6 +28,7 @@ import {
   Blue2SearchIcon,
   Blue2SettingsIcon,
 } from './icons';
+import { blue2Text } from './locale';
 import classes from './navigation.module.scss';
 
 type ItemProps = {
@@ -36,16 +37,24 @@ type ItemProps = {
   children: React.ReactNode;
   exact?: boolean;
   badge?: number;
+  iconClassName?: string;
 };
 
-const Item: React.FC<ItemProps> = ({ to, icon: Icon, children, exact, badge }) => (
+const Item: React.FC<ItemProps> = ({
+  to,
+  icon: Icon,
+  children,
+  exact,
+  badge,
+  iconClassName,
+}) => (
   <NavLink
     to={to}
     exact={exact}
     className={classes.item}
     activeClassName={classes.itemActive}
   >
-    <Icon size={27} />
+    <Icon size={27} className={iconClassName} />
     <span>{children}</span>
     {!!badge && badge > 0 && <span className={classes.badge}>{badge}</span>}
   </NavLink>
@@ -53,7 +62,8 @@ const Item: React.FC<ItemProps> = ({ to, icon: Icon, children, exact, badge }) =
 
 export const Blue2Navigation: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { accountId } = useIdentity();
+  const intl = useIntl();
+  const { accountId, signedIn } = useIdentity();
   const account = useAccount(accountId);
   const notificationsCount = useAppSelector(selectUnreadNotificationGroupsCount);
 
@@ -73,77 +83,93 @@ export const Blue2Navigation: React.FC = () => {
   const collectionsPath = account?.acct
     ? `/@${account.acct}/collections`
     : '/home';
+  const homePath = signedIn ? '/home' : '/';
 
   return (
     <nav className={classes.root} aria-label='BLUE 2.0'>
-      <Blue2AccountMenu />
+      {signedIn && <Blue2AccountMenu />}
 
       <div className={classes.items}>
-        <Item to='/home' exact icon={Blue2HomeIcon}>
+        <Item to={homePath} exact icon={Blue2HomeIcon}>
           <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
         </Item>
         <Item to='/explore' icon={Blue2SearchIcon}>
           <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
         </Item>
-        <Item to='/notifications' icon={Blue2BellIcon} badge={notificationsCount}>
-          <FormattedMessage
-            id='tabs_bar.notifications'
-            defaultMessage='Notifications'
-          />
-        </Item>
-        <Item to='/conversations' icon={Blue2MessageIcon}>
-          <FormattedMessage id='tabs_bar.messages' defaultMessage='Messages' />
-        </Item>
+
+        {signedIn && (
+          <>
+            <Item
+              to='/notifications'
+              icon={Blue2BellIcon}
+              badge={notificationsCount}
+            >
+              <FormattedMessage
+                id='tabs_bar.notifications'
+                defaultMessage='Notifications'
+              />
+            </Item>
+            <Item to='/conversations' icon={Blue2MessageIcon}>
+              <FormattedMessage id='tabs_bar.messages' defaultMessage='Messages' />
+            </Item>
+          </>
+        )}
+
         <Item to='/public/local' icon={Blue2FeedIcon}>
           <FormattedMessage
             id='tabs_bar.fediverse_feeds'
             defaultMessage='Feeds'
           />
         </Item>
-        <Item to='/explore' icon={TrendingUpIcon}>
-          <FormattedMessage
-            id='blue2.navigation.trending_feeds'
-            defaultMessage='Feeds em alta'
-          />
-        </Item>
-        <Item to='/lists' icon={Blue2ListIcon}>
-          <FormattedMessage id='navigation_bar.lists' defaultMessage='Lists' />
-        </Item>
-        <Item to='/bookmarks' icon={Blue2BookmarkIcon}>
-          <FormattedMessage id='tabs_bar.saved' defaultMessage='Saved' />
-        </Item>
-        <Item to={collectionsPath} icon={StackIcon}>
-          <FormattedMessage
-            id='navigation_bar.collections'
-            defaultMessage='Collections'
-          />
-        </Item>
-        <Item to={profilePath} icon={Blue2ProfileIcon}>
-          <FormattedMessage
-            id='navigation_bar.profile'
-            defaultMessage='Profile'
-          />
+        <Item
+          to='/explore'
+          icon={TrendingUpIcon}
+          iconClassName={classes.trendingIcon}
+        >
+          {blue2Text(intl.locale, 'trendingFeeds')}
         </Item>
 
-        <a className={classes.item} href='/settings/preferences'>
-          <Blue2SettingsIcon size={27} />
-          <span>
-            <FormattedMessage
-              id='navigation_bar.preferences'
-              defaultMessage='Preferências'
-            />
-          </span>
-        </a>
+        {signedIn && (
+          <>
+            <Item to='/lists' icon={Blue2ListIcon}>
+              <FormattedMessage id='navigation_bar.lists' defaultMessage='Lists' />
+            </Item>
+            <Item to='/bookmarks' icon={Blue2BookmarkIcon}>
+              <FormattedMessage id='tabs_bar.saved' defaultMessage='Saved' />
+            </Item>
+            <Item to={collectionsPath} icon={StackIcon}>
+              <FormattedMessage
+                id='navigation_bar.collections'
+                defaultMessage='Collections'
+              />
+            </Item>
+            <Item to={profilePath} icon={Blue2ProfileIcon}>
+              {blue2Text(intl.locale, 'profile')}
+            </Item>
+
+            <a className={classes.item} href='/settings/preferences'>
+              <Blue2SettingsIcon size={27} />
+              <span>
+                <FormattedMessage
+                  id='navigation_bar.preferences'
+                  defaultMessage='Preferences'
+                />
+              </span>
+            </a>
+          </>
+        )}
       </div>
 
-      <button
-        className={classes.composeButton}
-        type='button'
-        onClick={openComposer}
-      >
-        <Blue2ComposeIcon size={19} />
-        <FormattedMessage id='tabs_bar.publish' defaultMessage='New post' />
-      </button>
+      {signedIn && (
+        <button
+          className={classes.composeButton}
+          type='button'
+          onClick={openComposer}
+        >
+          <Blue2ComposeIcon size={19} />
+          <span>{blue2Text(intl.locale, 'write')}</span>
+        </button>
+      )}
     </nav>
   );
 };
