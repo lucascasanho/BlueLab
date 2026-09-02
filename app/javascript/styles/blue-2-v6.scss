@@ -1,7 +1,16 @@
 @use 'blue-2-v5';
 
-/* BLUE 2.0 sixth refinement layer: repair clipped borders and unify surfaces. */
+/* BlueLab 2.0 sixth refinement layer: repair clipped borders and unify surfaces. */
 body[data-theme='blue-2'] {
+  /* Ensure no upstream page background leaks above or between BlueLab columns. */
+  &,
+  .columns-area,
+  .columns-area > .column,
+  .column,
+  .column > .scrollable {
+    background-color: var(--blue2-bg) !important;
+  }
+
   /* Use inset strokes for rounded cards so borders cannot disappear at clipped edges. */
   .status__quote,
   .status-card,
@@ -81,6 +90,41 @@ body[data-theme='blue-2'] {
 
   .column-header,
   .column-header__wrapper {
+    box-shadow: none !important;
+  }
+
+  /* Rails settings callouts: one rounded surface, never a black rectangle inside it. */
+  &.admin .callout {
+    overflow: hidden !important;
+    border: 1px solid var(--blue2-border-soft) !important;
+    border-radius: 12px !important;
+    background: var(--blue2-search) !important;
+    box-shadow: none !important;
+  }
+
+  &.admin .callout > .content,
+  &.admin .callout > .content > .body,
+  &.admin .callout .content,
+  &.admin .callout .body {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  &.admin .callout > .content > a,
+  &.admin .callout .content > a {
+    background: transparent !important;
+  }
+
+  /* React callouts use data-variant; keep those on a single BlueLab surface too. */
+  aside[data-variant] {
+    overflow: hidden;
+    border: 1px solid var(--blue2-border-soft) !important;
+    background: var(--blue2-search) !important;
+    box-shadow: none !important;
+  }
+
+  aside[data-variant] > * {
     box-shadow: none !important;
   }
 
