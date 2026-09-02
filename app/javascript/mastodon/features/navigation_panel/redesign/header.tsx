@@ -30,7 +30,7 @@ export const NavigationHeader: React.FC<{
             {isBlue2 ? (
               <>
                 {blue2Text(intl.locale, 'basedOnMastodon')}{' '}
-                <IconLogo role='presentation' />
+                <IconLogo role='presentation' /> Mastodon
               </>
             ) : (
               <FormattedMessage
