@@ -9,9 +9,9 @@ import { Helmet } from '@unhead/react/helmet';
 import { NavigationFocusTarget } from '@/mastodon/components/navigation_focus_target';
 import { fetchServer } from 'mastodon/actions/server';
 import { ServerHeroImage } from 'mastodon/components/server_hero_image';
+import { TabLink, TabList } from 'mastodon/components/tab_list';
 import { useIdentity } from 'mastodon/identity_context';
 import { registrationsOpen } from 'mastodon/initial_state';
-import { TabLink, TabList } from 'mastodon/components/tab_list';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
 import { About } from './about';
