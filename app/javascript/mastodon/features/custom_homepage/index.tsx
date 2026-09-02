@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 
 import { Helmet } from '@unhead/react/helmet';
 
 import { NavigationFocusTarget } from '@/mastodon/components/navigation_focus_target';
+import { blue2Text } from '@/mastodon/features/blue2/locale';
 import { customAppIcon } from '@/mastodon/initial_state';
 import { fetchServer } from 'mastodon/actions/server';
 import { ServerHeroImage } from 'mastodon/components/server_hero_image';
@@ -19,6 +20,7 @@ import classes from './styles.module.scss';
 
 export const CustomHomepage: React.FC = () => {
   const dispatch = useAppDispatch();
+  const intl = useIntl();
   const server = useAppSelector((state) => state.server.server);
   const { path } = useRouteMatch();
   const isBlue2 =
@@ -73,7 +75,10 @@ export const CustomHomepage: React.FC = () => {
                 className={classes.blue2WelcomeClose}
                 type='button'
                 onClick={() => setShowBlue2Welcome(false)}
-                aria-label='Close'
+                aria-label={intl.formatMessage({
+                  id: 'bundle_modal_error.close',
+                  defaultMessage: 'Close',
+                })}
               >
                 ×
               </button>
@@ -101,12 +106,7 @@ export const CustomHomepage: React.FC = () => {
               </div>
 
               <div className={classes.blue2WelcomeLogin}>
-                <span>
-                  <FormattedMessage
-                    id='auth.have_account'
-                    defaultMessage='Already have an account?'
-                  />
-                </span>{' '}
+                <span>{blue2Text(intl.locale, 'haveAccount')}</span>{' '}
                 <a href='/auth/sign_in'>
                   <FormattedMessage id='auth.login' defaultMessage='Log in' />
                 </a>
