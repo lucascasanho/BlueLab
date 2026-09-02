@@ -11,9 +11,16 @@ import {
   ColumnSettingsMenu,
 } from '@/mastodon/components/column_header';
 import { MultiColumnMenuItems } from '@/mastodon/components/column_header/multicolumn_settings';
-import { useAppDispatch } from '@/mastodon/store';
+import { Blue2MessageIcon } from '@/mastodon/features/blue2/icons';
+import { blue2Text } from '@/mastodon/features/blue2/locale';
+import {
+  composerOriginFromElement,
+  openNewComposer,
+} from '@/mastodon/reducers/slices/composer';
+import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
+import InboxIcon from '@/material-icons/400-24px/inbox.svg?react';
 import { addColumn, removeColumn, moveColumn } from 'mastodon/actions/columns';
 import {
   mountConversations,
@@ -22,11 +29,13 @@ import {
 } from 'mastodon/actions/conversations';
 import { connectDirectStream } from 'mastodon/actions/streaming';
 
+import blue2Classes from './blue2.module.scss';
 import { ConversationsList } from './components/conversations_list';
 
 const messages = defineMessages({
   title: { id: 'column.direct', defaultMessage: 'Private mentions' },
   title_redesign: { id: 'tab_bar.messages', defaultMessage: 'Messages' },
+  blue2Title: { id: 'tabs_bar.messages', defaultMessage: 'Messages' },
 });
 
 interface ColumnBase {
@@ -37,7 +46,23 @@ interface ColumnBase {
 const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const conversations = useAppSelector((state) =>
+    state.conversations.get('items'),
+  );
+  const conversationsLoading = useAppSelector((state) =>
+    state.conversations.get('isLoading', true),
+  );
   const pinned = !!columnId;
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const title = intl.formatMessage(
+    isBlue2
+      ? messages.blue2Title
+      : isRedesignEnabled()
+        ? messages.title_redesign
+        : messages.title,
+  );
+  const isInboxEmpty = conversations?.isEmpty() ?? true;
 
   const handlePin = useCallback(() => {
     if (columnId) {
@@ -54,6 +79,18 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
     [dispatch, columnId],
   );
 
+  const handleNewConversation = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      dispatch(
+        openNewComposer({
+          type: 'message',
+          origin: composerOriginFromElement(event.currentTarget),
+        }),
+      );
+    },
+    [dispatch],
+  );
+
   useEffect(() => {
     dispatch(mountConversations());
     dispatch(expandConversations());
@@ -66,11 +103,85 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
     };
   }, [dispatch]);
 
+  if (isBlue2) {
+    return (
+      <Column bindToDocument={!multiColumn} label={title}>
+        <div className={blue2Classes.root}>
+          <header className={blue2Classes.header}>
+            <h1>{title}</h1>
+            <button
+              type='button'
+              className={blue2Classes.headerButton}
+              onClick={handleNewConversation}
+            >
+              <Blue2MessageIcon size={19} />
+              <span>{blue2Text(intl.locale, 'newConversation')}</span>
+            </button>
+          </header>
+
+          <div className={blue2Classes.notice}>
+            <FormattedMessage
+              id='compose.message.notice'
+              defaultMessage='Messages are not end-to-end encrypted'
+            />{' '}
+            <a
+              href='https://docs.joinmastodon.org/user/posting/#private'
+              rel='noreferrer'
+              target='_blank'
+            >
+              <FormattedMessage
+                id='compose_form.direct_message_warning_learn_more'
+                defaultMessage='Learn more'
+              />
+            </a>
+          </div>
+
+          <div className={blue2Classes.layout}>
+            <section className={blue2Classes.inbox} aria-label={title}>
+              {isInboxEmpty && !conversationsLoading ? (
+                <div className={blue2Classes.emptyInbox}>
+                  <InboxIcon />
+                  <strong>{blue2Text(intl.locale, 'inboxEmpty')}</strong>
+                </div>
+              ) : (
+                <div className={blue2Classes.listWrap}>
+                  <ConversationsList
+                    trackScroll={!pinned}
+                    scrollKey={`direct_timeline-${columnId}`}
+                    emptyMessage={blue2Text(intl.locale, 'inboxEmpty')}
+                    bindToDocument={!multiColumn}
+                  />
+                </div>
+              )}
+            </section>
+
+            <section className={blue2Classes.welcome}>
+              <div className={blue2Classes.welcomeInner}>
+                <Blue2MessageIcon size={64} />
+                <strong>{blue2Text(intl.locale, 'sayHello')}</strong>
+                <button
+                  type='button'
+                  className={blue2Classes.newConversation}
+                  onClick={handleNewConversation}
+                >
+                  <Blue2MessageIcon size={19} />
+                  <span>{blue2Text(intl.locale, 'newConversation')}</span>
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <Helmet>
+          <title>{title}</title>
+          <meta name='robots' content='noindex' />
+        </Helmet>
+      </Column>
+    );
+  }
+
   return (
-    <Column
-      bindToDocument={!multiColumn}
-      label={intl.formatMessage(messages.title)}
-    >
+    <Column bindToDocument={!multiColumn} label={title}>
       {isRedesignEnabled() ? (
         <ColumnHeader
           title={intl.formatMessage(messages.title_redesign)}
@@ -136,11 +247,7 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
       />
 
       <Helmet>
-        <title>
-          {intl.formatMessage(
-            isRedesignEnabled() ? messages.title_redesign : messages.title,
-          )}
-        </title>
+        <title>{title}</title>
         <meta name='robots' content='noindex' />
       </Helmet>
     </Column>
