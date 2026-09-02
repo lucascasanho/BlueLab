@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -13,9 +13,9 @@ import { Blue2HomeIcon, Blue2SearchIcon } from './icons';
 import { blue2Text } from './locale';
 import classes from './right_rail.module.scss';
 
-type TrendTag = {
+interface TrendTag {
   name: string;
-};
+}
 
 export const Blue2RightRail: React.FC = () => {
   const intl = useIntl();
@@ -46,7 +46,9 @@ export const Blue2RightRail: React.FC = () => {
       }
     })();
 
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   const searchPlaceholder = intl.formatMessage({
@@ -54,12 +56,44 @@ export const Blue2RightRail: React.FC = () => {
     defaultMessage: 'Search',
   });
 
-  const submitSearch: React.FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault();
-    const value = query.trim();
-    if (!value) return;
-    history.push(`/search?q=${encodeURIComponent(value)}`);
-  };
+  const submitSearch: React.SubmitEventHandler<HTMLFormElement> = useCallback(
+    (event) => {
+      event.preventDefault();
+      const value = query.trim();
+      if (!value) return;
+      history.push(`/search?q=${encodeURIComponent(value)}`);
+    },
+    [history, query],
+  );
+
+  const handleQueryChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setQuery(event.currentTarget.value);
+    },
+    [],
+  );
+
+  const openTrendMenu = useCallback(() => {
+    setTrendMenuOpen(true);
+  }, []);
+
+  const closeTrendMenu = useCallback(() => {
+    setTrendMenuOpen(false);
+  }, []);
+
+  const hideTrends = useCallback(() => {
+    setTrendsHidden(true);
+    setTrendMenuOpen(false);
+  }, []);
+
+  const handleBackdropMouseDown = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (event.target === event.currentTarget) {
+        setTrendMenuOpen(false);
+      }
+    },
+    [],
+  );
 
   return (
     <aside className={classes.root}>
@@ -71,7 +105,7 @@ export const Blue2RightRail: React.FC = () => {
           <input
             type='search'
             value={query}
-            onChange={(event) => setQuery(event.currentTarget.value)}
+            onChange={handleQueryChange}
             placeholder={searchPlaceholder}
             aria-label={searchPlaceholder}
           />
@@ -119,7 +153,7 @@ export const Blue2RightRail: React.FC = () => {
                 className={classes.moreButton}
                 type='button'
                 aria-label={blue2Text(intl.locale, 'hideTrendsTitle')}
-                onClick={() => setTrendMenuOpen(true)}
+                onClick={openTrendMenu}
               >
                 <MoreHorizIcon />
               </button>
@@ -170,9 +204,7 @@ export const Blue2RightRail: React.FC = () => {
         <div
           className={classes.modalBackdrop}
           role='presentation'
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setTrendMenuOpen(false);
-          }}
+          onMouseDown={handleBackdropMouseDown}
         >
           <div
             className={classes.trendModal}
@@ -188,17 +220,14 @@ export const Blue2RightRail: React.FC = () => {
             <button
               className={classes.modalPrimary}
               type='button'
-              onClick={() => {
-                setTrendsHidden(true);
-                setTrendMenuOpen(false);
-              }}
+              onClick={hideTrends}
             >
               {blue2Text(intl.locale, 'hide')}
             </button>
             <button
               className={classes.modalSecondary}
               type='button'
-              onClick={() => setTrendMenuOpen(false)}
+              onClick={closeTrendMenu}
             >
               <FormattedMessage
                 id='confirmation_modal.cancel'
