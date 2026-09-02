@@ -30,8 +30,11 @@ export const AccountTabs: FC = () => {
     return <hr className={classes.noTabs} />;
   }
 
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+
   return (
-    <TabList>
+    <TabList data-blue2-profile-tabs={isBlue2 ? 'true' : undefined}>
       <TabLink isActive={isActive} to={`/@${acct}`}>
         <FormattedMessage id='account.activity' defaultMessage='Activity' />
       </TabLink>
