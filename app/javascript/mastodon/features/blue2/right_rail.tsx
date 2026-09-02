@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 
+import { FormattedMessage, useIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
 
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
+import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 
 import { Blue2HomeIcon, Blue2SearchIcon } from './icons';
+import { blue2Text } from './locale';
 import classes from './right_rail.module.scss';
 
 type TrendTag = {
@@ -13,7 +16,10 @@ type TrendTag = {
 };
 
 export const Blue2RightRail: React.FC = () => {
+  const intl = useIntl();
   const [tags, setTags] = useState<TrendTag[]>([]);
+  const [trendMenuOpen, setTrendMenuOpen] = useState(false);
+  const [trendsHidden, setTrendsHidden] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -43,7 +49,7 @@ export const Blue2RightRail: React.FC = () => {
       <div className={classes.content}>
         <Link className={classes.search} to='/explore'>
           <Blue2SearchIcon size={19} />
-          <span>Pesquisar</span>
+          <FormattedMessage id='search.placeholder' defaultMessage='Search' />
         </Link>
 
         <nav className={classes.feeds} aria-label='Timelines'>
@@ -51,7 +57,7 @@ export const Blue2RightRail: React.FC = () => {
             <span className={classes.feedIcon}>
               <Blue2HomeIcon size={18} />
             </span>
-            <span>Seguindo</span>
+            <FormattedMessage id='account.following' defaultMessage='Following' />
           </Link>
 
           <Link className={classes.feedShortcut} to='/public/local'>
@@ -69,31 +75,98 @@ export const Blue2RightRail: React.FC = () => {
           </Link>
         </nav>
 
-        <section className={classes.card}>
-          <div className={classes.cardHeader}>
-            <strong>↗ Em alta</strong>
-          </div>
+        {!trendsHidden && (
+          <section className={classes.card}>
+            <div className={classes.cardHeader}>
+              <strong>
+                ↗ <FormattedMessage id='trends.trending_now' defaultMessage='Trending now' />
+              </strong>
+              <button
+                className={classes.moreButton}
+                type='button'
+                aria-label={blue2Text(intl.locale, 'hideTrendsTitle')}
+                onClick={() => setTrendMenuOpen(true)}
+              >
+                <MoreHorizIcon />
+              </button>
+            </div>
 
-          <ol className={classes.trendList}>
-            {tags.map((tag, index) => (
-              <li key={tag.name}>
-                <span className={classes.rank}>{index + 1}.</span>
-                <Link to={`/tags/${encodeURIComponent(tag.name)}`}>
-                  #{tag.name}
-                </Link>
-              </li>
-            ))}
-          </ol>
-        </section>
+            <ol className={classes.trendList}>
+              {tags.map((tag, index) => (
+                <li key={tag.name}>
+                  <span className={classes.rank}>{index + 1}.</span>
+                  <Link to={`/tags/${encodeURIComponent(tag.name)}`}>
+                    #{tag.name}
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
       </div>
 
       <footer className={classes.footer}>
-        <a href='/about'>Sobre</a>
+        <a href='/about'>
+          <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
+        </a>
         <span>·</span>
-        <a href='/privacy-policy'>Privacidade</a>
+        <a href='/privacy-policy'>
+          <FormattedMessage
+            id='footer.privacy_policy_short'
+            defaultMessage='Privacy'
+          />
+        </a>
         <span>·</span>
-        <a href='/terms-of-service'>Termos</a>
+        <a href='/terms-of-service'>
+          <FormattedMessage
+            id='footer.terms_of_service_short'
+            defaultMessage='Terms'
+          />
+        </a>
       </footer>
+
+      {trendMenuOpen && (
+        <div
+          className={classes.modalBackdrop}
+          role='presentation'
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setTrendMenuOpen(false);
+          }}
+        >
+          <div
+            className={classes.trendModal}
+            role='dialog'
+            aria-modal='true'
+            aria-labelledby='blue2-hide-trends-title'
+          >
+            <h2 id='blue2-hide-trends-title'>
+              {blue2Text(intl.locale, 'hideTrendsTitle')}
+            </h2>
+            <p>{blue2Text(intl.locale, 'hideTrendsDescription')}</p>
+
+            <button
+              className={classes.modalPrimary}
+              type='button'
+              onClick={() => {
+                setTrendsHidden(true);
+                setTrendMenuOpen(false);
+              }}
+            >
+              {blue2Text(intl.locale, 'hide')}
+            </button>
+            <button
+              className={classes.modalSecondary}
+              type='button'
+              onClick={() => setTrendMenuOpen(false)}
+            >
+              <FormattedMessage
+                id='confirmation_modal.cancel'
+                defaultMessage='Cancel'
+              />
+            </button>
+          </div>
+        </div>
+      )}
     </aside>
   );
 };
