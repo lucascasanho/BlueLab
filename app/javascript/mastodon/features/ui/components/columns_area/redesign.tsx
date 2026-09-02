@@ -6,6 +6,7 @@ import { Link, useHistory, useLocation } from 'react-router-dom';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
 import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
+import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { customAppIcon } from '@/mastodon/initial_state';
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
@@ -179,6 +180,8 @@ export const ColumnsAreaRedesign: React.FC<{
             <Blue2RightRail />
           </div>
         )}
+
+        <Blue2ScrollToTop />
       </div>
     );
   }
