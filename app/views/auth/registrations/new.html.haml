@@ -1,6 +1,12 @@
 - content_for :page_title do
   = t('auth.register')
 
+- content_for :blue2_auth_title do
+  = t('auth.register')
+
+- content_for :blue2_auth_subtitle do
+  = t('auth.sign_up.preamble', site_title: site_title)
+
 - content_for :header_tags do
   = render partial: 'shared/og', locals: { description: description_for_sign_up(@invite) }
 
