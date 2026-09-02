@@ -1,7 +1,9 @@
 ---
 en:
   themes:
-    blue-2: BlueLab 2.0
+    blue-2: BlueLab
+    mastodon-bird-ui-auto: Bird UI
 pt-BR:
   themes:
-    blue-2: BlueLab 2.0
+    blue-2: BlueLab
+    mastodon-bird-ui-auto: Bird UI
