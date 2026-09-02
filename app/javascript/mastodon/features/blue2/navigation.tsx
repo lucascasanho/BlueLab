@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 
 import { StackIcon } from '@phosphor-icons/react';
 
-import { Avatar } from '@/mastodon/components/avatar';
+import TrendingUpIcon from '@/material-icons/400-24px/trending_up.svg?react';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
@@ -15,6 +15,7 @@ import {
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
+import { Blue2AccountMenu } from './account_menu';
 import {
   Blue2BellIcon,
   Blue2BookmarkIcon,
@@ -75,9 +76,7 @@ export const Blue2Navigation: React.FC = () => {
 
   return (
     <nav className={classes.root} aria-label='BLUE 2.0'>
-      <NavLink to={profilePath} className={classes.avatarLink}>
-        <Avatar account={account} size={42} />
-      </NavLink>
+      <Blue2AccountMenu />
 
       <div className={classes.items}>
         <Item to='/home' exact icon={Blue2HomeIcon}>
@@ -98,7 +97,13 @@ export const Blue2Navigation: React.FC = () => {
         <Item to='/public/local' icon={Blue2FeedIcon}>
           <FormattedMessage
             id='tabs_bar.fediverse_feeds'
-            defaultMessage='Federação'
+            defaultMessage='Feeds'
+          />
+        </Item>
+        <Item to='/explore' icon={TrendingUpIcon}>
+          <FormattedMessage
+            id='blue2.navigation.trending_feeds'
+            defaultMessage='Feeds em alta'
           />
         </Item>
         <Item to='/lists' icon={Blue2ListIcon}>
@@ -123,7 +128,10 @@ export const Blue2Navigation: React.FC = () => {
         <a className={classes.item} href='/settings/preferences'>
           <Blue2SettingsIcon size={27} />
           <span>
-            <FormattedMessage id='tabs_bar.settings' defaultMessage='Settings' />
+            <FormattedMessage
+              id='navigation_bar.preferences'
+              defaultMessage='Preferências'
+            />
           </span>
         </a>
       </div>
