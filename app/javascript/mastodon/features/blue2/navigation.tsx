@@ -32,14 +32,14 @@ import {
 import { blue2Text } from './locale';
 import classes from './navigation.module.scss';
 
-type ItemProps = {
+interface ItemProps {
   to: string;
   icon: React.ElementType;
   children: React.ReactNode;
   exact?: boolean;
   badge?: number;
   iconClassName?: string;
-};
+}
 
 const Item: React.FC<ItemProps> = ({
   to,
