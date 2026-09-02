@@ -18,11 +18,13 @@ When synchronizing a new Mastodon upstream version:
 The following behavior must survive upstream updates:
 
 - The Bluesky-inspired BlueLab theme is the separate `blue-2` theme, currently entering through `styles/blue-2-v7.scss`; it must remain registered and selectable as **BlueLab**.
+- The complete BlueLab 2.0 experience is protected, not only its SCSS entrypoint. This includes the `features/blue2` navigation, account menu, compose launcher, icons, right rail, scroll-to-top behavior, BlueLab single-column/mobile layout integration, and the BlueLab messages/direct-timeline presentation.
+- When upstream replaces or renames a file used by BlueLab 2.0, port the BlueLab behavior to the new upstream component instead of restoring obsolete upstream files or dropping the customization.
 - `mastodon-bird-ui-auto` is a separate legacy Bird UI option and must never be renamed to BlueLab or used as a replacement for the `blue-2` theme.
 - Vanilla/default remains available alongside BlueLab and Bird UI.
 - Signed-out visitors use the BlueLab custom `/overview` homepage by default, except when Trends or Local Feed is explicitly configured as the landing page.
-- The custom homepage keeps guest actions for account creation (when registrations are open), normal login, and native passkey login.
-- The public About experience keeps the intended BlueLab surfaces and must not render duplicated borders between adjacent blocks.
+- The BlueLab homepage keeps guest actions for account creation (when registrations are open), normal login, native passkey login, and the option to continue exploring without authentication.
+- The public About experience keeps the intended BlueLab surfaces and must not render duplicated borders between adjacent blocks or between section wrappers, titles, and bodies.
 - BlueLab compose redesign fixes, including mobile internal scrolling, media/ALT access, quote-card behavior, cursor/emoji behavior, safe-area handling, and prevention of background-column scrolling, must be preserved when compose files conflict.
 - Existing BlueLab branding, limits, instance customization controls, menu/theme palette adjustments, username-display behavior, passkey additions, and other committed BlueLab features must not be removed merely to match upstream.
 
