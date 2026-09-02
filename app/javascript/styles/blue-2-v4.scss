@@ -1,0 +1,68 @@
+@use 'blue-2-v3';
+
+/*
+ * BLUE 2.0 fourth integration layer.
+ * Small fixes requested after desktop/light/dark testing. All selectors stay
+ * scoped to the BLUE 2.0 theme so Vanilla and Bird UI are unaffected.
+ */
+body[data-theme='blue-2'] {
+  /* Settings/admin navigation must remain reachable on long pages. */
+  &.admin .sidebar-wrapper {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--blue2-border) transparent;
+  }
+
+  &.admin .sidebar-wrapper::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &.admin .sidebar-wrapper::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: var(--blue2-border);
+  }
+
+  &.admin .sidebar {
+    min-height: max-content;
+    padding-bottom: 36px;
+  }
+
+  /* Password login and passkey login share the exact same visual weight. */
+  .blue2-auth-panel .blue2-login-submit,
+  .blue2-auth-panel .js-passkey-authentication {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 46px;
+    padding-inline: 22px;
+    border: 0 !important;
+    border-radius: 999px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--blue2-blue) !important;
+    color: #fff !important;
+    font-weight: 700;
+    box-shadow: none !important;
+  }
+
+  .blue2-auth-panel .blue2-login-submit:hover,
+  .blue2-auth-panel .blue2-login-submit:focus-visible,
+  .blue2-auth-panel .js-passkey-authentication:hover,
+  .blue2-auth-panel .js-passkey-authentication:focus-visible {
+    background: var(--blue2-blue-hover) !important;
+    outline: none;
+  }
+
+  .blue2-auth-panel .actions:has(.blue2-login-submit),
+  .blue2-auth-panel #passkey-authentication-form .actions {
+    width: 100%;
+    display: block;
+  }
+}
+
+@media (width <= 980px) {
+  body[data-theme='blue-2'].admin .sidebar-wrapper {
+    overflow-y: visible;
+  }
+}
