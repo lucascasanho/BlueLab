@@ -25,8 +25,9 @@ export const Blue2AccountMenu: React.FC = () => {
   const rootRef = useRef<HTMLDivElement>(null);
 
   const profilePath = account?.acct ? `/@${account.acct}` : '/home';
-  const displayName =
-    account?.display_name || account?.username || account?.acct;
+  const displayName = account?.display_name?.trim()
+    ? account.display_name
+    : (account?.username ?? account?.acct);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -48,6 +49,14 @@ export const Blue2AccountMenu: React.FC = () => {
     };
   }, [open]);
 
+  const toggleMenu = useCallback(() => {
+    setOpen((value) => !value);
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    setOpen(false);
+  }, []);
+
   const signOut = useCallback(async () => {
     try {
       const token = csrfToken();
@@ -61,6 +70,10 @@ export const Blue2AccountMenu: React.FC = () => {
     }
   }, []);
 
+  const handleSignOut = useCallback(() => {
+    void signOut();
+  }, [signOut]);
+
   if (!account) return null;
 
   return (
@@ -68,7 +81,7 @@ export const Blue2AccountMenu: React.FC = () => {
       <button
         type='button'
         className={classes.accountButton}
-        onClick={() => setOpen((value) => !value)}
+        onClick={toggleMenu}
         aria-expanded={open}
         aria-haspopup='menu'
       >
@@ -85,7 +98,7 @@ export const Blue2AccountMenu: React.FC = () => {
           <NavLink
             to={profilePath}
             className={classes.menuItem}
-            onClick={() => setOpen(false)}
+            onClick={closeMenu}
             role='menuitem'
           >
             <Blue2ProfileIcon size={22} />
@@ -98,7 +111,7 @@ export const Blue2AccountMenu: React.FC = () => {
           <button
             type='button'
             className={classes.menuItem}
-            onClick={() => void signOut()}
+            onClick={handleSignOut}
             role='menuitem'
           >
             <LogoutIcon />
