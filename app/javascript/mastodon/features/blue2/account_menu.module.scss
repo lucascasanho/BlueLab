@@ -1,0 +1,193 @@
+.root {
+  position: relative;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.accountButton {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 54px;
+  padding: 6px 10px 6px 6px;
+  border: 0;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  color: var(--blue2-text, #f7f7f8);
+  text-align: start;
+  cursor: pointer;
+  transition: background 120ms ease;
+
+  &:hover,
+  &:focus-visible,
+  &[aria-expanded='true'] {
+    background: var(--blue2-hover, #111820);
+    outline: none;
+  }
+}
+
+.identity {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+
+  strong,
+  span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    color: var(--blue2-text, #f7f7f8);
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 650;
+  }
+
+  span {
+    color: var(--blue2-muted, #9aa8b4);
+    font-size: 12px;
+    line-height: 1.2;
+  }
+}
+
+.moreIcon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  fill: currentColor;
+  color: var(--blue2-muted, #9aa8b4);
+}
+
+.menu {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 4px);
+  left: 4px;
+  width: min(250px, calc(100vw - 24px));
+  padding: 8px;
+  border: 1px solid var(--blue2-border, #22303b);
+  border-radius: 12px;
+  background: var(--blue2-surface-raised, #101820);
+  color: var(--blue2-text, #f7f7f8);
+  box-shadow: 0 12px 36px rgb(0 0 0 / 38%);
+}
+
+.menuTitle {
+  padding: 5px 8px 7px;
+  color: var(--blue2-muted, #9aa8b4);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.currentAccount,
+.menuItem {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 42px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: transparent;
+  color: var(--blue2-text, #f7f7f8) !important;
+  text-decoration: none;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--blue2-hover, #18212a);
+    color: var(--blue2-text, #f7f7f8) !important;
+    text-decoration: none;
+    outline: none;
+  }
+}
+
+.currentAccount {
+  span:not(.activeDot) {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  strong,
+  small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    font-size: 13px;
+    font-weight: 650;
+  }
+
+  small {
+    margin-top: 1px;
+    color: var(--blue2-muted, #9aa8b4);
+    font-size: 11px;
+  }
+}
+
+.activeDot {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  border: 1px solid var(--blue2-blue, #0085ff);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 4px var(--blue2-surface-raised, #101820);
+  background: var(--blue2-blue, #0085ff);
+}
+
+.divider {
+  height: 1px;
+  margin: 6px 4px;
+  background: var(--blue2-border, #22303b);
+}
+
+.menuItem {
+  font-size: 13px;
+  font-weight: 600;
+
+  svg {
+    width: 21px;
+    height: 21px;
+    flex: 0 0 21px;
+    fill: currentColor;
+  }
+}
+
+@media (width < 1024px) {
+  .root {
+    width: 52px;
+  }
+
+  .accountButton {
+    width: 52px;
+    height: 52px;
+    min-height: 52px;
+    padding: 5px;
+    justify-content: center;
+  }
+
+  .identity,
+  .moreIcon {
+    display: none;
+  }
+
+  .menu {
+    left: 56px;
+    top: 0;
+  }
+}
