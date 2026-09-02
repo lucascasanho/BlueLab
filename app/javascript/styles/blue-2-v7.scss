@@ -39,4 +39,19 @@ body[data-theme='blue-2'] {
   .more-from-author a {
     color: var(--blue2-blue) !important;
   }
+
+  /* Keep the full federated handle readable while visually separating the
+   * remote server, echoing Mastodon's older profile treatment with Blue 2.0
+   * colors instead of importing the legacy palette. */
+  .blue2-profile-handle-domain {
+    display: inline-block;
+    margin-inline-start: 3px;
+    padding: 1px 5px;
+    border-radius: 5px;
+    background: var(--color-bg-brand-soft);
+    color: var(--blue2-blue);
+    font-weight: 500;
+    line-height: 1.35;
+    vertical-align: baseline;
+  }
 }
