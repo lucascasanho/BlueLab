@@ -60,5 +60,5 @@ jobs:
           git add -A
           git diff --cached --check
 
-          git commit -m "Merge BlueLab 2.0 into Mastodon 4.8.0-alpha.2"
+          HUSKY=0 git commit -m "Merge BlueLab 2.0 into Mastodon 4.8.0-alpha.2"
           git push origin HEAD:sync/20260902-blue2-full-restore
