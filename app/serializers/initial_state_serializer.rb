@@ -140,7 +140,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       streaming_api_base_url: Rails.configuration.x.streaming_api_base_url,
       title: instance_presenter.title,
       custom_app_icon: app_icon_path(120),
-      landing_page: Setting.landing_page,
+      landing_page: object.current_account ? Setting.landing_page : guest_landing_page,
       trends_enabled: Setting.trends,
       version: instance_presenter.version,
       terms_of_service_enabled: TermsOfService.current.present?,
@@ -149,6 +149,12 @@ class InitialStateSerializer < ActiveModel::Serializer
       local_topic_feed_access: Setting.local_topic_feed_access,
       remote_topic_feed_access: Setting.remote_topic_feed_access,
     }
+  end
+
+  def guest_landing_page
+    return Setting.landing_page if %w(trends local_feed).include?(Setting.landing_page)
+
+    'overview'
   end
 
   def object_account_user

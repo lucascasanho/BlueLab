@@ -73,14 +73,19 @@ class ResumableMediaUploads::CreateService < BaseService
     raise ResumableMediaUploads::ResourceLimitError, 'too_many_chunks'
   end
 
+  def configured_storage_root
+    path = Pathname.new(Rails.configuration.x.resumable_media_uploads.storage_path.to_s)
+    path.absolute? ? path.cleanpath : Rails.root.join(path).cleanpath
+  end
+
   def prepare_storage_root!
-    root = ResumableMediaUpload.storage_root
+    root = configured_storage_root
     FileUtils.mkdir_p(root, mode: 0o700)
     File.chmod(0o700, root)
   end
 
   def validate_disk_space!(reserved_bytes)
-    output, status = Open3.capture2('df', '-Pk', ResumableMediaUpload.storage_root.to_s)
+    output, status = Open3.capture2('df', '-Pk', configured_storage_root.to_s)
     raise ResumableMediaUploads::ResourceLimitError, 'storage_unavailable' unless status.success?
 
     fields = output.lines.last.to_s.split
