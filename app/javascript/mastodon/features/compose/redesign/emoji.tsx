@@ -18,6 +18,7 @@ import { Popover } from '@/mastodon/components/popover';
 import { useToggle } from '@/mastodon/hooks/useToggle';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
+import { captureComposerSelectionOffset } from './rich_editor';
 import { PER_LINE, selectFrequentlyUsedEmoji } from './selectors';
 import classes from './styles.module.scss';
 
@@ -47,6 +48,9 @@ export const ComposeEmojiButton: React.FC<{ onPick: OnEmojiPick }> = ({
 }) => {
   const [open, { onToggle, onFalse }] = useToggle();
   const [target, setTarget] = useState<HTMLButtonElement | null>(null);
+  const handleEmojiButtonMouseDown = useCallback(() => {
+    captureComposerSelectionOffset();
+  }, []);
 
   return (
     <>
@@ -54,6 +58,7 @@ export const ComposeEmojiButton: React.FC<{ onPick: OnEmojiPick }> = ({
         size='sm'
         icon={SmileyIcon}
         ref={setTarget}
+        onMouseDown={handleEmojiButtonMouseDown}
         onClick={onToggle}
         aria-expanded={open}
       >

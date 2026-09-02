@@ -180,17 +180,23 @@ export const markdownToHtml = (
   return output.join('<br />');
 };
 
-export const plainTextToHtml = (
+export const renderEmojiShortcodes = (
   value: string,
   customEmojis: Record<string, { static_url: string; url: string }>,
 ) =>
-  escapeHtml(value)
-    .replace(/:([a-zA-Z0-9_+-]+):/g, (shortcode, name: string) => {
+  escapeHtml(value).replace(
+    /:([a-zA-Z0-9_+-]+):/g,
+    (shortcode, name: string) => {
       const emoji = customEmojis[name];
       if (!emoji) return shortcode;
       return `<span data-emoji-shortcode="${escapeAttribute(shortcode)}" contenteditable="false"><img src="${escapeAttribute(emoji.url)}" alt="${escapeAttribute(shortcode)}" draggable="false" /></span>`;
-    })
-    .replace(/\n/g, '<br />');
+    },
+  );
+
+export const plainTextToHtml = (
+  value: string,
+  customEmojis: Record<string, { static_url: string; url: string }>,
+) => renderEmojiShortcodes(value, customEmojis).replace(/\n/g, '<br />');
 
 const wrapInlineMarkdown = (content: string, marker: string) => {
   const match = /^(\s*)([\s\S]*?)(\s*)$/.exec(content);
@@ -286,6 +292,111 @@ export const editorPlainText = (element: HTMLElement) =>
     .map(nodeToPlainText)
     .join('')
     .replace(/^\n+|\n+$/g, '');
+
+export const getEditorSelectionOffset = (
+  editor: HTMLElement | null,
+): number => {
+  if (!editor) return 0;
+
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) return 0;
+
+  const range = selection.getRangeAt(0);
+  const startContainer = range.startContainer;
+
+  if (startContainer === editor) {
+    return Array.from(editor.childNodes)
+      .slice(0, range.startOffset)
+      .reduce((total, node) => total + (node.textContent?.length ?? 0), 0);
+  }
+
+  let offset = 0;
+  const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+  let node = walker.nextNode();
+
+  while (node) {
+    if (node === startContainer) {
+      return offset + range.startOffset;
+    }
+    offset += node.textContent?.length ?? 0;
+    node = walker.nextNode();
+  }
+
+  return offset;
+};
+
+const isContentEditableEditor = (element: unknown): element is HTMLElement => {
+  if (!(element instanceof HTMLElement)) return false;
+
+  return (
+    element.isContentEditable ||
+    element.contentEditable === 'true' ||
+    element.contentEditable === 'plaintext-only' ||
+    element.getAttribute('contenteditable') === 'true' ||
+    element.getAttribute('contenteditable') === 'plaintext-only'
+  );
+};
+
+export const captureComposerSelectionOffset = (): number => {
+  const activeElement = document.activeElement;
+
+  if (activeElement instanceof HTMLTextAreaElement) {
+    lastComposeSelectionOffset = activeElement.selectionStart;
+    return lastComposeSelectionOffset;
+  }
+
+  const selection = window.getSelection();
+  const editorFromSelection =
+    selection && selection.rangeCount > 0
+      ? (() => {
+          const range = selection.getRangeAt(0);
+          let container: Node | null =
+            range.startContainer instanceof Element
+              ? range.startContainer
+              : range.startContainer.parentElement;
+
+          while (container) {
+            if (isContentEditableEditor(container)) {
+              return container;
+            }
+            container = container.parentNode;
+          }
+
+          return null;
+        })()
+      : null;
+
+  const editor = isContentEditableEditor(activeElement)
+    ? activeElement
+    : editorFromSelection;
+
+  if (editor) {
+    lastComposeSelectionOffset = getEditorSelectionOffset(editor);
+    return lastComposeSelectionOffset;
+  }
+
+  return lastComposeSelectionOffset;
+};
+
+let lastComposeSelectionOffset = 0;
+
+export const getSavedComposerSelectionOffset = () => lastComposeSelectionOffset;
+
+export const insertTextAtSelection = (text: string) => {
+  const selection = window.getSelection();
+  if (!selection?.rangeCount) return;
+
+  const range = selection.getRangeAt(0).cloneRange();
+  range.deleteContents();
+
+  const node = document.createTextNode(text);
+  range.insertNode(node);
+
+  range.setStartAfter(node);
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
+};
 
 const wrapSelection = (tagName: string) => {
   const selection = window.getSelection();
@@ -659,6 +770,7 @@ export const RichComposeEditor: React.FC<{
       <div
         ref={ref}
         className={classes.richEditor}
+        data-compose-scroll-zone='editor'
         contentEditable={isMarkdown ? true : 'plaintext-only'}
         suppressContentEditableWarning
         role='textbox'

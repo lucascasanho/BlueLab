@@ -4,6 +4,7 @@ import { vi } from 'vitest';
 
 import { quoteCompose } from '@/mastodon/actions/compose_typed';
 import { browserHistory } from '@/mastodon/components/router';
+import { resolveComposeScrollTarget } from '@/mastodon/features/compose/redesign/scroll';
 import type { Status } from '@/mastodon/models/status';
 
 import { composerOriginFromElement, normalizeComposerEditor } from './composer';
@@ -55,6 +56,28 @@ describe('composer preference', () => {
     expect(normalizeComposerEditor('bluelab')).toBe('bluelab');
     expect(normalizeComposerEditor('unexpected')).toBe('bluelab');
     expect(normalizeComposerEditor('mastodon')).toBe('mastodon');
+  });
+
+  test('detects the local scroll context inside the composer', () => {
+    const editor = document.createElement('div');
+    editor.dataset.composeScrollZone = 'editor';
+    const textarea = document.createElement('textarea');
+    editor.appendChild(textarea);
+
+    const panel = document.createElement('div');
+    panel.dataset.composeScrollZone = 'panel';
+    const quote = document.createElement('div');
+    panel.appendChild(quote);
+
+    expect(resolveComposeScrollTarget(textarea)).toEqual({
+      zone: 'editor',
+      element: editor,
+    });
+    expect(resolveComposeScrollTarget(quote)).toEqual({
+      zone: 'panel',
+      element: panel,
+    });
+    expect(resolveComposeScrollTarget(document.body)).toBeNull();
   });
 
   test('captures the visual center of the launcher for the animation', () => {

@@ -1,10 +1,14 @@
 import { afterEach, vi } from 'vitest';
 
 import {
+  captureComposerSelectionOffset,
   editorPlainText,
   editorText,
+  getSavedComposerSelectionOffset,
+  insertTextAtSelection,
   markdownToHtml,
   plainTextToHtml,
+  renderEmojiShortcodes,
   toggleInlineCommand,
 } from './rich_editor';
 
@@ -160,5 +164,73 @@ describe('BlueLab rich editor conversion', () => {
     toggleInlineCommand('underline');
 
     expect(execCommand).toHaveBeenCalledWith('underline');
+  });
+
+  test('stores the cursor offset before opening the emoji picker', () => {
+    const editor = document.createElement('div');
+    editor.contentEditable = 'true';
+    editor.textContent = 'hello world';
+    document.body.appendChild(editor);
+    editor.focus();
+
+    const node = editor.firstChild;
+    if (!node) {
+      throw new Error('Expected editor text node');
+    }
+
+    const range = document.createRange();
+    range.setStart(node, 6);
+    range.collapse(true);
+    const selection = window.getSelection();
+    if (!selection) {
+      throw new Error('Expected selection');
+    }
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    expect(captureComposerSelectionOffset()).toBe(6);
+    expect(getSavedComposerSelectionOffset()).toBe(6);
+    document.body.removeChild(editor);
+  });
+
+  test('inserts emoji at the active text cursor instead of appending at the end', () => {
+    const editor = document.createElement('div');
+    editor.contentEditable = 'true';
+    editor.textContent = 'hello world';
+    document.body.appendChild(editor);
+
+    const node = editor.firstChild;
+    if (!node) {
+      throw new Error('Expected editor text node');
+    }
+
+    const range = document.createRange();
+    range.setStart(node, 6);
+    range.collapse(true);
+    const selection = window.getSelection();
+    if (!selection) {
+      throw new Error('Expected selection');
+    }
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    insertTextAtSelection('🙂');
+
+    expect(editor.textContent).toBe('hello 🙂world');
+    document.body.removeChild(editor);
+  });
+
+  test('renders typed custom emoji shortcodes immediately without waiting for the picker', () => {
+    const html = renderEmojiShortcodes('hello :party: world', {
+      party: {
+        static_url: 'https://example.test/static.png',
+        url: 'https://example.test/animated.gif',
+      },
+    });
+
+    expect(html).toContain('data-emoji-shortcode=":party:"');
+    expect(html).toContain('src="https://example.test/animated.gif"');
+    expect(html).toContain('hello ');
+    expect(html).toContain(' world');
   });
 });

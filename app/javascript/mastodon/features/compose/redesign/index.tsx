@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import { LockSimpleOpenIcon, PepperIcon } from '@phosphor-icons/react';
 
 import {
+  changeCompose,
   changeComposeSpoilerness,
   changeComposeSpoilerText,
   insertEmojiCompose,
@@ -29,7 +30,12 @@ import { ComposeFormHeader } from './header';
 import { ComposeHints } from './hints';
 import { LanguageButton } from './language';
 import { ComposeReply } from './reply';
-import { RichComposeEditor } from './rich_editor';
+import {
+  editorText,
+  getSavedComposerSelectionOffset,
+  RichComposeEditor,
+} from './rich_editor';
+import { resolveComposeScrollTarget } from './scroll';
 import {
   selectComposeCanSubmit,
   selectComposeSensitive,
@@ -69,12 +75,33 @@ export const RedesignComposeForm: React.FC<RedesignComposeFormProps> = ({
   const intl = useIntl();
   const titleId = useId();
 
+  const handleWheelCapture: React.WheelEventHandler<HTMLFormElement> =
+    useCallback((event) => {
+      const target = resolveComposeScrollTarget(event.target);
+      if (!target || target.zone === 'body') return;
+
+      const { element } = target;
+      const nextScrollTop = element.scrollTop + event.deltaY;
+      const maxScrollTop = Math.max(
+        element.scrollHeight - element.clientHeight,
+        0,
+      );
+
+      if (nextScrollTop < 0 || nextScrollTop > maxScrollTop) {
+        return;
+      }
+
+      event.preventDefault();
+      element.scrollTop = nextScrollTop;
+    }, []);
+
   return (
     <form
       ref={ref}
       role='dialog'
       data-bluelab-composer
       onSubmit={onSubmit}
+      onWheelCapture={handleWheelCapture}
       aria-labelledby={titleId}
       className={classNames(className, classes.root)}
     >
@@ -82,7 +109,11 @@ export const RedesignComposeForm: React.FC<RedesignComposeFormProps> = ({
 
       <ComposeFormHeader id={titleId} noMinimize={noMinimize} />
 
-      <div className={classes.content} data-compose-scroll-container>
+      <div
+        className={classes.content}
+        data-compose-scroll-container
+        data-compose-scroll-zone='panel'
+      >
         <ComposeReply />
 
         <div className={classes.toolbar}>
@@ -168,14 +199,78 @@ function useComposeHandlers(redirectOnSuccess?: boolean) {
 
   const onEmojiPick: OnEmojiPick = useCallback(
     (emoji) => {
-      const position = getComposerTextarea()?.selectionStart ?? 0;
-      const beforePosition = text[position - 1];
+      const activeElement = document.activeElement;
+      const editor =
+        activeElement instanceof HTMLElement ? activeElement : null;
+      const composerTextArea = getComposerTextarea();
+      const isContentEditable =
+        !!editor &&
+        (editor.isContentEditable ||
+          editor.contentEditable === 'true' ||
+          editor.contentEditable === 'plaintext-only' ||
+          editor.getAttribute('contenteditable') === 'true' ||
+          editor.getAttribute('contenteditable') === 'plaintext-only');
+      const savedSelectionStart = getSavedComposerSelectionOffset();
+
+      const selectionStart =
+        composerTextArea && activeElement === composerTextArea
+          ? composerTextArea.selectionStart || 0
+          : savedSelectionStart || 0;
+
+      const beforePosition = text[selectionStart - 1];
       const needsSpace =
         'custom' in emoji &&
         !!emoji.custom &&
         !!beforePosition &&
         !allowedAroundShortCode.includes(beforePosition);
-      dispatch(insertEmojiCompose(position, emoji, needsSpace));
+
+      if (editor && isContentEditable) {
+        const selection = window.getSelection();
+        if (selection) {
+          const range = document.createRange();
+          let currentOffset = 0;
+          const walker = document.createTreeWalker(
+            editor,
+            NodeFilter.SHOW_TEXT,
+          );
+          let node: Node | null = walker.nextNode();
+
+          while (node) {
+            const length = node.textContent?.length ?? 0;
+            if (currentOffset + length >= selectionStart) {
+              range.setStart(node, selectionStart - currentOffset);
+              range.collapse(true);
+              selection.removeAllRanges();
+              selection.addRange(range);
+              break;
+            }
+            currentOffset += length;
+            node = walker.nextNode();
+          }
+
+          if (!selection.rangeCount) {
+            range.selectNodeContents(editor);
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+
+          const caretRange = selection.getRangeAt(0).cloneRange();
+          caretRange.deleteContents();
+          const inserted = document.createTextNode(
+            'native' in emoji && emoji.native ? emoji.native : `:${emoji.id}:`,
+          );
+          caretRange.insertNode(inserted);
+          caretRange.setStartAfter(inserted);
+          caretRange.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(caretRange);
+          dispatch(changeCompose(editorText(editor)));
+          return;
+        }
+      }
+
+      dispatch(insertEmojiCompose(selectionStart, emoji, needsSpace));
     },
     [dispatch, text],
   );

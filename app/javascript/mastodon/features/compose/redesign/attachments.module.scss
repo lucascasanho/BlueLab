@@ -186,8 +186,21 @@
 
 // Quotes
 
+.quoteCard {
+  overflow: visible;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border-primary);
+  margin-top: var(--space-sm);
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
+
 .quoteBody {
   color: inherit;
+  max-height: 11rem;
+  overflow-y: auto;
+  overflow-x: hidden;
   text-decoration: none;
 }
 

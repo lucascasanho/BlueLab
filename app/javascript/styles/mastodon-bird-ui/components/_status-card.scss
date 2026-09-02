@@ -105,8 +105,25 @@
 
     .status__content {
       display: block;
+      max-height: none;
       overflow: visible;
     }
+  }
+
+  .status__quote .status__content,
+  .status__quote .status__content__text,
+  .status__quote .status__content__text--visible {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .compose-form .status__quote,
+  .compose-form .status__quote .status__content,
+  .compose-form .status__quote .status__content__text,
+  .compose-form .status__quote .status__content__text--visible {
+    max-height: none;
+    overflow: visible;
+    text-overflow: clip;
   }
 
   .status__quote.status__quote--error {

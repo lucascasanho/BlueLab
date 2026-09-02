@@ -48,17 +48,27 @@
   min-height: 0;
   flex-direction: column;
   gap: var(--space-md);
-  overflow-y: auto;
+  overflow: visible;
   overscroll-behavior-y: contain;
   scrollbar-width: thin;
   touch-action: pan-y;
 }
 
+.attachments,
+.richEditorWrapper,
+.richEditor {
+  overscroll-behavior-y: contain;
+}
+
 .toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   gap: var(--space-xs);
   align-items: center;
   flex-wrap: wrap;
+  background: var(--color-bg-primary);
 
   label {
     font-weight: inherit;
@@ -175,7 +185,9 @@ textarea.textarea {
   @include mixins.type-body-lg;
 
   min-height: 9rem;
+  max-height: min(22rem, 32vh);
   flex: 1 1 auto;
+  overflow-y: auto;
   padding: var(--space-xs);
   border-radius: var(--radius-xs);
   outline: none;
@@ -304,6 +316,13 @@ textarea.textarea {
   flex-direction: column;
   gap: var(--space-xs);
   margin-top: var(--space-md);
+  max-height: min(18rem, 28vh);
+  overflow-y: auto;
+
+  &[data-has-quote='true'] {
+    max-height: none;
+    overflow: visible;
+  }
 }
 
 .footer {

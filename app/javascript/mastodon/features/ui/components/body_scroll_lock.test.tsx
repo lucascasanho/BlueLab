@@ -31,10 +31,12 @@ afterEach(() => {
 });
 
 describe('BodyScrollLock', () => {
-  test('locks background scrolling while the BlueLab composer is expanded', () => {
+  test('does not lock background scrolling while the BlueLab composer is expanded', () => {
     renderWithComposerState('showing');
 
-    expect(document.documentElement.classList.contains('has-modal')).toBe(true);
+    expect(document.documentElement.classList.contains('has-modal')).toBe(
+      false,
+    );
   });
 
   test('does not lock background scrolling while the composer is hidden', () => {
@@ -48,7 +50,9 @@ describe('BodyScrollLock', () => {
   test('restores background scrolling when the composer closes', () => {
     const { store } = renderWithComposerState('showing');
 
-    expect(document.documentElement.classList.contains('has-modal')).toBe(true);
+    expect(document.documentElement.classList.contains('has-modal')).toBe(
+      false,
+    );
 
     act(() => {
       store.dispatch({ type: 'composer/hideComposer' });

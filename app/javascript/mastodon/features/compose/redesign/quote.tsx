@@ -44,7 +44,11 @@ export const ComposeQuote: React.FC<{ id: string }> = ({ id }) => {
   const statusTo = `/@${status.account.acct}/${status.id}`;
 
   return (
-    <Card image={imageEle} onDelete={handleDelete}>
+    <Card
+      image={imageEle}
+      onDelete={handleDelete}
+      className={classes.quoteCard}
+    >
       <CardTitle
         className={classes.quoteTitle}
         image={
@@ -66,7 +70,7 @@ export const ComposeQuote: React.FC<{ id: string }> = ({ id }) => {
         />
       </CardTitle>
 
-      <CardBody className={classes.quoteBody} as={Link} to={statusTo}>
+      <CardBody className={classes.quoteBody} as={Link} to={statusTo} noClamp>
         {!status.spoiler_text ? (
           <ComposeQuoteBody status={status} />
         ) : (

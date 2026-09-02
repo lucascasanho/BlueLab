@@ -1982,6 +1982,15 @@ body > [data-popover-placement] {
   border-radius: 12px;
   color: var(--color-text-primary);
   border: 1px solid var(--color-border-primary);
+
+  .status__content,
+  .status__content__text,
+  .status__content__text--visible,
+  .status--is-quote .status__content {
+    max-height: none;
+    overflow: visible;
+    text-overflow: clip;
+  }
 }
 
 .status__quote--error {
