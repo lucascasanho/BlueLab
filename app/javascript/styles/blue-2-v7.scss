@@ -39,4 +39,25 @@ body[data-theme='blue-2'] {
   .more-from-author a {
     color: var(--blue2-blue) !important;
   }
+
+  /*
+   * Upstream About sections can draw borders on the wrapper, title and body at
+   * the same time. Keep one separator per visual block so adjacent sections do
+   * not produce doubled lines in the BlueLab main column.
+   */
+  .about__section {
+    border: 0 !important;
+    border-top: 1px solid var(--blue2-border) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .about__section__title,
+  .about__section__body {
+    border: 0 !important;
+  }
+
+  .about__section__body {
+    border-top: 1px solid var(--blue2-border) !important;
+  }
 }
