@@ -3,6 +3,8 @@ import { useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { NavLink } from 'react-router-dom';
 
+import { StackIcon } from '@phosphor-icons/react';
+
 import { Avatar } from '@/mastodon/components/avatar';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
@@ -67,6 +69,9 @@ export const Blue2Navigation: React.FC = () => {
   );
 
   const profilePath = account?.acct ? `/@${account.acct}` : '/home';
+  const collectionsPath = account?.acct
+    ? `/@${account.acct}/collections`
+    : '/home';
 
   return (
     <nav className={classes.root} aria-label='BLUE 2.0'>
@@ -82,13 +87,19 @@ export const Blue2Navigation: React.FC = () => {
           <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
         </Item>
         <Item to='/notifications' icon={Blue2BellIcon} badge={notificationsCount}>
-          <FormattedMessage id='tabs_bar.notifications' defaultMessage='Notifications' />
+          <FormattedMessage
+            id='tabs_bar.notifications'
+            defaultMessage='Notifications'
+          />
         </Item>
         <Item to='/conversations' icon={Blue2MessageIcon}>
           <FormattedMessage id='tabs_bar.messages' defaultMessage='Messages' />
         </Item>
         <Item to='/public/local' icon={Blue2FeedIcon}>
-          <FormattedMessage id='tabs_bar.fediverse_feeds' defaultMessage='Feeds' />
+          <FormattedMessage
+            id='tabs_bar.fediverse_feeds'
+            defaultMessage='Federação'
+          />
         </Item>
         <Item to='/lists' icon={Blue2ListIcon}>
           <FormattedMessage id='navigation_bar.lists' defaultMessage='Lists' />
@@ -96,8 +107,17 @@ export const Blue2Navigation: React.FC = () => {
         <Item to='/bookmarks' icon={Blue2BookmarkIcon}>
           <FormattedMessage id='tabs_bar.saved' defaultMessage='Saved' />
         </Item>
+        <Item to={collectionsPath} icon={StackIcon}>
+          <FormattedMessage
+            id='navigation_bar.collections'
+            defaultMessage='Collections'
+          />
+        </Item>
         <Item to={profilePath} icon={Blue2ProfileIcon}>
-          <FormattedMessage id='navigation_bar.profile' defaultMessage='Profile' />
+          <FormattedMessage
+            id='navigation_bar.profile'
+            defaultMessage='Profile'
+          />
         </Item>
 
         <a className={classes.item} href='/settings/preferences'>
@@ -108,7 +128,11 @@ export const Blue2Navigation: React.FC = () => {
         </a>
       </div>
 
-      <button className={classes.composeButton} type='button' onClick={openComposer}>
+      <button
+        className={classes.composeButton}
+        type='button'
+        onClick={openComposer}
+      >
         <Blue2ComposeIcon size={19} />
         <FormattedMessage id='tabs_bar.publish' defaultMessage='New post' />
       </button>
