@@ -7,7 +7,6 @@ import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import { Helmet } from '@unhead/react/helmet';
 
 import { NavigationFocusTarget } from '@/mastodon/components/navigation_focus_target';
-import { blue2Text } from '@/mastodon/features/blue2/locale';
 import { customAppIcon } from '@/mastodon/initial_state';
 import { fetchServer } from 'mastodon/actions/server';
 import { ServerHeroImage } from 'mastodon/components/server_hero_image';
@@ -31,7 +30,9 @@ export const CustomHomepage: React.FC = () => {
   const { path } = useRouteMatch();
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
-  const [showBlue2Welcome, setShowBlue2Welcome] = useState(isBlue2);
+  const [showBlue2Welcome, setShowBlue2Welcome] = useState(
+    isBlue2 && !signedIn,
+  );
 
   useEffect(() => {
     void dispatch(fetchServer());
@@ -69,7 +70,7 @@ export const CustomHomepage: React.FC = () => {
 
         <About />
 
-        {showBlue2Welcome && (
+        {showBlue2Welcome && !signedIn && (
           <div className={classes.blue2WelcomeBackdrop}>
             <section
               className={classes.blue2WelcomeDialog}
@@ -99,12 +100,32 @@ export const CustomHomepage: React.FC = () => {
               <p>{server.item?.description}</p>
 
               <div className={classes.blue2WelcomeActions}>
-                <a href='/auth/sign_up' className={classes.blue2PrimaryAction}>
+                {registrationsOpen && (
+                  <a href={signupUrl} className={classes.blue2PrimaryAction}>
+                    <FormattedMessage
+                      id='sign_in_banner.create_account'
+                      defaultMessage='Create account'
+                    />
+                  </a>
+                )}
+
+                <a href='/auth/sign_in' className={classes.blue2SecondaryAction}>
                   <FormattedMessage
-                    id='auth.register'
-                    defaultMessage='Create account'
+                    id='sign_in_banner.sign_in'
+                    defaultMessage='Login'
                   />
                 </a>
+
+                <a
+                  href='/auth/sign_in#passkey-authentication-form'
+                  className={classes.blue2SecondaryAction}
+                >
+                  <FormattedMessage
+                    id='passkeys.sign_in'
+                    defaultMessage='Sign in with a passkey'
+                  />
+                </a>
+
                 <button
                   type='button'
                   className={classes.blue2ExploreAction}
@@ -115,13 +136,6 @@ export const CustomHomepage: React.FC = () => {
                     defaultMessage='Explore'
                   />
                 </button>
-              </div>
-
-              <div className={classes.blue2WelcomeLogin}>
-                <span>{blue2Text(intl.locale, 'haveAccount')}</span>{' '}
-                <a href='/auth/sign_in'>
-                  <FormattedMessage id='auth.login' defaultMessage='Log in' />
-                </a>
               </div>
             </section>
           </div>
