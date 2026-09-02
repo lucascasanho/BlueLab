@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -23,6 +23,7 @@ export const CustomHomepage: React.FC = () => {
   const { path } = useRouteMatch();
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const [showBlue2Welcome, setShowBlue2Welcome] = useState(isBlue2);
 
   useEffect(() => {
     void dispatch(fetchServer());
@@ -30,43 +31,89 @@ export const CustomHomepage: React.FC = () => {
 
   if (isBlue2) {
     return (
-      <div className={classes.blue2Landing}>
-        <section className={classes.blue2LandingIntro}>
+      <div className={classes.blue2AboutPage}>
+        <ServerHeroImage
+          alt={server.item?.thumbnail.description ?? ''}
+          blurhash={server.item?.thumbnail.blurhash ?? ''}
+          src={server.item?.thumbnail.url ?? ''}
+          srcSet={Object.keys(server.item?.thumbnail.versions ?? {})
+            .map(
+              (key) =>
+                `${server.item?.thumbnail.versions?.[key]} ${key.replace('@', '')}`,
+            )
+            .join(', ')}
+          className={classes.blue2AboutHeader}
+        />
+
+        <div className={classes.blue2AboutIdentity}>
           <img
             src={customAppIcon ?? '/favicon.ico'}
             alt=''
             className={classes.blue2LandingIcon}
           />
-          <NavigationFocusTarget as='h1'>
-            {server.item?.domain}
-          </NavigationFocusTarget>
-          <p>{server.item?.description}</p>
-
-          <div className={classes.blue2LandingActions}>
-            <a href='/auth/sign_in' className={classes.blue2PrimaryAction}>
-              <FormattedMessage id='auth.login' defaultMessage='Log in' />
-            </a>
-            <a href='/auth/sign_up' className={classes.blue2SecondaryAction}>
-              <FormattedMessage id='auth.register' defaultMessage='Sign up' />
-            </a>
+          <div>
+            <NavigationFocusTarget as='h1'>
+              {server.item?.domain}
+            </NavigationFocusTarget>
+            <p>{server.item?.description}</p>
           </div>
-        </section>
+        </div>
 
-        <section className={classes.blue2LandingAbout}>
-          <ServerHeroImage
-            alt={server.item?.thumbnail.description ?? ''}
-            blurhash={server.item?.thumbnail.blurhash ?? ''}
-            src={server.item?.thumbnail.url ?? ''}
-            srcSet={Object.keys(server.item?.thumbnail.versions ?? {})
-              .map(
-                (key) =>
-                  `${server.item?.thumbnail.versions?.[key]} ${key.replace('@', '')}`,
-              )
-              .join(', ')}
-            className={classes.blue2LandingHeader}
-          />
-          <About />
-        </section>
+        <About />
+
+        {showBlue2Welcome && (
+          <div className={classes.blue2WelcomeBackdrop}>
+            <section
+              className={classes.blue2WelcomeDialog}
+              role='dialog'
+              aria-modal='true'
+              aria-labelledby='blue2-welcome-title'
+            >
+              <button
+                className={classes.blue2WelcomeClose}
+                type='button'
+                onClick={() => setShowBlue2Welcome(false)}
+                aria-label='Close'
+              >
+                ×
+              </button>
+
+              <img
+                src={customAppIcon ?? '/favicon.ico'}
+                alt=''
+                className={classes.blue2WelcomeIcon}
+              />
+
+              <h2 id='blue2-welcome-title'>{server.item?.domain}</h2>
+              <p>{server.item?.description}</p>
+
+              <div className={classes.blue2WelcomeActions}>
+                <a href='/auth/sign_up' className={classes.blue2PrimaryAction}>
+                  <FormattedMessage id='auth.register' defaultMessage='Create account' />
+                </a>
+                <button
+                  type='button'
+                  className={classes.blue2ExploreAction}
+                  onClick={() => setShowBlue2Welcome(false)}
+                >
+                  <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
+                </button>
+              </div>
+
+              <div className={classes.blue2WelcomeLogin}>
+                <span>
+                  <FormattedMessage
+                    id='auth.have_account'
+                    defaultMessage='Already have an account?'
+                  />
+                </span>{' '}
+                <a href='/auth/sign_in'>
+                  <FormattedMessage id='auth.login' defaultMessage='Log in' />
+                </a>
+              </div>
+            </section>
+          </div>
+        )}
 
         <Helmet>
           <title>{server.item?.domain}</title>
