@@ -43,6 +43,12 @@ export const AccountName: FC<{ accountId: string }> = ({ accountId }) => {
     return null;
   }
 
+  const domainSeparator = handle?.lastIndexOf('@') ?? -1;
+  const handleUsername =
+    domainSeparator > 0 ? handle?.slice(0, domainSeparator) : handle;
+  const handleDomain =
+    domainSeparator > 0 ? handle?.slice(domainSeparator) : null;
+
   return (
     <div className={classes.nameWrapper}>
       <div className={classes.name}>
@@ -55,7 +61,12 @@ export const AccountName: FC<{ accountId: string }> = ({ accountId }) => {
       {account.invalid_handle ? (
         <InvalidAccountHelp />
       ) : (
-        <span className={classes.handleText}>{handle}</span>
+        <span className={classes.handleText}>
+          {handleUsername}
+          {handleDomain && (
+            <span className='blue2-profile-handle-domain'>{handleDomain}</span>
+          )}
+        </span>
       )}
     </div>
   );
