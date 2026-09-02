@@ -33,24 +33,24 @@ import { useColumnsContext } from '../../util/columns_context';
 import { MultiColumnContent } from './multi_column_content';
 import classes from './redesign.module.scss';
 
-const FIREHOSE_SWIPE_ROUTES = [
+const FIREHOSE_SWIPE_ROUTES: readonly string[] = [
   '/public/local',
   '/public/remote',
   '/public',
-] as const;
+];
 
-const EXPLORE_SWIPE_ROUTES = [
+const EXPLORE_SWIPE_ROUTES: readonly string[] = [
   '/explore',
   '/explore/tags',
   '/explore/suggestions',
   '/explore/links',
-] as const;
+];
 
-const EXPLORE_SIGNED_OUT_SWIPE_ROUTES = [
+const EXPLORE_SIGNED_OUT_SWIPE_ROUTES: readonly string[] = [
   '/explore',
   '/explore/tags',
   '/explore/links',
-] as const;
+];
 
 const TabsBarPortal = () => {
   const { setTabsBarElement } = useColumnsContext();
@@ -218,9 +218,7 @@ export const ColumnsAreaRedesign: React.FC<{
       }
 
       if (isBlue2Firehose) {
-        const currentIndex = FIREHOSE_SWIPE_ROUTES.indexOf(
-          location.pathname as (typeof FIREHOSE_SWIPE_ROUTES)[number],
-        );
+        const currentIndex = FIREHOSE_SWIPE_ROUTES.indexOf(location.pathname);
         if (currentIndex === -1) return;
 
         const nextIndex = currentIndex + (movingForward ? 1 : -1);
@@ -232,16 +230,14 @@ export const ColumnsAreaRedesign: React.FC<{
       }
 
       if (isBlue2Explore) {
-        const routes = signedIn
+        const routes: readonly string[] = signedIn
           ? EXPLORE_SWIPE_ROUTES
           : EXPLORE_SIGNED_OUT_SWIPE_ROUTES;
         const normalizedPath =
           location.pathname === '/explore/posts'
             ? '/explore'
             : location.pathname;
-        const currentIndex = routes.indexOf(
-          normalizedPath as (typeof routes)[number],
-        );
+        const currentIndex = routes.indexOf(normalizedPath);
         if (currentIndex === -1) return;
 
         const nextIndex = currentIndex + (movingForward ? 1 : -1);
