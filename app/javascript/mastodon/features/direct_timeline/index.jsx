@@ -5,16 +5,23 @@ import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 
 import { Helmet } from '@unhead/react/helmet';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
+import InboxIcon from '@/material-icons/400-24px/inbox.svg?react';
 import { addColumn, removeColumn, moveColumn } from 'mastodon/actions/columns';
 import { mountConversations, unmountConversations, expandConversations } from 'mastodon/actions/conversations';
 import { connectDirectStream } from 'mastodon/actions/streaming';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column/header';
 import { Blue2MessageIcon } from '@/mastodon/features/blue2/icons';
+import { blue2Text } from '@/mastodon/features/blue2/locale';
+import {
+  composerOriginFromElement,
+  openNewComposer,
+} from '@/mastodon/reducers/slices/composer';
 
+import blue2Classes from './blue2.module.scss';
 import { ConversationsList } from './components/conversations_list';
 
 const messages = defineMessages({
@@ -25,9 +32,12 @@ const messages = defineMessages({
 const DirectTimeline = ({ columnId, multiColumn }) => {
   const intl = useIntl();
   const dispatch = useDispatch();
+  const conversations = useSelector((state) => state.getIn(['conversations', 'items']));
+  const conversationsLoading = useSelector((state) => state.getIn(['conversations', 'isLoading'], true));
   const pinned = !!columnId;
   const isBlue2 = typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const title = intl.formatMessage(isBlue2 ? messages.blue2Title : messages.title);
+  const isInboxEmpty = conversations?.isEmpty?.() ?? true;
 
   const handlePin = useCallback(() => {
     if (columnId) {
@@ -41,6 +51,13 @@ const DirectTimeline = ({ columnId, multiColumn }) => {
     dispatch(moveColumn(columnId, dir));
   }, [dispatch, columnId]);
 
+  const handleNewConversation = useCallback((event) => {
+    dispatch(openNewComposer({
+      type: 'message',
+      origin: composerOriginFromElement(event.currentTarget),
+    }));
+  }, [dispatch]);
+
   useEffect(() => {
     dispatch(mountConversations());
     dispatch(expandConversations());
@@ -53,11 +70,88 @@ const DirectTimeline = ({ columnId, multiColumn }) => {
     };
   }, [dispatch]);
 
+  if (isBlue2) {
+    return (
+      <Column bindToDocument={!multiColumn} label={title}>
+        <div className={blue2Classes.root}>
+          <header className={blue2Classes.header}>
+            <h1>{title}</h1>
+            <button
+              type='button'
+              className={blue2Classes.headerButton}
+              onClick={handleNewConversation}
+            >
+              <Blue2MessageIcon size={19} />
+              <span>{blue2Text(intl.locale, 'newConversation')}</span>
+            </button>
+          </header>
+
+          <div className={blue2Classes.notice}>
+            <FormattedMessage
+              id='compose.message.notice'
+              defaultMessage='Messages are not end-to-end encrypted'
+            />{' '}
+            <a
+              href='https://docs.joinmastodon.org/user/posting/#private'
+              rel='noreferrer'
+              target='_blank'
+            >
+              <FormattedMessage
+                id='compose_form.direct_message_warning_learn_more'
+                defaultMessage='Learn more'
+              />
+            </a>
+          </div>
+
+          <div className={blue2Classes.layout}>
+            <section className={blue2Classes.inbox} aria-label={title}>
+              {isInboxEmpty && !conversationsLoading ? (
+                <div className={blue2Classes.emptyInbox}>
+                  <InboxIcon />
+                  <strong>{blue2Text(intl.locale, 'inboxEmpty')}</strong>
+                </div>
+              ) : (
+                <div className={blue2Classes.listWrap}>
+                  <ConversationsList
+                    trackScroll={!pinned}
+                    scrollKey={`direct_timeline-${columnId}`}
+                    emptyMessage={blue2Text(intl.locale, 'inboxEmpty')}
+                    bindToDocument={!multiColumn}
+                  />
+                </div>
+              )}
+            </section>
+
+            <section className={blue2Classes.welcome}>
+              <div className={blue2Classes.welcomeInner}>
+                <Blue2MessageIcon size={64} />
+                <strong>{blue2Text(intl.locale, 'sayHello')}</strong>
+                <button
+                  type='button'
+                  className={blue2Classes.newConversation}
+                  onClick={handleNewConversation}
+                >
+                  <Blue2MessageIcon size={19} />
+                  <span>{blue2Text(intl.locale, 'newConversation')}</span>
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <Helmet>
+          <title>{title}</title>
+          <meta name='robots' content='noindex' />
+        </Helmet>
+      </Column>
+    );
+  }
+
   return (
     <Column bindToDocument={!multiColumn} label={title}>
       <ColumnHeader
-        icon={isBlue2 ? 'comment' : 'at'}
-        iconComponent={isBlue2 ? Blue2MessageIcon : AlternateEmailIcon}
+        icon='at'
+        iconComponent={AlternateEmailIcon}
         title={title}
         onPin={handlePin}
         onMove={handleMove}
@@ -70,33 +164,19 @@ const DirectTimeline = ({ columnId, multiColumn }) => {
         trackScroll={!pinned}
         scrollKey={`direct_timeline-${columnId}`}
         emptyMessage={
-          isBlue2 ? (
-            <FormattedMessage
-              id='blue2.empty_column.messages'
-              defaultMessage='Você ainda não tem mensagens. Quando enviar ou receber uma, ela aparecerá aqui.'
-            />
-          ) : (
-            <FormattedMessage
-              id='empty_column.direct'
-              defaultMessage="You don't have any private mentions yet. When you send or receive one, it will show up here."
-            />
-          )
+          <FormattedMessage
+            id='empty_column.direct'
+            defaultMessage="You don't have any private mentions yet. When you send or receive one, it will show up here."
+          />
         }
         bindToDocument={!multiColumn}
         prepend={
           <div className='follow_requests-unlocked_explanation'>
             <span>
-              {isBlue2 ? (
-                <FormattedMessage
-                  id='compose.message.notice'
-                  defaultMessage='Messages are not end-to-end encrypted'
-                />
-              ) : (
-                <FormattedMessage
-                  id='compose_form.encryption_warning'
-                  defaultMessage='Posts on Mastodon are not end-to-end encrypted. Do not share any dangerous information over Mastodon.'
-                />
-              )}{' '}
+              <FormattedMessage
+                id='compose_form.encryption_warning'
+                defaultMessage='Posts on Mastodon are not end-to-end encrypted. Do not share any dangerous information over Mastodon.'
+              />{' '}
               <a
                 href='https://docs.joinmastodon.org/user/posting/#private'
                 rel='noreferrer'
