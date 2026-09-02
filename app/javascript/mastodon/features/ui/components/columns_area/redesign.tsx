@@ -1,9 +1,12 @@
 import { useCallback, useRef } from 'react';
 
+import { FormattedMessage, useIntl } from 'react-intl';
+
 import classNames from 'classnames';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
+import { blue2Text } from '@/mastodon/features/blue2/locale';
 import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
@@ -43,6 +46,7 @@ export const ColumnsAreaRedesign: React.FC<{
   children: React.ReactElement | React.ReactElement[];
   ref?: React.Ref<HTMLDivElement>;
 }> = ({ children, minimalShell, singleColumn, ref }) => {
+  const intl = useIntl();
   const history = useHistory();
   const location = useLocation();
   const swipeOrigin = useRef<{ x: number; y: number } | null>(null);
@@ -157,7 +161,10 @@ export const ColumnsAreaRedesign: React.FC<{
                   }
                   to='/home'
                 >
-                  Seguindo
+                  <FormattedMessage
+                    id='account.following'
+                    defaultMessage='Following'
+                  />
                 </Link>
                 <Link
                   className={
@@ -165,7 +172,7 @@ export const ColumnsAreaRedesign: React.FC<{
                   }
                   to='/public'
                 >
-                  Global
+                  {blue2Text(intl.locale, 'global')}
                 </Link>
               </header>
               {isBlue2Home && !isMobile && <Blue2ComposeLauncher />}
