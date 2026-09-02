@@ -13,17 +13,21 @@ import { mountConversations, unmountConversations, expandConversations } from 'm
 import { connectDirectStream } from 'mastodon/actions/streaming';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column/header';
+import { Blue2MessageIcon } from '@/mastodon/features/blue2/icons';
 
 import { ConversationsList } from './components/conversations_list';
 
 const messages = defineMessages({
   title: { id: 'column.direct', defaultMessage: 'Private mentions' },
+  blue2Title: { id: 'tabs_bar.messages', defaultMessage: 'Messages' },
 });
 
 const DirectTimeline = ({ columnId, multiColumn }) => {
   const intl = useIntl();
   const dispatch = useDispatch();
   const pinned = !!columnId;
+  const isBlue2 = typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const title = intl.formatMessage(isBlue2 ? messages.blue2Title : messages.title);
 
   const handlePin = useCallback(() => {
     if (columnId) {
@@ -50,11 +54,11 @@ const DirectTimeline = ({ columnId, multiColumn }) => {
   }, [dispatch]);
 
   return (
-    <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.title)}>
+    <Column bindToDocument={!multiColumn} label={title}>
       <ColumnHeader
-        icon='at'
-        iconComponent={AlternateEmailIcon}
-        title={intl.formatMessage(messages.title)}
+        icon={isBlue2 ? 'comment' : 'at'}
+        iconComponent={isBlue2 ? Blue2MessageIcon : AlternateEmailIcon}
+        title={title}
         onPin={handlePin}
         onMove={handleMove}
         pinned={pinned}
@@ -65,14 +69,52 @@ const DirectTimeline = ({ columnId, multiColumn }) => {
       <ConversationsList
         trackScroll={!pinned}
         scrollKey={`direct_timeline-${columnId}`}
-        emptyMessage={<FormattedMessage id='empty_column.direct' defaultMessage="You don't have any private mentions yet. When you send or receive one, it will show up here." />}
+        emptyMessage={
+          isBlue2 ? (
+            <FormattedMessage
+              id='blue2.empty_column.messages'
+              defaultMessage='Você ainda não tem mensagens. Quando enviar ou receber uma, ela aparecerá aqui.'
+            />
+          ) : (
+            <FormattedMessage
+              id='empty_column.direct'
+              defaultMessage="You don't have any private mentions yet. When you send or receive one, it will show up here."
+            />
+          )
+        }
         bindToDocument={!multiColumn}
-        prepend={<div className='follow_requests-unlocked_explanation'><span><FormattedMessage id='compose_form.encryption_warning' defaultMessage='Posts on Mastodon are not end-to-end encrypted. Do not share any dangerous information over Mastodon.' /> <a href='https://docs.joinmastodon.org/user/posting/#private' rel='noreferrer' target='_blank'><FormattedMessage id='compose_form.direct_message_warning_learn_more' defaultMessage='Learn more' /></a></span></div>}
+        prepend={
+          <div className='follow_requests-unlocked_explanation'>
+            <span>
+              {isBlue2 ? (
+                <FormattedMessage
+                  id='compose.message.notice'
+                  defaultMessage='Messages are not end-to-end encrypted'
+                />
+              ) : (
+                <FormattedMessage
+                  id='compose_form.encryption_warning'
+                  defaultMessage='Posts on Mastodon are not end-to-end encrypted. Do not share any dangerous information over Mastodon.'
+                />
+              )}{' '}
+              <a
+                href='https://docs.joinmastodon.org/user/posting/#private'
+                rel='noreferrer'
+                target='_blank'
+              >
+                <FormattedMessage
+                  id='compose_form.direct_message_warning_learn_more'
+                  defaultMessage='Learn more'
+                />
+              </a>
+            </span>
+          </div>
+        }
         alwaysPrepend
       />
 
       <Helmet>
-        <title>{intl.formatMessage(messages.title)}</title>
+        <title>{title}</title>
         <meta name='robots' content='noindex' />
       </Helmet>
     </Column>
