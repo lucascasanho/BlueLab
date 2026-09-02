@@ -28,10 +28,7 @@ export const NavigationHeader: React.FC<{
           </span>
           <span className={classes.poweredBy}>
             {isBlue2 ? (
-              <>
-                {blue2Text(intl.locale, 'basedOnMastodon')}{' '}
-                <IconLogo role='presentation' /> Mastodon
-              </>
+              <>{blue2Text(intl.locale, 'basedOnMastodon')}</>
             ) : (
               <FormattedMessage
                 id='navigation_bar.powered_by_mastodon'
