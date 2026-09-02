@@ -81,7 +81,7 @@
     --status-gutter-width: calc(var(--size-avatar) + var(--gap-default));
 
     overflow: visible;
-    width: 100%;
+    width: calc(100% - var(--quote-margin) - var(--thread-margin, 0px));
   }
 
   // This is Mastodon core variable
