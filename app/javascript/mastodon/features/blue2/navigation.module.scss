@@ -72,6 +72,11 @@
   }
 }
 
+.trendingIcon,
+.trendingIcon path {
+  fill: currentColor !important;
+}
+
 .itemActive {
   color: var(--blue2-text, #f7f7f8) !important;
   font-weight: 650;
