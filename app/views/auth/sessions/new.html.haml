@@ -1,6 +1,12 @@
 - content_for :page_title do
   = t('auth.login')
 
+- content_for :blue2_auth_title do
+  = t('auth.login')
+
+- content_for :blue2_auth_subtitle do
+  = t('auth.sign_in.preamble_html', domain: site_hostname)
+
 - content_for :header_tags do
   = render partial: 'shared/og'
 
