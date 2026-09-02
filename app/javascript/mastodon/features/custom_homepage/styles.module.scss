@@ -143,3 +143,134 @@
   display: flex;
   gap: 8px;
 }
+
+.blue2Landing {
+  width: min(100%, 1040px);
+  min-height: min(720px, calc(100dvh - 56px));
+  margin: 28px auto;
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(420px, 1.1fr);
+  overflow: hidden;
+  border: 1px solid var(--blue2-border-soft, #17232c);
+  border-radius: 18px;
+  background: var(--blue2-bg, #000);
+  color: var(--blue2-text, #f7f7f8);
+}
+
+.blue2LandingIntro {
+  padding: clamp(32px, 7vw, 72px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  border-inline-end: 1px solid var(--blue2-border-soft, #17232c);
+
+  h1 {
+    margin: 18px 0 8px;
+    color: var(--blue2-text, #f7f7f8);
+    font-size: clamp(34px, 5vw, 56px);
+    line-height: 1.02;
+    font-weight: 750;
+    letter-spacing: -0.035em;
+  }
+
+  p {
+    max-width: 34ch;
+    color: var(--blue2-muted, #9aa8b4);
+    font-size: 17px;
+    line-height: 1.45;
+  }
+}
+
+.blue2LandingIcon {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  object-fit: contain;
+}
+
+.blue2LandingActions {
+  width: min(100%, 320px);
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.blue2PrimaryAction,
+.blue2SecondaryAction {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none !important;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.blue2PrimaryAction {
+  background: #0085ff;
+  color: #fff !important;
+
+  &:hover,
+  &:focus-visible {
+    background: #0075e2;
+    outline: none;
+  }
+}
+
+.blue2SecondaryAction {
+  border: 1px solid var(--blue2-border, #22303b);
+  background: transparent;
+  color: var(--blue2-text, #f7f7f8) !important;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--blue2-hover, #111820);
+    outline: none;
+  }
+}
+
+.blue2LandingAbout {
+  min-width: 0;
+  overflow-y: auto;
+  background: var(--blue2-bg, #000);
+
+  .block {
+    border-bottom: 1px solid var(--blue2-border-soft, #17232c);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+}
+
+.blue2LandingHeader {
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+@media screen and (width <= 760px) {
+  .blue2Landing {
+    min-height: 100dvh;
+    margin: 0;
+    grid-template-columns: 1fr;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .blue2LandingIntro {
+    min-height: 52dvh;
+    padding: 36px 24px;
+    border-inline-end: 0;
+    border-bottom: 1px solid var(--blue2-border-soft, #17232c);
+  }
+
+  .blue2LandingActions {
+    width: 100%;
+  }
+}
