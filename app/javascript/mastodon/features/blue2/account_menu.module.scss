@@ -1,7 +1,7 @@
 .root {
   position: relative;
   z-index: 12;
-  width: 220px;
+  width: 216px;
   height: 54px;
   margin-bottom: 8px;
   overflow: visible;
@@ -35,7 +35,7 @@
 .root:hover .accountButton,
 .root:focus-within .accountButton,
 .accountButton[aria-expanded='true'] {
-  width: 220px;
+  width: 216px;
   padding: 5px 10px 5px 5px;
   overflow: visible;
   background: var(--blue2-hover, #111820);
@@ -94,7 +94,7 @@
 .root:hover .identity,
 .root:focus-within .identity,
 .accountButton[aria-expanded='true'] .identity {
-  max-width: 132px;
+  max-width: 128px;
   opacity: 1;
 }
 
@@ -106,11 +106,13 @@
 }
 
 .menu {
+  box-sizing: border-box;
   position: absolute;
   z-index: 40;
   top: 56px;
-  left: 0;
-  width: min(250px, calc(100vw - 24px));
+  inset-inline-start: 0;
+  width: 216px;
+  max-width: 100%;
   padding: 8px;
   border: 1px solid var(--blue2-border-soft, #17232c);
   border-radius: 12px;
@@ -177,7 +179,8 @@
   }
 
   .menu {
-    left: 56px;
+    width: min(216px, calc(100vw - 92px));
+    inset-inline-start: 56px;
     top: 0;
   }
 }
