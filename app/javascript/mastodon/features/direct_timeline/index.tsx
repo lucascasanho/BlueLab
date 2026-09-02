@@ -17,10 +17,9 @@ import {
   composerOriginFromElement,
   openNewComposer,
 } from '@/mastodon/reducers/slices/composer';
-import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import { useAppDispatch } from '@/mastodon/store';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
-import InboxIcon from '@/material-icons/400-24px/inbox.svg?react';
 import { addColumn, removeColumn, moveColumn } from 'mastodon/actions/columns';
 import {
   mountConversations,
@@ -46,12 +45,6 @@ interface ColumnBase {
 const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const conversations = useAppSelector((state) =>
-    state.conversations.get('items'),
-  );
-  const conversationsLoading = useAppSelector((state) =>
-    state.conversations.get('isLoading', true),
-  );
   const pinned = !!columnId;
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
@@ -62,7 +55,6 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
         ? messages.title_redesign
         : messages.title,
   );
-  const isInboxEmpty = conversations?.isEmpty() ?? true;
 
   const handlePin = useCallback(() => {
     if (columnId) {
@@ -138,21 +130,14 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
 
           <div className={blue2Classes.layout}>
             <section className={blue2Classes.inbox} aria-label={title}>
-              {isInboxEmpty && !conversationsLoading ? (
-                <div className={blue2Classes.emptyInbox}>
-                  <InboxIcon />
-                  <strong>{blue2Text(intl.locale, 'inboxEmpty')}</strong>
-                </div>
-              ) : (
-                <div className={blue2Classes.listWrap}>
-                  <ConversationsList
-                    trackScroll={!pinned}
-                    scrollKey={`direct_timeline-${columnId}`}
-                    emptyMessage={blue2Text(intl.locale, 'inboxEmpty')}
-                    bindToDocument={!multiColumn}
-                  />
-                </div>
-              )}
+              <div className={blue2Classes.listWrap}>
+                <ConversationsList
+                  trackScroll={!pinned}
+                  scrollKey={`direct_timeline-${columnId}`}
+                  emptyMessage={blue2Text(intl.locale, 'inboxEmpty')}
+                  bindToDocument={!multiColumn}
+                />
+              </div>
             </section>
 
             <section className={blue2Classes.welcome}>
