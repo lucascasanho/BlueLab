@@ -379,6 +379,297 @@ body[data-theme='blue-2'] {
   }
 }
 
+/* BLUE 2.0 integration for Rails-rendered pages, public pages and profile chrome. */
+body[data-theme='blue-2'] {
+  .container-alt,
+  .form-container,
+  .public-layout,
+  .public-layout__container,
+  .landing-page,
+  .landing-page__forms,
+  .landing-page__information,
+  .hero-widget,
+  .box-widget,
+  .about,
+  .about__section,
+  .about__meta,
+  .about__header,
+  .about__footer {
+    background: var(--blue2-bg);
+    color: var(--blue2-text);
+    border-color: var(--blue2-border);
+  }
+
+  .container-alt {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .logo-container {
+    padding-top: 34px;
+    color: var(--blue2-text);
+  }
+
+  .instance-auth-brand,
+  .mastodon-auth-brand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--blue2-text) !important;
+    text-decoration: none !important;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .instance-auth-brand img {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    object-fit: contain;
+  }
+
+  .form-container {
+    border-color: var(--blue2-border);
+    box-shadow: none;
+  }
+
+  .form-container h1,
+  .form-container h2,
+  .form-container h3,
+  .form-container p,
+  .simple_form,
+  .simple_form label,
+  .simple_form .input,
+  .simple_form .hint,
+  .simple_form .label_input > label {
+    color: var(--blue2-text);
+  }
+
+  .simple_form .hint,
+  .form-footer,
+  .form-footer p {
+    color: var(--blue2-muted);
+  }
+
+  .simple_form input[type='text'],
+  .simple_form input[type='email'],
+  .simple_form input[type='password'],
+  .simple_form input[type='url'],
+  .simple_form input[type='number'],
+  .simple_form textarea,
+  .simple_form select {
+    background: var(--blue2-search);
+    color: var(--blue2-text);
+    border: 1px solid var(--blue2-border);
+    border-radius: 10px;
+    box-shadow: none;
+  }
+
+  .simple_form input:focus,
+  .simple_form textarea:focus,
+  .simple_form select:focus {
+    border-color: var(--blue2-blue);
+    box-shadow: 0 0 0 1px var(--blue2-blue);
+  }
+
+  .form-footer a,
+  .about a,
+  .public-layout a {
+    color: var(--blue2-blue);
+  }
+
+  &.admin,
+  &.admin .admin-wrapper,
+  &.admin .sidebar-wrapper,
+  &.admin .sidebar-wrapper__inner,
+  &.admin .sidebar,
+  &.admin .content-wrapper,
+  &.admin .content {
+    background: var(--blue2-bg);
+    color: var(--blue2-text);
+    border-color: var(--blue2-border);
+  }
+
+  &.admin .sidebar-wrapper {
+    border-inline-end-color: var(--blue2-border);
+    box-shadow: none;
+  }
+
+  &.admin .sidebar nav a,
+  &.admin .sidebar nav button,
+  &.admin .sidebar__toggle a,
+  &.admin .sidebar__toggle__icon {
+    color: var(--blue2-text) !important;
+  }
+
+  &.admin .sidebar nav a:hover,
+  &.admin .sidebar nav a:focus,
+  &.admin .sidebar nav a.selected,
+  &.admin .sidebar nav a.active {
+    background: var(--blue2-hover);
+    color: var(--blue2-text) !important;
+  }
+
+  &.admin .sidebar nav a.selected,
+  &.admin .sidebar nav a.active {
+    font-weight: 650;
+  }
+
+  .blue2-admin-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 12px 18px;
+    color: var(--blue2-text) !important;
+    text-decoration: none !important;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .blue2-admin-brand img,
+  .sidebar__toggle__logo img {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    object-fit: contain;
+  }
+
+  .sidebar__toggle__logo a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--blue2-text) !important;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  &.admin .content__heading,
+  &.admin .content__heading h1,
+  &.admin .content h2,
+  &.admin .content h3,
+  &.admin .content h4,
+  &.admin .content p,
+  &.admin .content label,
+  &.admin .content th,
+  &.admin .content td {
+    color: var(--blue2-text);
+  }
+
+  &.admin .content__heading,
+  &.admin table,
+  &.admin .batch-table,
+  &.admin .batch-table__toolbar,
+  &.admin .filters,
+  &.admin .dashboard__counters,
+  &.admin .dashboard__widgets,
+  &.admin .announcements-list,
+  &.admin .directory__tag,
+  &.admin .speech-bubble,
+  &.admin .account-card {
+    background: var(--blue2-bg);
+    color: var(--blue2-text);
+    border-color: var(--blue2-border);
+    box-shadow: none;
+  }
+
+  &.admin .content input,
+  &.admin .content textarea,
+  &.admin .content select {
+    background: var(--blue2-search);
+    color: var(--blue2-text);
+    border-color: var(--blue2-border);
+  }
+
+  /* Keep profile borders and action controls consistent across every profile. */
+  .account__header {
+    border: 0;
+    box-shadow: none;
+  }
+
+  .account__header__image {
+    border-bottom: 1px solid var(--blue2-border);
+  }
+
+  .account__header__bar,
+  .account__header__tabs,
+  .account__header__extra,
+  .account__header__bio,
+  .account__header__fields {
+    border-color: var(--blue2-border) !important;
+    box-shadow: none !important;
+  }
+
+  .account__header__tabs__buttons,
+  .account__relationship {
+    gap: 8px;
+  }
+
+  .account__header__tabs__buttons .button,
+  .account__header__tabs__buttons .icon-button,
+  .account__relationship .button,
+  .account__relationship .icon-button {
+    min-height: 36px;
+    border: 1px solid var(--blue2-border) !important;
+    border-radius: 999px !important;
+    box-shadow: none !important;
+  }
+
+  .account__header__tabs__buttons .button-secondary,
+  .account__header__tabs__buttons .button-tertiary,
+  .account__relationship .button-secondary,
+  .account__relationship .button-tertiary,
+  .account__header__tabs__buttons .icon-button,
+  .account__relationship .icon-button {
+    background: transparent !important;
+    color: var(--blue2-text) !important;
+  }
+
+  .account__header__tabs__buttons .button-secondary:hover,
+  .account__header__tabs__buttons .button-tertiary:hover,
+  .account__relationship .button-secondary:hover,
+  .account__relationship .button-tertiary:hover,
+  .account__header__tabs__buttons .icon-button:hover,
+  .account__relationship .icon-button:hover {
+    background: var(--blue2-hover) !important;
+    color: var(--blue2-text) !important;
+  }
+
+  .account__header__tabs__buttons .button:not(.button-secondary):not(.button-tertiary),
+  .account__relationship .button:not(.button-secondary):not(.button-tertiary) {
+    border-color: transparent !important;
+    background: var(--blue2-blue) !important;
+    color: #fff !important;
+  }
+
+  .account__header__tabs__buttons .button:not(.button-secondary):not(.button-tertiary):hover,
+  .account__relationship .button:not(.button-secondary):not(.button-tertiary):hover {
+    background: var(--blue2-blue-hover) !important;
+  }
+
+  /* Public landing/about/account creation surfaces follow the same flat shell. */
+  .hero-widget,
+  .box-widget,
+  .landing-page__forms,
+  .about__section,
+  .about__meta {
+    border: 1px solid var(--blue2-border);
+    border-radius: 14px;
+    box-shadow: none;
+  }
+
+  .hero-widget__text,
+  .hero-widget__text h1,
+  .hero-widget__text p,
+  .box-widget h1,
+  .box-widget h2,
+  .box-widget p,
+  .landing-page__information h1,
+  .landing-page__information p {
+    color: var(--blue2-text);
+  }
+}
+
 html[data-color-scheme='light'] body[data-theme='blue-2'] {
   --blue2-bg: #fff;
   --blue2-surface: #fff;
@@ -424,6 +715,14 @@ html[data-color-scheme='light'] body[data-theme='blue-2'] {
     .video-player,
     .status-card {
       border-radius: 10px;
+    }
+
+    .form-container,
+    .hero-widget,
+    .box-widget,
+    .landing-page__forms {
+      border-inline: 0;
+      border-radius: 0;
     }
   }
 }
