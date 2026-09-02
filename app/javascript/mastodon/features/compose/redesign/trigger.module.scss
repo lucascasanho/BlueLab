@@ -23,13 +23,9 @@
 .composer,
 .composerMinimized {
   position: fixed;
-<<<<<<< HEAD
   z-index: 100;
-  bottom: 0;
   inset-inline-end: 0;
-  margin: var(--space-md);
   box-sizing: border-box;
-  border-radius: var(--radius-xl);
   pointer-events: auto;
   isolation: isolate;
   transform-origin: var(--composer-origin-x, 100%)
@@ -59,29 +55,29 @@
 :global(.reduce-motion) .composer,
 :global(.reduce-motion) .composerMinimized {
   animation: none;
-=======
-  right: 0;
-  box-sizing: border-box;
->>>>>>> 171438e185139efd68df7245f39f57c880dceff6
 }
 
 .composer {
-  width: 100%;
   top: env(safe-area-inset-top);
-
-  // Set from the visualViewport API.
-  height: var(--viewport-height, 100vh);
+  width: 100%;
+  height: var(
+    --viewport-height,
+    var(--composer-visual-viewport-height, 100vh)
+  );
   max-height: 100vh;
+  margin: 0;
+  border-radius: 0;
 
   @media (width >= #{variables.$mobile-menu-breakpoint}) {
     top: auto;
     bottom: 0;
-    min-height: 520px;
-    height: auto;
-    min-width: 300px;
     width: calc(100vw - var(--space-md) * 2);
+    min-width: 300px;
     max-width: 500px;
+    height: auto;
+    min-height: 520px;
     margin: var(--space-md);
+    border-radius: var(--radius-xl);
   }
 }
 
@@ -93,7 +89,7 @@
   }
 }
 
-@media (height <= 800px) {
+@media (width >= #{variables.$mobile-menu-breakpoint}) and (height <= 800px) {
   .composer {
     min-height: min(440px, calc(100dvh - var(--space-md) * 2));
     max-height: calc(100dvh - var(--space-md) * 2);
@@ -105,8 +101,16 @@
   width: min(320px, calc(100vw - var(--space-md) * 2));
   padding: var(--space-md);
   margin: var(--space-md);
+  border-radius: var(--radius-xl);
 
-<<<<<<< HEAD
+  @media (width < #{variables.$mobile-menu-breakpoint}) {
+    bottom: var(--mobile-bottom-nav-height);
+    width: auto;
+    padding: 0;
+    border-radius: var(--radius-round);
+  }
+}
+
 @media (width < #{variables.$mobile-menu-breakpoint}) {
   .button:not(.buttonInline) {
     opacity: 0;
@@ -126,51 +130,6 @@
     transform: translateY(0) scale(1);
   }
 
-  .composer,
-  .composerMinimized {
-    --composer-viewport-height: var(--composer-visual-viewport-height, 100dvh);
-    --composer-mobile-spacing: calc(2 * var(--space-md));
-    --composer-available-height: calc(
-      var(--composer-viewport-height) - var(--mobile-bottom-nav-height)
-    );
-    --composer-mobile-height: calc(
-      var(--composer-available-height) - var(--composer-mobile-spacing)
-    );
-
-    bottom: var(--mobile-bottom-nav-height);
-    max-height: var(--composer-mobile-height);
-  }
-
-  .composer {
-    height: min(440px, var(--composer-mobile-height));
-    min-height: 0;
-  }
-
-  :global(.ui--mobile-chrome-hidden) .composer,
-  :global(.ui--mobile-chrome-hidden) .composerMinimized {
-    --composer-available-height: calc(
-      var(--composer-viewport-height) - env(safe-area-inset-bottom)
-    );
-
-    bottom: env(safe-area-inset-bottom);
-    max-height: var(--composer-mobile-height);
-  }
-
-  :global(.ui--mobile-chrome-hidden) .composer {
-    height: min(440px, var(--composer-mobile-height));
-    min-height: 0;
-  }
-
-  .composer[data-keyboard-open] {
-    --composer-mobile-height: calc(
-      var(--composer-viewport-height) - var(--composer-mobile-spacing)
-    );
-
-    bottom: var(--composer-visual-viewport-bottom, 0);
-    height: min(440px, var(--composer-mobile-height));
-    max-height: var(--composer-mobile-height);
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .button:not(.buttonInline) {
       transition: none;
@@ -179,12 +138,5 @@
 
   :global(.reduce-motion) .button:not(.buttonInline) {
     transition: none;
-=======
-  @media (width < #{variables.$mobile-menu-breakpoint}) {
-    bottom: var(--mobile-bottom-nav-height);
-    width: auto;
-    padding: 0;
-    border-radius: var(--radius-round);
->>>>>>> 171438e185139efd68df7245f39f57c880dceff6
   }
 }
