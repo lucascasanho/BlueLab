@@ -41,25 +41,29 @@ body[data-theme='blue-2'] {
   }
 
   /*
-   * Profile actions belong to the identity row, not to the badge/role row.
-   * The account-header component already renders AccountButtons beside
-   * AccountName, but upstream flex rules let the primary button grow and let
-   * the action group wrap on narrow containers. That recreates the old visual
-   * hierarchy on mobile (large follow button plus vertically stacked icons).
-   * Keep the complete action group compact and on one line while allowing the
-   * identity block to use the remaining width.
+   * Profile actions sit in their own visual row directly under the cover,
+   * opposite the overlapping avatar. The account header still owns the same
+   * controls and behavior; only BlueLab 2.0 repositions them above the
+   * display-name/handle row.
    */
   .blue2-profile-identity-actions {
     min-width: 0;
-    align-items: flex-start !important;
+    display: block !important;
+    min-height: 0 !important;
   }
 
   .blue2-profile-actions {
+    position: absolute !important;
+    z-index: 4;
+    inset-inline-end: 16px;
+    top: 9px;
+    display: flex !important;
     flex: 0 1 auto !important;
     min-width: 0;
-    max-width: none !important;
+    max-width: calc(100% - 128px) !important;
     flex-wrap: nowrap !important;
-    align-items: flex-start !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
     gap: 7px;
     margin: 0 !important;
     transform: none !important;
@@ -69,7 +73,7 @@ body[data-theme='blue-2'] {
     flex: 0 1 auto !important;
     width: auto !important;
     min-width: 0 !important;
-    max-width: min(44vw, 180px);
+    max-width: min(40vw, 180px);
     padding-inline: 14px !important;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -92,16 +96,15 @@ body[data-theme='blue-2'] {
 
 @media (width <= 759px) {
   body[data-theme='blue-2'] {
-    .blue2-profile-identity-actions {
-      gap: 8px;
-    }
-
     .blue2-profile-actions {
+      inset-inline-end: 14px;
+      top: 8px;
+      max-width: calc(100% - 122px) !important;
       gap: 6px;
     }
 
     .blue2-profile-actions .button {
-      max-width: 44vw;
+      max-width: 38vw;
       padding-inline: 12px !important;
     }
   }
