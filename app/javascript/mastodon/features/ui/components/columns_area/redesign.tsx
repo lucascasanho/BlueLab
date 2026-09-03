@@ -17,10 +17,7 @@ import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trig
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
 import { ComposePanel } from '@/mastodon/features/ui/components/compose_panel';
-import {
-  customFavicon,
-  customInstanceLogo,
-} from '@/mastodon/initial_state';
+import { customFavicon, customInstanceLogo } from '@/mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { Footer } from 'mastodon/features/custom_homepage/components/footer';
 import { Header } from 'mastodon/features/custom_homepage/components/header';
