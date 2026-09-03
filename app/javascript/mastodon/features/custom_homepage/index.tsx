@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -52,6 +53,18 @@ export const CustomHomepage: React.FC = () => {
     void dispatch(fetchServer());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (!isBlue2 || signedIn || !showBlue2Welcome) {
+      return;
+    }
+
+    document.documentElement.classList.add('has-blue2-welcome-modal');
+
+    return () => {
+      document.documentElement.classList.remove('has-blue2-welcome-modal');
+    };
+  }, [isBlue2, signedIn, showBlue2Welcome]);
+
   const closeBlue2Welcome = useCallback(() => {
     setShowBlue2Welcome(false);
   }, []);
@@ -84,6 +97,94 @@ export const CustomHomepage: React.FC = () => {
   }, []);
 
   if (isBlue2 && isAboutRoute && showBlue2Welcome) {
+    const welcomeModal =
+      typeof document !== 'undefined'
+        ? createPortal(
+            <div className={classes.blue2WelcomeBackdrop}>
+              <section
+                className={classes.blue2WelcomeDialog}
+                role='dialog'
+                aria-modal='true'
+                aria-labelledby='blue2-welcome-title'
+              >
+                <button
+                  className={classes.blue2WelcomeClose}
+                  type='button'
+                  onClick={closeBlue2Welcome}
+                  aria-label={intl.formatMessage({
+                    id: 'bundle_modal_error.close',
+                    defaultMessage: 'Close',
+                  })}
+                >
+                  ×
+                </button>
+
+                <Link
+                  to='/'
+                  className={classes.blue2WelcomeBrand}
+                  aria-label={server.item?.domain}
+                >
+                  <img
+                    src={blue2Brand}
+                    alt=''
+                    className={classes.blue2WelcomeIcon}
+                  />
+                </Link>
+
+                <h2 id='blue2-welcome-title'>{server.item?.domain}</h2>
+                <p>{server.item?.description}</p>
+
+                <div className={classes.blue2WelcomeActions}>
+                  {registrationsOpen && (
+                    <a
+                      href={signupUrl}
+                      className={classes.blue2ModalPrimaryAction}
+                    >
+                      <FormattedMessage
+                        id='sign_in_banner.create_account'
+                        defaultMessage='Create account'
+                      />
+                    </a>
+                  )}
+
+                  <a
+                    href='/auth/sign_in'
+                    className={classes.blue2ModalSecondaryAction}
+                  >
+                    <FormattedMessage
+                      id='sign_in_banner.sign_in'
+                      defaultMessage='Login'
+                    />
+                  </a>
+
+                  <a
+                    href='/auth/sign_in#passkey-authentication-form'
+                    className={classes.blue2ModalSecondaryAction}
+                    onClick={handlePasskeyLogin}
+                  >
+                    <FormattedMessage
+                      id='passkeys.sign_in'
+                      defaultMessage='Sign in with a passkey'
+                    />
+                  </a>
+
+                  <button
+                    type='button'
+                    className={classes.blue2ExploreAction}
+                    onClick={closeBlue2Welcome}
+                  >
+                    <FormattedMessage
+                      id='tabs_bar.explore'
+                      defaultMessage='Explore'
+                    />
+                  </button>
+                </div>
+              </section>
+            </div>,
+            document.body,
+          )
+        : null;
+
     return (
       <div className={classes.blue2Landing}>
         <section className={classes.blue2LandingIntro}>
@@ -144,89 +245,7 @@ export const CustomHomepage: React.FC = () => {
           <About />
         </section>
 
-        {!signedIn && (
-          <div className={classes.blue2WelcomeBackdrop}>
-            <section
-              className={classes.blue2WelcomeDialog}
-              role='dialog'
-              aria-modal='true'
-              aria-labelledby='blue2-welcome-title'
-            >
-              <button
-                className={classes.blue2WelcomeClose}
-                type='button'
-                onClick={closeBlue2Welcome}
-                aria-label={intl.formatMessage({
-                  id: 'bundle_modal_error.close',
-                  defaultMessage: 'Close',
-                })}
-              >
-                ×
-              </button>
-
-              <Link
-                to='/'
-                className={classes.blue2WelcomeBrand}
-                aria-label={server.item?.domain}
-              >
-                <img
-                  src={blue2Brand}
-                  alt=''
-                  className={classes.blue2WelcomeIcon}
-                />
-              </Link>
-
-              <h2 id='blue2-welcome-title'>{server.item?.domain}</h2>
-              <p>{server.item?.description}</p>
-
-              <div className={classes.blue2WelcomeActions}>
-                {registrationsOpen && (
-                  <a
-                    href={signupUrl}
-                    className={classes.blue2ModalPrimaryAction}
-                  >
-                    <FormattedMessage
-                      id='sign_in_banner.create_account'
-                      defaultMessage='Create account'
-                    />
-                  </a>
-                )}
-
-                <a
-                  href='/auth/sign_in'
-                  className={classes.blue2ModalSecondaryAction}
-                >
-                  <FormattedMessage
-                    id='sign_in_banner.sign_in'
-                    defaultMessage='Login'
-                  />
-                </a>
-
-                <a
-                  href='/auth/sign_in#passkey-authentication-form'
-                  className={classes.blue2ModalSecondaryAction}
-                  onClick={handlePasskeyLogin}
-                >
-                  <FormattedMessage
-                    id='passkeys.sign_in'
-                    defaultMessage='Sign in with a passkey'
-                  />
-                </a>
-
-                <button
-                  type='button'
-                  className={classes.blue2ExploreAction}
-                  onClick={closeBlue2Welcome}
-                >
-                  <FormattedMessage
-                    id='tabs_bar.explore'
-                    defaultMessage='Explore'
-                  />
-                </button>
-              </div>
-            </section>
-          </div>
-        )}
+        {welcomeModal}
 
         <Helmet>
           <title>{server.item?.domain}</title>
