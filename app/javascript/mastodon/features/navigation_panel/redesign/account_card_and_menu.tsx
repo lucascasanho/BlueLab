@@ -61,6 +61,7 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
     ...localCustomEmojis,
     ...(cleanExtraEmojis(account.emojis) ?? {}),
   };
+  const displayNameEmojiVersion = `${Object.keys(localCustomEmojis).length}-${account.emojis.size}`;
 
   return (
     <div className={classes.root}>
@@ -74,6 +75,7 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
           <span className='display-name'>
             <bdi className='display-name__name'>
               <EmojiHTML
+                key={`${account.id}-${displayNameEmojiVersion}`}
                 className='display-name__html'
                 htmlString={account.display_name_html}
                 as='strong'
