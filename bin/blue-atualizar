@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+# Atualizador idempotente do canal de testes do Blue.
+# Canal remoto: BlueLab-Test
+
+set -u
+
+REPO="${BLUE_REPO:-$HOME/blue}"
+REMOTE="${BLUE_REMOTE:-bluelab}"
+REMOTE_URL="${BLUE_REMOTE_URL:-https://github.com/lucascasanho/BlueLab.git}"
+BRANCH="${BLUE_TEST_BRANCH:-BlueLab-Test}"
+SERVICES=(blue-web blue-sidekiq blue-streaming)
+
+fail() {
+  echo
+  echo "ERRO: $*"
+  echo "O terminal continuará aberto."
+  exit 1
+}
+
+run() {
+  "$@" || fail "falhou: $*"
+}
+
+echo "========================================"
+echo " BLUE - ATUALIZAR CANAL DE TESTES"
+echo "========================================"
+
+cd "$REPO" || fail "não consegui entrar em $REPO"
+git rev-parse --git-dir >/dev/null 2>&1 || fail "$REPO não é um repositório Git"
+
+if [ -n "$(git status --porcelain)" ]; then
+  echo
+  echo "Existem alterações locais não commitadas:"
+  git status --short
+  fail "working tree não está limpa; nada foi atualizado"
+fi
+
+CURRENT_BRANCH="$(git branch --show-current)"
+if [ "$CURRENT_BRANCH" != "$BRANCH" ]; then
+  fail "branch atual é '$CURRENT_BRANCH'. O Blue deve permanecer em '$BRANCH'"
+fi
+
+OLD_HEAD="$(git rev-parse HEAD)"
+
+echo
+echo "===== BUSCANDO $BRANCH ====="
+if git remote get-url "$REMOTE" >/dev/null 2>&1; then
+  run git fetch "$REMOTE" "$BRANCH"
+else
+  run git fetch "$REMOTE_URL" "$BRANCH"
+fi
+
+NEW_HEAD="$(git rev-parse FETCH_HEAD)"
+
+if [ "$OLD_HEAD" != "$NEW_HEAD" ]; then
+  echo
+  echo "===== VALIDANDO FAST-FORWARD ====="
+  git merge-base --is-ancestor "$OLD_HEAD" "$NEW_HEAD" || \
+    fail "o histórico local divergiu de $BRANCH; nenhuma atualização foi aplicada"
+
+  run git diff --check "$OLD_HEAD..$NEW_HEAD"
+
+  echo
+  echo "===== APLICANDO CÓDIGO NOVO ====="
+  run git merge --ff-only "$NEW_HEAD"
+else
+  echo
+  echo "Nenhum commit novo. Vou validar/reaplicar o deploy atual para que o comando seja idempotente."
+fi
+
+echo
+echo "===== RUBY ====="
+if ! bundle check; then
+  run bundle install
+fi
+
+echo
+echo "===== JAVASCRIPT ====="
+run yarn install --immutable
+
+echo
+echo "===== MIGRATIONS ====="
+run env RAILS_ENV=production bundle exec rails db:migrate
+
+echo
+echo "===== ASSETS ====="
+run env RAILS_ENV=production NODE_ENV=production bundle exec rails assets:precompile
+
+echo
+echo "===== REINICIANDO BLUE ====="
+run sudo systemctl restart "${SERVICES[@]}"
+
+sleep 2
+
+echo
+echo "===== STATUS ====="
+FAILED=0
+for service in "${SERVICES[@]}"; do
+  state="$(systemctl is-active "$service" 2>/dev/null || true)"
+  printf '%-24s %s\n' "$service" "$state"
+  if [ "$state" != "active" ]; then
+    FAILED=1
+  fi
+done
+
+if [ "$FAILED" -ne 0 ]; then
+  fail "um ou mais serviços não ficaram ativos"
+fi
+
+echo
+echo "===== VERSÃO ====="
+git log -1 --oneline
+
+echo
+echo "========================================"
+echo " BLUE ATUALIZADO E PRONTO PARA TESTE"
+echo "========================================"
