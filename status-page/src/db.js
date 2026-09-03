@@ -40,12 +40,9 @@ async function recordCheck(db, component, result, checkedAt = new Date()) {
   const checkedAtSql = checkedAt.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
   const day = dayFromDate(checkedAt);
   const bucket = bucketForStatus(result.status);
-  const upIncrement = bucket === 'up' ? 1 : 0;
-  const degradedIncrement = bucket === 'degraded' ? 1 : 0;
-  const downIncrement = bucket === 'down' ? 1 : 0;
   const lastOkAt = result.status === 'operational' ? checkedAtSql : component.last_ok_at;
 
-  await db.batch([
+  const statements = [
     db.prepare(`
       INSERT INTO checks (
         component_id, status, http_status, response_ms, message, checked_at
@@ -63,17 +60,30 @@ async function recordCheck(db, component, result, checkedAt = new Date()) {
       SET current_status = ?, last_checked_at = ?, last_ok_at = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(result.status, checkedAtSql, lastOkAt ?? null, component.id),
-    db.prepare(`
-      INSERT INTO daily_stats (
-        component_id, day, total_checks, up_checks, degraded_checks, down_checks
-      ) VALUES (?, ?, 1, ?, ?, ?)
-      ON CONFLICT(component_id, day) DO UPDATE SET
-        total_checks = total_checks + 1,
-        up_checks = up_checks + excluded.up_checks,
-        degraded_checks = degraded_checks + excluded.degraded_checks,
-        down_checks = down_checks + excluded.down_checks
-    `).bind(component.id, day, upIncrement, degradedIncrement, downIncrement),
-  ]);
+  ];
+
+  // Unknown means that the monitor has no evidence either way. Keep the raw
+  // check for diagnostics, but do not lower uptime by counting it as failure.
+  if (bucket !== 'unknown') {
+    const upIncrement = bucket === 'up' ? 1 : 0;
+    const degradedIncrement = bucket === 'degraded' ? 1 : 0;
+    const downIncrement = bucket === 'down' ? 1 : 0;
+
+    statements.push(
+      db.prepare(`
+        INSERT INTO daily_stats (
+          component_id, day, total_checks, up_checks, degraded_checks, down_checks
+        ) VALUES (?, ?, 1, ?, ?, ?)
+        ON CONFLICT(component_id, day) DO UPDATE SET
+          total_checks = total_checks + 1,
+          up_checks = up_checks + excluded.up_checks,
+          degraded_checks = degraded_checks + excluded.degraded_checks,
+          down_checks = down_checks + excluded.down_checks
+      `).bind(component.id, day, upIncrement, degradedIncrement, downIncrement),
+    );
+  }
+
+  await db.batch(statements);
 }
 
 async function checkHttp(component) {
