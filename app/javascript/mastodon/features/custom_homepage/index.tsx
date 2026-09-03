@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { Route, Switch, useRouteMatch } from 'react-router-dom';
+import { Route, Switch, useLocation, useRouteMatch } from 'react-router-dom';
 
 import * as WebAuthnJSON from '@github/webauthn-json';
 import { Helmet } from '@unhead/react/helmet';
@@ -29,6 +29,8 @@ export const CustomHomepage: React.FC = () => {
   );
   const { signedIn } = useIdentity();
   const { path } = useRouteMatch();
+  const { pathname } = useLocation();
+  const isAboutRoute = pathname === `${path}/about`;
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const [showBlue2Welcome, setShowBlue2Welcome] = useState(
@@ -70,7 +72,7 @@ export const CustomHomepage: React.FC = () => {
     void authenticate();
   }, []);
 
-  if (isBlue2) {
+  if (isBlue2 && isAboutRoute) {
     return (
       <div className={classes.blue2Landing}>
         <section className={classes.blue2LandingIntro}>
@@ -236,7 +238,7 @@ export const CustomHomepage: React.FC = () => {
         </NavigationFocusTarget>
         <p>{server.item?.description}</p>
 
-        {!signedIn && (
+        {!isBlue2 && !signedIn && (
           <div className={classes.guestActions}>
             {registrationsOpen && (
               <a href={signupUrl} className='button'>
