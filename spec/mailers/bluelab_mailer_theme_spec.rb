@@ -56,11 +56,20 @@ RSpec.describe 'BlueLab mailer theme' do
     expect(reset_mail.subject).to_not include('Mastodon')
   end
 
-  it 'uses the instance title in welcome copy that refers to the local service' do
+  it 'uses the instance title in rendered HTML and preserves the markup' do
     receiver.update!(locale: :'pt-BR')
     welcome_html = UserMailer.welcome(receiver).html_part.body.decoded
     expected_step = I18n.t('user_mailer.welcome.follow_step', locale: :'pt-BR').gsub(/\bMastodon\b/, 'Example Social')
 
-    expect(welcome_html).to include(expected_step)
+    expect(welcome_html).to include(expected_step, '<table')
+    expect(welcome_html).to_not include('&lt;table')
+  end
+
+  it 'uses the instance title in the plain-text mail layout too' do
+    receiver.update!(locale: :'pt-BR')
+    welcome_text = UserMailer.welcome(receiver).text_part.body.decoded
+    expected_step = I18n.t('user_mailer.welcome.follow_step', locale: :'pt-BR').gsub(/\bMastodon\b/, 'Example Social')
+
+    expect(welcome_text).to include(expected_step)
   end
 end
