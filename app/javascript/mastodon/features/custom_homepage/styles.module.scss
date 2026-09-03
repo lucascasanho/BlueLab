@@ -6,6 +6,10 @@
   background: var(--color-bg-primary);
   min-height: 100%;
 
+  :global(body[data-theme='blue-2']) & {
+    border-top: 0;
+  }
+
   :global(.item-list) article:last-child :global(.status) {
     border-bottom: 0;
   }
