@@ -24,11 +24,46 @@ on:
           - espelunca
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
+  format:
+    name: Format status page
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Set up JavaScript environment
+        uses: ./.github/actions/setup-javascript
+      - name: Apply repository formatter
+        run: |
+          yarn format \
+            status-page/src/availability.js \
+            status-page/src/config.js \
+            status-page/src/db.js \
+            status-page/src/index.js \
+            status-page/src/render.js \
+            status-page/test/availability.test.js \
+            status-page/wrangler.jsonc
+      - name: Commit formatting when needed
+        run: |
+          if git diff --quiet -- status-page; then
+            echo 'Status page already formatted.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add status-page
+          git commit -m 'style: format shared status page'
+          git push origin "HEAD:${{ github.head_ref }}"
+
   test:
     name: Test status page
+    needs: format
+    if: always() && (needs.format.result == 'success' || needs.format.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
