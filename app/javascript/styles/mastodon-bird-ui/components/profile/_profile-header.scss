@@ -70,11 +70,22 @@
     border: 1px solid var(--color-outer-space);
   }
 
-  // Fix focus overflow for 4.1.4-nightly
+  // Keep profile actions aligned directly below the header image.
   [class*='_comp_account_header__buttons'] {
+    align-items: center;
+    flex-wrap: nowrap;
+    min-width: 0;
     overflow: visible;
-    margin-top: -8px;
-    transform: translateY(-4px);
+    margin-top: -12px;
+    transform: translateY(-8px);
+  }
+
+  [class*='_comp_account_header__buttons'] .button {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    height: 36px;
+    min-height: 36px;
+    min-width: 0;
   }
 
   [class*='_comp_account_header__buttons'] .icon-button {
@@ -83,10 +94,16 @@
     border-bottom-right-radius: 9999px;
     border-top-left-radius: 9999px;
     border-top-right-radius: 9999px;
+    box-sizing: border-box;
     color: var(--color-light-text);
     display: inline-flex;
+    flex: 0 0 36px;
     height: 36px;
     justify-content: center;
+    max-height: 36px;
+    max-width: 36px;
+    min-height: 36px;
+    min-width: 36px;
     padding: 0;
     width: 36px;
   }
