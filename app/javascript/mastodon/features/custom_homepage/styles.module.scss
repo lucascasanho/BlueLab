@@ -338,15 +338,31 @@
   }
 }
 
+:global(html.has-blue2-welcome-modal),
+:global(html.has-blue2-welcome-modal body) {
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+:global(html.has-blue2-welcome-modal body) {
+  overflow: hidden !important;
+}
+
 .blue2WelcomeBackdrop {
   position: fixed;
   z-index: 10000;
   inset: 0;
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
   padding: 24px;
   display: grid;
   place-items: center;
+  overflow: hidden;
   background: rgb(8 18 29 / 82%);
   backdrop-filter: blur(10px);
+  overscroll-behavior: contain;
 }
 
 .blue2WelcomeDialog {
@@ -485,15 +501,119 @@
   }
 
   .blue2WelcomeBackdrop {
-    padding: 0;
+    padding: max(8px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
+    place-items: center;
+    touch-action: none;
   }
 
   .blue2WelcomeDialog {
-    width: 100%;
-    min-height: 100dvh;
-    padding: 74px 26px 44px;
-    border: 0;
-    border-radius: 0;
+    width: min(100%, 520px);
+    min-height: 0;
+    max-height: 100%;
+    padding: clamp(44px, 5.6dvh, 56px) clamp(18px, 5vw, 24px)
+      clamp(14px, 2.6dvh, 24px);
+    border: 1px solid rgb(255 255 255 / 24%);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .blue2WelcomeClose {
+    top: 8px;
+    right: 8px;
+    width: 34px;
+    height: 34px;
+    font-size: 25px;
+  }
+
+  .blue2WelcomeIcon {
+    height: clamp(44px, 6dvh, 58px);
+  }
+
+  .blue2WelcomeDialog h2 {
+    margin: clamp(9px, 1.8dvh, 14px) 0 6px;
+    font-size: clamp(24px, 7vw, 34px);
+    line-height: 1.02;
+  }
+
+  .blue2WelcomeDialog > p {
+    max-width: 36ch;
+    font-size: clamp(14px, 3.7vw, 16px);
+    line-height: 1.3;
+  }
+
+  .blue2WelcomeActions {
+    width: min(100%, 360px);
+    margin-top: clamp(12px, 2.2dvh, 18px);
+    gap: clamp(4px, 0.8dvh, 6px);
+  }
+
+  .blue2ModalPrimaryAction,
+  .blue2ModalSecondaryAction {
+    min-height: clamp(36px, 5.2dvh, 42px);
+    padding: 5px 16px;
+    font-size: clamp(13px, 3.6vw, 15px);
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .blue2ExploreAction {
+    min-height: clamp(32px, 4.6dvh, 38px);
+    font-size: 14px;
+  }
+}
+
+@media screen and (width <= 760px) and (height <= 650px) {
+  .blue2WelcomeBackdrop {
+    padding: max(5px, env(safe-area-inset-top))
+      max(5px, env(safe-area-inset-right)) max(5px, env(safe-area-inset-bottom))
+      max(5px, env(safe-area-inset-left));
+  }
+
+  .blue2WelcomeDialog {
+    padding: 38px 14px 8px;
+    border-radius: 14px;
+  }
+
+  .blue2WelcomeClose {
+    top: 3px;
+    right: 3px;
+    width: 30px;
+    height: 30px;
+    font-size: 22px;
+  }
+
+  .blue2WelcomeIcon {
+    height: 34px;
+  }
+
+  .blue2WelcomeDialog h2 {
+    margin: 6px 0 4px;
+    font-size: 22px;
+  }
+
+  .blue2WelcomeDialog > p {
+    max-width: 42ch;
+    font-size: 12.5px;
+    line-height: 1.2;
+  }
+
+  .blue2WelcomeActions {
+    margin-top: 8px;
+    gap: 3px;
+  }
+
+  .blue2ModalPrimaryAction,
+  .blue2ModalSecondaryAction {
+    min-height: 32px;
+    padding: 3px 12px;
+    font-size: 12.5px;
+  }
+
+  .blue2ExploreAction {
+    min-height: 30px;
+    font-size: 13px;
   }
 }
 
