@@ -17,7 +17,6 @@ import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trig
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
 import { ComposePanel } from '@/mastodon/features/ui/components/compose_panel';
-import { customAppIcon } from '@/mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { Footer } from 'mastodon/features/custom_homepage/components/footer';
 import { Header } from 'mastodon/features/custom_homepage/components/header';
@@ -41,6 +40,20 @@ const TabsBarPortal: React.FC<React.ComponentProps<'div'>> = (props) => {
   );
 
   return <div {...props} ref={setRef} />;
+};
+
+const getInstanceFavicon = () => {
+  if (typeof document === 'undefined') {
+    return '/favicon.ico';
+  }
+
+  return (
+    document.querySelector<HTMLLinkElement>(
+      "link[rel~='icon'][sizes='48x48']",
+    )?.href ??
+    document.querySelector<HTMLLinkElement>("link[rel~='icon']")?.href ??
+    '/favicon.ico'
+  );
 };
 
 export const ColumnsAreaRedesign: React.FC<{
@@ -67,6 +80,7 @@ export const ColumnsAreaRedesign: React.FC<{
   const isBlue2Home = isBlue2 && location.pathname === '/home';
   const isBlue2Global = isBlue2 && location.pathname === '/public';
   const isBlue2FeedPage = isBlue2Home || isBlue2Global;
+  const instanceFavicon = getInstanceFavicon();
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -183,7 +197,7 @@ export const ColumnsAreaRedesign: React.FC<{
               </button>
 
               <img
-                src={customAppIcon ?? '/favicon.ico'}
+                src={instanceFavicon}
                 alt=''
                 className={classes.blue2MobileBrand}
               />
@@ -210,7 +224,7 @@ export const ColumnsAreaRedesign: React.FC<{
             <>
               <header className={classes.blue2Topbar}>
                 <img
-                  src={customAppIcon ?? '/favicon.ico'}
+                  src={instanceFavicon}
                   alt=''
                   className={classes.blue2Brand}
                 />
