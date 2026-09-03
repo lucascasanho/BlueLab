@@ -3,6 +3,21 @@
 /* BlueLab 2.0 seventh refinement layer: link preview attribution continuity. */
 body[data-theme='blue-2'] {
   /*
+   * The original BlueLab stylesheet hid Mastodon's classic navigation and
+   * compose panels to avoid stale sidebars leaking into the redesigned UI.
+   * Current Mastodon deliberately renders those components in the advanced
+   * interface and when the user chooses the legacy composer, so hiding them
+   * now removes real navigation. Keep them visible whenever they are rendered.
+   */
+  .navigation-panel {
+    display: flex !important;
+  }
+
+  .compose-panel {
+    display: block !important;
+  }
+
+  /*
    * Mastodon renders provider/author attribution as a `.more-from-author`
    * sibling after the preview card. Make both pieces read as one rounded card
    * instead of two unrelated boxes with a broken radius between them.
