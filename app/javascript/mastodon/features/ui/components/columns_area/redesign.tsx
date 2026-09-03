@@ -49,9 +49,9 @@ const getInstanceFavicon = () => {
 
   return (
     document.querySelector<HTMLLinkElement>(
-      "link[rel~='icon'][sizes='48x48']",
+      'link[rel~="icon"][sizes="48x48"]',
     )?.href ??
-    document.querySelector<HTMLLinkElement>("link[rel~='icon']")?.href ??
+    document.querySelector<HTMLLinkElement>('link[rel~="icon"]')?.href ??
     '/favicon.ico'
   );
 };
