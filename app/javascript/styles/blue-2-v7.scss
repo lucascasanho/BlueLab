@@ -2,6 +2,39 @@
 
 /* BlueLab 2.0 seventh refinement layer: link preview attribution continuity. */
 body[data-theme='blue-2'] {
+  /* Mastodon-style remote handle domain badge, limited to BlueLab profiles. */
+  .bluelab-profile-handle-domain {
+    display: inline-block;
+    margin-inline-start: 2px;
+    padding: 0 4px;
+    border-radius: 4px;
+    background: var(--color-bg-brand-softest);
+    color: var(--color-text-brand);
+    font-weight: 500;
+  }
+
+  /* Advanced/multi-column refinements stay isolated from Vanilla and Bird UI. */
+  .layout-multiple-columns {
+    .compose-form__actions .icon-button.active:has(.icon-markdown) {
+      background: var(--color-bg-brand-softest);
+      color: var(--color-text-brand);
+    }
+
+    .drawer__bluelab-compose {
+      box-sizing: border-box;
+      flex: 1 1 auto;
+      width: 100%;
+      min-width: 0;
+      min-height: 100%;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .bluelab-advanced-footer-spacer {
+      flex: 1 1 auto;
+    }
+  }
+
   /* Keep a single clickable instance mark visible on authentication pages. */
   .blue2-auth-intro__brand {
     display: inline-flex;
