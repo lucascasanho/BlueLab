@@ -38,11 +38,13 @@ const Explore: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
     >
       {isRedesignEnabled() ? (
         <ColumnHeader
+          className='explore__column-header'
           withBackButton={multiColumn && 'auto'}
           title={intl.formatMessage(messages.titleRedesign)}
         />
       ) : (
         <LegacyColumnHeader
+          className='explore__column-header'
           icon={'explore'}
           iconComponent={logoRequired ? SymbolLogo : TrendingUpIcon}
           title={intl.formatMessage(messages.title)}
