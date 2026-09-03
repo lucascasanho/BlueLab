@@ -38,6 +38,12 @@
   email_dark_muted_color = email_color.call(:email_dark_muted_color, '#8b98a5')
   email_border_color = '#d8e0e8'
   email_dark_border_color = '#2f3336'
+
+  header_logo_path = instance_presenter.email_logo&.file&.url
+  header_logo_url = full_asset_url(header_logo_path) if header_logo_path.present?
+  footer_logo_upload = instance_presenter.favicon || instance_presenter.app_icon || instance_presenter.email_logo
+  footer_logo_path = footer_logo_upload&.file&.url
+  footer_logo_url = full_asset_url(footer_logo_path) if footer_logo_path.present?
 !!!
 %html{ lang: I18n.locale, dir: locale_direction }
   %head
@@ -48,9 +54,14 @@
     %meta{ name: 'format-detection', content: 'telephone=no, date=no, address=no, email=no, url=no' }
     %meta{ name: 'color-scheme', content: 'light dark' }
     %meta{ name: 'supported-color-schemes', content: 'light dark' }
+    = vite_stylesheet_tag 'styles/entrypoints/mailer.scss'
     %style
-      \table { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-      \body, .email { background-color: #{email_background_color} !important; color: #{email_text_color} !important; }
+      \html, body, .email { color-scheme: light dark !important; }
+      \table { mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; }
+      \.email-card-table,
+      \.email-header-table,
+      \.email-body-table { border: 0 !important; border-spacing: 0 !important; }
+      \body, .email, .email-desktop-p-8 { background-color: #{email_background_color} !important; color: #{email_text_color} !important; }
       \.email-card-td,
       \.email-inner-card-td,
       \.email-inner-card-td-without-padding,
@@ -60,10 +71,16 @@
       \.email-checklist-table,
       \.email-mini-td,
       \.email-feature-td,
-      \.email-body-td { background-color: #{email_surface_color} !important; border-color: #{email_border_color} !important; }
+      \.email-body-td,
+      \.email-body-table { background-color: #{email_surface_color} !important; border-color: #{email_border_color} !important; }
       \.email-header-td,
+      \.email-header-table,
       \.email-header-after-inside-div { background-color: #{email_surface_color} !important; border-color: #{email_border_color} !important; }
-      \.email-header-td { border-top: 4px solid #{email_primary_color} !important; border-bottom: 1px solid #{email_border_color} !important; }
+      \.email-header-td { border-top: 4px solid #{email_primary_color} !important; border-bottom: 0 !important; }
+      \.email-header-after-inside-div { border: 0 !important; }
+      \.email-body-columns-td,
+      \.email-border-top { border-top: 0 !important; }
+      \.email-border-bottom { border-bottom: 0 !important; }
       \.email-header-brand-text,
       \.email-header-heading-txt-td h1,
       \.email-account-name,
@@ -82,7 +99,7 @@
       \.email-prose ul,
       \.email-prose ol { color: #{email_text_color} !important; }
       \.email-header-heading-txt-td p,
-      \.email-header-logo-p,
+      \.email-header-domain,
       \.email-account-handle,
       \.email-account-stats-table td,
       \.email-header-card-description,
@@ -96,19 +113,19 @@
       \.email-mini-follow-text-td p,
       \.email-mini-hashtag-td p,
       \.email-footer-p,
-      \.email-footer-p a { color: #{email_muted_color} !important; }
+      \.email-footer-p a,
+      \.email-footer-brand-text { color: #{email_muted_color} !important; }
       \.email-prose a,
       \.email-status-prose a,
       \.email-link-with-arrow,
       \.email-column-action-td { color: #{email_link_color} !important; }
       \.email-btn-table { background-color: #{email_button_color} !important; }
-      \.email-btn-a { color: #ffffff !important; }
-      \.email-border-top,
-      \.email-border-bottom,
-      \.email-body-columns-td { border-color: #{email_border_color} !important; }
+      \.email-btn-a { color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
       \.email-account-banner-table,
       \.email-header-card-banner-td,
       \.email-frame-table { background-color: #{email_background_color} !important; }
+      \.email-header-logo-a img,
+      \.email-footer-logo-a img { border: 0 !important; display: block !important; outline: none !important; text-decoration: none !important; }
     %style{ 'data-premailer': 'ignore' }
       \:root { color-scheme: light dark; supported-color-schemes: light dark; }
       \.email a { text-decoration-thickness: 1px; text-underline-offset: 2px; }
@@ -116,7 +133,10 @@
       \.email-btn-hover:hover { filter: brightness(0.9); }
       \.email-banner-text-td .email-btn-hover:hover { filter: brightness(1.05); }
       \@media (prefers-color-scheme: dark) {
-      \  body, .email { background-color: #{email_dark_background_color} !important; color: #{email_dark_text_color} !important; }
+      \  html,
+      \  body,
+      \  .email,
+      \  .email-desktop-p-8 { background-color: #{email_dark_background_color} !important; color: #{email_dark_text_color} !important; }
       \  .email-card-td,
       \  .email-inner-card-td,
       \  .email-inner-card-td-without-padding,
@@ -126,10 +146,16 @@
       \  .email-checklist-table,
       \  .email-mini-td,
       \  .email-feature-td,
-      \  .email-body-td { background-color: #{email_dark_surface_color} !important; border-color: #{email_dark_border_color} !important; }
+      \  .email-body-td,
+      \  .email-body-table,
+      \  .email-header-table,
       \  .email-header-td,
       \  .email-header-after-inside-div { background-color: #{email_dark_surface_color} !important; border-color: #{email_dark_border_color} !important; }
-      \  .email-header-td { border-top-color: #{email_primary_color} !important; border-bottom-color: #{email_dark_border_color} !important; }
+      \  .email-header-td { border-top-color: #{email_primary_color} !important; border-bottom: 0 !important; }
+      \  .email-header-after-inside-div { border: 0 !important; }
+      \  .email-body-columns-td,
+      \  .email-border-top { border-top: 0 !important; }
+      \  .email-border-bottom { border-bottom: 0 !important; }
       \  .email-account-banner-table,
       \  .email-header-card-banner-td,
       \  .email-frame-table { background-color: #{email_dark_background_color} !important; }
@@ -151,7 +177,7 @@
       \  .email-prose ul,
       \  .email-prose ol { color: #{email_dark_text_color} !important; }
       \  .email-header-heading-txt-td p,
-      \  .email-header-logo-p,
+      \  .email-header-domain,
       \  .email-account-handle,
       \  .email-account-stats-table td,
       \  .email-header-card-description,
@@ -165,32 +191,36 @@
       \  .email-mini-follow-text-td p,
       \  .email-mini-hashtag-td p,
       \  .email-footer-p,
-      \  .email-footer-p a { color: #{email_dark_muted_color} !important; }
+      \  .email-footer-p a,
+      \  .email-footer-brand-text { color: #{email_dark_muted_color} !important; }
       \  .email-prose a,
       \  .email-status-prose a,
       \  .email-link-with-arrow,
       \  .email-column-action-td { color: #{email_primary_color} !important; }
-      \  .email-border-top,
-      \  .email-border-bottom,
-      \  .email-body-columns-td { border-color: #{email_dark_border_color} !important; }
+      \  .email-btn-a { color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
       \  .email-checklist-checked { background-color: #0f2f27 !important; border-color: #00ba7c !important; }
       \}
       \[data-ogsc] .email,
+      \[data-ogsc] .email-card-td,
       \[data-ogsc] .email-body-td,
-      \[data-ogsc] .email-card-td { background-color: #{email_dark_surface_color} !important; color: #{email_dark_text_color} !important; }
+      \[data-ogsc] .email-body-table,
+      \[data-ogsc] .email-header-table,
       \[data-ogsc] .email-header-td,
-      \[data-ogsc] .email-header-after-inside-div { background-color: #{email_dark_surface_color} !important; border-color: #{email_dark_border_color} !important; }
+      \[data-ogsc] .email-header-after-inside-div { background-color: #{email_dark_surface_color} !important; color: #{email_dark_text_color} !important; }
+      \[data-ogsb] .email,
+      \[data-ogsb] body { background-color: #{email_dark_background_color} !important; }
       \[data-ogsc] .email-footer-p,
       \[data-ogsc] .email-footer-p a,
+      \[data-ogsc] .email-footer-brand-text,
       \[data-ogsc] .email-p,
       \[data-ogsc] .email-h-sub { color: #{email_dark_muted_color} !important; }
+      \[data-ogsc] .email-btn-a { color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
     /[if mso]
       <xml>
       <o:OfficeDocumentSettings xmlns:o="urn:schemas-microsoft-com:office:office">
       <o:PixelsPerInch>96</o:PixelsPerInch>
       </o:OfficeDocumentSettings>
       </xml>
-    = vite_stylesheet_tag 'styles/entrypoints/mailer.scss'
   %body
     .email{ dir: locale_direction }
       %table.email-w-full{ cellspacing: 0, cellpadding: 0, border: 0, role: 'presentation' }
@@ -212,18 +242,12 @@
                           %table.email-header-logo-table{ cellspacing: 0, cellpadding: 0, border: 0, role: 'presentation' }
                             %tr
                               %td.email-header-logo-td
-                                /[if mso]
-                                  <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="false" stroke="false" style="position:absolute; left:40px; top:26px; width:636px;"><v:textbox style="mso-fit-shape-to-text:true" inset="0,0,0,0">
-                                .email-header-logo-div
-                                  %p.email-header-logo-p
-                                    %span.email-header-logo-span
-                                      = '/ '
-                                      = site_hostname
-                                /[if mso]
-                                  </v:textbox></v:rect>
                                 = link_to root_url, class: 'email-header-logo-a' do
-                                  = image_tag(instance_presenter.email_logo&.file&.url || frontend_asset_url('images/mailer/logo.png'), alt: '', width: 40, height: 40)
-                                  %span.email-header-brand-text= Setting.site_title
+                                  - if header_logo_url.present?
+                                    = image_tag header_logo_url, alt: Setting.site_title
+                                  - else
+                                    %span.email-header-brand-text= Setting.site_title
+                                    %span.email-header-domain= site_hostname
 
                           -# Heading
                           = yield :heading
@@ -251,7 +275,10 @@
                     - else
                       %p.email-footer-p
                         = link_to root_url, class: 'email-footer-logo-a' do
-                          = image_tag(instance_presenter.email_logo&.file&.url || frontend_asset_url('images/mailer/logo.png'), alt: Setting.site_title, width: 44, height: 44)
+                          - if footer_logo_url.present?
+                            = image_tag footer_logo_url, alt: Setting.site_title, width: 44, height: 44
+                          - else
+                            %span.email-footer-brand-text= Setting.site_title
                       %p.email-footer-p
                         = t 'about.hosted_on', domain: site_hostname
                       %p.email-footer-p
