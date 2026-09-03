@@ -1,6 +1,10 @@
 name: Status pages
 
 on:
+  pull_request:
+    paths:
+      - 'status-page/**'
+      - '.github/workflows/status-page.yml'
   push:
     branches:
       - main
@@ -42,7 +46,7 @@ jobs:
   deploy:
     name: Deploy ${{ matrix.environment }}
     needs: test
-    if: github.event_name == 'workflow_dispatch' || vars.STATUS_AUTODEPLOY == 'true'
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && vars.STATUS_AUTODEPLOY == 'true')
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -64,7 +68,7 @@ jobs:
 
       - name: Apply D1 migrations
         if: github.event_name == 'push' || inputs.target == 'all' || inputs.target == matrix.environment
-        run: printf 'y\n' | npx --yes wrangler@4.57.0 d1 migrations apply DB --remote --config status-page/wrangler.jsonc --env "${{ matrix.environment }}"
+        run: npx --yes wrangler@4.57.0 d1 migrations apply DB --remote --config status-page/wrangler.jsonc --env "${{ matrix.environment }}"
 
       - name: Configure Espelunca heartbeat secret
         if: (github.event_name == 'push' || inputs.target == 'all' || inputs.target == 'espelunca') && matrix.environment == 'espelunca'
