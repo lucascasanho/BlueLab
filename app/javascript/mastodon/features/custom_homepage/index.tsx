@@ -104,7 +104,10 @@ export const CustomHomepage: React.FC = () => {
 
           <div className={classes.blue2WelcomeActions}>
             {registrationsOpen && (
-              <a href={signupUrl} className={classes.blue2ModalPrimaryAction}>
+              <a
+                href={signupUrl}
+                className={classes.blue2ModalPrimaryAction}
+              >
                 <FormattedMessage
                   id='sign_in_banner.create_account'
                   defaultMessage='Create account'
