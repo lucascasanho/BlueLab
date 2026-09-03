@@ -73,6 +73,93 @@ body[data-theme='blue-2'] {
   }
 
   /*
+   * BlueLab profile action bar.
+   * Keep it as a real row directly below the cover instead of visually moving
+   * the generic Mastodon action group out of the display-name flex container.
+   * This avoids the upstream narrow-container wrapping rule and the generic
+   * content-box padding that made the overflow button taller than the others.
+   */
+  .blue2-profile-body {
+    padding-top: 8px !important;
+  }
+
+  .blue2-profile-actions-row {
+    box-sizing: border-box;
+    min-height: 46px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding-inline-start: 104px;
+  }
+
+  .blue2-profile-actions {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+    display: flex !important;
+    flex: 0 1 auto !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 7px;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+  }
+
+  .blue2-profile-actions > .button {
+    box-sizing: border-box !important;
+    flex: 0 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 180px;
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 14px !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--blue2-border-soft) !important;
+    border-radius: 999px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    box-shadow: none !important;
+  }
+
+  .blue2-profile-actions > .icon-button {
+    box-sizing: border-box !important;
+    flex: 0 0 36px !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid var(--blue2-border-soft) !important;
+    border-radius: 999px !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+  }
+
+  .blue2-profile-actions > .icon-button svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .blue2-profile-identity {
+    min-width: 0;
+    min-height: 0 !important;
+    display: block !important;
+    margin-top: 10px !important;
+  }
+
+  /*
    * Upstream About sections can draw borders on the wrapper, title and body at
    * the same time. Keep one separator per visual block so adjacent sections do
    * not produce doubled lines in the BlueLab main column.
@@ -103,5 +190,23 @@ body[data-theme='blue-2'] {
   body[data-theme='blue-2'] .blue2-auth-intro__icon {
     max-width: min(180px, 100%);
     height: 60px;
+  }
+
+  body[data-theme='blue-2'] .blue2-profile-body {
+    padding-top: 8px !important;
+  }
+
+  body[data-theme='blue-2'] .blue2-profile-actions-row {
+    min-height: 46px;
+    padding-inline-start: 100px;
+  }
+
+  body[data-theme='blue-2'] .blue2-profile-actions {
+    gap: 6px;
+  }
+
+  body[data-theme='blue-2'] .blue2-profile-actions > .button {
+    max-width: calc(100vw - 228px);
+    padding-inline: 11px !important;
   }
 }
