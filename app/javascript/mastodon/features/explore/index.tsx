@@ -30,26 +30,31 @@ const Explore: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   const { signedIn } = useIdentity();
   const intl = useIntl();
   const logoRequired = useBreakpoint('full');
+  const isMobile = useBreakpoint('openable');
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const hideBlue2MobileHeader = isBlue2 && isMobile;
 
   return (
     <Column
       bindToDocument={!multiColumn}
       label={intl.formatMessage(messages.title)}
     >
-      {isRedesignEnabled() ? (
-        <ColumnHeader
-          withBackButton={multiColumn && 'auto'}
-          title={intl.formatMessage(messages.titleRedesign)}
-        />
-      ) : (
-        <LegacyColumnHeader
-          icon={'explore'}
-          iconComponent={logoRequired ? SymbolLogo : TrendingUpIcon}
-          title={intl.formatMessage(messages.title)}
-          multiColumn={multiColumn}
-          scrollTopOnClick
-        />
-      )}
+      {!hideBlue2MobileHeader &&
+        (isRedesignEnabled() ? (
+          <ColumnHeader
+            withBackButton={multiColumn && 'auto'}
+            title={intl.formatMessage(messages.titleRedesign)}
+          />
+        ) : (
+          <LegacyColumnHeader
+            icon={'explore'}
+            iconComponent={logoRequired ? SymbolLogo : TrendingUpIcon}
+            title={intl.formatMessage(messages.title)}
+            multiColumn={multiColumn}
+            scrollTopOnClick
+          />
+        ))}
 
       <div
         className={classNames(
