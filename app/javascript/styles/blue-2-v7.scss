@@ -39,4 +39,70 @@ body[data-theme='blue-2'] {
   .more-from-author a {
     color: var(--blue2-blue) !important;
   }
+
+  /*
+   * Profile actions belong to the identity row, not to the badge/role row.
+   * The account-header component already renders AccountButtons beside
+   * AccountName, but upstream flex rules let the primary button grow and let
+   * the action group wrap on narrow containers. That recreates the old visual
+   * hierarchy on mobile (large follow button plus vertically stacked icons).
+   * Keep the complete action group compact and on one line while allowing the
+   * identity block to use the remaining width.
+   */
+  .blue2-profile-identity-actions {
+    min-width: 0;
+    align-items: flex-start !important;
+  }
+
+  .blue2-profile-actions {
+    flex: 0 1 auto !important;
+    min-width: 0;
+    max-width: none !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-start !important;
+    gap: 7px;
+    margin: 0 !important;
+    transform: none !important;
+  }
+
+  .blue2-profile-actions .button {
+    flex: 0 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: min(44vw, 180px);
+    padding-inline: 14px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .blue2-profile-actions .icon-button {
+    box-sizing: border-box !important;
+    flex: 0 0 36px !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    padding: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media (width <= 759px) {
+  body[data-theme='blue-2'] {
+    .blue2-profile-identity-actions {
+      gap: 8px;
+    }
+
+    .blue2-profile-actions {
+      gap: 6px;
+    }
+
+    .blue2-profile-actions .button {
+      max-width: 44vw;
+      padding-inline: 12px !important;
+    }
+  }
 }
