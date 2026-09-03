@@ -72,7 +72,7 @@ export const CustomHomepage: React.FC = () => {
     void authenticate();
   }, []);
 
-  if (isBlue2 && isAboutRoute) {
+  if (isBlue2 && isAboutRoute && showBlue2Welcome) {
     return (
       <div className={classes.blue2Landing}>
         <section className={classes.blue2LandingIntro}>
@@ -131,7 +131,7 @@ export const CustomHomepage: React.FC = () => {
           <About />
         </section>
 
-        {showBlue2Welcome && !signedIn && (
+        {!signedIn && (
           <div className={classes.blue2WelcomeBackdrop}>
             <section
               className={classes.blue2WelcomeDialog}
