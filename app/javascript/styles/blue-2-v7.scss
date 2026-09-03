@@ -61,3 +61,10 @@ body[data-theme='blue-2'] {
     border-top: 1px solid var(--blue2-border) !important;
   }
 }
+
+/* Keep Explore compact on phones in BlueLab only: the search is the page heading. */
+@media (width <= 759px) {
+  body[data-theme='blue-2'] .explore__column-header {
+    display: none !important;
+  }
+}
