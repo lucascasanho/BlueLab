@@ -44,6 +44,7 @@ interface InitialStateMeta {
   remote_topic_feed_access: 'public' | 'authenticated' | 'disabled';
   title: string;
   custom_app_icon: string | null;
+  custom_favicon: string | null;
   custom_instance_logo: string | null;
   show_trends: boolean;
   landing_page: 'about' | 'overview' | 'trends' | 'local_feed';
@@ -149,6 +150,7 @@ export const localTopicFeedAccess = getMeta('local_topic_feed_access');
 export const remoteTopicFeedAccess = getMeta('remote_topic_feed_access');
 export const title = getMeta('title');
 export const customAppIcon = getMeta('custom_app_icon');
+export const customFavicon = getMeta('custom_favicon');
 export const customInstanceLogo = getMeta('custom_instance_logo');
 export const landingPage = getMeta('landing_page');
 export const useBlurhash = getMeta('use_blurhash');

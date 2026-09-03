@@ -17,7 +17,7 @@ import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trig
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
 import { ComposePanel } from '@/mastodon/features/ui/components/compose_panel';
-import { customAppIcon } from '@/mastodon/initial_state';
+import { customFavicon } from '@/mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { Footer } from 'mastodon/features/custom_homepage/components/footer';
 import { Header } from 'mastodon/features/custom_homepage/components/header';
@@ -183,7 +183,7 @@ export const ColumnsAreaRedesign: React.FC<{
               </button>
 
               <img
-                src={customAppIcon ?? '/favicon.ico'}
+                src={customFavicon ?? '/favicon.ico'}
                 alt=''
                 className={classes.blue2MobileBrand}
               />
@@ -210,7 +210,7 @@ export const ColumnsAreaRedesign: React.FC<{
             <>
               <header className={classes.blue2Topbar}>
                 <img
-                  src={customAppIcon ?? '/favicon.ico'}
+                  src={customFavicon ?? '/favicon.ico'}
                   alt=''
                   className={classes.blue2Brand}
                 />
