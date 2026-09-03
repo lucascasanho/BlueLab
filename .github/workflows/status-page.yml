@@ -30,17 +30,24 @@ jobs:
   test:
     name: Test status page
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: status-page
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+      - name: Set up JavaScript environment
+        uses: ./.github/actions/setup-javascript
+      - name: Check status page formatting
+        run: |
+          yarn format \
+            status-page/src/availability.js \
+            status-page/src/config.js \
+            status-page/src/db.js \
+            status-page/src/index.js \
+            status-page/src/render.js \
+            status-page/test/availability.test.js \
+            status-page/wrangler.jsonc
+          git diff --exit-code -- status-page
       - name: Test daily uptime classification
+        working-directory: status-page
         run: node --test test/*.test.js
 
   deploy:
