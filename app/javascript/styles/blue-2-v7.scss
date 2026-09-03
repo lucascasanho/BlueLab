@@ -2,6 +2,38 @@
 
 /* BlueLab 2.0 seventh refinement layer: link preview attribution continuity. */
 body[data-theme='blue-2'] {
+  /* Keep a single clickable instance mark visible on authentication pages. */
+  .blue2-auth-intro__brand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    margin-bottom: 24px;
+    border-radius: 16px;
+    text-decoration: none !important;
+    transition:
+      opacity 120ms ease,
+      transform 120ms ease;
+  }
+
+  .blue2-auth-intro__brand:hover {
+    opacity: 0.9;
+  }
+
+  .blue2-auth-intro__brand:focus-visible {
+    outline: 2px solid var(--blue2-blue);
+    outline-offset: 5px;
+  }
+
+  .blue2-auth-intro__icon {
+    display: block;
+    width: auto;
+    max-width: min(220px, 100%);
+    height: 72px;
+    border-radius: 16px;
+    object-fit: contain;
+  }
+
   /*
    * Mastodon renders provider/author attribution as a `.more-from-author`
    * sibling after the preview card. Make both pieces read as one rounded card
@@ -66,5 +98,10 @@ body[data-theme='blue-2'] {
 @media (width <= 759px) {
   body[data-theme='blue-2'] .explore__column-header {
     display: none !important;
+  }
+
+  body[data-theme='blue-2'] .blue2-auth-intro__icon {
+    max-width: min(180px, 100%);
+    height: 60px;
   }
 }
