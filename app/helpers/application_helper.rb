@@ -172,6 +172,7 @@ module ApplicationHelper
     }
 
     base[:'data-system-theme'] = 'true' if page_color_scheme == 'auto'
+    base[:'data-bluelab-theme'] = 'true' if current_theme == 'default'
 
     base
   end

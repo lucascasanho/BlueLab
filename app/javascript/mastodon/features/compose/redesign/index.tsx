@@ -57,6 +57,7 @@ const messages = defineMessages({
 interface RedesignComposeFormProps {
   autoFocus?: boolean;
   className?: string;
+  embedded?: boolean;
   noMinimize?: boolean;
   redirectOnSuccess?: boolean;
   ref?: React.Ref<HTMLFormElement>;
@@ -65,6 +66,7 @@ interface RedesignComposeFormProps {
 export const RedesignComposeForm: React.FC<RedesignComposeFormProps> = ({
   autoFocus,
   className,
+  embedded = false,
   noMinimize,
   redirectOnSuccess,
   ref,
@@ -101,8 +103,9 @@ export const RedesignComposeForm: React.FC<RedesignComposeFormProps> = ({
   return (
     <form
       ref={ref}
-      role='dialog'
+      role={embedded ? 'region' : 'dialog'}
       data-bluelab-composer
+      data-bluelab-composer-embedded={embedded ? 'true' : undefined}
       onSubmit={onSubmit}
       onWheelCapture={handleWheelCapture}
       aria-labelledby={titleId}
@@ -110,7 +113,11 @@ export const RedesignComposeForm: React.FC<RedesignComposeFormProps> = ({
     >
       {type === 'message' && <div className={classes.background} />}
 
-      <ComposeFormHeader id={titleId} noMinimize={noMinimize} />
+      <ComposeFormHeader
+        id={titleId}
+        noMinimize={noMinimize || embedded}
+        noClose={embedded}
+      />
 
       <div
         className={classes.content}

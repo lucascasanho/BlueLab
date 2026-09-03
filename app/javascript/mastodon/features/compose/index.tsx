@@ -23,10 +23,12 @@ import { mountCompose, unmountCompose } from 'mastodon/actions/compose';
 import { openModal } from 'mastodon/actions/modal';
 import { Icon } from 'mastodon/components/icon';
 import { mascot, reduceMotion } from 'mastodon/initial_state';
+import { selectComposerEditor } from 'mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
 import { messages as navbarMessages } from '../ui/components/navigation_bar';
 
+import { RedesignComposeForm } from './redesign';
 import { Search } from './components/search';
 import ComposeFormContainer from './containers/compose_form_container';
 
@@ -54,6 +56,11 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   const columns = useAppSelector(
     (state) => state.settings.get('columns') as ImmutableList<ColumnMap>,
   );
+  const composerEditor = useAppSelector(selectComposerEditor);
+  const useBlueLabComposer =
+    multiColumn &&
+    composerEditor === 'bluelab' &&
+    document.documentElement.dataset.bluelabTheme === 'true';
 
   useEffect(() => {
     dispatch(mountCompose());
@@ -165,11 +172,24 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
           aria-label={intl.formatMessage(navbarMessages.publish)}
         >
           <div className='drawer__inner'>
-            <ComposeFormContainer />
+            {useBlueLabComposer ? (
+              <RedesignComposeForm
+                className='drawer__bluelab-compose'
+                embedded
+              />
+            ) : (
+              <>
+                <ComposeFormContainer />
 
-            <div className='drawer__inner__mastodon with-zig-zag-decoration'>
-              <img alt='' draggable='false' src={mascot ?? elephantUIPlane} />
-            </div>
+                <div className='drawer__inner__mastodon with-zig-zag-decoration'>
+                  <img
+                    alt=''
+                    draggable='false'
+                    src={mascot ?? elephantUIPlane}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
