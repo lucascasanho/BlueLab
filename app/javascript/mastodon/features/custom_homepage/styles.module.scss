@@ -485,15 +485,52 @@
   }
 
   .blue2WelcomeBackdrop {
-    padding: 0;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    padding:
+      max(12px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+    overflow: hidden;
+    place-items: center;
+    overscroll-behavior: contain;
+    touch-action: none;
   }
 
   .blue2WelcomeDialog {
-    width: 100%;
-    min-height: 100dvh;
-    padding: 74px 26px 44px;
-    border: 0;
-    border-radius: 0;
+    width: min(100%, 520px);
+    min-height: 0;
+    max-height: 100%;
+    padding: clamp(56px, 8dvh, 72px) clamp(20px, 6vw, 28px)
+      clamp(28px, 5dvh, 40px);
+    border: 1px solid rgb(255 255 255 / 24%);
+    border-radius: 18px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
+  .blue2WelcomeClose {
+    top: 10px;
+    right: 10px;
+  }
+
+  .blue2WelcomeIcon {
+    height: clamp(54px, 8dvh, 64px);
+  }
+
+  .blue2WelcomeDialog h2 {
+    margin-top: 18px;
+    font-size: clamp(28px, 8vw, 38px);
+  }
+
+  .blue2WelcomeActions {
+    width: min(100%, 360px);
+    margin-top: clamp(20px, 4dvh, 28px);
   }
 }
 
