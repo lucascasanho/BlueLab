@@ -140,8 +140,12 @@ const MobileMenuButton: React.FC = () => {
   }, [dispatch]);
 
   const isMobile = useBreakpoint('openable');
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
-  if (!isMobile) {
+  // BlueLab 2.0 already provides the primary sidebar trigger in the
+  // mobile utility bar, so rendering the generic column trigger duplicates it.
+  if (!isMobile || isBlue2) {
     return null;
   }
 
