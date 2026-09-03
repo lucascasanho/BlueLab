@@ -133,6 +133,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       streaming_api_base_url: Rails.configuration.x.streaming_api_base_url,
       title: instance_presenter.title,
       custom_app_icon: app_icon_path(120),
+      custom_instance_logo: instance_presenter.auth_logo&.file&.url,
       landing_page: Setting.landing_page,
       trends_enabled: Setting.trends,
       version: instance_presenter.version,

@@ -16,8 +16,9 @@ import {
 } from '@phosphor-icons/react';
 
 import { openModal } from '@/mastodon/actions/modal';
-import { Account } from '@/mastodon/components/account';
+import { Avatar } from '@/mastodon/components/avatar';
 import { IconButton } from '@/mastodon/components/button/redesign';
+import { DisplayName } from '@/mastodon/components/display_name';
 import {
   Menu,
   MenuItem,
@@ -45,24 +46,26 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
     dispatch(openModal({ modalType: 'CONFIRM_LOG_OUT', modalProps: {} }));
   }, [dispatch]);
 
-  if (!accountId) {
+  if (!accountId || !account) {
     return null;
   }
 
   const isManager = canManageReports(permissions);
   const isAdmin = canViewAdminDashboard(permissions);
-
-  const accountBasePath = `/@${account?.acct}`;
+  const accountBasePath = `/@${account.acct}`;
 
   return (
     <div className={classes.root}>
-      <Account
-        id={accountId}
-        minimal
-        withBorder={false}
-        withMenu={false}
-        size={32}
-      />
+      <a
+        className={classes.accountLink}
+        href={account.url}
+        data-hover-card-account={accountId}
+      >
+        <Avatar account={account} size={32} />
+        <span className={classes.accountText}>
+          <DisplayName account={account} variant='shortHandle' />
+        </span>
+      </a>
       <Menu type='navigation'>
         <MenuTrigger
           as={IconButton}
