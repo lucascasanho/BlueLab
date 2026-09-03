@@ -2,12 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import {
-  Route,
-  Switch,
-  useLocation,
-  useRouteMatch,
-} from 'react-router-dom';
+import { Route, Switch, useLocation, useRouteMatch } from 'react-router-dom';
 
 import * as WebAuthnJSON from '@github/webauthn-json';
 import { Helmet } from '@unhead/react/helmet';
