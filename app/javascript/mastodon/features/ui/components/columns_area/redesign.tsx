@@ -196,11 +196,7 @@ export const ColumnsAreaRedesign: React.FC<{
                 <HamburgerIcon size={28} />
               </button>
 
-              <img
-                src={instanceFavicon}
-                alt=''
-                className={classes.blue2MobileBrand}
-              />
+              <img src={instanceFavicon} alt='' className={classes.blue2MobileBrand} />
 
               <button
                 type='button'
@@ -223,11 +219,7 @@ export const ColumnsAreaRedesign: React.FC<{
           {isBlue2FeedPage && (
             <>
               <header className={classes.blue2Topbar}>
-                <img
-                  src={instanceFavicon}
-                  alt=''
-                  className={classes.blue2Brand}
-                />
+                <img src={instanceFavicon} alt='' className={classes.blue2Brand} />
 
                 <Link
                   className={
