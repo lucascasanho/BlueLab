@@ -43,7 +43,7 @@
 
     = yield :header_tags
 
-  %body{ class: body_classes }
+  %body{ class: body_classes, 'data-theme': (current_theme if current_theme == 'blue-2') }
     = content_for?(:content) ? yield(:content) : yield
 
     .logo-resources{ 'tabindex' => '-1', 'inert' => true, 'aria-hidden' => 'true' }
