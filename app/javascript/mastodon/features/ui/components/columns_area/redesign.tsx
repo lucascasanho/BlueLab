@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 
-import { HamburgerIcon, HashIcon } from '@phosphor-icons/react';
+import { HashIcon } from '@phosphor-icons/react';
 
 import { openNavigation } from '@/mastodon/actions/navigation';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
@@ -19,6 +19,7 @@ import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/r
 import { ComposePanel } from '@/mastodon/features/ui/components/compose_panel';
 import { customFavicon, customInstanceLogo } from '@/mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import MenuIcon from '@/material-icons/400-24px/menu.svg?react';
 import { Footer } from 'mastodon/features/custom_homepage/components/footer';
 import { Header } from 'mastodon/features/custom_homepage/components/header';
 
@@ -180,7 +181,7 @@ export const ColumnsAreaRedesign: React.FC<{
                   defaultMessage: 'Menu',
                 })}
               >
-                <HamburgerIcon size={28} />
+                <MenuIcon width={28} height={28} />
               </button>
 
               <img
