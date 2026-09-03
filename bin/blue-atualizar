@@ -9,6 +9,8 @@ REPO="${BLUE_REPO:-$HOME/blue}"
 REMOTE="${BLUE_REMOTE:-bluelab}"
 REMOTE_URL="${BLUE_REMOTE_URL:-https://github.com/lucascasanho/BlueLab.git}"
 BRANCH="${BLUE_TEST_BRANCH:-BlueLab-Test}"
+INSTALL_DIR="${BLUE_INSTALL_DIR:-$HOME/.local/bin}"
+INSTALL_PATH="$INSTALL_DIR/blue-atualizar"
 SERVICES=(blue-web blue-sidekiq blue-streaming)
 
 fail() {
@@ -36,28 +38,40 @@ if [ -n "$(git status --porcelain)" ]; then
   fail "working tree não está limpa; nada foi atualizado"
 fi
 
-CURRENT_BRANCH="$(git branch --show-current)"
-if [ "$CURRENT_BRANCH" != "$BRANCH" ]; then
-  fail "branch atual é '$CURRENT_BRANCH'. O Blue deve permanecer em '$BRANCH'"
-fi
-
-OLD_HEAD="$(git rev-parse HEAD)"
-
 echo
 echo "===== BUSCANDO $BRANCH ====="
 if git remote get-url "$REMOTE" >/dev/null 2>&1; then
   run git fetch "$REMOTE" "$BRANCH"
+  NEW_HEAD="$(git rev-parse FETCH_HEAD)"
 else
   run git fetch "$REMOTE_URL" "$BRANCH"
+  NEW_HEAD="$(git rev-parse FETCH_HEAD)"
 fi
 
-NEW_HEAD="$(git rev-parse FETCH_HEAD)"
+CURRENT_BRANCH="$(git branch --show-current)"
+if [ "$CURRENT_BRANCH" != "$BRANCH" ]; then
+  echo
+  echo "===== MUDANDO PARA O CANAL DE TESTES ====="
+  echo "branch atual: $CURRENT_BRANCH"
+  echo "destino:      $BRANCH"
+
+  if git show-ref --verify --quiet "refs/heads/$BRANCH"; then
+    run git switch "$BRANCH"
+  elif git remote get-url "$REMOTE" >/dev/null 2>&1 && \
+       git show-ref --verify --quiet "refs/remotes/$REMOTE/$BRANCH"; then
+    run git switch --track -c "$BRANCH" "$REMOTE/$BRANCH"
+  else
+    run git switch -c "$BRANCH" "$NEW_HEAD"
+  fi
+fi
+
+OLD_HEAD="$(git rev-parse HEAD)"
 
 if [ "$OLD_HEAD" != "$NEW_HEAD" ]; then
   echo
   echo "===== VALIDANDO FAST-FORWARD ====="
   git merge-base --is-ancestor "$OLD_HEAD" "$NEW_HEAD" || \
-    fail "o histórico local divergiu de $BRANCH; nenhuma atualização foi aplicada"
+    fail "o histórico local de $BRANCH divergiu do remoto; nenhuma atualização foi aplicada"
 
   run git diff --check "$OLD_HEAD..$NEW_HEAD"
 
@@ -68,6 +82,13 @@ else
   echo
   echo "Nenhum commit novo. Vou validar/reaplicar o deploy atual para que o comando seja idempotente."
 fi
+
+# Mantém o comando disponível mesmo depois de trocar de branch ou reabrir o shell.
+echo
+echo "===== INSTALANDO COMANDO PERSISTENTE ====="
+run mkdir -p "$INSTALL_DIR"
+run install -m 0755 "$REPO/bin/blue-atualizar" "$INSTALL_PATH"
+echo "instalado em: $INSTALL_PATH"
 
 echo
 echo "===== RUBY ====="
