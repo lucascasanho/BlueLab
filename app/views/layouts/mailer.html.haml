@@ -250,7 +250,7 @@
                                     %span.email-header-domain= site_hostname
 
                           -# Heading
-                          = yield :heading
+                          = mailer_instance_brand(yield :heading)
 
                     .email-header-after-div
                       .email-header-after-inside-div
@@ -258,7 +258,7 @@
                       %tr
                         %td.email-body-td
                           -# Content
-                          = yield
+                          = mailer_instance_brand(yield)
 
               /[if mso]
                 </td></tr></table>
@@ -271,7 +271,7 @@
                 %tr
                   %td.email-footer-td
                     - if content_for?(:footer)
-                      = yield :footer
+                      = mailer_instance_brand(yield :footer)
                     - else
                       %p.email-footer-p
                         = link_to root_url, class: 'email-footer-logo-a' do
