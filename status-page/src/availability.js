@@ -42,22 +42,27 @@ export function bucketForStatus(status) {
   if (status === 'operational') return 'up';
   if (status === 'degraded' || status === 'maintenance') return 'degraded';
   if (DOWN_STATUSES.has(status)) return 'down';
-  return 'degraded';
+  return 'unknown';
 }
 
 export function worstStatus(statuses) {
   const rank = {
-    unknown: 0,
     operational: 1,
-    maintenance: 2,
-    degraded: 3,
-    partial_outage: 4,
-    major_outage: 5,
+    unknown: 2,
+    maintenance: 3,
+    degraded: 4,
+    partial_outage: 5,
+    major_outage: 6,
   };
 
   let worst = 'unknown';
+  let hasStatus = false;
   for (const status of statuses ?? []) {
-    if ((rank[status] ?? 0) > (rank[worst] ?? 0)) worst = status;
+    if (!Object.hasOwn(rank, status)) continue;
+    if (!hasStatus || rank[status] > rank[worst]) {
+      worst = status;
+      hasStatus = true;
+    }
   }
   return worst;
 }
