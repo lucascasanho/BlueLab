@@ -12,7 +12,7 @@ module InstanceHelper
   def mailer_instance_brand(text)
     return text unless text.is_a?(String)
 
-    text.gsub(/\bMastodon\b/) { Setting.site_title }
+    text.dup.tap { |value| value.gsub!(/\bMastodon\b/) { Setting.site_title } }
   end
 
   def description_for_sign_up(invite = nil)
