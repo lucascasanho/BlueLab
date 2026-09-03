@@ -1,15 +1,43 @@
 :ruby
-  email_button_color = safe_customization_color(:email_button_color, fallback: '#6364ff')
-  email_link_color = safe_customization_color(:email_link_color, fallback: '#5638cc')
-  email_primary_color = safe_customization_color(:email_primary_color, fallback: '#6364ff')
-  email_background_color = safe_customization_color(:email_background_color, fallback: '#f3f2f5')
-  email_surface_color = safe_customization_color(:email_surface_color, fallback: '#ffffff')
-  email_text_color = safe_customization_color(:email_text_color, fallback: '#1f1b23')
-  email_muted_color = safe_customization_color(:email_muted_color, fallback: '#746a7e')
-  email_dark_background_color = safe_customization_color(:email_dark_background_color, fallback: '#1e2028')
-  email_dark_surface_color = safe_customization_color(:email_dark_surface_color, fallback: '#232543')
-  email_dark_text_color = safe_customization_color(:email_dark_text_color, fallback: '#f7f9f9')
-  email_dark_muted_color = safe_customization_color(:email_dark_muted_color, fallback: '#b8b3c0')
+  instance_accent_color = safe_customization_color(:instance_accent_color, fallback: '#2b8fcd')
+  instance_light_background_color = safe_customization_color(:instance_light_background_color, fallback: '#ffffff')
+  instance_light_surface_color = safe_customization_color(:instance_light_surface_color, fallback: '#f7f9fa')
+  instance_light_text_color = safe_customization_color(:instance_light_text_color, fallback: '#0f1419')
+  instance_dark_background_color = safe_customization_color(:instance_dark_background_color, fallback: '#000000')
+  instance_dark_surface_color = safe_customization_color(:instance_dark_surface_color, fallback: '#16181c')
+  instance_dark_text_color = safe_customization_color(:instance_dark_text_color, fallback: '#f7f9f9')
+
+  email_color_keys = %w(
+    email_primary_color
+    email_button_color
+    email_link_color
+    email_background_color
+    email_surface_color
+    email_text_color
+    email_muted_color
+    email_dark_background_color
+    email_dark_surface_color
+    email_dark_text_color
+    email_dark_muted_color
+  )
+  explicit_email_colors = Setting.where(var: email_color_keys).pluck(:var)
+  email_color = ->(key, fallback) do
+    explicit_email_colors.include?(key.to_s) ? safe_customization_color(key, fallback: fallback) : fallback
+  end
+
+  email_primary_color = email_color.call(:email_primary_color, instance_accent_color)
+  email_button_color = email_color.call(:email_button_color, instance_accent_color)
+  email_link_color = email_color.call(:email_link_color, instance_accent_color)
+  email_background_color = email_color.call(:email_background_color, instance_light_background_color)
+  email_surface_color = email_color.call(:email_surface_color, instance_light_surface_color)
+  email_text_color = email_color.call(:email_text_color, instance_light_text_color)
+  email_muted_color = email_color.call(:email_muted_color, '#536471')
+  email_dark_background_color = email_color.call(:email_dark_background_color, instance_dark_background_color)
+  email_dark_surface_color = email_color.call(:email_dark_surface_color, instance_dark_surface_color)
+  email_dark_text_color = email_color.call(:email_dark_text_color, instance_dark_text_color)
+  email_dark_muted_color = email_color.call(:email_dark_muted_color, '#8b98a5')
+  email_border_color = '#d8e0e8'
+  email_dark_border_color = '#2f3336'
 !!!
 %html{ lang: I18n.locale, dir: locale_direction }
   %head
@@ -22,23 +50,71 @@
     %meta{ name: 'supported-color-schemes', content: 'light dark' }
     %style
       \table { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-      \.email-btn-table { background-color: #{email_button_color} !important; }
+      \body, .email { background-color: #{email_background_color} !important; color: #{email_text_color} !important; }
+      \.email-card-td,
+      \.email-inner-card-td,
+      \.email-inner-card-td-without-padding,
+      \.email-inner-nested-card-td,
+      \.email-header-card-table,
+      \.email-account-banner-icon-table,
+      \.email-checklist-table,
+      \.email-mini-td,
+      \.email-feature-td,
+      \.email-body-td { background-color: #{email_surface_color} !important; border-color: #{email_border_color} !important; }
+      \.email-header-td,
+      \.email-header-after-inside-div { background-color: #{email_surface_color} !important; border-color: #{email_border_color} !important; }
+      \.email-header-td { border-top: 4px solid #{email_primary_color} !important; border-bottom: 1px solid #{email_border_color} !important; }
+      \.email-header-brand-text,
+      \.email-header-heading-txt-td h1,
+      \.email-account-name,
+      \.email-account-stats-table b,
+      \.email-header-card-instance,
+      \.email-body-padding-td > p,
+      \.email-h2,
+      \.email-status-header-name,
+      \.email-quote-header-name,
+      \.email-status-prose p,
+      \.email-status-media,
+      \.email-checklist-text-td h3,
+      \.email-mini-follow-text-td h3,
+      \.email-mini-hashtag-td h3,
+      \.email-prose p,
+      \.email-prose ul,
+      \.email-prose ol { color: #{email_text_color} !important; }
+      \.email-header-heading-txt-td p,
+      \.email-header-logo-p,
+      \.email-account-handle,
+      \.email-account-stats-table td,
+      \.email-header-card-description,
+      \.email-h-sub,
+      \.email-p,
+      \.email-status-header-handle,
+      \.email-quote-header-handle,
+      \.email-status-spoiler,
+      \.email-status-footer,
+      \.email-checklist-text-td p,
+      \.email-mini-follow-text-td p,
+      \.email-mini-hashtag-td p,
+      \.email-footer-p,
+      \.email-footer-p a { color: #{email_muted_color} !important; }
       \.email-prose a,
       \.email-status-prose a,
       \.email-link-with-arrow,
       \.email-column-action-td { color: #{email_link_color} !important; }
-      \.email-header-td { border-color: #{email_primary_color} !important; }
-      \body, .email { background-color: #{email_background_color} !important; color: #{email_text_color} !important; }
-      \.email-card-td, .email-inner-card-td, .email-inner-card-td-without-padding,
-      \.email-inner-nested-card-td, .email-body-td { background-color: #{email_surface_color} !important; }
-      \.email-account-handle, .email-account-stats-table td, .email-header-card-description,
-      \.email-h-sub, .email-p, .email-status-header-handle, .email-quote-header-handle,
-      \.email-status-spoiler, .email-status-footer, .email-footer-p { color: #{email_muted_color} !important; }
+      \.email-btn-table { background-color: #{email_button_color} !important; }
+      \.email-btn-a { color: #ffffff !important; }
+      \.email-border-top,
+      \.email-border-bottom,
+      \.email-body-columns-td { border-color: #{email_border_color} !important; }
+      \.email-account-banner-table,
+      \.email-header-card-banner-td,
+      \.email-frame-table { background-color: #{email_background_color} !important; }
     %style{ 'data-premailer': 'ignore' }
       \:root { color-scheme: light dark; supported-color-schemes: light dark; }
-      \.email a { color: inherit; text-decoration: none; }
-      \.email-btn-hover:hover { background-color: #563acc !important; }
-      \.email-banner-text-td .email-btn-hover:hover { background-color: #fff !important; }
+      \.email a { text-decoration-thickness: 1px; text-underline-offset: 2px; }
+      \.email-btn-a { text-decoration: none !important; }
+      \.email-btn-hover:hover { filter: brightness(0.9); }
+      \.email-banner-text-td .email-btn-hover:hover { filter: brightness(1.05); }
       \@media (prefers-color-scheme: dark) {
       \  body, .email { background-color: #{email_dark_background_color} !important; color: #{email_dark_text_color} !important; }
       \  .email-card-td,
@@ -49,10 +125,16 @@
       \  .email-account-banner-icon-table,
       \  .email-checklist-table,
       \  .email-mini-td,
-      \  .email-feature-td { background-color: #{email_dark_surface_color} !important; border-color: #38384d !important; }
-      \  .email-account-banner-table, .email-header-card-banner-td { background-color: #393f4f !important; }
-      \  .email-header-td, .email-header-after-inside-div, .email-banner-table { background-color: #1e2028 !important; }
-      \  .email-body-td { background-color: #{email_dark_surface_color} !important; background-image: none !important; }
+      \  .email-feature-td,
+      \  .email-body-td { background-color: #{email_dark_surface_color} !important; border-color: #{email_dark_border_color} !important; }
+      \  .email-header-td,
+      \  .email-header-after-inside-div { background-color: #{email_dark_surface_color} !important; border-color: #{email_dark_border_color} !important; }
+      \  .email-header-td { border-top-color: #{email_primary_color} !important; border-bottom-color: #{email_dark_border_color} !important; }
+      \  .email-account-banner-table,
+      \  .email-header-card-banner-td,
+      \  .email-frame-table { background-color: #{email_dark_background_color} !important; }
+      \  .email-header-brand-text,
+      \  .email-header-heading-txt-td h1,
       \  .email-account-name,
       \  .email-account-stats-table b,
       \  .email-header-card-instance,
@@ -68,6 +150,8 @@
       \  .email-prose p,
       \  .email-prose ul,
       \  .email-prose ol { color: #{email_dark_text_color} !important; }
+      \  .email-header-heading-txt-td p,
+      \  .email-header-logo-p,
       \  .email-account-handle,
       \  .email-account-stats-table td,
       \  .email-header-card-description,
@@ -82,10 +166,24 @@
       \  .email-mini-hashtag-td p,
       \  .email-footer-p,
       \  .email-footer-p a { color: #{email_dark_muted_color} !important; }
-      \  .email-border-top, .email-border-bottom, .email-body-columns-td { border-color: #38384d !important; }
-      \  .email-frame-table { background-color: #393f4f !important; }
-      \  .email-checklist-checked { background-color: #193c34 !important; border-color: #00ba7c !important; }
+      \  .email-prose a,
+      \  .email-status-prose a,
+      \  .email-link-with-arrow,
+      \  .email-column-action-td { color: #{email_primary_color} !important; }
+      \  .email-border-top,
+      \  .email-border-bottom,
+      \  .email-body-columns-td { border-color: #{email_dark_border_color} !important; }
+      \  .email-checklist-checked { background-color: #0f2f27 !important; border-color: #00ba7c !important; }
       \}
+      \[data-ogsc] .email,
+      \[data-ogsc] .email-body-td,
+      \[data-ogsc] .email-card-td { background-color: #{email_dark_surface_color} !important; color: #{email_dark_text_color} !important; }
+      \[data-ogsc] .email-header-td,
+      \[data-ogsc] .email-header-after-inside-div { background-color: #{email_dark_surface_color} !important; border-color: #{email_dark_border_color} !important; }
+      \[data-ogsc] .email-footer-p,
+      \[data-ogsc] .email-footer-p a,
+      \[data-ogsc] .email-p,
+      \[data-ogsc] .email-h-sub { color: #{email_dark_muted_color} !important; }
     /[if mso]
       <xml>
       <o:OfficeDocumentSettings xmlns:o="urn:schemas-microsoft-com:office:office">
