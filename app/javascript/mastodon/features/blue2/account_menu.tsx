@@ -5,7 +5,10 @@ import { FormattedMessage } from 'react-intl';
 import { NavLink } from 'react-router-dom';
 
 import { Avatar } from '@/mastodon/components/avatar';
+import { EmojiHTML } from '@/mastodon/components/emoji/html';
+import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
 import { useAccount } from '@/mastodon/hooks/useAccount';
+import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import { useIdentity } from '@/mastodon/identity_context';
 import LogoutIcon from '@/material-icons/400-24px/logout.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
@@ -21,13 +24,9 @@ const csrfToken = () =>
 export const Blue2AccountMenu: React.FC = () => {
   const { accountId } = useIdentity();
   const account = useAccount(accountId);
+  const localCustomEmojis = useCustomEmojis();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
-
-  const profilePath = account?.acct ? `/@${account.acct}` : '/home';
-  const displayName = account?.display_name.trim()
-    ? account.display_name
-    : (account?.username ?? account?.acct);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -76,6 +75,16 @@ export const Blue2AccountMenu: React.FC = () => {
 
   if (!account) return null;
 
+  const profilePath = account.acct ? `/@${account.acct}` : '/home';
+  const displayName = account.display_name.trim()
+    ? account.display_name
+    : account.username;
+  const displayNameEmojis = {
+    ...localCustomEmojis,
+    ...(cleanExtraEmojis(account.emojis) ?? {}),
+  };
+  const displayNameEmojiVersion = `${Object.keys(localCustomEmojis).length}-${account.emojis.size}`;
+
   return (
     <div className={classes.root} ref={rootRef}>
       <button
@@ -87,7 +96,17 @@ export const Blue2AccountMenu: React.FC = () => {
       >
         <Avatar account={account} size={42} />
         <span className={classes.identity}>
-          <strong>{displayName}</strong>
+          {account.display_name_html ? (
+            <EmojiHTML
+              key={`${account.id}-${displayNameEmojiVersion}`}
+              className='display-name__html'
+              htmlString={account.display_name_html}
+              as='strong'
+              extraEmojis={displayNameEmojis}
+            />
+          ) : (
+            <strong>{displayName}</strong>
+          )}
           <span>@{account.acct}</span>
         </span>
         <MoreHorizIcon className={classes.moreIcon} />
