@@ -9,6 +9,12 @@ module InstanceHelper
     @site_hostname ||= Addressable::URI.parse("//#{Rails.configuration.x.local_domain}").display_uri.host
   end
 
+  def mailer_instance_brand(text)
+    return text unless text.is_a?(String)
+
+    text.gsub(/\bMastodon\b/) { Setting.site_title }
+  end
+
   def description_for_sign_up(invite = nil)
     safe_join([description_prefix(invite), I18n.t('auth.description.suffix')], ' ')
   end
