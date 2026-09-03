@@ -49,10 +49,9 @@
     // Keep the control above the fixed mobile navigation. The navigation is
     // composed of a 48px link row, its list padding, the root bottom padding,
     // and the device safe area.
-    bottom: calc(
-      48px + var(--space-2xs) + var(--space-2xs) + var(--space-md) + 14px +
-        env(safe-area-inset-bottom)
-    );
+    --mobile-nav-offset: calc(62px + var(--space-2xs) * 2 + var(--space-md));
+
+    bottom: calc(var(--mobile-nav-offset) + env(safe-area-inset-bottom));
     left: 14px;
   }
 }

@@ -7,6 +7,7 @@ import { IconLogo } from '@/mastodon/components/logo';
 import { blue2Text } from '@/mastodon/features/blue2/locale';
 import {
   customAppIcon,
+  customFavicon,
   customInstanceLogo,
   domain,
   title,
@@ -21,11 +22,14 @@ export const NavigationHeader: React.FC<{
   const intl = useIntl();
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
 
   return (
     <header className={classes.root} data-stuck={isStuck}>
       <Link to='/' className={classes.siteNameLink}>
-        {customInstanceLogo ? (
+        {isBlue2 ? (
+          <img src={blue2Brand} alt='' className={classes.appIcon} />
+        ) : customInstanceLogo ? (
           <img src={customInstanceLogo} alt='' className={classes.appIcon} />
         ) : customAppIcon ? (
           <img src={customAppIcon} alt='' className={classes.appIcon} />

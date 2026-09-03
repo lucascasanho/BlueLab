@@ -2,14 +2,24 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { Route, Switch, useLocation, useRouteMatch } from 'react-router-dom';
+import {
+  Link,
+  Route,
+  Switch,
+  useLocation,
+  useRouteMatch,
+} from 'react-router-dom';
 
 import * as WebAuthnJSON from '@github/webauthn-json';
 import { Helmet } from '@unhead/react/helmet';
 
 import api from '@/mastodon/api';
 import { NavigationFocusTarget } from '@/mastodon/components/navigation_focus_target';
-import { customAppIcon, registrationsOpen } from '@/mastodon/initial_state';
+import {
+  customFavicon,
+  customInstanceLogo,
+  registrationsOpen,
+} from '@/mastodon/initial_state';
 import { fetchServer } from 'mastodon/actions/server';
 import { ServerHeroImage } from 'mastodon/components/server_hero_image';
 import { TabLink, TabList } from 'mastodon/components/tab_list';
@@ -33,6 +43,7 @@ export const CustomHomepage: React.FC = () => {
   const isAboutRoute = pathname === `${path}/about`;
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
   const [showBlue2Welcome, setShowBlue2Welcome] = useState(
     isBlue2 && !signedIn,
   );
@@ -76,11 +87,13 @@ export const CustomHomepage: React.FC = () => {
     return (
       <div className={classes.blue2Landing}>
         <section className={classes.blue2LandingIntro}>
-          <img
-            src={customAppIcon ?? '/favicon.ico'}
-            alt=''
-            className={classes.blue2LandingIcon}
-          />
+          <Link
+            to='/'
+            className={classes.blue2LandingBrand}
+            aria-label={server.item?.domain}
+          >
+            <img src={blue2Brand} alt='' className={classes.blue2LandingIcon} />
+          </Link>
           <NavigationFocusTarget as='h1'>
             {server.item?.domain}
           </NavigationFocusTarget>
@@ -151,11 +164,17 @@ export const CustomHomepage: React.FC = () => {
                 ×
               </button>
 
-              <img
-                src={customAppIcon ?? '/favicon.ico'}
-                alt=''
-                className={classes.blue2WelcomeIcon}
-              />
+              <Link
+                to='/'
+                className={classes.blue2WelcomeBrand}
+                aria-label={server.item?.domain}
+              >
+                <img
+                  src={blue2Brand}
+                  alt=''
+                  className={classes.blue2WelcomeIcon}
+                />
+              </Link>
 
               <h2 id='blue2-welcome-title'>{server.item?.domain}</h2>
               <p>{server.item?.description}</p>

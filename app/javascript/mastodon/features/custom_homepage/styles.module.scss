@@ -209,8 +209,24 @@
   }
 }
 
+.blue2LandingBrand,
+.blue2WelcomeBrand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  border-radius: 16px;
+  text-decoration: none !important;
+
+  &:focus-visible {
+    outline: 2px solid #0085ff;
+    outline-offset: 4px;
+  }
+}
+
 .blue2LandingIcon {
-  width: 58px;
+  width: auto;
+  max-width: min(180px, 100%);
   height: 58px;
   border-radius: 14px;
   object-fit: contain;
@@ -398,7 +414,8 @@
 }
 
 .blue2WelcomeIcon {
-  width: 68px;
+  width: auto;
+  max-width: min(190px, 100%);
   height: 68px;
   border-radius: 16px;
   object-fit: contain;
