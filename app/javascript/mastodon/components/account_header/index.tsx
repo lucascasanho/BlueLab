@@ -73,6 +73,15 @@ export const AccountHeader: React.FC<{
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
+  const profileButtons = (
+    <AccountButtons
+      accountId={accountId}
+      className={isBlue2 ? 'blue2-profile-actions' : classes.buttons}
+      noShare={!isMe || 'share' in navigator}
+      forceMenu={'share' in navigator}
+    />
+  );
+
   return (
     <div className={isBlue2 ? 'blue2-profile' : undefined}>
       <AccountBanners account={account} />
@@ -122,23 +131,24 @@ export const AccountHeader: React.FC<{
             </a>
           </div>
 
-          <div
-            className={classNames(
-              classes.displayNameWrapper,
-              isBlue2 && 'blue2-profile-identity-actions',
-            )}
-          >
-            <AccountName accountId={accountId} />
-            <AccountButtons
-              accountId={accountId}
-              className={classNames(
-                classes.buttons,
-                isBlue2 && 'blue2-profile-actions',
-              )}
-              noShare={!isMe || 'share' in navigator}
-              forceMenu={'share' in navigator}
-            />
-          </div>
+          {isBlue2 ? (
+            <>
+              <div className='blue2-profile-actions-row'>{profileButtons}</div>
+              <div
+                className={classNames(
+                  classes.displayNameWrapper,
+                  'blue2-profile-identity',
+                )}
+              >
+                <AccountName accountId={accountId} />
+              </div>
+            </>
+          ) : (
+            <div className={classes.displayNameWrapper}>
+              <AccountName accountId={accountId} />
+              {profileButtons}
+            </div>
+          )}
 
           <AccountBadges accountId={accountId} />
 
