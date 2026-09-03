@@ -1,0 +1,202 @@
+@use 'blue-2-v5';
+
+/* BlueLab 2.0 sixth refinement layer: repair clipped borders and unify surfaces. */
+body[data-theme='blue-2'] {
+  /* Ensure no upstream application background leaks above or between BlueLab columns. */
+  &,
+  #mastodon,
+  .app-holder,
+  .app-body,
+  .ui,
+  .layout-single-column,
+  .columns-area,
+  .columns-area > .column,
+  .column,
+  .column > .scrollable,
+  .tabs-bar__wrapper {
+    background-color: var(--blue2-bg) !important;
+  }
+
+  .tabs-bar__wrapper {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Use inset strokes for rounded cards so borders cannot disappear at clipped edges. */
+  .status__quote,
+  .status-card,
+  .account-card,
+  .conversation,
+  .follow_requests-unlocked_explanation {
+    box-sizing: border-box;
+    background-clip: padding-box;
+    border-color: transparent !important;
+    box-shadow: inset 0 0 0 1px var(--blue2-border-soft) !important;
+  }
+
+  .status__quote {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: 0 !important;
+    border: 0 !important;
+    border-radius: 12px !important;
+    overflow: clip !important;
+    background: var(--blue2-bg) !important;
+  }
+
+  .status__quote > .status,
+  .status__quote .status--is-quote {
+    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    border: 0 !important;
+    border-radius: inherit;
+    background: var(--blue2-bg) !important;
+  }
+
+  .status__quote .status__content,
+  .status__quote .status__content__text,
+  .status__quote .status__content__text--visible {
+    max-width: 100%;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .status-card,
+  .account-card,
+  .conversation {
+    overflow: clip;
+  }
+
+  /* Direct/private content must remain a single surface from prepend to actions. */
+  .status__wrapper-direct,
+  .notification-ungrouped--direct,
+  .notification-group--direct,
+  .detailed-status__wrapper-direct,
+  .detailed-status__wrapper-direct .detailed-status,
+  .detailed-status__wrapper-direct .detailed-status__action-bar,
+  .status__wrapper-direct .status,
+  .status__wrapper-direct .status__prepend {
+    background: var(--blue2-bg) !important;
+  }
+
+  .status__wrapper-direct .status__prepend,
+  .detailed-status__wrapper-direct .status__prepend,
+  .notification-ungrouped--direct .notification-ungrouped__header {
+    color: var(--blue2-muted) !important;
+  }
+
+  /* Column separators stay visible but do not look like hard black/blue cuts. */
+  .column,
+  .column > .scrollable,
+  .columns-area > .column,
+  .column-header,
+  .column-header__wrapper,
+  .tabs-bar__wrapper,
+  .account__section-headline,
+  .notification__filter-bar {
+    border-color: var(--blue2-border-soft) !important;
+  }
+
+  .column-header,
+  .column-header__wrapper {
+    box-shadow: none !important;
+  }
+
+  /* Rails settings callouts: one rounded surface, never a black rectangle inside it. */
+  &.admin .callout {
+    overflow: hidden !important;
+    border: 1px solid var(--blue2-border-soft) !important;
+    border-radius: 12px !important;
+    background: var(--blue2-search) !important;
+    box-shadow: none !important;
+  }
+
+  &.admin .callout > .content,
+  &.admin .callout > .content > .body,
+  &.admin .callout .content,
+  &.admin .callout .body {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  &.admin .callout > .content > a,
+  &.admin .callout .content > a {
+    background: transparent !important;
+  }
+
+  /* React callouts use data-variant; keep those on a single BlueLab surface too. */
+  aside[data-variant] {
+    overflow: hidden;
+    border: 1px solid var(--blue2-border-soft) !important;
+    background: var(--blue2-search) !important;
+    box-shadow: none !important;
+  }
+
+  aside[data-variant] > * {
+    box-shadow: none !important;
+  }
+
+  /* Avoid horizontal clipping in the left navigation while keeping its own scroll. */
+  [class*='blue2NavigationWrapper'] {
+    overflow-x: visible !important;
+  }
+
+  /* The upstream translation contribution prompt is hidden only in BlueLab 2.0. */
+  .translation-prompt {
+    display: none !important;
+  }
+}
+
+/*
+ * iOS/Safari can render the data-URI CSS masks used by the BlueLab desktop
+ * action glyphs with stray square/line artifacts. On mobile, use the real SVG
+ * components already rendered by Mastodon instead of those pseudo-elements.
+ */
+@media (max-width: 759px) {
+  body[data-theme='blue-2'] {
+    .status__action-bar__button-wrapper:nth-child(-n + 3)
+      .status__action-bar__button::before {
+      content: none !important;
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      flex: 0 0 0 !important;
+      background: none !important;
+      mask: none !important;
+      mask-image: none !important;
+      -webkit-mask: none !important;
+      -webkit-mask-image: none !important;
+    }
+
+    .status__action-bar__button-wrapper:nth-child(-n + 3)
+      .status__action-bar__button > svg {
+      display: block !important;
+      width: 21px !important;
+      height: 21px !important;
+      min-width: 21px !important;
+      min-height: 21px !important;
+      flex: 0 0 21px !important;
+      overflow: visible !important;
+      transform: none !important;
+    }
+
+    .status__action-bar__button {
+      overflow: visible !important;
+      line-height: 1 !important;
+    }
+  }
+}
+
+html[data-color-scheme='light'] body[data-theme='blue-2'] {
+  .status__quote,
+  .status-card,
+  .account-card,
+  .conversation,
+  .follow_requests-unlocked_explanation {
+    box-shadow: inset 0 0 0 1px var(--blue2-border-soft) !important;
+  }
+}
