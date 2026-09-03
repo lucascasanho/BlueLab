@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 
 import {
   aggregateUptime,
+  bucketForStatus,
   classifyDailyStat,
   dailyAvailability,
+  worstStatus,
 } from '../src/availability.js';
 
 test('sem amostras fica desconhecido/cinza', () => {
@@ -36,4 +38,14 @@ test('uptime agregado continua sendo calculado pelas amostras reais', () => {
     { total_checks: 100, up_checks: 98 },
   ]);
   assert.equal(uptime, 98.5);
+});
+
+test('status desconhecido não é tratado como indisponibilidade', () => {
+  assert.equal(bucketForStatus('unknown'), 'unknown');
+  assert.equal(bucketForStatus('unexpected-value'), 'unknown');
+});
+
+test('um componente desconhecido impede banner falso de tudo operacional', () => {
+  assert.equal(worstStatus(['operational', 'unknown']), 'unknown');
+  assert.equal(worstStatus(['operational', 'degraded', 'unknown']), 'degraded');
 });
