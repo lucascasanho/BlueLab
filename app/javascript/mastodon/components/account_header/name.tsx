@@ -38,6 +38,15 @@ export const AccountName: FC<{ accountId: string }> = ({ accountId }) => {
   );
   const relationship = useRelationship(accountId);
   const handle = useAccountHandle(account, localDomain);
+  const domainSeparatorIndex = handle?.indexOf('@', 1) ?? -1;
+  const handleUsername =
+    handle && domainSeparatorIndex > 0
+      ? handle.slice(0, domainSeparatorIndex)
+      : handle;
+  const handleDomain =
+    handle && domainSeparatorIndex > 0
+      ? handle.slice(domainSeparatorIndex)
+      : null;
 
   if (!account) {
     return null;
@@ -55,7 +64,14 @@ export const AccountName: FC<{ accountId: string }> = ({ accountId }) => {
       {account.invalid_handle ? (
         <InvalidAccountHelp />
       ) : (
-        <span className={classes.handleText}>{handle}</span>
+        <span className={classes.handleText}>
+          {handleUsername}
+          {handleDomain && (
+            <span className='bluelab-profile-handle-domain'>
+              {handleDomain}
+            </span>
+          )}
+        </span>
       )}
     </div>
   );

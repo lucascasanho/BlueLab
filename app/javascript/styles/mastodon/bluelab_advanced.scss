@@ -1,4 +1,14 @@
 html[data-bluelab-theme='true'] {
+  .bluelab-profile-handle-domain {
+    display: inline-block;
+    margin-inline-start: 2px;
+    padding: 0 4px;
+    border-radius: 4px;
+    background: var(--color-bg-brand-softest);
+    color: var(--color-text-brand);
+    font-weight: 500;
+  }
+
   .layout-multiple-columns {
     .compose-form__actions .icon-button.active:has(.icon-markdown) {
       background: var(--color-bg-brand-softest);
