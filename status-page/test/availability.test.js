@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
+// eslint-disable-next-line import/extensions
 import {
   aggregateUptime,
   bucketForStatus,
