@@ -134,7 +134,7 @@ export const ColumnsAreaRedesign: React.FC<{
         <div className={classes.main}>
           <Header />
 
-          <TabsBarPortal className={classes.columnHeader} />
+          <TabsBarPortal />
 
           <div className={classes.content}>{children}</div>
 
