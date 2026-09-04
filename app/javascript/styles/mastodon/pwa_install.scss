@@ -1,0 +1,98 @@
+.pwa-install-prompt {
+  position: fixed;
+  z-index: 10000;
+  inset-inline: 12px;
+  bottom: calc(env(safe-area-inset-bottom) + 16px);
+  box-sizing: border-box;
+  max-width: 440px;
+  margin-inline: auto;
+  padding: 12px;
+  border: 1px solid var(--color-border-primary);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  box-shadow: 0 12px 36px rgb(0 0 0 / 28%);
+}
+
+.pwa-install-prompt__message {
+  min-width: 0;
+  flex: 1 1 auto;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.pwa-install-prompt__actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pwa-install-prompt__install,
+.pwa-install-prompt__dismiss {
+  min-height: 38px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.pwa-install-prompt__install {
+  border: 1px solid transparent;
+  background: var(--color-bg-brand-base);
+  color: var(--color-text-on-brand-base);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--color-bg-brand-base-hover);
+  }
+}
+
+.pwa-install-prompt__dismiss {
+  border: 1px solid var(--color-border-primary);
+  background: transparent;
+  color: var(--color-text-secondary);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+  }
+}
+
+.pwa-install-prompt__install:focus-visible,
+.pwa-install-prompt__dismiss:focus-visible {
+  outline: var(--outline-focus-default);
+  outline-offset: 2px;
+}
+
+@media (max-width: 759px) {
+  .pwa-install-prompt {
+    bottom: calc(env(safe-area-inset-bottom) + 76px);
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pwa-install-prompt__actions {
+    width: 100%;
+  }
+
+  .pwa-install-prompt__install,
+  .pwa-install-prompt__dismiss {
+    flex: 1 1 0;
+  }
+}
+
+@media (min-width: 760px) {
+  .pwa-install-prompt {
+    inset-inline: auto 18px;
+    width: min(440px, calc(100vw - 36px));
+    margin-inline: 0;
+  }
+}
