@@ -33,17 +33,24 @@ SELECT
 FROM components
 CROSS JOIN days;
 
--- Two deliberately imperfect days on Website & API:
--- 287/288 = yellow (brief degradation), not red.
+-- Three deliberately imperfect days on Website & API:
+-- 287/288 = green (>= 99% availability; isolated failure), not red.
 UPDATE daily_stats
 SET up_checks = 287,
     down_checks = 1
 WHERE component_id = (SELECT id FROM components WHERE slug = 'website-api')
   AND day = date('now', '-1 day');
 
--- 280/288 = orange (partial outage), not red.
+-- 280/288 = yellow (between 95% and 99%), not red.
 UPDATE daily_stats
 SET up_checks = 280,
     down_checks = 8
 WHERE component_id = (SELECT id FROM components WHERE slug = 'website-api')
   AND day = date('now', '-2 day');
+
+-- 270/288 = orange (below 95% but not a full-day outage), not red.
+UPDATE daily_stats
+SET up_checks = 270,
+    down_checks = 18
+WHERE component_id = (SELECT id FROM components WHERE slug = 'website-api')
+  AND day = date('now', '-3 day');
