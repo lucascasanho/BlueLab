@@ -4,10 +4,12 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Link, useHistory } from 'react-router-dom';
 
+import { clickSearchResult } from '@/mastodon/actions/search';
 import { useIdentity } from '@/mastodon/identity_context';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
+import { useAppDispatch } from '@/mastodon/store';
 
 import { Blue2HomeIcon, Blue2SearchIcon } from './icons';
 import { blue2Text } from './locale';
@@ -19,6 +21,7 @@ interface TrendTag {
 
 export const Blue2RightRail: React.FC = () => {
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const history = useHistory();
   const { signedIn } = useIdentity();
   const [query, setQuery] = useState('');
@@ -61,9 +64,15 @@ export const Blue2RightRail: React.FC = () => {
       event.preventDefault();
       const value = query.trim();
       if (!value) return;
-      history.push(`/search?q=${encodeURIComponent(value)}`);
+
+      void dispatch(clickSearchResult({ q: value }));
+      const queryParams = new URLSearchParams({ q: value });
+      history.push({
+        pathname: '/search',
+        search: queryParams.toString(),
+      });
     },
-    [history, query],
+    [dispatch, history, query],
   );
 
   const handleQueryChange = useCallback(

@@ -25,8 +25,7 @@
   font-weight: 750;
 }
 
-.headerButton,
-.newConversation {
+.headerButton {
   min-height: 38px;
   padding: 0 16px;
   border: 0;
@@ -44,15 +43,16 @@
 }
 
 .headerButton:hover,
-.headerButton:focus-visible,
-.newConversation:hover,
-.newConversation:focus-visible {
+.headerButton:focus-visible {
   background: var(--blue2-blue-hover, #0075e2);
-  outline: none;
 }
 
-.headerButton svg,
-.newConversation svg {
+.headerButton:focus-visible {
+  outline: 2px solid var(--blue2-blue, #0085ff);
+  outline-offset: 2px;
+}
+
+.headerButton svg {
   width: 19px !important;
   height: 19px !important;
   margin: 0 !important;
@@ -60,13 +60,18 @@
 }
 
 .notice {
-  margin: 10px 12px 0;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--blue2-search, #111b25);
+  margin: 12px 14px 14px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: color-mix(
+    in srgb,
+    var(--blue2-search, #15202b) 76%,
+    var(--blue2-bg, #000)
+  );
   color: var(--blue2-muted, #9aa8b4);
   font-size: 13px;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .notice a {
@@ -74,70 +79,95 @@
   font-weight: 650;
 }
 
-.layout {
-  min-height: 0;
-  flex: 1 1 auto;
-  display: grid;
-  grid-template-columns: minmax(250px, 40%) minmax(0, 60%);
-}
-
-.inbox,
-.welcome {
+.inbox {
   min-width: 0;
   min-height: 0;
-}
-
-.inbox {
-  border-inline-end: 1px solid var(--blue2-border-soft, #17232c);
+  flex: 1 1 auto;
 }
 
 .listWrap {
+  min-height: 0;
   height: 100%;
 }
 
-.emptyInbox,
-.welcomeInner {
-  min-height: 420px;
-  height: 100%;
-  padding: 28px;
+/*
+ * BlueLab messages are presented as soft, separated conversation cards.
+ * This deliberately overrides the generic BlueLab inset stroke applied to
+ * `.conversation` elsewhere without changing Vanilla or Bird UI.
+ */
+.listWrap :global(.conversation) {
+  box-sizing: border-box;
+  margin: 0 12px 8px;
+  padding: 12px 12px 10px;
+  border: 0 !important;
+  border-radius: 14px;
+  background: color-mix(
+    in srgb,
+    var(--blue2-search, #15202b) 66%,
+    var(--blue2-bg, #000)
+  ) !important;
+  box-shadow: none !important;
+  overflow: clip;
+  transition: background-color 120ms ease;
+}
+
+.listWrap :global(.conversation:hover),
+.listWrap :global(.conversation:focus-visible) {
+  background: color-mix(
+    in srgb,
+    var(--blue2-hover, #0c141b) 82%,
+    var(--blue2-bg, #000)
+  ) !important;
+}
+
+.listWrap :global(.conversation:focus-visible) {
+  outline: 2px solid var(--blue2-blue, #0085ff);
+  outline-offset: -2px;
+}
+
+.listWrap :global(.empty-column-indicator) {
+  box-sizing: border-box;
+  min-height: min(56dvh, 480px);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.emptyInbox {
+  box-sizing: border-box;
+  width: min(100%, 440px);
+  padding: 44px 24px 96px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  color: var(--blue2-text, #f7f7f8);
   text-align: center;
-  box-sizing: border-box;
 }
 
-.emptyInbox > svg,
-.welcomeInner > svg {
-  width: 52px;
-  height: 52px;
-  margin-bottom: 14px;
-  color: var(--blue2-text, #f7f7f8);
+.emptyInbox > svg {
+  width: 58px !important;
+  height: 58px !important;
+  margin: 0 0 16px !important;
+  color: var(--blue2-blue, #0085ff);
   fill: currentColor;
 }
 
-.emptyInbox strong,
-.welcomeInner strong {
+.emptyInbox strong {
   color: var(--blue2-text, #f7f7f8);
-  font-size: 17px;
-  line-height: 1.25;
+  font-size: 21px;
+  line-height: 1.2;
   font-weight: 750;
 }
 
-.welcomeInner {
-  min-height: 520px;
-}
-
-.welcomeInner > svg {
-  width: 64px;
-  height: 64px;
-}
-
-.newConversation {
-  margin-top: 16px;
-  min-height: 40px;
-  padding-inline: 18px;
+.emptyInbox span {
+  max-width: 340px;
+  margin-top: 8px;
+  color: var(--blue2-muted, #9aa8b4);
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 @media (width <= 759px) {
@@ -162,39 +192,24 @@
     font-size: 0;
   }
 
-  .layout {
-    display: block;
-  }
-
-  .inbox {
-    border-inline-end: 0;
-  }
-
-  .inbox:has(.emptyInbox) {
-    display: none;
-  }
-
-  .welcomeInner {
-    min-height: calc(100dvh - 180px);
-    padding: 28px 22px 96px;
-  }
-
-  .welcomeInner > svg {
-    width: 70px;
-    height: 70px;
-  }
-
-  .welcomeInner strong {
-    font-size: 22px;
-  }
-
-  .newConversation {
-    min-height: 44px;
-    padding-inline: 20px;
-    font-size: 15px;
-  }
-
   .notice {
+    margin: 10px 10px 14px;
+    padding: 12px 13px;
+    border-radius: 12px;
+  }
+
+  .listWrap :global(.conversation) {
     margin-inline: 10px;
+    margin-block-end: 8px;
+    padding: 11px 11px 9px;
+    border-radius: 13px;
+  }
+
+  .listWrap :global(.empty-column-indicator) {
+    min-height: calc(100dvh - 250px);
+  }
+
+  .emptyInbox {
+    padding: 36px 22px 112px;
   }
 }

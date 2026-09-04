@@ -24,6 +24,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { ComposeAttachments } from './attachments';
+import { ComposeAutocomplete } from './autocomplete';
 import type { OnEmojiPick } from './emoji';
 import { ComposeFooter } from './footer';
 import { ComposeFormHeader } from './header';
@@ -57,6 +58,7 @@ const messages = defineMessages({
 interface RedesignComposeFormProps {
   autoFocus?: boolean;
   className?: string;
+  embedded?: boolean;
   noMinimize?: boolean;
   redirectOnSuccess?: boolean;
 }
@@ -66,6 +68,7 @@ export const RedesignComposeForm: React.FC<
 > = ({
   autoFocus,
   className,
+  embedded = false,
   noMinimize,
   redirectOnSuccess,
   ref,
@@ -86,15 +89,18 @@ export const RedesignComposeForm: React.FC<
       if (!target || target.zone === 'body') return;
 
       const { element } = target;
-      const nextScrollTop = element.scrollTop + event.deltaY;
       const maxScrollTop = Math.max(
         element.scrollHeight - element.clientHeight,
         0,
       );
+      if (maxScrollTop === 0) return;
 
-      if (nextScrollTop < 0 || nextScrollTop > maxScrollTop) {
-        return;
-      }
+      const nextScrollTop = Math.min(
+        maxScrollTop,
+        Math.max(0, element.scrollTop + event.deltaY),
+      );
+
+      if (nextScrollTop === element.scrollTop) return;
 
       event.preventDefault();
       element.scrollTop = nextScrollTop;
@@ -104,8 +110,9 @@ export const RedesignComposeForm: React.FC<
     <form
       {...props}
       ref={ref}
-      role='dialog'
+      role={embedded ? 'region' : 'dialog'}
       data-bluelab-composer
+      data-bluelab-composer-embedded={embedded ? 'true' : undefined}
       onSubmit={onSubmit}
       onWheelCapture={handleWheelCapture}
       aria-labelledby={titleId}
@@ -113,7 +120,11 @@ export const RedesignComposeForm: React.FC<
     >
       {type === 'message' && <div className={classes.background} />}
 
-      <ComposeFormHeader id={titleId} noMinimize={noMinimize} />
+      <ComposeFormHeader
+        id={titleId}
+        noMinimize={noMinimize || embedded}
+        noClose={embedded}
+      />
 
       <div
         className={classes.content}
@@ -122,7 +133,7 @@ export const RedesignComposeForm: React.FC<
       >
         <ComposeReply />
 
-        <div className={classes.toolbar}>
+        <div className={classes.toolbar} data-bluelab-compose-toolbar>
           <ComposeVisibility className={classes.flexGrowWrap} />
 
           <LanguageButton />
@@ -160,13 +171,15 @@ export const RedesignComposeForm: React.FC<
           />
         )}
 
-        <RichComposeEditor
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus={autoFocus}
-          onSubmit={onSubmit}
-        >
-          <ComposeAttachments className={classes.attachments} />
-        </RichComposeEditor>
+        <ComposeAutocomplete>
+          <RichComposeEditor
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus={autoFocus}
+            onSubmit={onSubmit}
+          >
+            <ComposeAttachments className={classes.attachments} />
+          </RichComposeEditor>
+        </ComposeAutocomplete>
 
         <ComposeHints />
       </div>

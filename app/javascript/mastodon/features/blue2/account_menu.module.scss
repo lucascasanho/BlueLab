@@ -156,7 +156,9 @@
   }
 }
 
-@media (width < 1024px) {
+// The account control must collapse at the same breakpoint as the BlueLab
+// navigation rail. Otherwise its 216px box can spill out of the 76px rail.
+@media (width < 1180px) {
   .root {
     width: 52px;
   }

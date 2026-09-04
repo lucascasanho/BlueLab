@@ -92,6 +92,9 @@ class ManifestSerializer < ActiveModel::Serializer
   end
 
   def prefer_related_applications
+    # Chromium-based browsers require this to be false (or omitted) before
+    # promoting the web app for installation:
+    # https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Manifest/Reference/prefer_related_applications
     false
   end
 

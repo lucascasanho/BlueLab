@@ -9,6 +9,18 @@ module InstanceHelper
     @site_hostname ||= Addressable::URI.parse("//#{Rails.configuration.x.local_domain}").display_uri.host
   end
 
+  def mailer_instance_brand(text)
+    return text unless text.is_a?(String)
+
+    html_safe = text.html_safe?
+    replacement = html_safe ? ERB::Util.html_escape(Setting.site_title) : Setting.site_title.to_s
+    branded = text.gsub(/\bMastodon\b/, replacement)
+
+    # The source translation was already marked safe; only the escaped instance
+    # title is introduced by the replacement above.
+    html_safe ? branded.html_safe : branded # rubocop:disable Rails/OutputSafety
+  end
+
   def description_for_sign_up(invite = nil)
     safe_join([description_prefix(invite), I18n.t('auth.description.suffix')], ' ')
   end

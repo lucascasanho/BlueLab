@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 
-import { HamburgerIcon, HashIcon } from '@phosphor-icons/react';
+import { HashIcon } from '@phosphor-icons/react';
 
 import { openNavigation } from '@/mastodon/actions/navigation';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
@@ -19,12 +19,14 @@ import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/r
 import { ComposePanel } from '@/mastodon/features/ui/components/compose_panel';
 import { customFavicon, customInstanceLogo } from '@/mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import MenuIcon from '@/material-icons/400-24px/menu.svg?react';
 import { Footer } from 'mastodon/features/custom_homepage/components/footer';
 import { Header } from 'mastodon/features/custom_homepage/components/header';
 
 import { useBreakpoint } from '../../hooks/useBreakpoint';
 import { useColumnsContext } from '../../util/columns_context';
 
+import mobileChromeClasses from './blue2_mobile_chrome.module.scss';
 import { MultiColumnContent } from './multi_column_content';
 import classes from './redesign.module.scss';
 
@@ -155,7 +157,9 @@ export const ColumnsAreaRedesign: React.FC<{
         )}
 
         {isMobile ? (
-          <RedesignMobileNavigation hideMenuButton />
+          <div className={mobileChromeClasses.mobileNavigation}>
+            <RedesignMobileNavigation hideMenuButton />
+          </div>
         ) : (
           <ComposeRedesignButton />
         )}
@@ -170,7 +174,12 @@ export const ColumnsAreaRedesign: React.FC<{
           onTouchEnd={handleSwipeEnd}
         >
           {isMobile && (
-            <header className={classes.blue2MobileUtilityBar}>
+            <header
+              className={classNames(
+                classes.blue2MobileUtilityBar,
+                mobileChromeClasses.topUtilityBar,
+              )}
+            >
               <button
                 type='button'
                 className={classes.blue2MobileUtilityButton}
@@ -180,7 +189,7 @@ export const ColumnsAreaRedesign: React.FC<{
                   defaultMessage: 'Menu',
                 })}
               >
-                <HamburgerIcon size={28} />
+                <MenuIcon width={28} height={28} fill='currentColor' />
               </button>
 
               <img
@@ -202,14 +211,24 @@ export const ColumnsAreaRedesign: React.FC<{
           )}
 
           {!isBlue2FeedPage && (
-            <div className={classes.blue2Portal}>
+            <div
+              className={classNames(
+                classes.blue2Portal,
+                isMobile && mobileChromeClasses.portal,
+              )}
+            >
               <TabsBarPortal />
             </div>
           )}
 
           {isBlue2FeedPage && (
             <>
-              <header className={classes.blue2Topbar}>
+              <header
+                className={classNames(
+                  classes.blue2Topbar,
+                  isMobile && mobileChromeClasses.feedTopBar,
+                )}
+              >
                 <img src={blue2Brand} alt='' className={classes.blue2Brand} />
 
                 <Link

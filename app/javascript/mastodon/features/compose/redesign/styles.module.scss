@@ -383,6 +383,36 @@ textarea.textarea {
 }
 
 @media screen and (width <= 759px) {
+  .root[role='dialog'] {
+    box-sizing: border-box;
+    flex: 0 1 auto;
+    height: fit-content;
+    min-height: 0;
+    max-height: calc(100vh - env(safe-area-inset-top) - var(--space-md));
+    max-height: calc(100dvh - env(safe-area-inset-top) - var(--space-md));
+    overflow: hidden;
+  }
+
+  .root[role='dialog'] .content {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .root[role='dialog'] .richEditorWrapper,
+  .root[role='dialog'] .richEditor {
+    flex-grow: 0;
+  }
+
+  .root[role='dialog'] .footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    background: var(--color-bg-primary);
+    padding-bottom: max(var(--space-xs), env(safe-area-inset-bottom));
+  }
+
   .languageMenu {
     box-sizing: border-box;
     width: min(280px, calc(100vw - 2 * var(--space-md)));

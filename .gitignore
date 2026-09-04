@@ -29,6 +29,9 @@ stats.html
 node_modules/
 /build/
 
+# Ignore local Cloudflare Wrangler preview state for the shared status page.
+/status-page/.wrangler/
+
 # Ignore Vagrant files
 .vagrant/
 

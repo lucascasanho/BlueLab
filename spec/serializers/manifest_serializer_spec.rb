@@ -11,6 +11,14 @@ RSpec.describe ManifestSerializer do
     end
   end
 
+  describe '#icons' do
+    it 'includes the icon sizes required by Chromium install promotion' do
+      sizes = serializer.icons.pluck(:sizes)
+
+      expect(sizes).to include('192x192', '512x512')
+    end
+  end
+
   describe 'install navigation metadata' do
     it 'opens as a standalone app within the instance scope' do
       expect(serializer.display).to eq('standalone')

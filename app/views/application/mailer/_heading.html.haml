@@ -8,6 +8,6 @@
             %td.email-header-heading-img-td
               = image_tag image_url, alt: '', width: 56, height: 56
           %td.email-header-heading-txt-td
-            %h1= title
+            %h1= mailer_instance_brand(title)
             - if subtitle
-              %p= subtitle
+              %p= mailer_instance_brand(subtitle)

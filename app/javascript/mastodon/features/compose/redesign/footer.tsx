@@ -67,7 +67,7 @@ export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
   }, [contentType, dispatch]);
 
   return (
-    <footer className={classes.footer}>
+    <footer className={classes.footer} data-bluelab-compose-footer>
       <ComposeUploadButton disabled={hasQuote} />
 
       <ComposeEmojiButton onPick={onEmojiPick} />

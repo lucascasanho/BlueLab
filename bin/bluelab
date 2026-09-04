@@ -1,0 +1,212 @@
+#!/usr/bin/env bash
+
+# Atualizador unificado do BlueLab para os WSL Blue e Espelunca.
+#
+# - Blue:      atualiza ~/blue e reinicia blue-web/sidekiq/streaming
+# - Espelunca: atualiza ~/espelunca e reinicia espelunca-web/sidekiq/streaming
+# - Busca todas as branches, tags e commits do remoto BlueLab.
+# - Implanta o HEAD da branch sincronizada BlueLab-Testing.
+# - Preserva alterações locais em stash e histórico divergente em branch de backup.
+
+set -Eeuo pipefail
+
+REMOTE="${BLUELAB_REMOTE:-bluelab}"
+REMOTE_URL="${BLUELAB_REMOTE_URL:-https://github.com/lucascasanho/BlueLab.git}"
+BRANCH="${BLUELAB_BRANCH:-BlueLab-Testing}"
+INSTALL_DIR="${BLUELAB_INSTALL_DIR:-$HOME/.local/bin}"
+INSTALL_PATH="$INSTALL_DIR/bluelab"
+
+fail() {
+  echo
+  echo "ERRO: $*" >&2
+  echo "Nenhuma etapa posterior será executada." >&2
+  exit 1
+}
+
+run() {
+  "$@" || fail "falhou: $*"
+}
+
+select_target() {
+  local requested="${BLUELAB_TARGET:-}"
+
+  case "$requested" in
+    blue)
+      TARGET="blue"
+      REPO="${BLUELAB_REPO:-$HOME/blue}"
+      SERVICES=(blue-web blue-sidekiq blue-streaming)
+      return
+      ;;
+    espelunca)
+      TARGET="espelunca"
+      REPO="${BLUELAB_REPO:-$HOME/espelunca}"
+      SERVICES=(espelunca-web espelunca-sidekiq espelunca-streaming)
+      return
+      ;;
+    "") ;;
+    *) fail "BLUELAB_TARGET deve ser 'blue' ou 'espelunca'" ;;
+  esac
+
+  if [[ "${USER:-}" == "blue" && -d "$HOME/blue/.git" ]]; then
+    TARGET="blue"
+    REPO="${BLUELAB_REPO:-$HOME/blue}"
+    SERVICES=(blue-web blue-sidekiq blue-streaming)
+    return
+  fi
+
+  if [[ "${USER:-}" == "espelunca" && -d "$HOME/espelunca/.git" ]]; then
+    TARGET="espelunca"
+    REPO="${BLUELAB_REPO:-$HOME/espelunca}"
+    SERVICES=(espelunca-web espelunca-sidekiq espelunca-streaming)
+    return
+  fi
+
+  if [[ -n "${BLUELAB_REPO:-}" ]]; then
+    REPO="$BLUELAB_REPO"
+    case "$(basename "$REPO")" in
+      blue)
+        TARGET="blue"
+        SERVICES=(blue-web blue-sidekiq blue-streaming)
+        ;;
+      espelunca)
+        TARGET="espelunca"
+        SERVICES=(espelunca-web espelunca-sidekiq espelunca-streaming)
+        ;;
+      *) fail "não consegui inferir a instância de BLUELAB_REPO=$REPO; defina BLUELAB_TARGET" ;;
+    esac
+    return
+  fi
+
+  if [[ -d "$HOME/blue/.git" && ! -d "$HOME/espelunca/.git" ]]; then
+    TARGET="blue"
+    REPO="$HOME/blue"
+    SERVICES=(blue-web blue-sidekiq blue-streaming)
+    return
+  fi
+
+  if [[ -d "$HOME/espelunca/.git" && ! -d "$HOME/blue/.git" ]]; then
+    TARGET="espelunca"
+    REPO="$HOME/espelunca"
+    SERVICES=(espelunca-web espelunca-sidekiq espelunca-streaming)
+    return
+  fi
+
+  fail "não consegui identificar automaticamente Blue ou Espelunca"
+}
+
+select_target
+
+printf '\n============================================================\n'
+printf ' BLUELAB — ATUALIZAÇÃO COMPLETA\n'
+printf '============================================================\n\n'
+printf 'Instância:    %s\n' "$TARGET"
+printf 'Repositório:  %s\n' "$REPO"
+printf 'Remote:       %s\n' "$REMOTE"
+printf 'Branch deploy:%s\n' " $BRANCH"
+
+cd "$REPO" || fail "não consegui entrar em $REPO"
+git rev-parse --git-dir >/dev/null 2>&1 || fail "$REPO não é um repositório Git"
+
+printf '\n===== PRESERVANDO ESTADO LOCAL =====\n'
+if [[ -n "$(git status --porcelain=v1)" ]]; then
+  STASH_LABEL="bluelab-auto-backup-${TARGET}-$(date +%Y%m%d-%H%M%S)"
+  git status --short
+  run git stash push --include-untracked -m "$STASH_LABEL"
+  echo "Alterações locais guardadas em git stash: $STASH_LABEL"
+else
+  echo "Working tree limpa."
+fi
+
+printf '\n===== CONFIGURANDO REMOTE =====\n'
+if git remote get-url "$REMOTE" >/dev/null 2>&1; then
+  echo "Usando remote existente: $REMOTE -> $(git remote get-url "$REMOTE")"
+else
+  echo "Criando remote $REMOTE -> $REMOTE_URL"
+  run git remote add "$REMOTE" "$REMOTE_URL"
+fi
+
+printf '\n===== BUSCANDO TODO O REPOSITÓRIO =====\n'
+run git fetch --prune --tags "$REMOTE" "+refs/heads/*:refs/remotes/$REMOTE/*"
+
+REMOTE_REF="refs/remotes/$REMOTE/$BRANCH"
+git show-ref --verify --quiet "$REMOTE_REF" || fail "branch remota $REMOTE/$BRANCH não encontrada"
+NEW_HEAD="$(git rev-parse "$REMOTE_REF")"
+OLD_HEAD="$(git rev-parse HEAD)"
+CURRENT_BRANCH="$(git branch --show-current)"
+
+printf 'HEAD local antes: %s\n' "$OLD_HEAD"
+printf 'HEAD remoto:      %s\n' "$NEW_HEAD"
+
+if [[ "$OLD_HEAD" != "$NEW_HEAD" && ( "$CURRENT_BRANCH" == "$BRANCH" || -z "$CURRENT_BRANCH" ) ]]; then
+  if ! git merge-base --is-ancestor "$OLD_HEAD" "$NEW_HEAD"; then
+    BACKUP_BRANCH="backup/bluelab-local-${TARGET}-$(date +%Y%m%d-%H%M%S)"
+    run git branch "$BACKUP_BRANCH" "$OLD_HEAD"
+    echo "Histórico local divergente preservado em: $BACKUP_BRANCH"
+  fi
+fi
+
+printf '\n===== ALINHANDO CÓDIGO AO MAIS RECENTE =====\n'
+if git show-ref --verify --quiet "refs/heads/$BRANCH"; then
+  run git switch "$BRANCH"
+else
+  run git switch --track -c "$BRANCH" "$REMOTE/$BRANCH"
+fi
+
+# O objetivo deste comando é implantar exatamente o estado consolidado do GitHub.
+# Qualquer estado local relevante já foi preservado acima.
+run git reset --hard "$NEW_HEAD"
+run git diff --check "$NEW_HEAD"
+
+printf '\n===== ATUALIZANDO O PRÓPRIO COMANDO =====\n'
+run mkdir -p "$INSTALL_DIR"
+run install -m 0755 "$REPO/bin/bluelab" "$INSTALL_PATH"
+echo "Comando instalado/atualizado em: $INSTALL_PATH"
+
+printf '\n===== RUBY =====\n'
+if ! bundle check; then
+  run bundle install
+else
+  echo "Dependências Ruby já satisfeitas."
+fi
+
+printf '\n===== JAVASCRIPT =====\n'
+run yarn install --immutable
+
+printf '\n===== MIGRATIONS =====\n'
+run env RAILS_ENV=production bundle exec rails db:migrate
+
+printf '\n===== ASSETS =====\n'
+run env RAILS_ENV=production NODE_ENV=production bundle exec rails assets:precompile
+
+printf '\n===== REINICIANDO %s =====\n' "${TARGET^^}"
+for service in "${SERVICES[@]}"; do
+  systemctl cat "$service" >/dev/null 2>&1 || fail "serviço $service não existe neste WSL"
+done
+run sudo systemctl restart "${SERVICES[@]}"
+
+sleep 2
+
+printf '\n===== STATUS =====\n'
+FAILED=0
+for service in "${SERVICES[@]}"; do
+  state="$(systemctl is-active "$service" 2>/dev/null || true)"
+  printf '%-28s %s\n' "$service" "$state"
+  if [[ "$state" != "active" ]]; then
+    FAILED=1
+  fi
+done
+
+if [[ "$FAILED" -ne 0 ]]; then
+  fail "um ou mais serviços não ficaram ativos"
+fi
+
+printf '\n===== VERSÃO IMPLANTADA =====\n'
+git log -1 --format='commit:   %H%ndata:     %cd%nmensagem: %s' --date=iso
+
+printf '\n===== REFS REMOTAS =====\n'
+printf 'Branches remotas: %s\n' "$(git for-each-ref --format='%(refname:short)' "refs/remotes/$REMOTE" | wc -l)"
+printf 'Tags locais:      %s\n' "$(git tag | wc -l)"
+
+printf '\n============================================================\n'
+printf ' BLUELAB ATUALIZADO — %s\n' "${TARGET^^}"
+printf '============================================================\n'

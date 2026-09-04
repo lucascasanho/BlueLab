@@ -1,0 +1,71 @@
+.mobileNavigation {
+  display: contents;
+}
+
+@media (width <= 759px) {
+  // BlueLab's bottom navigation is a fixed shell that also owns the compose
+  // button. Animate only its link list so the compose button stays fixed and
+  // usable while the navigation row moves out of view.
+  .mobileNavigation > nav > ul {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition:
+      transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 170ms ease;
+    will-change: transform, opacity;
+  }
+
+  .topUtilityBar,
+  .feedTopBar {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition:
+      transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 170ms ease;
+    will-change: transform, opacity;
+  }
+
+  // Non-feed pages keep their contextual column header visible. When the
+  // utility bar leaves, slide that sticky header into the freed top position.
+  .portal {
+    transition: top 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  :global(.ui--mobile-chrome-hidden) .mobileNavigation > nav > ul {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(
+      0,
+      calc(100% + 24px + env(safe-area-inset-bottom)),
+      0
+    );
+  }
+
+  :global(.ui--mobile-chrome-hidden) .topUtilityBar {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(0, -100%, 0);
+  }
+
+  // Feed tabs sit immediately below the 56px utility bar. Move them by their
+  // own height plus that offset so the complete BlueLab top chrome clears the
+  // viewport instead of leaving a second sticky strip behind.
+  :global(.ui--mobile-chrome-hidden) .feedTopBar {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(0, calc(-100% - 56px), 0);
+  }
+
+  :global(.ui--mobile-chrome-hidden) .portal {
+    top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileNavigation > nav > ul,
+  .topUtilityBar,
+  .feedTopBar,
+  .portal {
+    transition: none;
+  }
+}

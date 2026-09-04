@@ -204,10 +204,23 @@ export const NavigationBar: React.FC = () => {
   const dispatch = useAppDispatch();
   const open = useAppSelector((state) => state.navigation.open);
   const intl = useIntl();
+  const isBlue2Mobile =
+    signedIn &&
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'blue-2' &&
+    typeof window !== 'undefined' &&
+    window.matchMedia('(max-width: 759px)').matches;
 
   const handleClick = useCallback(() => {
     dispatch(toggleNavigation());
   }, [dispatch]);
+
+  // BlueLab mobile renders its own navigation shell. Keeping the legacy
+  // navigation mounted underneath it creates a second bottom bar and duplicate
+  // focus targets, so suppress it only for signed-in BlueLab users on phones.
+  if (isBlue2Mobile) {
+    return null;
+  }
 
   return (
     <div className='ui__navigation-bar'>

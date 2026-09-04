@@ -1,0 +1,29 @@
+@use 'blue-2-v8';
+
+/*
+ * BlueLab ninth refinement layer.
+ * Mobile-only chrome cleanup for notifications and Rails preferences pages.
+ */
+@media (width <= 759px) {
+  /*
+   * Notifications already have their own quick-filter row (All / Mentions).
+   * Remove the redundant portaled title/settings block above it only in
+   * BlueLab mobile. The filter row itself remains untouched.
+   */
+  body[data-theme='blue-2']:has(.notification__filter-bar)
+    #tabs-bar__portal
+    > .column-header__wrapper {
+    display: none !important;
+  }
+
+  /*
+   * The desktop BlueLab admin rail reserves bottom breathing room. On mobile
+   * the navigation list is collapsed, so that same padding becomes an empty
+   * bordered strip between the utility header and the actual preferences
+   * content. Remove the desktop-only reserve without changing the form layout.
+   */
+  body[data-theme='blue-2'].admin .sidebar {
+    min-height: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}

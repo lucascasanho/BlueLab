@@ -1,0 +1,59 @@
+@use 'blue-2-v10';
+
+/*
+ * BlueLab eleventh refinement layer.
+ * The advanced-interface state class is applied to the body itself. Match that
+ * same element so the compact embedded composer and bottom footer rules are
+ * actually active without affecting Vanilla, Bird UI, or the classic composer.
+ */
+body[data-theme='blue-2'].layout-multiple-columns {
+  .drawer__bluelab-compose {
+    box-sizing: border-box;
+    flex: 0 1 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    max-height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  [data-bluelab-composer-embedded='true'] > [data-compose-scroll-container] {
+    flex: 0 1 auto;
+  }
+
+  [data-bluelab-composer-embedded='true'] [data-bluelab-compose-toolbar] {
+    flex-wrap: nowrap;
+  }
+
+  [data-bluelab-composer-embedded='true']
+    [data-bluelab-compose-toolbar]
+    > :first-child {
+    flex: 0 1 auto;
+    flex-basis: auto !important;
+    min-width: 0;
+  }
+
+  [data-bluelab-composer-embedded='true'] [data-bluelab-compose-footer] {
+    flex-wrap: nowrap;
+  }
+
+  [data-bluelab-composer-embedded='true']
+    [data-bluelab-compose-footer]
+    > div:last-child {
+    flex: 1 1 auto;
+    flex-basis: auto !important;
+    min-width: 0;
+    justify-content: flex-end;
+  }
+
+  .column:has(> .bluelab-advanced-footer-spacer) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .bluelab-advanced-footer-spacer {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+}
