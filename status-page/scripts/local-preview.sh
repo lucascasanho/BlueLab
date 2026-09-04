@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-WRANGLER=(npx --yes wrangler@4.57.0)
+WRANGLER=(npx --yes wrangler@4.129.0)
 CONFIG="wrangler.preview.jsonc"
 
 printf '\n===== BlueLab Status — preview local =====\n'
