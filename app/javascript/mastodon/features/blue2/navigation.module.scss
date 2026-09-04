@@ -133,7 +133,9 @@
 }
 
 // Keep the navigation contents compact whenever the BlueLab shell collapses
-// its navigation column to 76px. The shell uses the same 1180px breakpoint.
+// its navigation column to 76px. In this compact rail Home must always be the
+// first navigation action, immediately before Search, independent of viewport
+// orientation/height.
 @media (width < 1180px) {
   .root {
     width: 76px;
@@ -157,6 +159,16 @@
     }
   }
 
+  .landscapeHomeItem {
+    display: flex;
+    flex: 0 0 48px;
+    margin-bottom: 1px;
+  }
+
+  .homeItem {
+    display: none;
+  }
+
   .badge {
     position: absolute;
     top: 1px;
@@ -176,20 +188,5 @@
     > :not(svg) {
       display: none;
     }
-  }
-}
-
-// In phone/tablet landscape the compact rail gets a dedicated Home shortcut
-// directly below the account control. Hide the normal in-list copy there so
-// Home is guaranteed to be the first navigation action before Search.
-@media (orientation: landscape) and (width < 1180px) and (height < 760px) {
-  .landscapeHomeItem {
-    display: flex;
-    flex: 0 0 48px;
-    margin-bottom: 1px;
-  }
-
-  .homeItem {
-    display: none;
   }
 }
