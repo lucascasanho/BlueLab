@@ -101,7 +101,12 @@ if ! "${WRANGLER[@]}" deployments status --name "$WORKER_NAME" >/tmp/bluelab-sta
 fi
 cat /tmp/bluelab-status-espelunca-worker.txt
 
-printf '\n===== 3/6 CONFIRMANDO D1 EXISTENTE =====\n'
+printf '\n===== 3/6 ATUALIZANDO E CONFIRMANDO D1 EXISTENTE =====\n'
+"${WRANGLER[@]}" d1 migrations apply DB \
+  --remote \
+  --config "$CONFIG" \
+  --env espelunca
+
 "${WRANGLER[@]}" d1 execute DB \
   --remote \
   --config "$CONFIG" \
@@ -110,7 +115,7 @@ printf '\n===== 3/6 CONFIRMANDO D1 EXISTENTE =====\n'
 
 echo
 printf 'O banco acima deve ser o D1 existente da Espelunca: %s\n' "$EXPECTED_DB_ID"
-printf 'Nenhuma migration será aplicada nesta atualização.\n'
+printf 'Somente migrations incrementais foram aplicadas; os dados existentes foram preservados.\n'
 
 printf '\n===== 4/6 VERIFICANDO PÁGINA ATUAL =====\n'
 CURRENT_HTTP="$(curl -sS -o /tmp/bluelab-status-espelunca-before.html -w '%{http_code}' "$PUBLIC_URL/" || true)"

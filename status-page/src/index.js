@@ -1,5 +1,10 @@
 /* eslint-disable import/extensions */
-import { fetchBrandingAsset } from './branding.js';
+import {
+  getBrandingAsset,
+  getBrandingSummary,
+  refreshBranding,
+  refreshBrandingIfStale,
+} from './branding.js';
 import { getInstanceConfig } from './config.js';
 import {
   getDashboardData,
@@ -11,7 +16,7 @@ import {
 import { renderStatusPage } from './render.js';
 
 const FAVICON_PATH = '/instance-favicon';
-const BRANDING_VERSION = '20260904-2';
+const BRANDING_VERSION = 'automatic';
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
@@ -42,9 +47,21 @@ function withVersionedBranding(html) {
 }
 
 const worker = {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const config = getInstanceConfig(env);
+
+    ctx.waitUntil(
+      refreshBrandingIfStale(env.DB, config).catch((error) => {
+        console.error(
+          JSON.stringify({
+            event: 'branding_refresh_failed',
+            instance: config.baseUrl,
+            error: error instanceof Error ? error.message : String(error),
+          }),
+        );
+      }),
+    );
 
     if (url.pathname === '/health') {
       return json(healthPayload(config));
@@ -52,14 +69,14 @@ const worker = {
 
     if (request.method === 'GET' || request.method === 'HEAD') {
       if (url.pathname === '/favicon.ico' || url.pathname === FAVICON_PATH) {
-        const response = await fetchBrandingAsset(config, 'favicon');
+        const response = await getBrandingAsset(env.DB, config, 'favicon');
         return request.method === 'HEAD'
           ? new Response(null, response)
           : response;
       }
 
       if (url.pathname === '/instance-logo') {
-        const response = await fetchBrandingAsset(config, 'logo');
+        const response = await getBrandingAsset(env.DB, config, 'logo');
         return request.method === 'HEAD'
           ? new Response(null, response)
           : response;
@@ -87,6 +104,10 @@ const worker = {
 
     const data = await getDashboardData(env.DB);
 
+    if (url.pathname === '/api/branding') {
+      return json(await getBrandingSummary(env.DB, config));
+    }
+
     if (url.pathname === '/api/status') {
       return json({ instance: config.name, ...data });
     }
@@ -95,7 +116,10 @@ const worker = {
       return new Response('Not Found', { status: 404 });
     }
 
-    const html = withVersionedBranding(renderStatusPage(config, data));
+    const branding = await getBrandingSummary(env.DB, config);
+    const html = withVersionedBranding(
+      renderStatusPage({ ...config, name: branding.name }, data),
+    );
     return new Response(request.method === 'HEAD' ? null : html, {
       headers: {
         'content-type': 'text/html; charset=utf-8',
@@ -111,6 +135,15 @@ const worker = {
     ctx.waitUntil(
       (async () => {
         await syncComponents(env.DB, config);
+        await refreshBranding(env.DB, config).catch((error) => {
+          console.error(
+            JSON.stringify({
+              event: 'branding_refresh_failed',
+              instance: config.baseUrl,
+              error: error instanceof Error ? error.message : String(error),
+            }),
+          );
+        });
         await runScheduledChecks(env.DB);
       })(),
     );

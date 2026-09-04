@@ -2,10 +2,12 @@ const INSTANCE_BY_HOST = Object.freeze({
   'mastodon.blue': Object.freeze({
     name: 'Blue',
     statusUrl: 'https://status.mastodon.blue',
+    statusBinding: 'BLUE_STATUS',
   }),
   'espelunca.social': Object.freeze({
     name: 'Espelunca',
     statusUrl: 'https://status.espelunca.social',
+    statusBinding: 'ESPELUNCA_STATUS',
   }),
 });
 
@@ -93,11 +95,52 @@ export async function classifyInterceptableError(response) {
   return null;
 }
 
+async function resolveInstanceBranding(instance, statusFetch) {
+  if (!statusFetch) return instance;
+
+  try {
+    const response = await statusFetch(
+      instance,
+      new Request(`${instance.statusUrl}/api/branding`, {
+        headers: { accept: 'application/json' },
+      }),
+    );
+    if (!response.ok)
+      throw new Error(`Status branding returned HTTP ${response.status}`);
+    const data = JSON.parse(await readBodyPrefix(response));
+    const name =
+      typeof data?.name === 'string' ? data.name.trim().slice(0, 120) : '';
+    return {
+      ...instance,
+      name: name || instance.name,
+      brandingVersion: data?.refreshedAt || 'current',
+    };
+  } catch (error) {
+    console.error(
+      JSON.stringify({
+        event: 'status_branding_fetch_failed',
+        statusUrl: instance.statusUrl,
+        error: error instanceof Error ? error.message : String(error),
+      }),
+    );
+    return instance;
+  }
+}
+
 export function renderUnavailablePage(instance, hostname, errorCode) {
   const safeName = escapeHtml(instance.name);
   const safeHostname = escapeHtml(hostname);
   const safeStatusUrl = escapeHtml(instance.statusUrl);
   const safeErrorCode = escapeHtml(errorCode);
+  const brandingVersion = encodeURIComponent(
+    instance.brandingVersion || 'current',
+  );
+  const safeLogoUrl = escapeHtml(
+    `${instance.statusUrl}/instance-logo?v=${brandingVersion}`,
+  );
+  const safeFaviconUrl = escapeHtml(
+    `${instance.statusUrl}/instance-favicon?v=${brandingVersion}`,
+  );
 
   return `<!doctype html>
 <html lang="pt-BR">
@@ -105,6 +148,8 @@ export function renderUnavailablePage(instance, hostname, errorCode) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="dark light">
+  <link rel="icon" href="${safeFaviconUrl}">
+  <link rel="shortcut icon" href="${safeFaviconUrl}">
   <title>${safeName} está temporariamente indisponível</title>
   <style>
     :root{color-scheme:dark light;--bg:#000;--surface:#101820;--surface-2:#15202b;--border:#18242d;--text:#f7f7f8;--muted:#9aa8b4;--blue:#0085ff;--blue-action:#0075e2;--blue-action-hover:#006acb;--focus:#63b3ff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
@@ -132,11 +177,8 @@ export function renderUnavailablePage(instance, hostname, errorCode) {
 <body>
   <main>
     <div class="brand">
-      <svg class="mark" viewBox="0 0 52 52" aria-hidden="true">
-        <rect width="52" height="52" rx="16" fill="#0085ff"/>
-        <path fill="#fff" d="M16 11h11c6 0 10 3 10 8 0 3-2 6-5 7 4 1 6 4 6 7 0 6-4 9-11 9H16V11Zm8 7v6h3c2 0 3-1 3-3s-1-3-3-3h-3Zm0 12v6h3c3 0 4-1 4-3s-1-3-4-3h-3Z"/>
-      </svg>
-      <span>BlueLab</span>
+      <img class="mark" src="${safeLogoUrl}" alt="" width="42" height="42">
+      <span>${safeName}</span>
     </div>
     <section class="card" aria-labelledby="title">
       <p class="host">${safeHostname}</p>
@@ -164,7 +206,7 @@ function unavailableResponse(
     'Cache-Control': 'private, no-store, no-cache, must-revalidate',
     'Content-Language': 'pt-BR',
     'Content-Security-Policy':
-      "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+      "default-src 'none'; style-src 'unsafe-inline'; img-src https://status.mastodon.blue https://status.espelunca.social; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
     'Content-Type': 'text/html; charset=utf-8',
     'Referrer-Policy': 'no-referrer',
     'X-Content-Type-Options': 'nosniff',
@@ -179,7 +221,11 @@ function unavailableResponse(
   });
 }
 
-export async function handleRequest(request, originFetch = fetch) {
+export async function handleRequest(
+  request,
+  originFetch = fetch,
+  statusFetch = null,
+) {
   const url = new URL(request.url);
   const instance = INSTANCE_BY_HOST[url.hostname];
 
@@ -204,7 +250,12 @@ export async function handleRequest(request, originFetch = fetch) {
     );
 
     if (isDocumentNavigation(request)) {
-      return unavailableResponse(instance, url.hostname, 'conexão', 503);
+      return unavailableResponse(
+        await resolveInstanceBranding(instance, statusFetch),
+        url.hostname,
+        'conexão',
+        503,
+      );
     }
 
     return new Response(null, {
@@ -219,7 +270,7 @@ export async function handleRequest(request, originFetch = fetch) {
   if (!errorCode) return response;
 
   return unavailableResponse(
-    instance,
+    await resolveInstanceBranding(instance, statusFetch),
     url.hostname,
     errorCode,
     response.status,
@@ -228,8 +279,13 @@ export async function handleRequest(request, originFetch = fetch) {
 }
 
 const worker = {
-  async fetch(request) {
-    return handleRequest(request);
+  async fetch(request, env) {
+    return handleRequest(request, fetch, async (instance, statusRequest) => {
+      const binding = env[instance.statusBinding];
+      if (!binding)
+        throw new Error(`Missing service binding ${instance.statusBinding}`);
+      return binding.fetch(statusRequest);
+    });
   },
 };
 

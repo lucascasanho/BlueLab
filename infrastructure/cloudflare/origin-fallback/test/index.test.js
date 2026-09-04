@@ -162,6 +162,29 @@ describe('fallback page', () => {
     assert.match(html, /servidor · 1033/);
   });
 
+  it('uses the current name, logo and favicon supplied by its status Worker', async () => {
+    const response = await handleRequest(
+      documentRequest('espelunca.social'),
+      async () => new Response('error code: 1033', { status: 530 }),
+      async (_instance, request) => {
+        assert.equal(new URL(request.url).pathname, '/api/branding');
+        return Response.json({
+          name: 'Espelunca Atualizada',
+          refreshedAt: '2026-09-04 14:00:00',
+        });
+      },
+    );
+    const html = await response.text();
+
+    assert.match(
+      html,
+      /Espelunca Atualizada está temporariamente indisponível/,
+    );
+    assert.match(html, /status\.espelunca\.social\/instance-logo/);
+    assert.match(html, /status\.espelunca\.social\/instance-favicon/);
+    assert.doesNotMatch(html, />BlueLab</);
+  });
+
   it('renders a document fallback when fetch itself throws', async () => {
     const response = await handleRequest(documentRequest(), async () => {
       throw new TypeError('network failure');

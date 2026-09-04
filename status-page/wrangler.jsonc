@@ -2,8 +2,16 @@
   "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "bluelab-status",
   "main": "src/index.js",
-  "compatibility_date": "2026-09-03",
+  "compatibility_date": "2026-09-04",
+  "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 0.01,
+    },
+  },
   "env": {
     "blue": {
       "vars": {

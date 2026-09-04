@@ -18,7 +18,7 @@ function decodeBase64(value) {
   return bytes;
 }
 
-export function bundledBrandingAsset(config) {
+export function bundledBrandingRecord(config) {
   let hostname;
 
   try {
@@ -28,14 +28,28 @@ export function bundledBrandingAsset(config) {
   }
 
   const encoded = BUNDLED_ICON_BASE64[hostname];
-  if (!encoded) {
+  if (!encoded) return null;
+
+  return {
+    name: config.name || 'BlueLab',
+    logoBase64: encoded,
+    logoContentType: 'image/png',
+    faviconBase64: encoded,
+    faviconContentType: 'image/png',
+    refreshedAt: null,
+  };
+}
+
+export function bundledBrandingAsset(config) {
+  const branding = bundledBrandingRecord(config);
+  if (!branding) {
     return new Response(null, {
       status: 404,
       headers: { 'cache-control': 'no-store' },
     });
   }
 
-  return new Response(decodeBase64(encoded), {
+  return new Response(decodeBase64(branding.logoBase64), {
     headers: {
       'cache-control': `public, max-age=${ASSET_CACHE_SECONDS}, stale-while-revalidate=${ASSET_CACHE_SECONDS}, stale-if-error=604800`,
       'content-type': 'image/png',
