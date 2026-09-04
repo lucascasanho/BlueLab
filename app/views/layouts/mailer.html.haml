@@ -8,37 +8,30 @@
   instance_dark_surface_color = safe_customization_color(:instance_dark_surface_color, fallback: '#16181c')
   instance_dark_text_color = safe_customization_color(:instance_dark_text_color, fallback: '#f7f9f9')
 
-  email_color_keys = %w(
-    email_primary_color
-    email_button_color
-    email_link_color
-    email_background_color
-    email_surface_color
-    email_text_color
-    email_muted_color
-    email_dark_background_color
-    email_dark_surface_color
-    email_dark_text_color
-    email_dark_muted_color
-  )
-  explicit_email_colors = Setting.where(var: email_color_keys).pluck(:var)
-  email_color = lambda do |key, fallback|
-    explicit_email_colors.include?(key.to_s) ? safe_customization_color(key, fallback: fallback) : fallback
+  mix_color = lambda do |foreground, background, foreground_weight|
+    foreground_channels = foreground.delete_prefix('#').scan(/../).map { |channel| channel.to_i(16) }
+    background_channels = background.delete_prefix('#').scan(/../).map { |channel| channel.to_i(16) }
+    mixed_channels = foreground_channels.zip(background_channels).map do |foreground_channel, background_channel|
+      ((foreground_channel * foreground_weight) + (background_channel * (1 - foreground_weight))).round
+    end
+    format('#%02x%02x%02x', *mixed_channels)
   end
 
-  email_primary_color = email_color.call(:email_primary_color, instance_accent_color)
-  email_button_color = email_color.call(:email_button_color, instance_accent_color)
-  email_link_color = email_color.call(:email_link_color, instance_accent_color)
-  email_background_color = email_color.call(:email_background_color, instance_light_background_color)
-  email_surface_color = email_color.call(:email_surface_color, instance_light_surface_color)
-  email_text_color = email_color.call(:email_text_color, instance_light_text_color)
-  email_muted_color = email_color.call(:email_muted_color, '#536471')
-  email_dark_background_color = email_color.call(:email_dark_background_color, instance_dark_background_color)
-  email_dark_surface_color = email_color.call(:email_dark_surface_color, instance_dark_surface_color)
-  email_dark_text_color = email_color.call(:email_dark_text_color, instance_dark_text_color)
-  email_dark_muted_color = email_color.call(:email_dark_muted_color, '#8b98a5')
-  email_border_color = '#d8e0e8'
-  email_dark_border_color = '#2f3336'
+  # Email presentation deliberately follows the same instance palette as the
+  # web interface. Legacy email-specific Setting values are intentionally ignored.
+  email_primary_color = instance_accent_color
+  email_button_color = instance_accent_color
+  email_link_color = instance_accent_color
+  email_background_color = instance_light_background_color
+  email_surface_color = instance_light_surface_color
+  email_text_color = instance_light_text_color
+  email_muted_color = mix_color.call(instance_light_text_color, instance_light_background_color, 0.64)
+  email_dark_background_color = instance_dark_background_color
+  email_dark_surface_color = instance_dark_surface_color
+  email_dark_text_color = instance_dark_text_color
+  email_dark_muted_color = mix_color.call(instance_dark_text_color, instance_dark_background_color, 0.64)
+  email_border_color = mix_color.call(instance_light_text_color, instance_light_surface_color, 0.16)
+  email_dark_border_color = mix_color.call(instance_dark_text_color, instance_dark_surface_color, 0.20)
 
   header_logo_path = instance_presenter.email_logo&.file&.url
   header_logo_url = full_asset_url(header_logo_path) if header_logo_path.present?

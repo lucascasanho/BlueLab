@@ -19,17 +19,6 @@ class Form::InstanceCustomization
     instance_dark_background_color
     instance_dark_surface_color
     instance_dark_text_color
-    email_primary_color
-    email_button_color
-    email_link_color
-    email_background_color
-    email_surface_color
-    email_text_color
-    email_muted_color
-    email_dark_background_color
-    email_dark_surface_color
-    email_dark_text_color
-    email_dark_muted_color
   ).freeze
   UPLOAD_KEYS = %i(auth_logo email_logo).freeze
   KEYS = (SCALAR_KEYS + UPLOAD_KEYS).freeze
@@ -43,17 +32,6 @@ class Form::InstanceCustomization
     instance_dark_background_color
     instance_dark_surface_color
     instance_dark_text_color
-    email_primary_color
-    email_button_color
-    email_link_color
-    email_background_color
-    email_surface_color
-    email_text_color
-    email_muted_color
-    email_dark_background_color
-    email_dark_surface_color
-    email_dark_text_color
-    email_dark_muted_color
   ).freeze
 
   STATUS_LIMIT_RANGE = (1..100_000)
@@ -159,19 +137,13 @@ class Form::InstanceCustomization
   end
 
   def validate_color_contrast
-    { instance_accent_color: 3.0, email_primary_color: 3.0, email_button_color: 3.0, email_link_color: 4.5 }.each do |key, minimum|
-      value = public_send(key)
-      next if value.blank? || !value.match?(/\A#[0-9a-fA-F]{6}\z/)
-
-      errors.add(key, I18n.t('admin.settings.instance_customization.contrast_error', ratio: minimum)) if contrast_ratio(value, '#ffffff') < minimum
+    value = instance_accent_color
+    if value.present? && value.match?(/\A#[0-9a-fA-F]{6}\z/) && contrast_ratio(value, '#ffffff') < 3.0
+      errors.add(:instance_accent_color, I18n.t('admin.settings.instance_customization.contrast_error', ratio: 3.0))
     end
 
     validate_color_pair(:instance_light_text_color, :instance_light_background_color)
     validate_color_pair(:instance_dark_text_color, :instance_dark_background_color)
-    validate_color_pair(:email_text_color, :email_surface_color)
-    validate_color_pair(:email_muted_color, :email_surface_color)
-    validate_color_pair(:email_dark_text_color, :email_dark_surface_color)
-    validate_color_pair(:email_dark_muted_color, :email_dark_surface_color)
   end
 
   def validate_color_pair(foreground_key, background_key)

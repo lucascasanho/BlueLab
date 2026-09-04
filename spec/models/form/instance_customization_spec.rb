@@ -20,17 +20,6 @@ RSpec.describe Form::InstanceCustomization do
       instance_dark_background_color: '#1e2028',
       instance_dark_surface_color: '#232543',
       instance_dark_text_color: '#f7f9f9',
-      email_primary_color: '#5638cc',
-      email_button_color: '#5638cc',
-      email_link_color: '#5638cc',
-      email_background_color: '#f3f2f5',
-      email_surface_color: '#ffffff',
-      email_text_color: '#1f1b23',
-      email_muted_color: '#746a7e',
-      email_dark_background_color: '#1e2028',
-      email_dark_surface_color: '#232543',
-      email_dark_text_color: '#f7f9f9',
-      email_dark_muted_color: '#b8b3c0',
     }
   end
 
@@ -60,6 +49,22 @@ RSpec.describe Form::InstanceCustomization do
 
     expect(form).to_not be_valid
     expect(form.errors[:instance_light_text_color]).to be_present
+  end
+
+  it 'does not expose legacy email palette settings through the form' do
+    expect(described_class::KEYS).to_not include(
+      :email_primary_color,
+      :email_button_color,
+      :email_link_color,
+      :email_background_color,
+      :email_surface_color,
+      :email_text_color,
+      :email_muted_color,
+      :email_dark_background_color,
+      :email_dark_surface_color,
+      :email_dark_text_color,
+      :email_dark_muted_color
+    )
   end
 
   it 'restores a setting to its configured default' do

@@ -63,33 +63,6 @@
         - if @instance_customization.public_send(key).persisted?
           = image_tag @instance_customization.public_send(key).file.url, class: 'fields-group__thumbnail', alt: ''
 
-  %h2= t('admin.settings.instance_customization.email')
-  .fields-row
-    - %i(email_primary_color email_button_color email_link_color).each do |key|
-      .fields-row__column.fields-row__column-4.fields-group
-        = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), hint: t("admin.settings.instance_customization.#{key}_hint"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
-        %p.hint
-          = t('admin.settings.instance_customization.effective_color')
-          %code= @instance_customization.public_send(key)
-        = f.button :button, t('admin.settings.instance_customization.restore_color_default'), type: :submit, name: "reset[#{key}]", value: '1', class: 'button-tertiary'
-  .fields-row
-    - %i(email_background_color email_surface_color email_text_color email_muted_color).each do |key|
-      .fields-row__column.fields-row__column-6.fields-group
-        = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), hint: t("admin.settings.instance_customization.#{key}_hint"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
-        %p.hint
-          = t('admin.settings.instance_customization.effective_color')
-          %code= @instance_customization.public_send(key)
-        = f.button :button, t('admin.settings.instance_customization.restore_color_default'), type: :submit, name: "reset[#{key}]", value: '1', class: 'button-tertiary'
-  %h3= t('admin.settings.instance_customization.email_dark_theme')
-  .fields-row
-    - %i(email_dark_background_color email_dark_surface_color email_dark_text_color email_dark_muted_color).each do |key|
-      .fields-row__column.fields-row__column-6.fields-group
-        = f.input key, as: :color, label: t("admin.settings.instance_customization.#{key}"), hint: t("admin.settings.instance_customization.#{key}_hint"), input_html: { pattern: '#[0-9a-fA-F]{6}' }
-        %p.hint
-          = t('admin.settings.instance_customization.effective_color')
-          %code= @instance_customization.public_send(key)
-        = f.button :button, t('admin.settings.instance_customization.restore_color_default'), type: :submit, name: "reset[#{key}]", value: '1', class: 'button-tertiary'
-
   .actions
     = f.button :button, t('generic.save_changes'), type: :submit
     = f.button :button,

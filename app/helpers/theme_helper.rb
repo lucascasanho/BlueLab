@@ -46,8 +46,8 @@ module ThemeHelper
     )
   end
 
-  # Validated semantic-token overrides. Keeping this after the
-  # selected theme lets every theme retain its neutral palette.
+  # Validated semantic-token overrides. Keeping this after the selected theme
+  # lets every theme retain its structure while instance colors stay authoritative.
   def instance_customization_styles
     accent = safe_customization_color(:instance_accent_color, fallback: '#6364ff')
     light_background = safe_customization_color(:instance_light_background_color, fallback: '#ffffff')
@@ -101,6 +101,58 @@ module ThemeHelper
         --color-text-brand-soft: var(--color-text-brand);
         --color-text-status-links: var(--color-text-brand);
         --color-border-brand: var(--color-text-brand);
+      }
+
+      /* BlueLab owns a second semantic layer (--blue2-*). Mirror the instance
+         palette into that layer at runtime so compiled theme defaults cannot
+         mask administrator-selected colors. This is intentionally theme-gated. */
+      body[data-theme='blue-2'] {
+        --blue2-blue: #{accent};
+        --blue2-blue-hover: color-mix(in srgb, #{accent}, black 15%);
+      }
+      body[data-theme='blue-2'] ::selection {
+        background: color-mix(in srgb, #{accent}, transparent 65%);
+      }
+      html[data-color-scheme='dark'] body[data-theme='blue-2'],
+      html[data-color-scheme='auto'] body[data-theme='blue-2'],
+      html:not([data-color-scheme]) body[data-theme='blue-2'] {
+        --blue2-bg: #{dark_background};
+        --blue2-surface: #{dark_surface};
+        --blue2-surface-raised: #{dark_surface};
+        --blue2-search: color-mix(in srgb, #{dark_surface} 92%, #{dark_text});
+        --blue2-hover: color-mix(in srgb, #{dark_surface} 96%, #{dark_text});
+        --blue2-border: color-mix(in srgb, #{dark_surface} 84%, #{dark_text});
+        --blue2-border-soft: color-mix(in srgb, #{dark_surface} 90%, #{dark_text});
+        --blue2-text: #{dark_text};
+        --blue2-muted: color-mix(in srgb, #{dark_text} 66%, #{dark_background});
+        --blue2-muted-2: color-mix(in srgb, #{dark_text} 50%, #{dark_background});
+      }
+      html[data-color-scheme='light'] body[data-theme='blue-2'] {
+        --blue2-bg: #{light_background};
+        --blue2-surface: #{light_surface};
+        --blue2-surface-raised: #{light_surface};
+        --blue2-search: color-mix(in srgb, #{light_surface} 94%, #{light_text});
+        --blue2-hover: color-mix(in srgb, #{light_surface} 97%, #{light_text});
+        --blue2-border: color-mix(in srgb, #{light_surface} 84%, #{light_text});
+        --blue2-border-soft: color-mix(in srgb, #{light_surface} 90%, #{light_text});
+        --blue2-text: #{light_text};
+        --blue2-muted: color-mix(in srgb, #{light_text} 66%, #{light_background});
+        --blue2-muted-2: color-mix(in srgb, #{light_text} 50%, #{light_background});
+      }
+      @media (prefers-color-scheme: light) {
+        html[data-color-scheme='auto'] body[data-theme='blue-2'],
+        html:not([data-color-scheme]) body[data-theme='blue-2'] {
+          --blue2-bg: #{light_background};
+          --blue2-surface: #{light_surface};
+          --blue2-surface-raised: #{light_surface};
+          --blue2-search: color-mix(in srgb, #{light_surface} 94%, #{light_text});
+          --blue2-hover: color-mix(in srgb, #{light_surface} 97%, #{light_text});
+          --blue2-border: color-mix(in srgb, #{light_surface} 84%, #{light_text});
+          --blue2-border-soft: color-mix(in srgb, #{light_surface} 90%, #{light_text});
+          --blue2-text: #{light_text};
+          --blue2-muted: color-mix(in srgb, #{light_text} 66%, #{light_background});
+          --blue2-muted-2: color-mix(in srgb, #{light_text} 50%, #{light_background});
+        }
       }
     CSS
     tag.style(safe_join([css]), nonce: request.content_security_policy_nonce)
