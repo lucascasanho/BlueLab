@@ -18,7 +18,23 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import AutosuggestAccountContainer from '../containers/autosuggest_account_container';
 
 const SEARCH_TOKENS = ['@', '＠', ':'];
+const ACCOUNT_TOKENS = new Set(['@', '＠']);
 const WRAPPER_STYLE = { display: 'contents' };
+
+export const suggestionMatchesToken = (suggestion, token) => {
+  const trigger = token?.[0];
+
+  if (ACCOUNT_TOKENS.has(trigger)) return suggestion.type === 'account';
+
+  if (trigger === ':') {
+    return (
+      suggestion.type === 'emoji' &&
+      (suggestion.custom === true || !suggestion.native)
+    );
+  }
+
+  return false;
+};
 
 const nodeAutocompleteText = (node) => {
   if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? '';
@@ -287,12 +303,19 @@ export const ComposeAutocomplete = ({ children }) => {
   const [editorElement, setEditorElement] = useState(null);
   const [suggestionsHidden, setSuggestionsHidden] = useState(true);
   const [selectedSuggestion, setSelectedSuggestion] = useState(0);
+  const [activeToken, setActiveToken] = useState(null);
   const lastTokenRef = useRef(null);
   const tokenStartRef = useRef(0);
   const skipNextInputRef = useRef(false);
 
+  const visibleSuggestions = suggestions.filter((suggestion) =>
+    suggestionMatchesToken(suggestion, activeToken),
+  );
+  const visibleSuggestionCount = visibleSuggestions.size;
+
   const clearSuggestions = useCallback(() => {
     lastTokenRef.current = null;
+    setActiveToken(null);
     setSuggestionsHidden(true);
     setSelectedSuggestion(0);
     dispatch(clearComposeSuggestions());
@@ -307,16 +330,27 @@ export const ComposeAutocomplete = ({ children }) => {
         SEARCH_TOKENS,
       );
 
-      if (token !== null && lastTokenRef.current !== token) {
+      if (token === null) {
+        setActiveToken(null);
+        setSuggestionsHidden(true);
+
+        if (lastTokenRef.current !== null || suggestions.size > 0) {
+          clearSuggestions();
+        }
+
+        return;
+      }
+
+      setActiveToken(token);
+
+      if (lastTokenRef.current !== token) {
         tokenStartRef.current = tokenStart;
         lastTokenRef.current = token;
         setSelectedSuggestion(0);
         dispatch(fetchComposeSuggestions(token));
-      } else if (token === null && lastTokenRef.current !== null) {
-        clearSuggestions();
       }
     },
-    [clearSuggestions, dispatch],
+    [clearSuggestions, dispatch, suggestions.size],
   );
 
   const handleFocusCapture = useCallback((event) => {
@@ -348,7 +382,7 @@ export const ComposeAutocomplete = ({ children }) => {
 
   const selectSuggestion = useCallback(
     (index) => {
-      const suggestion = suggestions.get(index);
+      const suggestion = visibleSuggestions.get(index);
       const token = lastTokenRef.current;
       const editor = editorElement;
       const tokenStart = tokenStartRef.current;
@@ -381,7 +415,7 @@ export const ComposeAutocomplete = ({ children }) => {
       customEmojis,
       dispatch,
       editorElement,
-      suggestions,
+      visibleSuggestions,
     ],
   );
 
@@ -389,7 +423,7 @@ export const ComposeAutocomplete = ({ children }) => {
     (event) => {
       const editor = findEditor(event.target);
       if (!editor || event.nativeEvent?.isComposing || event.which === 229) return;
-      if (suggestionsHidden || suggestions.size === 0) return;
+      if (suggestionsHidden || visibleSuggestionCount === 0) return;
 
       switch (event.key) {
         case 'Escape':
@@ -401,7 +435,7 @@ export const ComposeAutocomplete = ({ children }) => {
           event.preventDefault();
           event.stopPropagation();
           setSelectedSuggestion((current) =>
-            Math.min(current + 1, suggestions.size - 1),
+            Math.min(current + 1, visibleSuggestionCount - 1),
           );
           break;
         case 'ArrowUp':
@@ -417,7 +451,12 @@ export const ComposeAutocomplete = ({ children }) => {
           break;
       }
     },
-    [selectedSuggestion, selectSuggestion, suggestions, suggestionsHidden],
+    [
+      selectedSuggestion,
+      selectSuggestion,
+      suggestionsHidden,
+      visibleSuggestionCount,
+    ],
   );
 
   const handleSuggestionMouseDown = useCallback(
@@ -435,17 +474,17 @@ export const ComposeAutocomplete = ({ children }) => {
 
   useEffect(() => {
     if (
-      suggestions.size > 0 &&
+      visibleSuggestionCount > 0 &&
       editorElement &&
       editorElement === document.activeElement
     ) {
       setSuggestionsHidden(false);
     }
-  }, [editorElement, suggestions]);
+  }, [editorElement, visibleSuggestionCount]);
 
   useEffect(() => {
-    if (suggestions.size === 0) setSuggestionsHidden(true);
-  }, [suggestions]);
+    if (visibleSuggestionCount === 0) setSuggestionsHidden(true);
+  }, [visibleSuggestionCount]);
 
   const renderSuggestion = useCallback(
     (suggestion, index) => {
@@ -495,7 +534,7 @@ export const ComposeAutocomplete = ({ children }) => {
           isOpen={
             !!editorElement &&
             !suggestionsHidden &&
-            suggestions.size > 0
+            visibleSuggestionCount > 0
           }
           onClose={closeMenu}
           reference={editorElement}
@@ -506,7 +545,7 @@ export const ComposeAutocomplete = ({ children }) => {
                 className='autosuggest-textarea__suggestions'
                 style={{ width: editorElement?.clientWidth }}
               >
-                {suggestions.map(renderSuggestion)}
+                {visibleSuggestions.map(renderSuggestion)}
               </div>
             </div>
           )}
