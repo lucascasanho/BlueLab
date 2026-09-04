@@ -9,12 +9,17 @@
 body[data-theme='blue-2'].layout-multiple-columns {
   .drawer__bluelab-compose {
     box-sizing: border-box;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     width: 100%;
     min-width: 0;
-    min-height: 100%;
+    min-height: 0;
+    max-height: 100%;
     border-radius: 0;
     box-shadow: none;
+  }
+
+  [data-bluelab-composer-embedded='true'] > [data-compose-scroll-container] {
+    flex: 0 1 auto;
   }
 
   [data-bluelab-composer-embedded='true'] [data-bluelab-compose-toolbar] {
