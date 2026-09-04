@@ -10,37 +10,43 @@
         "INSTANCE_NAME": "Blue",
         "INSTANCE_URL": "https://mastodon.blue",
         "WEBSITE_HEALTH_URL": "https://mastodon.blue/health",
-        "STREAMING_HEALTH_URL": "https://mastodon.blue/api/v1/streaming/health",
+        "STREAMING_HEALTH_URL": "https://mastodon.blue/api/v1/streaming/health"
       },
+      "routes": [
+        {
+          "pattern": "status.mastodon.blue",
+          "custom_domain": true
+        }
+      ],
       "d1_databases": [
         {
           "binding": "DB",
           "database_name": "blue-status-db",
-          "migrations_dir": "migrations",
-        },
+          "migrations_dir": "migrations"
+        }
       ],
       "triggers": {
-        "crons": ["*/5 * * * *"],
-      },
+        "crons": ["*/5 * * * *"]
+      }
     },
     "espelunca": {
       "vars": {
         "INSTANCE_NAME": "Espelunca",
         "INSTANCE_URL": "https://espelunca.social",
         "WEBSITE_HEALTH_URL": "https://espelunca.social/health",
-        "STREAMING_HEALTH_URL": "https://espelunca.social/api/v1/streaming/health",
+        "STREAMING_HEALTH_URL": "https://espelunca.social/api/v1/streaming/health"
       },
       "d1_databases": [
         {
           "binding": "DB",
           "database_name": "espelunca-status-db",
           "database_id": "3a2e3b58-4d52-466f-ab85-2c6ebb7c8df2",
-          "migrations_dir": "migrations",
-        },
+          "migrations_dir": "migrations"
+        }
       ],
       "triggers": {
-        "crons": ["*/5 * * * *"],
-      },
-    },
-  },
+        "crons": ["*/5 * * * *"]
+      }
+    }
+  }
 }
