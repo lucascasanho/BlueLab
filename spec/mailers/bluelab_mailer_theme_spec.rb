@@ -2,9 +2,9 @@
 
 require 'rails_helper'
 
-RSpec.describe 'BlueLab mailer theme' do
+RSpec.describe UserMailer do
   let(:receiver) { Fabricate(:user) }
-  let(:mail) { UserMailer.confirmation_instructions(receiver, 'spec') }
+  let(:mail) { described_class.confirmation_instructions(receiver, 'spec') }
 
   before do
     Setting.site_title = 'Example Social'
@@ -50,7 +50,7 @@ RSpec.describe 'BlueLab mailer theme' do
 
   it 'uses the instance title instead of Mastodon in branded subjects' do
     receiver.update!(locale: :'pt-BR')
-    reset_mail = UserMailer.reset_password_instructions(receiver, 'spec')
+    reset_mail = described_class.reset_password_instructions(receiver, 'spec')
 
     expect(reset_mail.subject).to include('Example Social')
     expect(reset_mail.subject).to_not include('Mastodon')
@@ -58,7 +58,7 @@ RSpec.describe 'BlueLab mailer theme' do
 
   it 'uses the instance title in rendered HTML and preserves the markup' do
     receiver.update!(locale: :'pt-BR')
-    welcome_html = UserMailer.welcome(receiver).html_part.body.decoded
+    welcome_html = described_class.welcome(receiver).html_part.body.decoded
     expected_step = I18n.t('user_mailer.welcome.follow_step', locale: :'pt-BR').gsub(/\bMastodon\b/, 'Example Social')
 
     expect(welcome_html).to include(expected_step, '<table')
@@ -67,7 +67,7 @@ RSpec.describe 'BlueLab mailer theme' do
 
   it 'uses the instance title in the plain-text mail layout too' do
     receiver.update!(locale: :'pt-BR')
-    welcome_text = UserMailer.welcome(receiver).text_part.body.decoded
+    welcome_text = described_class.welcome(receiver).text_part.body.decoded
     expected_step = I18n.t('user_mailer.welcome.follow_step', locale: :'pt-BR').gsub(/\bMastodon\b/, 'Example Social')
 
     expect(welcome_text).to include(expected_step)
