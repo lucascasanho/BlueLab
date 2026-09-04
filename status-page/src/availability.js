@@ -1,9 +1,7 @@
 const DOWN_STATUSES = new Set(['partial_outage', 'major_outage']);
 
 function countAvailableChecks(stat) {
-  return (
-    Number(stat?.up_checks ?? 0) + Number(stat?.degraded_checks ?? 0)
-  );
+  return Number(stat?.up_checks ?? 0) + Number(stat?.degraded_checks ?? 0);
 }
 
 export function dailyAvailability(stat) {
