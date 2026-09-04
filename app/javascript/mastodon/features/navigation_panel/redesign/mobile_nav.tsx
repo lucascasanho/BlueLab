@@ -150,10 +150,7 @@ const SlideOutNavigation: React.FC = () => {
 
       const touch = event.touches[0];
       if (touch) {
-        blue2SwipeOriginRef.current = {
-          x: touch.clientX,
-          y: touch.clientY,
-        };
+        blue2SwipeOriginRef.current = { x: touch.clientX, y: touch.clientY };
       }
     },
     [isOpen],
@@ -164,11 +161,7 @@ const SlideOutNavigation: React.FC = () => {
       const origin = blue2SwipeOriginRef.current;
       blue2SwipeOriginRef.current = null;
 
-      if (
-        !origin ||
-        !isOpen ||
-        document.body.dataset.theme !== 'blue-2'
-      ) {
+      if (!origin || !isOpen || document.body.dataset.theme !== 'blue-2') {
         return;
       }
 
