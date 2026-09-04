@@ -62,6 +62,35 @@ export function findFaviconInHtml(html, baseUrl) {
   return null;
 }
 
+export function findHomepageLogoInHtml(html, baseUrl) {
+  const tags = String(html).match(/<img\b[^>]*>/gi) ?? [];
+  const candidates = [];
+
+  for (const tag of tags) {
+    const src = readAttribute(tag, 'src');
+    if (!src) continue;
+
+    try {
+      const url = new URL(src, baseUrl);
+      if (!url.pathname.toLowerCase().endsWith('.svg')) continue;
+
+      const alt = readAttribute(tag, 'alt') || '';
+      const className = readAttribute(tag, 'class') || '';
+      let score = 0;
+      if (/^mastodon$/i.test(alt.trim())) score += 4;
+      if (/(^|[\s_-])logo([\s_-]|$)/i.test(className)) score += 2;
+      if (/(^|\/)logo(?:[-_.][^/]*)?\.svg$/i.test(url.pathname)) score += 1;
+      if (score > 0) candidates.push({ score, url: url.toString() });
+    } catch {
+      // Ignore malformed image URLs and continue with API icons.
+    }
+  }
+
+  return (
+    candidates.sort((left, right) => right.score - left.score)[0]?.url ?? null
+  );
+}
+
 async function readBoundedBytes(response, limit) {
   const declaredLength = Number(response.headers.get('content-length'));
   if (Number.isFinite(declaredLength) && declaredLength > limit) {
@@ -178,8 +207,10 @@ export async function refreshBranding(db, config, originFetch = fetch) {
   const metadata = JSON.parse(metadataText);
   const icons = Array.isArray(metadata?.icon) ? metadata.icon : [];
   const htmlFavicon = findFaviconInHtml(html, config.baseUrl);
+  const htmlLogo = findHomepageLogoInHtml(html, config.baseUrl);
+  const apiLogo = selectLargestInstanceIcon(icons);
   const logoUrl =
-    selectLargestInstanceIcon(icons) ??
+    (config.preferHomepageLogo ? (htmlLogo ?? apiLogo) : apiLogo) ??
     htmlFavicon ??
     `${config.baseUrl}/favicon.ico`;
   const faviconUrl =

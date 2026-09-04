@@ -5,6 +5,7 @@ import test from 'node:test';
 import { bundledBrandingAsset } from '../src/brand-assets.js';
 import {
   findFaviconInHtml,
+  findHomepageLogoInHtml,
   getBrandingAsset,
   getBrandingSummary,
   refreshBranding,
@@ -70,6 +71,17 @@ test('usa o favicon declarado pelo HTML da instância', () => {
   assert.equal(
     findFaviconInHtml(html, 'https://mastodon.example'),
     'https://mastodon.example/favicon-blue.svg',
+  );
+});
+
+test('encontra a logo SVG exibida na página inicial', () => {
+  const html = `
+    <img alt="ilustração" src="/packs/elephant.svg">
+    <img alt="Mastodon" src="/packs/assets/logo-C6gBTbrO.svg">
+  `;
+  assert.equal(
+    findHomepageLogoInHtml(html, 'https://espelunca.social'),
+    'https://espelunca.social/packs/assets/logo-C6gBTbrO.svg',
   );
 });
 
@@ -139,4 +151,56 @@ test('salva e serve automaticamente nome, logo e favicon da instância', async (
   const logo = await getBrandingAsset(db, config, 'logo');
   assert.equal(logo.headers.get('content-type'), 'image/png');
   assert.deepEqual(new Uint8Array(await logo.arrayBuffer()), image);
+});
+
+test('a Espelunca prefere a logo SVG da página inicial ao ícone de aplicativo', async () => {
+  const db = brandingDb();
+  const config = {
+    name: 'Espelunca',
+    baseUrl: 'https://espelunca.social',
+    preferHomepageLogo: true,
+  };
+  const requested = [];
+  const originFetch = async (input) => {
+    const url = String(input);
+    requested.push(url);
+    if (url.endsWith('/api/v2/instance')) {
+      return Response.json({
+        title: 'espelunca',
+        icon: [
+          {
+            src: 'https://espelunca.social/app-icon.png',
+            size: '512x512',
+          },
+        ],
+      });
+    }
+    if (url === 'https://espelunca.social') {
+      return new Response(`
+        <link rel="icon" href="/favicon.png">
+        <img alt="Mastodon" src="/packs/assets/logo-DXQkHAe5.svg">
+      `);
+    }
+    if (url.endsWith('.svg')) {
+      return new Response('<svg viewBox="0 0 10 10"></svg>', {
+        headers: { 'content-type': 'image/svg+xml' },
+      });
+    }
+    return new Response(new Uint8Array([137, 80, 78, 71]), {
+      headers: { 'content-type': 'image/png' },
+    });
+  };
+
+  await refreshBranding(db, config, originFetch);
+  const logo = await getBrandingAsset(db, config, 'logo');
+  const favicon = await getBrandingAsset(db, config, 'favicon');
+
+  assert.ok(
+    requested.includes(
+      'https://espelunca.social/packs/assets/logo-DXQkHAe5.svg',
+    ),
+  );
+  assert.ok(!requested.includes('https://espelunca.social/app-icon.png'));
+  assert.equal(logo.headers.get('content-type'), 'image/svg+xml');
+  assert.equal(favicon.headers.get('content-type'), 'image/png');
 });
