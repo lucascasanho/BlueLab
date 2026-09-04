@@ -501,10 +501,8 @@
   }
 
   .blue2WelcomeBackdrop {
-    padding:
-      max(8px, env(safe-area-inset-top))
-      max(8px, env(safe-area-inset-right))
-      max(8px, env(safe-area-inset-bottom))
+    padding: max(8px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom))
       max(8px, env(safe-area-inset-left));
     place-items: center;
     touch-action: none;
@@ -568,10 +566,8 @@
 
 @media screen and (width <= 760px) and (height <= 650px) {
   .blue2WelcomeBackdrop {
-    padding:
-      max(5px, env(safe-area-inset-top))
-      max(5px, env(safe-area-inset-right))
-      max(5px, env(safe-area-inset-bottom))
+    padding: max(5px, env(safe-area-inset-top))
+      max(5px, env(safe-area-inset-right)) max(5px, env(safe-area-inset-bottom))
       max(5px, env(safe-area-inset-left));
   }
 
