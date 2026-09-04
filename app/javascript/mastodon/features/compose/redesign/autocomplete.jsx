@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 
 import {
-  changeCompose,
   clearComposeSuggestions,
   fetchComposeSuggestions,
 } from '@/mastodon/actions/compose';
@@ -18,13 +17,8 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import AutosuggestAccountContainer from '../containers/autosuggest_account_container';
 
-import { editorPlainText, editorText } from './rich_editor';
-
 const SEARCH_TOKENS = ['@', '＠', ':'];
 const WRAPPER_STYLE = { display: 'contents' };
-
-const isEmojiElement = (node) =>
-  node instanceof HTMLElement && !!node.dataset.emojiShortcode;
 
 const nodeAutocompleteText = (node) => {
   if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? '';
@@ -128,7 +122,10 @@ const pointAtAutocompleteOffset = (editor, targetOffset) => {
       return;
     }
 
-    if ((node.tagName === 'DIV' || node.tagName === 'P') && consumeVirtualCharacter(node)) {
+    if (
+      (node.tagName === 'DIV' || node.tagName === 'P') &&
+      consumeVirtualCharacter(node)
+    ) {
       return;
     }
 
@@ -202,33 +199,13 @@ export const renderCompletedCustomEmoji = (editor, customEmojis) => {
   return true;
 };
 
-const replaceAutocompleteRange = (
-  editor,
-  start,
-  end,
-  suggestion,
-  accounts,
-  customEmojis,
-) => {
-  const startPoint = pointAtAutocompleteOffset(editor, start);
-  const endPoint = pointAtAutocompleteOffset(editor, end);
-  const range = document.createRange();
-
-  try {
-    range.setStart(startPoint.node, startPoint.offset);
-    range.setEnd(endPoint.node, endPoint.offset);
-  } catch {
-    return false;
-  }
-
-  range.deleteContents();
-
+const buildSuggestionFragment = (suggestion, accounts, customEmojis) => {
   const fragment = document.createDocumentFragment();
   let insertedTail = null;
 
   if (suggestion.type === 'account') {
     const acct = accounts.getIn([suggestion.id, 'acct']);
-    if (!acct) return false;
+    if (!acct) return null;
     insertedTail = document.createTextNode(`@${acct} `);
     fragment.appendChild(insertedTail);
   } else if (suggestion.type === 'emoji') {
@@ -248,15 +225,45 @@ const replaceAutocompleteRange = (
       }
     }
   } else {
+    return null;
+  }
+
+  return { fragment, insertedTail };
+};
+
+const replaceAutocompleteRange = (
+  editor,
+  start,
+  end,
+  suggestion,
+  accounts,
+  customEmojis,
+) => {
+  const insertion = buildSuggestionFragment(
+    suggestion,
+    accounts,
+    customEmojis,
+  );
+  if (!insertion) return false;
+
+  const startPoint = pointAtAutocompleteOffset(editor, start);
+  const endPoint = pointAtAutocompleteOffset(editor, end);
+  const range = document.createRange();
+
+  try {
+    range.setStart(startPoint.node, startPoint.offset);
+    range.setEnd(endPoint.node, endPoint.offset);
+  } catch {
     return false;
   }
 
-  range.insertNode(fragment);
+  range.deleteContents();
+  range.insertNode(insertion.fragment);
 
   const selection = window.getSelection();
-  if (selection && insertedTail) {
+  if (selection && insertion.insertedTail) {
     const nextRange = document.createRange();
-    nextRange.setStartAfter(insertedTail);
+    nextRange.setStartAfter(insertion.insertedTail);
     nextRange.collapse(true);
     selection.removeAllRanges();
     selection.addRange(nextRange);
@@ -275,9 +282,6 @@ export const ComposeAutocomplete = ({ children }) => {
   const dispatch = useAppDispatch();
   const suggestions = useAppSelector((state) => state.compose.get('suggestions'));
   const accounts = useAppSelector((state) => state.accounts);
-  const contentType = useAppSelector(
-    (state) => state.compose.get('content_type') ?? 'text/plain',
-  );
   const customEmojis = useCustomEmojis();
 
   const [editorElement, setEditorElement] = useState(null);
@@ -285,6 +289,7 @@ export const ComposeAutocomplete = ({ children }) => {
   const [selectedSuggestion, setSelectedSuggestion] = useState(0);
   const lastTokenRef = useRef(null);
   const tokenStartRef = useRef(0);
+  const skipNextInputRef = useRef(false);
 
   const clearSuggestions = useCallback(() => {
     lastTokenRef.current = null;
@@ -326,6 +331,11 @@ export const ComposeAutocomplete = ({ children }) => {
 
       setEditorElement(editor);
 
+      if (skipNextInputRef.current) {
+        skipNextInputRef.current = false;
+        return;
+      }
+
       if (renderCompletedCustomEmoji(editor, customEmojis)) {
         clearSuggestions();
         return;
@@ -360,18 +370,14 @@ export const ComposeAutocomplete = ({ children }) => {
 
       if (suggestion.type === 'emoji') dispatch(emojiUse(suggestion));
 
-      const value =
-        contentType === 'text/markdown'
-          ? editorText(editor)
-          : editorPlainText(editor);
-      dispatch(changeCompose(value));
+      skipNextInputRef.current = true;
+      editor.dispatchEvent(new Event('input', { bubbles: true }));
       clearSuggestions();
       editor.focus({ preventScroll: true });
     },
     [
       accounts,
       clearSuggestions,
-      contentType,
       customEmojis,
       dispatch,
       editorElement,
