@@ -120,6 +120,21 @@ describe('safe Cloudflare/Tunnel error classification', () => {
       null,
     );
   });
+
+  it('classifies the bodyless 1033 response exposed to a Worker by its Cloudflare headers', async () => {
+    assert.equal(
+      await classifyInterceptableError(
+        new Response(null, {
+          status: 530,
+          headers: {
+            server: 'cloudflare',
+            'retry-after': '120',
+          },
+        }),
+      ),
+      '1033',
+    );
+  });
 });
 
 describe('fallback page', () => {

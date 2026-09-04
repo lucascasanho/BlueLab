@@ -74,6 +74,15 @@ export async function classifyInterceptableError(response) {
 
   if (response.status !== 502 && response.status !== 530) return null;
 
+  if (
+    response.status === 530 &&
+    response.headers.has('retry-after') &&
+    (response.headers.get('server')?.toLowerCase() === 'cloudflare' ||
+      response.headers.has('cf-ray'))
+  ) {
+    return '1033';
+  }
+
   const prefix = await readBodyPrefix(response);
 
   if (
