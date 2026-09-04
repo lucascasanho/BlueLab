@@ -19,6 +19,7 @@
         "INSTANCE_URL": "https://mastodon.blue",
         "WEBSITE_HEALTH_URL": "https://mastodon.blue/health",
         "STREAMING_HEALTH_URL": "https://mastodon.blue/api/v1/streaming/health",
+        "STATUS_IGNORE_UNKNOWN_IN_OVERALL": "true",
       },
       "routes": [
         {
