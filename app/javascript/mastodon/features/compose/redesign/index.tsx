@@ -89,15 +89,18 @@ export const RedesignComposeForm: React.FC<
       if (!target || target.zone === 'body') return;
 
       const { element } = target;
-      const nextScrollTop = element.scrollTop + event.deltaY;
       const maxScrollTop = Math.max(
         element.scrollHeight - element.clientHeight,
         0,
       );
+      if (maxScrollTop === 0) return;
 
-      if (nextScrollTop < 0 || nextScrollTop > maxScrollTop) {
-        return;
-      }
+      const nextScrollTop = Math.min(
+        maxScrollTop,
+        Math.max(0, element.scrollTop + event.deltaY),
+      );
+
+      if (nextScrollTop === element.scrollTop) return;
 
       event.preventDefault();
       element.scrollTop = nextScrollTop;
