@@ -42,29 +42,23 @@ export const MultiColumnMenuItems: React.FC<MultiColumnMenuItemsProps> = ({
       {withDivider && <MenuItemDivider />}
       <MenuItem onClick={togglePin} keepMenuOpenOnClick>
         {pinned ? (
-          <FormattedMessage
-            id='column_header.unpin_column'
-            defaultMessage='Unpin column'
-          />
+          <FormattedMessage id='column_header.unpin' defaultMessage='Unpin' />
         ) : (
-          <FormattedMessage
-            id='column_header.pin_column'
-            defaultMessage='Pin column'
-          />
+          <FormattedMessage id='column_header.pin' defaultMessage='Pin' />
         )}
       </MenuItem>
       {pinned && onMove && (
         <>
           <MenuItem onClick={moveLeft} keepMenuOpenOnClick>
             <FormattedMessage
-              id='column_header.move_column_left'
-              defaultMessage='Move column left'
+              id='column_header.moveLeft_settings'
+              defaultMessage='Move column to the left'
             />
           </MenuItem>
           <MenuItem onClick={moveRight} keepMenuOpenOnClick>
             <FormattedMessage
-              id='column_header.move_column_right'
-              defaultMessage='Move column right'
+              id='column_header.moveRight_settings'
+              defaultMessage='Move column to the right'
             />
           </MenuItem>
         </>
