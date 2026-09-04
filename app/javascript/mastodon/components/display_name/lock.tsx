@@ -9,7 +9,8 @@ import { Icon } from '../icon';
 const messages = defineMessages({
   locked: {
     id: 'account.locked_info',
-    defaultMessage: 'This account manually reviews who can follow it.',
+    defaultMessage:
+      'This account privacy status is set to locked. The owner manually reviews who can follow them.',
   },
 });
 
