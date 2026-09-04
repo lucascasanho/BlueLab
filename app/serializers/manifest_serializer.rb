@@ -6,6 +6,7 @@ class ManifestSerializer < ActiveModel::Serializer
   include ActionView::Helpers::TextHelper
 
   attributes :id, :name, :short_name,
+             :description, :screenshots,
              :icons, :theme_color, :background_color,
              :display, :start_url, :scope,
              :share_target, :shortcuts,
@@ -24,6 +25,31 @@ class ManifestSerializer < ActiveModel::Serializer
 
   def short_name
     object.title
+  end
+
+  def description
+    object.description.presence || "#{object.title} na web e como aplicativo."
+  end
+
+  def screenshots
+    screenshot_set = object.domain == 'espelunca.social' ? 'espelunca-social' : 'mastodon-blue'
+
+    [
+      {
+        src: "/pwa-screenshots/#{screenshot_set}-narrow.png",
+        sizes: '720x1280',
+        type: 'image/png',
+        form_factor: 'narrow',
+        label: "Tela de entrada de #{object.title} em celular",
+      },
+      {
+        src: "/pwa-screenshots/#{screenshot_set}-wide.png",
+        sizes: '1280x720',
+        type: 'image/png',
+        form_factor: 'wide',
+        label: "Tela de entrada de #{object.title} em computador",
+      },
+    ]
   end
 
   def icons
