@@ -16,7 +16,7 @@ module InstanceHelper
     replacement = html_safe ? ERB::Util.html_escape(Setting.site_title) : Setting.site_title.to_s
     branded = text.gsub(/\bMastodon\b/, replacement)
 
-    html_safe ? branded.html_safe : branded
+    html_safe ? ActiveSupport::SafeBuffer.new(branded) : branded
   end
 
   def description_for_sign_up(invite = nil)
