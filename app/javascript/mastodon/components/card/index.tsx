@@ -91,11 +91,13 @@ export const CardTitle: React.FC<
     <div {...props} className={classNames(className, classes.title)}>
       {image && <span className={classes.titleImage}>{image}</span>}
 
-      <span id={`${id}_title`}>{children}</span>
+      <span id={`${id}_title`} className={classes.titleContent}>
+        {children}
+      </span>
 
       {afterContent && (
         // eslint-disable-next-line no-restricted-syntax -- Allow &bull;
-        <span>
+        <span className={classes.titleAfterContent}>
           &nbsp;&bull;&nbsp;
           {afterContent}
         </span>

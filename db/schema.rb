@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_28_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_31_230000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1105,6 +1105,41 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_160000) do
     t.index ["target_account_id"], name: "index_reports_on_target_account_id"
   end
 
+  create_table "resumable_media_upload_parts", force: :cascade do |t|
+    t.integer "byte_size", null: false
+    t.datetime "created_at", null: false
+    t.integer "part_index", null: false
+    t.bigint "resumable_media_upload_id", null: false
+    t.string "sha256", limit: 64, null: false
+    t.datetime "updated_at", null: false
+    t.index ["resumable_media_upload_id", "part_index"], name: "index_resumable_upload_parts_on_upload_and_index", unique: true
+  end
+
+  create_table "resumable_media_uploads", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.integer "chunk_count", null: false
+    t.integer "chunk_size", null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.string "declared_content_type"
+    t.string "error_code"
+    t.bigint "expected_size", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "last_activity_at", null: false
+    t.integer "lock_version", default: 0, null: false
+    t.bigint "media_attachment_id"
+    t.string "original_filename", null: false
+    t.string "public_id", null: false
+    t.string "sha256", limit: 64
+    t.integer "state", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "state"], name: "index_resumable_media_uploads_on_account_id_and_state"
+    t.index ["account_id"], name: "index_resumable_media_uploads_on_account_id"
+    t.index ["media_attachment_id"], name: "index_resumable_media_uploads_on_media_attachment_id"
+    t.index ["public_id"], name: "index_resumable_media_uploads_on_public_id", unique: true
+    t.index ["state", "expires_at"], name: "index_resumable_media_uploads_on_state_and_expires_at"
+  end
+
   create_table "rule_translations", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "hint", default: "", null: false
@@ -1616,6 +1651,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_160000) do
   add_foreign_key "reports", "accounts", column: "target_account_id", name: "fk_eb37af34f0", on_delete: :cascade
   add_foreign_key "reports", "accounts", name: "fk_4b81f7522c", on_delete: :cascade
   add_foreign_key "reports", "oauth_applications", column: "application_id", on_delete: :nullify
+  add_foreign_key "resumable_media_upload_parts", "resumable_media_uploads", on_delete: :cascade
+  add_foreign_key "resumable_media_uploads", "accounts", on_delete: :cascade
+  add_foreign_key "resumable_media_uploads", "media_attachments", on_delete: :nullify
   add_foreign_key "rule_translations", "rules", on_delete: :cascade
   add_foreign_key "scheduled_statuses", "accounts", on_delete: :cascade
   add_foreign_key "session_activations", "oauth_access_tokens", column: "access_token_id", name: "fk_957e5bda89", on_delete: :cascade

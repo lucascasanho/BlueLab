@@ -65,9 +65,7 @@ class AdvancedTextFormatter < TextFormatter
           processed_index = entity[:indices].last
         end
 
-        if processed_index < content.size
-          replacement << Nokogiri::XML::Text.new(content[processed_index, content.size - processed_index], document)
-        end
+        replacement << Nokogiri::XML::Text.new(content[processed_index, content.size - processed_index], document) if processed_index < content.size
 
         text_node.replace(replacement)
       end
@@ -89,6 +87,7 @@ class AdvancedTextFormatter < TextFormatter
       fenced_code_blocks: true,
       disable_indented_code_blocks: true,
       strikethrough: true,
+      underline: true,
       lax_spacing: true,
       space_after_headers: true,
       footnotes: false,

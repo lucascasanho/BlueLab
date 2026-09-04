@@ -5,12 +5,13 @@ import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 
+import { StackIcon } from '@phosphor-icons/react';
+
 import { useDispatch } from 'react-redux';
 
 import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
 import BlockIcon from '@/material-icons/400-24px/block.svg?react';
 import CampaignIcon from '@/material-icons/400-24px/campaign.svg?react';
-import CollectionsIcon from '@/material-icons/400-24px/category.svg?react';
 import ReplyIcon from '@/material-icons/400-24px/reply.svg?react';
 import VisibilityOffIcon from '@/material-icons/400-24px/visibility_off.svg?react';
 import { blockAccount } from 'mastodon/actions/accounts';
@@ -76,7 +77,7 @@ export const BlockModal = ({ accountId, acct }) => {
           </li>
 
           <li>
-            <div className='safety-action-modal__bullet-points__icon'><Icon icon={CollectionsIcon} /></div>
+            <div className='safety-action-modal__bullet-points__icon'><Icon icon={StackIcon} /></div>
             <div><FormattedMessage id='block_modal.no_collections' defaultMessage="Neither of you can add each other to collections. You'll be automatically removed from each others' existing collections, if applicable." /></div>
           </li>
         </ul>

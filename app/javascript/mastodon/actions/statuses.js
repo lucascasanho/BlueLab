@@ -135,7 +135,7 @@ export const editStatus = (id) => (dispatch, getState) => {
 
   api().get(`/api/v1/statuses/${id}/source`).then(response => {
     dispatch(fetchStatusSourceSuccess());
-    ensureComposeIsVisible(getState);
+    ensureComposeIsVisible(getState, dispatch);
     dispatch(setComposeToStatus(status, response.data.text, response.data.spoiler_text, response.data.content_type));
   }).catch(error => {
     dispatch(fetchStatusSourceFail(error));
@@ -172,7 +172,7 @@ export function deleteStatus(id, withRedraft = false) {
 
       if (withRedraft) {
         dispatch(redraft(status, response.data.text, response.data.content_type, response.data.quote?.quoted_status?.id));
-        ensureComposeIsVisible(getState);
+        ensureComposeIsVisible(getState, dispatch);
       } else {
         dispatch(showAlert({ message: messages.deleteSuccess }));
       }

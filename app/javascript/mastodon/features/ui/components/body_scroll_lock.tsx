@@ -12,8 +12,9 @@ const getShouldLockBodyScroll = createAppSelector(
 );
 
 /**
- * This component locks scrolling on the body when
- * `getShouldLockBodyScroll` returns true.
+ * This component locks scrolling on the body while a modal or the mobile menu
+ * is open. The BlueLab composer allows the page behind it to scroll normally
+ * when the pointer is outside of the compose surface.
  */
 
 export const BodyScrollLock: React.FC = () => {

@@ -30,6 +30,9 @@ const meta = {
           'audio/mp3',
         ],
       },
+      compose: {
+        language: 'en',
+      },
     },
   },
 } satisfies Meta<typeof RedesignComposeForm>;
@@ -45,6 +48,21 @@ export const PostPending: Story = {
     state: {
       compose: {
         pending_media_attachments: 2,
+      },
+    },
+  },
+};
+
+export const Overflow: Story = {
+  parameters: {
+    state: {
+      compose: {
+        language: 'en',
+        pending_media_attachments: 4,
+        text: Array.from(
+          { length: 30 },
+          (_, index) => `Long composer line ${index + 1}`,
+        ).join('\n'),
       },
     },
   },

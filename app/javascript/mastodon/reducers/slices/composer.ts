@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 
 import {
   changeCompose,
@@ -17,6 +18,7 @@ import type {
   ApiStatusJSON,
   StatusVisibility,
 } from '@/mastodon/api_types/statuses';
+import { browserHistory } from '@/mastodon/components/router';
 import {
   createAppSelector,
   createAppThunk,
@@ -35,12 +37,20 @@ export function getComposerTextarea() {
  * @param defer Waits before focusing. Useful if the composer may not be focusable immediately.
  */
 export function focusComposerTextarea(defer = false) {
-  if (defer) {
-    requestAnimationFrame(() => {
-      getComposerTextarea()?.focus();
-    });
-  } else {
+  const focus = () => {
+    const editor = document.querySelector<HTMLElement>(
+      '[contenteditable="true"], [contenteditable="plaintext-only"]',
+    );
+    if (editor) {
+      editor.focus();
+      return;
+    }
     getComposerTextarea()?.focus();
+  };
+  if (defer) {
+    requestAnimationFrame(focus);
+  } else {
+    focus();
   }
 }
 
@@ -48,20 +58,30 @@ type DisplayState = 'hidden' | 'showing' | 'minimized';
 
 export type ComposeType = 'post' | 'message' | 'reply';
 
+export type ComposerEditor = 'bluelab' | 'mastodon';
+
+export interface ComposerOrigin {
+  x: number;
+  y: number;
+}
+
 interface ComposerState {
   displayState: DisplayState;
+  origin: ComposerOrigin | null;
 }
 
 const initialState: ComposerState = {
   displayState: 'hidden',
+  origin: null,
 };
 
 const composerSlice = createSlice({
   name: 'composer',
   initialState,
   reducers: {
-    showComposer(state) {
+    showComposer(state, action: PayloadAction<ComposerOrigin | undefined>) {
       state.displayState = 'showing';
+      state.origin = action.payload ?? null;
     },
     minimizeComposerToggle(state) {
       state.displayState =
@@ -69,6 +89,7 @@ const composerSlice = createSlice({
     },
     hideComposer(state) {
       state.displayState = 'hidden';
+      state.origin = null;
     },
   },
 });
@@ -118,11 +139,27 @@ interface ComposeNewMessage {
   type: 'message';
   toAccountId?: string;
 }
-type ComposeNewPayload = (
+export type ComposeNewPayload = (
   | ComposeNewPost
   | ComposeNewReply
   | ComposeNewMessage
-) & { force?: boolean };
+) & { force?: boolean; origin?: ComposerOrigin };
+
+export const normalizeComposerEditor = (value: unknown): ComposerEditor =>
+  value === 'mastodon' ? 'mastodon' : 'bluelab';
+
+export const selectComposerEditor = createAppSelector(
+  [(state) => state.compose.get('composer_editor') as unknown],
+  normalizeComposerEditor,
+);
+
+export const composerOriginFromElement = (element: Element): ComposerOrigin => {
+  const rect = element.getBoundingClientRect();
+  return {
+    x: rect.left + rect.width / 2,
+    y: rect.top + rect.height / 2,
+  };
+};
 
 export const openNewComposer = createAppThunk(
   (payload: ComposeNewPayload, { dispatch, getState }) => {
@@ -131,7 +168,7 @@ export const openNewComposer = createAppThunk(
         openModal({
           modalType: 'COMPOSER_DRAFT_DELETE',
           modalProps: {
-            openNew: true,
+            openNew: payload,
           },
         }),
       );
@@ -150,8 +187,28 @@ export const openNewComposer = createAppThunk(
     } else if (payload.type === 'reply') {
       dispatch(replyComposeById(payload.toStatusId));
     }
-    dispatch(composerSlice.actions.showComposer());
+    dispatch(composerSlice.actions.showComposer(payload.origin));
 
+    focusComposerTextarea(true);
+  },
+);
+
+export const openPreferredComposer = createAppThunk(
+  (payload: Pick<ComposeNewPayload, 'origin'>, { dispatch, getState }) => {
+    const preferredEditor = selectComposerEditor(getState());
+
+    if (preferredEditor === 'mastodon') {
+      browserHistory.push('/publish', { focusTarget: false });
+      return;
+    }
+
+    dispatch(openNewComposer({ type: 'post', ...payload }));
+  },
+);
+
+export const resumeComposer = createAppThunk(
+  (origin: ComposerOrigin | undefined, { dispatch }) => {
+    dispatch(composerSlice.actions.showComposer(origin));
     focusComposerTextarea(true);
   },
 );
@@ -175,6 +232,11 @@ export const closeComposer = createAppThunk((_arg, { getState, dispatch }) => {
       }),
     );
   }
+});
+
+export const dismissComposer = createAppThunk((_arg, { dispatch }) => {
+  dispatch(composerSlice.actions.hideComposer());
+  dispatch(clearComposeSuggestions());
 });
 
 export const newComposer = createAppThunk((_arg, { getState, dispatch }) => {

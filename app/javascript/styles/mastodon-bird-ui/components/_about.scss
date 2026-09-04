@@ -1,0 +1,51 @@
+// Keep the public About page on the instance's neutral theme surfaces. The
+// upstream section headings and rule counters otherwise fall back to brand
+// blues that do not match the surrounding Bird UI panels.
+.layout-single-column,
+.layout-multiple-columns {
+  .about {
+    background-color: var(--color-bg-primary);
+    border-color: var(--color-border-primary);
+    color: var(--color-text-primary);
+
+    &__meta,
+    &__section__title,
+    &__section__body {
+      background-color: var(--color-bg-primary);
+      color: var(--color-text-primary);
+    }
+
+    // Upstream can put borders on both the section wrapper/title/body. Bird UI
+    // keeps only one separator for each visual block so adjacent edges never
+    // render as a doubled line after upstream style changes.
+    &__section {
+      border: 0;
+      border-top: 1px solid var(--color-border-primary);
+    }
+
+    &__section__title,
+    &__section__body {
+      border: 0;
+    }
+
+    &__section__body {
+      border-top: 1px solid var(--color-border-primary);
+    }
+
+    &__section__title {
+      &:hover {
+        background-color: var(--color-bg-highlight);
+      }
+
+      &:focus-visible {
+        outline: var(--outline-focus-default);
+        outline-offset: -2px;
+      }
+    }
+
+    .rules-list li::before {
+      background-color: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
+    }
+  }
+}

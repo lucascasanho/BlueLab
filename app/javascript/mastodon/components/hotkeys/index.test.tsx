@@ -1,0 +1,104 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+
+import { Hotkeys } from './index';
+
+describe('Hotkeys', () => {
+  test('does not handle shortcuts from descendants of a contenteditable', () => {
+    const onNew = vi.fn();
+
+    render(
+      <Hotkeys global handlers={{ new: onNew }}>
+        <div contentEditable suppressContentEditableWarning>
+          <strong data-testid='formatted-text'>formatted text</strong>
+        </div>
+      </Hotkeys>,
+    );
+
+    fireEvent.keyDown(screen.getByTestId('formatted-text'), { key: 'n' });
+
+    expect(onNew).not.toHaveBeenCalled();
+  });
+
+  test('does not handle shortcuts from a plaintext-only editor', () => {
+    const onNew = vi.fn();
+
+    render(
+      <Hotkeys global handlers={{ new: onNew }}>
+        <div contentEditable='plaintext-only' suppressContentEditableWarning>
+          plain text
+        </div>
+      </Hotkeys>,
+    );
+
+    fireEvent.keyDown(screen.getByText('plain text'), { key: 'n' });
+
+    expect(onNew).not.toHaveBeenCalled();
+  });
+
+  test('handles shortcuts outside editable controls', () => {
+    const onNew = vi.fn();
+
+    render(
+      <Hotkeys global handlers={{ new: onNew }}>
+        <div data-testid='page-content'>page content</div>
+      </Hotkeys>,
+    );
+
+    fireEvent.keyDown(screen.getByTestId('page-content'), { key: 'n' });
+
+    expect(onNew).toHaveBeenCalledOnce();
+  });
+
+  test('handles the period shortcut outside editable controls', () => {
+    const onLoadNewPosts = vi.fn();
+
+    render(
+      <Hotkeys global handlers={{ loadNewPosts: onLoadNewPosts }}>
+        <div data-testid='timeline'>timeline</div>
+      </Hotkeys>,
+    );
+
+    fireEvent.keyDown(screen.getByTestId('timeline'), { key: '.' });
+
+    expect(onLoadNewPosts).toHaveBeenCalledOnce();
+  });
+
+  test.each(['input', 'textarea'])(
+    'does not handle period while typing in a %s',
+    (tag) => {
+      const onLoadNewPosts = vi.fn();
+
+      const { container } = render(
+        <Hotkeys global handlers={{ loadNewPosts: onLoadNewPosts }}>
+          {tag === 'input' ? <input /> : <textarea />}
+        </Hotkeys>,
+      );
+
+      const input = container.querySelector(tag);
+      expect(input).not.toBeNull();
+      if (input) {
+        fireEvent.keyDown(input, { key: '.' });
+      }
+
+      expect(onLoadNewPosts).not.toHaveBeenCalled();
+    },
+  );
+
+  test('does not handle shortcuts from controls inside the BlueLab composer', () => {
+    const onNew = vi.fn();
+
+    render(
+      <Hotkeys global handlers={{ new: onNew }}>
+        <div data-bluelab-composer>
+          <button type='button'>Formatting</button>
+        </div>
+      </Hotkeys>,
+    );
+
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Formatting' }), {
+      key: 'n',
+    });
+
+    expect(onNew).not.toHaveBeenCalled();
+  });
+});

@@ -11,9 +11,19 @@
   overflow: hidden;
   z-index: calc(infinity);
   max-width: var(--_max-card-width, 100vw);
+  text-align: start;
 
   &[data-elevation='2'] {
     @include mixins.elevation-2;
+  }
+
+  :global(body[data-theme='blue-2']) & {
+    max-height: calc(100dvh - 24px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scroll-padding-block: 12px;
   }
 }
 

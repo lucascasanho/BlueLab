@@ -64,6 +64,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:default_sensitive] = object_account_user.setting_default_sensitive
       store[:default_language]     = object_account_user.preferred_posting_language
       store[:default_content_type] = object_account_user.setting_default_content_type
+      store[:composer_editor] = object_account_user.settings['composer_editor'] || 'bluelab'
       store[:default_quote_policy] = object_account_user.setting_default_quote_policy
     end
 
@@ -90,7 +91,13 @@ class InitialStateSerializer < ActiveModel::Serializer
   end
 
   def media_attachments
-    { accept_content_types: MediaAttachment.supported_file_extensions + MediaAttachment.supported_mime_types }
+    {
+      accept_content_types: MediaAttachment.supported_file_extensions + MediaAttachment.supported_mime_types,
+      resumable_uploads: {
+        enabled: ResumableMediaUpload.enabled?,
+        chunk_size: Rails.configuration.x.resumable_media_uploads.chunk_size,
+      },
+    }
   end
 
   def languages
@@ -133,8 +140,9 @@ class InitialStateSerializer < ActiveModel::Serializer
       streaming_api_base_url: Rails.configuration.x.streaming_api_base_url,
       title: instance_presenter.title,
       custom_app_icon: app_icon_path(120),
+      custom_favicon: favicon_path(48),
       custom_instance_logo: instance_presenter.auth_logo&.file&.url,
-      landing_page: Setting.landing_page,
+      landing_page: object.current_account ? Setting.landing_page : guest_landing_page,
       trends_enabled: Setting.trends,
       version: instance_presenter.version,
       terms_of_service_enabled: TermsOfService.current.present?,
@@ -143,6 +151,12 @@ class InitialStateSerializer < ActiveModel::Serializer
       local_topic_feed_access: Setting.local_topic_feed_access,
       remote_topic_feed_access: Setting.remote_topic_feed_access,
     }
+  end
+
+  def guest_landing_page
+    return Setting.landing_page if %w(trends local_feed).include?(Setting.landing_page)
+
+    'overview'
   end
 
   def object_account_user

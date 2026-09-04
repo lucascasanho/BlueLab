@@ -23,7 +23,11 @@ export const ComposeAttachments: React.FC<{ className?: string }> = ({
   }
 
   return (
-    <div className={className}>
+    <div
+      className={className}
+      data-compose-scroll-zone='panel'
+      data-has-quote={quotedStatusId ? 'true' : 'false'}
+    >
       {hasPoll && <ComposePoll />}
       {hasAttachments && <ComposeMediaAttachments />}
       {quotedStatusId && <ComposeQuote id={quotedStatusId} />}

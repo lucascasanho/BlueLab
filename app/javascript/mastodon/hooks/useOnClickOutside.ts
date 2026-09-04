@@ -21,17 +21,13 @@ export function useOnClickOutside(
     for (const ref of excludedRefs) {
       const excludedElement = ref instanceof Element ? ref : ref?.current;
 
-      // Bail out if the clicked element or the currently focused element
-      // is inside of excludedElement. We're also checking the focused element
-      // to prevent an issue in Chrome where initiating a drag inside of an
-      // input (to select the text inside of it) and ending that drag outside
-      // of the input fires a click event, breaking our excludedElement rule.
+      // Keep the popover open only when the click itself is inside it. This
+      // lets a non-focusable area close a picker even when its trigger is
+      // still focused.
       if (
         excludedElement &&
         (excludedElement === event.target ||
-          excludedElement === document.activeElement ||
-          excludedElement.contains(event.target as Node) ||
-          excludedElement.contains(document.activeElement))
+          excludedElement.contains(event.target as Node))
       ) {
         return;
       }
@@ -41,13 +37,20 @@ export function useOnClickOutside(
   });
 
   useEffect(() => {
-    if (enabled) {
-      document.addEventListener('click', handleClickOutside);
-
-      return () => {
-        document.removeEventListener('click', handleClickOutside);
-      };
+    if (!enabled) {
+      return () => null;
     }
-    return () => null;
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      handleClickOutside(event as MouseEvent);
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('click', handleClickOutside);
+    };
   }, [enabled]);
 }

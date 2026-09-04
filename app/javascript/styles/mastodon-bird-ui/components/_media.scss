@@ -2,7 +2,7 @@
 .layout-single-column,
 .layout-multiple-columns {
   // Fix aspect-ratio for some videos in mastodon v4.1.5-nightly-2023-07-26
-  div[style*="aspect-ratio"]:not([class]) {
+  div[style*='aspect-ratio']:not([class]) {
     // It's inlined so we have to use !important
     aspect-ratio: unset !important;
   }
@@ -31,6 +31,20 @@
   .video-player,
   .status__quote .status__quote-author-button {
     margin-left: calc(var(--size-avatar) + var(--gap-default));
+  }
+
+  // Quote cards place media below their complete header row rather than next
+  // to the avatar used by regular timeline statuses.
+  .status.status--is-quote {
+    > .media-gallery,
+    > .video-player,
+    > .audio-player,
+    > .collection-preview,
+    > .status-card,
+    > .status__quote-author-button {
+      margin-inline-start: 0;
+      max-width: 100%;
+    }
   }
 
   .spoiler-button + .media-gallery__item > .media-gallery__preview {
@@ -93,7 +107,7 @@
   // When image is still loading up, reset width to 100%, Fixes #150
   // When images are still loading the placeholder only shows up partly #150
   // @link https://github.com/ronilaukkarinen/mastodon-bird-ui/issues/150
-  canvas[class="media-gallery__preview"] {
+  canvas[class='media-gallery__preview'] {
     width: 100% !important;
   }
 

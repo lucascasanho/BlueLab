@@ -1,0 +1,43 @@
+@use 'blue-2-v7';
+
+/* BlueLab 2.0 eighth refinement layer: mobile search chrome. */
+@media (width <= 759px) {
+  body[data-theme='blue-2'] {
+    /*
+     * Search already has its own input and result-type tabs on mobile. Remove
+     * only the redundant ColumnHeader row (search icon + queried term), while
+     * keeping the search controls mounted directly below the app navigation.
+     */
+    #tabs-bar__portal
+      .column-header__wrapper:has(> .explore__search-header)
+      > .column-header {
+      display: none !important;
+    }
+
+    /* Keep search result section labels on BlueLab surfaces and theme tokens. */
+    .search-results__section__header {
+      background: var(--blue2-search) !important;
+      color: var(--blue2-muted) !important;
+      border-color: var(--blue2-border-soft) !important;
+      box-shadow: none !important;
+    }
+
+    .search-results__section__header h3,
+    .search-results__section__header h3 .icon,
+    .search-results__section__header h3 svg {
+      color: var(--blue2-muted) !important;
+    }
+
+    .search-results__section__header button {
+      background: transparent !important;
+      color: var(--blue2-blue) !important;
+      box-shadow: none !important;
+    }
+
+    .search-results__section__header button:hover,
+    .search-results__section__header button:focus-visible {
+      background: var(--blue2-hover) !important;
+      color: var(--blue2-blue) !important;
+    }
+  }
+}

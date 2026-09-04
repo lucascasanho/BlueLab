@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 
-import { ScrollableList } from '../index';
+import { ScrollableListForTest } from '../index';
 
 const status = (id) => createElement('div', { key: id });
 
@@ -32,7 +32,7 @@ const buildList = ({ scrollTop = 500 } = {}) => {
   setRect(articles[1], 80, 280);
   setRect(articles[2], 280, 480);
 
-  const list = new ScrollableList({
+  const list = new ScrollableListForTest({
     bindToDocument: false,
     children: ['x', 'y', 'z', 'a', 'b', 'c'].map(status),
   });

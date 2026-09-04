@@ -126,6 +126,7 @@ const hotkeyMatcherMap = {
   forceNew: optionPlus('n'),
   focusColumn: any('1', '2', '3', '4', '5', '6', '7', '8', '9'),
   focusLoadMore: just('l'),
+  loadNewPosts: just('.'),
   reply: just('r'),
   favourite: just('f'),
   boost: just('b'),
@@ -200,11 +201,23 @@ export function useHotkeys<T extends HTMLElement>(handlers: HandlerMap) {
 
     function listener(event: Event) {
       // Ignore key presses from input, textarea, or select elements
-      const tagName = (event.target as HTMLElement).tagName.toLowerCase();
+      const target =
+        event.target instanceof HTMLElement ? event.target : undefined;
+      const tagName = target?.tagName.toLowerCase() ?? '';
+      const isInsideEditable =
+        !!target?.isContentEditable ||
+        !!target?.closest(
+          '[contenteditable="true"], [contenteditable="plaintext-only"]',
+        );
+      const isInsideBlueLabComposer = !!target?.closest(
+        '[data-bluelab-composer]',
+      );
       const shouldHandleEvent =
         isKeyboardEvent(event) &&
         !event.defaultPrevented &&
         !['input', 'textarea', 'select'].includes(tagName) &&
+        !isInsideEditable &&
+        !isInsideBlueLabComposer &&
         !(
           ['a', 'button'].includes(tagName) &&
           normalizeKey(event.key) === 'enter'

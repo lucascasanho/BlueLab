@@ -33,6 +33,7 @@ import {
   COMPOSE_UPLOAD_UNDO,
   COMPOSE_UPLOAD_PROGRESS,
   COMPOSE_UPLOAD_PROCESSING,
+  COMPOSE_UPLOAD_CANCEL,
   THUMBNAIL_UPLOAD_REQUEST,
   THUMBNAIL_UPLOAD_SUCCESS,
   THUMBNAIL_UPLOAD_FAIL,
@@ -61,7 +62,7 @@ import {
 } from '../actions/compose';
 import { REDRAFT } from '../actions/statuses';
 import { STORE_HYDRATE } from '../actions/store';
-import { me } from '../initial_state';
+import { initialState as initialStateData, me } from '../initial_state';
 import { unescapeHTML } from '../utils/html';
 import { uuid } from '../uuid';
 
@@ -85,6 +86,9 @@ const initialState = ImmutableMap({
   isDragDisabled: false,
   should_redirect_to_compose_page: false,
   progress: 0,
+  upload_filename: null,
+  upload_loaded: 0,
+  upload_total: 0,
   isUploadingThumbnail: false,
   thumbnailProgress: 0,
   media_attachments: ImmutableList(),
@@ -96,6 +100,7 @@ const initialState = ImmutableMap({
   default_sensitive: false,
   default_language: 'en',
   default_content_type: 'text/markdown',
+  composer_editor: initialStateData?.compose?.composer_editor || 'bluelab',
   resetFileKey: Math.floor((Math.random() * 0x10000)),
   idempotencyKey: null,
   tagHistory: ImmutableList(),
@@ -142,6 +147,9 @@ function clearAll(state) {
     map.set('language', state.get('default_language'));
     map.update('media_attachments', list => list.clear());
     map.set('progress', 0);
+    map.set('upload_filename', null);
+    map.set('upload_loaded', 0);
+    map.set('upload_total', 0);
     map.set('poll', null);
     map.set('idempotencyKey', uuid());
     map.set('quoted_status_id', null);
@@ -161,6 +169,9 @@ function appendMedia(state, media, file) {
     map.set('is_uploading', false);
     map.set('is_processing', false);
     map.set('progress', 0);
+    map.set('upload_filename', null);
+    map.set('upload_loaded', 0);
+    map.set('upload_total', 0);
     map.set('resetFileKey', Math.floor((Math.random() * 0x10000)));
     map.set('idempotencyKey', uuid());
     map.update('pending_media_attachments', n => n - 1);
@@ -524,7 +535,13 @@ export const composeReducer = (state = initialState, action) => {
   case COMPOSE_SUBMIT_FAIL:
     return state.set('is_submitting', false);
   case COMPOSE_UPLOAD_REQUEST:
-    return state.set('is_uploading', true).update('pending_media_attachments', n => n + 1);
+    return state
+      .set('is_uploading', true)
+      .set('is_processing', false)
+      .set('upload_filename', action.filename)
+      .set('upload_loaded', 0)
+      .set('upload_total', action.total)
+      .update('pending_media_attachments', n => n + 1);
   case COMPOSE_UPLOAD_PROCESSING:
     return state.set('is_processing', true);
   case COMPOSE_UPLOAD_SUCCESS:
@@ -534,11 +551,26 @@ export const composeReducer = (state = initialState, action) => {
       .set('is_uploading', false)
       .set('is_processing', false)
       .set('progress', 0)
-      .update('pending_media_attachments', n => n - 1);
+      .set('upload_filename', null)
+      .set('upload_loaded', 0)
+      .set('upload_total', 0)
+      .update('pending_media_attachments', n => Math.max(0, n - 1));
+  case COMPOSE_UPLOAD_CANCEL:
+    return state
+      .set('is_uploading', false)
+      .set('is_processing', false)
+      .set('progress', 0)
+      .set('upload_filename', null)
+      .set('upload_loaded', 0)
+      .set('upload_total', 0)
+      .update('pending_media_attachments', n => Math.max(0, n - 1));
   case COMPOSE_UPLOAD_UNDO:
     return removeMedia(state, action.media_id);
   case COMPOSE_UPLOAD_PROGRESS:
-    return state.set('progress', calculateProgress(action.loaded, action.total));
+    return state
+      .set('progress', calculateProgress(action.loaded, action.total))
+      .set('upload_loaded', action.loaded)
+      .set('upload_total', action.total);
   case THUMBNAIL_UPLOAD_REQUEST:
     return state.set('isUploadingThumbnail', true);
   case THUMBNAIL_UPLOAD_PROGRESS:

@@ -2,11 +2,11 @@ import { useCallback, useEffect } from 'react';
 
 import { useIntl, defineMessages, FormattedMessage } from 'react-intl';
 
+import { StackIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column/header';
-import CollectionsIcon from '@/material-icons/400-24px/category.svg?react';
 import FindInPageIcon from '@/material-icons/400-24px/find_in_page.svg?react';
 import PeopleIcon from '@/material-icons/400-24px/group.svg?react';
 import SearchIcon from '@/material-icons/400-24px/search.svg?react';
@@ -159,7 +159,7 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
                   key='collections'
                   title={
                     <>
-                      <Icon id='collections' icon={CollectionsIcon} />
+                      <Icon id='collections' icon={StackIcon} />
                       <FormattedMessage
                         id='search_results.collections'
                         defaultMessage='Collections'

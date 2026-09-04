@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import { LockSimpleOpenIcon, PepperIcon } from '@phosphor-icons/react';
 
 import {
+  changeCompose,
   changeComposeSpoilerness,
   changeComposeSpoilerText,
   insertEmojiCompose,
@@ -30,12 +31,20 @@ import { ComposeHints } from './hints';
 import { LanguageButton } from './language';
 import { ComposeReply } from './reply';
 import {
+  captureComposerSelectionOffset,
+  editorText,
+  getEditorSelectionOffset,
+  getSavedComposerSelectionOffset,
+  RichComposeEditor,
+  setSavedComposerSelectionOffset,
+} from './rich_editor';
+import { resolveComposeScrollTarget } from './scroll';
+import {
   selectComposeCanSubmit,
   selectComposeSensitive,
   selectComposeType,
 } from './selectors';
 import classes from './styles.module.scss';
-import { ComposeTextarea } from './textarea';
 import { ComposeVisibility } from './visibility';
 
 const messages = defineMessages({
@@ -48,15 +57,21 @@ const messages = defineMessages({
 interface RedesignComposeFormProps {
   autoFocus?: boolean;
   className?: string;
+  embedded?: boolean;
   noMinimize?: boolean;
   redirectOnSuccess?: boolean;
 }
 
-export const RedesignComposeForm: React.FC<RedesignComposeFormProps> = ({
+export const RedesignComposeForm: React.FC<
+  RedesignComposeFormProps & React.ComponentPropsWithRef<'form'>
+> = ({
   autoFocus,
   className,
+  embedded = false,
   noMinimize,
   redirectOnSuccess,
+  ref,
+  ...props
 }) => {
   const type = useAppSelector(selectComposeType);
   const { sensitive, sensitiveText } = useAppSelector(selectComposeSensitive);
@@ -67,63 +82,101 @@ export const RedesignComposeForm: React.FC<RedesignComposeFormProps> = ({
   const intl = useIntl();
   const titleId = useId();
 
+  const handleWheelCapture: React.WheelEventHandler<HTMLFormElement> =
+    useCallback((event) => {
+      const target = resolveComposeScrollTarget(event.target);
+      if (!target || target.zone === 'body') return;
+
+      const { element } = target;
+      const nextScrollTop = element.scrollTop + event.deltaY;
+      const maxScrollTop = Math.max(
+        element.scrollHeight - element.clientHeight,
+        0,
+      );
+
+      if (nextScrollTop < 0 || nextScrollTop > maxScrollTop) {
+        return;
+      }
+
+      event.preventDefault();
+      element.scrollTop = nextScrollTop;
+    }, []);
+
   return (
     <form
-      role='dialog'
+      {...props}
+      ref={ref}
+      role={embedded ? 'region' : 'dialog'}
+      data-bluelab-composer
+      data-bluelab-composer-embedded={embedded ? 'true' : undefined}
       onSubmit={onSubmit}
+      onWheelCapture={handleWheelCapture}
       aria-labelledby={titleId}
       className={classNames(className, classes.root)}
     >
       {type === 'message' && <div className={classes.background} />}
 
-      <ComposeFormHeader id={titleId} noMinimize={noMinimize} />
+      <ComposeFormHeader
+        id={titleId}
+        noMinimize={noMinimize || embedded}
+        noClose={embedded}
+      />
 
-      <ComposeReply />
-
-      <div className={classes.toolbar}>
-        <ComposeVisibility className={classes.flexGrowWrap} />
-
-        <LanguageButton />
-
-        <ToggleButton
-          size='sm'
-          active={sensitive}
-          onClick={onSensitiveChange}
-          leadingIcon={PepperIcon}
-        >
-          <FormattedMessage id='compose.sensitive' defaultMessage='Sensitive' />
-        </ToggleButton>
-      </div>
-
-      {type === 'message' && (
-        <p className={classes.toolbarMessage}>
-          <Icon id='lock-open' icon={LockSimpleOpenIcon} />
-          <FormattedMessage
-            id='compose.message.notice'
-            defaultMessage='Messages are not end-to-end encrypted'
-          />
-        </p>
-      )}
-
-      {sensitive && (
-        <TextInputField
-          label={intl.formatMessage(messages.sensitiveText)}
-          value={sensitiveText}
-          onChange={onSensitiveTextChange}
-          // eslint-disable-next-line jsx-a11y/no-autofocus -- Focuses on open
-          autoFocus
-        />
-      )}
-
-      <ComposeTextarea
-        // eslint-disable-next-line jsx-a11y/no-autofocus
-        autoFocus={autoFocus}
-        onSubmit={onSubmit}
+      <div
+        className={classes.content}
+        data-compose-scroll-container
+        data-compose-scroll-zone='panel'
       >
-        <ComposeAttachments className={classes.attachments} />
-      </ComposeTextarea>
+        <ComposeReply />
 
-      <ComposeHints />
+        <div className={classes.toolbar} data-bluelab-compose-toolbar>
+          <ComposeVisibility className={classes.flexGrowWrap} />
+
+          <LanguageButton />
+
+          <ToggleButton
+            size='sm'
+            active={sensitive}
+            onClick={onSensitiveChange}
+            leadingIcon={PepperIcon}
+          >
+            <FormattedMessage
+              id='compose.sensitive'
+              defaultMessage='Sensitive'
+            />
+          </ToggleButton>
+        </div>
+
+        {type === 'message' && (
+          <p className={classes.toolbarMessage}>
+            <Icon id='lock-open' icon={LockSimpleOpenIcon} />
+            <FormattedMessage
+              id='compose.message.notice'
+              defaultMessage='Messages are not end-to-end encrypted'
+            />
+          </p>
+        )}
+
+        {sensitive && (
+          <TextInputField
+            label={intl.formatMessage(messages.sensitiveText)}
+            value={sensitiveText}
+            onChange={onSensitiveTextChange}
+            // eslint-disable-next-line jsx-a11y/no-autofocus -- Focuses on open
+            autoFocus
+          />
+        )}
+
+        <RichComposeEditor
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus={autoFocus}
+          onSubmit={onSubmit}
+        >
+          <ComposeAttachments className={classes.attachments} />
+        </RichComposeEditor>
+
+        <ComposeHints />
+      </div>
 
       <ComposeFooter onEmojiPick={onEmojiPick} />
     </form>
@@ -159,14 +212,113 @@ function useComposeHandlers(redirectOnSuccess?: boolean) {
 
   const onEmojiPick: OnEmojiPick = useCallback(
     (emoji) => {
-      const position = getComposerTextarea()?.selectionStart ?? 0;
-      const beforePosition = text[position - 1];
+      captureComposerSelectionOffset();
+
+      const activeElement = document.activeElement;
+      const editor =
+        activeElement instanceof HTMLElement ? activeElement : null;
+      const composerTextArea = getComposerTextarea();
+      const isContentEditable =
+        !!editor &&
+        (editor.isContentEditable ||
+          editor.contentEditable === 'true' ||
+          editor.contentEditable === 'plaintext-only' ||
+          editor.getAttribute('contenteditable') === 'true' ||
+          editor.getAttribute('contenteditable') === 'plaintext-only');
+      const savedSelectionStart = getSavedComposerSelectionOffset();
+
+      const selectionFromEditor = (() => {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return null;
+
+        const range = selection.getRangeAt(0);
+        let container: Node | null =
+          range.startContainer instanceof Element
+            ? range.startContainer
+            : range.startContainer.parentElement;
+
+        while (container) {
+          if (
+            container instanceof HTMLElement &&
+            (container.isContentEditable ||
+              container.contentEditable === 'true' ||
+              container.contentEditable === 'plaintext-only' ||
+              container.getAttribute('contenteditable') === 'true' ||
+              container.getAttribute('contenteditable') === 'plaintext-only')
+          ) {
+            return getEditorSelectionOffset(container);
+          }
+          container = container.parentNode;
+        }
+
+        return null;
+      })();
+
+      const selectionStart =
+        composerTextArea && activeElement === composerTextArea
+          ? composerTextArea.selectionStart || 0
+          : (selectionFromEditor ?? savedSelectionStart);
+
+      const beforePosition = text[selectionStart - 1];
       const needsSpace =
         'custom' in emoji &&
         !!emoji.custom &&
         !!beforePosition &&
         !allowedAroundShortCode.includes(beforePosition);
-      dispatch(insertEmojiCompose(position, emoji, needsSpace));
+
+      if (editor && isContentEditable) {
+        const selection = window.getSelection();
+        if (selection) {
+          const range = document.createRange();
+          let currentOffset = 0;
+          const walker = document.createTreeWalker(
+            editor,
+            NodeFilter.SHOW_TEXT,
+          );
+          let node: Node | null = walker.nextNode();
+
+          while (node) {
+            const length = node.textContent?.length ?? 0;
+            if (currentOffset + length >= selectionStart) {
+              range.setStart(node, selectionStart - currentOffset);
+              range.collapse(true);
+              selection.removeAllRanges();
+              selection.addRange(range);
+              break;
+            }
+            currentOffset += length;
+            node = walker.nextNode();
+          }
+
+          if (!selection.rangeCount) {
+            range.selectNodeContents(editor);
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+
+          const caretRange = selection.getRangeAt(0).cloneRange();
+          caretRange.deleteContents();
+          const inserted = document.createTextNode(
+            'native' in emoji && emoji.native ? emoji.native : `:${emoji.id}:`,
+          );
+          caretRange.insertNode(inserted);
+          caretRange.setStartAfter(inserted);
+          caretRange.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(caretRange);
+          captureComposerSelectionOffset();
+          dispatch(changeCompose(editorText(editor)));
+          return;
+        }
+      }
+
+      const emojiText =
+        'native' in emoji && emoji.native ? emoji.native : `:${emoji.id}:`;
+      const insertedLength = emojiText.length + (needsSpace ? 1 : 0) + 1;
+
+      dispatch(insertEmojiCompose(selectionStart, emoji, needsSpace));
+      setSavedComposerSelectionOffset(selectionStart + insertedLength);
     },
     [dispatch, text],
   );

@@ -3,7 +3,8 @@ import { useCallback } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import CollectionsIcon from '@/material-icons/400-24px/category.svg?react';
+import { StackIcon } from '@phosphor-icons/react';
+
 import HomeIcon from '@/material-icons/400-24px/home-fill.svg?react';
 import InsertChartIcon from '@/material-icons/400-24px/insert_chart.svg?react';
 import PersonAddIcon from '@/material-icons/400-24px/person_add.svg?react';
@@ -135,7 +136,7 @@ export const FilterBar: React.FC = () => {
           key='collection'
           title={intl.formatMessage(tooltips.collections)}
         >
-          <Icon id='collections' icon={CollectionsIcon} />
+          <Icon id='collections' icon={StackIcon} />
         </BarButton>
       </div>
     );

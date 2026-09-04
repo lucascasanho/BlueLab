@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ArrowsOutSimpleIcon, MinusIcon, XIcon } from '@phosphor-icons/react';
+import { ReadCvLogoIcon } from '@phosphor-icons/react/dist/ssr';
 
 import { IconButton } from '@/mastodon/components/button/redesign';
 import {
@@ -15,6 +16,8 @@ import {
   useAppDispatch,
   useAppSelector,
 } from '@/mastodon/store';
+
+import { useBreakpoint } from '../../ui/hooks/useBreakpoint';
 
 import { selectComposeType } from './selectors';
 import classes from './styles.module.scss';
@@ -59,8 +62,9 @@ const selectComposeFormTitle = createAppSelector(
 
 export const ComposeFormHeader: React.FC<{
   id?: string;
+  noClose?: boolean;
   noMinimize?: boolean;
-}> = ({ id, noMinimize }) => {
+}> = ({ id, noClose, noMinimize }) => {
   const intl = useIntl();
   const titleMessage = useAppSelector(selectComposeFormTitle);
   const isMinimized = useAppSelector(selectIsMinimized);
@@ -72,6 +76,16 @@ export const ComposeFormHeader: React.FC<{
   const onMinimize = useCallback(() => {
     dispatch(minimizeComposerToggle());
   }, [dispatch]);
+
+  const isMobile = useBreakpoint('openable');
+
+  if (isMobile && isMinimized && !noMinimize) {
+    return (
+      <IconButton icon={ReadCvLogoIcon} onClick={onMinimize} size='lg'>
+        <FormattedMessage id='compose.expand' defaultMessage='Show composer' />
+      </IconButton>
+    );
+  }
 
   return (
     <header className={classes.header}>
@@ -98,9 +112,11 @@ export const ComposeFormHeader: React.FC<{
         </IconButton>
       )}
 
-      <IconButton icon={XIcon} variant='ghost' size='sm' onClick={onClose}>
-        <FormattedMessage id='lightbox.close' defaultMessage='Close' />
-      </IconButton>
+      {!noClose && (
+        <IconButton icon={XIcon} variant='ghost' size='sm' onClick={onClose}>
+          <FormattedMessage id='lightbox.close' defaultMessage='Close' />
+        </IconButton>
+      )}
     </header>
   );
 };

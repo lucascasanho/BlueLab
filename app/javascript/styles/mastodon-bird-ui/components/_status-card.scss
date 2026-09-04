@@ -78,22 +78,57 @@
 
   // New Quote Posts feature after v4.5.0.alpha.2-2025-08-24
   .status__quote {
-    // stylelint-disable-next-line
     --status-gutter-width: calc(var(--size-avatar) + var(--gap-default));
+
+    overflow: visible;
+    width: calc(100% - var(--quote-margin) - var(--thread-margin, 0px));
   }
 
   // This is Mastodon core variable
   .detailed-status.status--has-quote .status__quote {
-    // stylelint-disable-next-line
     --status-gutter-width: 0;
   }
 
   .status.status--is-quote {
     --size-avatar: 32px;
+
+    // Quote previews are cards, not timeline rows. Keep the header and body in
+    // separate rows instead of inheriting Bird UI's avatar-gutter layout.
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: visible;
+
+    .status__info {
+      height: auto;
+      min-height: var(--size-avatar);
+    }
+
+    .status__content {
+      display: block;
+      max-height: none;
+      overflow: visible;
+    }
+  }
+
+  .status__quote .status__content,
+  .status__quote .status__content__text,
+  .status__quote .status__content__text--visible {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .compose-form .status__quote,
+  .compose-form .status__quote .status__content,
+  .compose-form .status__quote .status__content__text,
+  .compose-form .status__quote .status__content__text--visible {
+    max-height: none;
+    overflow: visible;
+    text-overflow: clip;
   }
 
   .status__quote.status__quote--error {
     --surface-border-color: var(--color-border);
+
     background-color: var(--surface-border-color);
     border-color: var(--surface-border-color);
     color: var(--color-light-text);
@@ -111,7 +146,7 @@
   }
 
   // Disabled quote post selection
-  .dropdown-menu__item [aria-disabled="true"],
+  .dropdown-menu__item [aria-disabled='true'],
   .dropdown-menu__item :disabled,
   .dropdown-menu__item button:disabled {
     color: var(--color-dim);

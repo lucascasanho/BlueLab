@@ -1,19 +1,23 @@
 @use '@/styles/mastodon/mixins';
+@use '@/styles/mastodon/variables';
 
 .root {
-  @include mixins.elevation-2;
-
   container-type: inline-size;
-  border-radius: var(--radius-xl);
   background: var(--color-bg-primary);
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
   padding: var(--space-md);
-  min-width: 300px;
+  min-width: min(300px, calc(100vw - var(--space-md) * 2));
   position: relative;
-  overflow: hidden;
   z-index: 1; // To cover the sidebar
+
+  @media (width >= #{variables.$mobile-menu-breakpoint}) {
+    @include mixins.elevation-2;
+
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+  }
 }
 
 .background {
@@ -33,6 +37,7 @@
 .header {
   display: flex;
   align-items: start;
+  flex: 0 0 auto;
 
   h2 {
     @include mixins.type-heading-sm;
@@ -41,11 +46,35 @@
   }
 }
 
+.content {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--space-md);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  touch-action: pan-y;
+}
+
+.attachments,
+.richEditorWrapper,
+.richEditor {
+  min-height: 0;
+  overscroll-behavior-y: contain;
+}
+
 .toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   gap: var(--space-xs);
   align-items: center;
   flex-wrap: wrap;
+  background: var(--color-bg-primary);
 
   label {
     font-weight: inherit;
@@ -144,6 +173,141 @@ textarea.textarea {
   resize: none;
 }
 
+.richEditorWrapper {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-height: 0;
+}
+
+.richEditorToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3xs);
+}
+
+.richEditor {
+  @include mixins.type-body-lg;
+
+  min-height: 9rem;
+  max-height: min(22rem, 32vh);
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: var(--space-xs);
+  border-radius: var(--radius-xs);
+  outline: none;
+  white-space: pre-wrap;
+
+  b,
+  strong {
+    font-weight: 700;
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  u {
+    text-decoration: underline;
+  }
+
+  code,
+  pre {
+    font-family: var(--font-monospace, monospace);
+  }
+
+  code {
+    padding: var(--space-3xs);
+    border-radius: var(--radius-xs);
+    background: var(--color-bg-secondary);
+  }
+
+  pre,
+  blockquote,
+  ul,
+  ol {
+    display: block;
+    margin-block: var(--space-xs);
+  }
+
+  pre {
+    padding: var(--space-xs);
+    border-radius: var(--radius-xs);
+    background: var(--color-bg-secondary);
+    white-space: pre-wrap;
+  }
+
+  blockquote {
+    padding-inline-start: var(--space-md);
+    border-inline-start: var(--border-w-strong) solid var(--color-border-brand);
+    color: var(--color-text-secondary);
+  }
+
+  ul,
+  ol {
+    padding-inline-start: var(--space-xl);
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  [data-emoji-shortcode] {
+    display: inline-flex;
+    vertical-align: middle;
+    user-select: none;
+
+    img {
+      width: 1.25em;
+      height: 1.25em;
+      object-fit: contain;
+      vertical-align: middle;
+    }
+  }
+
+  overflow-wrap: anywhere;
+  cursor: text;
+
+  &:focus {
+    outline: 2px solid var(--color-border-brand);
+    outline-offset: -2px;
+  }
+
+  &:empty::before {
+    content: attr(data-placeholder);
+    color: var(--color-text-tertiary);
+    pointer-events: none;
+  }
+}
+
+@media (width < 760px), (height <= 800px) {
+  .root {
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+  }
+
+  .richEditor {
+    flex: 1 1 6rem;
+    min-height: 5.5rem;
+    max-height: 10rem;
+  }
+}
+
+.richEditorTransport {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .textareaMirror {
   visibility: hidden;
   pointer-events: none;
@@ -159,13 +323,25 @@ textarea.textarea {
   flex-direction: column;
   gap: var(--space-xs);
   margin-top: var(--space-md);
+  max-height: min(18rem, 28vh);
+  overflow-y: auto;
+
+  &[data-has-quote='true'] {
+    max-height: none;
+    overflow: visible;
+  }
 }
 
 .footer {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: var(--space-2xs);
   flex-wrap: wrap;
+  position: relative;
+  border-top: 1px solid var(--color-border-primary);
+  padding-top: var(--space-xs);
+  margin-top: var(--space-2xs);
 }
 
 .counter {
@@ -181,10 +357,16 @@ textarea.textarea {
   color: var(--color-text-error);
 }
 
+.submitButton {
+  margin-inline-start: auto;
+}
+
 // Language selector
 
 .languageMenu {
   padding: var(--space-xs);
+  display: flex;
+  flex-direction: column;
 
   input {
     margin-bottom: var(--space-xs);
@@ -198,6 +380,51 @@ textarea.textarea {
 .languageList {
   max-height: 350px;
   overflow-y: auto;
+}
+
+@media screen and (width <= 759px) {
+  .root[role='dialog'] {
+    box-sizing: border-box;
+    flex: 0 1 auto;
+    height: fit-content;
+    min-height: 0;
+    max-height: calc(100vh - env(safe-area-inset-top) - var(--space-md));
+    max-height: calc(100dvh - env(safe-area-inset-top) - var(--space-md));
+    overflow: hidden;
+  }
+
+  .root[role='dialog'] .content {
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .root[role='dialog'] .richEditorWrapper,
+  .root[role='dialog'] .richEditor {
+    flex-grow: 0;
+  }
+
+  .root[role='dialog'] .footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    background: var(--color-bg-primary);
+    padding-bottom: max(var(--space-xs), env(safe-area-inset-bottom));
+  }
+
+  .languageMenu {
+    box-sizing: border-box;
+    width: min(280px, calc(100vw - 2 * var(--space-md)));
+    max-height: calc(100vh - 2 * var(--space-md));
+    max-height: calc(100dvh - 2 * var(--space-md));
+  }
+
+  .languageList {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
 }
 
 .languageItem {
@@ -257,7 +484,7 @@ textarea.textarea {
 
 div.emojiRoot {
   position: relative;
-  z-index: 2;
+  z-index: calc(infinity);
   padding: 0;
   min-width: 300px;
   min-height: 300px;
@@ -270,5 +497,16 @@ div.emojiRoot {
 
   @container (width > 400px) {
     min-height: 370px;
+  }
+
+  @media screen and (width <= 759px) {
+    box-sizing: border-box;
+    width: min(300px, calc(100vw - 16px));
+    min-width: 0;
+    max-width: calc(100vw - 16px);
+
+    :global(.emoji-mart) {
+      max-width: 100%;
+    }
   }
 }

@@ -18,14 +18,21 @@ describe('<DisplayName />', () => {
     expect(screen.queryByText('@alice@remote.example')).toBeNull();
   });
 
-  it('still renders the complete handle with the default variant', () => {
+  it('renders the full handle without an expansion control', () => {
     const { container } = render(<DisplayName account={account} />);
 
     expect(container.querySelector('.display-name__account')?.textContent).toBe(
       '@alice@remote.example',
     );
-    expect(container.querySelector('.display-name__domain')?.textContent).toBe(
-      '@remote.example',
+    expect(screen.queryByRole('button', { name: /username/i })).toBeNull();
+  });
+
+  it('does not add an incomplete domain when the local domain is unavailable', () => {
+    const localAccount = account.set('acct', 'alice');
+    const { container } = render(<DisplayName account={localAccount} />);
+
+    expect(container.querySelector('.display-name__account')?.textContent).toBe(
+      '@alice',
     );
   });
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -9,12 +9,14 @@ import {
   ChatCircleIcon,
   HouseIcon,
   MagnifyingGlassIcon,
+  HamburgerIcon,
 } from '@phosphor-icons/react';
 import { animated, useSpring } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
 
 import { closeNavigation, openNavigation } from '@/mastodon/actions/navigation';
 import { Avatar } from '@/mastodon/components/avatar';
+import { IconButton } from '@/mastodon/components/button/redesign';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { useAccount } from '@/mastodon/hooks/useAccount';
@@ -26,13 +28,21 @@ import { RedesignNavigationPanel } from '.';
 import classes from './mobile_nav.module.scss';
 import { MobileNavLink } from './navigation_link';
 
-export const RedesignMobileNavigation: React.FC = () => {
+export const RedesignMobileNavigation: React.FC<{
+  hideMenuButton?: boolean;
+}> = ({ hideMenuButton = false }) => {
+  const dispatch = useAppDispatch();
+
   const { accountId, signedIn } = useIdentity();
   const account = useAccount(accountId);
 
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
   );
+
+  const handleOpenNavigation = useCallback(() => {
+    dispatch(openNavigation());
+  }, [dispatch]);
 
   if (!signedIn) {
     return null;
@@ -81,6 +91,15 @@ export const RedesignMobileNavigation: React.FC = () => {
           </MobileNavLink>
         </ul>
         <ComposeRedesignButton inline />
+        {!hideMenuButton && (
+          <IconButton // Upstream placeholder; BlueLab 2.0 renders its own top-bar trigger.
+            icon={HamburgerIcon}
+            variant='solid'
+            onClick={handleOpenNavigation}
+          >
+            Menu
+          </IconButton>
+        )}
       </nav>
       <SlideOutNavigation />
     </>
@@ -201,7 +220,7 @@ const SlideOutNavigation: React.FC = () => {
       ref={overlayRef}
     >
       <animated.div className={classes.slideOut} {...bind()} style={{ x }}>
-        <RedesignNavigationPanel />
+        <RedesignNavigationPanel mode='slide-out' />
       </animated.div>
     </div>
   );

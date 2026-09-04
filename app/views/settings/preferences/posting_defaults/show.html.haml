@@ -57,6 +57,16 @@
                  wrapper: :with_label
 
     .fields-group
+      = ff.input :composer_editor,
+                 collection: [[I18n.t('posting_defaults.composer_editors.bluelab'), 'bluelab'], [I18n.t('posting_defaults.composer_editors.mastodon'), 'mastodon']],
+                 selected: current_user.settings['composer_editor'] || 'bluelab',
+                 include_blank: false,
+                 label: I18n.t('posting_defaults.composer_editor'),
+                 hint: I18n.t('posting_defaults.composer_editor_hint'),
+                 required: false,
+                 wrapper: :with_label
+
+    .fields-group
       = ff.input :default_sensitive,
                  hint: I18n.t('simple_form.hints.defaults.setting_default_sensitive'),
                  label: I18n.t('simple_form.labels.defaults.setting_default_sensitive'),

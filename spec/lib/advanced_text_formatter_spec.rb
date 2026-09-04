@@ -6,10 +6,10 @@ RSpec.describe AdvancedTextFormatter do
   subject(:formatted) { described_class.new(text, content_type: 'text/markdown', preloaded_accounts: []).to_s }
 
   context 'with supported Markdown' do
-    let(:text) { "**negrito** e *italico*\n\n- um\n- dois\n\n`codigo`" }
+    let(:text) { "**negrito**, *italico* e _sublinhado_\n\n- um\n- dois\n\n`codigo`" }
 
     it 'renders formatting and lists' do
-      expect(formatted).to include('<strong>negrito</strong>', '<em>italico</em>', '<ul>', '<code>codigo</code>')
+      expect(formatted).to include('<strong>negrito</strong>', '<em>italico</em>', '<u>sublinhado</u>', '<ul>', '<code>codigo</code>')
     end
   end
 

@@ -86,8 +86,8 @@ RSpec.describe InstancePresenter do
         end
       end
 
-      it 'defaults to the core mastodon repo URL' do
-        expect(instance_presenter.source_url).to eq('https://github.com/mastodon/mastodon')
+      it 'defaults to the BlueLab repository URL' do
+        expect(instance_presenter.source_url).to eq('https://github.com/lucascasanho/BlueLab')
       end
     end
 

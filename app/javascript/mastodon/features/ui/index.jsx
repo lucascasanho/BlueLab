@@ -23,8 +23,8 @@ import { PictureInPicture } from 'mastodon/features/picture_in_picture';
 import { identityContextPropShape, withIdentity } from 'mastodon/identity_context';
 import { layoutFromWindow, transientSingleColumn } from 'mastodon/is_mobile';
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
-import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import { checkAnnualReport } from '@/mastodon/reducers/slices/annual_report';
+import { openNewComposer, openPreferredComposer } from '@/mastodon/reducers/slices/composer';
 
 import { uploadCompose, resetCompose, changeComposeSpoilerness } from '../../actions/compose';
 import { clearHeight } from '../../actions/height_cache';
@@ -88,6 +88,7 @@ import {
 } from './util/async-components';
 import { ColumnsContextProvider } from './util/columns_context';
 import { focusColumn, getFocusedItemIndex, focusItemSibling, focusFirstItem, getFocusedColumnIndex } from './util/focusUtils';
+import { createMobileChromeScrollState, updateMobileChromeScrollState } from './util/mobile_chrome';
 import { WrappedSwitch, WrappedRoute } from './util/react_router_helpers';
 import { CustomHomepage } from 'mastodon/features/custom_homepage';
 
@@ -112,6 +113,7 @@ const mapStateToProps = state => ({
   firstLaunch: state.getIn(['settings', 'introductionVersion'], 0) < INTRODUCTION_VERSION,
   newAccount: !state.getIn(['accounts', me, 'note']) && !state.getIn(['accounts', me, 'bot']) && state.getIn(['accounts', me, 'following_count'], 0) === 0 && state.getIn(['accounts', me, 'statuses_count'], 0) === 0,
   username: state.getIn(['accounts', me, 'username']),
+  composerEditor: state.getIn(['compose', 'composer_editor']) === 'mastodon' ? 'mastodon' : 'bluelab',
 });
 
 class SwitchingColumnsArea extends PureComponent {
@@ -285,11 +287,83 @@ class UI extends PureComponent {
     firstLaunch: PropTypes.bool,
     newAccount: PropTypes.bool,
     username: PropTypes.string,
+    composerEditor: PropTypes.oneOf(['bluelab', 'mastodon']).isRequired,
     ...WithRouterPropTypes,
   };
 
   state = {
     draggingOver: false,
+    mobileChromeHidden: false,
+  };
+
+  mobileChromeAnimationFrame = null;
+  mobileChromeScrollState = createMobileChromeScrollState();
+  mobileChromeViewportWidth = null;
+
+  getDocumentScrollMetrics = () => {
+    const scrollingElement = document.scrollingElement;
+    if (!scrollingElement) return { y: 0, maxY: 0 };
+    return {
+      y: scrollingElement.scrollTop,
+      maxY: scrollingElement.scrollHeight - scrollingElement.clientHeight,
+    };
+  };
+
+  resetMobileChrome = () => {
+    const { y, maxY } = this.getDocumentScrollMetrics();
+    const clampedY = Math.min(Math.max(y, 0), Math.max(maxY, 0));
+    this.mobileChromeScrollState = createMobileChromeScrollState(clampedY);
+    if (this.state.mobileChromeHidden) {
+      this.setState({ mobileChromeHidden: false });
+    }
+  };
+
+  scheduleMobileChromeReset = () => {
+    if (this.mobileChromeAnimationFrame !== null) {
+      cancelAnimationFrame(this.mobileChromeAnimationFrame);
+    }
+    this.mobileChromeAnimationFrame = requestAnimationFrame(() => {
+      this.mobileChromeAnimationFrame = null;
+      this.resetMobileChrome();
+    });
+  };
+
+  handleMobileScroll = () => {
+    if (this.mobileChromeAnimationFrame !== null) return;
+
+    this.mobileChromeAnimationFrame = requestAnimationFrame(() => {
+      this.mobileChromeAnimationFrame = null;
+      if (window.innerWidth > 759 || !this.props.identity.signedIn) {
+        this.resetMobileChrome();
+        return;
+      }
+
+      const { y, maxY } = this.getDocumentScrollMetrics();
+      const activeElement = document.activeElement;
+      if (
+        document.documentElement.classList.contains('has-modal') ||
+        activeElement?.closest?.(
+          '[data-bluelab-composer], .tabs-bar__wrapper, .ui__navigation-bar',
+        )
+      ) {
+        const clampedY = Math.min(Math.max(y, 0), Math.max(maxY, 0));
+        this.mobileChromeScrollState = createMobileChromeScrollState(
+          clampedY,
+          this.state.mobileChromeHidden,
+        );
+        return;
+      }
+
+      const nextState = updateMobileChromeScrollState(
+        this.mobileChromeScrollState,
+        y,
+        maxY,
+      );
+      this.mobileChromeScrollState = nextState;
+      if (nextState.hidden !== this.state.mobileChromeHidden) {
+        this.setState({ mobileChromeHidden: nextState.hidden });
+      }
+    });
   };
 
   handleBeforeUnload = e => {
@@ -406,6 +480,11 @@ class UI extends PureComponent {
   handleResize = () => {
     const layout = layoutFromWindow();
 
+    if (window.innerWidth !== this.mobileChromeViewportWidth) {
+      this.mobileChromeViewportWidth = window.innerWidth;
+      this.scheduleMobileChromeReset();
+    }
+
     if (layout !== this.props.layout) {
       this.handleLayoutChange.cancel();
       this.props.dispatch(changeLayout({ layout }));
@@ -420,6 +499,7 @@ class UI extends PureComponent {
 
   componentDidMount () {
     const { signedIn } = this.props.identity;
+    this.mobileChromeViewportWidth = window.innerWidth;
 
     window.addEventListener('focus', this.handleWindowFocus, false);
     window.addEventListener('blur', this.handleWindowBlur, false);
@@ -430,6 +510,8 @@ class UI extends PureComponent {
     document.addEventListener('dragover', this.handleDragOver, false);
     document.addEventListener('drop', this.handleDrop, false);
     document.addEventListener('dragleave', this.handleDragLeave, false);
+    window.addEventListener('scroll', this.handleMobileScroll, { passive: true });
+    this.scheduleMobileChromeReset();
 
     if ('serviceWorker' in  navigator) {
       navigator.serviceWorker.addEventListener('message', this.handleServiceWorkerPostMessage);
@@ -456,6 +538,21 @@ class UI extends PureComponent {
     document.removeEventListener('dragover', this.handleDragOver);
     document.removeEventListener('drop', this.handleDrop);
     document.removeEventListener('dragleave', this.handleDragLeave);
+    window.removeEventListener('scroll', this.handleMobileScroll);
+
+    if (this.mobileChromeAnimationFrame !== null) {
+      cancelAnimationFrame(this.mobileChromeAnimationFrame);
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (
+      prevProps.location.pathname !== this.props.location.pathname ||
+      prevProps.location.key !== this.props.location.key ||
+      prevProps.identity.signedIn !== this.props.identity.signedIn
+    ) {
+      this.scheduleMobileChromeReset();
+    }
   }
 
   setRef = c => {
@@ -464,12 +561,30 @@ class UI extends PureComponent {
 
   handleHotkeyNew = e => {
     e.preventDefault();
-
-    const element = this.node.querySelector('.autosuggest-textarea__textarea');
-
-    if (element) {
-      element.focus();
+    if (this.props.composerEditor === 'mastodon') {
+      const upstreamEditor = this.node.querySelector('.autosuggest-textarea__textarea');
+      if (upstreamEditor) {
+        upstreamEditor.focus();
+        return;
+      }
+      this.props.dispatch(openPreferredComposer({}));
+    } else {
+      this.props.dispatch(openNewComposer({ type: 'post' }));
     }
+    setTimeout(() => {
+      const element = this.node.querySelector('[contenteditable="true"], [contenteditable="plaintext-only"], .autosuggest-textarea__textarea');
+      element?.focus();
+    }, 0);
+  };
+
+  handleHotkeyMention = e => {
+    if (this.props.composerEditor === 'mastodon') return;
+    e.preventDefault();
+    this.props.dispatch(openNewComposer({ type: 'message' }));
+    setTimeout(() => {
+      const element = this.node.querySelector('[contenteditable="true"], [contenteditable="plaintext-only"], .autosuggest-textarea__textarea');
+      element?.focus();
+    }, 0);
   };
 
   handleHotkeySearch = e => {
@@ -498,6 +613,18 @@ class UI extends PureComponent {
 
   handleHotkeyLoadMore = () => {
     document.querySelector('.load-more')?.focus();
+  };
+
+  handleHotkeyLoadNewPosts = () => {
+    const timeline = document.querySelector('.status-list');
+    if (!timeline) return false;
+
+    // Reuse the same control that is shown for pending items. It only exists
+    // when the active timeline has items ready to be inserted, so this does
+    // not issue a redundant timeline request.
+    document.querySelector('.load-gap')?.click();
+    timeline.closest('.scrollable')?.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   handleMoveToTop = () => {
@@ -603,17 +730,19 @@ class UI extends PureComponent {
   };
 
   render () {
-    const { draggingOver } = this.state;
+    const { draggingOver, mobileChromeHidden } = this.state;
     const { children, isComposing, location, layout, firstLaunch, newAccount } = this.props;
 
     const handlers = {
       help: this.handleHotkeyToggleHelp,
       new: this.handleHotkeyNew,
+      mention: this.handleHotkeyMention,
       search: this.handleHotkeySearch,
       forceNew: this.handleHotkeyForceNew,
       toggleComposeSpoilers: this.handleHotkeyToggleComposeSpoilers,
       focusColumn: this.handleHotkeyFocusColumn,
       focusLoadMore: this.handleHotkeyLoadMore,
+      loadNewPosts: this.handleHotkeyLoadNewPosts,
       moveDown: this.handleMoveDown,
       moveUp: this.handleMoveUp,
       moveToTop: this.handleMoveToTop,
@@ -638,7 +767,7 @@ class UI extends PureComponent {
 
     return (
       <Hotkeys global handlers={handlers}>
-        <div className={classNames('ui', { 'is-composing': isComposing })} ref={this.setRef}>
+        <div className={classNames('ui', { 'is-composing': isComposing, 'ui--mobile-chrome-hidden': mobileChromeHidden })} ref={this.setRef}>
           {!minimalShell && (
             <SkipLinks
               multiColumn={layout === 'multi-column'}
@@ -657,7 +786,7 @@ class UI extends PureComponent {
             {children}
           </SwitchingColumnsArea>
 
-          {!minimalShell && !isRedesignEnabled() && <NavigationBar />}
+          {!minimalShell && <NavigationBar />}
           {layout !== 'mobile' && <PictureInPicture />}
           <AlertsController />
           {!disableHoverCards && <HoverCardController />}

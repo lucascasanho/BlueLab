@@ -21,6 +21,15 @@ RSpec.describe 'Admin::Settings::ContentRetention' do
       .to have_text(success_message)
   end
 
+  it 'Offers the scoped manual cache cleanup' do
+    visit admin_settings_content_retention_path
+
+    expect(page).to have_link(
+      I18n.t('admin.settings.content_retention.cleanup_button'),
+      href: cleanup_admin_settings_content_retention_path
+    )
+  end
+
   def media_cache_retention_period_field
     form_label 'form_admin_settings.media_cache_retention_period'
   end

@@ -14,14 +14,21 @@ import {
 
 import FediIcon from '@/images/icons/icon_fediverse.svg?react';
 import { fetchLists } from '@/mastodon/actions/lists';
+import { closeNavigation } from '@/mastodon/actions/navigation';
 import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
+import { blue2Text } from '@/mastodon/features/blue2/locale';
 import { useScrollSensor } from '@/mastodon/hooks/useScrollSensor';
 import { useIdentity } from '@/mastodon/identity_context';
-import { openNewComposer } from '@/mastodon/reducers/slices/composer';
+import {
+  composerOriginFromElement,
+  openPreferredComposer,
+  selectComposerEditor,
+} from '@/mastodon/reducers/slices/composer';
 import { getOrderedLists } from '@/mastodon/selectors/lists';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import AddIcon from '@/material-icons/400-24px/add.svg?react';
 
 import { NavigationAccountCardAndMenu } from './account_card_and_menu';
 import { NavigationFooterLinks } from './footer_links';
@@ -51,9 +58,7 @@ function useCustomFeeds() {
     }
   }, [dispatch, signedIn]);
 
-  return {
-    customFeeds,
-  };
+  return { customFeeds };
 }
 
 function useFollowedHashtags() {
@@ -70,37 +75,46 @@ function useFollowedHashtags() {
   return { followedHashtags: tags };
 }
 
-export const RedesignNavigationPanel: React.FC<{ siteName?: string }> = ({
-  siteName,
-}) => {
+export const RedesignNavigationPanel: React.FC<{
+  siteName?: string;
+  mode?: 'static' | 'slide-out';
+}> = ({ siteName, mode = 'static' }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const { signedIn } = useIdentity();
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
   );
+  const composerEditor = useAppSelector(selectComposerEditor);
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
-  const openComposer = useCallback(() => {
-    dispatch(openNewComposer({ type: 'post' }));
-  }, [dispatch]);
+  const openComposer = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      dispatch(closeNavigation());
+      dispatch(
+        openPreferredComposer({
+          origin: composerOriginFromElement(event.currentTarget),
+        }),
+      );
+    },
+    [dispatch],
+  );
 
   const { customFeeds } = useCustomFeeds();
   const { followedHashtags } = useFollowedHashtags();
 
   const { sensor: topSensor, isInViewport: isScrolledToTop } = useScrollSensor({
     placement: 'top',
-    // Only show overlay fade after a bit of scrolling, as the nav header has
-    // a bit of bottom spacing where the fade isn't needed yet
     tolerance: 36,
   });
   const { sensor: bottomSensor, isInViewport: isScrolledToBottom } =
-    useScrollSensor({
-      placement: 'bottom',
-    });
+    useScrollSensor({ placement: 'bottom' });
 
   return (
     <nav
       className={classes.root}
+      data-mode={mode}
       aria-label={intl.formatMessage(messages.main)}
     >
       {topSensor}
@@ -111,13 +125,21 @@ export const RedesignNavigationPanel: React.FC<{ siteName?: string }> = ({
             <NavigationLink
               withSpaceAfter
               as='button'
+              type='button'
+              data-bluelab-compose={isBlue2 ? 'true' : undefined}
               onClick={openComposer}
-              iconComponent={PenNibIcon}
+              iconComponent={
+                composerEditor === 'mastodon' ? AddIcon : PenNibIcon
+              }
             >
-              <FormattedMessage
-                id='tabs_bar.publish'
-                defaultMessage='New Post'
-              />
+              {isBlue2 ? (
+                blue2Text(intl.locale, 'write')
+              ) : (
+                <FormattedMessage
+                  id='tabs_bar.publish'
+                  defaultMessage='New Post'
+                />
+              )}
             </NavigationLink>
             <NavigationLink to='/home' iconComponent={HouseIcon}>
               <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
@@ -139,20 +161,30 @@ export const RedesignNavigationPanel: React.FC<{ siteName?: string }> = ({
               to='/public/local'
               iconComponent={FediIcon}
             >
-              <FormattedMessage
-                id='tabs_bar.fediverse_feeds'
-                defaultMessage='Fediverse Feeds'
-              />
+              {isBlue2 ? (
+                blue2Text(intl.locale, 'fediverseFeeds')
+              ) : (
+                <FormattedMessage
+                  id='tabs_bar.fediverse_feeds'
+                  defaultMessage='Fediverse Feeds'
+                />
+              )}
             </NavigationLink>
             <ListSection
               title={
-                <FormattedMessage
-                  id='tabs_bar.custom_feeds'
-                  defaultMessage='Custom Feeds'
-                />
+                isBlue2 ? (
+                  blue2Text(intl.locale, 'customFeeds')
+                ) : (
+                  <FormattedMessage
+                    id='tabs_bar.custom_feeds'
+                    defaultMessage='Custom Feeds'
+                  />
+                )
               }
               action={{
-                label: (
+                label: isBlue2 ? (
+                  blue2Text(intl.locale, 'createFeed')
+                ) : (
                   <FormattedMessage
                     id='tabs_bar.create_custom_feed'
                     defaultMessage='Create feed'
@@ -161,10 +193,14 @@ export const RedesignNavigationPanel: React.FC<{ siteName?: string }> = ({
                 link: '/lists/new',
               }}
               emptyMessage={
-                <FormattedMessage
-                  id='tabs_bar.custom_feeds_empty'
-                  defaultMessage='You have no custom feeds yet.'
-                />
+                isBlue2 ? (
+                  blue2Text(intl.locale, 'customFeedsEmpty')
+                ) : (
+                  <FormattedMessage
+                    id='tabs_bar.custom_feeds_empty'
+                    defaultMessage='You have no custom feeds yet.'
+                  />
+                )
               }
             >
               {customFeeds.map((feed) => (

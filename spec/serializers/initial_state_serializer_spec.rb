@@ -28,4 +28,26 @@ RSpec.describe InitialStateSerializer do
       expect(meta[:hide_status_character_counter]).to be true
     end
   end
+
+  context 'without a signed-in account' do
+    let(:presenter) { InitialStatePresenter.new }
+
+    it 'uses the BlueLab overview instead of the upstream about page by default' do
+      Setting.landing_page = 'about'
+
+      expect(meta[:landing_page]).to eq 'overview'
+    end
+
+    it 'preserves an explicitly configured trends landing page' do
+      Setting.landing_page = 'trends'
+
+      expect(meta[:landing_page]).to eq 'trends'
+    end
+
+    it 'preserves an explicitly configured local feed landing page' do
+      Setting.landing_page = 'local_feed'
+
+      expect(meta[:landing_page]).to eq 'local_feed'
+    end
+  end
 end

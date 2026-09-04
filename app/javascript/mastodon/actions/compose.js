@@ -7,6 +7,7 @@ import api from 'mastodon/api';
 import { browserHistory } from 'mastodon/components/router';
 import { countableText } from 'mastodon/features/compose/util/counter';
 import { tagHistory } from 'mastodon/settings';
+import { cancelResumableMediaUpload, shouldUseResumableMediaUpload, uploadResumableMedia } from 'mastodon/utils/resumable_media_upload';
 import { emojiMartSearch } from '@/mastodon/features/emoji/picker';
 
 import { showAlert, showAlertForError } from './alerts';
@@ -22,6 +23,10 @@ let fetchComposeSuggestionsAccountsController;
 let fetchComposeSuggestionsTagsController;
 /** @type {AbortController | undefined} */
 let searchComposeSuggestionsEmojiController;
+/** @type {AbortController | undefined} */
+let activeComposeUploadController;
+/** @type {string | undefined} */
+let activeResumableMediaUploadId;
 
 export const COMPOSE_CHANGE          = 'COMPOSE_CHANGE';
 export const COMPOSE_SUBMIT_REQUEST  = 'COMPOSE_SUBMIT_REQUEST';
@@ -39,6 +44,7 @@ export const COMPOSE_UPLOAD_FAIL       = 'COMPOSE_UPLOAD_FAIL';
 export const COMPOSE_UPLOAD_PROGRESS   = 'COMPOSE_UPLOAD_PROGRESS';
 export const COMPOSE_UPLOAD_PROCESSING = 'COMPOSE_UPLOAD_PROCESSING';
 export const COMPOSE_UPLOAD_UNDO       = 'COMPOSE_UPLOAD_UNDO';
+export const COMPOSE_UPLOAD_CANCEL     = 'COMPOSE_UPLOAD_CANCEL';
 
 export const THUMBNAIL_UPLOAD_REQUEST  = 'THUMBNAIL_UPLOAD_REQUEST';
 export const THUMBNAIL_UPLOAD_SUCCESS  = 'THUMBNAIL_UPLOAD_SUCCESS';
@@ -91,8 +97,14 @@ const messages = defineMessages({
   blankPostError: { id: 'compose.error.blank_post', defaultMessage: 'Post can\'t be blank.' },
 });
 
-export const ensureComposeIsVisible = (getState) => {
-  if (!getState().getIn(['compose', 'mounted'])) {
+export const ensureComposeIsVisible = (getState, dispatch) => {
+  const state = getState();
+
+  if (state.getIn(['compose', 'composer_editor']) !== 'mastodon') {
+    if (state.composer.displayState !== 'showing') {
+      dispatch({ type: 'composer/showComposer' });
+    }
+  } else if (!state.getIn(['compose', 'mounted'])) {
     browserHistory.push('/publish', { focusTarget: false });
   }
 };
@@ -126,7 +138,7 @@ export function replyCompose(status) {
       status: status,
     });
 
-    ensureComposeIsVisible(getState);
+    ensureComposeIsVisible(getState, dispatch);
   };
 }
 
@@ -161,7 +173,7 @@ export const focusCompose = (defaultText = '', caretStart = false) => (dispatch,
     caretStart,
   });
 
-  ensureComposeIsVisible(getState);
+  ensureComposeIsVisible(getState, dispatch);
 };
 
 export function mentionCompose(account) {
@@ -171,7 +183,7 @@ export function mentionCompose(account) {
       account: account,
     });
 
-    ensureComposeIsVisible(getState);
+    ensureComposeIsVisible(getState, dispatch);
   };
 }
 
@@ -188,7 +200,7 @@ export function directCompose(account) {
       account: account,
     });
 
-    ensureComposeIsVisible(getState);
+    ensureComposeIsVisible(getState, dispatch);
   };
 }
 
@@ -328,7 +340,7 @@ export function submitComposeFail(error) {
 }
 
 export function uploadCompose(files) {
-  return function (dispatch, getState) {
+  return async function (dispatch, getState) {
     // Exit if there's a quote.
     if (getState().compose.get('quoted_status_id')) {
       dispatch(showAlert({ message: messages.uploadQuote }));
@@ -337,54 +349,99 @@ export function uploadCompose(files) {
     const uploadLimit = getState().getIn(['server', 'server', 'item', 'configuration', 'statuses', 'max_media_attachments']);
     const media = getState().getIn(['compose', 'media_attachments']);
     const pending = getState().getIn(['compose', 'pending_media_attachments']);
-    const progress = new Array(files.length).fill(0);
-
-    let total = Array.from(files).reduce((a, v) => a + v.size, 0);
-
     if (files.length + media.size + pending > uploadLimit) {
       dispatch(showAlert({ message: messages.uploadErrorLimit }));
       return;
     }
 
-    dispatch(uploadComposeRequest());
-
     for (const [i, file] of Array.from(files).entries()) {
       if (media.size + i > (uploadLimit - 1)) break;
 
-      const data = new FormData();
-      data.append('file', file);
+      dispatch(uploadComposeRequest(file.name, file.size));
+      activeComposeUploadController = new AbortController();
 
-      api().post('/api/v2/media', data, {
-        onUploadProgress: function({ loaded }){
-          progress[i] = loaded;
-          dispatch(uploadComposeProgress(progress.reduce((a, v) => a + v, 0), total));
-        },
-      }).then(({ status, data }) => {
-        // If server-side processing of the media attachment has not completed yet,
-        // poll the server until it is, before showing the media attachment as uploaded
+      try {
+        const resumableConfig = getState().getIn(['media_attachments', 'resumable_uploads']);
+        const useResumableUpload = shouldUseResumableMediaUpload(
+          file.size,
+          resumableConfig?.get('enabled') === true,
+          resumableConfig?.get('chunk_size') ?? 0,
+        );
+        let uploadedMedia;
 
-        if (status === 200) {
-          dispatch(uploadComposeSuccess(data, file));
-        } else if (status === 202) {
-          dispatch(uploadComposeProcessing());
-
-          let tryCount = 1;
-
-          const poll = () => {
-            api().get(`/api/v1/media/${data.id}`).then(response => {
-              if (response.status === 200) {
-                dispatch(uploadComposeSuccess(response.data, file));
-              } else if (response.status === 206) {
-                const retryAfter = (Math.log2(tryCount) || 1) * 1000;
-                tryCount += 1;
-                setTimeout(() => poll(), retryAfter);
-              }
-            }).catch(error => dispatch(uploadComposeFail(error)));
-          };
-
-          poll();
+        if (useResumableUpload) {
+          uploadedMedia = await uploadResumableMedia(file, {
+            onProgress: (loaded, total) => dispatch(uploadComposeProgress(loaded, total)),
+            onProcessing: () => dispatch(uploadComposeProcessing()),
+            onSession: id => {
+              activeResumableMediaUploadId = id;
+            },
+          }, activeComposeUploadController.signal);
+        } else {
+          uploadedMedia = await uploadTraditionalMedia(file, dispatch, activeComposeUploadController.signal);
         }
-      }).catch(error => dispatch(uploadComposeFail(error)));
+
+        dispatch(uploadComposeSuccess(uploadedMedia, file));
+      } catch (error) {
+        if (axios.isCancel(error) || error?.name === 'AbortError') {
+          dispatch(uploadComposeCancel());
+          return;
+        } else {
+          dispatch(uploadComposeFail(error));
+        }
+      } finally {
+        activeComposeUploadController = undefined;
+        activeResumableMediaUploadId = undefined;
+      }
+    }
+  };
+}
+
+async function uploadTraditionalMedia(file, dispatch, signal) {
+  const data = new FormData();
+  data.append('file', file);
+
+  const response = await api().post('/api/v2/media', data, {
+    signal,
+    onUploadProgress: ({ loaded }) => {
+      dispatch(uploadComposeProgress(loaded, file.size));
+    },
+  });
+
+  if (response.status === 200) return response.data;
+
+  dispatch(uploadComposeProcessing());
+  let tryCount = 1;
+
+  while (true) {
+    const pollResponse = await api().get(`/api/v1/media/${response.data.id}`, {
+      signal,
+      validateStatus: status => [200, 206].includes(status),
+    });
+    if (pollResponse.status === 200) return pollResponse.data;
+
+    const retryAfter = Math.min(10_000, (Math.log2(tryCount) || 1) * 1000);
+    tryCount += 1;
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(resolve, retryAfter);
+      signal.addEventListener('abort', () => {
+        clearTimeout(timeout);
+        reject(new DOMException('Upload canceled', 'AbortError'));
+      }, { once: true });
+    });
+  }
+}
+
+export function cancelUploadCompose() {
+  return async function () {
+    activeComposeUploadController?.abort();
+
+    if (activeResumableMediaUploadId) {
+      try {
+        await cancelResumableMediaUpload(activeResumableMediaUploadId);
+      } catch {
+        // The server-side expiration job remains a safe cleanup fallback.
+      }
     }
   };
 }
@@ -465,9 +522,11 @@ export function onChangeMediaFocus(focusX, focusY) {
   };
 }
 
-export function uploadComposeRequest() {
+export function uploadComposeRequest(filename, total) {
   return {
     type: COMPOSE_UPLOAD_REQUEST,
+    filename,
+    total,
     skipLoading: true,
   };
 }
@@ -493,6 +552,13 @@ export function uploadComposeFail(error) {
   return {
     type: COMPOSE_UPLOAD_FAIL,
     error: error,
+    skipLoading: true,
+  };
+}
+
+export function uploadComposeCancel() {
+  return {
+    type: COMPOSE_UPLOAD_CANCEL,
     skipLoading: true,
   };
 }

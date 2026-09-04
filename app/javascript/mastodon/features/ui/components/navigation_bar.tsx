@@ -5,6 +5,8 @@ import { useIntl, defineMessages, FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { NavLink, useRouteMatch } from 'react-router-dom';
 
+import { PenNibIcon } from '@phosphor-icons/react';
+
 import AddIcon from '@/material-icons/400-24px/add.svg?react';
 import HomeActiveIcon from '@/material-icons/400-24px/home-fill.svg?react';
 import HomeIcon from '@/material-icons/400-24px/home.svg?react';
@@ -20,6 +22,11 @@ import { IconWithBadge } from 'mastodon/components/icon_with_badge';
 import type { MastodonLocationDescriptor } from 'mastodon/components/router';
 import { useIdentity } from 'mastodon/identity_context';
 import { registrationsOpen, sso_redirect } from 'mastodon/initial_state';
+import {
+  composerOriginFromElement,
+  openPreferredComposer,
+  selectComposerEditor,
+} from 'mastodon/reducers/slices/composer';
 import { selectUnreadNotificationGroupsCount } from 'mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
@@ -85,6 +92,40 @@ const NotificationsButton = () => {
       }
       title={intl.formatMessage(messages.notifications)}
     />
+  );
+};
+
+const ComposeButton = () => {
+  const dispatch = useAppDispatch();
+  const editor = useAppSelector(selectComposerEditor);
+  const intl = useIntl();
+  const publishMatch = useRouteMatch('/publish');
+  const isActive = editor === 'mastodon' && !!publishMatch;
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      dispatch(
+        openPreferredComposer({
+          origin: composerOriginFromElement(event.currentTarget),
+        }),
+      );
+    },
+    [dispatch],
+  );
+
+  return (
+    <button
+      className={classNames(
+        'ui__navigation-bar__item ui__navigation-bar__item--compose',
+        { active: isActive },
+      )}
+      type='button'
+      onClick={handleClick}
+      aria-label={intl.formatMessage(messages.publish)}
+      aria-current={isActive ? 'page' : undefined}
+      data-composer-editor={editor}
+    >
+      <Icon id='' icon={editor === 'mastodon' ? AddIcon : PenNibIcon} />
+    </button>
   );
 };
 
@@ -163,10 +204,23 @@ export const NavigationBar: React.FC = () => {
   const dispatch = useAppDispatch();
   const open = useAppSelector((state) => state.navigation.open);
   const intl = useIntl();
+  const isBlue2Mobile =
+    signedIn &&
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'blue-2' &&
+    typeof window !== 'undefined' &&
+    window.matchMedia('(max-width: 759px)').matches;
 
   const handleClick = useCallback(() => {
     dispatch(toggleNavigation());
   }, [dispatch]);
+
+  // BlueLab mobile renders its own navigation shell. Keeping the legacy
+  // navigation mounted underneath it creates a second bottom bar and duplicate
+  // focus targets, so suppress it only for signed-in BlueLab users on phones.
+  if (isBlue2Mobile) {
+    return null;
+  }
 
   return (
     <div className='ui__navigation-bar'>
@@ -190,11 +244,7 @@ export const NavigationBar: React.FC = () => {
               to='/explore'
               icon={<Icon id='' icon={SearchIcon} />}
             />
-            <IconLabelButton
-              title={intl.formatMessage(messages.publish)}
-              to={{ pathname: '/publish', state: { focusTarget: false } }}
-              icon={<Icon id='' icon={AddIcon} />}
-            />
+            <ComposeButton />
             <NotificationsButton />
           </>
         )}

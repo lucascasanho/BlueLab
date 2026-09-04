@@ -2,8 +2,8 @@ import { length } from 'stringz';
 
 import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
 import { immutableListToSuggestions } from '@/mastodon/components/autosuggest/utils';
-import type { StatusVisibility } from '@/mastodon/models/status';
 import { statusMaxCharacters } from '@/mastodon/initial_state';
+import type { StatusVisibility } from '@/mastodon/models/status';
 import type { ComposeType } from '@/mastodon/reducers/slices/composer';
 import { createAppSelector } from '@/mastodon/store';
 import { DAY, MINUTE } from '@/mastodon/utils/time';

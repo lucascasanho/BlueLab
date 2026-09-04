@@ -39,9 +39,16 @@ RSpec.describe 'Admin instance customization settings' do
     expect(response.body).to_not include('content__heading__tabs')
     expect(response.body).to_not include('&#39;dark&#39;')
     expect(response.body).to_not include('Editor e emojis', 'Editor and emoji')
-    expect(response.parsed_body.css('button[type="submit"]').count).to eq(2)
+    expect(response.parsed_body.css('button[type="submit"]').count).to eq(20)
     expect(response.parsed_body.css('button[name="reset_all"]').count).to eq(1)
-    expect(response.parsed_body.css('input[name^="reset["]').count).to eq(0)
+  end
+
+  it 'offers a reset action for each customizable color' do
+    sign_in Fabricate(:admin_user)
+    get admin_settings_instance_customization_path
+
+    expect(response.parsed_body.css('button[name="reset[instance_accent_color]"]').count).to eq(1)
+    expect(response.parsed_body.css('button[name="reset[email_dark_surface_color]"]').count).to eq(1)
   end
 
   it 'explains branding uploads and offers light, dark, and email colors' do
@@ -65,6 +72,18 @@ RSpec.describe 'Admin instance customization settings' do
     expect(response).to redirect_to(admin_settings_instance_customization_path)
     expect(Setting.find_by(var: :status_character_limit)).to be_nil
     expect(Setting.find_by(var: :instance_accent_color)).to be_nil
+  end
+
+  it 'restores an individual color without resetting other customizations' do
+    sign_in Fabricate(:admin_user)
+    Setting.instance_accent_color = '#5638cc'
+    Setting.email_button_color = '#6364ff'
+
+    put admin_settings_instance_customization_path, params: valid_params.merge(reset: { instance_accent_color: '1' })
+
+    expect(response).to redirect_to(admin_settings_instance_customization_path)
+    expect(Setting.find_by(var: :instance_accent_color)).to be_nil
+    expect(Setting.email_button_color).to eq('#5638cc')
   end
 
   it 'renders a native single-line sidebar entry with an available icon' do

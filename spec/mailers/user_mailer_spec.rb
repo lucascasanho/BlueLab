@@ -65,6 +65,20 @@ RSpec.describe UserMailer do
         .and match(Rails.configuration.x.local_domain)
     end
 
+    it 'uses customized light and dark colors in the HTML layout' do
+      Setting.email_background_color = '#123456'
+      Setting.email_surface_color = '#234567'
+      Setting.email_text_color = '#345678'
+      Setting.email_dark_background_color = '#102030'
+      Setting.email_dark_surface_color = '#203040'
+      Setting.email_dark_text_color = '#f0f1f2'
+
+      html = mail.html_part.body.decoded
+
+      expect(html).to include('#123456', '#234567', '#345678', '#102030', '#203040', '#f0f1f2')
+      expect(html).to include('@media (prefers-color-scheme: dark)')
+    end
+
     context 'when the user needs to reconfirm' do
       before { receiver.update!(email: 'new-email@example.com', locale: nil) }
 

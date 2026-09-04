@@ -76,3 +76,7 @@
       interval: 1 hour
       class: Scheduler::CollectionItemCleanupScheduler
       queue: scheduler
+    resumable_media_uploads_cleanup_scheduler:
+      interval: 1 hour
+      class: Scheduler::ResumableMediaUploadsCleanupScheduler
+      queue: scheduler

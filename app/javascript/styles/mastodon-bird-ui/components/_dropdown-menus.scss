@@ -5,11 +5,121 @@
 .dropdown-menu__container {
   max-height: calc(100vh - 16px);
   overflow-y: auto;
-  scrollbar-color: var(--color-border) transparent;
+  scrollbar-color: var(--color-border-primary) var(--color-bg-secondary);
   scrollbar-width: thin;
 }
 
 .dropdown-menu__container::-webkit-scrollbar {
   height: 4px;
   width: 4px;
+}
+
+// Menu popovers can be portaled outside the column layout. Keep the legacy
+// menu implementations on neutral theme tokens without relying on scoping.
+.dropdown-menu,
+.actions-modal,
+.dropdown-menu__arrow::before,
+.privacy-dropdown__dropdown,
+.language-dropdown__dropdown,
+.visibility-dropdown__dropdown,
+.privacy-dropdown.active .privacy-dropdown__value {
+  background: var(--color-bg-primary);
+  border-color: var(--color-border-primary);
+  color: var(--color-text-primary);
+}
+
+.dropdown-menu {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.dropdown-menu__item {
+  a,
+  button {
+    border-radius: calc(var(--radius-md) - 2px);
+  }
+
+  :is(a, button):is(:hover, :focus, :active):where(
+      :not(:disabled, [aria-disabled='true'])
+    ) {
+    background-color: var(--color-bg-highlight);
+  }
+}
+
+// DropdownMenu uses ActionsModal on narrow screens. It is the same menu and
+// should retain the same hover and keyboard-focus treatment.
+.actions-modal {
+  :is(a, button) {
+    color: var(--color-text-primary);
+  }
+
+  :is(a, button):is(:hover, :focus, :active) {
+    background-color: var(--color-bg-highlight);
+  }
+
+  :is(a, button):focus-visible {
+    outline: var(--outline-focus-default);
+    outline-offset: -2px;
+  }
+}
+
+// Classic compose and settings selectors still use the legacy listbox
+// classes. Their upstream selected state uses the brand fill, which brings
+// back Mastodon's blue even when the menu surface is neutral.
+:is(.privacy-dropdown__option, .visibility-dropdown__option) {
+  &:is(:hover, :active) {
+    background: var(--color-bg-highlight);
+    color: var(--color-text-primary);
+  }
+
+  &:is(:focus, .active) {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+  }
+
+  &:focus-visible {
+    outline: var(--outline-focus-default);
+    outline-offset: -2px;
+  }
+}
+
+:is(.privacy-dropdown__option, .visibility-dropdown__option):is(
+  :focus,
+  .active
+) {
+  :is(
+    .privacy-dropdown__option__content,
+    .privacy-dropdown__option__additional,
+    .visibility-dropdown__option__content,
+    .visibility-dropdown__option__additional
+  ) {
+    color: var(--color-text-secondary);
+  }
+
+  :is(.privacy-dropdown__option__content, .visibility-dropdown__option__content)
+    strong {
+    color: var(--color-text-primary);
+  }
+}
+
+.language-dropdown__dropdown__results__item {
+  &:is(:hover, :active) {
+    background: var(--color-bg-highlight);
+    color: var(--color-text-primary);
+  }
+
+  &:is(:focus, .active) {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+  }
+
+  &:focus-visible {
+    outline: var(--outline-focus-default);
+    outline-offset: -2px;
+  }
+
+  &:is(:focus, .active)
+    .language-dropdown__dropdown__results__item__common-name {
+    color: var(--color-text-secondary);
+  }
 }

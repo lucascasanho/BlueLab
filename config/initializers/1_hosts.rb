@@ -28,8 +28,13 @@ Rails.application.configure do
   end
 
   unless Rails.env.test?
-    config.hosts << host if host.present?
-    config.hosts << web_host if web_host.present?
+    config.hosts.concat([
+      host,
+      web_host,
+      'localhost',
+      '127.0.0.1',
+      '::1',
+    ].compact.uniq)
     config.hosts.concat(alternate_domains) if alternate_domains.present?
     config.host_authorization = { exclude: ->(request) { request.path == '/health' } }
   end

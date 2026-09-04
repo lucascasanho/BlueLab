@@ -1006,6 +1006,7 @@ en:
         preamble: Persistent, validated server customization. Saving does not edit source files and changes apply immediately.
         proxy_warning: This is the Mastodon limit. Proxies, CDNs or tunnels, including Cloudflare, may impose smaller limits and must be configured separately.
         restore_defaults: Restore all defaults
+        restore_color_default: Restore this color
         restore_defaults_confirm: This removes every customization on this page and restores the default values. Do you want to continue?
         status_limit: Character limit for standard users
         title: Instance customization
@@ -1028,6 +1029,11 @@ en:
         desc_html: This relies on external scripts from hCaptcha, which may be a security and privacy concern. In addition, <strong>this can make the registration process significantly less accessible to some (especially disabled) people</strong>. For these reasons, please consider alternative measures such as approval-based or invite-based registration.
         title: Require new users to solve a CAPTCHA to confirm their account
       content_retention:
+        cleanup_button: Clean up cached media now
+        cleanup_confirm: This will remove remote media older than 14 days and all cached link preview images. Local media and posts will not be deleted. Continue?
+        cleanup_preamble: Schedule a background cleanup of remote media older than 14 days and all cached link preview images. Local media and posts are always preserved.
+        cleanup_started: The cache cleanup has been scheduled or is already running.
+        cleanup_title: Manual cache cleanup
         danger_zone: Danger zone
         preamble: Control how user-generated content is stored in Mastodon.
         title: Content retention
@@ -2049,6 +2055,11 @@ en:
     vote: Vote
   posting_defaults:
     explanation: These settings will be used as defaults when you create new posts, but you can edit them per post within the composer.
+    composer_editor: Publication editor
+    composer_editor_hint: Choose the editor used when creating a new post.
+    composer_editors:
+      bluelab: Composer BlueLab
+      mastodon: Standard Mastodon composer
   preferences:
     other: Other
     posting_defaults: Posting defaults
@@ -2317,7 +2328,7 @@ en:
     review_link: Review terms of service
     title: The terms of service of %{domain} are changing
   themes:
-    default: Mastodon
+    default: Vanilla
   time:
     formats:
       default: "%b %d, %Y, %H:%M"

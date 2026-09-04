@@ -6,7 +6,7 @@ import {
   DotsThreeIcon,
   UserIcon,
   GearIcon,
-  CirclesFourIcon,
+  StackIcon,
   HeartIcon,
   UsersThreeIcon,
   ProhibitIcon,
@@ -18,7 +18,8 @@ import {
 import { openModal } from '@/mastodon/actions/modal';
 import { Avatar } from '@/mastodon/components/avatar';
 import { IconButton } from '@/mastodon/components/button/redesign';
-import { DisplayName } from '@/mastodon/components/display_name';
+import { AccountLock } from '@/mastodon/components/display_name/lock';
+import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import {
   Menu,
   MenuItem,
@@ -27,7 +28,9 @@ import {
   MenuList,
   MenuTrigger,
 } from '@/mastodon/components/menu';
+import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
 import { useAccount } from '@/mastodon/hooks/useAccount';
+import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
   canManageReports,
@@ -41,6 +44,7 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
   const dispatch = useAppDispatch();
   const { accountId, permissions } = useIdentity();
   const account = useAccount(accountId);
+  const localCustomEmojis = useCustomEmojis();
 
   const confirmLogout = useCallback(() => {
     dispatch(openModal({ modalType: 'CONFIRM_LOG_OUT', modalProps: {} }));
@@ -53,6 +57,11 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
   const isManager = canManageReports(permissions);
   const isAdmin = canViewAdminDashboard(permissions);
   const accountBasePath = `/@${account.acct}`;
+  const displayNameEmojis = {
+    ...localCustomEmojis,
+    ...(cleanExtraEmojis(account.emojis) ?? {}),
+  };
+  const displayNameEmojiVersion = `${Object.keys(localCustomEmojis).length}-${account.emojis.size}`;
 
   return (
     <div className={classes.root}>
@@ -63,7 +72,19 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
       >
         <Avatar account={account} size={32} />
         <span className={classes.accountText}>
-          <DisplayName account={account} variant='shortHandle' />
+          <span className='display-name'>
+            <bdi className='display-name__name'>
+              <EmojiHTML
+                key={`${account.id}-${displayNameEmojiVersion}`}
+                className='display-name__html'
+                htmlString={account.display_name_html}
+                as='strong'
+                extraEmojis={displayNameEmojis}
+              />
+              {account.locked && <AccountLock />}
+            </bdi>{' '}
+            <span className='display-name__account'>@{account.username}</span>
+          </span>
         </span>
       </a>
       <Menu type='navigation'>
@@ -84,17 +105,14 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
           </MenuItemLink>
           <MenuItemLink as='a' href='/settings/preferences' icon={GearIcon}>
             <FormattedMessage
-              id='tabs_bar.settings'
-              defaultMessage='Settings'
+              id='navigation_bar.preferences'
+              defaultMessage='Preferences'
             />
           </MenuItemLink>
 
           <MenuItemDivider />
 
-          <MenuItemLink
-            to={`${accountBasePath}/collections`}
-            icon={CirclesFourIcon}
-          >
+          <MenuItemLink to={`${accountBasePath}/collections`} icon={StackIcon}>
             <FormattedMessage
               id='navigation_bar.collections'
               defaultMessage='Collections'
@@ -102,8 +120,8 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
           </MenuItemLink>
           <MenuItemLink to='/favourites' icon={HeartIcon}>
             <FormattedMessage
-              id='navigation_bar.liked_posts'
-              defaultMessage='Liked posts'
+              id='navigation_bar.favourites'
+              defaultMessage='Favourites'
             />
           </MenuItemLink>
 
@@ -111,15 +129,15 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
 
           <MenuItemLink as='a' href='/relationships' icon={UsersThreeIcon}>
             <FormattedMessage
-              id='navigation_bar.followers_and_following'
-              defaultMessage='Followers & Following'
+              id='navigation_bar.follows_and_followers'
+              defaultMessage='Follows and followers'
             />
           </MenuItemLink>
 
           <MenuItemLink to='/blocks' icon={ProhibitIcon}>
             <FormattedMessage
-              id='navigation_bar.blocked_accounts'
-              defaultMessage='Blocked accounts'
+              id='navigation_bar.blocks'
+              defaultMessage='Blocked users'
             />
           </MenuItemLink>
 
@@ -155,8 +173,8 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
 
           <MenuItem onClick={confirmLogout} icon={SignOutIcon}>
             <FormattedMessage
-              id='navigation_bar.sign_out'
-              defaultMessage='Sign out'
+              id='navigation_bar.logout'
+              defaultMessage='Log out'
             />
           </MenuItem>
         </MenuList>

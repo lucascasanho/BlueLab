@@ -45,4 +45,36 @@
     height: 32px;
     width: 32px;
   }
+
+  // Logged-out interaction modal on phones only.
+  // Keep it attached to the visual viewport instead of the page/column behind it,
+  // while allowing short screens to scroll the modal itself without clipping actions.
+  @media screen and (max-width: 630px) {
+    .modal-root__container:has(> .interaction-modal) {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      max-width: none;
+      height: 100vh;
+      height: 100dvh;
+      padding:
+        max(12px, env(safe-area-inset-top))
+        12px
+        max(12px, env(safe-area-inset-bottom));
+      box-sizing: border-box;
+      transform: none;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .modal-root__container > .interaction-modal {
+      width: min(100%, 560px);
+      max-height: 100%;
+      margin: auto;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+  }
 }

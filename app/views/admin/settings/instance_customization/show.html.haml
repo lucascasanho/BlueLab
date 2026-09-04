@@ -32,6 +32,7 @@
       %p.hint
         = t('admin.settings.instance_customization.effective_color')
         %code= @instance_customization.public_send(key)
+      = f.button :button, t('admin.settings.instance_customization.restore_color_default'), type: :submit, name: "reset[#{key}]", value: '1', class: 'button-tertiary'
 
   %h3= t('admin.settings.instance_customization.light_theme')
   .fields-row
@@ -41,6 +42,7 @@
         %p.hint
           = t('admin.settings.instance_customization.effective_color')
           %code= @instance_customization.public_send(key)
+        = f.button :button, t('admin.settings.instance_customization.restore_color_default'), type: :submit, name: "reset[#{key}]", value: '1', class: 'button-tertiary'
 
   %h3= t('admin.settings.instance_customization.dark_theme')
   .fields-row
@@ -50,6 +52,7 @@
         %p.hint
           = t('admin.settings.instance_customization.effective_color')
           %code= @instance_customization.public_send(key)
+        = f.button :button, t('admin.settings.instance_customization.restore_color_default'), type: :submit, name: "reset[#{key}]", value: '1', class: 'button-tertiary'
 
   %h2= t('admin.settings.instance_customization.branding')
   %p.hint= t('admin.settings.instance_customization.branding_hint_html', branding_path: admin_settings_branding_path)
@@ -68,6 +71,7 @@
         %p.hint
           = t('admin.settings.instance_customization.effective_color')
           %code= @instance_customization.public_send(key)
+        = f.button :button, t('admin.settings.instance_customization.restore_color_default'), type: :submit, name: "reset[#{key}]", value: '1', class: 'button-tertiary'
   .fields-row
     - %i(email_background_color email_surface_color email_text_color email_muted_color).each do |key|
       .fields-row__column.fields-row__column-6.fields-group
@@ -75,6 +79,7 @@
         %p.hint
           = t('admin.settings.instance_customization.effective_color')
           %code= @instance_customization.public_send(key)
+        = f.button :button, t('admin.settings.instance_customization.restore_color_default'), type: :submit, name: "reset[#{key}]", value: '1', class: 'button-tertiary'
   %h3= t('admin.settings.instance_customization.email_dark_theme')
   .fields-row
     - %i(email_dark_background_color email_dark_surface_color email_dark_text_color email_dark_muted_color).each do |key|
@@ -83,6 +88,7 @@
         %p.hint
           = t('admin.settings.instance_customization.effective_color')
           %code= @instance_customization.public_send(key)
+        = f.button :button, t('admin.settings.instance_customization.restore_color_default'), type: :submit, name: "reset[#{key}]", value: '1', class: 'button-tertiary'
 
   .actions
     = f.button :button, t('generic.save_changes'), type: :submit

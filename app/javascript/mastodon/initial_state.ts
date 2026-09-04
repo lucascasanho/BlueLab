@@ -44,9 +44,10 @@ interface InitialStateMeta {
   remote_topic_feed_access: 'public' | 'authenticated' | 'disabled';
   title: string;
   custom_app_icon: string | null;
+  custom_favicon: string | null;
   custom_instance_logo: string | null;
   show_trends: boolean;
-  landing_page: 'about' | 'trends' | 'local_feed';
+  landing_page: 'about' | 'overview' | 'trends' | 'local_feed';
   use_blurhash: boolean;
   use_pending_items?: boolean;
   version: string;
@@ -79,6 +80,7 @@ interface InitialStateCompose {
   default_sensitive?: boolean;
   default_language?: string;
   default_content_type?: 'text/plain' | 'text/markdown';
+  composer_editor?: 'bluelab' | 'mastodon';
   default_quote_policy?: string;
   me?: string;
 }
@@ -148,6 +150,7 @@ export const localTopicFeedAccess = getMeta('local_topic_feed_access');
 export const remoteTopicFeedAccess = getMeta('remote_topic_feed_access');
 export const title = getMeta('title');
 export const customAppIcon = getMeta('custom_app_icon');
+export const customFavicon = getMeta('custom_favicon');
 export const customInstanceLogo = getMeta('custom_instance_logo');
 export const landingPage = getMeta('landing_page');
 export const useBlurhash = getMeta('use_blurhash');
@@ -163,6 +166,8 @@ export const termsOfServiceEnabled = getMeta('terms_of_service_enabled');
 export const wrapstodon = getMeta('wrapstodon');
 
 const displayNames =
+  // Intl.DisplayNames can be undefined in old browsers
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   Intl.DisplayNames &&
   (new Intl.DisplayNames(getMeta('locale'), {
     type: 'language',
@@ -171,6 +176,7 @@ const displayNames =
   }) as Intl.DisplayNames | undefined);
 
 export const languages = initialState?.languages.map((lang) => {
+  // zh-YUE is not a valid CLDR unicode_language_id
   return [
     lang[0],
     displayNames?.of(lang[0].replace('zh-YUE', 'yue')) ?? lang[1],

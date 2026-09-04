@@ -16,6 +16,10 @@ RSpec.describe UserSettings do
       it 'uses Markdown as the default post format' do
         expect(subject[:default_content_type]).to eq 'text/markdown'
       end
+
+      it 'does not show trending tags by default' do
+        expect(subject[:'web.trends']).to be false
+      end
     end
 
     context 'when setting is set' do

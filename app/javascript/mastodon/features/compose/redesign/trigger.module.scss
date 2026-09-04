@@ -3,37 +3,192 @@
 .button {
   &:not(.buttonInline) {
     position: fixed;
-    bottom: var(--space-md);
-    right: var(--space-md);
-    z-index: 2;
+    bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+    inset-inline-end: max(
+      calc(var(--space-md) + env(safe-area-inset-left)),
+      calc(var(--space-md) + env(safe-area-inset-right))
+    );
+    z-index: 100;
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease,
+      visibility 0s linear;
   }
+}
+
+.mastodonButton:not(.buttonInline) {
+  display: none;
 }
 
 .composer,
 .composerMinimized {
   position: fixed;
-  bottom: 0;
-  right: 0;
-  margin: var(--space-md);
+  z-index: 100;
+  inset-inline-end: 0;
   box-sizing: border-box;
-  border-radius: var(--radius-xl);
+  pointer-events: auto;
+  isolation: isolate;
+  transform-origin: var(--composer-origin-x, 100%)
+    var(--composer-origin-y, 100%);
+  animation: composer-enter 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes composer-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.16);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .composer,
+  .composerMinimized {
+    animation: none;
+  }
+}
+
+:global(.reduce-motion) .composer,
+:global(.reduce-motion) .composerMinimized {
+  animation: none;
 }
 
 .composer {
-  width: calc(100vw - var(--space-md) * 2);
-  max-width: 500px;
-  min-height: 520px;
-  max-height: 80vh;
+  top: env(safe-area-inset-top);
+  width: 100%;
+  height: var(--viewport-height, var(--composer-visual-viewport-height, 100vh));
+  max-height: 100vh;
+  margin: 0;
+  border-radius: 0;
+
+  @media (width >= #{variables.$mobile-menu-breakpoint}) {
+    top: auto;
+    bottom: 0;
+    width: calc(100vw - var(--space-md) * 2);
+    min-width: 300px;
+    max-width: 500px;
+    height: auto;
+    min-height: 520px;
+    margin: var(--space-md);
+    border-radius: var(--radius-xl);
+  }
+}
+
+// When in the mobile view and the composer is open, disable scroll on the body element.
+// This prevents scrolling the textarea accidentally hitting the body instead.
+@media (width < #{variables.$mobile-menu-breakpoint}) {
+  body:has(.composer) {
+    overflow-y: hidden !important;
+  }
+}
+
+@media (width >= #{variables.$mobile-menu-breakpoint}) and (height <= 800px) {
+  .composer {
+    min-height: min(440px, calc(100dvh - var(--space-md) * 2));
+    max-height: calc(100dvh - var(--space-md) * 2);
+  }
 }
 
 .composerMinimized {
+  bottom: 0;
   width: min(320px, calc(100vw - var(--space-md) * 2));
   padding: var(--space-md);
+  margin: var(--space-md);
+  border-radius: var(--radius-xl);
+
+  @media (width < #{variables.$mobile-menu-breakpoint}) {
+    bottom: var(--mobile-bottom-nav-height);
+    width: auto;
+    padding: 0;
+    border-radius: var(--radius-round);
+  }
 }
 
 @media (width < #{variables.$mobile-menu-breakpoint}) {
-  .composer,
-  .composerMinimized {
-    bottom: var(--mobile-bottom-nav-height);
+  .button:not(.buttonInline) {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transform: translateY(var(--space-md)) scale(0.9);
+  }
+
+  .mastodonButton:not(.buttonInline) {
+    display: inline-flex;
+  }
+
+  :global(.ui--mobile-chrome-hidden) .button:not(.buttonInline) {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .button:not(.buttonInline) {
+      transition: none;
+    }
+  }
+
+  :global(.reduce-motion) .button:not(.buttonInline) {
+    transition: none;
+  }
+}
+
+// BLUE 2.0 uses an inline launcher in the timeline and renders the redesigned
+// composer as a centered Bluesky-like dialog. These selectors are impossible
+// to match in other themes because the body data attribute is theme-specific.
+:global(body[data-theme='blue-2']) .button:not(.buttonInline) {
+  display: none;
+}
+
+:global(body[data-theme='blue-2']) .composer {
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  inset-inline-end: auto;
+  width: min(600px, calc(100vw - 32px));
+  max-width: 600px;
+  min-height: 0;
+  max-height: calc(100dvh - 32px);
+  margin: 0;
+  border: 1px solid var(--blue2-border-soft, #17232c);
+  border-radius: 16px;
+  transform: translate(-50%, -50%);
+  animation: none;
+  box-shadow:
+    0 0 0 100vmax rgb(0 0 0 / 58%),
+    0 18px 50px rgb(0 0 0 / 35%);
+}
+
+:global(body[data-theme='blue-2']) .composerMinimized {
+  right: 20px;
+  bottom: 20px;
+  margin: 0;
+  border: 1px solid var(--blue2-border-soft, #17232c);
+  background: var(--blue2-bg, #000);
+}
+
+@media (width < #{variables.$mobile-menu-breakpoint}) {
+  :global(body[data-theme='blue-2']) .composer {
+    --composer-viewport-height: var(--composer-visual-viewport-height, 100dvh);
+
+    top: env(safe-area-inset-top);
+    left: 0;
+    right: 0;
+    bottom: var(--composer-visual-viewport-bottom, 0);
+    width: 100vw;
+    max-width: none;
+    height: calc(var(--composer-viewport-height) - env(safe-area-inset-top));
+    min-height: 0;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    transform: none;
+    box-shadow: none;
   }
 }

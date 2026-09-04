@@ -5,8 +5,6 @@ import classNames from 'classnames';
 import { Helmet } from '@unhead/react/helmet';
 
 import { openModal } from '@/mastodon/actions/modal';
-import { useLayout } from '@/mastodon/hooks/useLayout';
-import { useVisibility } from '@/mastodon/hooks/useVisibility';
 import {
   autoPlayGif,
   me,
@@ -20,6 +18,7 @@ import { Avatar } from '../avatar';
 import { AnimateEmojiProvider } from '../emoji/context';
 import { FamiliarFollowers } from '../familiar_followers';
 
+import { AccountBadges } from './badges';
 import { AccountBanners } from './banners';
 import { AccountButtons } from './buttons';
 import { AccountHeaderFields } from './fields';
@@ -64,13 +63,6 @@ export const AccountHeader: React.FC<{
     [dispatch, account],
   );
 
-  const { layout } = useLayout();
-  const { observedRef, isIntersecting } = useVisibility({
-    observerOptions: {
-      rootMargin: layout === 'mobile' ? '0px 0px -55px 0px' : '', // Height of bottom nav bar.
-    },
-  });
-
   if (!account) {
     return null;
   }
@@ -78,15 +70,31 @@ export const AccountHeader: React.FC<{
   const suspendedOrHidden = hidden || account.suspended;
   const isLocal = !account.acct.includes('@');
   const isMe = me && account.id === me;
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+
+  const profileButtons = (
+    <AccountButtons
+      accountId={accountId}
+      className={isBlue2 ? 'blue2-profile-actions' : classes.buttons}
+      noShare={!isMe || 'share' in navigator}
+      forceMenu={'share' in navigator}
+    />
+  );
 
   return (
-    <div>
+    <div className={isBlue2 ? 'blue2-profile' : undefined}>
       <AccountBanners account={account} />
 
       <AnimateEmojiProvider
         className={classNames(!!account.moved && classes.moved)}
       >
-        <div className={classes.header}>
+        <div
+          className={classNames(
+            classes.header,
+            isBlue2 && 'blue2-profile-cover',
+          )}
+        >
           {!suspendedOrHidden && (
             <img
               src={autoPlayGif ? account.header : account.header_static}
@@ -96,8 +104,18 @@ export const AccountHeader: React.FC<{
           )}
         </div>
 
-        <div className={classes.barWrapper}>
-          <div className={classes.avatarWrapper}>
+        <div
+          className={classNames(
+            classes.barWrapper,
+            isBlue2 && 'blue2-profile-body',
+          )}
+        >
+          <div
+            className={classNames(
+              classes.avatarWrapper,
+              isBlue2 && 'blue2-profile-avatar',
+            )}
+          >
             <a
               href={account.avatar}
               rel='noopener'
@@ -108,22 +126,39 @@ export const AccountHeader: React.FC<{
                 className={classes.avatar}
                 account={suspendedOrHidden ? undefined : account}
                 alt={account.avatar_description}
-                size={80}
+                size={isBlue2 ? 88 : 80}
               />
             </a>
           </div>
 
-          <div className={classes.displayNameWrapper}>
-            <AccountName accountId={accountId} />
-            <AccountButtons
-              accountId={accountId}
-              className={classes.buttonsDesktop}
-              noShare={!isMe || 'share' in navigator}
-              forceMenu={'share' in navigator}
-            />
-          </div>
+          {isBlue2 ? (
+            <>
+              <div className='blue2-profile-actions-row'>{profileButtons}</div>
+              <div
+                className={classNames(
+                  classes.displayNameWrapper,
+                  'blue2-profile-identity',
+                )}
+              >
+                <AccountName accountId={accountId} />
+              </div>
+            </>
+          ) : (
+            <div className={classes.displayNameWrapper}>
+              <AccountName accountId={accountId} />
+              {profileButtons}
+            </div>
+          )}
 
-          <AccountNumberFields accountId={accountId} />
+          <AccountBadges accountId={accountId} />
+
+          {isBlue2 ? (
+            <div className='blue2-profile-counts'>
+              <AccountNumberFields accountId={accountId} />
+            </div>
+          ) : (
+            <AccountNumberFields accountId={accountId} />
+          )}
 
           {!isMe && !suspendedOrHidden && (
             <FamiliarFollowers
@@ -133,7 +168,12 @@ export const AccountHeader: React.FC<{
           )}
 
           {!suspendedOrHidden && (
-            <div className={classes.bioButtonsWrapper}>
+            <div
+              className={classNames(
+                classes.bioButtonsWrapper,
+                isBlue2 && 'blue2-profile-bio',
+              )}
+            >
               {me && account.id !== me && <AccountNote accountId={accountId} />}
 
               <AccountBio showDropdown accountId={accountId} />
@@ -145,20 +185,10 @@ export const AccountHeader: React.FC<{
               )}
             </div>
           )}
-
-          <AccountButtons
-            className={classNames(
-              classes.buttonsMobile,
-              !isIntersecting && classes.buttonsMobileIsStuck,
-            )}
-            accountId={accountId}
-            noShare
-          />
         </div>
       </AnimateEmojiProvider>
 
       {!hideTabs && !hidden && <AccountTabs />}
-      <div ref={observedRef} />
 
       <Helmet>
         <title>{titleFromAccount(account, localDomain)}</title>

@@ -27,10 +27,8 @@
     align-self: center;
     display: inline-flex;
     font-size: 14px;
-    padding-bottom: 6px;
-    padding-left: 10px;
-    padding-right: 18px;
-    padding-top: 6px;
+    justify-content: center;
+    padding: 6px 12px;
   }
 
   //  Speed up animation in the new mobile slideout navigation for v4.4.0-beta.1

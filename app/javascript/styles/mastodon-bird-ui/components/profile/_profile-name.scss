@@ -1,11 +1,17 @@
 // Profile display name size and alignment
 .layout-single-column,
 .layout-multiple-columns {
-  ._comp_account_header__name,
   ._comp_account_header__name > h1,
   ._comp_account_header__name > h1 > bdi {
     align-items: center;
     display: inline-flex;
+  }
+
+  // AccountName renders the handle immediately after this element. Keeping
+  // the wrapper as a block preserves the profile's two-line identity layout
+  // and leaves the action controls room in the header row on mobile.
+  ._comp_account_header__name {
+    display: block;
   }
 
   ._comp_account_header__name > h1 span {

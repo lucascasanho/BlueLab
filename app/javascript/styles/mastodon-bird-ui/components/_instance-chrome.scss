@@ -1,9 +1,3 @@
-// Espelunca does not display the generic footer in the web app.
-footer[data-context='default'],
-footer[data-context='multi-column'] {
-  display: none !important;
-}
-
 // Settings and administration use the sidebar navigation without the
 // standalone brand mark above it.
 body.admin .admin-wrapper .sidebar {

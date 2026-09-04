@@ -779,15 +779,30 @@ body > [data-popover-placement] {
   &__submit {
     display: flex;
     align-items: center;
-    flex: 1 1 auto;
-    max-width: 100%;
+    flex: 1 0 max-content;
+    gap: 8px;
+    min-width: 0;
+
+    .character-counter {
+      flex: 0 1 auto;
+      margin-inline-end: auto;
+      text-align: start;
+    }
+
+    .button {
+      flex: 0 0 auto;
+      margin-inline-start: auto;
+      width: fit-content;
+      white-space: nowrap;
+    }
   }
 
   &__buttons {
     display: flex;
     gap: 8px;
     align-items: center;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
+    min-width: 0;
 
     & > div {
       display: flex;
@@ -801,14 +816,20 @@ body > [data-popover-placement] {
       width: 20px;
       height: 20px;
     }
+
+    .character-counter {
+      flex: 0 1 auto;
+      min-width: 0;
+    }
   }
 
   &__actions {
     display: flex;
     align-items: center;
     flex: 0 0 auto;
-    gap: 12px;
     flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
 
     .icon-button {
       box-sizing: content-box;
@@ -1955,12 +1976,23 @@ body > [data-popover-placement] {
   --quote-margin: var(--status-gutter-width);
 
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  box-sizing: border-box;
+  width: calc(100% - var(--quote-margin) - var(--thread-margin, 0px));
   margin-block-start: 16px;
   margin-inline-start: calc(var(--quote-margin) + var(--thread-margin, 0px));
   border-radius: 12px;
   color: var(--color-text-primary);
   border: 1px solid var(--color-border-primary);
+
+  .status__content,
+  .status__content__text,
+  .status__content__text--visible,
+  .status--is-quote .status__content {
+    max-height: none;
+    overflow: visible;
+    text-overflow: clip;
+  }
 }
 
 .status__quote--error {
@@ -2022,14 +2054,13 @@ body > [data-popover-placement] {
   }
 
   .status__content {
-    display: -webkit-box;
+    display: block;
     font-size: 14px;
     letter-spacing: 0.25px;
     line-height: 20px;
-    -webkit-line-clamp: 4;
-    line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    overflow: visible;
 
     p {
       margin-bottom: 20px;
@@ -2877,54 +2908,6 @@ a.account__display-name {
   }
 }
 
-.navigation-bar__account-stats {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  flex: 1 1 auto;
-  min-width: 0;
-  gap: 4px;
-  color: var(--color-text-secondary);
-  font-size: 12px;
-  line-height: 18px;
-  margin-inline-start: 56px;
-
-  .navigation-bar__account-social-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    min-width: 0;
-  }
-
-  .navigation-bar__account-stat {
-    border-radius: 4px;
-    color: inherit;
-    min-width: 0;
-    overflow: hidden;
-    outline-offset: 2px;
-    text-decoration: none;
-    text-overflow: ellipsis;
-
-    strong {
-      color: var(--color-text-primary);
-      font-weight: 600;
-    }
-
-    &--posts {
-      color: var(--color-text-secondary);
-      white-space: nowrap;
-    }
-
-    &:hover strong {
-      color: var(--color-text-brand);
-    }
-
-    &:focus-visible {
-      outline: var(--outline-focus-default);
-    }
-  }
-}
-
 .display-name__account {
   min-width: 0;
   overflow: hidden;
@@ -3370,7 +3353,6 @@ a.account__display-name {
 }
 
 .ui {
-  --mobile-bottom-nav-height: 55px;
   --last-content-item-border-width: 2px;
 
   flex: 0 0 auto;
@@ -3566,6 +3548,14 @@ a.account__display-name {
 }
 
 @media screen and (width <= 759px) {
+  .tabs-bar__wrapper,
+  .ui__navigation-bar {
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease,
+      visibility 0s linear;
+  }
+
   .columns-area__panels__main {
     width: 100%;
   }
@@ -3622,6 +3612,43 @@ a.account__display-name {
 @media screen and (width >= 760px) {
   .ui__navigation-bar {
     display: none;
+  }
+}
+
+@media screen and (width <= 759px) {
+  .ui--mobile-chrome-hidden {
+    .tabs-bar__wrapper,
+    .ui__navigation-bar {
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition:
+        opacity 180ms ease,
+        transform 180ms ease,
+        visibility 0s linear 180ms;
+    }
+
+    .tabs-bar__wrapper {
+      transform: translateY(-100%);
+    }
+
+    .ui__navigation-bar {
+      transform: translateY(100%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tabs-bar__wrapper,
+    .ui__navigation-bar {
+      transition: none !important;
+    }
+  }
+
+  .reduce-motion {
+    .tabs-bar__wrapper,
+    .ui__navigation-bar {
+      transition: none !important;
+    }
   }
 }
 
@@ -3858,6 +3885,14 @@ a.account__display-name {
   .compose-form {
     flex: 1 1 auto;
   }
+
+  &__new-post-button {
+    align-self: center;
+    width: calc(100% - 32px);
+    max-width: 240px;
+    flex-shrink: 0;
+    margin: 12px 8px 0;
+  }
 }
 
 .navigation-panel {
@@ -3907,15 +3942,13 @@ a.account__display-name {
 
   &__compose-button {
     display: flex;
-    justify-content: flex-start;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-inline-start: 12px - 7px;
-    padding-inline-end: 12px;
+    justify-content: center;
+    width: calc(100% - 48px);
+    padding: 6px 12px;
     gap: 8px;
-    margin: 12px;
+    margin: 12px auto;
     border-radius: 6px;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     line-height: 18px;
 
@@ -5522,6 +5555,16 @@ a.status-card {
   box-shadow: var(--dropdown-shadow);
   border-radius: 5px;
 
+  @media screen and (width <= 600px) {
+    box-sizing: border-box;
+    width: min(300px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+
+    .emoji-mart {
+      max-width: 100%;
+    }
+  }
+
   .emoji-mart-scroll {
     transition: opacity 200ms ease;
   }
@@ -5651,6 +5694,29 @@ a.status-card {
 
 .upload-progress__message {
   flex: 1 1 auto;
+  min-width: 0;
+}
+
+.upload-progress__filename,
+.upload-progress__bytes {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upload-progress .upload-progress__filename {
+  color: var(--color-text-primary);
+  text-transform: none;
+}
+
+.upload-progress .upload-progress__bytes {
+  margin-top: 2px;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.upload-progress__cancel {
+  flex: 0 0 auto;
 }
 
 .upload-progress__backdrop {
@@ -5827,6 +5893,21 @@ a.status-card {
   &__dropdown {
     width: 300px;
     padding: 0;
+
+    @media screen and (width <= 600px) {
+      box-sizing: border-box;
+      width: min(300px, calc(100vw - 16px));
+      max-height: calc(100vh - 16px);
+      max-height: calc(100dvh - 16px);
+      display: flex;
+      flex-direction: column;
+
+      .emoji-mart-scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+      }
+    }
 
     .emoji-mart-search {
       padding: 10px;
@@ -8196,9 +8277,12 @@ a.status-card {
   display: flex;
   flex-shrink: 0;
 
+  [data-redesign='true'] & {
+    border-inline: none;
+  }
+
   @media screen and (max-width: ($no-gap-breakpoint - 1px)) {
-    border-right: 0;
-    border-left: 0;
+    border-inline: none;
   }
 
   button {
@@ -10771,12 +10855,16 @@ noscript {
   }
 }
 
-.notification-group__actions,
-.compose-form__actions {
+.notification-group__actions {
   .button {
     display: block; // Otherwise text-ellipsis doesn't work
     flex: 1 1 auto;
   }
+}
+
+.compose-form__actions > .compose-form__submit .button {
+  display: block; // Otherwise text-ellipsis doesn't work
+  flex: 0 0 auto;
 }
 
 .notification-ungrouped {

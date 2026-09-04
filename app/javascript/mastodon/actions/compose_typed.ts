@@ -316,7 +316,7 @@ const urlLikeRegex = /^https?:\/\/[^\s]+\/[^\s]+$/i;
 export const processPasteOrDrop = createAppThunk(
   (transfer: DataTransfer, { dispatch }) => {
     if (transfer.files.length === 1) {
-      dispatch(uploadCompose(transfer.files));
+      void dispatch(uploadCompose(transfer.files));
     } else if (transfer.files.length === 0) {
       const data = transfer.getData('text/plain');
       if (!urlLikeRegex.exec(data)) return;
