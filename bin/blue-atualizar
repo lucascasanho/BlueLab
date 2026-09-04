@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 
-# Atualizador idempotente do Blue usando a branch principal do BlueLab.
-# Canal remoto padrão: main
+# Atualizador idempotente do Blue usando o canal sincronizado do BlueLab.
+# Canal remoto padrão: BlueLab-Testing (sincronizado com main e BlueLab).
 
 set -u
 
 REPO="${BLUE_REPO:-$HOME/blue}"
 REMOTE="${BLUE_REMOTE:-bluelab}"
 REMOTE_URL="${BLUE_REMOTE_URL:-https://github.com/lucascasanho/BlueLab.git}"
-BRANCH="${BLUE_BRANCH:-${BLUE_TEST_BRANCH:-main}}"
+BRANCH="${BLUE_BRANCH:-${BLUE_TEST_BRANCH:-BlueLab-Testing}}"
 INSTALL_DIR="${BLUE_INSTALL_DIR:-$HOME/.local/bin}"
 INSTALL_PATH="$INSTALL_DIR/blue-atualizar"
+BLUELAB_INSTALL_PATH="$INSTALL_DIR/bluelab"
 SERVICES=(blue-web blue-sidekiq blue-streaming)
 
 fail() {
@@ -25,7 +26,7 @@ run() {
 }
 
 echo "========================================"
-echo " BLUE - ATUALIZAR BRANCH PRINCIPAL"
+echo " BLUE - ATUALIZAR BLUELAB"
 echo "========================================"
 
 cd "$REPO" || fail "não consegui entrar em $REPO"
@@ -51,7 +52,7 @@ fi
 CURRENT_BRANCH="$(git branch --show-current)"
 if [ "$CURRENT_BRANCH" != "$BRANCH" ]; then
   echo
-  echo "===== MUDANDO PARA A BRANCH PRINCIPAL ====="
+  echo "===== MUDANDO PARA A BRANCH DE DEPLOY ====="
   echo "branch atual: $CURRENT_BRANCH"
   echo "destino:      $BRANCH"
 
@@ -83,12 +84,14 @@ else
   echo "Nenhum commit novo. Vou validar/reaplicar o deploy atual para que o comando seja idempotente."
 fi
 
-# Mantém o comando disponível mesmo depois de trocar de branch ou reabrir o shell.
+# Mantém os comandos disponíveis mesmo depois de trocar de branch ou reabrir o shell.
 echo
-echo "===== INSTALANDO COMANDO PERSISTENTE ====="
+echo "===== INSTALANDO COMANDOS PERSISTENTES ====="
 run mkdir -p "$INSTALL_DIR"
 run install -m 0755 "$REPO/bin/blue-atualizar" "$INSTALL_PATH"
-echo "instalado em: $INSTALL_PATH"
+run install -m 0755 "$REPO/bin/bluelab" "$BLUELAB_INSTALL_PATH"
+echo "blue-atualizar: $INSTALL_PATH"
+echo "bluelab:        $BLUELAB_INSTALL_PATH"
 
 echo
 echo "===== RUBY ====="
