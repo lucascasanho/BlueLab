@@ -1,0 +1,37 @@
+{
+  "worker": "bluelab-origin-fallback",
+  "request_limit_fail_open": true,
+  "instances": {
+    "mastodon.blue": {
+      "zone": "mastodon.blue",
+      "enabled_in_test": true
+    },
+    "espelunca.social": {
+      "zone": "espelunca.social",
+      "enabled_in_test": false
+    }
+  },
+  "worker_route": "{hostname}/*",
+  "bypass_routes": [
+    "{hostname}/api/*",
+    "{hostname}/.well-known/*",
+    "{hostname}/nodeinfo/*",
+    "{hostname}/users/*",
+    "{hostname}/packs/*",
+    "{hostname}/assets/*",
+    "{hostname}/css/*",
+    "{hostname}/system/*",
+    "{hostname}/emoji/*",
+    "{hostname}/sounds/*",
+    "{hostname}/auth/*",
+    "{hostname}/oauth/*",
+    "{hostname}/cdn-cgi/*",
+    "{hostname}/inbox",
+    "{hostname}/sw.js",
+    "{hostname}/manifest",
+    "{hostname}/manifest.json",
+    "{hostname}/favicon.ico",
+    "{hostname}/robots.txt",
+    "{hostname}/health"
+  ]
+}

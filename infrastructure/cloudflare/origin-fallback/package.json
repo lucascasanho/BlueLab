@@ -1,0 +1,13 @@
+{
+  "name": "@bluelab/origin-fallback",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check": "npx --yes wrangler@4.129.0 deploy --dry-run --config wrangler.jsonc",
+    "deploy": "npx --yes wrangler@4.129.0 deploy --config wrangler.jsonc"
+  },
+  "devDependencies": {
+    "wrangler": "4.129.0"
+  }
+}
