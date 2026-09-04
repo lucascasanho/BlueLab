@@ -130,7 +130,7 @@
 
 // Keep the navigation contents compact whenever the BlueLab shell collapses
 // its navigation column to 76px. The shell uses the same 1180px breakpoint.
-@media (max-width: 1179px) {
+@media (width < 1180px) {
   .root {
     width: 76px;
     align-items: center;
