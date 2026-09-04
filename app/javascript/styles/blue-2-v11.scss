@@ -67,7 +67,7 @@ body[data-theme='blue-2'].layout-multiple-columns {
 @media (width <= 759px) {
   body[data-theme='blue-2'] form[data-bluelab-composer][role='dialog'] {
     position: fixed !important;
-    top: calc(var(--composer-visual-viewport-height, 100dvh) / 2) !important;
+    top: 50% !important;
     left: 50% !important;
     right: auto !important;
     bottom: auto !important;
@@ -132,21 +132,16 @@ body[data-theme='blue-2'].layout-multiple-columns {
    */
   body[data-theme='blue-2']
     form[data-bluelab-composer][role='dialog'][data-keyboard-open] {
-    top: env(safe-area-inset-top) !important;
+    top: 0 !important;
     left: 0 !important;
     right: 0 !important;
     bottom: auto !important;
     width: 100vw !important;
     max-width: none !important;
-    height: calc(
-      var(--composer-visual-viewport-height, 100dvh) -
-        env(safe-area-inset-top)
-    ) !important;
+    height: var(--composer-visual-viewport-height, 100dvh) !important;
     min-height: 0 !important;
-    max-height: calc(
-      var(--composer-visual-viewport-height, 100dvh) -
-        env(safe-area-inset-top)
-    ) !important;
+    max-height: var(--composer-visual-viewport-height, 100dvh) !important;
+    padding-top: max(var(--space-sm), env(safe-area-inset-top)) !important;
     border-top: 0 !important;
     border-inline: 0 !important;
     border-radius: 0 0 16px 16px !important;
