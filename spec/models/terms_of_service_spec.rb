@@ -57,6 +57,12 @@ RSpec.describe TermsOfService do
           .and include(effective_past)
           .and not_include(effective_future)
       end
+
+      it 'includes terms that take effect today' do
+        terms_effective_today = Fabricate(:terms_of_service, effective_date: Time.zone.today)
+
+        expect(described_class.live).to include(terms_effective_today)
+      end
     end
 
     describe '.upcoming' do
@@ -122,6 +128,14 @@ RSpec.describe TermsOfService do
       let(:effective_date) { nil }
 
       it { is_expected.to eq(Time.zone.today) }
+    end
+  end
+
+  describe '#effective?' do
+    it 'is true on the effective date' do
+      terms_of_service = Fabricate(:terms_of_service, effective_date: Time.zone.today)
+
+      expect(terms_of_service).to be_effective
     end
   end
 

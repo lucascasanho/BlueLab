@@ -15,8 +15,8 @@
 #
 class TermsOfService < ApplicationRecord
   scope :published, -> { where.not(published_at: nil).order(Arel.sql('coalesce(effective_date, published_at) DESC')) }
-  scope :live, -> { published.where('effective_date IS NULL OR effective_date < now()') }
-  scope :upcoming, -> { published.reorder(effective_date: :asc).where('effective_date IS NOT NULL AND effective_date > now()') }
+  scope :live, -> { published.where('effective_date IS NULL OR effective_date <= ?', Time.zone.today) }
+  scope :upcoming, -> { published.reorder(effective_date: :asc).where('effective_date > ?', Time.zone.today) }
   scope :draft, -> { where(published_at: nil).order(id: :desc) }
 
   validates :text, presence: true
@@ -40,7 +40,7 @@ class TermsOfService < ApplicationRecord
   end
 
   def effective?
-    published? && effective_date&.past?
+    published? && effective_date.present? && effective_date <= Time.zone.today
   end
 
   def succeeded_by
