@@ -36,5 +36,5 @@ jobs:
       - name: Set up Javascript environment
         uses: ./.github/actions/setup-javascript
 
-      - name: Stylelint
-        run: yarn lint:css --custom-formatter @csstools/stylelint-formatter-github
+      - name: Stylelint diagnostics
+        run: yarn lint:css
