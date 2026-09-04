@@ -14,7 +14,7 @@
     mixed_channels = foreground_channels.zip(background_channels).map do |foreground_channel, background_channel|
       ((foreground_channel * foreground_weight) + (background_channel * (1 - foreground_weight))).round
     end
-    format('#%02x%02x%02x', *mixed_channels)
+    "##{mixed_channels.map { |channel| channel.to_s(16).rjust(2, '0') }.join}"
   end
 
   # Email presentation deliberately follows the same instance palette as the
