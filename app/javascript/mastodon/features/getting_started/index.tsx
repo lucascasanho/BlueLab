@@ -13,12 +13,10 @@ const GettingStarted: React.FC = () => {
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   return (
-    <Column>
+    <Column
+      className={isBlueLabTheme ? 'bluelab-advanced-getting-started' : undefined}
+    >
       <NavigationPanel multiColumn />
-
-      {isBlueLabTheme && (
-        <div className='bluelab-advanced-footer-spacer' aria-hidden='true' />
-      )}
 
       <LinkFooter context='multi-column' />
 
