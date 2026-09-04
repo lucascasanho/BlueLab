@@ -75,9 +75,11 @@ RSpec.describe 'Admin instance customization settings' do
     get admin_settings_instance_customization_path
 
     expect(response.body).to include('--blue2-blue: #2b8fcd;')
+    expect(response.body).to include('--color-bg-brand-soft: color-mix(in srgb, #2b8fcd 14%, transparent);')
     expect(response.body).to include('--blue2-bg: #f6f8fa;')
     expect(response.body).to include('--blue2-surface: #15191d;')
     expect(response.body).to include("body[data-theme='blue-2']")
+    expect(response.body).to include('background: var(--blue2-hover);')
   end
 
   it 'restores every customization with one action' do
