@@ -28,14 +28,12 @@ test('prefere ícone próximo de 48px como fallback de favicon', () => {
     { src: 'https://example.test/72.png', size: '72x72' },
   ];
 
-  assert.equal(
-    selectFaviconInstanceIcon(icons),
-    'https://example.test/48.png',
-  );
+  assert.equal(selectFaviconInstanceIcon(icons), 'https://example.test/48.png');
 });
 
 test('usa o favicon declarado pelo HTML da instância', () => {
-  const html = '<html><head><link rel="icon" href="/favicon-blue.svg"></head></html>';
+  const html =
+    '<html><head><link rel="icon" href="/favicon-blue.svg"></head></html>';
   assert.equal(
     findFaviconInHtml(html, 'https://mastodon.example'),
     'https://mastodon.example/favicon-blue.svg',

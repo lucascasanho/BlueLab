@@ -11,9 +11,11 @@ function iconArea(icon) {
 }
 
 export function selectLargestInstanceIcon(icons) {
-  return [...(icons ?? [])]
-    .filter((icon) => typeof icon?.src === 'string' && icon.src.length > 0)
-    .sort((left, right) => iconArea(right) - iconArea(left))[0]?.src ?? null;
+  return (
+    [...(icons ?? [])]
+      .filter((icon) => typeof icon?.src === 'string' && icon.src.length > 0)
+      .sort((left, right) => iconArea(right) - iconArea(left))[0]?.src ?? null
+  );
 }
 
 export function selectFaviconInstanceIcon(icons) {
@@ -23,12 +25,14 @@ export function selectFaviconInstanceIcon(icons) {
 
   if (!candidates.length) return null;
 
-  return candidates.sort((left, right) => {
-    const leftArea = iconArea(left);
-    const rightArea = iconArea(right);
-    const targetArea = 48 * 48;
-    return Math.abs(leftArea - targetArea) - Math.abs(rightArea - targetArea);
-  })[0]?.src ?? null;
+  return (
+    candidates.sort((left, right) => {
+      const leftArea = iconArea(left);
+      const rightArea = iconArea(right);
+      const targetArea = 48 * 48;
+      return Math.abs(leftArea - targetArea) - Math.abs(rightArea - targetArea);
+    })[0]?.src ?? null
+  );
 }
 
 function readAttribute(tag, attribute) {
@@ -72,7 +76,8 @@ async function fetchInstanceMetadata(baseUrl) {
     signal: AbortSignal.timeout(5000),
   });
 
-  if (!response.ok) throw new Error(`Instance API returned HTTP ${response.status}`);
+  if (!response.ok)
+    throw new Error(`Instance API returned HTTP ${response.status}`);
   return response.json();
 }
 
@@ -108,7 +113,10 @@ async function resolveBranding(config) {
 
   const apiIcons = Array.isArray(metadata?.icon) ? metadata.icon : [];
   const apiFavicon = selectFaviconInstanceIcon(apiIcons);
-  const logoUrl = selectLargestInstanceIcon(apiIcons) ?? htmlFavicon ?? `${baseUrl}/favicon.ico`;
+  const logoUrl =
+    selectLargestInstanceIcon(apiIcons) ??
+    htmlFavicon ??
+    `${baseUrl}/favicon.ico`;
   const faviconUrl = htmlFavicon ?? apiFavicon ?? `${baseUrl}/favicon.ico`;
 
   return { faviconUrl, logoUrl };
@@ -128,7 +136,8 @@ export async function fetchBrandingAsset(config, asset) {
       signal: AbortSignal.timeout(5000),
     });
 
-    if (!upstream.ok) throw new Error(`Branding asset returned HTTP ${upstream.status}`);
+    if (!upstream.ok)
+      throw new Error(`Branding asset returned HTTP ${upstream.status}`);
 
     const headers = new Headers(upstream.headers);
     headers.set(
