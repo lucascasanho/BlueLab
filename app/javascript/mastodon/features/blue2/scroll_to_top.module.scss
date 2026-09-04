@@ -61,7 +61,7 @@
  * viewports. Keep the floating control outside that rail instead of covering
  * navigation actions. Portrait and desktop geometry remain unchanged.
  */
-@media (orientation: landscape) and (1180px >= width) and (759px >= height) {
+@media (orientation: landscape) and (width <= 1180px) and (height <= 759px) {
   .root {
     left: calc(max(14px, env(safe-area-inset-left)) + 72px);
     bottom: max(18px, env(safe-area-inset-bottom));
