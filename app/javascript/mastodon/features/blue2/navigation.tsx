@@ -39,6 +39,7 @@ interface ItemProps {
   exact?: boolean;
   badge?: number;
   iconClassName?: string;
+  className?: string;
 }
 
 const Item: React.FC<ItemProps> = ({
@@ -48,11 +49,12 @@ const Item: React.FC<ItemProps> = ({
   exact,
   badge,
   iconClassName,
+  className,
 }) => (
   <NavLink
     to={to}
     exact={exact}
-    className={classes.item}
+    className={className ? `${classes.item} ${className}` : classes.item}
     activeClassName={classes.itemActive}
   >
     <Icon size={27} className={iconClassName} />
@@ -92,8 +94,22 @@ export const Blue2Navigation: React.FC = () => {
     <nav className={classes.root} aria-label='BLUE 2.0'>
       {signedIn && <Blue2AccountMenu />}
 
+      <Item
+        to={homePath}
+        exact
+        icon={Blue2HomeIcon}
+        className={classes.landscapeHomeItem}
+      >
+        <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
+      </Item>
+
       <div className={classes.items}>
-        <Item to={homePath} exact icon={Blue2HomeIcon}>
+        <Item
+          to={homePath}
+          exact
+          icon={Blue2HomeIcon}
+          className={classes.homeItem}
+        >
           <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
         </Item>
         <Item to='/explore' icon={Blue2SearchIcon}>
@@ -124,7 +140,7 @@ export const Blue2Navigation: React.FC = () => {
         <Item to='/public/local' icon={Blue2FeedIcon}>
           <FormattedMessage
             id='tabs_bar.fediverse_feeds'
-            defaultMessage='Feeds'
+            defaultMessage='Fediverse Feeds'
           />
         </Item>
         <Item

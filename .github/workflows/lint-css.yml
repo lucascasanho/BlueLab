@@ -37,4 +37,9 @@ jobs:
         uses: ./.github/actions/setup-javascript
 
       - name: Stylelint
-        run: yarn lint:css --custom-formatter @csstools/stylelint-formatter-github
+        run: |
+          if ! yarn lint:css --custom-formatter @csstools/stylelint-formatter-github; then
+            echo 'Stylelint failed; rerunning with the standard formatter for actionable file and line output.'
+            yarn stylelint "**/*.{css,scss}" --formatter string
+            exit 1
+          fi

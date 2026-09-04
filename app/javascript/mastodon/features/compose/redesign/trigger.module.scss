@@ -174,21 +174,48 @@
 }
 
 @media (width < #{variables.$mobile-menu-breakpoint}) {
-  :global(body[data-theme='blue-2']) .composer {
+  // Keep the BlueLab composer compact on phones, but never let the form
+  // collapse down to only its footer. The visual viewport variables keep the
+  // sheet above the software keyboard while content can grow up to full height.
+  :global(body[data-theme='blue-2'])
+    .composer[data-bluelab-composer][role='dialog'] {
     --composer-viewport-height: var(--composer-visual-viewport-height, 100dvh);
 
-    top: env(safe-area-inset-top);
+    top: auto;
     left: 0;
     right: 0;
     bottom: var(--composer-visual-viewport-bottom, 0);
     width: 100vw;
     max-width: none;
-    height: calc(var(--composer-viewport-height) - env(safe-area-inset-top));
-    min-height: 0;
-    max-height: none;
+    height: auto;
+    min-height: min(
+      430px,
+      calc(var(--composer-viewport-height) - env(safe-area-inset-top))
+    );
+    max-height: calc(
+      var(--composer-viewport-height) - env(safe-area-inset-top)
+    );
     border: 0;
-    border-radius: 0;
+    border-radius: 16px 16px 0 0;
     transform: none;
-    box-shadow: none;
+    box-shadow: 0 -12px 36px rgb(0 0 0 / 18%);
+  }
+
+  :global(body[data-theme='blue-2'])
+    .composer[data-bluelab-composer][role='dialog']
+    [data-compose-scroll-container] {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  :global(body[data-theme='blue-2'])
+    .composer[data-bluelab-composer][role='dialog']
+    [contenteditable='true'],
+  :global(body[data-theme='blue-2'])
+    .composer[data-bluelab-composer][role='dialog']
+    [contenteditable='plaintext-only'] {
+    min-height: 5.5rem;
   }
 }

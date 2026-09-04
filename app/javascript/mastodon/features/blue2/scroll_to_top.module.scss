@@ -55,3 +55,33 @@
     left: 14px;
   }
 }
+
+// Match BlueLab's portrait mobile chrome: when the bottom navigation is
+// auto-hidden, use the vacated navigation position instead of leaving its
+// vertical offset reserved. Landscape is intentionally excluded below.
+@media (width <= 759px) and (orientation: portrait) {
+  .root {
+    transition:
+      opacity 150ms ease,
+      transform 150ms ease,
+      visibility 0s linear 150ms,
+      background 120ms ease,
+      bottom 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  :global(.ui--mobile-chrome-hidden) .root {
+    bottom: calc(18px + env(safe-area-inset-bottom));
+  }
+}
+
+/*
+ * BlueLab uses a vertical navigation rail on phone/tablet-sized landscape
+ * viewports. Keep the floating control outside that rail instead of covering
+ * navigation actions. Portrait and desktop geometry remain unchanged.
+ */
+@media (orientation: landscape) and (width <= 1180px) and (height <= 759px) {
+  .root {
+    left: calc(max(14px, env(safe-area-inset-left)) + 72px);
+    bottom: max(18px, env(safe-area-inset-bottom));
+  }
+}
