@@ -122,12 +122,10 @@ export function renderUnavailablePage(instance, hostname, errorCode) {
     .button--primary{border-color:var(--blue-action);background:var(--blue-action);color:#fff}
     .button:hover{border-color:var(--muted);background:var(--bg)}
     .button--primary:hover{border-color:var(--blue-action-hover);background:var(--blue-action-hover)}
-    .button:focus-visible,.footer a:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+    .button:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
     .technical{margin:28px 0 0;color:var(--muted);font-size:12px}
-    .footer{margin:18px 4px 0;display:flex;flex-wrap:wrap;gap:8px 16px;color:var(--muted);font-size:12px}
-    .footer a{color:inherit;text-underline-offset:3px}
     @media(prefers-color-scheme:light){:root{--bg:#fff;--surface:#f3f3f8;--surface-2:#fff;--border:#dfe5e9;--text:#101114;--muted:#626b75;--blue:#006acb;--focus:#006acb}}
-    @media(max-width:520px){body{padding:16px}.brand{margin-inline:2px}.card{padding:28px 22px;border-radius:14px}.actions{display:grid}.button{width:100%}.footer{margin-inline:2px}}
+    @media(max-width:520px){body{padding:16px}.brand{margin-inline:2px}.card{padding:28px 22px;border-radius:14px}.actions{display:grid}.button{width:100%}}
     @media(prefers-reduced-motion:reduce){.button{transition:none}}
   </style>
 </head>
@@ -150,10 +148,6 @@ export function renderUnavailablePage(instance, hostname, errorCode) {
       </div>
       <p class="technical">Erro de conexão com o servidor · ${safeErrorCode}</p>
     </section>
-    <nav class="footer" aria-label="Páginas de status">
-      <a href="https://status.mastodon.blue">Status do Blue</a>
-      <a href="https://status.espelunca.social">Status da Espelunca</a>
-    </nav>
   </main>
 </body>
 </html>`;

@@ -1,8 +1,10 @@
+/* eslint-disable import/extensions */
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-/* eslint-disable import/extensions */
+import { bundledBrandingAsset } from '../src/brand-assets.js';
 import {
+  fetchBrandingAsset,
   findFaviconInHtml,
   selectFaviconInstanceIcon,
   selectLargestInstanceIcon,
@@ -38,4 +40,39 @@ test('usa o favicon declarado pelo HTML da instância', () => {
     findFaviconInHtml(html, 'https://mastodon.example'),
     'https://mastodon.example/favicon-blue.svg',
   );
+});
+
+test('mantém uma cópia local do ícone do Blue', async () => {
+  const response = bundledBrandingAsset({
+    baseUrl: 'https://mastodon.blue',
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('content-type'), 'image/png');
+  assert.ok((await response.arrayBuffer()).byteLength > 1_000);
+});
+
+test('mantém uma cópia local do ícone da Espelunca', async () => {
+  const response = bundledBrandingAsset({
+    baseUrl: 'https://espelunca.social',
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('content-type'), 'image/png');
+  assert.ok((await response.arrayBuffer()).byteLength > 1_000);
+});
+
+test('serve o ícone incorporado sem redirecionar quando a instância cai', async () => {
+  const response = await fetchBrandingAsset(
+    { baseUrl: 'https://mastodon.blue' },
+    'logo',
+    async () => {
+      throw new TypeError('origin offline');
+    },
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('location'), null);
+  assert.equal(response.headers.get('content-type'), 'image/png');
+  assert.ok((await response.arrayBuffer()).byteLength > 1_000);
 });

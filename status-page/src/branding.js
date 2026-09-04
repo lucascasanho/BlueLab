@@ -1,3 +1,6 @@
+/* eslint-disable import/extensions */
+import { bundledBrandingAsset } from './brand-assets.js';
+
 const BRANDING_CACHE_SECONDS = 3600;
 const ASSET_CACHE_SECONDS = 86400;
 
@@ -63,8 +66,8 @@ export function findFaviconInHtml(html, baseUrl) {
   return candidates[0] ?? null;
 }
 
-async function fetchInstanceMetadata(baseUrl) {
-  const response = await fetch(`${baseUrl}/api/v2/instance`, {
+async function fetchInstanceMetadata(baseUrl, originFetch) {
+  const response = await originFetch(`${baseUrl}/api/v2/instance`, {
     headers: {
       accept: 'application/json',
       'user-agent': 'BlueLab Status Branding/1.0',
@@ -81,8 +84,8 @@ async function fetchInstanceMetadata(baseUrl) {
   return response.json();
 }
 
-async function fetchInstanceFavicon(baseUrl) {
-  const response = await fetch(baseUrl, {
+async function fetchInstanceFavicon(baseUrl, originFetch) {
+  const response = await originFetch(baseUrl, {
     headers: {
       accept: 'text/html',
       'user-agent': 'BlueLab Status Branding/1.0',
@@ -98,14 +101,14 @@ async function fetchInstanceFavicon(baseUrl) {
   return findFaviconInHtml(await response.text(), baseUrl);
 }
 
-async function resolveBranding(config) {
+async function resolveBranding(config, originFetch) {
   const baseUrl = config.baseUrl;
   let metadata = null;
   let htmlFavicon = null;
 
   const [metadataResult, faviconResult] = await Promise.allSettled([
-    fetchInstanceMetadata(baseUrl),
-    fetchInstanceFavicon(baseUrl),
+    fetchInstanceMetadata(baseUrl, originFetch),
+    fetchInstanceFavicon(baseUrl, originFetch),
   ]);
 
   if (metadataResult.status === 'fulfilled') metadata = metadataResult.value;
@@ -122,12 +125,12 @@ async function resolveBranding(config) {
   return { faviconUrl, logoUrl };
 }
 
-export async function fetchBrandingAsset(config, asset) {
-  const branding = await resolveBranding(config);
+export async function fetchBrandingAsset(config, asset, originFetch = fetch) {
+  const branding = await resolveBranding(config, originFetch);
   const sourceUrl = asset === 'logo' ? branding.logoUrl : branding.faviconUrl;
 
   try {
-    const upstream = await fetch(sourceUrl, {
+    const upstream = await originFetch(sourceUrl, {
       headers: { 'user-agent': 'BlueLab Status Branding/1.0' },
       cf: {
         cacheEverything: true,
@@ -151,12 +154,6 @@ export async function fetchBrandingAsset(config, asset) {
       headers,
     });
   } catch {
-    return new Response(null, {
-      status: 302,
-      headers: {
-        location: `${config.baseUrl}/favicon.ico`,
-        'cache-control': 'public, max-age=300',
-      },
-    });
+    return bundledBrandingAsset(config);
   }
 }

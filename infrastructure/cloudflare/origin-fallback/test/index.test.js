@@ -143,7 +143,7 @@ describe('fallback page', () => {
     assert.match(html, /Blue está temporariamente indisponível/);
     assert.match(html, /mastodon\.blue/);
     assert.match(html, /https:\/\/status\.mastodon\.blue/);
-    assert.match(html, /https:\/\/status\.espelunca\.social/);
+    assert.doesNotMatch(html, /https:\/\/status\.espelunca\.social/);
     assert.match(html, /prefers-color-scheme:light/);
     assert.doesNotMatch(html, /<script/i);
   });
@@ -158,6 +158,7 @@ describe('fallback page', () => {
     assert.equal(response.status, 530);
     assert.match(html, /Espelunca está temporariamente indisponível/);
     assert.match(html, /status\.espelunca\.social/);
+    assert.doesNotMatch(html, /status\.mastodon\.blue/);
     assert.match(html, /servidor · 1033/);
   });
 

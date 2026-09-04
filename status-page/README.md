@@ -27,6 +27,7 @@ O Worker consulta a própria instância configurada em `INSTANCE_URL` e:
 - usa os ícones publicados por `GET /api/v2/instance` para escolher a logo exibida ao lado do nome no topo;
 - faz fallback para os ícones da API ou `/favicon.ico` quando necessário;
 - serve esses arquivos pelo próprio Worker com cache, em `/favicon.ico`, `/instance-favicon` e `/instance-logo`;
+- mantém no próprio código uma cópia de cada ícone e a serve diretamente quando a instância está inacessível, sem redirecionar de volta ao site fora do ar;
 - referencia `/instance-favicon` com uma versão na página para forçar navegadores que tenham armazenado em cache um favicon ausente ou antigo a buscar novamente o favicon da instância.
 
 Assim, quando a mesma base for instalada na Espelunca, ela exibirá automaticamente o favicon e o ícone da Espelunca em vez dos do Blue.
