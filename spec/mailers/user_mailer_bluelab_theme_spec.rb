@@ -17,7 +17,7 @@ RSpec.describe UserMailer do
     Setting.instance_dark_text_color = '#f7f9f9'
   end
 
-  it 'inherits the instance palette when email-specific colors are not persisted' do
+  it 'inherits the instance palette for the complete email design' do
     html = mail.html_part.body.decoded
 
     expect(html).to include('#2b8fcd', '#f7f9fa', '#ffffff', '#0f1419', '#000000', '#16181c', '#f7f9f9')
@@ -25,14 +25,24 @@ RSpec.describe UserMailer do
     expect(html).to include('color-scheme: light dark', '-webkit-text-fill-color: #ffffff')
   end
 
-  it 'keeps explicit email color overrides' do
+  it 'ignores legacy email-specific palette settings' do
     Setting.email_button_color = '#245f91'
     Setting.email_link_color = '#1d4f78'
     Setting.email_dark_surface_color = '#102334'
 
     html = mail.html_part.body.decoded
 
-    expect(html).to include('#245f91', '#1d4f78', '#102334')
+    expect(html).to include('#2b8fcd', '#16181c')
+    expect(html).to_not include('#245f91', '#1d4f78', '#102334')
+  end
+
+  it 'derives secondary email colors from the instance palette' do
+    html = mail.html_part.body.decoded
+
+    expect(html).to include('border-color: #d9d9da !important')
+    expect(html).to include('color: #63666a !important')
+    expect(html).to include('border-color: #434548 !important')
+    expect(html).to include('color: #9e9f9f !important')
   end
 
   it 'removes structural separator lines from the BlueLab mail layout' do

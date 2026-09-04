@@ -12,10 +12,13 @@ RSpec.describe 'Admin instance customization settings' do
         hide_admin_status_character_counter: '1',
         media_image_size_limit_mb: 100,
         media_video_size_limit_mb: 1024,
-        instance_accent_color: '',
-        email_primary_color: '#5638cc',
-        email_button_color: '#5638cc',
-        email_link_color: '#5638cc',
+        instance_accent_color: '#5638cc',
+        instance_light_background_color: '#ffffff',
+        instance_light_surface_color: '#f7f7f9',
+        instance_light_text_color: '#1f1b23',
+        instance_dark_background_color: '#1e2028',
+        instance_dark_surface_color: '#232543',
+        instance_dark_text_color: '#f7f9f9',
       },
     }
   end
@@ -39,19 +42,19 @@ RSpec.describe 'Admin instance customization settings' do
     expect(response.body).to_not include('content__heading__tabs')
     expect(response.body).to_not include('&#39;dark&#39;')
     expect(response.body).to_not include('Editor e emojis', 'Editor and emoji')
-    expect(response.parsed_body.css('button[type="submit"]').count).to eq(20)
+    expect(response.parsed_body.css('button[type="submit"]').count).to eq(9)
     expect(response.parsed_body.css('button[name="reset_all"]').count).to eq(1)
   end
 
-  it 'offers a reset action for each customizable color' do
+  it 'offers a reset action for each instance color' do
     sign_in Fabricate(:admin_user)
     get admin_settings_instance_customization_path
 
     expect(response.parsed_body.css('button[name="reset[instance_accent_color]"]').count).to eq(1)
-    expect(response.parsed_body.css('button[name="reset[email_dark_surface_color]"]').count).to eq(1)
+    expect(response.parsed_body.css('button[name="reset[instance_dark_surface_color]"]').count).to eq(1)
   end
 
-  it 'explains branding uploads and offers light, dark, and email colors' do
+  it 'explains branding uploads and offers only the shared light and dark palettes' do
     sign_in Fabricate(:admin_user)
     get admin_settings_instance_customization_path
 
@@ -59,7 +62,24 @@ RSpec.describe 'Admin instance customization settings' do
     expect(response.body).to include(I18n.t('admin.settings.instance_customization.email_logo_hint'))
     expect(response.parsed_body.at_css('input[name="form_instance_customization[instance_light_background_color]"]')).to be_present
     expect(response.parsed_body.at_css('input[name="form_instance_customization[instance_dark_background_color]"]')).to be_present
-    expect(response.parsed_body.at_css('input[name="form_instance_customization[email_dark_surface_color]"]')).to be_present
+    expect(response.parsed_body.at_css('input[name="form_instance_customization[email_primary_color]"]')).to be_nil
+    expect(response.parsed_body.at_css('input[name="form_instance_customization[email_dark_surface_color]"]')).to be_nil
+  end
+
+  it 'emits BlueLab runtime tokens from the instance palette' do
+    sign_in Fabricate(:admin_user)
+    Setting.instance_accent_color = '#2b8fcd'
+    Setting.instance_light_background_color = '#f6f8fa'
+    Setting.instance_dark_surface_color = '#15191d'
+
+    get admin_settings_instance_customization_path
+
+    expect(response.body).to include('--blue2-blue: #2b8fcd;')
+    expect(response.body).to include('--color-bg-brand-soft: color-mix(in srgb, #2b8fcd 14%, transparent);')
+    expect(response.body).to include('--blue2-bg: #f6f8fa;')
+    expect(response.body).to include('--blue2-surface: #15191d;')
+    expect(response.body).to include("body[data-theme='blue-2']")
+    expect(response.body).to include('background: var(--blue2-hover);')
   end
 
   it 'restores every customization with one action' do
@@ -76,14 +96,14 @@ RSpec.describe 'Admin instance customization settings' do
 
   it 'restores an individual color without resetting other customizations' do
     sign_in Fabricate(:admin_user)
-    Setting.instance_accent_color = '#5638cc'
-    Setting.email_button_color = '#6364ff'
+    Setting.instance_accent_color = '#2b8fcd'
+    Setting.instance_light_surface_color = '#eeeeee'
 
     put admin_settings_instance_customization_path, params: valid_params.merge(reset: { instance_accent_color: '1' })
 
     expect(response).to redirect_to(admin_settings_instance_customization_path)
     expect(Setting.find_by(var: :instance_accent_color)).to be_nil
-    expect(Setting.email_button_color).to eq('#5638cc')
+    expect(Setting.instance_light_surface_color).to eq('#f7f7f9')
   end
 
   it 'renders a native single-line sidebar entry with an available icon' do
@@ -102,6 +122,14 @@ RSpec.describe 'Admin instance customization settings' do
     sign_in Fabricate(:user)
     put admin_settings_instance_customization_path, params: valid_params
     expect(response).to have_http_status(403)
+  end
+
+  it 'rejects legacy email palette parameters' do
+    sign_in Fabricate(:admin_user)
+    expect do
+      put admin_settings_instance_customization_path, params: { form_instance_customization: valid_params[:form_instance_customization].merge(email_button_color: '#245f91') }
+    end.to(not_change { Setting.find_by(var: :email_button_color)&.value })
+    expect(response).to redirect_to(admin_settings_instance_customization_path)
   end
 
   it 'rejects non-allowlisted parameters' do
