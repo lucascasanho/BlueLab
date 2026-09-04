@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { checkHttp } from '../src/db.js';
+import { checkHttp, syncComponents } from '../src/db.js';
 
 const component = { target_url: 'https://example.test/health' };
 
@@ -44,4 +44,47 @@ test('duas falhas HTTP consecutivas continuam registradas como indisponibilidade
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+test('sincronização desativa componentes que não têm monitor configurado', async () => {
+  const statements = [];
+  const db = {
+    prepare(sql) {
+      return {
+        bind(...values) {
+          const statement = { sql, values };
+          statements.push(statement);
+          return statement;
+        },
+      };
+    },
+    async batch(batch) {
+      assert.equal(batch.length, 3);
+    },
+  };
+
+  await syncComponents(db, {
+    components: [
+      {
+        slug: 'website-api',
+        name: 'Site e API',
+        description: 'Site público.',
+        monitorType: 'http',
+        targetUrl: 'https://example.test/health',
+        sortOrder: 10,
+      },
+      {
+        slug: 'streaming-api',
+        name: 'Tempo real',
+        description: 'Streaming.',
+        monitorType: 'http',
+        targetUrl: 'https://example.test/streaming/health',
+        sortOrder: 20,
+      },
+    ],
+  });
+
+  const disable = statements.at(-1);
+  assert.match(disable.sql, /slug NOT IN \(\?, \?\)/);
+  assert.deepEqual(disable.values, ['website-api', 'streaming-api']);
 });

@@ -49,7 +49,7 @@ printf '  http://127.0.0.1:%s\n\n' "$PORT"
 printf '%s\n' 'Este é o protótipo da futura página de status do Blue.'
 printf '%s\n' 'Ele usa somente D1 LOCAL e não publica nada na Cloudflare.'
 printf '%s\n\n' 'Também não altera mastodon.blue nem status.espelunca.social.'
-printf '%s\n' 'O Website & API foi semeado com:'
+printf '%s\n' 'O Site e API foi semeado com:'
 printf '%s\n' '  - um dia com 287/288 verificações OK -> amarelo;'
 printf '%s\n' '  - um dia com 280/288 verificações OK -> laranja;'
 printf '%s\n\n' '  - nenhum dia vermelho.'

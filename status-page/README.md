@@ -32,6 +32,17 @@ O Worker consulta a própria instância configurada em `INSTANCE_URL` e:
 
 Assim, quando a mesma base for instalada na Espelunca, ela exibirá automaticamente o favicon e o ícone da Espelunca em vez dos do Blue.
 
+## Dados exibidos
+
+A página só apresenta um componente quando existe uma medição real para ele. Por padrão, cada ambiente verifica a cada cinco minutos:
+
+- o site/API pelo endpoint definido em `WEBSITE_HEALTH_URL`;
+- as atualizações em tempo real pelo endpoint definido em `STREAMING_HEALTH_URL`.
+
+O armazenamento de mídia só aparece quando `MEDIA_HEALTH_URL` está configurado. As tarefas em segundo plano só aparecem quando o secret `HEARTBEAT_TOKEN` existe e o servidor envia heartbeats. Isso evita declarar como operacional — ou indisponível — um serviço que o monitor não tem como observar.
+
+As barras continuam cobrindo uma janela máxima de 90 dias, mas o texto informa a primeira data realmente observada. Dias anteriores ao início do monitoramento ficam cinza e não entram no percentual. O histórico bruto de verificações e incidentes é preservado quando um componente fica oculto.
+
 ## Preview local no Blue
 
 Para testar sem alterar a instalação Mastodon do Blue e sem tocar na Cloudflare remota, use um worktree separado do repositório.
@@ -68,10 +79,10 @@ O script:
 - recria somente o D1 local da preview;
 - aplica as migrations localmente;
 - carrega 90 dias de dados de demonstração;
-- executa os testes da classificação do uptime e do branding;
+- executa os testes de uptime, monitoramento, identidade e renderização;
 - inicia o Worker local na porta 8787.
 
-A demonstração deixa `Website & API` com três dias imperfeitos: `287/288` verificações OK aparece verde por permanecer acima de 99%; `280/288` aparece amarelo; e `270/288` aparece laranja. Nenhum deles aparece vermelho, pois vermelho fica reservado para um dia em que todas as verificações registradas falharam. O restante dos dias permanece verde. Nenhum dado remoto é modificado.
+A demonstração deixa `Site e API` com três dias imperfeitos: `287/288` verificações OK aparece verde por permanecer acima de 99%; `280/288` aparece amarelo; e `270/288` aparece laranja. Nenhum deles aparece vermelho, pois vermelho fica reservado para um dia em que todas as verificações registradas falharam. O restante dos dias permanece verde. Nenhum dado remoto é modificado.
 
 Para testar o handler agendado contra os endpoints públicos do Blue enquanto o preview estiver rodando, em outro terminal execute:
 
@@ -79,7 +90,7 @@ Para testar o handler agendado contra os endpoints públicos do Blue enquanto o 
 curl "http://127.0.0.1:8787/__scheduled?cron=*%2F5+*+*+*+*"
 ```
 
-Depois atualize a página. O `Website & API` e o `Streaming API` serão consultados nos endpoints configurados para `mastodon.blue`. O componente de filas usa heartbeat e o armazenamento de mídia permanece manual nesta primeira versão.
+Depois atualize a página. `Site e API` e `Atualizações em tempo real` serão consultados nos endpoints configurados para `mastodon.blue`. Mídia e tarefas em segundo plano permanecem ocultos enquanto não houver um sinal específico configurado para eles.
 
 Para encerrar o preview, use `Ctrl+C`. Para remover o worktree depois do teste:
 

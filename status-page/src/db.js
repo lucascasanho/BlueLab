@@ -39,7 +39,20 @@ export async function syncComponents(db, config) {
       ),
   );
 
-  if (statements.length) await db.batch(statements);
+  if (!statements.length) return;
+
+  const activePlaceholders = config.components.map(() => '?').join(', ');
+  statements.push(
+    db
+      .prepare(`
+        UPDATE components
+        SET enabled = 0, updated_at = CURRENT_TIMESTAMP
+        WHERE enabled = 1 AND slug NOT IN (${activePlaceholders})
+      `)
+      .bind(...config.components.map((component) => component.slug)),
+  );
+
+  await db.batch(statements);
 }
 
 async function recordCheck(db, component, result, checkedAt = new Date()) {

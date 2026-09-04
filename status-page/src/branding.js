@@ -169,6 +169,21 @@ async function fetchAsset(url, originFetch) {
   return { base64: encodeBase64(bytes), contentType };
 }
 
+async function fetchFirstAsset(urls, originFetch) {
+  let lastError;
+  const uniqueUrls = [...new Set(urls.filter(Boolean))];
+
+  for (const url of uniqueUrls) {
+    try {
+      return await fetchAsset(url, originFetch);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError ?? new Error('No branding asset candidate was available');
+}
+
 function normalizeStoredBranding(row, config) {
   if (!row) return bundledBrandingRecord(config);
   return {
@@ -209,15 +224,17 @@ export async function refreshBranding(db, config, originFetch = fetch) {
   const htmlFavicon = findFaviconInHtml(html, config.baseUrl);
   const instanceLogo = findInstanceLogoInHtml(html, config.baseUrl);
   const apiLogo = selectLargestInstanceIcon(icons);
-  const logoUrl =
-    instanceLogo ?? apiLogo ?? htmlFavicon ?? `${config.baseUrl}/favicon.ico`;
-  const faviconUrl =
-    htmlFavicon ??
-    selectFaviconInstanceIcon(icons) ??
-    `${config.baseUrl}/favicon.ico`;
+  const defaultFaviconUrl = `${config.baseUrl}/favicon.ico`;
+  const apiFavicon = selectFaviconInstanceIcon(icons);
   const [logo, favicon] = await Promise.all([
-    fetchAsset(logoUrl, originFetch),
-    fetchAsset(faviconUrl, originFetch),
+    fetchFirstAsset(
+      [instanceLogo, apiLogo, htmlFavicon, apiFavicon, defaultFaviconUrl],
+      originFetch,
+    ),
+    fetchFirstAsset(
+      [htmlFavicon, apiFavicon, apiLogo, defaultFaviconUrl],
+      originFetch,
+    ),
   ]);
   const name =
     String(metadata?.title || config.name)

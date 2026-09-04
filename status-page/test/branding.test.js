@@ -217,3 +217,38 @@ test('prefere a logo personalizada ao ícone de aplicativo e à marca padrão', 
   assert.equal(logo.headers.get('content-type'), 'image/png');
   assert.equal(favicon.headers.get('content-type'), 'image/png');
 });
+
+test('usa o ícone da API se a logo personalizada não puder ser armazenada', async () => {
+  const db = brandingDb();
+  const config = { name: 'Blue', baseUrl: 'https://mastodon.blue' };
+  const requested = [];
+  const icon = new Uint8Array([137, 80, 78, 71, 7]);
+  const originFetch = async (input) => {
+    const url = String(input);
+    requested.push(url);
+    if (url.endsWith('/api/v2/instance')) {
+      return Response.json({
+        title: 'blue',
+        icon: [{ src: 'https://mastodon.blue/app-icon.png', size: '192x192' }],
+      });
+    }
+    if (url === 'https://mastodon.blue') {
+      return new Response(
+        '<style>:root { --instance-logo: url("/huge-logo.png"); }</style>',
+      );
+    }
+    if (url.endsWith('/huge-logo.png')) {
+      return new Response(null, {
+        headers: { 'content-length': String(512 * 1024 + 1) },
+      });
+    }
+    return new Response(icon, { headers: { 'content-type': 'image/png' } });
+  };
+
+  await refreshBranding(db, config, originFetch);
+  const logo = await getBrandingAsset(db, config, 'logo');
+
+  assert.ok(requested.includes('https://mastodon.blue/huge-logo.png'));
+  assert.ok(requested.includes('https://mastodon.blue/app-icon.png'));
+  assert.deepEqual(new Uint8Array(await logo.arrayBuffer()), icon);
+});

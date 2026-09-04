@@ -125,6 +125,8 @@ const worker = {
       headers: {
         'content-type': 'text/html; charset=utf-8',
         'cache-control': 'public, max-age=30, stale-while-revalidate=60',
+        'content-security-policy':
+          "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
         'x-content-type-options': 'nosniff',
         'referrer-policy': 'strict-origin-when-cross-origin',
       },
