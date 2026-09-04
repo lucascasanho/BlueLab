@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - BlueLab-Testing
+      - BlueLab
   workflow_dispatch:
 
 permissions:
@@ -16,7 +17,7 @@ concurrency:
 
 jobs:
   sync:
-    name: Keep main and BlueLab-Testing aligned
+    name: Keep deployment branches aligned
     runs-on: ubuntu-latest
 
     steps:
@@ -30,31 +31,56 @@ jobs:
         run: |
           set -euo pipefail
 
-          git fetch origin main BlueLab-Testing
+          branches=(main BlueLab-Testing BlueLab)
+          git fetch origin "${branches[@]}"
 
-          main_sha="$(git rev-parse origin/main)"
-          testing_sha="$(git rev-parse origin/BlueLab-Testing)"
+          declare -A shas
+          for branch in "${branches[@]}"; do
+            shas["$branch"]="$(git rev-parse "origin/$branch")"
+            printf '%-16s %s\n' "$branch:" "${shas[$branch]}"
+          done
 
-          echo "main:            $main_sha"
-          echo "BlueLab-Testing: $testing_sha"
+          candidate_branch=''
+          candidate_sha=''
 
-          if [[ "$main_sha" == "$testing_sha" ]]; then
-            echo "Deployment branches are already aligned."
-            exit 0
+          for branch in "${branches[@]}"; do
+            sha="${shas[$branch]}"
+            is_latest=true
+
+            for other in "${branches[@]}"; do
+              other_sha="${shas[$other]}"
+              if ! git merge-base --is-ancestor "$other_sha" "$sha"; then
+                is_latest=false
+                break
+              fi
+            done
+
+            if [[ "$is_latest" == true ]]; then
+              candidate_branch="$branch"
+              candidate_sha="$sha"
+              break
+            fi
+          done
+
+          if [[ -z "$candidate_sha" ]]; then
+            echo "::error::main, BlueLab-Testing and BlueLab diverged. Refusing to force-push or discard any history."
+            echo "Resolve the divergence explicitly, then run this workflow again."
+            exit 1
           fi
 
-          if git merge-base --is-ancestor "$main_sha" "$testing_sha"; then
-            echo "main is behind; fast-forwarding main to BlueLab-Testing."
-            git push origin "$testing_sha:refs/heads/main"
-            exit 0
-          fi
+          echo "Latest linear deployment state: $candidate_branch ($candidate_sha)"
 
-          if git merge-base --is-ancestor "$testing_sha" "$main_sha"; then
-            echo "BlueLab-Testing is behind; fast-forwarding it to main."
-            git push origin "$main_sha:refs/heads/BlueLab-Testing"
-            exit 0
-          fi
+          changed=false
+          for branch in "${branches[@]}"; do
+            if [[ "${shas[$branch]}" == "$candidate_sha" ]]; then
+              continue
+            fi
 
-          echo "::error::main and BlueLab-Testing diverged. Refusing to force-push or discard either history."
-          echo "Resolve the divergence explicitly, then run this workflow again."
-          exit 1
+            echo "Fast-forwarding $branch to $candidate_sha"
+            git push origin "$candidate_sha:refs/heads/$branch"
+            changed=true
+          done
+
+          if [[ "$changed" == false ]]; then
+            echo "All deployment branches are already aligned."
+          fi
