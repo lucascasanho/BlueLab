@@ -4,6 +4,7 @@ import {
   editorAutocompleteText,
   getEditorAutocompleteContext,
   renderCompletedCustomEmoji,
+  suggestionMatchesToken,
 } from './autocomplete';
 
 afterEach(() => {
@@ -12,6 +13,27 @@ afterEach(() => {
 });
 
 describe('redesigned composer autocomplete', () => {
+  test('keeps account and custom emoji suggestions strictly separated by trigger', () => {
+    const account = { type: 'account', id: '123' };
+    const customEmoji = { type: 'emoji', id: 'party', custom: true };
+    const nativeEmoji = {
+      type: 'emoji',
+      id: 'smile',
+      custom: false,
+      native: '😄',
+    };
+
+    expect(suggestionMatchesToken(account, '@lu')).toBe(true);
+    expect(suggestionMatchesToken(account, '＠lu')).toBe(true);
+    expect(suggestionMatchesToken(account, ':lu')).toBe(false);
+
+    expect(suggestionMatchesToken(customEmoji, ':pa')).toBe(true);
+    expect(suggestionMatchesToken(customEmoji, '@pa')).toBe(false);
+
+    expect(suggestionMatchesToken(nativeEmoji, ':sm')).toBe(false);
+    expect(suggestionMatchesToken(customEmoji, null)).toBe(false);
+  });
+
   test('tracks the caret correctly on browser-created multiline blocks', () => {
     const editor = document.createElement('div');
     editor.contentEditable = 'true';
