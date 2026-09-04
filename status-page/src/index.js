@@ -27,10 +27,17 @@ function json(data, status = 200) {
   });
 }
 
-function authorizeHeartbeat(request, env) {
+async function authorizeHeartbeat(request, env) {
   if (!env.HEARTBEAT_TOKEN) return false;
   const header = request.headers.get('authorization') || '';
-  return header === `Bearer ${env.HEARTBEAT_TOKEN}`;
+  const provided = header.startsWith('Bearer ') ? header.slice(7) : '';
+  const encoder = new TextEncoder();
+  const [providedHash, expectedHash] = await Promise.all([
+    crypto.subtle.digest('SHA-256', encoder.encode(provided)),
+    crypto.subtle.digest('SHA-256', encoder.encode(env.HEARTBEAT_TOKEN)),
+  ]);
+
+  return crypto.subtle.timingSafeEqual(providedHash, expectedHash);
 }
 
 function withVersionedBranding(html, refreshedAt) {
@@ -87,7 +94,7 @@ const worker = {
       request.method === 'POST' &&
       url.pathname.startsWith('/api/heartbeat/')
     ) {
-      if (!authorizeHeartbeat(request, env)) {
+      if (!(await authorizeHeartbeat(request, env))) {
         return json({ ok: false, error: 'unauthorized' }, 401);
       }
 

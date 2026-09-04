@@ -6,6 +6,78 @@ import { checkHttp, syncComponents } from '../src/db.js';
 
 const component = { target_url: 'https://example.test/health' };
 
+test('mídia verifica um arquivo publicado pela API da instância', async () => {
+  const originalFetch = globalThis.fetch;
+  const requests = [];
+
+  globalThis.fetch = async (url, options) => {
+    requests.push({ url, options });
+    if (String(url).endsWith('/api/v2/instance')) {
+      return Response.json({
+        thumbnail: {
+          url: 'https://cdn.example.test/system/site_uploads/instance.png',
+        },
+      });
+    }
+
+    return new Response(new Uint8Array([137]), {
+      status: 206,
+      headers: { 'content-type': 'image/png' },
+    });
+  };
+
+  try {
+    const result = await checkHttp({
+      slug: 'media-storage',
+      target_url: 'https://example.test/api/v2/instance',
+    });
+
+    assert.equal(result.status, 'operational');
+    assert.equal(result.httpStatus, 206);
+    assert.equal(requests.length, 2);
+    assert.equal(
+      requests[1].url,
+      'https://cdn.example.test/system/site_uploads/instance.png',
+    );
+    assert.equal(requests[1].options.headers.range, 'bytes=0-0');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('mídia fica indisponível após duas falhas reais do arquivo', async () => {
+  const originalFetch = globalThis.fetch;
+  let metadataRequests = 0;
+  let mediaRequests = 0;
+
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/api/v2/instance')) {
+      metadataRequests += 1;
+      return Response.json({
+        icon: [{ src: 'https://example.test/system/icon.png' }],
+      });
+    }
+
+    mediaRequests += 1;
+    return new Response(null, { status: 503 });
+  };
+
+  try {
+    const result = await checkHttp({
+      slug: 'media-storage',
+      target_url: 'https://example.test/api/v2/instance',
+    });
+
+    assert.equal(result.status, 'major_outage');
+    assert.equal(result.httpStatus, 503);
+    assert.equal(metadataRequests, 2);
+    assert.equal(mediaRequests, 2);
+    assert.match(result.message, /duas tentativas/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test('falha HTTP transitória é confirmada antes de virar downtime', async () => {
   const originalFetch = globalThis.fetch;
   let attempts = 0;

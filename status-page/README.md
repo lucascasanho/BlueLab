@@ -34,12 +34,14 @@ Assim, quando a mesma base for instalada na Espelunca, ela exibirá automaticame
 
 ## Dados exibidos
 
-A página só apresenta um componente quando existe uma medição real para ele. Por padrão, cada ambiente verifica a cada cinco minutos:
+A página só apresenta um componente quando existe uma medição real para ele. Cada ambiente verifica a cada cinco minutos:
 
 - o site/API pelo endpoint definido em `WEBSITE_HEALTH_URL`;
-- as atualizações em tempo real pelo endpoint definido em `STREAMING_HEALTH_URL`.
+- as atualizações em tempo real pelo endpoint definido em `STREAMING_HEALTH_URL`;
+- a entrega de mídia, consultando `/api/v2/instance` e requisitando somente o primeiro byte de um arquivo publicado pela própria instância;
+- as tarefas em segundo plano, usando um heartbeat produzido dentro da fila `scheduler` do Sidekiq a cada minuto.
 
-O armazenamento de mídia só aparece quando `MEDIA_HEALTH_URL` está configurado. As tarefas em segundo plano só aparecem quando o secret `HEARTBEAT_TOKEN` existe e o servidor envia heartbeats. Isso evita declarar como operacional — ou indisponível — um serviço que o monitor não tem como observar.
+As tarefas em segundo plano só aparecem quando o secret `HEARTBEAT_TOKEN` existe no Worker. O servidor deriva o mesmo token por HMAC a partir de `SECRET_KEY_BASE`, com um contexto exclusivo para o status; o token derivado não é gravado no repositório nem no arquivo `.env.production`. É possível substituir apenas o destino com `STATUS_HEARTBEAT_URL`, mas por padrão ele é `https://status.<LOCAL_DOMAIN>/api/heartbeat/sidekiq`.
 
 As barras continuam cobrindo uma janela máxima de 90 dias, mas o texto informa a primeira data realmente observada. Dias anteriores ao início do monitoramento ficam cinza e não entram no percentual. O histórico bruto de verificações e incidentes é preservado quando um componente fica oculto.
 
@@ -90,7 +92,7 @@ Para testar o handler agendado contra os endpoints públicos do Blue enquanto o 
 curl "http://127.0.0.1:8787/__scheduled?cron=*%2F5+*+*+*+*"
 ```
 
-Depois atualize a página. `Site e API` e `Atualizações em tempo real` serão consultados nos endpoints configurados para `mastodon.blue`. Mídia e tarefas em segundo plano permanecem ocultos enquanto não houver um sinal específico configurado para eles.
+Depois atualize a página. `Site e API`, `Atualizações em tempo real` e `Arquivos e mídia` serão consultados nos endpoints públicos do Blue. Tarefas em segundo plano permanecem ocultas no preview enquanto não houver o secret de heartbeat.
 
 Para encerrar o preview, use `Ctrl+C`. Para remover o worktree depois do teste:
 
@@ -124,6 +126,17 @@ O endpoint legado de heartbeat do Sidekiq também é aceito:
 com `Authorization: Bearer <token>`.
 
 O token não deve ser versionado. Use o secret `STATUS_HEARTBEAT_TOKEN_ESPELUNCA` no GitHub.
+
+Para uma implantação direta, derive o token dentro da própria instância e envie-o ao Wrangler sem mostrá-lo no terminal:
+
+```bash
+env RAILS_ENV=production bundle exec rails runner \
+  "print OpenSSL::HMAC.hexdigest('SHA256', ENV.fetch('SECRET_KEY_BASE'), Scheduler::StatusHeartbeatScheduler::TOKEN_CONTEXT)" \
+  | npx --yes wrangler@4.129.0 secret put HEARTBEAT_TOKEN \
+      --config status-page/wrangler.jsonc --env blue
+```
+
+Na Espelunca, troque apenas o ambiente Wrangler para `--env espelunca`. O segredo derivado é diferente em cada instância porque cada uma tem seu próprio `SECRET_KEY_BASE`.
 
 ## Publicação pelo GitHub
 

@@ -9,20 +9,23 @@ const baseEnv = {
   INSTANCE_URL: 'https://mastodon.blue/',
 };
 
-test('exibe por padrão apenas componentes com monitor HTTP real', () => {
+test('exibe por padrão os três componentes com monitor HTTP real', () => {
   const config = getInstanceConfig(baseEnv);
 
   assert.equal(config.baseUrl, 'https://mastodon.blue');
   assert.deepEqual(
     config.components.map((component) => component.slug),
-    ['website-api', 'streaming-api'],
+    ['website-api', 'streaming-api', 'media-storage'],
+  );
+  assert.equal(
+    config.components.at(-1).targetUrl,
+    'https://mastodon.blue/api/v2/instance',
   );
 });
 
-test('ativa mídia e filas somente quando seus sinais estão configurados', () => {
+test('ativa filas somente quando o heartbeat está configurado', () => {
   const config = getInstanceConfig({
     ...baseEnv,
-    MEDIA_HEALTH_URL: 'https://mastodon.blue/system/probe.png',
     HEARTBEAT_TOKEN: 'configured-secret',
   });
 

@@ -1,6 +1,8 @@
 /* eslint-disable import/extensions */
 import { bucketForStatus } from './availability.js';
 
+const MAX_MEDIA_METADATA_BYTES = 256 * 1024;
+
 function isoNow() {
   return new Date()
     .toISOString()
@@ -143,14 +145,152 @@ async function checkHttpAttempt(component) {
   }
 }
 
+function publicMediaUrl(metadata, metadataUrl) {
+  const candidates = [
+    metadata?.thumbnail?.url,
+    metadata?.thumbnail?.versions?.['@1x'],
+    ...(Array.isArray(metadata?.icon)
+      ? metadata.icon.map((icon) => icon?.src)
+      : []),
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate !== 'string' || !candidate) continue;
+
+    try {
+      const url = new URL(candidate, metadataUrl);
+      if (!['http:', 'https:'].includes(url.protocol)) continue;
+      if (url.username || url.password) continue;
+      return url.toString();
+    } catch {
+      // Ignore malformed URLs published in instance metadata.
+    }
+  }
+
+  return null;
+}
+
+async function readMediaMetadata(response) {
+  const declaredLength = Number(response.headers.get('content-length'));
+  if (
+    Number.isFinite(declaredLength) &&
+    declaredLength > MAX_MEDIA_METADATA_BYTES
+  ) {
+    await response.body?.cancel();
+    throw new Error('Metadados de mídia excederam o limite de tamanho');
+  }
+
+  if (!response.body) return {};
+
+  const reader = response.body.getReader();
+  const chunks = [];
+  let length = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      length += value.byteLength;
+      if (length > MAX_MEDIA_METADATA_BYTES) {
+        throw new Error('Metadados de mídia excederam o limite de tamanho');
+      }
+      chunks.push(value);
+    }
+  } finally {
+    await reader.cancel().catch(() => undefined);
+  }
+
+  const bytes = new Uint8Array(length);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
+async function checkMediaAttempt(component) {
+  const started = Date.now();
+
+  try {
+    const metadataResponse = await fetch(component.target_url, {
+      method: 'GET',
+      redirect: 'follow',
+      headers: {
+        accept: 'application/json',
+        'user-agent': 'BlueLab Status Monitor/1.0',
+      },
+      signal: AbortSignal.timeout(10_000),
+    });
+
+    if (metadataResponse.status < 200 || metadataResponse.status >= 400) {
+      await metadataResponse.body?.cancel();
+      return {
+        status: 'major_outage',
+        httpStatus: metadataResponse.status,
+        responseMs: Date.now() - started,
+        message: `Metadados de mídia HTTP ${metadataResponse.status}`,
+      };
+    }
+
+    const metadata = await readMediaMetadata(metadataResponse);
+    const mediaUrl = publicMediaUrl(metadata, component.target_url);
+    if (!mediaUrl) {
+      return {
+        status: 'major_outage',
+        httpStatus: metadataResponse.status,
+        responseMs: Date.now() - started,
+        message: 'A instância não publicou um arquivo de mídia verificável',
+      };
+    }
+
+    const mediaResponse = await fetch(mediaUrl, {
+      method: 'GET',
+      redirect: 'follow',
+      headers: {
+        accept: 'image/*,video/*,application/octet-stream',
+        'cache-control': 'no-cache',
+        range: 'bytes=0-0',
+        'user-agent': 'BlueLab Status Monitor/1.0',
+      },
+      signal: AbortSignal.timeout(10_000),
+      cf: { cacheTtl: 0 },
+    });
+    await mediaResponse.body?.cancel();
+
+    const contentType = (mediaResponse.headers.get('content-type') || '')
+      .split(';')[0]
+      .trim();
+    const ok =
+      mediaResponse.status >= 200 &&
+      mediaResponse.status < 400 &&
+      (contentType.startsWith('image/') ||
+        contentType === 'application/octet-stream');
+    return {
+      status: ok ? 'operational' : 'major_outage',
+      httpStatus: mediaResponse.status,
+      responseMs: Date.now() - started,
+      message: `Mídia HTTP ${mediaResponse.status}`,
+    };
+  } catch (error) {
+    return {
+      status: 'major_outage',
+      httpStatus: null,
+      responseMs: Date.now() - started,
+      message: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
 // A single transient Cloudflare/Tunnel/network error must not become downtime.
 // Retry once inside the same scheduled sample; only two consecutive failures
 // are recorded as an unavailable check.
 export async function checkHttp(component) {
-  const first = await checkHttpAttempt(component);
+  const checkAttempt =
+    component.slug === 'media-storage' ? checkMediaAttempt : checkHttpAttempt;
+  const first = await checkAttempt(component);
   if (first.status === 'operational') return first;
 
-  const second = await checkHttpAttempt(component);
+  const second = await checkAttempt(component);
   if (second.status === 'operational') {
     return {
       ...second,

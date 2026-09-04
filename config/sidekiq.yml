@@ -56,6 +56,10 @@
       interval: 1 minute
       class: Scheduler::AccountsStatusesCleanupScheduler
       queue: scheduler
+    status_heartbeat_scheduler:
+      interval: 1 minute
+      class: Scheduler::StatusHeartbeatScheduler
+      queue: scheduler
     suspended_user_cleanup_scheduler:
       interval: 1 minute
       class: Scheduler::SuspendedUserCleanupScheduler

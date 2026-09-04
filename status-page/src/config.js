@@ -19,18 +19,15 @@ export function getInstanceConfig(env) {
         env.STREAMING_HEALTH_URL || `${baseUrl}/api/v1/streaming/health`,
       sortOrder: 20,
     },
-  ];
-
-  if (env.MEDIA_HEALTH_URL) {
-    components.push({
+    {
       slug: 'media-storage',
       name: 'Arquivos e mídia',
       description: 'Entrega de imagens, vídeos e outros arquivos da instância.',
       monitorType: 'http',
-      targetUrl: env.MEDIA_HEALTH_URL,
+      targetUrl: `${baseUrl}/api/v2/instance`,
       sortOrder: 30,
-    });
-  }
+    },
+  ];
 
   // Filas só aparecem quando existe um heartbeat real configurado. Exibir um
   // componente sem sinal de saúde produziria um status que não pode ser

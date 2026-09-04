@@ -4,12 +4,18 @@ on:
   pull_request:
     paths:
       - 'status-page/**'
+      - 'app/workers/scheduler/status_heartbeat_scheduler.rb'
+      - 'config/sidekiq.yml'
+      - 'spec/workers/scheduler/status_heartbeat_scheduler_spec.rb'
       - '.github/workflows/status-page.yml'
   push:
     branches:
       - main
     paths:
       - 'status-page/**'
+      - 'app/workers/scheduler/status_heartbeat_scheduler.rb'
+      - 'config/sidekiq.yml'
+      - 'spec/workers/scheduler/status_heartbeat_scheduler_spec.rb'
       - '.github/workflows/status-page.yml'
   workflow_dispatch:
     inputs:
@@ -49,6 +55,7 @@ jobs:
             status-page/src/render.js \
             status-page/test/availability.test.js \
             status-page/test/branding.test.js \
+            status-page/test/config.test.js \
             status-page/test/monitoring.test.js \
             status-page/wrangler.jsonc \
             status-page/wrangler.preview.jsonc
@@ -85,6 +92,7 @@ jobs:
             status-page/src/render.js \
             status-page/test/availability.test.js \
             status-page/test/branding.test.js \
+            status-page/test/config.test.js \
             status-page/test/monitoring.test.js \
             status-page/wrangler.jsonc \
             status-page/wrangler.preview.jsonc
