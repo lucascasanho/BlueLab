@@ -138,9 +138,7 @@ class Form::InstanceCustomization
 
   def validate_color_contrast
     value = instance_accent_color
-    if value.present? && value.match?(/\A#[0-9a-fA-F]{6}\z/) && contrast_ratio(value, '#ffffff') < 3.0
-      errors.add(:instance_accent_color, I18n.t('admin.settings.instance_customization.contrast_error', ratio: 3.0))
-    end
+    errors.add(:instance_accent_color, I18n.t('admin.settings.instance_customization.contrast_error', ratio: 3.0)) if value.present? && value.match?(/\A#[0-9a-fA-F]{6}\z/) && contrast_ratio(value, '#ffffff') < 3.0
 
     validate_color_pair(:instance_light_text_color, :instance_light_background_color)
     validate_color_pair(:instance_dark_text_color, :instance_dark_background_color)
