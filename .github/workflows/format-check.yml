@@ -19,12 +19,5 @@ jobs:
       - name: Set up Javascript environment
         uses: ./.github/actions/setup-javascript
 
-      - name: Format and show diff for diagnostics
-        run: |
-          yarn format
-          git diff -- \
-            app/javascript/mastodon/components/account_header/index.tsx \
-            app/javascript/mastodon/features/blue2/right_rail.tsx \
-            app/javascript/mastodon/features/custom_homepage/styles.module.scss \
-            app/javascript/styles/mastodon-bird-ui/components/_modals.scss
-          exit 1
+      - name: Check formatting
+        run: yarn format:check
