@@ -1,0 +1,7 @@
+.searchPortal {
+  // On BlueLab mobile search results, keep the search field and result tabs but
+  // remove the redundant Mastodon column title row (search icon + query text).
+  :global(.column-header) {
+    display: none;
+  }
+}
