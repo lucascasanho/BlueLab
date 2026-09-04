@@ -9,6 +9,8 @@ import {
   dailyAvailability,
   worstStatus,
 } from '../src/availability.js';
+import { getInstanceConfig } from '../src/config.js';
+import { renderStatusPage } from '../src/render.js';
 
 test('sem amostras fica desconhecido/cinza', () => {
   assert.equal(classifyDailyStat({ total_checks: 0 }), 'unknown');
@@ -96,4 +98,43 @@ test('status desconhecido não é tratado como indisponibilidade', () => {
 test('um componente desconhecido impede banner falso de tudo operacional', () => {
   assert.equal(worstStatus(['operational', 'unknown']), 'unknown');
   assert.equal(worstStatus(['operational', 'degraded', 'unknown']), 'degraded');
+});
+
+test('somente o Blue pode calcular o banner pelos monitores com estado conhecido', () => {
+  const data = {
+    components: [
+      {
+        id: 1,
+        name: 'Website & API',
+        description: 'Site principal',
+        current_status: 'operational',
+      },
+      {
+        id: 2,
+        name: 'Media storage',
+        description: 'Monitoramento manual',
+        current_status: 'unknown',
+      },
+    ],
+    stats: [],
+    incidents: [],
+  };
+
+  const blueConfig = getInstanceConfig({
+    INSTANCE_NAME: 'Blue',
+    INSTANCE_URL: 'https://mastodon.blue',
+    STATUS_IGNORE_UNKNOWN_IN_OVERALL: 'true',
+  });
+  const blueHtml = renderStatusPage(blueConfig, data);
+  assert.match(blueHtml, /banner--operational/);
+  assert.match(blueHtml, /Sistemas monitorados operacionais/);
+  assert.doesNotMatch(blueHtml, /Status parcialmente desconhecido/);
+
+  const defaultConfig = getInstanceConfig({
+    INSTANCE_NAME: 'Espelunca',
+    INSTANCE_URL: 'https://espelunca.social',
+  });
+  const defaultHtml = renderStatusPage(defaultConfig, data);
+  assert.match(defaultHtml, /banner--unknown/);
+  assert.match(defaultHtml, /Status parcialmente desconhecido/);
 });

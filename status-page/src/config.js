@@ -4,6 +4,9 @@ export function getInstanceConfig(env) {
   return {
     name: env.INSTANCE_NAME || 'BlueLab',
     baseUrl,
+    ignoreUnknownInOverall:
+      String(env.STATUS_IGNORE_UNKNOWN_IN_OVERALL ?? '').toLowerCase() ===
+      'true',
     components: [
       {
         slug: 'website-api',
