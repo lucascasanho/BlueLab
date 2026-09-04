@@ -35,15 +35,19 @@ body[data-theme='blue-2'] {
     }
   }
 
-  /* Make the first slide-out action read as a real BlueLab compose button. */
-  nav[data-mode='slide-out'] > ul:first-of-type > li:first-child > button {
+  /* BlueLab sidebar compose action is a primary pill, not a plain nav row. */
+  button[data-bluelab-compose='true'] {
+    box-sizing: border-box;
+    width: 100%;
     min-height: 48px;
     padding: 0 18px;
     justify-content: center;
+    gap: 10px;
     border: 0 !important;
     border-radius: 999px !important;
     background: var(--blue2-blue) !important;
     color: #fff !important;
+    font-size: 16px;
     font-weight: 650;
     box-shadow: none !important;
     transition:
@@ -51,30 +55,18 @@ body[data-theme='blue-2'] {
       transform 120ms ease;
   }
 
-  nav[data-mode='slide-out']
-    > ul:first-of-type
-    > li:first-child
-    > button:hover,
-  nav[data-mode='slide-out']
-    > ul:first-of-type
-    > li:first-child
-    > button:focus-visible {
+  button[data-bluelab-compose='true']:hover,
+  button[data-bluelab-compose='true']:focus-visible {
     background: var(--blue2-blue-hover) !important;
     color: #fff !important;
   }
 
-  nav[data-mode='slide-out']
-    > ul:first-of-type
-    > li:first-child
-    > button:focus-visible {
+  button[data-bluelab-compose='true']:focus-visible {
     outline: 2px solid var(--blue2-blue) !important;
     outline-offset: 2px;
   }
 
-  nav[data-mode='slide-out']
-    > ul:first-of-type
-    > li:first-child
-    > button:active {
+  button[data-bluelab-compose='true']:active {
     transform: scale(0.985);
   }
 
