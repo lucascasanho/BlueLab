@@ -24,6 +24,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { ComposeAttachments } from './attachments';
+import { ComposeAutocomplete } from './autocomplete';
 import type { OnEmojiPick } from './emoji';
 import { ComposeFooter } from './footer';
 import { ComposeFormHeader } from './header';
@@ -167,13 +168,15 @@ export const RedesignComposeForm: React.FC<
           />
         )}
 
-        <RichComposeEditor
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus={autoFocus}
-          onSubmit={onSubmit}
-        >
-          <ComposeAttachments className={classes.attachments} />
-        </RichComposeEditor>
+        <ComposeAutocomplete>
+          <RichComposeEditor
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus={autoFocus}
+            onSubmit={onSubmit}
+          >
+            <ComposeAttachments className={classes.attachments} />
+          </RichComposeEditor>
+        </ComposeAutocomplete>
 
         <ComposeHints />
       </div>
