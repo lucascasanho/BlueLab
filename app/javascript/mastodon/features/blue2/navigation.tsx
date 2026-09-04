@@ -124,7 +124,7 @@ export const Blue2Navigation: React.FC = () => {
         <Item to='/public/local' icon={Blue2FeedIcon}>
           <FormattedMessage
             id='tabs_bar.fediverse_feeds'
-            defaultMessage='Feeds'
+            defaultMessage='Fediverse Feeds'
           />
         </Item>
         <Item
