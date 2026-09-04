@@ -126,6 +126,7 @@ export const RedesignNavigationPanel: React.FC<{
               withSpaceAfter
               as='button'
               type='button'
+              data-bluelab-compose={isBlue2 ? 'true' : undefined}
               onClick={openComposer}
               iconComponent={
                 composerEditor === 'mastodon' ? AddIcon : PenNibIcon
@@ -140,7 +141,7 @@ export const RedesignNavigationPanel: React.FC<{
                 />
               )}
             </NavigationLink>
-            <NavigationLink to='/home' iconComponent={HouseIcon}>
+            <NavigationLink to={homePath} iconComponent={HouseIcon}>
               <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
             </NavigationLink>
             <NavigationLink
