@@ -4,12 +4,18 @@ RSpec.shared_examples 'localized subject' do |*args, **kwrest|
   it 'renders subject localized for the locale of the receiver' do
     locale = :de
     receiver.update!(locale: locale)
-    expect(mail.subject).to eq I18n.t(*args, **kwrest.merge(locale: locale))
+    expected_subject = I18n.t(*args, **kwrest.merge(locale: locale))
+    expected_subject = expected_subject.gsub(/\bMastodon\b/) { Setting.site_title } if described_class.name == 'UserMailer'
+
+    expect(mail.subject).to eq expected_subject
   end
 
   it 'renders subject localized for the default locale if the locale of the receiver is unavailable' do
     receiver.update!(locale: nil)
-    expect(mail.subject).to eq I18n.t(*args, **kwrest.merge(locale: I18n.default_locale))
+    expected_subject = I18n.t(*args, **kwrest.merge(locale: I18n.default_locale))
+    expected_subject = expected_subject.gsub(/\bMastodon\b/) { Setting.site_title } if described_class.name == 'UserMailer'
+
+    expect(mail.subject).to eq expected_subject
   end
 end
 

@@ -437,3 +437,78 @@
     }
   }
 }
+
+// BlueLab keeps navigation chrome minimal: generic back actions are hidden on
+// normal columns. Profiles restore a compact back control directly over the
+// cover without reserving a separate header row.
+.blue2Root :global(.column-header__back-button) {
+  display: none !important;
+}
+
+.blue2Root:has(:global(.blue2-profile))
+  .blue2Portal:has(:global(.column-header__back-button)) {
+  position: relative;
+  top: 0;
+  z-index: 20;
+  height: 0;
+  min-height: 0;
+  overflow: visible;
+  background: transparent !important;
+}
+
+.blue2Root:has(:global(.blue2-profile))
+  .blue2Portal:has(:global(.column-header__back-button))
+  :global(#tabs-bar__portal) {
+  position: relative !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+.blue2Root:has(:global(.blue2-profile))
+  .blue2Portal
+  :global(.column-header__back-button) {
+  position: absolute;
+  inset-block-start: 12px;
+  inset-inline-start: 12px;
+  z-index: 21;
+  box-sizing: border-box;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  border: 1px solid rgb(255 255 255 / 28%) !important;
+  border-radius: 999px !important;
+  background: rgb(0 0 0 / 58%) !important;
+  color: #fff !important;
+  font-size: 0;
+  line-height: 0;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 24%) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.blue2Root:has(:global(.blue2-profile))
+  .blue2Portal
+  :global(.column-header__back-button:hover) {
+  background: rgb(0 0 0 / 72%) !important;
+}
+
+.blue2Root:has(:global(.blue2-profile))
+  .blue2Portal
+  :global(.column-header__back-button:focus-visible) {
+  outline: 2px solid var(--blue2-blue, #0085ff) !important;
+  outline-offset: 2px;
+}
+
+// The BlueLab shell already carries instance branding. Never expose the legacy
+// Mastodon symbol from a column header inside this theme.
+.blue2Root :global(.column-header .logo--icon) {
+  display: none !important;
+}

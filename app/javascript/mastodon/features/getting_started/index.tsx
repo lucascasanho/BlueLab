@@ -9,9 +9,16 @@ import { LinkFooter } from '../ui/components/link_footer';
 
 const GettingStarted: React.FC = () => {
   const intl = useIntl();
+  const isBlueLabTheme =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+
   return (
     <Column>
       <NavigationPanel multiColumn />
+
+      {isBlueLabTheme && (
+        <div className='bluelab-advanced-footer-spacer' aria-hidden='true' />
+      )}
 
       <LinkFooter context='multi-column' />
 

@@ -11,6 +11,7 @@ import { Helmet } from '@unhead/react/helmet';
 import elephantUIPlane from '@/images/elephant_ui_plane.svg';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column/header';
+import { selectComposerEditor } from '@/mastodon/reducers/slices/composer';
 import EditIcon from '@/material-icons/400-24px/edit_square.svg?react';
 import PeopleIcon from '@/material-icons/400-24px/group.svg?react';
 import HomeIcon from '@/material-icons/400-24px/home-fill.svg?react';
@@ -27,6 +28,7 @@ import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
 import { messages as navbarMessages } from '../ui/components/navigation_bar';
 
+import { RedesignComposeForm } from './redesign';
 import { Search } from './components/search';
 import ComposeFormContainer from './containers/compose_form_container';
 
@@ -54,6 +56,12 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   const columns = useAppSelector(
     (state) => state.settings.get('columns') as ImmutableList<ColumnMap>,
   );
+  const composerEditor = useAppSelector(selectComposerEditor);
+  const useBlueLabComposer =
+    multiColumn &&
+    composerEditor === 'bluelab' &&
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'blue-2';
 
   useEffect(() => {
     dispatch(mountCompose());
@@ -165,11 +173,24 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
           aria-label={intl.formatMessage(navbarMessages.publish)}
         >
           <div className='drawer__inner'>
-            <ComposeFormContainer />
+            {useBlueLabComposer ? (
+              <RedesignComposeForm
+                className='drawer__bluelab-compose'
+                embedded
+              />
+            ) : (
+              <>
+                <ComposeFormContainer />
 
-            <div className='drawer__inner__mastodon with-zig-zag-decoration'>
-              <img alt='' draggable='false' src={mascot ?? elephantUIPlane} />
-            </div>
+                <div className='drawer__inner__mastodon with-zig-zag-decoration'>
+                  <img
+                    alt=''
+                    draggable='false'
+                    src={mascot ?? elephantUIPlane}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

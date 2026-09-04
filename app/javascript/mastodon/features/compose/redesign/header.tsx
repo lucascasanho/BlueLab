@@ -62,8 +62,9 @@ const selectComposeFormTitle = createAppSelector(
 
 export const ComposeFormHeader: React.FC<{
   id?: string;
+  noClose?: boolean;
   noMinimize?: boolean;
-}> = ({ id, noMinimize }) => {
+}> = ({ id, noClose, noMinimize }) => {
   const intl = useIntl();
   const titleMessage = useAppSelector(selectComposeFormTitle);
   const isMinimized = useAppSelector(selectIsMinimized);
@@ -111,9 +112,11 @@ export const ComposeFormHeader: React.FC<{
         </IconButton>
       )}
 
-      <IconButton icon={XIcon} variant='ghost' size='sm' onClick={onClose}>
-        <FormattedMessage id='lightbox.close' defaultMessage='Close' />
-      </IconButton>
+      {!noClose && (
+        <IconButton icon={XIcon} variant='ghost' size='sm' onClick={onClose}>
+          <FormattedMessage id='lightbox.close' defaultMessage='Close' />
+        </IconButton>
+      )}
     </header>
   );
 };
