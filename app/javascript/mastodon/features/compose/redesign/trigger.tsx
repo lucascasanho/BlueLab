@@ -152,6 +152,10 @@ export const ComposeRedesignButton: React.FC<{
         `${viewportHeight}px`,
       );
       composer.style.setProperty(
+        '--composer-visual-viewport-offset-top',
+        `${viewportOffsetTop}px`,
+      );
+      composer.style.setProperty(
         '--composer-visual-viewport-bottom',
         `${bottomInset}px`,
       );
