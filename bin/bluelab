@@ -119,11 +119,7 @@ fi
 
 printf '\n===== CONFIGURANDO REMOTE =====\n'
 if git remote get-url "$REMOTE" >/dev/null 2>&1; then
-  CURRENT_REMOTE_URL="$(git remote get-url "$REMOTE")"
-  if [[ "$CURRENT_REMOTE_URL" != "$REMOTE_URL" ]]; then
-    echo "Atualizando URL de $REMOTE: $CURRENT_REMOTE_URL -> $REMOTE_URL"
-    run git remote set-url "$REMOTE" "$REMOTE_URL"
-  fi
+  echo "Usando remote existente: $REMOTE -> $(git remote get-url "$REMOTE")"
 else
   echo "Criando remote $REMOTE -> $REMOTE_URL"
   run git remote add "$REMOTE" "$REMOTE_URL"
