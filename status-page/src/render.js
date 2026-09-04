@@ -305,7 +305,7 @@ export function renderStatusPage(config, data, now = new Date()) {
     .incident__top { display: flex; justify-content: space-between; gap: 16px; }
     .incident__top span, .incident small { color: var(--muted); font-size: 12px; }
 
-    footer { display: flex; justify-content: space-between; gap: 20px; margin-top: 26px; padding: 0 3px; color: var(--muted); font-size: 12px; }
+    footer { display: flex; justify-content: flex-end; margin-top: 26px; padding: 0 3px; color: var(--muted); font-size: 12px; }
 
     @media (max-width: 600px) {
       .wrap { width: min(calc(100% - 24px), 780px); padding: 24px 0 32px; }
@@ -324,7 +324,6 @@ export function renderStatusPage(config, data, now = new Date()) {
       .uptime-meta { grid-template-columns: 1fr auto; }
       .uptime-meta span:last-child { display: none; }
       footer { display: block; text-align: center; }
-      footer span { display: block; margin-bottom: 5px; }
     }
 
     @media (prefers-reduced-motion: no-preference) {
@@ -358,7 +357,6 @@ export function renderStatusPage(config, data, now = new Date()) {
     ${renderIncidents(data.incidents)}
 
     <footer>
-      <span>Verificações automáticas a cada 5 minutos</span>
       <a href="${escapeHtml(config.baseUrl)}" rel="noopener noreferrer">Voltar para ${escapeHtml(hostname)}</a>
     </footer>
   </main>

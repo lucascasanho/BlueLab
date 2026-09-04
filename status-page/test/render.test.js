@@ -49,4 +49,5 @@ test('inclui os tokens BlueLab nos modos claro e escuro sem JavaScript', () => {
   assert.match(html, /--surface: #101820/);
   assert.match(html, /--primary: #0085ff/);
   assert.doesNotMatch(html, /<script\b/i);
+  assert.doesNotMatch(html, /Verificações automáticas a cada 5 minutos/);
 });
