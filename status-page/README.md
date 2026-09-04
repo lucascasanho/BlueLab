@@ -132,6 +132,7 @@ Para uma implantação direta, derive o token dentro da própria instância e en
 ```bash
 env RAILS_ENV=production bundle exec rails runner \
   "print OpenSSL::HMAC.hexdigest('SHA256', ENV.fetch('SECRET_KEY_BASE'), Scheduler::StatusHeartbeatScheduler::TOKEN_CONTEXT)" \
+  | tail -c 64 \
   | npx --yes wrangler@4.129.0 secret put HEARTBEAT_TOKEN \
       --config status-page/wrangler.jsonc --env blue
 ```
