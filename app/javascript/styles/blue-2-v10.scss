@@ -1,0 +1,16 @@
+@use 'blue-2-v9';
+
+/*
+ * BlueLab tenth refinement layer.
+ * Mobile search already exposes the query in its input, so the extra
+ * ColumnHeader row (search icon + “Search for ...”) is redundant.
+ */
+@media (width <= 759px) {
+  body[data-theme='blue-2'] {
+    #tabs-bar__portal
+      .column-header__wrapper:has(.explore__search-header)
+      > .column-header {
+      display: none !important;
+    }
+  }
+}
