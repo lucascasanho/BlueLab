@@ -8,11 +8,9 @@ export function dailyAvailability(stat) {
   return Math.max(0, Math.min(100, (up / total) * 100));
 }
 
-/**
- * Red means the service was unavailable in every recorded check that day.
- * Mixed days use yellow/orange so a brief failure does not look like a
- * full-day outage while the numeric uptime remains high.
- */
+// Red means the service was unavailable in every recorded check that day.
+// Mixed days use yellow/orange so a brief failure does not look like a
+// full-day outage while the numeric uptime remains high.
 export function classifyDailyStat(stat) {
   const total = Number(stat?.total_checks ?? 0);
   if (total <= 0) return 'unknown';
