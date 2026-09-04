@@ -240,13 +240,10 @@
   // keeps the existing internal scroll behavior for media, quotes and drafts.
   :global(body[data-theme='blue-2'])
     .composer[data-bluelab-composer][role='dialog'][data-keyboard-open] {
-    top: calc(
-      var(--composer-visual-viewport-offset-top, 0px) +
-        env(safe-area-inset-top)
-    );
+    top: calc(var(--composer-visual-viewport-offset-top, 0px) + env(safe-area-inset-top));
     left: 0;
     right: 0;
-    bottom: var(--composer-visual-viewport-bottom, 0px);
+    bottom: var(--composer-visual-viewport-bottom, 0);
     inset-inline-end: auto;
     width: 100vw;
     max-width: none;
