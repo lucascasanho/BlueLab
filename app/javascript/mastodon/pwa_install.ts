@@ -71,7 +71,7 @@ function removeInstallPrompt() {
 }
 
 function showInstallPrompt() {
-  if (installPromptElement || !document.body) return;
+  if (installPromptElement) return;
 
   const copy = getCopy();
   const container = document.createElement('aside');
