@@ -234,6 +234,7 @@ export async function handleRequest(
   request,
   originFetch = fetch,
   statusFetch = null,
+  healthFetch = null,
 ) {
   const url = new URL(request.url);
   const instance = INSTANCE_BY_HOST[url.hostname];
@@ -243,6 +244,44 @@ export async function handleRequest(
       status: 421,
       headers: { 'Content-Type': 'text/plain; charset=utf-8' },
     });
+  }
+
+  if (isDocumentNavigation(request) && healthFetch) {
+    try {
+      const healthResponse = await healthFetch(
+        new Request(`${url.origin}/health`, {
+          headers: { accept: 'application/json' },
+          signal: AbortSignal.timeout(5000),
+        }),
+      );
+      if (healthResponse.status >= 500) {
+        const errorCode =
+          healthResponse.status === 530
+            ? '1033'
+            : String(healthResponse.status);
+        return unavailableResponse(
+          await resolveInstanceBranding(instance, statusFetch),
+          url.hostname,
+          errorCode,
+          healthResponse.status,
+          healthResponse.headers.get('retry-after'),
+        );
+      }
+    } catch (error) {
+      console.error(
+        JSON.stringify({
+          event: 'origin_health_fetch_failed',
+          hostname: url.hostname,
+          error: error instanceof Error ? error.name : 'UnknownError',
+        }),
+      );
+      return unavailableResponse(
+        await resolveInstanceBranding(instance, statusFetch),
+        url.hostname,
+        'conexão',
+        503,
+      );
+    }
   }
 
   let response;
@@ -289,12 +328,17 @@ export async function handleRequest(
 
 const worker = {
   async fetch(request, env) {
-    return handleRequest(request, fetch, async (instance, statusRequest) => {
-      const binding = env[instance.statusBinding];
-      if (!binding)
-        throw new Error(`Missing service binding ${instance.statusBinding}`);
-      return binding.fetch(statusRequest);
-    });
+    return handleRequest(
+      request,
+      fetch,
+      async (instance, statusRequest) => {
+        const binding = env[instance.statusBinding];
+        if (!binding)
+          throw new Error(`Missing service binding ${instance.statusBinding}`);
+        return binding.fetch(statusRequest);
+      },
+      fetch,
+    );
   },
 };
 

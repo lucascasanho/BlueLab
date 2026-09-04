@@ -138,6 +138,26 @@ describe('safe Cloudflare/Tunnel error classification', () => {
 });
 
 describe('fallback page', () => {
+  it('uses the bypassed health endpoint before Cloudflare can replace a tunnel error body', async () => {
+    let originCalled = false;
+    const response = await handleRequest(
+      documentRequest(),
+      async () => {
+        originCalled = true;
+        return new Response('origin document');
+      },
+      null,
+      async (request) => {
+        assert.equal(new URL(request.url).pathname, '/health');
+        return new Response(null, { status: 530 });
+      },
+    );
+
+    assert.equal(originCalled, false);
+    assert.equal(response.status, 530);
+    assert.match(await response.text(), /servidor · 1033/);
+  });
+
   it('renders the Blue identity, links and security headers', async () => {
     const response = await handleRequest(
       documentRequest(),
