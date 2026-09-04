@@ -94,7 +94,7 @@ jobs:
   deploy:
     name: Deploy ${{ matrix.environment }}
     needs: test
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && vars.STATUS_AUTODEPLOY == 'true')
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -107,19 +107,19 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: Checkout
-        if: github.event_name == 'push' || inputs.target == 'all' || inputs.target == matrix.environment
+        if: inputs.target == 'all' || inputs.target == matrix.environment
         uses: actions/checkout@v4
 
       - name: Deploy Worker and provision bindings
-        if: github.event_name == 'push' || inputs.target == 'all' || inputs.target == matrix.environment
+        if: inputs.target == 'all' || inputs.target == matrix.environment
         run: npx --yes wrangler@4.129.0 deploy --config status-page/wrangler.jsonc --env "${{ matrix.environment }}"
 
       - name: Apply D1 migrations
-        if: github.event_name == 'push' || inputs.target == 'all' || inputs.target == matrix.environment
+        if: inputs.target == 'all' || inputs.target == matrix.environment
         run: npx --yes wrangler@4.129.0 d1 migrations apply DB --remote --config status-page/wrangler.jsonc --env "${{ matrix.environment }}"
 
       - name: Configure Espelunca heartbeat secret
-        if: (github.event_name == 'push' || inputs.target == 'all' || inputs.target == 'espelunca') && matrix.environment == 'espelunca'
+        if: (inputs.target == 'all' || inputs.target == 'espelunca') && matrix.environment == 'espelunca'
         env:
           HEARTBEAT_TOKEN: ${{ secrets.STATUS_HEARTBEAT_TOKEN_ESPELUNCA }}
         run: |
@@ -130,7 +130,7 @@ jobs:
           fi
 
       - name: Configure Blue heartbeat secret
-        if: (github.event_name == 'push' || inputs.target == 'all' || inputs.target == 'blue') && matrix.environment == 'blue'
+        if: (inputs.target == 'all' || inputs.target == 'blue') && matrix.environment == 'blue'
         env:
           HEARTBEAT_TOKEN: ${{ secrets.STATUS_HEARTBEAT_TOKEN_BLUE }}
         run: |
