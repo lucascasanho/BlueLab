@@ -17,6 +17,19 @@ Isso significa:
 
 A página da Espelunca não depende de `mastodon.blue` estar online para funcionar. Ela recebe a mesma versão do código, mas continua sendo uma implantação independente. Isso evita que uma queda do Blue derrube também o status da Espelunca.
 
+## Branding da instância
+
+A página não mantém favicon ou logo específicos do Blue no código compartilhado.
+
+O Worker consulta a própria instância configurada em `INSTANCE_URL` e:
+
+- usa o favicon declarado no HTML da instância como favicon da página de status;
+- usa os ícones publicados por `GET /api/v2/instance` para escolher a logo exibida ao lado do nome no topo;
+- faz fallback para os ícones da API ou `/favicon.ico` quando necessário;
+- serve esses arquivos pelo próprio Worker com cache, em `/favicon.ico` e `/instance-logo`.
+
+Assim, quando a mesma base for instalada na Espelunca, ela exibirá automaticamente o favicon e o ícone da Espelunca em vez dos do Blue.
+
 ## Preview local no Blue
 
 Para testar sem alterar a instalação Mastodon do Blue e sem tocar na Cloudflare remota, use um worktree separado do repositório.
@@ -53,7 +66,7 @@ O script:
 - recria somente o D1 local da preview;
 - aplica as migrations localmente;
 - carrega 90 dias de dados de demonstração;
-- executa os testes da classificação do uptime;
+- executa os testes da classificação do uptime e do branding;
 - inicia o Worker local na porta 8787.
 
 A demonstração deixa `Website & API` com duas falhas parciais: uma de `287/288` verificações OK e outra de `280/288`. Elas devem aparecer em amarelo e laranja, respectivamente, nunca em vermelho. O restante dos dias permanece verde. Nenhum dado remoto é modificado.
@@ -99,7 +112,7 @@ O token não deve ser versionado. Use o secret `STATUS_HEARTBEAT_TOKEN_ESPELUNCA
 
 ## Publicação pelo GitHub
 
-O workflow `.github/workflows/status-page.yml` testa a classificação das barras e pode publicar os ambientes `blue`, `espelunca` ou ambos.
+O workflow `.github/workflows/status-page.yml` testa a classificação das barras e o branding e pode publicar os ambientes `blue`, `espelunca` ou ambos.
 
 Secrets necessários no repositório:
 
@@ -108,12 +121,12 @@ Secrets necessários no repositório:
 - `STATUS_HEARTBEAT_TOKEN_ESPELUNCA` (quando o heartbeat da Espelunca for transferido)
 - `STATUS_HEARTBEAT_TOKEN_BLUE` (quando o heartbeat do Blue for configurado)
 
-A variável de repositório `STATUS_AUTODEPLOY=true` habilita publicação automática dos dois ambientes após alterações em `status-page/**`. Sem essa variável, o deploy continua disponível manualmente em GitHub Actions e nenhuma página de produção é trocada só por adicionar este código ao repositório.
+A variável de repositório `STATUS_AUTODEPLOY=true` habilita publicação automática dos dois ambientes após alterações em `status-page/**`. Sem essa variável, o deploy continua disponível manualmente em GitHub Actions.
 
 O fluxo pretendido é: desenvolver/testar no Blue -> publicar Blue -> depois publicar a mesma revisão para Espelunca. Assim, o Blue funciona como laboratório e fonte das atualizações, enquanto a Espelunca só recebe versões já verificadas.
 
-## Cutover seguro
+## Domínio do Blue
 
-A configuração não declara custom domains de propósito. Primeiro publique e valide o Worker do Blue em `workers.dev`. Só depois associe o domínio público do status do Blue.
+O ambiente `blue` já declara `status.mastodon.blue` como Custom Domain do Cloudflare Worker. Quando o deploy do ambiente Blue for executado com credenciais Cloudflare válidas, o Wrangler poderá associar o Worker diretamente a esse hostname e a Cloudflare cuidará do DNS/certificado do Custom Domain.
 
-A Espelunca permanece apontada para sua página atual até a nova revisão compartilhada ser validada no Blue e o cutover da Espelunca ser feito explicitamente. Isso preserva a página que já está funcionando hoje.
+A Espelunca permanece apontada para sua página atual até a nova revisão compartilhada ser validada no Blue e o cutover da Espelunca ser feito explicitamente.
