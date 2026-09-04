@@ -37,12 +37,14 @@ body[data-theme='blue-2'] {
 
   /* BlueLab sidebar compose action is a primary pill, not a plain nav row. */
   button[data-bluelab-compose='true'] {
+    position: relative;
     box-sizing: border-box;
-    width: 100%;
+    width: calc(100% - 24px);
     min-height: 48px;
+    margin-inline: auto;
     padding: 0 18px;
     justify-content: center;
-    gap: 10px;
+    gap: 0;
     border: 0 !important;
     border-radius: 999px !important;
     background: var(--blue2-blue) !important;
@@ -53,6 +55,20 @@ body[data-theme='blue-2'] {
     transition:
       background 120ms ease,
       transform 120ms ease;
+  }
+
+  button[data-bluelab-compose='true'] > span:first-child {
+    position: absolute;
+    inset-inline-start: 18px;
+    width: 20px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+  }
+
+  button[data-bluelab-compose='true'] > span:last-child {
+    flex: 0 1 auto;
+    text-align: center;
   }
 
   button[data-bluelab-compose='true']:hover,
