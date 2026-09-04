@@ -1,0 +1,60 @@
+name: Sync deployment branches
+
+on:
+  push:
+    branches:
+      - main
+      - BlueLab-Testing
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-deployment-branches
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Keep main and BlueLab-Testing aligned
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          fetch-depth: 0
+
+      - name: Synchronize deployment refs safely
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git fetch origin main BlueLab-Testing
+
+          main_sha="$(git rev-parse origin/main)"
+          testing_sha="$(git rev-parse origin/BlueLab-Testing)"
+
+          echo "main:            $main_sha"
+          echo "BlueLab-Testing: $testing_sha"
+
+          if [[ "$main_sha" == "$testing_sha" ]]; then
+            echo "Deployment branches are already aligned."
+            exit 0
+          fi
+
+          if git merge-base --is-ancestor "$main_sha" "$testing_sha"; then
+            echo "main is behind; fast-forwarding main to BlueLab-Testing."
+            git push origin "$testing_sha:refs/heads/main"
+            exit 0
+          fi
+
+          if git merge-base --is-ancestor "$testing_sha" "$main_sha"; then
+            echo "BlueLab-Testing is behind; fast-forwarding it to main."
+            git push origin "$main_sha:refs/heads/BlueLab-Testing"
+            exit 0
+          fi
+
+          echo "::error::main and BlueLab-Testing diverged. Refusing to force-push or discard either history."
+          echo "Resolve the divergence explicitly, then run this workflow again."
+          exit 1
