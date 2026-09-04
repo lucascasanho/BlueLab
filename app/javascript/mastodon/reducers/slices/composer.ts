@@ -290,6 +290,9 @@ export const submitComposer = createAppThunk(
       privacy === 'private' &&
       statuses.getIn([quotedStatusId, 'account']) !== me &&
       !settings.getIn(['dismissed_banners', PRIVATE_QUOTE_MODAL_ID]);
+    const closeBlue2AfterSuccess =
+      typeof document !== 'undefined' &&
+      document.body.dataset.theme === 'blue-2';
 
     if (
       !!meta.get('missing_alt_text_modal') &&
@@ -312,6 +315,11 @@ export const submitComposer = createAppThunk(
     } else {
       dispatch(
         submitCompose((status: ApiStatusJSON) => {
+          if (closeBlue2AfterSuccess) {
+            dispatch(composerSlice.actions.hideComposer());
+            dispatch(clearComposeSuggestions());
+          }
+
           if (redirectOnSuccess) {
             window.location.assign(status.url);
           }
