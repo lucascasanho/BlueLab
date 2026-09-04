@@ -42,11 +42,13 @@ jobs:
         run: |
           yarn format \
             status-page/src/availability.js \
+            status-page/src/branding.js \
             status-page/src/config.js \
             status-page/src/db.js \
             status-page/src/index.js \
             status-page/src/render.js \
             status-page/test/availability.test.js \
+            status-page/test/branding.test.js \
             status-page/wrangler.jsonc \
             status-page/wrangler.preview.jsonc
       - name: Commit formatting when needed
@@ -75,15 +77,17 @@ jobs:
         run: |
           yarn format \
             status-page/src/availability.js \
+            status-page/src/branding.js \
             status-page/src/config.js \
             status-page/src/db.js \
             status-page/src/index.js \
             status-page/src/render.js \
             status-page/test/availability.test.js \
+            status-page/test/branding.test.js \
             status-page/wrangler.jsonc \
             status-page/wrangler.preview.jsonc
           git diff --exit-code -- status-page
-      - name: Test daily uptime classification
+      - name: Test status page logic
         working-directory: status-page
         run: node --test test/*.test.js
 
