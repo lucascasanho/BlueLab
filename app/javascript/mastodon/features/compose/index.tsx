@@ -26,9 +26,9 @@ import { Icon } from 'mastodon/components/icon';
 import { mascot, reduceMotion } from 'mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
+import { Blue2AdvancedComposePanel } from '../blue2/advanced_compose_panel';
 import { messages as navbarMessages } from '../ui/components/navigation_bar';
 
-import { RedesignComposeForm } from './redesign';
 import { Search } from './components/search';
 import ComposeFormContainer from './containers/compose_form_container';
 
@@ -174,10 +174,7 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
         >
           <div className='drawer__inner'>
             {useBlueLabComposer ? (
-              <RedesignComposeForm
-                className='drawer__bluelab-compose'
-                embedded
-              />
+              <Blue2AdvancedComposePanel />
             ) : (
               <>
                 <ComposeFormContainer />

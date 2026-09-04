@@ -55,3 +55,11 @@
     left: 14px;
   }
 }
+
+@media (orientation: landscape) and (width >= 760px) and (width < 1024px) {
+  .root {
+    // In tablet landscape the BlueLab navigation collapses to a 76px rail.
+    // Keep the fixed control beside that rail so it cannot cover its buttons.
+    left: calc(76px + 14px + env(safe-area-inset-left));
+  }
+}

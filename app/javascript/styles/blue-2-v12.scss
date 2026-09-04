@@ -1,0 +1,21 @@
+@use 'blue-2-v11';
+
+/*
+ * BlueLab twelfth refinement layer.
+ * Keep the advanced-interface footer at the bottom of its own column without
+ * relying on :has(), while leaving Vanilla, Bird UI, and the classic composer
+ * untouched.
+ */
+body[data-theme='blue-2'].layout-multiple-columns {
+  .bluelab-advanced-getting-started {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .bluelab-advanced-getting-started > [data-context='multi-column'] {
+    margin-top: auto;
+  }
+}
