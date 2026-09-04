@@ -237,6 +237,7 @@ export const ComposeRedesignButton: React.FC<{
         color='accent'
         className={classNames(classes.button, inline && classes.buttonInline)}
         size='lg'
+        data-blue2-compose-fab={isBlue2 && !inline ? 'true' : undefined}
         onPointerDown={captureLauncherPointerOrigin}
         onFocus={captureLauncherFocusOrigin}
       >

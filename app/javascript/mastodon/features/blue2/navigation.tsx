@@ -40,6 +40,7 @@ interface ItemProps {
   badge?: number;
   iconClassName?: string;
   className?: string;
+  homeNav?: boolean;
 }
 
 const Item: React.FC<ItemProps> = ({
@@ -50,12 +51,14 @@ const Item: React.FC<ItemProps> = ({
   badge,
   iconClassName,
   className,
+  homeNav,
 }) => (
   <NavLink
     to={to}
     exact={exact}
     className={className ? `${classes.item} ${className}` : classes.item}
     activeClassName={classes.itemActive}
+    data-blue2-home-nav={homeNav ? 'true' : undefined}
   >
     <Icon size={27} className={iconClassName} />
     <span>{children}</span>
@@ -94,21 +97,13 @@ export const Blue2Navigation: React.FC = () => {
     <nav className={classes.root} aria-label='BLUE 2.0'>
       {signedIn && <Blue2AccountMenu />}
 
-      <Item
-        to={homePath}
-        exact
-        icon={Blue2HomeIcon}
-        className={classes.landscapeHomeItem}
-      >
-        <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
-      </Item>
-
       <div className={classes.items}>
         <Item
           to={homePath}
           exact
           icon={Blue2HomeIcon}
           className={classes.homeItem}
+          homeNav
         >
           <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
         </Item>
