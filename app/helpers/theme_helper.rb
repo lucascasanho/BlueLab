@@ -109,9 +109,16 @@ module ThemeHelper
       body[data-theme='blue-2'] {
         --blue2-blue: #{accent};
         --blue2-blue-hover: color-mix(in srgb, #{accent}, black 15%);
+        --color-bg-brand-soft: color-mix(in srgb, #{accent} 14%, transparent);
+        --color-bg-brand-softest: color-mix(in srgb, #{accent} 8%, transparent);
       }
       body[data-theme='blue-2'] ::selection {
         background: color-mix(in srgb, #{accent}, transparent 65%);
+      }
+      body[data-theme='blue-2'] .status:hover,
+      body[data-theme='blue-2'] .notification:hover,
+      body[data-theme='blue-2'] .notification-group:hover {
+        background: var(--blue2-hover);
       }
       html[data-color-scheme='dark'] body[data-theme='blue-2'],
       html[data-color-scheme='auto'] body[data-theme='blue-2'],
