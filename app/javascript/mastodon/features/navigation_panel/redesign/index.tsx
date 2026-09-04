@@ -126,6 +126,7 @@ export const RedesignNavigationPanel: React.FC<{
               withSpaceAfter
               as='button'
               type='button'
+              data-bluelab-compose={isBlue2 ? 'true' : undefined}
               onClick={openComposer}
               iconComponent={
                 composerEditor === 'mastodon' ? AddIcon : PenNibIcon
