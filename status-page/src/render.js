@@ -143,6 +143,8 @@ export function renderStatusPage(config, data) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark light">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="shortcut icon" href="/favicon.ico">
   <title>Status — ${escapeHtml(config.name)}</title>
   <style>
     :root {
@@ -171,6 +173,9 @@ export function renderStatusPage(config, data) {
     a { color: inherit; text-decoration: none; }
     .wrap { width: min(100% - 32px, 820px); margin: 0 auto; padding: 0 0 54px; }
     header { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; padding: 0 0 36px; }
+    .brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .brand__logo { width: 38px; height: 38px; border-radius: 9px; object-fit: contain; flex: 0 0 auto; }
+    .brand__text { min-width: 0; }
     header h1 { margin: 0; font-size: 22px; line-height: 1.15; }
     header p { margin: 7px 0 0; color: #d4dce8; font-weight: 600; }
     header a { margin-top: 8px; color: #aeb9ff; }
@@ -227,7 +232,9 @@ export function renderStatusPage(config, data) {
 
     @media (max-width: 650px) {
       .wrap { width: min(100% - 24px, 820px); }
-      header { padding-bottom: 24px; }
+      header { padding-bottom: 24px; gap: 12px; }
+      .brand { gap: 9px; }
+      .brand__logo { width: 34px; height: 34px; border-radius: 8px; }
       .component { padding: 20px 16px 18px; }
       .component__top { gap: 12px; }
       .uptime-bars { gap: 1px; height: 22px; }
@@ -242,9 +249,12 @@ export function renderStatusPage(config, data) {
 <body>
   <main class="wrap">
     <header>
-      <div>
-        <h1>${escapeHtml(config.name)}</h1>
-        <p>Status dos serviços</p>
+      <div class="brand">
+        <img class="brand__logo" src="/instance-logo" alt="" width="38" height="38">
+        <div class="brand__text">
+          <h1>${escapeHtml(config.name)}</h1>
+          <p>Status dos serviços</p>
+        </div>
       </div>
       <a href="${escapeHtml(config.baseUrl)}" rel="noopener noreferrer">${escapeHtml(config.baseUrl.replace(/^https?:\/\//, ''))}</a>
     </header>
