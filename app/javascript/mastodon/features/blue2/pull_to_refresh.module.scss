@@ -1,0 +1,54 @@
+.root {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: 0;
+  display: flex;
+  justify-content: center;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.indicator {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--blue2-border, #22303b);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--blue2-bg, #000) 94%, transparent);
+  color: var(--blue2-text, #f7f7f8);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 22%);
+  backdrop-filter: blur(10px);
+  opacity: min(1, calc(var(--blue2-pull-distance, 0px) / 36px));
+  transform: translateY(calc(var(--blue2-pull-distance, 0px) - 42px));
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  transition: transform 120ms ease;
+}
+
+.root[data-ready='true'] .icon {
+  transform: rotate(180deg);
+}
+
+.root[data-refreshing='true'] .indicator {
+  opacity: 1;
+  transform: translateY(12px);
+}
+
+.root[data-refreshing='true'] .icon {
+  animation: bluelab-pull-refresh-spin 700ms linear infinite;
+}
+
+@keyframes bluelab-pull-refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
