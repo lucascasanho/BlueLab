@@ -2,18 +2,22 @@
 
 /*
  * BLUE 2.0 light-mode correction.
- * Keep the dark-theme post hover exactly as defined by blue-2.scss while
- * replacing that dark hover surface only when the interface is light.
+ * Keep the dark-theme hover surfaces exactly as defined by blue-2.scss while
+ * replacing them only when the interface is light.
  */
 html[data-color-scheme='light'] body[data-theme='blue-2'] {
-  .status:hover {
+  .status:hover,
+  .notification:hover,
+  .notification-group:hover {
     background: var(--blue2-hover) !important;
   }
 }
 
 @media (prefers-color-scheme: light) {
   html:not([data-color-scheme]) body[data-theme='blue-2'] {
-    .status:hover {
+    .status:hover,
+    .notification:hover,
+    .notification-group:hover {
       background: var(--blue2-hover) !important;
     }
   }
