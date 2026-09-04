@@ -1,7 +1,7 @@
-import test from 'node:test';
+/* eslint-disable import/extensions */
 import assert from 'node:assert/strict';
+import test from 'node:test';
 
-// eslint-disable-next-line import/extensions
 import {
   aggregateUptime,
   bucketForStatus,

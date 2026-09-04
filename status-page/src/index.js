@@ -1,6 +1,5 @@
-// eslint-disable-next-line import/extensions
+/* eslint-disable import/extensions */
 import { getInstanceConfig } from './config.js';
-// eslint-disable-next-line import/extensions
 import {
   getDashboardData,
   healthPayload,
@@ -8,7 +7,6 @@ import {
   runScheduledChecks,
   syncComponents,
 } from './db.js';
-// eslint-disable-next-line import/extensions
 import { renderStatusPage } from './render.js';
 
 function json(data, status = 200) {
@@ -27,8 +25,7 @@ function authorizeHeartbeat(request, env) {
   return header === `Bearer ${env.HEARTBEAT_TOKEN}`;
 }
 
-// eslint-disable-next-line import/no-anonymous-default-export
-export default {
+const worker = {
   async fetch(request, env) {
     const url = new URL(request.url);
     const config = getInstanceConfig(env);
@@ -82,3 +79,5 @@ export default {
     })());
   },
 };
+
+export default worker;

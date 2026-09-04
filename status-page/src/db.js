@@ -1,4 +1,4 @@
-// eslint-disable-next-line import/extensions
+/* eslint-disable import/extensions */
 import { bucketForStatus } from './availability.js';
 
 function isoNow() {

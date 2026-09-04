@@ -1,4 +1,4 @@
-// eslint-disable-next-line import/extensions
+/* eslint-disable import/extensions */
 import {
   aggregateUptime,
   classifyDailyStat,
