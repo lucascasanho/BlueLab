@@ -36,6 +36,12 @@
         "WEBSITE_HEALTH_URL": "https://espelunca.social/health",
         "STREAMING_HEALTH_URL": "https://espelunca.social/api/v1/streaming/health",
       },
+      "routes": [
+        {
+          "pattern": "status.espelunca.social",
+          "custom_domain": true,
+        },
+      ],
       "d1_databases": [
         {
           "binding": "DB",
