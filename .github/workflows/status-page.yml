@@ -47,7 +47,8 @@ jobs:
             status-page/src/index.js \
             status-page/src/render.js \
             status-page/test/availability.test.js \
-            status-page/wrangler.jsonc
+            status-page/wrangler.jsonc \
+            status-page/wrangler.preview.jsonc
       - name: Commit formatting when needed
         run: |
           if git diff --quiet -- status-page; then
@@ -79,7 +80,8 @@ jobs:
             status-page/src/index.js \
             status-page/src/render.js \
             status-page/test/availability.test.js \
-            status-page/wrangler.jsonc
+            status-page/wrangler.jsonc \
+            status-page/wrangler.preview.jsonc
           git diff --exit-code -- status-page
       - name: Test daily uptime classification
         working-directory: status-page
@@ -106,11 +108,11 @@ jobs:
 
       - name: Deploy Worker and provision bindings
         if: github.event_name == 'push' || inputs.target == 'all' || inputs.target == matrix.environment
-        run: npx --yes wrangler@4.57.0 deploy --config status-page/wrangler.jsonc --env "${{ matrix.environment }}"
+        run: npx --yes wrangler@4.129.0 deploy --config status-page/wrangler.jsonc --env "${{ matrix.environment }}"
 
       - name: Apply D1 migrations
         if: github.event_name == 'push' || inputs.target == 'all' || inputs.target == matrix.environment
-        run: npx --yes wrangler@4.57.0 d1 migrations apply DB --remote --config status-page/wrangler.jsonc --env "${{ matrix.environment }}"
+        run: npx --yes wrangler@4.129.0 d1 migrations apply DB --remote --config status-page/wrangler.jsonc --env "${{ matrix.environment }}"
 
       - name: Configure Espelunca heartbeat secret
         if: (github.event_name == 'push' || inputs.target == 'all' || inputs.target == 'espelunca') && matrix.environment == 'espelunca'
@@ -118,7 +120,7 @@ jobs:
           HEARTBEAT_TOKEN: ${{ secrets.STATUS_HEARTBEAT_TOKEN_ESPELUNCA }}
         run: |
           if [ -n "$HEARTBEAT_TOKEN" ]; then
-            printf '%s' "$HEARTBEAT_TOKEN" | npx --yes wrangler@4.57.0 secret put HEARTBEAT_TOKEN --config status-page/wrangler.jsonc --env espelunca
+            printf '%s' "$HEARTBEAT_TOKEN" | npx --yes wrangler@4.129.0 secret put HEARTBEAT_TOKEN --config status-page/wrangler.jsonc --env espelunca
           else
             echo 'STATUS_HEARTBEAT_TOKEN_ESPELUNCA não configurado; mantendo o Worker sem heartbeat autenticado.'
           fi
@@ -129,7 +131,7 @@ jobs:
           HEARTBEAT_TOKEN: ${{ secrets.STATUS_HEARTBEAT_TOKEN_BLUE }}
         run: |
           if [ -n "$HEARTBEAT_TOKEN" ]; then
-            printf '%s' "$HEARTBEAT_TOKEN" | npx --yes wrangler@4.57.0 secret put HEARTBEAT_TOKEN --config status-page/wrangler.jsonc --env blue
+            printf '%s' "$HEARTBEAT_TOKEN" | npx --yes wrangler@4.129.0 secret put HEARTBEAT_TOKEN --config status-page/wrangler.jsonc --env blue
           else
             echo 'STATUS_HEARTBEAT_TOKEN_BLUE não configurado; mantendo o Worker sem heartbeat autenticado.'
           fi
