@@ -43,6 +43,21 @@ find_existing_worker() {
   printf '%s' 'espelunca-status'
 }
 
+cloudflare_authenticated() {
+  local output
+  output="$("${WRANGLER[@]}" whoami 2>&1 || true)"
+
+  if grep -qiE 'not authenticated|please run [`'"'"']?wrangler login|CLOUDFLARE_API_TOKEN' <<<"$output"; then
+    return 1
+  fi
+
+  if grep -qiE 'account|email|token|oauth' <<<"$output"; then
+    return 0
+  fi
+
+  return 1
+}
+
 printf '\n===== STATUS ESPELUNCA — ATUALIZAÇÃO PELO BLUELAB =====\n'
 printf 'Código: %s\n' "$ROOT"
 printf 'Config: %s\n' "$CONFIG"
@@ -52,11 +67,29 @@ WORKER_NAME="$(find_existing_worker)"
 printf 'Worker detectado: %s\n' "$WORKER_NAME"
 
 printf '\n===== 1/6 AUTENTICAÇÃO CLOUDFLARE =====\n'
-if ! "${WRANGLER[@]}" whoami >/dev/null 2>&1; then
-  echo 'Wrangler ainda não está autenticado. Abrindo login da Cloudflare...'
-  "${WRANGLER[@]}" login
+if ! cloudflare_authenticated; then
+  if [ -n "${CLOUDFLARE_API_TOKEN:-}" ]; then
+    echo 'CLOUDFLARE_API_TOKEN está definido, mas o Wrangler não conseguiu validar a autenticação.'
+    echo 'Confira o token e tente novamente.'
+    exit 1
+  fi
+
+  echo 'Wrangler ainda não está autenticado.'
+  echo 'Vou iniciar o login por dispositivo da Cloudflare.'
+  echo 'O terminal mostrará uma URL e um código; aprove a autorização no navegador.'
+  echo
+  "${WRANGLER[@]}" login --device
 fi
+
+echo
 "${WRANGLER[@]}" whoami
+
+if ! cloudflare_authenticated; then
+  echo
+  echo 'ERRO: o login não ficou disponível para o Wrangler.'
+  echo 'Nada foi publicado.'
+  exit 1
+fi
 
 printf '\n===== 2/6 CONFIRMANDO WORKER EXISTENTE =====\n'
 if ! "${WRANGLER[@]}" deployments status --name "$WORKER_NAME" >/tmp/bluelab-status-espelunca-worker.txt 2>&1; then
