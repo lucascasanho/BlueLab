@@ -4,8 +4,8 @@
 
 @media (width <= 759px) {
   // BlueLab's bottom navigation is a fixed shell that also owns the compose
-  // button. Animate only its link list so the compose button stays fixed and
-  // usable while the navigation row moves out of view.
+  // button. Animate the link list out of view; the portrait-only rule below
+  // also shifts the shell so the compose button fills the vacated nav space.
   .mobileNavigation > nav > ul {
     opacity: 1;
     transform: translate3d(0, 0, 0);
