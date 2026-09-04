@@ -129,7 +129,7 @@ export const RedesignComposeForm: React.FC<
       >
         <ComposeReply />
 
-        <div className={classes.toolbar}>
+        <div className={classes.toolbar} data-bluelab-compose-toolbar>
           <ComposeVisibility className={classes.flexGrowWrap} />
 
           <LanguageButton />
