@@ -1,16 +1,27 @@
 # BlueLab Status
 
-Página de status compartilhada para Blue e Espelunca, executada em Cloudflare Workers com histórico em D1.
+Página de status do Blue que também funciona como fonte única das atualizações da página de status da Espelunca. O código roda em Cloudflare Workers e mantém o histórico em D1.
 
-## Objetivo
+## Arquitetura
 
-O código de apresentação e monitoramento é único. Os ambientes `blue` e `espelunca` usam configurações e bancos separados, então uma correção visual ou de lógica feita aqui pode ser publicada para as duas páginas sem duplicar código.
+O Blue é o projeto-base deste diretório. A página nova é desenvolvida e validada primeiro como status do Blue. Depois, o mesmo código é publicado no ambiente da Espelunca, sem manter uma segunda cópia da interface.
 
-A Espelunca continua usando o banco D1 já existente (`espelunca-status-db`) para preservar o histórico. O Blue usa um D1 próprio (`blue-status-db`).
+Isso significa:
+
+- `status-page/src/**` é a fonte única de layout, cálculo de uptime, incidentes e monitoramento;
+- Blue e Espelunca usam o mesmo código;
+- cada instância mantém configuração, Worker e banco D1 próprios;
+- alterações de layout ou lógica feitas para o Blue podem ser publicadas também para a Espelunca pelo GitHub Actions;
+- o histórico atual da Espelunca permanece no `espelunca-status-db`;
+- o Blue passa a usar seu próprio `blue-status-db` quando a página for publicada.
+
+A página da Espelunca não depende de `mastodon.blue` estar online para funcionar. Ela recebe a mesma versão do código, mas continua sendo uma implantação independente. Isso evita que uma queda do Blue derrube também o status da Espelunca.
 
 ## Preview local no Blue
 
-Para testar sem alterar a instalação Mastodon do Blue e sem tocar na Cloudflare remota, use um worktree separado do repositório e execute:
+Para testar sem alterar a instalação Mastodon do Blue e sem tocar na Cloudflare remota, use um worktree separado do repositório.
+
+Primeiro teste:
 
 ```bash
 git fetch https://github.com/lucascasanho/BlueLab.git status/shared-status-pages-20260903
@@ -19,7 +30,23 @@ cd "$HOME/blue-status-test"
 bash status-page/scripts/local-preview.sh
 ```
 
+Se o worktree `~/blue-status-test` já existir, atualize somente ele:
+
+```bash
+cd "$HOME/blue-status-test" || exit 1
+if [ -n "$(git status --porcelain)" ]; then
+  echo "ERRO: o worktree de teste possui alterações locais."
+  git status --short
+  exit 1
+fi
+git fetch https://github.com/lucascasanho/BlueLab.git status/shared-status-pages-20260903
+git reset --hard FETCH_HEAD
+bash status-page/scripts/local-preview.sh
+```
+
 Depois abra `http://127.0.0.1:8787`.
+
+O preview usa `wrangler.preview.jsonc`, uma configuração exclusiva para desenvolvimento local com um D1 local. Ela existe justamente para não depender do ID do futuro banco D1 remoto do Blue.
 
 O script:
 
@@ -83,8 +110,10 @@ Secrets necessários no repositório:
 
 A variável de repositório `STATUS_AUTODEPLOY=true` habilita publicação automática dos dois ambientes após alterações em `status-page/**`. Sem essa variável, o deploy continua disponível manualmente em GitHub Actions e nenhuma página de produção é trocada só por adicionar este código ao repositório.
 
+O fluxo pretendido é: desenvolver/testar no Blue -> publicar Blue -> depois publicar a mesma revisão para Espelunca. Assim, o Blue funciona como laboratório e fonte das atualizações, enquanto a Espelunca só recebe versões já verificadas.
+
 ## Cutover seguro
 
-A configuração não declara custom domains de propósito. Primeiro publique e valide os Workers `bluelab-status-blue` e `bluelab-status-espelunca` nos endereços `workers.dev`. Depois associe os domínios de status no painel da Cloudflare. Isso evita substituir a página atual da Espelunca antes da validação.
+A configuração não declara custom domains de propósito. Primeiro publique e valide o Worker do Blue em `workers.dev`. Só depois associe o domínio público do status do Blue.
 
-O domínio público do Blue também deve ser escolhido no momento do cutover, em vez de ficar hardcoded no código compartilhado.
+A Espelunca permanece apontada para sua página atual até a nova revisão compartilhada ser validada no Blue e o cutover da Espelunca ser feito explicitamente. Isso preserva a página que já está funcionando hoje.
