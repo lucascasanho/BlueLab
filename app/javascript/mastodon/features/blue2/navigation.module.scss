@@ -72,6 +72,9 @@
   }
 }
 
+// Kept only for backwards compatibility with the existing JSX. The real Home
+// entry lives inside .items and must remain visible in both full and compact
+// rails so it is always immediately above Search.
 .landscapeHomeItem {
   display: none;
 }
@@ -133,9 +136,9 @@
 }
 
 // Keep the navigation contents compact whenever the BlueLab shell collapses
-// its navigation column to 76px. In this compact rail Home must always be the
-// first navigation action, immediately before Search, independent of viewport
-// orientation/height.
+// its navigation column to 76px. Home remains the first item in .items rather
+// than switching to a second special-case copy; this avoids an invisible gap
+// where Home used to disappear on landscape tablet widths.
 @media (width < 1180px) {
   .root {
     width: 76px;
@@ -157,16 +160,6 @@
     > span:not(.badge) {
       display: none;
     }
-  }
-
-  .landscapeHomeItem {
-    display: flex;
-    flex: 0 0 48px;
-    margin-bottom: 1px;
-  }
-
-  .homeItem {
-    display: none;
   }
 
   .badge {
