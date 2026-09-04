@@ -26,6 +26,7 @@ import { Header } from 'mastodon/features/custom_homepage/components/header';
 import { useBreakpoint } from '../../hooks/useBreakpoint';
 import { useColumnsContext } from '../../util/columns_context';
 
+import mobileChromeClasses from './blue2_mobile_chrome.module.scss';
 import { MultiColumnContent } from './multi_column_content';
 import classes from './redesign.module.scss';
 
@@ -156,7 +157,9 @@ export const ColumnsAreaRedesign: React.FC<{
         )}
 
         {isMobile ? (
-          <RedesignMobileNavigation hideMenuButton />
+          <div className={mobileChromeClasses.mobileNavigation}>
+            <RedesignMobileNavigation hideMenuButton />
+          </div>
         ) : (
           <ComposeRedesignButton />
         )}
@@ -171,7 +174,12 @@ export const ColumnsAreaRedesign: React.FC<{
           onTouchEnd={handleSwipeEnd}
         >
           {isMobile && (
-            <header className={classes.blue2MobileUtilityBar}>
+            <header
+              className={classNames(
+                classes.blue2MobileUtilityBar,
+                mobileChromeClasses.topUtilityBar,
+              )}
+            >
               <button
                 type='button'
                 className={classes.blue2MobileUtilityButton}
@@ -203,14 +211,24 @@ export const ColumnsAreaRedesign: React.FC<{
           )}
 
           {!isBlue2FeedPage && (
-            <div className={classes.blue2Portal}>
+            <div
+              className={classNames(
+                classes.blue2Portal,
+                isMobile && mobileChromeClasses.portal,
+              )}
+            >
               <TabsBarPortal />
             </div>
           )}
 
           {isBlue2FeedPage && (
             <>
-              <header className={classes.blue2Topbar}>
+              <header
+                className={classNames(
+                  classes.blue2Topbar,
+                  isMobile && mobileChromeClasses.feedTopBar,
+                )}
+              >
                 <img src={blue2Brand} alt='' className={classes.blue2Brand} />
 
                 <Link
