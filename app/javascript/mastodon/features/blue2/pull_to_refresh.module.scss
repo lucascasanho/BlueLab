@@ -20,7 +20,7 @@
   color: var(--blue2-text, #f7f7f8);
   box-shadow: 0 6px 18px rgb(0 0 0 / 22%);
   backdrop-filter: blur(10px);
-  opacity: min(1, calc(var(--blue2-pull-distance, 0px) / 36px));
+  opacity: var(--blue2-pull-opacity, 0);
   transform: translateY(calc(var(--blue2-pull-distance, 0px) - 42px));
   transition:
     opacity 120ms ease,
