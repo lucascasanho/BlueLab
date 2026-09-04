@@ -5,7 +5,7 @@ import test from 'node:test';
 import { bundledBrandingAsset } from '../src/brand-assets.js';
 import {
   findFaviconInHtml,
-  findHomepageLogoInHtml,
+  findInstanceLogoInHtml,
   getBrandingAsset,
   getBrandingSummary,
   refreshBranding,
@@ -74,14 +74,22 @@ test('usa o favicon declarado pelo HTML da instância', () => {
   );
 });
 
-test('encontra a logo SVG exibida na página inicial', () => {
+test('encontra a logo personalizada configurada pela instância', () => {
   const html = `
-    <img alt="ilustração" src="/packs/elephant.svg">
+    <style>:root { --instance-logo: url(/system/site_uploads/house.png); }</style>
     <img alt="Mastodon" src="/packs/assets/logo-C6gBTbrO.svg">
   `;
   assert.equal(
-    findHomepageLogoInHtml(html, 'https://espelunca.social'),
-    'https://espelunca.social/packs/assets/logo-C6gBTbrO.svg',
+    findInstanceLogoInHtml(html, 'https://espelunca.social'),
+    'https://espelunca.social/system/site_uploads/house.png',
+  );
+});
+
+test('encontra a logo personalizada no estado serializado da instância', () => {
+  const html = String.raw`{"custom_instance_logo":"\/system\/site_uploads\/house.svg"}`;
+  assert.equal(
+    findInstanceLogoInHtml(html, 'https://mastodon.example'),
+    'https://mastodon.example/system/site_uploads/house.svg',
   );
 });
 
@@ -153,12 +161,11 @@ test('salva e serve automaticamente nome, logo e favicon da instância', async (
   assert.deepEqual(new Uint8Array(await logo.arrayBuffer()), image);
 });
 
-test('a Espelunca prefere a logo SVG da página inicial ao ícone de aplicativo', async () => {
+test('prefere a logo personalizada ao ícone de aplicativo e à marca padrão', async () => {
   const db = brandingDb();
   const config = {
     name: 'Espelunca',
     baseUrl: 'https://espelunca.social',
-    preferHomepageLogo: true,
   };
   const requested = [];
   const originFetch = async (input) => {
@@ -178,6 +185,7 @@ test('a Espelunca prefere a logo SVG da página inicial ao ícone de aplicativo'
     if (url === 'https://espelunca.social') {
       return new Response(`
         <link rel="icon" href="/favicon.png">
+        <style>:root { --instance-logo: url('/system/site_uploads/house.png'); }</style>
         <img alt="Mastodon" src="/packs/assets/logo-DXQkHAe5.svg">
       `);
     }
@@ -197,10 +205,15 @@ test('a Espelunca prefere a logo SVG da página inicial ao ícone de aplicativo'
 
   assert.ok(
     requested.includes(
-      'https://espelunca.social/packs/assets/logo-DXQkHAe5.svg',
+      'https://espelunca.social/system/site_uploads/house.png',
     ),
   );
   assert.ok(!requested.includes('https://espelunca.social/app-icon.png'));
-  assert.equal(logo.headers.get('content-type'), 'image/svg+xml');
+  assert.ok(
+    !requested.includes(
+      'https://espelunca.social/packs/assets/logo-DXQkHAe5.svg',
+    ),
+  );
+  assert.equal(logo.headers.get('content-type'), 'image/png');
   assert.equal(favicon.headers.get('content-type'), 'image/png');
 });

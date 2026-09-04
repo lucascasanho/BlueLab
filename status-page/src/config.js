@@ -4,7 +4,6 @@ export function getInstanceConfig(env) {
   return {
     name: env.INSTANCE_NAME || 'BlueLab',
     baseUrl,
-    preferHomepageLogo: env.PREFER_HOMEPAGE_LOGO === 'true',
     components: [
       {
         slug: 'website-api',

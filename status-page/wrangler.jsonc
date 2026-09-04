@@ -42,7 +42,6 @@
       "vars": {
         "INSTANCE_NAME": "Espelunca",
         "INSTANCE_URL": "https://espelunca.social",
-        "PREFER_HOMEPAGE_LOGO": "true",
         "WEBSITE_HEALTH_URL": "https://espelunca.social/health",
         "STREAMING_HEALTH_URL": "https://espelunca.social/api/v1/streaming/health",
       },

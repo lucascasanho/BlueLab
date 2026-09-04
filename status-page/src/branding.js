@@ -62,33 +62,33 @@ export function findFaviconInHtml(html, baseUrl) {
   return null;
 }
 
-export function findHomepageLogoInHtml(html, baseUrl) {
-  const tags = String(html).match(/<img\b[^>]*>/gi) ?? [];
-  const candidates = [];
+export function findInstanceLogoInHtml(html, baseUrl) {
+  const source = String(html);
+  const cssMatch =
+    /--instance-logo\s*:\s*url\(\s*(?:"([^"]+)"|'([^']+)'|([^\s)]+))\s*\)/i.exec(
+      source,
+    );
+  const serializedMatch =
+    /"custom_instance_logo"\s*:\s*"((?:\\.|[^"\\])*)"/i.exec(source);
+  let serializedUrl = null;
 
-  for (const tag of tags) {
-    const src = readAttribute(tag, 'src');
-    if (!src) continue;
-
+  if (serializedMatch?.[1]) {
     try {
-      const url = new URL(src, baseUrl);
-      if (!url.pathname.toLowerCase().endsWith('.svg')) continue;
-
-      const alt = readAttribute(tag, 'alt') || '';
-      const className = readAttribute(tag, 'class') || '';
-      let score = 0;
-      if (/^mastodon$/i.test(alt.trim())) score += 4;
-      if (/(^|[\s_-])logo([\s_-]|$)/i.test(className)) score += 2;
-      if (/(^|\/)logo(?:[-_.][^/]*)?\.svg$/i.test(url.pathname)) score += 1;
-      if (score > 0) candidates.push({ score, url: url.toString() });
+      serializedUrl = JSON.parse(`"${serializedMatch[1]}"`);
     } catch {
-      // Ignore malformed image URLs and continue with API icons.
+      // Continue with the CSS property or API icon fallback.
     }
   }
 
-  return (
-    candidates.sort((left, right) => right.score - left.score)[0]?.url ?? null
-  );
+  const candidate =
+    cssMatch?.[1] ?? cssMatch?.[2] ?? cssMatch?.[3] ?? serializedUrl;
+  if (!candidate) return null;
+
+  try {
+    return new URL(candidate, baseUrl).toString();
+  } catch {
+    return null;
+  }
 }
 
 async function readBoundedBytes(response, limit) {
@@ -207,12 +207,10 @@ export async function refreshBranding(db, config, originFetch = fetch) {
   const metadata = JSON.parse(metadataText);
   const icons = Array.isArray(metadata?.icon) ? metadata.icon : [];
   const htmlFavicon = findFaviconInHtml(html, config.baseUrl);
-  const htmlLogo = findHomepageLogoInHtml(html, config.baseUrl);
+  const instanceLogo = findInstanceLogoInHtml(html, config.baseUrl);
   const apiLogo = selectLargestInstanceIcon(icons);
   const logoUrl =
-    (config.preferHomepageLogo ? (htmlLogo ?? apiLogo) : apiLogo) ??
-    htmlFavicon ??
-    `${config.baseUrl}/favicon.ico`;
+    instanceLogo ?? apiLogo ?? htmlFavicon ?? `${config.baseUrl}/favicon.ico`;
   const faviconUrl =
     htmlFavicon ??
     selectFaviconInstanceIcon(icons) ??
