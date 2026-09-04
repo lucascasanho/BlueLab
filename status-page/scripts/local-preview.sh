@@ -5,9 +5,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 WRANGLER=(npx --yes wrangler@4.57.0)
+CONFIG="wrangler.preview.jsonc"
 
 printf '\n===== BlueLab Status — preview local =====\n'
-printf 'Diretório: %s\n\n' "$ROOT"
+printf 'Diretório: %s\n' "$ROOT"
+printf 'Config local: %s\n\n' "$CONFIG"
 
 printf '1/4 Limpando apenas o D1 local desta preview...\n'
 rm -rf .wrangler/state
@@ -15,14 +17,12 @@ rm -rf .wrangler/state
 printf '2/4 Aplicando migrations no D1 local...\n'
 "${WRANGLER[@]}" d1 migrations apply DB \
   --local \
-  --config wrangler.jsonc \
-  --env blue
+  --config "$CONFIG"
 
 printf '3/4 Carregando dados de demonstração...\n'
 "${WRANGLER[@]}" d1 execute DB \
   --local \
-  --config wrangler.jsonc \
-  --env blue \
+  --config "$CONFIG" \
   --file preview/seed.sql
 
 printf '4/4 Executando testes da lógica de uptime...\n'
@@ -34,23 +34,23 @@ cat <<'EOF'
 Abra no navegador:
   http://127.0.0.1:8787
 
-O preview usa somente D1 LOCAL.
-Não altera mastodon.blue, Cloudflare remoto ou status.espelunca.social.
+Este é o protótipo da futura página de status do Blue.
+Ele usa somente D1 LOCAL e não publica nada na Cloudflare.
+Também não altera mastodon.blue nem status.espelunca.social.
 
 O Website & API foi semeado com:
   - um dia com 287/288 verificações OK -> amarelo;
   - um dia com 280/288 verificações OK -> laranja;
   - nenhum dia vermelho.
 
-Isso serve para confirmar visualmente que uma falha parcial não pinta o dia
-inteiro de vermelho enquanto o uptime permanece positivo.
+A base de código desta página será a fonte das futuras atualizações da página
+da Espelunca; cada instância continuará usando banco e configuração próprios.
 
 Para encerrar o preview: Ctrl+C
 EOF
 
 exec "${WRANGLER[@]}" dev \
-  --config wrangler.jsonc \
-  --env blue \
+  --config "$CONFIG" \
   --test-scheduled \
   --ip 127.0.0.1 \
   --port 8787
