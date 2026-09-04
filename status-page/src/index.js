@@ -16,7 +16,6 @@ import {
 import { renderStatusPage } from './render.js';
 
 const FAVICON_PATH = '/instance-favicon';
-const BRANDING_VERSION = 'automatic';
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
@@ -34,15 +33,16 @@ function authorizeHeartbeat(request, env) {
   return header === `Bearer ${env.HEARTBEAT_TOKEN}`;
 }
 
-function withVersionedBranding(html) {
+function withVersionedBranding(html, refreshedAt) {
+  const brandingVersion = encodeURIComponent(refreshedAt || 'automatic');
   return html
     .replaceAll(
       'href="/favicon.ico"',
-      `href="${FAVICON_PATH}?v=${BRANDING_VERSION}"`,
+      `href="${FAVICON_PATH}?v=${brandingVersion}"`,
     )
     .replaceAll(
       'src="/instance-logo"',
-      `src="/instance-logo?v=${BRANDING_VERSION}"`,
+      `src="/instance-logo?v=${brandingVersion}"`,
     );
 }
 
@@ -119,6 +119,7 @@ const worker = {
     const branding = await getBrandingSummary(env.DB, config);
     const html = withVersionedBranding(
       renderStatusPage({ ...config, name: branding.name }, data),
+      branding.refreshedAt,
     );
     return new Response(request.method === 'HEAD' ? null : html, {
       headers: {
