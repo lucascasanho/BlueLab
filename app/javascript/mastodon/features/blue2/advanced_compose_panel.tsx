@@ -10,9 +10,9 @@ import {
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch } from '@/mastodon/store';
 
+import classes from './advanced_compose_panel.module.scss';
 import { Blue2ComposeIcon } from './icons';
 import { blue2Text } from './locale';
-import classes from './advanced_compose_panel.module.scss';
 
 interface TrendTag {
   name: string;
