@@ -27,6 +27,7 @@ import { useBreakpoint } from '../../hooks/useBreakpoint';
 import { useColumnsContext } from '../../util/columns_context';
 
 import mobileChromeClasses from './blue2_mobile_chrome.module.scss';
+import searchPortalClasses from './blue2_search_portal.module.scss';
 import { MultiColumnContent } from './multi_column_content';
 import classes from './redesign.module.scss';
 
@@ -56,6 +57,7 @@ export const ColumnsAreaRedesign: React.FC<{
   const history = useHistory();
   const location = useLocation();
   const swipeOrigin = useRef<{ x: number; y: number } | null>(null);
+  const railSwipeOrigin = useRef<{ x: number; y: number } | null>(null);
   const [isBlue2MobileRailOpen, setIsBlue2MobileRailOpen] = useState(false);
   const isModalOpen = useAppSelector(
     (state) => !state.modal.get('stack').isEmpty(),
@@ -68,6 +70,7 @@ export const ColumnsAreaRedesign: React.FC<{
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const isBlue2Home = isBlue2 && location.pathname === '/home';
   const isBlue2Global = isBlue2 && location.pathname === '/public';
+  const isBlue2Search = isBlue2 && location.pathname === '/search';
   const isBlue2FeedPage = isBlue2Home || isBlue2Global;
   const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
 
@@ -92,6 +95,45 @@ export const ColumnsAreaRedesign: React.FC<{
   const handleCloseBlue2MobileRail = useCallback(() => {
     setIsBlue2MobileRailOpen(false);
   }, []);
+
+  const handleBlue2RailSwipeStart = useCallback(
+    (event: React.TouchEvent<HTMLElement>) => {
+      if (!isBlue2MobileRailOpen) return;
+
+      const touch = event.touches[0];
+      if (touch) {
+        railSwipeOrigin.current = { x: touch.clientX, y: touch.clientY };
+      }
+    },
+    [isBlue2MobileRailOpen],
+  );
+
+  const handleBlue2RailSwipeEnd = useCallback(
+    (event: React.TouchEvent<HTMLElement>) => {
+      const origin = railSwipeOrigin.current;
+      railSwipeOrigin.current = null;
+
+      if (!origin || !isBlue2MobileRailOpen) return;
+
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+
+      const deltaX = touch.clientX - origin.x;
+      const deltaY = touch.clientY - origin.y;
+
+      if (Math.abs(deltaX) < 56 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) {
+        return;
+      }
+
+      const isRtl = document.documentElement.dir === 'rtl';
+      const isClosingDirection = isRtl ? deltaX < 0 : deltaX > 0;
+
+      if (isClosingDirection) {
+        setIsBlue2MobileRailOpen(false);
+      }
+    },
+    [isBlue2MobileRailOpen],
+  );
 
   const handleSwipeStart = useCallback(
     (event: React.TouchEvent<HTMLElement>) => {
@@ -214,6 +256,7 @@ export const ColumnsAreaRedesign: React.FC<{
             <div
               className={classNames(
                 classes.blue2Portal,
+                isMobile && isBlue2Search && searchPortalClasses.searchPortal,
                 isMobile && mobileChromeClasses.portal,
               )}
             >
@@ -278,7 +321,11 @@ export const ColumnsAreaRedesign: React.FC<{
                 defaultMessage: 'Close',
               })}
             />
-            <aside className={classes.blue2MobileRailDrawer}>
+            <aside
+              className={classes.blue2MobileRailDrawer}
+              onTouchStart={handleBlue2RailSwipeStart}
+              onTouchEnd={handleBlue2RailSwipeEnd}
+            >
               <Blue2RightRail />
             </aside>
           </div>

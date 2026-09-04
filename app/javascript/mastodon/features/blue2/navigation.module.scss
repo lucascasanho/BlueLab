@@ -72,6 +72,10 @@
   }
 }
 
+.landscapeHomeItem {
+  display: none;
+}
+
 .trendingIcon,
 .trendingIcon path {
   fill: currentColor !important;
@@ -172,5 +176,20 @@
     > :not(svg) {
       display: none;
     }
+  }
+}
+
+// In phone/tablet landscape the compact rail gets a dedicated Home shortcut
+// directly below the account control. Hide the normal in-list copy there so
+// Home is guaranteed to be the first navigation action before Search.
+@media (orientation: landscape) and (width < 1180px) and (height < 760px) {
+  .landscapeHomeItem {
+    display: flex;
+    flex: 0 0 48px;
+    margin-bottom: 1px;
+  }
+
+  .homeItem {
+    display: none;
   }
 }

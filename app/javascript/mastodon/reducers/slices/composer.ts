@@ -4,6 +4,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import {
   changeCompose,
   clearComposeSuggestions,
+  COMPOSE_SUBMIT_SUCCESS,
   directCompose,
   replyComposeById,
   resetCompose,
@@ -68,11 +69,13 @@ export interface ComposerOrigin {
 interface ComposerState {
   displayState: DisplayState;
   origin: ComposerOrigin | null;
+  closeOnSubmitSuccess: boolean;
 }
 
 const initialState: ComposerState = {
   displayState: 'hidden',
   origin: null,
+  closeOnSubmitSuccess: false,
 };
 
 const composerSlice = createSlice({
@@ -82,6 +85,7 @@ const composerSlice = createSlice({
     showComposer(state, action: PayloadAction<ComposerOrigin | undefined>) {
       state.displayState = 'showing';
       state.origin = action.payload ?? null;
+      state.closeOnSubmitSuccess = false;
     },
     minimizeComposerToggle(state) {
       state.displayState =
@@ -90,7 +94,20 @@ const composerSlice = createSlice({
     hideComposer(state) {
       state.displayState = 'hidden';
       state.origin = null;
+      state.closeOnSubmitSuccess = false;
     },
+    setCloseOnSubmitSuccess(state, action: PayloadAction<boolean>) {
+      state.closeOnSubmitSuccess = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(COMPOSE_SUBMIT_SUCCESS, (state) => {
+      if (state.closeOnSubmitSuccess) {
+        state.displayState = 'hidden';
+        state.origin = null;
+        state.closeOnSubmitSuccess = false;
+      }
+    });
   },
 });
 
@@ -290,6 +307,13 @@ export const submitComposer = createAppThunk(
       privacy === 'private' &&
       statuses.getIn([quotedStatusId, 'account']) !== me &&
       !settings.getIn(['dismissed_banners', PRIVATE_QUOTE_MODAL_ID]);
+    const closeBlue2AfterSuccess =
+      typeof document !== 'undefined' &&
+      document.body.dataset.theme === 'blue-2';
+
+    dispatch(
+      composerSlice.actions.setCloseOnSubmitSuccess(closeBlue2AfterSuccess),
+    );
 
     if (
       !!meta.get('missing_alt_text_modal') &&
