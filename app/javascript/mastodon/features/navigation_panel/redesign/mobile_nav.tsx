@@ -112,6 +112,7 @@ const SlideOutNavigation: React.FC = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const overlayRef = useRef<HTMLDivElement>(null);
+  const blue2SwipeOriginRef = useRef<{ x: number; y: number } | null>(null);
 
   const isOpen = useAppSelector((state) => state.navigation.open);
 
@@ -142,6 +143,52 @@ const SlideOutNavigation: React.FC = () => {
   }, [dispatch]);
 
   const isLtrDir = getComputedStyle(document.body).direction !== 'rtl';
+
+  const handleBlue2SwipeStart = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      if (!isOpen || document.body.dataset.theme !== 'blue-2') return;
+
+      const touch = event.touches[0];
+      if (touch) {
+        blue2SwipeOriginRef.current = {
+          x: touch.clientX,
+          y: touch.clientY,
+        };
+      }
+    },
+    [isOpen],
+  );
+
+  const handleBlue2SwipeEnd = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      const origin = blue2SwipeOriginRef.current;
+      blue2SwipeOriginRef.current = null;
+
+      if (
+        !origin ||
+        !isOpen ||
+        document.body.dataset.theme !== 'blue-2'
+      ) {
+        return;
+      }
+
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+
+      const deltaX = touch.clientX - origin.x;
+      const deltaY = touch.clientY - origin.y;
+
+      if (Math.abs(deltaX) < 56 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) {
+        return;
+      }
+
+      const isClosingDirection = isLtrDir ? deltaX < 0 : deltaX > 0;
+      if (isClosingDirection) {
+        dispatch(closeNavigation());
+      }
+    },
+    [dispatch, isLtrDir, isOpen],
+  );
 
   const OPEN_MENU_OFFSET = isLtrDir ? -MENU_WIDTH : MENU_WIDTH;
 
@@ -218,6 +265,8 @@ const SlideOutNavigation: React.FC = () => {
       className={classes.slideOutWrapper}
       data-is-open={isOpen}
       ref={overlayRef}
+      onTouchStart={handleBlue2SwipeStart}
+      onTouchEnd={handleBlue2SwipeEnd}
     >
       <animated.div className={classes.slideOut} {...bind()} style={{ x }}>
         <RedesignNavigationPanel mode='slide-out' />
