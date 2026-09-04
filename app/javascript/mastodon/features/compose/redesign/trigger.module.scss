@@ -174,14 +174,15 @@
 }
 
 @media (width < #{variables.$mobile-menu-breakpoint}) {
-  // With the keyboard closed the BlueLab composer stays centered in the
-  // visible phone viewport. It keeps a usable minimum height and lets the
-  // existing internal scroll container handle media, quotes and long drafts.
+  // On phones the BlueLab composer is centered using VisualViewport's actual
+  // center instead of top: 50%, which can be wrong on iOS when the layout and
+  // visual viewports differ. The form flow is also forced back to
+  // header -> scrollable content -> footer so controls cannot invert order.
   :global(body[data-theme='blue-2'])
     .composer[data-bluelab-composer][role='dialog'] {
     --composer-viewport-height: var(--composer-visual-viewport-height, 100dvh);
 
-    top: 50%;
+    top: var(--composer-visual-viewport-center-y, 50dvh);
     left: 50%;
     right: auto;
     bottom: auto;
@@ -191,6 +192,10 @@
     height: auto;
     min-height: min(430px, calc(var(--composer-viewport-height) - 24px));
     max-height: calc(var(--composer-viewport-height) - 24px);
+    margin: 0;
+    display: flex;
+    flex-direction: column !important;
+    overflow: hidden;
     border: 1px solid var(--blue2-border-soft, #17232c);
     border-radius: 16px;
     transform: translate(-50%, -50%);
@@ -199,9 +204,40 @@
       0 18px 50px rgb(0 0 0 / 35%);
   }
 
-  // Once the software keyboard opens, anchor the composer to the top of the
-  // visual viewport instead of leaving it behind the keyboard. Its maximum
-  // height follows the remaining visible viewport and the form body scrolls.
+  :global(body[data-theme='blue-2'])
+    .composer[data-bluelab-composer][role='dialog']
+    > header {
+    order: 0;
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 3;
+    background: var(--color-bg-primary);
+  }
+
+  :global(body[data-theme='blue-2'])
+    .composer[data-bluelab-composer][role='dialog']
+    [data-compose-scroll-container] {
+    order: 1;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  :global(body[data-theme='blue-2'])
+    .composer[data-bluelab-composer][role='dialog']
+    [data-bluelab-compose-footer] {
+    order: 2;
+    flex: 0 0 auto;
+    position: relative;
+    bottom: auto;
+    z-index: 3;
+    background: var(--color-bg-primary);
+  }
+
+  // With the software keyboard open, fill only the VisualViewport area above
+  // the keyboard. Header and footer remain visible while the middle content
+  // keeps the existing internal scroll behavior for media, quotes and drafts.
   :global(body[data-theme='blue-2'])
     .composer[data-bluelab-composer][role='dialog'][data-keyboard-open] {
     --composer-viewport-top: var(--composer-visual-viewport-offset-top, 0px);
@@ -209,17 +245,13 @@
     top: calc(var(--composer-viewport-top) + env(safe-area-inset-top));
     left: 0;
     right: 0;
-    bottom: auto;
+    bottom: var(--composer-visual-viewport-bottom, 0);
     inset-inline-end: auto;
     width: 100vw;
     max-width: none;
-    min-height: min(
-      430px,
-      calc(var(--composer-viewport-height) - env(safe-area-inset-top))
-    );
-    max-height: calc(
-      var(--composer-viewport-height) - env(safe-area-inset-top)
-    );
+    height: auto;
+    min-height: 0;
+    max-height: none;
     border-top: 0;
     border-inline: 0;
     border-radius: 0 0 16px 16px;
@@ -227,15 +259,6 @@
     box-shadow:
       0 0 0 100vmax rgb(0 0 0 / 58%),
       0 12px 32px rgb(0 0 0 / 28%);
-  }
-
-  :global(body[data-theme='blue-2'])
-    .composer[data-bluelab-composer][role='dialog']
-    [data-compose-scroll-container] {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
   }
 
   :global(body[data-theme='blue-2'])

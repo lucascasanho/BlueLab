@@ -72,6 +72,7 @@ export const ComposeRedesignButton: React.FC<{
       setViewportHeight(visualViewport?.height ?? null);
     };
 
+    updateHeight();
     visualViewport?.addEventListener('resize', updateHeight);
 
     return () => {
@@ -146,6 +147,8 @@ export const ComposeRedesignButton: React.FC<{
         0,
         window.innerHeight - viewportOffsetTop - viewportHeight,
       );
+      const viewportCenterY = viewportOffsetTop + viewportHeight / 2;
+      const keyboardOpen = window.innerHeight - viewportHeight > 150;
 
       composer.style.setProperty(
         '--composer-visual-viewport-height',
@@ -156,10 +159,14 @@ export const ComposeRedesignButton: React.FC<{
         `${viewportOffsetTop}px`,
       );
       composer.style.setProperty(
+        '--composer-visual-viewport-center-y',
+        `${viewportCenterY}px`,
+      );
+      composer.style.setProperty(
         '--composer-visual-viewport-bottom',
         `${bottomInset}px`,
       );
-      composer.toggleAttribute('data-keyboard-open', bottomInset > 100);
+      composer.toggleAttribute('data-keyboard-open', keyboardOpen);
     };
 
     updateVisualViewport();
