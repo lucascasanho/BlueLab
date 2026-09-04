@@ -21,12 +21,14 @@ interface InstallCopy {
   dismiss: string;
 }
 
-const installCopy: Record<string, InstallCopy> = {
-  en: {
-    message: (host) => `Install ${host} as an app?`,
-    install: 'Install',
-    dismiss: 'Not now',
-  },
+const defaultInstallCopy: InstallCopy = {
+  message: (host) => `Install ${host} as an app?`,
+  install: 'Install',
+  dismiss: 'Not now',
+};
+
+const installCopy: Partial<Record<string, InstallCopy>> = {
+  en: defaultInstallCopy,
   es: {
     message: (host) => `¿Instalar ${host} como aplicación?`,
     install: 'Instalar',
@@ -57,9 +59,10 @@ function isMobileInstallSurface() {
   );
 }
 
-function getCopy() {
-  const language = document.documentElement.lang.toLowerCase().split('-')[0];
-  return installCopy[language ?? ''] ?? installCopy.en;
+function getCopy(): InstallCopy {
+  const language =
+    document.documentElement.lang.toLowerCase().split('-')[0] ?? 'en';
+  return installCopy[language] ?? defaultInstallCopy;
 }
 
 function removeInstallPrompt() {
