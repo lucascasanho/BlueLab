@@ -128,33 +128,22 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
             </a>
           </div>
 
-          <div className={blue2Classes.layout}>
-            <section className={blue2Classes.inbox} aria-label={title}>
-              <div className={blue2Classes.listWrap}>
-                <ConversationsList
-                  trackScroll={!pinned}
-                  scrollKey={`direct_timeline-${columnId}`}
-                  emptyMessage={blue2Text(intl.locale, 'inboxEmpty')}
-                  bindToDocument={!multiColumn}
-                />
-              </div>
-            </section>
-
-            <section className={blue2Classes.welcome}>
-              <div className={blue2Classes.welcomeInner}>
-                <Blue2MessageIcon size={64} />
-                <strong>{blue2Text(intl.locale, 'sayHello')}</strong>
-                <button
-                  type='button'
-                  className={blue2Classes.newConversation}
-                  onClick={handleNewConversation}
-                >
-                  <Blue2MessageIcon size={19} />
-                  <span>{blue2Text(intl.locale, 'newConversation')}</span>
-                </button>
-              </div>
-            </section>
-          </div>
+          <section className={blue2Classes.inbox} aria-label={title}>
+            <div className={blue2Classes.listWrap}>
+              <ConversationsList
+                trackScroll={!pinned}
+                scrollKey={`direct_timeline-${columnId}`}
+                emptyMessage={
+                  <div className={blue2Classes.emptyInbox}>
+                    <Blue2MessageIcon size={58} />
+                    <strong>{blue2Text(intl.locale, 'sayHello')}</strong>
+                    <span>{blue2Text(intl.locale, 'inboxEmpty')}</span>
+                  </div>
+                }
+                bindToDocument={!multiColumn}
+              />
+            </div>
+          </section>
         </div>
 
         <Helmet>

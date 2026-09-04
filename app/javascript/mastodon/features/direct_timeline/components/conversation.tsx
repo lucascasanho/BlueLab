@@ -105,9 +105,20 @@ export const Conversation: React.FC<{
     }
 
     if (lastStatus) {
-      history.push(
-        `/@${lastStatus.getIn(['account', 'acct']) as string}/${lastStatus.get('id')}`,
-      );
+      const statusId = lastStatus.get('id');
+      const isBlue2 =
+        typeof document !== 'undefined' &&
+        document.body.dataset.theme === 'blue-2';
+
+      // BlueLab's messages view uses the status-id route so opening a direct
+      // message does not depend on the account-prefixed profile route.
+      if (isBlue2) {
+        history.push(`/statuses/${statusId}`);
+      } else {
+        history.push(
+          `/@${lastStatus.getIn(['account', 'acct']) as string}/${statusId}`,
+        );
+      }
     }
   }, [dispatch, history, unread, id, lastStatus]);
 
@@ -263,7 +274,7 @@ export const Conversation: React.FC<{
             <div className='status__action-bar-dropdown'>
               <Dropdown
                 scrollKey={scrollKey}
-                // @ts-expect-error Dropdown status prop isn't properly typed
+                // @ts-expect-error Dropdown status prop isn't properly typed yet
                 status={lastStatus}
                 items={menu}
                 icon='ellipsis-h'
