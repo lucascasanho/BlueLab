@@ -174,20 +174,46 @@
 }
 
 @media (width < #{variables.$mobile-menu-breakpoint}) {
-  // Keep the BlueLab composer compact on phones, but never let the form
-  // collapse down to only its footer. The visual viewport variables keep the
-  // sheet above the software keyboard while content can grow up to full height.
+  // With the keyboard closed the BlueLab composer stays centered in the
+  // visible phone viewport. It keeps a usable minimum height and lets the
+  // existing internal scroll container handle media, quotes and long drafts.
   :global(body[data-theme='blue-2'])
     .composer[data-bluelab-composer][role='dialog'] {
     --composer-viewport-height: var(--composer-visual-viewport-height, 100dvh);
 
-    top: auto;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    inset-inline-end: auto;
+    width: min(600px, calc(100vw - 24px));
+    max-width: 600px;
+    height: auto;
+    min-height: min(430px, calc(var(--composer-viewport-height) - 24px));
+    max-height: calc(var(--composer-viewport-height) - 24px);
+    border: 1px solid var(--blue2-border-soft, #17232c);
+    border-radius: 16px;
+    transform: translate(-50%, -50%);
+    box-shadow:
+      0 0 0 100vmax rgb(0 0 0 / 58%),
+      0 18px 50px rgb(0 0 0 / 35%);
+  }
+
+  // Once the software keyboard opens, anchor the composer to the top of the
+  // visual viewport instead of leaving it behind the keyboard. Its maximum
+  // height follows the remaining visible viewport and the form body scrolls.
+  :global(body[data-theme='blue-2'])
+    .composer[data-bluelab-composer][role='dialog'][data-keyboard-open] {
+    top: calc(
+      var(--composer-visual-viewport-offset-top, 0px) +
+        env(safe-area-inset-top)
+    );
     left: 0;
     right: 0;
-    bottom: var(--composer-visual-viewport-bottom, 0);
+    bottom: auto;
+    inset-inline-end: auto;
     width: 100vw;
     max-width: none;
-    height: auto;
     min-height: min(
       430px,
       calc(var(--composer-viewport-height) - env(safe-area-inset-top))
@@ -195,10 +221,13 @@
     max-height: calc(
       var(--composer-viewport-height) - env(safe-area-inset-top)
     );
-    border: 0;
-    border-radius: 16px 16px 0 0;
+    border-top: 0;
+    border-inline: 0;
+    border-radius: 0 0 16px 16px;
     transform: none;
-    box-shadow: 0 -12px 36px rgb(0 0 0 / 18%);
+    box-shadow:
+      0 0 0 100vmax rgb(0 0 0 / 58%),
+      0 12px 32px rgb(0 0 0 / 28%);
   }
 
   :global(body[data-theme='blue-2'])
