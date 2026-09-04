@@ -26,15 +26,36 @@ test('dia 100% operacional fica verde', () => {
   assert.equal(dailyAvailability(stat), 100);
 });
 
-test('uma falha isolada não pinta o dia inteiro de vermelho', () => {
+test('uma falha isolada acima de 99% continua verde', () => {
   const stat = {
     total_checks: 288,
     up_checks: 287,
     degraded_checks: 0,
     down_checks: 1,
   };
-  assert.equal(classifyDailyStat(stat), 'degraded');
+  assert.equal(classifyDailyStat(stat), 'operational');
   assert.ok(dailyAvailability(stat) > 99);
+});
+
+test('98% de disponibilidade fica amarelo, não vermelho', () => {
+  const stat = {
+    total_checks: 100,
+    up_checks: 98,
+    degraded_checks: 0,
+    down_checks: 2,
+  };
+  assert.equal(classifyDailyStat(stat), 'degraded');
+  assert.equal(dailyAvailability(stat), 98);
+});
+
+test('abaixo de 95% fica laranja como indisponibilidade parcial', () => {
+  const stat = {
+    total_checks: 100,
+    up_checks: 94,
+    degraded_checks: 0,
+    down_checks: 6,
+  };
+  assert.equal(classifyDailyStat(stat), 'partial_outage');
 });
 
 test('dia totalmente indisponível fica vermelho', () => {
@@ -48,12 +69,23 @@ test('dia totalmente indisponível fica vermelho', () => {
   assert.equal(dailyAvailability(stat), 0);
 });
 
-test('uptime agregado continua sendo calculado pelas amostras reais', () => {
+test('degradação conta como serviço disponível no percentual de uptime', () => {
+  const stat = {
+    total_checks: 100,
+    up_checks: 98,
+    degraded_checks: 2,
+    down_checks: 0,
+  };
+  assert.equal(dailyAvailability(stat), 100);
+  assert.equal(classifyDailyStat(stat), 'degraded');
+});
+
+test('uptime agregado usa verificações disponíveis, inclusive degradadas', () => {
   const uptime = aggregateUptime([
-    { total_checks: 100, up_checks: 99 },
-    { total_checks: 100, up_checks: 98 },
+    { total_checks: 100, up_checks: 98, degraded_checks: 2 },
+    { total_checks: 100, up_checks: 99, degraded_checks: 0 },
   ]);
-  assert.equal(uptime, 98.5);
+  assert.equal(uptime, 99.5);
 });
 
 test('status desconhecido não é tratado como indisponibilidade', () => {
