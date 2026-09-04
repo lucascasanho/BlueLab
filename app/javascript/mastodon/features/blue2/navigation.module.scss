@@ -72,11 +72,8 @@
   }
 }
 
-// Kept only for backwards compatibility with the existing JSX. The real Home
-// entry lives inside .items and must remain visible in both full and compact
-// rails so it is always immediately above Search.
-.landscapeHomeItem {
-  display: none;
+.homeItem {
+  display: flex;
 }
 
 .trendingIcon,
@@ -136,9 +133,8 @@
 }
 
 // Keep the navigation contents compact whenever the BlueLab shell collapses
-// its navigation column to 76px. Home remains the first item in .items rather
-// than switching to a second special-case copy; this avoids an invisible gap
-// where Home used to disappear on landscape tablet widths.
+// its navigation column to 76px. Home is a single real item in .items and must
+// remain the first action immediately above Search.
 @media (width < 1180px) {
   .root {
     width: 76px;
@@ -150,10 +146,12 @@
     margin-inline: 0;
   }
 
-  .item {
+  .item,
+  .homeItem {
     width: 48px;
     height: 48px;
     min-height: 48px;
+    display: flex;
     justify-content: center;
     padding: 0;
 
