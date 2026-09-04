@@ -181,7 +181,7 @@ export const ColumnsAreaRedesign: React.FC<{
                   defaultMessage: 'Menu',
                 })}
               >
-                <MenuIcon width={28} height={28} />
+                <MenuIcon width={28} height={28} fill='currentColor' />
               </button>
 
               <img
