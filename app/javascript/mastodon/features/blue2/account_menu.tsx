@@ -136,7 +136,7 @@ export const Blue2AccountMenu: React.FC = () => {
             <LogoutIcon />
             <FormattedMessage
               id='navigation_bar.logout'
-              defaultMessage='Log out'
+              defaultMessage='Logout'
             />
           </button>
         </div>
