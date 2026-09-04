@@ -1,0 +1,25 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "bluelab-status-preview",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-03",
+  "workers_dev": true,
+  "vars": {
+    "INSTANCE_NAME": "Blue",
+    "INSTANCE_URL": "https://mastodon.blue",
+    "WEBSITE_HEALTH_URL": "https://mastodon.blue/health",
+    "STREAMING_HEALTH_URL": "https://mastodon.blue/api/v1/streaming/health"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "blue-status-preview",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "preview_database_id": "blue-status-preview-local",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  }
+}
