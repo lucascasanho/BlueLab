@@ -124,9 +124,20 @@ export function renderStatusPage(config, data) {
     statsByComponent.set(stat.component_id, list);
   }
 
-  const overall = worstStatus(
-    data.components.map((component) => component.current_status),
+  const componentStatuses = data.components.map(
+    (component) => component.current_status,
   );
+  const hasUnknownComponents = componentStatuses.includes('unknown');
+  const statusesForOverall = config.ignoreUnknownInOverall
+    ? componentStatuses.filter((status) => status !== 'unknown')
+    : componentStatuses;
+  const overall = worstStatus(statusesForOverall);
+  const bannerLabel =
+    overall === 'operational' &&
+    config.ignoreUnknownInOverall &&
+    hasUnknownComponents
+      ? 'Sistemas monitorados operacionais'
+      : (BANNER_LABELS[overall] ?? BANNER_LABELS.unknown);
   const componentsHtml = data.components
     .map((component) =>
       renderComponent(
@@ -259,7 +270,7 @@ export function renderStatusPage(config, data) {
       <a href="${escapeHtml(config.baseUrl)}" rel="noopener noreferrer">${escapeHtml(config.baseUrl.replace(/^https?:\/\//, ''))}</a>
     </header>
 
-    <div class="banner banner--${escapeHtml(overall)}">${escapeHtml(BANNER_LABELS[overall] ?? BANNER_LABELS.unknown)}</div>
+    <div class="banner banner--${escapeHtml(overall)}">${escapeHtml(bannerLabel)}</div>
 
     <div class="components">${componentsHtml}</div>
 
