@@ -6,10 +6,10 @@ import { Link, useHistory } from 'react-router-dom';
 
 import { clickSearchResult } from '@/mastodon/actions/search';
 import { useIdentity } from '@/mastodon/identity_context';
+import { useAppDispatch } from '@/mastodon/store';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
-import { useAppDispatch } from '@/mastodon/store';
 
 import { Blue2HomeIcon, Blue2SearchIcon } from './icons';
 import { blue2Text } from './locale';
