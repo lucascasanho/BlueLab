@@ -9,6 +9,7 @@ import { HashIcon } from '@phosphor-icons/react';
 
 import { openNavigation } from '@/mastodon/actions/navigation';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
+import { Blue2HomeIcon } from '@/mastodon/features/blue2/icons';
 import { blue2Text } from '@/mastodon/features/blue2/locale';
 import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
@@ -195,6 +196,20 @@ export const ColumnsAreaRedesign: React.FC<{
         {!isMobile && (
           <div className={classes.blue2NavigationWrapper}>
             <Blue2Navigation />
+            <Link
+              to='/home'
+              className={classes.blue2LandscapeHomeFallback}
+              aria-label={intl.formatMessage({
+                id: 'tabs_bar.home',
+                defaultMessage: 'Home',
+              })}
+              title={intl.formatMessage({
+                id: 'tabs_bar.home',
+                defaultMessage: 'Home',
+              })}
+            >
+              <Blue2HomeIcon size={27} />
+            </Link>
           </div>
         )}
 

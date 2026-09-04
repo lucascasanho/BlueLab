@@ -59,19 +59,29 @@ body[data-theme='blue-2'].layout-multiple-columns {
 }
 
 /*
- * Final BlueLab phone composer geometry. An older BlueLab refinement allows
- * composer popovers to escape with `overflow: visible !important`; that also
- * defeated the mobile dialog clipping/scroll rules from the CSS module. Keep
- * the phone dialog self-contained here, after every previous theme layer.
+ * Final BlueLab phone composer geometry. Use the actual VisualViewport offsets
+ * supplied by trigger.tsx so iOS keyboard panning cannot leave the dialog
+ * underneath the keyboard. Closed keyboard = centered in the visual viewport;
+ * open keyboard = pinned to the visual viewport top with its height constrained
+ * to the visible area above the keyboard. Only the middle content scrolls.
  */
 @media (width <= 759px) {
   body[data-theme='blue-2'] form[data-bluelab-composer][role='dialog'] {
     position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
+    top: calc(
+      var(--composer-visual-viewport-offset-top, 0px) +
+        var(--composer-visual-viewport-height, 100dvh) / 2
+    ) !important;
+    left: calc(
+      var(--composer-visual-viewport-offset-left, 0px) +
+        var(--composer-visual-viewport-width, 100vw) / 2
+    ) !important;
     right: auto !important;
     bottom: auto !important;
-    width: calc(100vw - 24px) !important;
+    width: min(
+      600px,
+      calc(var(--composer-visual-viewport-width, 100vw) - 24px)
+    ) !important;
     max-width: 600px !important;
     height: auto !important;
     min-height: min(
@@ -124,19 +134,13 @@ body[data-theme='blue-2'].layout-multiple-columns {
     background: var(--color-bg-primary) !important;
   }
 
-  /*
-   * Do not add VisualViewport.offsetTop to the closed-keyboard center: on iOS
-   * that can double-count the visual viewport displacement and push the sheet
-   * downward. Once the keyboard is open, pin the form to the visible top and
-   * constrain it to the VisualViewport height; only the middle section scrolls.
-   */
   body[data-theme='blue-2']
     form[data-bluelab-composer][role='dialog'][data-keyboard-open] {
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    top: var(--composer-visual-viewport-offset-top, 0px) !important;
+    left: var(--composer-visual-viewport-offset-left, 0px) !important;
+    right: auto !important;
     bottom: auto !important;
-    width: 100vw !important;
+    width: var(--composer-visual-viewport-width, 100vw) !important;
     max-width: none !important;
     height: var(--composer-visual-viewport-height, 100dvh) !important;
     min-height: 0 !important;
@@ -151,8 +155,9 @@ body[data-theme='blue-2'].layout-multiple-columns {
 
 /*
  * BlueLab uses the desktop/single-column shell on wide phone and tablet
- * landscape viewports. Restore the same compose FAB available in portrait and
- * make the real Home entry unconditionally visible above Search in that rail.
+ * landscape viewports. Restore the compose FAB and keep the Home shortcut in
+ * the compact rail. The shell also has an explicit fallback Home link so the
+ * action remains visible even if the inner navigation layout is clipped.
  */
 @media (orientation: landscape) and (width >= 760px) and (width < 1180px) {
   body[data-theme='blue-2'] [data-blue2-home-nav='true'] {

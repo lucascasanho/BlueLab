@@ -65,18 +65,17 @@ export const ComposeRedesignButton: React.FC<{
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
-  // Update viewport based on visual size in order to account for the virtual keyboard.
   const [viewportHeight, setViewportHeight] = useState<null | number>(null);
   useEffect(() => {
     const updateHeight = () => {
-      setViewportHeight(visualViewport?.height ?? null);
+      setViewportHeight(window.visualViewport?.height ?? null);
     };
 
     updateHeight();
-    visualViewport?.addEventListener('resize', updateHeight);
+    window.visualViewport?.addEventListener('resize', updateHeight);
 
     return () => {
-      visualViewport?.removeEventListener('resize', updateHeight);
+      window.visualViewport?.removeEventListener('resize', updateHeight);
     };
   }, []);
 
@@ -142,29 +141,32 @@ export const ComposeRedesignButton: React.FC<{
     const visualViewport = window.visualViewport;
     const updateVisualViewport = () => {
       const viewportHeight = visualViewport?.height ?? window.innerHeight;
+      const viewportWidth = visualViewport?.width ?? window.innerWidth;
       const viewportOffsetTop = visualViewport?.offsetTop ?? 0;
-      const bottomInset = Math.max(
-        0,
-        window.innerHeight - viewportOffsetTop - viewportHeight,
-      );
-      const viewportCenterY = viewportOffsetTop + viewportHeight / 2;
-      const keyboardOpen = window.innerHeight - viewportHeight > 150;
+      const viewportOffsetLeft = visualViewport?.offsetLeft ?? 0;
+      const keyboardOpen =
+        window.innerHeight - viewportHeight > 120 ||
+        document.documentElement.clientHeight - viewportHeight > 120;
 
       composer.style.setProperty(
         '--composer-visual-viewport-height',
         `${viewportHeight}px`,
       );
       composer.style.setProperty(
+        '--composer-visual-viewport-width',
+        `${viewportWidth}px`,
+      );
+      composer.style.setProperty(
         '--composer-visual-viewport-offset-top',
         `${viewportOffsetTop}px`,
       );
       composer.style.setProperty(
-        '--composer-visual-viewport-center-y',
-        `${viewportCenterY}px`,
+        '--composer-visual-viewport-offset-left',
+        `${viewportOffsetLeft}px`,
       );
       composer.style.setProperty(
-        '--composer-visual-viewport-bottom',
-        `${bottomInset}px`,
+        '--composer-visual-viewport-center-y',
+        `${viewportOffsetTop + viewportHeight / 2}px`,
       );
       composer.toggleAttribute('data-keyboard-open', keyboardOpen);
     };
@@ -211,7 +213,6 @@ export const ComposeRedesignButton: React.FC<{
   }
 
   if (displayState === 'showing') {
-    // Pass the viewport height as a CSS variable so it's only used for mobile.
     const style = {
       '--viewport-height': viewportHeight ? `${viewportHeight}px` : undefined,
     } as React.CSSProperties;
