@@ -9,8 +9,9 @@ export function dailyAvailability(stat) {
 }
 
 /**
- * A day is red only when every recorded check was down.
- * Mixed days are shown as degraded (yellow), not as a full outage.
+ * Red means the service was unavailable in every recorded check that day.
+ * Mixed days use yellow/orange so a brief failure does not look like a
+ * full-day outage while the numeric uptime remains high.
  */
 export function classifyDailyStat(stat) {
   const total = Number(stat?.total_checks ?? 0);
@@ -22,7 +23,10 @@ export function classifyDailyStat(stat) {
 
   if (down >= total) return 'major_outage';
   if (up >= total && degraded === 0 && down === 0) return 'operational';
-  return 'degraded';
+
+  const availability = (up / total) * 100;
+  if (availability >= 99) return 'degraded';
+  return 'partial_outage';
 }
 
 export function aggregateUptime(stats) {
