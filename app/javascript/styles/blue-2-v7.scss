@@ -30,8 +30,45 @@ body[data-theme='blue-2'] {
       box-shadow: none;
     }
 
+    /*
+     * The redesigned composer switches its flexible control groups to a full
+     * row below 310px. The advanced drawer is intentionally narrower than
+     * that, so keep BlueLab's embedded controls compact instead of wrapping.
+     */
+    [data-bluelab-composer-embedded='true'] [data-bluelab-compose-toolbar] {
+      flex-wrap: nowrap;
+    }
+
+    [data-bluelab-composer-embedded='true']
+      [data-bluelab-compose-toolbar]
+      > :first-child {
+      flex: 0 1 auto;
+      flex-basis: auto !important;
+      min-width: 0;
+    }
+
+    [data-bluelab-composer-embedded='true'] [data-bluelab-compose-footer] {
+      flex-wrap: nowrap;
+    }
+
+    [data-bluelab-composer-embedded='true']
+      [data-bluelab-compose-footer]
+      > div:last-child {
+      flex: 1 1 auto;
+      flex-basis: auto !important;
+      min-width: 0;
+      justify-content: flex-end;
+    }
+
+    /* Push the advanced getting-started footer to the bottom of its column. */
+    .column:has(> .bluelab-advanced-footer-spacer) {
+      display: flex;
+      flex-direction: column;
+    }
+
     .bluelab-advanced-footer-spacer {
       flex: 1 1 auto;
+      min-height: 0;
     }
   }
 
