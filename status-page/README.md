@@ -26,7 +26,8 @@ O Worker consulta a própria instância configurada em `INSTANCE_URL` e:
 - usa o favicon declarado no HTML da instância como favicon da página de status;
 - usa os ícones publicados por `GET /api/v2/instance` para escolher a logo exibida ao lado do nome no topo;
 - faz fallback para os ícones da API ou `/favicon.ico` quando necessário;
-- serve esses arquivos pelo próprio Worker com cache, em `/favicon.ico` e `/instance-logo`.
+- serve esses arquivos pelo próprio Worker com cache, em `/favicon.ico`, `/instance-favicon` e `/instance-logo`;
+- referencia `/instance-favicon` com uma versão na página para forçar navegadores que tenham armazenado em cache um favicon ausente ou antigo a buscar novamente o favicon da instância.
 
 Assim, quando a mesma base for instalada na Espelunca, ela exibirá automaticamente o favicon e o ícone da Espelunca em vez dos do Blue.
 
@@ -37,7 +38,7 @@ Para testar sem alterar a instalação Mastodon do Blue e sem tocar na Cloudflar
 Primeiro teste:
 
 ```bash
-git fetch https://github.com/lucascasanho/BlueLab.git status/shared-status-pages-20260903
+git fetch https://github.com/lucascasanho/BlueLab.git main
 git worktree add --detach "$HOME/blue-status-test" FETCH_HEAD
 cd "$HOME/blue-status-test"
 bash status-page/scripts/local-preview.sh
@@ -52,7 +53,7 @@ if [ -n "$(git status --porcelain)" ]; then
   git status --short
   exit 1
 fi
-git fetch https://github.com/lucascasanho/BlueLab.git status/shared-status-pages-20260903
+git fetch https://github.com/lucascasanho/BlueLab.git main
 git reset --hard FETCH_HEAD
 bash status-page/scripts/local-preview.sh
 ```
@@ -69,7 +70,7 @@ O script:
 - executa os testes da classificação do uptime e do branding;
 - inicia o Worker local na porta 8787.
 
-A demonstração deixa `Website & API` com duas falhas parciais: uma de `287/288` verificações OK e outra de `280/288`. Elas devem aparecer em amarelo e laranja, respectivamente, nunca em vermelho. O restante dos dias permanece verde. Nenhum dado remoto é modificado.
+A demonstração deixa `Website & API` com três dias imperfeitos: `287/288` verificações OK aparece verde por permanecer acima de 99%; `280/288` aparece amarelo; e `270/288` aparece laranja. Nenhum deles aparece vermelho, pois vermelho fica reservado para um dia em que todas as verificações registradas falharam. O restante dos dias permanece verde. Nenhum dado remoto é modificado.
 
 Para testar o handler agendado contra os endpoints públicos do Blue enquanto o preview estiver rodando, em outro terminal execute:
 
@@ -91,12 +92,14 @@ git worktree remove "$HOME/blue-status-test"
 As barras de 90 dias não tratam uma falha isolada como se o serviço tivesse ficado indisponível durante todo o dia:
 
 - cinza: não há amostras para o dia;
-- verde: todas as verificações foram operacionais;
-- amarelo: disponibilidade diária de pelo menos 99%, mas houve falha/degradação;
-- laranja: houve indisponibilidade parcial mais significativa;
+- verde: disponibilidade diária de pelo menos 99%, desde que o monitor não tenha registrado um estado explicitamente degradado;
+- amarelo: disponibilidade diária entre 95% e 99%, ou houve estado explicitamente degradado sem indisponibilidade;
+- laranja: disponibilidade diária abaixo de 95%, mas não houve indisponibilidade durante todas as verificações do dia;
 - vermelho: todas as verificações registradas naquele dia ficaram indisponíveis.
 
-O percentual de uptime continua sendo calculado a partir do total real de verificações operacionais dividido pelo total de verificações. Assim, a cor da barra e o percentual deixam de transmitir informações contraditórias.
+O percentual de uptime é disponibilidade, portanto verificações `degraded` continuam contando como serviço disponível no cálculo numérico, embora a barra possa ficar amarela para mostrar que houve degradação. Estados desconhecidos continuam fora do denominador.
+
+Para monitores HTTP, uma única falha transitória de Cloudflare, Tunnel ou rede também não é gravada imediatamente como downtime: o Worker repete a verificação uma vez dentro da mesma amostra e só registra indisponibilidade se as duas tentativas consecutivas falharem. Isso reduz falsos negativos sem esconder uma queda persistente.
 
 ## Compatibilidade com a Espelunca
 
