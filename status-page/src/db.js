@@ -102,7 +102,7 @@ async function recordCheck(db, component, result, checkedAt = new Date()) {
   await db.batch(statements);
 }
 
-async function checkHttp(component) {
+async function checkHttpAttempt(component) {
   const started = Date.now();
   try {
     const response = await fetch(component.target_url, {
@@ -128,6 +128,27 @@ async function checkHttp(component) {
       message: error instanceof Error ? error.message : String(error),
     };
   }
+}
+
+// A single transient Cloudflare/Tunnel/network error must not become downtime.
+// Retry once inside the same scheduled sample; only two consecutive failures
+// are recorded as an unavailable check.
+export async function checkHttp(component) {
+  const first = await checkHttpAttempt(component);
+  if (first.status === 'operational') return first;
+
+  const second = await checkHttpAttempt(component);
+  if (second.status === 'operational') {
+    return {
+      ...second,
+      message: `${second.message}; recuperado na segunda tentativa`,
+    };
+  }
+
+  return {
+    ...second,
+    message: `${second.message}; falhou em duas tentativas`,
+  };
 }
 
 async function checkHeartbeat(component, now = new Date()) {

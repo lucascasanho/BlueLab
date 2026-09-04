@@ -10,6 +10,9 @@ import {
 } from './db.js';
 import { renderStatusPage } from './render.js';
 
+const FAVICON_PATH = '/instance-favicon';
+const FAVICON_VERSION = '20260904-1';
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data, null, 2), {
     status,
@@ -26,6 +29,13 @@ function authorizeHeartbeat(request, env) {
   return header === `Bearer ${env.HEARTBEAT_TOKEN}`;
 }
 
+function withVersionedFavicon(html) {
+  return html.replaceAll(
+    'href="/favicon.ico"',
+    `href="${FAVICON_PATH}?v=${FAVICON_VERSION}"`,
+  );
+}
+
 const worker = {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -36,7 +46,7 @@ const worker = {
     }
 
     if (request.method === 'GET' || request.method === 'HEAD') {
-      if (url.pathname === '/favicon.ico') {
+      if (url.pathname === '/favicon.ico' || url.pathname === FAVICON_PATH) {
         const response = await fetchBrandingAsset(config, 'favicon');
         return request.method === 'HEAD'
           ? new Response(null, response)
@@ -80,7 +90,7 @@ const worker = {
       return new Response('Not Found', { status: 404 });
     }
 
-    const html = renderStatusPage(config, data);
+    const html = withVersionedFavicon(renderStatusPage(config, data));
     return new Response(request.method === 'HEAD' ? null : html, {
       headers: {
         'content-type': 'text/html; charset=utf-8',

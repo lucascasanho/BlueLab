@@ -49,6 +49,7 @@ jobs:
             status-page/src/render.js \
             status-page/test/availability.test.js \
             status-page/test/branding.test.js \
+            status-page/test/monitoring.test.js \
             status-page/wrangler.jsonc \
             status-page/wrangler.preview.jsonc
       - name: Commit formatting when needed
@@ -84,6 +85,7 @@ jobs:
             status-page/src/render.js \
             status-page/test/availability.test.js \
             status-page/test/branding.test.js \
+            status-page/test/monitoring.test.js \
             status-page/wrangler.jsonc \
             status-page/wrangler.preview.jsonc
           git diff --exit-code -- status-page
