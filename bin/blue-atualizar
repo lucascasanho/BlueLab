@@ -11,6 +11,7 @@ REMOTE_URL="${BLUE_REMOTE_URL:-https://github.com/lucascasanho/BlueLab.git}"
 BRANCH="${BLUE_TEST_BRANCH:-BlueLab-Test}"
 INSTALL_DIR="${BLUE_INSTALL_DIR:-$HOME/.local/bin}"
 INSTALL_PATH="$INSTALL_DIR/blue-atualizar"
+STATUS_INSTALL_PATH="$INSTALL_DIR/status-blue-atualizar"
 SERVICES=(blue-web blue-sidekiq blue-streaming)
 
 fail() {
@@ -88,7 +89,9 @@ echo
 echo "===== INSTALANDO COMANDO PERSISTENTE ====="
 run mkdir -p "$INSTALL_DIR"
 run install -m 0755 "$REPO/bin/blue-atualizar" "$INSTALL_PATH"
+run install -m 0755 "$REPO/bin/status-blue-atualizar" "$STATUS_INSTALL_PATH"
 echo "instalado em: $INSTALL_PATH"
+echo "status do Blue: $STATUS_INSTALL_PATH"
 
 echo
 echo "===== RUBY ====="
