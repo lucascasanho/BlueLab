@@ -1,3 +1,4 @@
+-# haml-lint:disable ViewLength
 :ruby
   instance_accent_color = safe_customization_color(:instance_accent_color, fallback: '#2b8fcd')
   instance_light_background_color = safe_customization_color(:instance_light_background_color, fallback: '#ffffff')
@@ -21,7 +22,7 @@
     email_dark_muted_color
   )
   explicit_email_colors = Setting.where(var: email_color_keys).pluck(:var)
-  email_color = ->(key, fallback) do
+  email_color = lambda do |key, fallback|
     explicit_email_colors.include?(key.to_s) ? safe_customization_color(key, fallback: fallback) : fallback
   end
 
