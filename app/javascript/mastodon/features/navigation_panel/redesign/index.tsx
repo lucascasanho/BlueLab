@@ -141,7 +141,7 @@ export const RedesignNavigationPanel: React.FC<{
                 />
               )}
             </NavigationLink>
-            <NavigationLink to={homePath} iconComponent={HouseIcon}>
+            <NavigationLink to='/home' iconComponent={HouseIcon}>
               <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
             </NavigationLink>
             <NavigationLink
