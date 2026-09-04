@@ -56,16 +56,19 @@ function formatPercent(value) {
 }
 
 function renderBars(statsByDay, days) {
-  return days.map((day) => {
-    const stat = statsByDay.get(day);
-    const status = classifyDailyStat(stat);
-    const availability = dailyAvailability(stat);
-    const title = availability == null
-      ? `${day}: sem dados`
-      : `${day}: ${availability.toFixed(3)}% (${Number(stat.up_checks)}/${Number(stat.total_checks)} verificações OK)`;
+  return days
+    .map((day) => {
+      const stat = statsByDay.get(day);
+      const status = classifyDailyStat(stat);
+      const availability = dailyAvailability(stat);
+      const title =
+        availability == null
+          ? `${day}: sem dados`
+          : `${day}: ${availability.toFixed(3)}% (${Number(stat.up_checks)}/${Number(stat.total_checks)} verificações OK)`;
 
-    return `<span class="uptime-bar uptime-bar--${status}" title="${escapeHtml(title)}" aria-label="${escapeHtml(title)}"></span>`;
-  }).join('');
+      return `<span class="uptime-bar uptime-bar--${status}" title="${escapeHtml(title)}" aria-label="${escapeHtml(title)}"></span>`;
+    })
+    .join('');
 }
 
 function renderComponent(component, componentStats, days) {
@@ -97,7 +100,9 @@ function renderIncidents(incidents) {
     return '<div class="incident-empty">Nenhum incidente relatado nos últimos 7 dias.</div>';
   }
 
-  return incidents.map((incident) => `
+  return incidents
+    .map(
+      (incident) => `
     <article class="incident">
       <div class="incident__top">
         <strong>${escapeHtml(incident.title)}</strong>
@@ -105,7 +110,9 @@ function renderIncidents(incidents) {
       </div>
       ${incident.summary ? `<p>${escapeHtml(incident.summary)}</p>` : ''}
       <small>${escapeHtml(incident.started_at)}</small>
-    </article>`).join('');
+    </article>`,
+    )
+    .join('');
 }
 
 export function renderStatusPage(config, data) {
@@ -117,10 +124,18 @@ export function renderStatusPage(config, data) {
     statsByComponent.set(stat.component_id, list);
   }
 
-  const overall = worstStatus(data.components.map((component) => component.current_status));
-  const componentsHtml = data.components.map((component) =>
-    renderComponent(component, statsByComponent.get(component.id) ?? [], days),
-  ).join('');
+  const overall = worstStatus(
+    data.components.map((component) => component.current_status),
+  );
+  const componentsHtml = data.components
+    .map((component) =>
+      renderComponent(
+        component,
+        statsByComponent.get(component.id) ?? [],
+        days,
+      ),
+    )
+    .join('');
 
   return `<!doctype html>
 <html lang="pt-BR">

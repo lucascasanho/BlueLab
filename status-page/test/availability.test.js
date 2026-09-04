@@ -16,19 +16,34 @@ test('sem amostras fica desconhecido/cinza', () => {
 });
 
 test('dia 100% operacional fica verde', () => {
-  const stat = { total_checks: 288, up_checks: 288, degraded_checks: 0, down_checks: 0 };
+  const stat = {
+    total_checks: 288,
+    up_checks: 288,
+    degraded_checks: 0,
+    down_checks: 0,
+  };
   assert.equal(classifyDailyStat(stat), 'operational');
   assert.equal(dailyAvailability(stat), 100);
 });
 
 test('uma falha isolada não pinta o dia inteiro de vermelho', () => {
-  const stat = { total_checks: 288, up_checks: 287, degraded_checks: 0, down_checks: 1 };
+  const stat = {
+    total_checks: 288,
+    up_checks: 287,
+    degraded_checks: 0,
+    down_checks: 1,
+  };
   assert.equal(classifyDailyStat(stat), 'degraded');
   assert.ok(dailyAvailability(stat) > 99);
 });
 
 test('dia totalmente indisponível fica vermelho', () => {
-  const stat = { total_checks: 288, up_checks: 0, degraded_checks: 0, down_checks: 288 };
+  const stat = {
+    total_checks: 288,
+    up_checks: 0,
+    degraded_checks: 0,
+    down_checks: 288,
+  };
   assert.equal(classifyDailyStat(stat), 'major_outage');
   assert.equal(dailyAvailability(stat), 0);
 });

@@ -2,7 +2,10 @@
 import { bucketForStatus } from './availability.js';
 
 function isoNow() {
-  return new Date().toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
+  return new Date()
+    .toISOString()
+    .replace('T', ' ')
+    .replace(/\.\d{3}Z$/, '');
 }
 
 function dayFromDate(date = new Date()) {
@@ -11,7 +14,8 @@ function dayFromDate(date = new Date()) {
 
 export async function syncComponents(db, config) {
   const statements = config.components.map((component) =>
-    db.prepare(`
+    db
+      .prepare(`
       INSERT INTO components (
         slug, name, description, monitor_type, target_url,
         current_status, sort_order, enabled, updated_at
@@ -24,43 +28,52 @@ export async function syncComponents(db, config) {
         sort_order = excluded.sort_order,
         enabled = 1,
         updated_at = CURRENT_TIMESTAMP
-    `).bind(
-      component.slug,
-      component.name,
-      component.description,
-      component.monitorType,
-      component.targetUrl,
-      component.sortOrder,
-    ),
+    `)
+      .bind(
+        component.slug,
+        component.name,
+        component.description,
+        component.monitorType,
+        component.targetUrl,
+        component.sortOrder,
+      ),
   );
 
   if (statements.length) await db.batch(statements);
 }
 
 async function recordCheck(db, component, result, checkedAt = new Date()) {
-  const checkedAtSql = checkedAt.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
+  const checkedAtSql = checkedAt
+    .toISOString()
+    .replace('T', ' ')
+    .replace(/\.\d{3}Z$/, '');
   const day = dayFromDate(checkedAt);
   const bucket = bucketForStatus(result.status);
-  const lastOkAt = result.status === 'operational' ? checkedAtSql : component.last_ok_at;
+  const lastOkAt =
+    result.status === 'operational' ? checkedAtSql : component.last_ok_at;
 
   const statements = [
-    db.prepare(`
+    db
+      .prepare(`
       INSERT INTO checks (
         component_id, status, http_status, response_ms, message, checked_at
       ) VALUES (?, ?, ?, ?, ?, ?)
-    `).bind(
-      component.id,
-      result.status,
-      result.httpStatus ?? null,
-      result.responseMs ?? null,
-      result.message ?? null,
-      checkedAtSql,
-    ),
-    db.prepare(`
+    `)
+      .bind(
+        component.id,
+        result.status,
+        result.httpStatus ?? null,
+        result.responseMs ?? null,
+        result.message ?? null,
+        checkedAtSql,
+      ),
+    db
+      .prepare(`
       UPDATE components
       SET current_status = ?, last_checked_at = ?, last_ok_at = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
-    `).bind(result.status, checkedAtSql, lastOkAt ?? null, component.id),
+    `)
+      .bind(result.status, checkedAtSql, lastOkAt ?? null, component.id),
   ];
 
   // Unknown means that the monitor has no evidence either way. Keep the raw
@@ -71,7 +84,8 @@ async function recordCheck(db, component, result, checkedAt = new Date()) {
     const downIncrement = bucket === 'down' ? 1 : 0;
 
     statements.push(
-      db.prepare(`
+      db
+        .prepare(`
         INSERT INTO daily_stats (
           component_id, day, total_checks, up_checks, degraded_checks, down_checks
         ) VALUES (?, ?, 1, ?, ?, ?)
@@ -80,7 +94,8 @@ async function recordCheck(db, component, result, checkedAt = new Date()) {
           up_checks = up_checks + excluded.up_checks,
           degraded_checks = degraded_checks + excluded.degraded_checks,
           down_checks = down_checks + excluded.down_checks
-      `).bind(component.id, day, upIncrement, degradedIncrement, downIncrement),
+      `)
+        .bind(component.id, day, upIncrement, degradedIncrement, downIncrement),
     );
   }
 
@@ -123,8 +138,18 @@ async function checkHeartbeat(component, now = new Date()) {
     };
   }
 
-  const ageSeconds = Math.max(0, Math.floor((now.getTime() - new Date(`${component.last_ok_at}Z`).getTime()) / 1000));
-  const status = ageSeconds <= 180 ? 'operational' : ageSeconds <= 600 ? 'degraded' : 'major_outage';
+  const ageSeconds = Math.max(
+    0,
+    Math.floor(
+      (now.getTime() - new Date(`${component.last_ok_at}Z`).getTime()) / 1000,
+    ),
+  );
+  const status =
+    ageSeconds <= 180
+      ? 'operational'
+      : ageSeconds <= 600
+        ? 'degraded'
+        : 'major_outage';
 
   return {
     status,
@@ -133,12 +158,14 @@ async function checkHeartbeat(component, now = new Date()) {
 }
 
 export async function runScheduledChecks(db) {
-  const { results = [] } = await db.prepare(`
+  const { results = [] } = await db
+    .prepare(`
     SELECT id, slug, monitor_type, target_url, last_ok_at
     FROM components
     WHERE enabled = 1 AND monitor_type IN ('http', 'heartbeat')
     ORDER BY sort_order
-  `).all();
+  `)
+    .all();
 
   for (const component of results) {
     let result;
@@ -151,7 +178,11 @@ export async function runScheduledChecks(db) {
     await recordCheck(db, component, result);
   }
 
-  await db.prepare("DELETE FROM checks WHERE checked_at < datetime('now', '-100 days')").run();
+  await db
+    .prepare(
+      "DELETE FROM checks WHERE checked_at < datetime('now', '-100 days')",
+    )
+    .run();
 }
 
 export async function receiveHeartbeat(db, slug) {
@@ -162,48 +193,67 @@ export async function receiveHeartbeat(db, slug) {
   const componentSlug = aliases[slug];
   if (!componentSlug) return false;
 
-  const component = await db.prepare(`
+  const component = await db
+    .prepare(`
     SELECT id, slug, last_ok_at
     FROM components
     WHERE slug = ? AND enabled = 1
-  `).bind(componentSlug).first();
+  `)
+    .bind(componentSlug)
+    .first();
   if (!component) return false;
 
   const now = new Date();
-  const checkedAt = now.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
+  const checkedAt = now
+    .toISOString()
+    .replace('T', ' ')
+    .replace(/\.\d{3}Z$/, '');
 
-  await db.prepare(`
+  await db
+    .prepare(`
     UPDATE components
     SET current_status = 'operational',
         last_checked_at = ?,
         last_ok_at = ?,
         updated_at = CURRENT_TIMESTAMP
     WHERE id = ?
-  `).bind(checkedAt, checkedAt, component.id).run();
+  `)
+    .bind(checkedAt, checkedAt, component.id)
+    .run();
 
   return true;
 }
 
 export async function getDashboardData(db) {
-  const [{ results: components = [] }, { results: stats = [] }, { results: incidents = [] }] = await Promise.all([
-    db.prepare(`
+  const [
+    { results: components = [] },
+    { results: stats = [] },
+    { results: incidents = [] },
+  ] = await Promise.all([
+    db
+      .prepare(`
       SELECT id, slug, name, description, current_status, sort_order, last_checked_at, last_ok_at
       FROM components
       WHERE enabled = 1
       ORDER BY sort_order
-    `).all(),
-    db.prepare(`
+    `)
+      .all(),
+    db
+      .prepare(`
       SELECT component_id, day, total_checks, up_checks, degraded_checks, down_checks
       FROM daily_stats
       WHERE day >= date('now', '-89 days')
       ORDER BY day
-    `).all(),
-    db.prepare(`
+    `)
+      .all(),
+    db
+      .prepare(`
       SELECT id, slug, title, status, impact, summary, started_at, resolved_at
       FROM incidents
       WHERE started_at >= datetime('now', '-7 days')
       ORDER BY started_at DESC
-    `).all(),
+    `)
+      .all(),
   ]);
 
   return { components, stats, incidents };

@@ -34,7 +34,10 @@ const worker = {
       return json(healthPayload(config));
     }
 
-    if (request.method === 'POST' && url.pathname.startsWith('/api/heartbeat/')) {
+    if (
+      request.method === 'POST' &&
+      url.pathname.startsWith('/api/heartbeat/')
+    ) {
       if (!authorizeHeartbeat(request, env)) {
         return json({ ok: false, error: 'unauthorized' }, 401);
       }
@@ -73,10 +76,12 @@ const worker = {
 
   async scheduled(_controller, env, ctx) {
     const config = getInstanceConfig(env);
-    ctx.waitUntil((async () => {
-      await syncComponents(env.DB, config);
-      await runScheduledChecks(env.DB);
-    })());
+    ctx.waitUntil(
+      (async () => {
+        await syncComponents(env.DB, config);
+        await runScheduledChecks(env.DB);
+      })(),
+    );
   },
 };
 

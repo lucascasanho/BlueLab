@@ -24,7 +24,8 @@ export function getInstanceConfig(env) {
       {
         slug: 'media-storage',
         name: 'Media storage',
-        description: 'Disponibilidade de imagens, vídeos e outros arquivos de mídia.',
+        description:
+          'Disponibilidade de imagens, vídeos e outros arquivos de mídia.',
         monitorType: 'manual',
         targetUrl: null,
         sortOrder: 30,
@@ -34,7 +35,8 @@ export function getInstanceConfig(env) {
         name: 'Streaming API',
         description: 'Atualizações em tempo real e conexões de streaming.',
         monitorType: 'http',
-        targetUrl: env.STREAMING_HEALTH_URL || `${baseUrl}/api/v1/streaming/health`,
+        targetUrl:
+          env.STREAMING_HEALTH_URL || `${baseUrl}/api/v1/streaming/health`,
         sortOrder: 40,
       },
     ],
