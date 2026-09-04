@@ -106,9 +106,11 @@
   --navigation-min-width: 240px;
   --navigation-max-width: 260px;
 
+  max-width: 100vw;
   min-height: 100dvh;
   padding: 0;
   gap: 0;
+  overflow-x: clip;
   background: var(--blue2-bg, #000);
 
   @media (min-width: $mobile-menu-breakpoint) {
@@ -123,6 +125,7 @@
   grid-column: 1;
   position: sticky;
   top: 0;
+  min-width: 0;
   height: 100dvh;
   z-index: 3;
   border-inline-end: 1px solid var(--blue2-border-soft, #17232c);
@@ -131,6 +134,7 @@
 
 .blue2Main {
   grid-column: 2;
+  min-width: 0;
   max-width: 600px;
   min-height: 100dvh;
   border: 0;
@@ -299,12 +303,33 @@
   cursor: pointer;
 }
 
+// Tablet/landscape uses a strict 76px navigation track. The third track is
+// allowed to shrink instead of imposing a 270px minimum that can push the
+// timeline underneath the navigation rail.
 @media (width < 1180px) and (min-width: $mobile-menu-breakpoint) {
   .blue2Root {
     --navigation-min-width: 76px;
     --navigation-max-width: 76px;
 
-    grid-template-columns: 76px minmax(0, 600px) minmax(270px, 1fr);
+    grid-template-columns: 76px minmax(0, 600px) minmax(0, 1fr);
+  }
+
+  .blue2NavigationWrapper {
+    width: 76px;
+    min-width: 76px;
+    max-width: 76px;
+  }
+
+  .blue2Main {
+    min-width: 0;
+  }
+}
+
+// Below the minimum width required by 76px + 600px + the 270px right rail,
+// remove the inline right rail instead of allowing the grid to overflow.
+@media (width < 946px) and (min-width: $mobile-menu-breakpoint) {
+  .blue2RightRail {
+    display: none;
   }
 }
 
