@@ -24,6 +24,7 @@ export default class StatusList extends ImmutablePureComponent {
     statusIds: ImmutablePropTypes.list.isRequired,
     featuredStatusIds: ImmutablePropTypes.list,
     onLoadMore: PropTypes.func,
+    onLoadPending: PropTypes.func,
     onScrollToTop: PropTypes.func,
     onScroll: PropTypes.func,
     trackScroll: PropTypes.bool,
@@ -44,10 +45,41 @@ export default class StatusList extends ImmutablePureComponent {
     trackScroll: true,
   };
 
+  pullRefreshRequested = false;
+  pullRefreshSawLoading = false;
+
   handleLoadOlder = debounce(() => {
     const { statusIds, lastId, onLoadMore } = this.props;
     onLoadMore(lastId || statusIds.findLast(id => !isNonStatusId(id)));
   }, 300, { leading: true });
+
+  handleRefresh = () => {
+    const { isLoading, onLoadMore } = this.props;
+
+    if (!onLoadMore || isLoading) return;
+
+    this.pullRefreshRequested = true;
+    this.pullRefreshSawLoading = false;
+    onLoadMore();
+  };
+
+  componentDidUpdate (prevProps) {
+    if (!this.pullRefreshRequested) return;
+
+    if (!prevProps.isLoading && this.props.isLoading) {
+      this.pullRefreshSawLoading = true;
+    }
+
+    if (
+      this.pullRefreshSawLoading &&
+      prevProps.isLoading &&
+      !this.props.isLoading
+    ) {
+      this.pullRefreshRequested = false;
+      this.pullRefreshSawLoading = false;
+      this.props.onLoadPending?.();
+    }
+  }
 
   setRef = c => {
     this.node = c;
@@ -112,7 +144,14 @@ export default class StatusList extends ImmutablePureComponent {
     }
 
     return (
-      <ScrollableList {...other} className='status-list' showLoading={isLoading && statusIds.size === 0} onLoadMore={onLoadMore && this.handleLoadOlder} ref={this.setRef}>
+      <ScrollableList
+        {...other}
+        className='status-list'
+        showLoading={isLoading && statusIds.size === 0}
+        onLoadMore={onLoadMore && this.handleLoadOlder}
+        onRefresh={onLoadMore ? this.handleRefresh : undefined}
+        ref={this.setRef}
+      >
         {scrollableContent}
       </ScrollableList>
     );

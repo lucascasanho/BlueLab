@@ -9,7 +9,9 @@ import { connect } from 'react-redux';
 import { supportsPassiveEvents } from 'detect-passive-events';
 import { throttle } from 'lodash';
 
+import RefreshIcon from '@/material-icons/400-24px/refresh.svg?react';
 import { ScrollContainer } from 'mastodon/containers/scroll_container';
+import pullToRefreshClasses from 'mastodon/features/blue2/pull_to_refresh.module.scss';
 
 import IntersectionObserverArticleContainer from '../../containers/intersection_observer_article_container';
 import { attachFullscreenListener, detachFullscreenListener, isFullscreen } from '../../features/ui/util/fullscreen';
@@ -22,6 +24,9 @@ import { Scrollable, ItemList } from './components';
 
 const MOUSE_IDLE_DELAY = 300;
 const TOP_THRESHOLD = 100;
+const PULL_REFRESH_THRESHOLD = 72;
+const PULL_REFRESH_MAX_DISTANCE = 112;
+const PULL_REFRESH_FALLBACK_DELAY = 12000;
 
 const listenerOptions = supportsPassiveEvents ? { passive: true } : false;
 
@@ -67,6 +72,7 @@ class ScrollableList extends PureComponent {
     scrollKey: PropTypes.string.isRequired,
     onLoadMore: PropTypes.func,
     onLoadPending: PropTypes.func,
+    onRefresh: PropTypes.func,
     onScrollToTop: PropTypes.func,
     onScroll: PropTypes.func,
     trackScroll: PropTypes.bool,
@@ -92,9 +98,18 @@ class ScrollableList extends PureComponent {
   state = {
     fullscreen: null,
     cachedMediaWidth: 250, // Default media/card width using default Mastodon theme
+    pullDistance: 0,
+    pullRefreshing: false,
   };
 
   intersectionObserverWrapper = new IntersectionObserverWrapper();
+  pullOrigin = null;
+  pullTracking = false;
+  pullDistance = 0;
+  pullSawLoading = false;
+  pullRefreshFallbackTimer = null;
+  pullResetTimer = null;
+  mounted = false;
 
   handleScroll = throttle(() => {
     if (this.node) {
@@ -184,6 +199,7 @@ class ScrollableList extends PureComponent {
   };
 
   componentDidMount () {
+    this.mounted = true;
     this.attachScrollListener();
     this.attachIntersectionObserver();
 
@@ -263,6 +279,16 @@ class ScrollableList extends PureComponent {
         this.setScrollTop(this.getScrollHeight() - bottom);
       }
     }
+
+    if (this.state.pullRefreshing) {
+      if (!prevProps.isLoading && this.props.isLoading) {
+        this.pullSawLoading = true;
+      }
+
+      if (this.pullSawLoading && prevProps.isLoading && !this.props.isLoading) {
+        this.finishPullRefresh();
+      }
+    }
   }
 
   cacheMediaWidth = (width) => {
@@ -272,9 +298,12 @@ class ScrollableList extends PureComponent {
   };
 
   componentWillUnmount () {
+    this.mounted = false;
     this.clearMouseIdleTimer();
     this.detachScrollListener();
     this.detachIntersectionObserver();
+    clearTimeout(this.pullRefreshFallbackTimer);
+    clearTimeout(this.pullResetTimer);
 
     detachFullscreenListener(this.onFullScreenChange);
   }
@@ -334,6 +363,146 @@ class ScrollableList extends PureComponent {
     this.node = c;
   };
 
+  isBlueLabPullToRefreshEnabled = () => {
+    return Boolean(
+      this.props.onRefresh &&
+      typeof document !== 'undefined' &&
+      document.body.dataset.theme === 'blue-2',
+    );
+  };
+
+  resetPullGesture = () => {
+    this.pullOrigin = null;
+    this.pullTracking = false;
+    this.pullDistance = 0;
+
+    if (this.mounted && this.state.pullDistance !== 0) {
+      this.setState({ pullDistance: 0 });
+    }
+  };
+
+  finishPullRefresh = () => {
+    clearTimeout(this.pullRefreshFallbackTimer);
+    clearTimeout(this.pullResetTimer);
+    this.pullRefreshFallbackTimer = null;
+    this.pullSawLoading = false;
+
+    this.pullResetTimer = setTimeout(() => {
+      if (!this.mounted) return;
+
+      this.pullDistance = 0;
+      this.setState({ pullDistance: 0, pullRefreshing: false });
+    }, 180);
+  };
+
+  handlePullStart = event => {
+    if (
+      !this.isBlueLabPullToRefreshEnabled() ||
+      this.state.pullRefreshing ||
+      this.props.isLoading ||
+      event.touches.length !== 1 ||
+      this.getScrollTop() > 0
+    ) {
+      return;
+    }
+
+    const touch = event.touches[0];
+    this.pullOrigin = { x: touch.clientX, y: touch.clientY };
+    this.pullTracking = true;
+    this.pullDistance = 0;
+  };
+
+  handlePullMove = event => {
+    if (!this.pullTracking || !this.pullOrigin || event.touches.length !== 1) {
+      return;
+    }
+
+    if (this.getScrollTop() > 0) {
+      this.resetPullGesture();
+      return;
+    }
+
+    const touch = event.touches[0];
+    const deltaX = touch.clientX - this.pullOrigin.x;
+    const deltaY = touch.clientY - this.pullOrigin.y;
+
+    if (deltaY <= 0 || Math.abs(deltaX) > Math.abs(deltaY) * 0.8) {
+      this.resetPullGesture();
+      return;
+    }
+
+    if (deltaY < 8) return;
+
+    if (event.cancelable) {
+      event.preventDefault();
+    }
+
+    const distance = Math.min(
+      PULL_REFRESH_MAX_DISTANCE,
+      Math.round(deltaY * 0.52),
+    );
+    this.pullDistance = distance;
+    this.setState({ pullDistance: distance });
+  };
+
+  handlePullEnd = () => {
+    if (!this.pullTracking) return;
+
+    const shouldRefresh = this.pullDistance >= PULL_REFRESH_THRESHOLD;
+    this.pullOrigin = null;
+    this.pullTracking = false;
+
+    if (!shouldRefresh) {
+      this.resetPullGesture();
+      return;
+    }
+
+    this.pullSawLoading = false;
+    this.pullDistance = PULL_REFRESH_THRESHOLD;
+    this.setState({
+      pullDistance: PULL_REFRESH_THRESHOLD,
+      pullRefreshing: true,
+    });
+
+    clearTimeout(this.pullRefreshFallbackTimer);
+    this.pullRefreshFallbackTimer = setTimeout(
+      this.finishPullRefresh,
+      PULL_REFRESH_FALLBACK_DELAY,
+    );
+
+    try {
+      this.props.onRefresh();
+    } catch {
+      this.finishPullRefresh();
+    }
+  };
+
+  handlePullCancel = () => {
+    if (!this.state.pullRefreshing) {
+      this.resetPullGesture();
+    }
+  };
+
+  renderPullRefreshIndicator = () => {
+    const { pullDistance, pullRefreshing } = this.state;
+
+    if (!pullRefreshing && pullDistance <= 0) return null;
+
+    return (
+      <div
+        className={pullToRefreshClasses.root}
+        data-ready={pullDistance >= PULL_REFRESH_THRESHOLD ? 'true' : 'false'}
+        data-refreshing={pullRefreshing ? 'true' : 'false'}
+        style={{ '--blue2-pull-distance': `${pullDistance}px` }}
+        aria-hidden='true'
+      >
+        <span className={pullToRefreshClasses.indicator}>
+          <RefreshIcon className={pullToRefreshClasses.icon} />
+        </span>
+      </div>
+    );
+  };
+
   handleLoadMore = e => {
     e.preventDefault();
     this.props.onLoadMore();
@@ -355,6 +524,16 @@ class ScrollableList extends PureComponent {
     const { children, scrollKey, className, trackScroll, showLoading, isLoading, hasMore, numPending, prepend, alwaysPrepend, append, footer, emptyMessage, onLoadMore } = this.props;
     const { fullscreen } = this.state;
     const childrenCount = Children.count(children);
+    const pullToRefreshEnabled = this.isBlueLabPullToRefreshEnabled();
+    const pullHandlers = pullToRefreshEnabled ? {
+      onTouchStart: this.handlePullStart,
+      onTouchMove: this.handlePullMove,
+      onTouchEnd: this.handlePullEnd,
+      onTouchCancel: this.handlePullCancel,
+    } : {};
+    const pullRefreshIndicator = pullToRefreshEnabled
+      ? this.renderPullRefreshIndicator()
+      : null;
 
     const loadMore     = (hasMore && onLoadMore) ? <LoadMore visible={!isLoading} onClick={this.handleLoadMore} /> : null;
     const loadPending  = (numPending > 0) ? <LoadPending count={numPending} onClick={this.handleLoadPending} /> : null;
@@ -362,7 +541,8 @@ class ScrollableList extends PureComponent {
 
     if (showLoading) {
       scrollableArea = (
-        <Scrollable ref={this.setRef}>
+        <Scrollable ref={this.setRef} {...pullHandlers}>
+          {pullRefreshIndicator}
           {prepend}
 
           <ItemList isLoading />
@@ -372,7 +552,8 @@ class ScrollableList extends PureComponent {
       );
     } else if (isLoading || childrenCount > 0 || numPending > 0 || hasMore || !emptyMessage) {
       scrollableArea = (
-        <Scrollable fullscreen={fullscreen} ref={this.setRef} onMouseMove={this.handleMouseMove}>
+        <Scrollable fullscreen={fullscreen} ref={this.setRef} onMouseMove={this.handleMouseMove} {...pullHandlers}>
+          {pullRefreshIndicator}
           {prepend}
 
           <ItemList className={className}>
@@ -407,7 +588,8 @@ class ScrollableList extends PureComponent {
       );
     } else {
       scrollableArea = (
-        <Scrollable fullscreen={fullscreen} ref={this.setRef}>
+        <Scrollable fullscreen={fullscreen} ref={this.setRef} {...pullHandlers}>
+          {pullRefreshIndicator}
           {alwaysPrepend && prepend}
 
           <div className='empty-column-indicator'>

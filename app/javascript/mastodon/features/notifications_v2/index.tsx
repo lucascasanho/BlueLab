@@ -19,6 +19,7 @@ import ScrollableList from '@/mastodon/components/scrollable_list';
 import DoneAllIcon from '@/material-icons/400-24px/done_all.svg?react';
 import NotificationsIcon from '@/material-icons/400-24px/notifications-fill.svg?react';
 import {
+  fetchNotifications,
   fetchNotificationsGap,
   updateScrollPosition,
   loadPending,
@@ -129,6 +130,10 @@ export const Notifications: React.FC<{
     dispatch(loadPending());
   }, [dispatch]);
 
+  const handleRefresh = useCallback(() => {
+    void dispatch(fetchNotifications());
+  }, [dispatch]);
+
   const handleScrollToTop = useDebouncedCallback(() => {
     void dispatch(updateScrollPosition({ top: true }));
   }, 100);
@@ -222,6 +227,7 @@ export const Notifications: React.FC<{
       emptyMessage={emptyMessage}
       onLoadMore={handleLoadOlder}
       onLoadPending={handleLoadPending}
+      onRefresh={handleRefresh}
       onScrollToTop={handleScrollToTop}
       onScroll={handleScroll}
       bindToDocument={!multiColumn}

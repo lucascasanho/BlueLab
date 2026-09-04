@@ -126,10 +126,7 @@ export const Blue2RightRail: React.FC = () => {
               <span className={classes.feedIcon}>
                 <Blue2HomeIcon size={18} />
               </span>
-              <FormattedMessage
-                id='account.following'
-                defaultMessage='Following'
-              />
+              <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
             </Link>
           )}
 
