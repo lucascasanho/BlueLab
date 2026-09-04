@@ -57,3 +57,125 @@ body[data-theme='blue-2'].layout-multiple-columns {
     min-height: 0;
   }
 }
+
+/*
+ * Final BlueLab phone composer geometry. An older BlueLab refinement allows
+ * composer popovers to escape with `overflow: visible !important`; that also
+ * defeated the mobile dialog clipping/scroll rules from the CSS module. Keep
+ * the phone dialog self-contained here, after every previous theme layer.
+ */
+@media (width <= 759px) {
+  body[data-theme='blue-2'] form[data-bluelab-composer][role='dialog'] {
+    position: fixed !important;
+    top: calc(var(--composer-visual-viewport-height, 100dvh) / 2) !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: calc(100vw - 24px) !important;
+    max-width: 600px !important;
+    height: auto !important;
+    min-height: min(
+      430px,
+      calc(var(--composer-visual-viewport-height, 100dvh) - 24px)
+    ) !important;
+    max-height: calc(
+      var(--composer-visual-viewport-height, 100dvh) - 24px
+    ) !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    border: 1px solid var(--blue2-border-soft) !important;
+    border-radius: 16px !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  body[data-theme='blue-2']
+    form[data-bluelab-composer][role='dialog']
+    > header {
+    order: 0 !important;
+    flex: 0 0 auto !important;
+    position: relative !important;
+    z-index: 3;
+    display: flex !important;
+    visibility: visible !important;
+    background: var(--color-bg-primary) !important;
+  }
+
+  body[data-theme='blue-2']
+    form[data-bluelab-composer][role='dialog']
+    > [data-compose-scroll-container] {
+    order: 1 !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body[data-theme='blue-2']
+    form[data-bluelab-composer][role='dialog']
+    > [data-bluelab-compose-footer] {
+    order: 2 !important;
+    flex: 0 0 auto !important;
+    position: relative !important;
+    inset: auto !important;
+    z-index: 3;
+    background: var(--color-bg-primary) !important;
+  }
+
+  /*
+   * Do not add VisualViewport.offsetTop to the closed-keyboard center: on iOS
+   * that can double-count the visual viewport displacement and push the sheet
+   * downward. Once the keyboard is open, pin the form to the visible top and
+   * constrain it to the VisualViewport height; only the middle section scrolls.
+   */
+  body[data-theme='blue-2']
+    form[data-bluelab-composer][role='dialog'][data-keyboard-open] {
+    top: env(safe-area-inset-top) !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: auto !important;
+    width: 100vw !important;
+    max-width: none !important;
+    height: calc(
+      var(--composer-visual-viewport-height, 100dvh) -
+        env(safe-area-inset-top)
+    ) !important;
+    min-height: 0 !important;
+    max-height: calc(
+      var(--composer-visual-viewport-height, 100dvh) -
+        env(safe-area-inset-top)
+    ) !important;
+    border-top: 0 !important;
+    border-inline: 0 !important;
+    border-radius: 0 0 16px 16px !important;
+    transform: none !important;
+  }
+}
+
+/*
+ * BlueLab uses the desktop/single-column shell on wide phone and tablet
+ * landscape viewports. Restore the same compose FAB available in portrait and
+ * make the real Home entry unconditionally visible above Search in that rail.
+ */
+@media (orientation: landscape) and (width >= 760px) and (width < 1180px) {
+  body[data-theme='blue-2'] [data-blue2-home-nav='true'] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  body[data-theme='blue-2'].layout-single-column
+    [data-blue2-compose-fab='true'] {
+    position: fixed !important;
+    inset-inline-end: max(18px, env(safe-area-inset-right)) !important;
+    bottom: max(18px, env(safe-area-inset-bottom)) !important;
+    z-index: 100 !important;
+    display: inline-flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: none !important;
+  }
+}
