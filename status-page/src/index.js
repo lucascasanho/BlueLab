@@ -1,4 +1,5 @@
 /* eslint-disable import/extensions */
+import { fetchBrandingAsset } from './branding.js';
 import { getInstanceConfig } from './config.js';
 import {
   getDashboardData,
@@ -32,6 +33,22 @@ const worker = {
 
     if (url.pathname === '/health') {
       return json(healthPayload(config));
+    }
+
+    if (request.method === 'GET' || request.method === 'HEAD') {
+      if (url.pathname === '/favicon.ico') {
+        const response = await fetchBrandingAsset(config, 'favicon');
+        return request.method === 'HEAD'
+          ? new Response(null, response)
+          : response;
+      }
+
+      if (url.pathname === '/instance-logo') {
+        const response = await fetchBrandingAsset(config, 'logo');
+        return request.method === 'HEAD'
+          ? new Response(null, response)
+          : response;
+      }
     }
 
     if (
