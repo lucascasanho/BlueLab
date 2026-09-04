@@ -204,10 +204,7 @@
   // height follows the remaining visible viewport and the form body scrolls.
   :global(body[data-theme='blue-2'])
     .composer[data-bluelab-composer][role='dialog'][data-keyboard-open] {
-    top: calc(
-      var(--composer-visual-viewport-offset-top, 0px) +
-        env(safe-area-inset-top)
-    );
+    top: calc(var(--composer-visual-viewport-offset-top, 0px) + env(safe-area-inset-top));
     left: 0;
     right: 0;
     bottom: auto;
