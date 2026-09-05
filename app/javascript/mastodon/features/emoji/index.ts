@@ -12,20 +12,32 @@ let worker: Worker | null = null;
 const log = emojiLogger('index');
 const workerLog = emojiLogger('worker');
 
-// Keep detached Image instances alive until their assets have been fetched and
-// decoded. Once complete, the browser's image cache can serve the picker
-// immediately without rendering temporary empty custom-emoji cells.
+// Keep the custom emoji files warm before the picker is opened. This uses the
+// same URL variant as the picker and waits for decoding so opening the picker
+// can reuse the browser cache instead of painting temporary empty cells.
 const preloadedCustomEmojiUrls = new Set<string>();
-const customEmojiPreloads = new Map<string, HTMLImageElement>();
+const customEmojiPreloadImages = new Map<string, HTMLImageElement>();
+const customEmojiPreloadPromises = new Map<string, Promise<void>>();
+let customEmojiPreloadPromise = Promise.resolve();
 
 function preloadCustomEmojiImages(
   emojis: Record<string, { url: string; static_url: string }>,
 ) {
+  const pendingPreloads: Promise<void>[] = [];
+
   for (const emoji of Object.values(emojis)) {
-    // Match the exact asset variant used by the emoji picker so the request is
-    // satisfied from cache when the picker is opened.
     const url = autoPlayGif ? emoji.url : emoji.static_url;
-    if (!url || preloadedCustomEmojiUrls.has(url)) {
+    if (!url) {
+      continue;
+    }
+
+    const inFlight = customEmojiPreloadPromises.get(url);
+    if (inFlight) {
+      pendingPreloads.push(inFlight);
+      continue;
+    }
+
+    if (preloadedCustomEmojiUrls.has(url)) {
       continue;
     }
 
@@ -33,19 +45,41 @@ function preloadCustomEmojiImages(
 
     const image = new Image();
     image.decoding = 'async';
-    customEmojiPreloads.set(url, image);
-    image.src = url;
+    customEmojiPreloadImages.set(url, image);
 
-    void image
-      .decode()
-      .catch(() => {
+    const preload = new Promise<void>((resolve) => {
+      image.onload = () => {
+        void image
+          .decode()
+          .catch(() => undefined)
+          .finally(resolve);
+      };
+      image.onerror = () => {
         // Allow a later emoji refresh to retry assets that failed to preload.
         preloadedCustomEmojiUrls.delete(url);
-      })
-      .finally(() => {
-        customEmojiPreloads.delete(url);
-      });
+        resolve();
+      };
+      image.src = url;
+    }).finally(() => {
+      image.onload = null;
+      image.onerror = null;
+      customEmojiPreloadImages.delete(url);
+      customEmojiPreloadPromises.delete(url);
+    });
+
+    customEmojiPreloadPromises.set(url, preload);
+    pendingPreloads.push(preload);
   }
+
+  customEmojiPreloadPromise = Promise.all(pendingPreloads).then(
+    () => undefined,
+  );
+
+  return customEmojiPreloadPromise;
+}
+
+export function waitForCustomEmojiImages() {
+  return customEmojiPreloadPromise;
 }
 
 // This is too short, but better to fallback quickly than wait.
@@ -173,7 +207,7 @@ async function loadEmojisToStore() {
 
   loadLocale(userLocale);
   await store.dispatch(loadCustomEmojis());
-  preloadCustomEmojiImages(store.getState().emojis.custom);
+  void preloadCustomEmojiImages(store.getState().emojis.custom);
 
   log('loaded emoji data into store');
 }
