@@ -27,11 +27,7 @@ body[data-theme='blue-2'] {
   --color-text-status-links: var(--blue2-blue);
   --color-bg-brand-base: var(--blue2-blue);
   --color-bg-brand-base-hover: var(--blue2-blue-hover);
-  --color-bg-brand-soft: color-mix(
-    in srgb,
-    var(--blue2-blue) 14%,
-    transparent
-  );
+  --color-bg-brand-soft: color-mix(in srgb, var(--blue2-blue) 14%, transparent);
   --color-bg-brand-softest: color-mix(
     in srgb,
     var(--blue2-blue) 8%,
@@ -105,8 +101,7 @@ body[data-theme='blue-2'] {
   /* Force primary/focus/selected details back through the editable accent. */
   .button:not(.button-secondary, .button-tertiary),
   button.button:not(.button-secondary, .button-tertiary),
-  .account__relationship
-    .button:not(.button-secondary, .button-tertiary),
+  .account__relationship .button:not(.button-secondary, .button-tertiary),
   .account__header__tabs__buttons
     .button:not(.button-secondary, .button-tertiary),
   button[data-bluelab-compose='true'],
@@ -117,8 +112,7 @@ body[data-theme='blue-2'] {
 
   .button:not(.button-secondary, .button-tertiary):hover,
   button.button:not(.button-secondary, .button-tertiary):hover,
-  .account__relationship
-    .button:not(.button-secondary, .button-tertiary):hover,
+  .account__relationship .button:not(.button-secondary, .button-tertiary):hover,
   .account__header__tabs__buttons
     .button:not(.button-secondary, .button-tertiary):hover,
   button[data-bluelab-compose='true']:hover,
