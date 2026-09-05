@@ -1,4 +1,4 @@
-import { initialState } from '@/mastodon/initial_state';
+import { autoPlayGif, initialState } from '@/mastodon/initial_state';
 
 import { EMOJI_DB_RELOAD_EVENT } from './constants';
 import { toSupportedLocale } from './locale';
@@ -11,6 +11,42 @@ let worker: Worker | null = null;
 
 const log = emojiLogger('index');
 const workerLog = emojiLogger('worker');
+
+// Keep detached Image instances alive until their assets have been fetched and
+// decoded. Once complete, the browser's image cache can serve the picker
+// immediately without rendering temporary empty custom-emoji cells.
+const preloadedCustomEmojiUrls = new Set<string>();
+const customEmojiPreloads = new Map<string, HTMLImageElement>();
+
+function preloadCustomEmojiImages(
+  emojis: Record<string, { url: string; static_url: string }>,
+) {
+  for (const emoji of Object.values(emojis)) {
+    // Match the exact asset variant used by the emoji picker so the request is
+    // satisfied from cache when the picker is opened.
+    const url = autoPlayGif ? emoji.url : emoji.static_url;
+    if (!url || preloadedCustomEmojiUrls.has(url)) {
+      continue;
+    }
+
+    preloadedCustomEmojiUrls.add(url);
+
+    const image = new Image();
+    image.decoding = 'async';
+    customEmojiPreloads.set(url, image);
+    image.src = url;
+
+    void image
+      .decode()
+      .catch(() => {
+        // Allow a later emoji refresh to retry assets that failed to preload.
+        preloadedCustomEmojiUrls.delete(url);
+      })
+      .finally(() => {
+        customEmojiPreloads.delete(url);
+      });
+  }
+}
 
 // This is too short, but better to fallback quickly than wait.
 const WORKER_TIMEOUT = 2_000;
@@ -137,6 +173,7 @@ async function loadEmojisToStore() {
 
   loadLocale(userLocale);
   await store.dispatch(loadCustomEmojis());
+  preloadCustomEmojiImages(store.getState().emojis.custom);
 
   log('loaded emoji data into store');
 }
