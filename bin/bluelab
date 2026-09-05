@@ -184,8 +184,19 @@ run yarn install --immutable
 printf '\n===== MIGRATIONS =====\n'
 run env RAILS_ENV=production bundle exec rails db:migrate
 
-printf '\n===== ASSETS =====\n'
+printf '\n===== ASSETS — REBUILD LIMPO =====\n'
+echo "Removendo assets compilados antigos, incluindo os packs do Vite..."
+run env RAILS_ENV=production NODE_ENV=production bundle exec rails assets:clobber
+
+echo "Limpando cache temporário do Rails antes da recompilação..."
+run env RAILS_ENV=production bundle exec rails tmp:cache:clear
+
+echo "Compilando assets novamente a partir do checkout atual..."
 run env RAILS_ENV=production NODE_ENV=production bundle exec rails assets:precompile
+
+VITE_MANIFEST="$REPO/public/packs/.vite/manifest.json"
+[[ -s "$VITE_MANIFEST" ]] || fail "manifesto do Vite não foi gerado em $VITE_MANIFEST"
+echo "Manifesto Vite regenerado: $VITE_MANIFEST"
 
 printf '\n===== REINICIANDO %s =====\n' "${TARGET^^}"
 for service in "${SERVICES[@]}"; do
