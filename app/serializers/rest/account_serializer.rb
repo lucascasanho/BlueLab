@@ -179,21 +179,13 @@ class REST::AccountSerializer < ActiveModel::Serializer
   def verified_by_role
     return false if object.unavailable?
 
-    object.user_role&.name.to_s.strip == 'Verificado'
+    object.user_role&.verified_by_instance? || false
   end
 
   def verified_by_role_since
     return unless verified_by_role
 
-    user = object.user
-    return if user.nil?
-
-    Rails.cache.fetch(['verified-role-since', user.id, user.role_id, user.updated_at.to_i], expires_in: 6.hours) do
-      Admin::ActionLog
-        .where(action: 'change_role', target_type: 'User', target_id: user.id)
-        .order(created_at: :desc)
-        .pick(:created_at)
-    end
+    object.verified_by_role_since
   end
 
   def roles

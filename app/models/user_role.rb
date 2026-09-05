@@ -100,6 +100,11 @@ class UserRole < ApplicationRecord
     }.freeze
   end
 
+  VERIFIED_ROLE_NAMES = ['verified', 'verificado', 'trusted verified', 'vf'].freeze
+  VERIFICATION_PRIVILEGES = (
+    Flags::CATEGORIES[:moderation] + Flags::CATEGORIES[:administration]
+  ).uniq.freeze
+
   attr_writer :current_account
 
   validates :name, presence: true, unless: :everyone?
@@ -113,6 +118,7 @@ class UserRole < ApplicationRecord
   validate :validate_own_role_edition
 
   before_validation :set_position
+  after_update_commit :sync_assigned_accounts_verification_timestamp, if: :verification_eligibility_changed?
 
   scope :assignable, -> { where.not(id: EVERYONE_ROLE_ID).order(position: :asc) }
 
@@ -130,6 +136,18 @@ class UserRole < ApplicationRecord
 
   def self.that_can(*any_of_privileges)
     all.select { |role| role.can?(*any_of_privileges) }
+  end
+
+  def self.verifies_instance_profile?(name:, permissions:)
+    normalized_name = name.to_s.strip.downcase
+    explicit_permissions = permissions.to_i
+
+    return true if VERIFIED_ROLE_NAMES.include?(normalized_name)
+    return true if explicit_permissions & FLAGS[:administrator] == FLAGS[:administrator]
+
+    VERIFICATION_PRIVILEGES.any? do |privilege|
+      explicit_permissions & FLAGS.fetch(privilege) == FLAGS.fetch(privilege)
+    end
   end
 
   def everyone?
@@ -187,6 +205,12 @@ class UserRole < ApplicationRecord
     permissions & FLAGS[:administrator] == FLAGS[:administrator]
   end
 
+  def verified_by_instance?
+    return false if everyone? || nobody?
+
+    self.class.verifies_instance_profile?(name: name, permissions: permissions)
+  end
+
   private
 
   def in_permissions?(privilege)
@@ -197,6 +221,28 @@ class UserRole < ApplicationRecord
 
   def set_position
     self.position = NOBODY_POSITION if everyone?
+  end
+
+  def verification_eligibility_changed?
+    return false unless previous_changes.key?('name') || previous_changes.key?('permissions')
+
+    previous_name = previous_changes.fetch('name', [name]).first
+    previous_permissions = previous_changes.fetch('permissions', [permissions]).first
+    previously_verified = !everyone? && self.class.verifies_instance_profile?(
+      name: previous_name,
+      permissions: previous_permissions
+    )
+
+    previously_verified != verified_by_instance?
+  end
+
+  def sync_assigned_accounts_verification_timestamp
+    now = Time.current
+    verified_since = verified_by_instance? ? now : nil
+
+    Account
+      .where(id: users.select(:account_id))
+      .update_all(verified_by_role_since: verified_since, updated_at: now)
   end
 
   def validate_own_role_edition
