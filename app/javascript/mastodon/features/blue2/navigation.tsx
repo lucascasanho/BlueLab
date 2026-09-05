@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -40,7 +40,6 @@ interface ItemProps {
   badge?: number;
   iconClassName?: string;
   className?: string;
-  homeNav?: boolean;
 }
 
 const Item: React.FC<ItemProps> = ({
@@ -51,20 +50,46 @@ const Item: React.FC<ItemProps> = ({
   badge,
   iconClassName,
   className,
-  homeNav,
 }) => (
   <NavLink
     to={to}
     exact={exact}
     className={className ? `${classes.item} ${className}` : classes.item}
     activeClassName={classes.itemActive}
-    data-blue2-home-nav={homeNav ? 'true' : undefined}
   >
     <Icon size={27} className={iconClassName} />
     <span>{children}</span>
     {!!badge && badge > 0 && <span className={classes.badge}>{badge}</span>}
   </NavLink>
 );
+
+const isCompactLandscapeViewport = () =>
+  typeof window !== 'undefined' &&
+  window.innerWidth < 1180 &&
+  window.innerWidth > window.innerHeight;
+
+const useCompactLandscapeViewport = () => {
+  const [compactLandscape, setCompactLandscape] = useState(
+    isCompactLandscapeViewport,
+  );
+
+  useEffect(() => {
+    const update = () => {
+      setCompactLandscape(isCompactLandscapeViewport());
+    };
+
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('orientationchange', update);
+
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('orientationchange', update);
+    };
+  }, []);
+
+  return compactLandscape;
+};
 
 export const Blue2Navigation: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -74,6 +99,7 @@ export const Blue2Navigation: React.FC = () => {
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
   );
+  const compactLandscape = useCompactLandscapeViewport();
 
   const openComposer = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -93,20 +119,26 @@ export const Blue2Navigation: React.FC = () => {
     : '/home';
   const homePath = signedIn ? '/home' : '/';
 
+  const homeItem = (
+    <Item
+      to={homePath}
+      exact
+      icon={Blue2HomeIcon}
+      className={classes.homeItem}
+    >
+      <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
+    </Item>
+  );
+
   return (
     <nav className={classes.root} aria-label='BLUE 2.0'>
       {signedIn && <Blue2AccountMenu />}
 
+      {compactLandscape && homeItem}
+
       <div className={classes.items}>
-        <Item
-          to={homePath}
-          exact
-          icon={Blue2HomeIcon}
-          className={classes.homeItem}
-          homeNav
-        >
-          <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
-        </Item>
+        {!compactLandscape && homeItem}
+
         <Item to='/explore' icon={Blue2SearchIcon}>
           <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
         </Item>
