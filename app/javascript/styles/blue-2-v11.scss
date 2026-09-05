@@ -203,6 +203,28 @@ body[data-theme='blue-2'].layout-multiple-columns {
     -webkit-overflow-scrolling: touch;
   }
 
+  /*
+   * Media, polls and quote cards have their own scroll region below the editor.
+   * The base composer intentionally disabled this for quotes; on a phone with
+   * the keyboard open that can push the action footer out of the visible area.
+   */
+  body[data-theme='blue-2']
+    form[data-bluelab-composer][role='dialog']
+    [data-compose-scroll-zone='panel'][data-has-quote] {
+    flex: 0 1 auto !important;
+    min-height: 0 !important;
+    max-height: clamp(
+      7rem,
+      calc(var(--composer-visual-viewport-height, 100dvh) - 13rem),
+      18rem
+    ) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+
   body[data-theme='blue-2']
     form[data-bluelab-composer][role='dialog']
     > [data-bluelab-compose-footer] {
