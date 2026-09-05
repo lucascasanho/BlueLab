@@ -6,7 +6,7 @@
 class AccountUsernameReservation < ApplicationRecord
   belongs_to :account, inverse_of: :username_reservations, optional: true
 
-  validates :username, presence: true, format: { with: /\A[a-z0-9_]+\z/i }, length: { maximum: Account::USERNAME_LENGTH_LIMIT }
+  validates :username, presence: true, format: { with: Account::USERNAME_ONLY_RE }, length: { maximum: Account::USERNAME_LENGTH_HARD_LIMIT }
   validates :username, uniqueness: { case_sensitive: false }
 
   scope :current, -> { where(relinquished_at: nil) }
