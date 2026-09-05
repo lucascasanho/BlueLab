@@ -49,6 +49,22 @@ const ComposeLazyForm = lazy(() =>
   })),
 );
 
+interface VisualViewportMetrics {
+  height: number | null;
+  offsetTop: number;
+  bottomInset: number;
+  centerY: number | null;
+  keyboardOpen: boolean;
+}
+
+const emptyVisualViewportMetrics: VisualViewportMetrics = {
+  height: null,
+  offsetTop: 0,
+  bottomInset: 0,
+  centerY: null,
+  keyboardOpen: false,
+};
+
 export const ComposeRedesignButton: React.FC<{
   /**
    * Render the button in regular document flow instead of fixed positioning for mobile layout
@@ -70,18 +86,44 @@ export const ComposeRedesignButton: React.FC<{
       ? createPortal(content, document.body)
       : content;
 
-  // Update viewport based on visual size in order to account for the virtual keyboard.
-  const [viewportHeight, setViewportHeight] = useState<null | number>(null);
+  /*
+   * Keep VisualViewport metrics in React state instead of mutating the form from
+   * a layout effect. The redesigned form is lazy-loaded; an effect can run while
+   * Suspense is still showing its fallback and never see composerRef.current.
+   * State survives that delay, so the form receives the correct visible height
+   * as soon as it mounts and whenever the software keyboard changes it.
+   */
+  const [viewport, setViewport] = useState<VisualViewportMetrics>(
+    emptyVisualViewportMetrics,
+  );
   useEffect(() => {
-    const updateHeight = () => {
-      setViewportHeight(visualViewport?.height ?? null);
+    const updateViewport = () => {
+      const visualViewport = window.visualViewport;
+      const height = visualViewport?.height ?? window.innerHeight;
+      const offsetTop = visualViewport?.offsetTop ?? 0;
+      const bottomInset = Math.max(
+        0,
+        window.innerHeight - offsetTop - height,
+      );
+
+      setViewport({
+        height,
+        offsetTop,
+        bottomInset,
+        centerY: offsetTop + height / 2,
+        keyboardOpen: window.innerHeight - height > 150,
+      });
     };
 
-    updateHeight();
-    visualViewport?.addEventListener('resize', updateHeight);
+    updateViewport();
+    window.visualViewport?.addEventListener('resize', updateViewport);
+    window.visualViewport?.addEventListener('scroll', updateViewport);
+    window.addEventListener('resize', updateViewport);
 
     return () => {
-      visualViewport?.removeEventListener('resize', updateHeight);
+      window.visualViewport?.removeEventListener('resize', updateViewport);
+      window.visualViewport?.removeEventListener('scroll', updateViewport);
+      window.removeEventListener('resize', updateViewport);
     };
   }, []);
 
@@ -130,58 +172,17 @@ export const ComposeRedesignButton: React.FC<{
 
   useLayoutEffect(() => {
     const composer = composerRef.current;
-    if (!composer) return;
+    if (!composer || !origin) return;
 
-    if (origin) {
-      const rect = composer.getBoundingClientRect();
-      composer.style.setProperty(
-        '--composer-origin-x',
-        `${origin.x - rect.left}px`,
-      );
-      composer.style.setProperty(
-        '--composer-origin-y',
-        `${origin.y - rect.top}px`,
-      );
-    }
-
-    const visualViewport = window.visualViewport;
-    const updateVisualViewport = () => {
-      const viewportHeight = visualViewport?.height ?? window.innerHeight;
-      const viewportOffsetTop = visualViewport?.offsetTop ?? 0;
-      const bottomInset = Math.max(
-        0,
-        window.innerHeight - viewportOffsetTop - viewportHeight,
-      );
-      const viewportCenterY = viewportOffsetTop + viewportHeight / 2;
-      const keyboardOpen = window.innerHeight - viewportHeight > 150;
-
-      composer.style.setProperty(
-        '--composer-visual-viewport-height',
-        `${viewportHeight}px`,
-      );
-      composer.style.setProperty(
-        '--composer-visual-viewport-offset-top',
-        `${viewportOffsetTop}px`,
-      );
-      composer.style.setProperty(
-        '--composer-visual-viewport-center-y',
-        `${viewportCenterY}px`,
-      );
-      composer.style.setProperty(
-        '--composer-visual-viewport-bottom',
-        `${bottomInset}px`,
-      );
-      composer.toggleAttribute('data-keyboard-open', keyboardOpen);
-    };
-
-    updateVisualViewport();
-    visualViewport?.addEventListener('resize', updateVisualViewport);
-    visualViewport?.addEventListener('scroll', updateVisualViewport);
-
-    return () => {
-      visualViewport?.removeEventListener('resize', updateVisualViewport);
-      visualViewport?.removeEventListener('scroll', updateVisualViewport);
-    };
+    const rect = composer.getBoundingClientRect();
+    composer.style.setProperty(
+      '--composer-origin-x',
+      `${origin.x - rect.left}px`,
+    );
+    composer.style.setProperty(
+      '--composer-origin-y',
+      `${origin.y - rect.top}px`,
+    );
   }, [displayState, origin]);
 
   if (!signedIn) return null;
@@ -216,9 +217,16 @@ export const ComposeRedesignButton: React.FC<{
   }
 
   if (displayState === 'showing') {
-    // Pass the viewport height as a CSS variable so it's only used for mobile.
     const style = {
-      '--viewport-height': viewportHeight ? `${viewportHeight}px` : undefined,
+      '--viewport-height': viewport.height ? `${viewport.height}px` : undefined,
+      '--composer-visual-viewport-height': viewport.height
+        ? `${viewport.height}px`
+        : undefined,
+      '--composer-visual-viewport-offset-top': `${viewport.offsetTop}px`,
+      '--composer-visual-viewport-center-y': viewport.centerY
+        ? `${viewport.centerY}px`
+        : undefined,
+      '--composer-visual-viewport-bottom': `${viewport.bottomInset}px`,
     } as React.CSSProperties;
 
     return portalBlue2InlineOverlay(
@@ -228,6 +236,7 @@ export const ComposeRedesignButton: React.FC<{
           autoFocus
           className={classes.composer}
           style={style}
+          data-keyboard-open={viewport.keyboardOpen ? 'true' : undefined}
         />
       </Suspense>,
     );
