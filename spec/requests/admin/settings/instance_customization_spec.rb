@@ -66,20 +66,26 @@ RSpec.describe 'Admin instance customization settings' do
     expect(response.parsed_body.at_css('input[name="form_instance_customization[email_dark_surface_color]"]')).to be_nil
   end
 
-  it 'emits BlueLab runtime tokens from the instance palette' do
+  it 'emits every BlueLab runtime palette token from the editable instance colors' do
     sign_in Fabricate(:admin_user)
     Setting.instance_accent_color = '#2b8fcd'
     Setting.instance_light_background_color = '#f6f8fa'
+    Setting.instance_light_surface_color = '#e6ebf0'
+    Setting.instance_light_text_color = '#20242a'
+    Setting.instance_dark_background_color = '#101418'
     Setting.instance_dark_surface_color = '#15191d'
+    Setting.instance_dark_text_color = '#f2f5f7'
 
     get admin_settings_instance_customization_path
 
-    expect(response.body).to include('--blue2-blue: #2b8fcd;')
-    expect(response.body).to include('--color-bg-brand-soft: color-mix(in srgb, #2b8fcd 14%, transparent);')
-    expect(response.body).to include('--blue2-bg: #f6f8fa;')
-    expect(response.body).to include('--blue2-surface: #15191d;')
-    expect(response.body).to include("body[data-theme='blue-2']")
-    expect(response.body).to include('background: var(--blue2-hover);')
+    runtime_style = response.parsed_body.css('style').find { |node| node.text.include?('--blue2-blue: #2b8fcd;') }
+
+    expect(runtime_style).to be_present
+    expect(runtime_style.text).to include('--color-bg-brand-soft: color-mix(in srgb, #2b8fcd 14%, transparent);')
+    expect(runtime_style.text).to include('--blue2-bg: #f6f8fa;', '--blue2-surface: #e6ebf0;', '--blue2-text: #20242a;')
+    expect(runtime_style.text).to include('--blue2-bg: #101418;', '--blue2-surface: #15191d;', '--blue2-text: #f2f5f7;')
+    expect(runtime_style.text).to include("body[data-theme='blue-2']")
+    expect(runtime_style.text).to include('background: var(--blue2-hover);')
   end
 
   it 'restores every customization with one action' do

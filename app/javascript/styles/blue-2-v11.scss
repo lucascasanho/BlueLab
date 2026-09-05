@@ -154,7 +154,7 @@ body[data-theme='blue-2'].layout-multiple-columns {
     form[data-bluelab-composer][role='dialog'][data-keyboard-open] {
     box-sizing: border-box !important;
     position: fixed !important;
-    top: var(--composer-visual-viewport-offset-top, 0px) !important;
+    top: var(--composer-visual-viewport-offset-top, 0) !important;
     left: 0 !important;
     right: 0 !important;
     bottom: auto !important;
