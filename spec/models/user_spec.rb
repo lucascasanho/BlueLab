@@ -77,7 +77,7 @@ RSpec.describe User do
       user = Fabricate(:user)
 
       expect(user.chosen_languages).to be_nil
-      expect(user.settings['web.auto_play']).to be_nil
+      expect(user.settings['web.auto_play']).to be(false)
     end
   end
 

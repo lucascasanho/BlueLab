@@ -89,6 +89,15 @@ RSpec.describe DeleteAccountService do
         expect(a_request(:post, remote_bob.inbox_url)).to have_been_made.once
       end
     end
+
+    it 'deletes username reservations when the username should not be reserved' do
+      account = Fabricate(:account)
+      reservation = account.username_reservations.sole
+
+      described_class.new.call(account, reserve_email: false, reserve_username: false, skip_side_effects: true)
+
+      expect { reservation.reload }.to raise_error(ActiveRecord::RecordNotFound)
+    end
   end
 
   describe '#call on remote account', :inline_jobs do

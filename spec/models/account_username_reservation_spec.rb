@@ -27,7 +27,7 @@ RSpec.describe AccountUsernameReservation do
   end
 
   it 'lets an application actor reclaim an orphaned reservation' do
-    original_account = Fabricate(:account, username: 'application.internal')
+    original_account = Fabricate(:account, actor_type: 'Application', username: 'application.internal')
     reservation = original_account.username_reservations.sole
     original_account.destroy!
 

@@ -99,9 +99,11 @@ RSpec.describe Mastodon::CLI::Maintenance do
         end
 
         def duplicate_local_account_without_reservation
-          account = Fabricate.build(:account, username: duplicate_account_username, domain: 'temporary.invalid')
-          account.save!(validate: false)
-          account.update_column(:domain, nil)
+          2.times do
+            account = Fabricate.build(:account, username: duplicate_account_username, domain: 'temporary.invalid')
+            account.save!(validate: false)
+            account.update_column(:domain, nil)
+          end
         end
 
         def choose_local_account_to_keep
