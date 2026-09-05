@@ -8,6 +8,7 @@ import { Skeleton } from '../skeleton';
 
 import type { DisplayNameProps } from './index';
 import { AccountLock } from './lock';
+import { VerifiedBadge } from './verified_badge';
 
 export const DisplayNameWithoutDomain: FC<
   Omit<DisplayNameProps, 'variant'> & ComponentPropsWithoutRef<'span'>
@@ -31,6 +32,7 @@ export const DisplayNameWithoutDomain: FC<
             <Skeleton width='10ch' />
           </strong>
         )}
+        <VerifiedBadge account={account} />
         {account?.locked && <AccountLock />}
       </bdi>
       {children}
