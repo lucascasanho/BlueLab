@@ -55,8 +55,9 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
   const popoverId = `bluelab-verified-popover-${uniqueId}`;
   const headingId = `bluelab-verified-heading-${uniqueId}`;
   const [open, setOpen] = useState(false);
-  const [triggerElement, setTriggerElement] =
-    useState<HTMLSpanElement | null>(null);
+  const [triggerElement, setTriggerElement] = useState<HTMLSpanElement | null>(
+    null,
+  );
 
   const handleClick = useCallback((event: MouseEvent<HTMLSpanElement>) => {
     event.preventDefault();
@@ -64,22 +65,26 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
     setOpen((previous) => !previous);
   }, []);
 
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLSpanElement>) => {
-      if (event.key !== 'Enter' && event.key !== ' ') {
-        return;
-      }
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLSpanElement>) => {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
 
-      event.preventDefault();
-      event.stopPropagation();
-      setOpen((previous) => !previous);
-    },
-    [],
-  );
+    event.preventDefault();
+    event.stopPropagation();
+    setOpen((previous) => !previous);
+  }, []);
 
   const handleClose = useCallback(() => {
     setOpen(false);
   }, []);
+
+  const handlePopoverClick = useCallback(
+    (event: MouseEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+    },
+    [],
+  );
 
   if (!account || !hasVerifiedRole(account)) {
     return null;
@@ -173,14 +178,12 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
             role='dialog'
             aria-labelledby={headingId}
             className={`dropdown-animation ${classes.popover}`}
-            onClick={(event) => event.stopPropagation()}
+            onClickCapture={handlePopoverClick}
           >
             <h3 id={headingId} className={classes.title}>
               {titleText}
             </h3>
-            <p className={classes.description}>
-              {descriptionText}
-            </p>
+            <p className={classes.description}>{descriptionText}</p>
             <p className={classes.since}>{sinceText}</p>
           </div>
         )}
