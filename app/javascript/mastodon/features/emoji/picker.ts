@@ -1,6 +1,5 @@
 import type { CategoryName, CustomEmoji } from 'emoji-mart';
 
-import { autoPlayGif } from '@/mastodon/initial_state';
 import {
   createAppSelector,
   useAppSelector,
@@ -106,7 +105,11 @@ const selectPickerData = createAppSelector(
         id: shortcode,
         custom: true,
         short_names: [shortcode],
-        imageUrl: autoPlayGif ? emoji.url : emoji.static_url,
+        // The picker can keep dozens of custom emoji thumbnails mounted at
+        // once. Use the static thumbnail here so an open picker does not
+        // compete with timeline avatars and media for bandwidth/decoding.
+        // Rendered posts still follow the user's animation preference.
+        imageUrl: emoji.static_url || emoji.url,
         customCategory: categoryMap.get(shortcode),
       } as CustomEmoji);
     }
