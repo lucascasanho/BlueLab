@@ -103,48 +103,41 @@ RSpec.describe ThemeHelper do
   describe '#current_theme' do
     subject { helper.current_theme }
 
-    context 'when user is not signed in' do
-      context 'when theme was not changed in settings' do
-        it { is_expected.to eq('default') }
-      end
+    before do
+      allow(Themes.instance).to receive(:names).and_return %w(default blue-2 alternate)
+    end
 
-      context 'when theme is changed in settings' do
-        before do
-          allow(Themes.instance).to receive(:names).and_return(%w(default contrast))
-          Setting.theme = 'contrast'
-        end
+    context 'when the administrator selected BlueLab' do
+      before { Setting.theme = 'blue-2' }
 
-        it { is_expected.to eq('contrast') }
-      end
+      it { is_expected.to eq('blue-2') }
+    end
 
-      context 'when theme is changed to invalid value' do
-        before { Setting.theme = 'fakethemename' }
+    context 'when the administrator selected another available theme' do
+      before { Setting.theme = 'alternate' }
 
-        it { is_expected.to eq('default') }
+      it { is_expected.to eq('alternate') }
+    end
+
+    context 'when the administrator theme is invalid' do
+      before { Setting.theme = 'missing-theme' }
+
+      it 'falls back to BlueLab' do
+        expect(subject).to eq('blue-2')
       end
     end
 
-    context 'when user is signed in' do
-      before { allow(helper).to receive(:current_user).and_return(current_user) }
-
+    context 'when a signed-in user has an older personal theme preference' do
       let(:current_user) { Fabricate :user }
 
-      context 'when user did not set theme' do
-        it { is_expected.to eq('default') }
+      before do
+        allow(helper).to receive(:current_user).and_return(current_user)
+        current_user.settings.update(theme: 'alternate', noindex: false)
+        Setting.theme = 'blue-2'
       end
 
-      context 'when user set theme' do
-        before { current_user.settings.update(theme: 'alternate', noindex: false) }
-
-        context 'when theme is valid' do
-          before { allow(Themes.instance).to receive(:names).and_return %w(default alternate good evil) }
-
-          it { is_expected.to eq('alternate') }
-        end
-
-        context 'when theme is not valid' do
-          it { is_expected.to eq('default') }
-        end
+      it 'ignores the personal preference and follows the administrator theme' do
+        expect(subject).to eq('blue-2')
       end
     end
   end
