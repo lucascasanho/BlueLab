@@ -14,8 +14,9 @@
 #  consumed_timestep         :integer
 #  current_sign_in_at        :datetime
 #  disabled                  :boolean          default(FALSE), not null
-#  email                     :string           default(""), not null
-#  encrypted_password        :string           default(""), not null
+#  email                     :string           default("") , not null
+#  encrypted_password        :string           default("") , not null
+#  instance_verified_at      :datetime
 #  last_emailed_at           :datetime
 #  last_sign_in_at           :datetime
 #  locale                    :string
@@ -114,6 +115,7 @@ class User < ApplicationRecord
 
   before_validation :sanitize_role
   before_validation :set_new_local_account_defaults, on: :create
+  before_save :sync_instance_verification_timestamp, if: :will_save_change_to_role_id?
   before_create :set_approved
   before_create :set_age_verified_at
   after_commit :send_pending_devise_notifications
@@ -490,7 +492,7 @@ class User < ApplicationRecord
   end
 
   def sign_up_username_requires_approval?
-    account.username? && UsernameBlock.matches?(account.username, allow_with_approval: true)
+    account.username? && UsernameBlock.matches?(account.username, allow_with_approval: true).exists?
   end
 
   def open_registrations?
@@ -499,6 +501,24 @@ class User < ApplicationRecord
 
   def sanitize_role
     self.role = nil if role.present? && role.everyone?
+  end
+
+  def sync_instance_verification_timestamp
+    previous_role_id, next_role_id = role_id_change_to_be_saved
+    was_eligible = instance_verification_eligible_role_id?(previous_role_id)
+    is_eligible = instance_verification_eligible_role_id?(next_role_id)
+
+    if is_eligible && !was_eligible
+      self.instance_verified_at = Time.current
+    elsif !is_eligible
+      self.instance_verified_at = nil
+    end
+  end
+
+  def instance_verification_eligible_role_id?(candidate_role_id)
+    return false if candidate_role_id.nil?
+
+    UserRole.find_by(id: candidate_role_id)&.instance_verification_eligible? || false
   end
 
   def prepare_new_user!
