@@ -19,5 +19,8 @@ jobs:
       - name: Set up Javascript environment
         uses: ./.github/actions/setup-javascript
 
-      - name: Check formatting
-        run: yarn format:check
+      - name: Show formatter diff for verified badge
+        run: |
+          yarn oxfmt app/javascript/mastodon/components/display_name/verified_badge.tsx app/javascript/mastodon/components/display_name/verified_badge.module.scss
+          git diff -- app/javascript/mastodon/components/display_name/verified_badge.tsx app/javascript/mastodon/components/display_name/verified_badge.module.scss
+          exit 1
