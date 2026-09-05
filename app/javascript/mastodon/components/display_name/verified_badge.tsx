@@ -10,7 +10,7 @@ export function hasVerifiedRole(account: DisplayNameProps['account']) {
     return false;
   }
 
-  if (account.verified_by_role === true) {
+  if (account.verified_by_role) {
     return true;
   }
 
