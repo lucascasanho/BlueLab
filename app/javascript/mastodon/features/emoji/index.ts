@@ -12,74 +12,172 @@ let worker: Worker | null = null;
 const log = emojiLogger('index');
 const workerLog = emojiLogger('worker');
 
-// Keep the custom emoji files warm before the picker is opened. This uses the
-// same URL variant as the picker and waits for decoding so opening the picker
-// can reuse the browser cache instead of painting temporary empty cells.
+type CustomEmojiAsset = { url: string; static_url: string };
+type EmojiPreloadPriority = 'low' | 'high';
+
+const CUSTOM_EMOJI_BACKGROUND_DELAY = 1_000;
+const CUSTOM_EMOJI_IMAGE_TIMEOUT = 3_000;
+const CUSTOM_EMOJI_FOREGROUND_TIMEOUT = 4_500;
+const CUSTOM_EMOJI_BACKGROUND_CONCURRENCY = 3;
+const CUSTOM_EMOJI_FOREGROUND_CONCURRENCY = 12;
+
+// Custom emoji assets are deliberately warmed only after the initial page has
+// finished loading. This keeps avatars, feed media and other user-visible
+// content ahead of the picker on the browser's network queue.
+const knownCustomEmojiUrls = new Set<string>();
 const preloadedCustomEmojiUrls = new Set<string>();
 const customEmojiPreloadImages = new Map<string, HTMLImageElement>();
 const customEmojiPreloadPromises = new Map<string, Promise<void>>();
-let customEmojiPreloadPromise = Promise.resolve();
+let customEmojiBackgroundPreloadScheduled = false;
 
-function preloadCustomEmojiImages(
-  emojis: Record<string, { url: string; static_url: string }>,
-) {
-  const pendingPreloads: Promise<void>[] = [];
-
+function rememberCustomEmojiImages(emojis: Record<string, CustomEmojiAsset>) {
   for (const emoji of Object.values(emojis)) {
     const url = autoPlayGif ? emoji.url : emoji.static_url;
-    if (!url) {
-      continue;
+    if (url) {
+      knownCustomEmojiUrls.add(url);
     }
-
-    const inFlight = customEmojiPreloadPromises.get(url);
-    if (inFlight) {
-      pendingPreloads.push(inFlight);
-      continue;
-    }
-
-    if (preloadedCustomEmojiUrls.has(url)) {
-      continue;
-    }
-
-    preloadedCustomEmojiUrls.add(url);
-
-    const image = new Image();
-    image.decoding = 'async';
-    customEmojiPreloadImages.set(url, image);
-
-    const preload = new Promise<void>((resolve) => {
-      image.onload = () => {
-        void image
-          .decode()
-          .catch(() => undefined)
-          .finally(resolve);
-      };
-      image.onerror = () => {
-        // Allow a later emoji refresh to retry assets that failed to preload.
-        preloadedCustomEmojiUrls.delete(url);
-        resolve();
-      };
-      image.src = url;
-    }).finally(() => {
-      image.onload = null;
-      image.onerror = null;
-      customEmojiPreloadImages.delete(url);
-      customEmojiPreloadPromises.delete(url);
-    });
-
-    customEmojiPreloadPromises.set(url, preload);
-    pendingPreloads.push(preload);
   }
-
-  customEmojiPreloadPromise = Promise.all(pendingPreloads).then(
-    () => undefined,
-  );
-
-  return customEmojiPreloadPromise;
 }
 
-export function waitForCustomEmojiImages() {
-  return customEmojiPreloadPromise;
+function preloadCustomEmojiImage(
+  url: string,
+  priority: EmojiPreloadPriority,
+): Promise<void> {
+  if (preloadedCustomEmojiUrls.has(url)) {
+    return Promise.resolve();
+  }
+
+  const existingPreload = customEmojiPreloadPromises.get(url);
+  if (existingPreload) {
+    return existingPreload;
+  }
+
+  const image = new Image();
+  image.decoding = 'async';
+  image.setAttribute('fetchpriority', priority);
+  customEmojiPreloadImages.set(url, image);
+
+  const preload = new Promise<void>((resolve) => {
+    let settled = false;
+    let timeoutId = 0;
+
+    const finish = (loaded: boolean) => {
+      if (settled) {
+        return;
+      }
+
+      settled = true;
+      window.clearTimeout(timeoutId);
+      if (loaded) {
+        preloadedCustomEmojiUrls.add(url);
+      }
+      resolve();
+    };
+
+    image.onload = () => {
+      // The network resource is already warm at this point. Wait for decode as
+      // well when possible so the picker can paint from cache immediately.
+      preloadedCustomEmojiUrls.add(url);
+      void image
+        .decode()
+        .catch(() => undefined)
+        .finally(() => finish(true));
+    };
+    image.onerror = () => finish(false);
+    timeoutId = window.setTimeout(
+      () => finish(false),
+      CUSTOM_EMOJI_IMAGE_TIMEOUT,
+    );
+    image.src = url;
+  }).finally(() => {
+    image.onload = null;
+    image.onerror = null;
+    if (!preloadedCustomEmojiUrls.has(url)) {
+      image.src = '';
+    }
+    customEmojiPreloadImages.delete(url);
+    customEmojiPreloadPromises.delete(url);
+  });
+
+  customEmojiPreloadPromises.set(url, preload);
+  return preload;
+}
+
+async function preloadPendingCustomEmojiImages(
+  priority: EmojiPreloadPriority,
+  concurrency: number,
+) {
+  const urls = Array.from(knownCustomEmojiUrls).filter(
+    (url) => !preloadedCustomEmojiUrls.has(url),
+  );
+
+  if (urls.length === 0) {
+    return;
+  }
+
+  let cursor = 0;
+  const workerCount = Math.min(concurrency, urls.length);
+  const workers = Array.from({ length: workerCount }, async () => {
+    while (cursor < urls.length) {
+      const url = urls[cursor++];
+      if (url) {
+        await preloadCustomEmojiImage(url, priority);
+      }
+    }
+  });
+
+  await Promise.all(workers);
+}
+
+function scheduleCustomEmojiImagePreload(
+  emojis: Record<string, CustomEmojiAsset>,
+) {
+  rememberCustomEmojiImages(emojis);
+
+  if (customEmojiBackgroundPreloadScheduled) {
+    return;
+  }
+
+  customEmojiBackgroundPreloadScheduled = true;
+
+  const schedule = () => {
+    const knownUrlCount = knownCustomEmojiUrls.size;
+    window.setTimeout(() => {
+      void preloadPendingCustomEmojiImages(
+        'low',
+        CUSTOM_EMOJI_BACKGROUND_CONCURRENCY,
+      ).finally(() => {
+        customEmojiBackgroundPreloadScheduled = false;
+
+        // If the emoji database changed while the background pass was active,
+        // queue one more low-priority pass for only the newly discovered URLs.
+        if (knownCustomEmojiUrls.size > knownUrlCount) {
+          scheduleCustomEmojiImagePreload({});
+        }
+      });
+    }, CUSTOM_EMOJI_BACKGROUND_DELAY);
+  };
+
+  if (document.readyState === 'complete') {
+    schedule();
+  } else {
+    window.addEventListener('load', schedule, { once: true });
+  }
+}
+
+export async function waitForCustomEmojiImages() {
+  // If the user opens the picker before the background warm-up has completed,
+  // temporarily increase concurrency. The hard cap prevents a single broken
+  // custom emoji URL from making the desktop picker appear to never open.
+  await Promise.race([
+    preloadPendingCustomEmojiImages(
+      'high',
+      CUSTOM_EMOJI_FOREGROUND_CONCURRENCY,
+    ),
+    new Promise<void>((resolve) => {
+      window.setTimeout(resolve, CUSTOM_EMOJI_FOREGROUND_TIMEOUT);
+    }),
+  ]);
 }
 
 // This is too short, but better to fallback quickly than wait.
@@ -207,7 +305,7 @@ async function loadEmojisToStore() {
 
   loadLocale(userLocale);
   await store.dispatch(loadCustomEmojis());
-  void preloadCustomEmojiImages(store.getState().emojis.custom);
+  scheduleCustomEmojiImagePreload(store.getState().emojis.custom);
 
   log('loaded emoji data into store');
 }
