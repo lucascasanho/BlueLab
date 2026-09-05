@@ -73,8 +73,9 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
       <polygon
         points='12,2 15.33,3.96 19.07,4.93 20.04,8.67 22,12 20.04,15.33 19.07,19.07 15.33,20.04 12,22 8.67,20.04 4.93,19.07 3.96,15.33 2,12 3.96,8.67 4.93,4.93 8.67,3.96'
         fill={`url(#${gradientId})`}
-        stroke='rgb(from var(--color-text-on-brand-base) r g b / 28%)'
+        stroke='var(--color-text-on-brand-base)'
         strokeLinejoin='round'
+        strokeOpacity='0.28'
         strokeWidth='0.65'
       />
       <path
