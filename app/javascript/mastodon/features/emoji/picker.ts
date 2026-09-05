@@ -1,5 +1,6 @@
 import type { CategoryName, CustomEmoji } from 'emoji-mart';
 
+import { autoPlayGif } from '@/mastodon/initial_state';
 import {
   createAppSelector,
   useAppSelector,
@@ -94,10 +95,21 @@ const selectPickerData = createAppSelector(
     }
 
     const customEmojis: CustomEmoji[] = [];
+    const staticEmojiFallbacks = new Map<string, string>();
     for (const shortcode in emojis) {
       const emoji = emojis[shortcode];
       if (!emoji) {
         continue;
+      }
+
+      const imageUrl =
+        (autoPlayGif ? emoji.url : emoji.static_url) ||
+        emoji.url ||
+        emoji.static_url;
+      const staticUrl = emoji.static_url || emoji.url;
+
+      if (imageUrl && staticUrl && imageUrl !== staticUrl) {
+        staticEmojiFallbacks.set(imageUrl, staticUrl);
       }
 
       customEmojis.push({
@@ -105,11 +117,10 @@ const selectPickerData = createAppSelector(
         id: shortcode,
         custom: true,
         short_names: [shortcode],
-        // The picker can keep dozens of custom emoji thumbnails mounted at
-        // once. Use the static thumbnail here so an open picker does not
-        // compete with timeline avatars and media for bandwidth/decoding.
-        // Rendered posts still follow the user's animation preference.
-        imageUrl: emoji.static_url || emoji.url,
+        // Restore Mastodon's normal animation preference in the picker. A
+        // lightweight static fallback is tracked separately so the UI never
+        // needs to show transparent lazy-load placeholders while scrolling.
+        imageUrl,
         customCategory: categoryMap.get(shortcode),
       } as CustomEmoji);
     }
@@ -119,6 +130,7 @@ const selectPickerData = createAppSelector(
 
     return {
       emojis: customEmojis,
+      staticEmojiFallbacks,
       categories: [
         'recent',
         'custom',
