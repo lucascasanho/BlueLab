@@ -308,15 +308,20 @@ class EmojiPickerDropdown extends PureComponent {
   };
 
   onShowDropdown = () => {
-    this.setState({ loading: true });
+    // Make the popover responsive immediately. Custom emoji image warm-up is
+    // deliberately concurrent so a large emoji library cannot delay first open.
+    this.setState({ active: true, loading: !EmojiPicker });
+    void waitForCustomEmojiImages().catch(() => undefined);
 
-    void Promise.all([loadEmojiPicker(), waitForCustomEmojiImages()])
-      .then(() => {
-        this.setState({ loading: false, active: true });
-      })
-      .catch(() => {
-        this.setState({ loading: false, active: false });
-      });
+    if (!EmojiPicker) {
+      void loadEmojiPicker()
+        .then(() => {
+          this.setState({ loading: false });
+        })
+        .catch(() => {
+          this.setState({ loading: false, active: false });
+        });
+    }
   };
 
   onHideDropdown = () => {
@@ -324,10 +329,10 @@ class EmojiPickerDropdown extends PureComponent {
   };
 
   onToggle = (e) => {
-    if (!this.state.loading && (!e.key || e.key === 'Enter')) {
+    if (!e.key || e.key === 'Enter') {
       if (this.state.active) {
         this.onHideDropdown();
-      } else {
+      } else if (!this.state.loading) {
         this.onShowDropdown(e);
       }
     }
