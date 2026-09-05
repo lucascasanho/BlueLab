@@ -14,7 +14,10 @@ import { usePickerEmojis } from './picker';
 
 const backgroundImageFnDefault = () => `${assetHost}/emoji/sheet_16_0.png`;
 
-function eagerLoadPickerCustomEmojiImages(root: ParentNode) {
+function preparePickerCustomEmojiImages(
+  root: ParentNode,
+  staticEmojiFallbacks: ReadonlyMap<string, string>,
+) {
   for (const image of root.querySelectorAll<HTMLImageElement>(
     'img.lazy[data-src]',
   )) {
@@ -23,14 +26,14 @@ function eagerLoadPickerCustomEmojiImages(root: ParentNode) {
       continue;
     }
 
-    // emoji-mart-lazyload intentionally leaves a transparent placeholder until
-    // IntersectionObserver sees each row. The application already warms these
-    // assets after the feed, so point every picker image at its real URL as
-    // soon as the picker DOM exists instead of waiting for scroll position.
-    image.loading = 'eager';
-    image.setAttribute('fetchpriority', 'high');
-    image.src = source;
-    image.classList.remove('lazy');
+    // emoji-mart-lazyload normally uses a transparent 1px placeholder until a
+    // custom emoji reaches the viewport. Replace that placeholder with the
+    // lightweight static thumbnail while preserving emoji-mart's lazy class and
+    // data-src. Its own IntersectionObserver can then swap visible entries to
+    // the preferred animated URL without downloading every animation at once.
+    image.decoding = 'async';
+    image.loading = 'lazy';
+    image.src = staticEmojiFallbacks.get(source) ?? source;
   }
 }
 
@@ -43,7 +46,7 @@ export const Picker: FC<PickerProps> = ({
   ...props
 }) => {
   const { mode } = useEmojiAppState();
-  const { categories, emojis } = usePickerEmojis();
+  const { categories, emojis, staticEmojiFallbacks } = usePickerEmojis();
 
   useLayoutEffect(() => {
     const pickerRoots = Array.from(
@@ -56,7 +59,7 @@ export const Picker: FC<PickerProps> = ({
 
     const hydrate = () => {
       for (const root of pickerRoots) {
-        eagerLoadPickerCustomEmojiImages(root);
+        preparePickerCustomEmojiImages(root, staticEmojiFallbacks);
       }
     };
 
@@ -66,9 +69,8 @@ export const Picker: FC<PickerProps> = ({
       return;
     }
 
-    // emoji-mart adds the remaining categories shortly after its first render.
-    // Observe only picker roots, never the feed, so this cannot alter avatar or
-    // media loading behaviour elsewhere in the interface.
+    // emoji-mart adds some categories after its first render. Observe only the
+    // picker subtree; feed avatars and media are deliberately outside this path.
     const observer = new MutationObserver(hydrate);
     for (const root of pickerRoots) {
       observer.observe(root, { childList: true, subtree: true });
@@ -77,7 +79,7 @@ export const Picker: FC<PickerProps> = ({
     return () => {
       observer.disconnect();
     };
-  }, [emojis]);
+  }, [emojis, staticEmojiFallbacks]);
 
   return (
     <PickerRaw
