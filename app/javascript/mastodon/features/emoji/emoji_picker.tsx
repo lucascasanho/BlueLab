@@ -1,3 +1,4 @@
+import { useLayoutEffect } from 'react';
 import type { FC } from 'react';
 
 import type { EmojiProps, PickerProps } from 'emoji-mart';
@@ -13,6 +14,26 @@ import { usePickerEmojis } from './picker';
 
 const backgroundImageFnDefault = () => `${assetHost}/emoji/sheet_16_0.png`;
 
+function eagerLoadPickerCustomEmojiImages(root: ParentNode) {
+  for (const image of root.querySelectorAll<HTMLImageElement>(
+    'img.lazy[data-src]',
+  )) {
+    const source = image.dataset.src;
+    if (!source) {
+      continue;
+    }
+
+    // emoji-mart-lazyload intentionally leaves a transparent placeholder until
+    // IntersectionObserver sees each row. The application already warms these
+    // assets after the feed, so point every picker image at its real URL as
+    // soon as the picker DOM exists instead of waiting for scroll position.
+    image.loading = 'eager';
+    image.setAttribute('fetchpriority', 'high');
+    image.src = source;
+    image.classList.remove('lazy');
+  }
+}
+
 export const Picker: FC<PickerProps> = ({
   set = 'twitter',
   sheetSize = 32,
@@ -23,6 +44,38 @@ export const Picker: FC<PickerProps> = ({
 }) => {
   const { mode } = useEmojiAppState();
   const { categories, emojis } = usePickerEmojis();
+
+  useLayoutEffect(() => {
+    const pickerRoots = Array.from(
+      document.querySelectorAll<HTMLElement>('.emoji-mart'),
+    );
+
+    if (pickerRoots.length === 0) {
+      return;
+    }
+
+    const hydrate = () => {
+      for (const root of pickerRoots) {
+        eagerLoadPickerCustomEmojiImages(root);
+      }
+    };
+
+    hydrate();
+
+    if (typeof MutationObserver === 'undefined') {
+      return;
+    }
+
+    // emoji-mart adds the remaining categories shortly after its first render.
+    // Observe only picker roots, never the feed, so this cannot alter avatar or
+    // media loading behaviour elsewhere in the interface.
+    const observer = new MutationObserver(hydrate);
+    for (const root of pickerRoots) {
+      observer.observe(root, { childList: true, subtree: true });
+    }
+
+    return () => observer.disconnect();
+  }, [emojis]);
 
   return (
     <PickerRaw
