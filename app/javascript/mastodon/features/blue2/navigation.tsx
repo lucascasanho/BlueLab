@@ -4,7 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { NavLink } from 'react-router-dom';
 
-import { HouseIcon, StackIcon } from '@phosphor-icons/react';
+import { StackIcon } from '@phosphor-icons/react';
 
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
@@ -87,21 +87,12 @@ export const Blue2Navigation: React.FC = () => {
   const collectionsPath = account?.acct
     ? `/@${account.acct}/collections`
     : '/home';
-  const homePath = signedIn ? '/home' : '/';
 
   return (
     <nav className={classes.root} aria-label='BLUE 2.0'>
       {signedIn && <Blue2AccountMenu />}
 
       <div className={classes.items}>
-        <Item
-          to={homePath}
-          exact
-          icon={HouseIcon}
-          className={classes.wideHomeItem}
-        >
-          <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
-        </Item>
         <Item to='/explore' icon={Blue2SearchIcon}>
           <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
         </Item>
