@@ -8,6 +8,7 @@ module Account::Avatar
   AVATAR_LIMIT = 8.megabytes
   AVATAR_DIMENSIONS = [400, 400].freeze
   AVATAR_GEOMETRY = [AVATAR_DIMENSIONS.first, AVATAR_DIMENSIONS.last].join('x')
+  DEFAULT_AVATAR_URL = '/avatars/original/missing.png'
 
   class_methods do
     def avatar_styles(file)
@@ -21,7 +22,11 @@ module Account::Avatar
 
   included do
     # Avatar upload
-    has_attached_file :avatar, styles: ->(f) { avatar_styles(f) }, convert_options: { all: '+profile "!icc,*" +set date:modify +set date:create +set date:timestamp' }, processors: [:lazy_thumbnail]
+    has_attached_file :avatar,
+                      styles: ->(f) { avatar_styles(f) },
+                      default_url: DEFAULT_AVATAR_URL,
+                      convert_options: { all: '+profile "!icc,*" +set date:modify +set date:create +set date:timestamp' },
+                      processors: [:lazy_thumbnail]
     validates_attachment_content_type :avatar, content_type: AVATAR_IMAGE_MIME_TYPES
     validates_attachment_size :avatar, less_than: AVATAR_LIMIT
     remotable_attachment :avatar, AVATAR_LIMIT, suppress_errors: false
