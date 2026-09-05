@@ -4,18 +4,54 @@
  * BlueLab twelfth refinement layer.
  *
  * The administrator palette is emitted at runtime through --blue2-* tokens.
- * Earlier BlueLab layers intentionally kept several cards, dialogs and admin
- * widgets on --blue2-bg, which meant the editable surface color was technically
- * present but barely visible. Keep the feed/page canvas on the background token
- * and route elevated/secondary UI through the surface token instead.
+ * BlueLab keeps its own structural dark palette, while the shared instance
+ * accent remains authoritative for buttons, links, focus states and details.
  */
+
+/*
+ * The generic instance dark defaults belong to Mastodon's standard themes and
+ * were overriding BlueLab's original black canvas after the runtime palette was
+ * introduced. Keep BlueLab's native dark surfaces authoritative. `!important`
+ * is deliberate here because the validated runtime style is emitted after the
+ * compiled theme. Explicit light mode continues to use the editable light
+ * palette, and the accent token is intentionally not pinned here.
+ */
+html[data-color-scheme='dark'] body[data-theme='blue-2'] {
+  --blue2-bg: #000 !important;
+  --blue2-surface: #000 !important;
+  --blue2-surface-raised: #101820 !important;
+  --blue2-search: #15202b !important;
+  --blue2-hover: #0c141b !important;
+  --blue2-border: #25313b !important;
+  --blue2-border-soft: #1c2730 !important;
+  --blue2-text: #f7f7f8 !important;
+  --blue2-muted: #9aa8b4 !important;
+  --blue2-muted-2: #6f7f8c !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-color-scheme='auto'] body[data-theme='blue-2'],
+  html:not([data-color-scheme]) body[data-theme='blue-2'] {
+    --blue2-bg: #000 !important;
+    --blue2-surface: #000 !important;
+    --blue2-surface-raised: #101820 !important;
+    --blue2-search: #15202b !important;
+    --blue2-hover: #0c141b !important;
+    --blue2-border: #25313b !important;
+    --blue2-border-soft: #1c2730 !important;
+    --blue2-text: #f7f7f8 !important;
+    --blue2-muted: #9aa8b4 !important;
+    --blue2-muted-2: #6f7f8c !important;
+  }
+}
+
 body[data-theme='blue-2'] {
-  /* Keep Mastodon's semantic aliases attached to the administrator palette. */
+  /* Keep Mastodon's semantic aliases attached to the BlueLab palette. */
   --color-bg: var(--blue2-bg);
   --color-bg-primary: var(--blue2-bg);
   --color-bg-ambient: var(--blue2-bg);
-  --color-bg-elevated: var(--blue2-surface);
-  --color-bg-secondary-base: var(--blue2-surface);
+  --color-bg-elevated: var(--blue2-surface-raised);
+  --color-bg-secondary-base: var(--blue2-surface-raised);
   --color-bg-secondary: var(--blue2-surface);
   --color-bg-secondary-solid: var(--blue2-surface);
   --color-fg: var(--blue2-text);
@@ -41,23 +77,34 @@ body[data-theme='blue-2'] {
     background: color-mix(in srgb, var(--blue2-blue) 35%, transparent);
   }
 
-  /* Cards, panels, menus and other elevated surfaces use the editable surface. */
+  /* Floating menus return to the native black canvas; true dialogs stay raised. */
   .dropdown-menu,
   .dropdown-menu__container,
   .dropdown-menu__container__list,
+  .privacy-dropdown__dropdown {
+    background: var(--blue2-bg) !important;
+    color: var(--blue2-text);
+    border-color: var(--blue2-border-soft) !important;
+  }
+
   .modal-root__modal,
   .confirmation-modal,
   .boost-modal,
   .report-dialog-modal,
-  .picture-in-picture,
-  .privacy-dropdown__dropdown,
+  .picture-in-picture {
+    background: var(--blue2-surface-raised) !important;
+    color: var(--blue2-text);
+    border-color: var(--blue2-border-soft) !important;
+  }
+
+  /* Feed cards keep the flat BlueLab canvas instead of Mastodon's purple surface. */
   .status-card,
   .account-card,
   .hero-widget,
   .box-widget,
   .landing-page__forms,
   .about__meta {
-    background: var(--blue2-surface) !important;
+    background: var(--blue2-bg) !important;
     color: var(--blue2-text);
     border-color: var(--blue2-border-soft) !important;
   }
@@ -69,7 +116,7 @@ body[data-theme='blue-2'] {
     background: var(--blue2-hover) !important;
   }
 
-  /* Rails administration/settings secondary containers follow the same token. */
+  /* Rails administration/settings secondary containers remain visually raised. */
   &.admin table,
   &.admin .batch-table,
   &.admin .batch-table__toolbar,
@@ -80,12 +127,12 @@ body[data-theme='blue-2'] {
   &.admin .directory__tag,
   &.admin .speech-bubble,
   &.admin .account-card {
-    background: var(--blue2-surface) !important;
+    background: var(--blue2-surface-raised) !important;
     color: var(--blue2-text) !important;
     border-color: var(--blue2-border-soft) !important;
   }
 
-  /* Inputs and informational secondary areas stay derived from surface + text. */
+  /* Inputs and informational secondary areas use BlueLab's search surface. */
   input,
   textarea,
   .search__input,
@@ -102,7 +149,7 @@ body[data-theme='blue-2'] {
     border-color: var(--blue2-border-soft) !important;
   }
 
-  /* Force primary/focus/selected details back through the editable accent. */
+  /* Force primary/focus/selected details through the editable accent. */
   .button:not(.button-secondary, .button-tertiary),
   button.button:not(.button-secondary, .button-tertiary),
   .account__relationship .button:not(.button-secondary, .button-tertiary),
