@@ -19,8 +19,5 @@ jobs:
       - name: Set up Javascript environment
         uses: ./.github/actions/setup-javascript
 
-      - name: Show exact BlueLab formatter output
-        run: |
-          yarn format app/javascript/styles/blue-2-v12.scss
-          git diff -- app/javascript/styles/blue-2-v12.scss
-          yarn format:check
+      - name: Check formatting
+        run: yarn format:check
