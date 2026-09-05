@@ -66,9 +66,10 @@ RSpec.describe 'Admin instance customization settings' do
     expect(response.parsed_body.at_css('input[name="form_instance_customization[email_dark_surface_color]"]')).to be_nil
   end
 
-  it 'emits every BlueLab runtime palette token from the editable instance colors' do
+  it 'emits browser-valid BlueLab runtime palette selectors and every editable token' do
     sign_in Fabricate(:admin_user)
-    Setting.instance_accent_color = '#2b8fcd'
+    Setting.theme = 'blue-2'
+    Setting.instance_accent_color = '#d52a96'
     Setting.instance_light_background_color = '#f6f8fa'
     Setting.instance_light_surface_color = '#e6ebf0'
     Setting.instance_light_text_color = '#20242a'
@@ -78,14 +79,19 @@ RSpec.describe 'Admin instance customization settings' do
 
     get admin_settings_instance_customization_path
 
-    runtime_style = response.parsed_body.css('style').find { |node| node.text.include?('--blue2-blue: #2b8fcd;') }
+    runtime_style = response.parsed_body.css('style').find { |node| node.text.include?('--blue2-blue: #d52a96;') }
 
+    expect(response.parsed_body.at_css('body')['data-theme']).to eq('blue-2')
     expect(runtime_style).to be_present
-    expect(runtime_style.text).to include('--color-bg-brand-soft: color-mix(in srgb, #2b8fcd 14%, transparent);')
+    expect(runtime_style.text).to include('--color-bg-brand-soft: color-mix(in srgb, #d52a96 14%, transparent);')
     expect(runtime_style.text).to include('--blue2-bg: #f6f8fa;', '--blue2-surface: #e6ebf0;', '--blue2-text: #20242a;')
     expect(runtime_style.text).to include('--blue2-bg: #101418;', '--blue2-surface: #15191d;', '--blue2-text: #f2f5f7;')
-    expect(runtime_style.text).to include("body[data-theme='blue-2']")
+    expect(runtime_style.text).to include('body[data-theme=blue-2]')
+    expect(runtime_style.text).to include('html[data-color-scheme=auto] body[data-theme=blue-2]')
     expect(runtime_style.text).to include('background: var(--blue2-hover);')
+    expect(response.body).to include('body[data-theme=blue-2]')
+    expect(response.body).to_not include('data-theme=&#39;blue-2&#39;')
+    expect(response.body).to_not include('data-color-scheme=&#39;auto&#39;')
   end
 
   it 'restores every customization with one action' do
