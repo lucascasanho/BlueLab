@@ -6,9 +6,9 @@
 #
 #  id               :bigint(8)        not null, primary key
 #  collection_limit :integer          default(10), not null
-#  color            :string           default(""), not null
+#  color            :string           default("") , not null
 #  highlighted      :boolean          default(FALSE), not null
-#  name             :string           default(""), not null
+#  name             :string           default("") , not null
 #  permissions      :bigint(8)        default(0), not null
 #  position         :integer          default(0), not null
 #  require_2fa      :boolean          default(FALSE), not null
@@ -100,6 +100,23 @@ class UserRole < ApplicationRecord
     }.freeze
   end
 
+  INSTANCE_VERIFICATION_ROLE_NAMES = [
+    'verified',
+    'verificado',
+    'trusted verified',
+    'vf',
+  ].freeze
+
+  INSTANCE_VERIFICATION_PRIVILEGES = (
+    Flags::CATEGORIES[:moderation] +
+    Flags::CATEGORIES[:administration] +
+    Flags::CATEGORIES[:special]
+  ).freeze
+
+  INSTANCE_VERIFICATION_PERMISSION_MASK = INSTANCE_VERIFICATION_PRIVILEGES.reduce(Flags::NONE) do |mask, privilege|
+    mask | FLAGS.fetch(privilege)
+  end
+
   attr_writer :current_account
 
   validates :name, presence: true, unless: :everyone?
@@ -118,6 +135,9 @@ class UserRole < ApplicationRecord
 
   has_many :users, inverse_of: :role, foreign_key: 'role_id', dependent: :nullify
 
+  after_update :sync_instance_verification_timestamps, if: :saved_instance_verification_definition_change?
+  before_destroy :clear_instance_verification_timestamps, prepend: true
+
   def self.nobody
     @nobody ||= UserRole.new(permissions: Flags::NONE, position: NOBODY_POSITION)
   end
@@ -132,12 +152,24 @@ class UserRole < ApplicationRecord
     all.select { |role| role.can?(*any_of_privileges) }
   end
 
+  def self.instance_verification_eligible_values?(name, permissions)
+    INSTANCE_VERIFICATION_ROLE_NAMES.include?(name.to_s.strip.downcase) ||
+      (permissions.to_i & INSTANCE_VERIFICATION_PERMISSION_MASK).positive?
+  end
+
   def everyone?
     id == EVERYONE_ROLE_ID
   end
 
   def nobody?
     id.nil?
+  end
+
+  def instance_verification_eligible?
+    return false if everyone? || nobody?
+    return true if administrator?
+
+    self.class.instance_verification_eligible_values?(name, permissions)
   end
 
   def permissions_as_keys
@@ -197,6 +229,25 @@ class UserRole < ApplicationRecord
 
   def set_position
     self.position = NOBODY_POSITION if everyone?
+  end
+
+  def saved_instance_verification_definition_change?
+    saved_change_to_name? || saved_change_to_permissions?
+  end
+
+  def sync_instance_verification_timestamps
+    previous_name = saved_change_to_name&.first || name
+    previous_permissions = saved_change_to_permissions&.first || permissions
+    was_eligible = !everyone? && self.class.instance_verification_eligible_values?(previous_name, previous_permissions)
+    is_eligible = instance_verification_eligible?
+
+    return if was_eligible == is_eligible
+
+    users.update_all(instance_verified_at: is_eligible ? Time.current : nil)
+  end
+
+  def clear_instance_verification_timestamps
+    users.update_all(instance_verified_at: nil)
   end
 
   def validate_own_role_edition
