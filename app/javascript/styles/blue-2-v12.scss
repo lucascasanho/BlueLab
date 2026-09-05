@@ -3,14 +3,12 @@
 /*
  * BlueLab twelfth refinement layer.
  *
- * The administrator palette is emitted at runtime through --blue2-* tokens.
- * Earlier BlueLab layers intentionally kept several cards, dialogs and admin
- * widgets on --blue2-bg, which meant the editable surface color was technically
- * present but barely visible. Keep the feed/page canvas on the background token
- * and route elevated/secondary UI through the surface token instead.
+ * All administrator-editable colors are injected at runtime through the
+ * --blue2-* tokens. The compiled theme keeps only layout/semantic mapping here;
+ * it must never pin dark/light palette values over those runtime tokens.
  */
 body[data-theme='blue-2'] {
-  /* Keep Mastodon's semantic aliases attached to the administrator palette. */
+  /* Main canvas, secondary surfaces and text follow the admin palette. */
   --color-bg: var(--blue2-bg);
   --color-bg-primary: var(--blue2-bg);
   --color-bg-ambient: var(--blue2-bg);
@@ -41,16 +39,20 @@ body[data-theme='blue-2'] {
     background: color-mix(in srgb, var(--blue2-blue) 35%, transparent);
   }
 
-  /* Cards, panels, menus and other elevated surfaces use the editable surface. */
+  /*
+   * The admin “surface” color explicitly controls cards, panels, menus and
+   * secondary areas. Keep the page/feed canvas on --blue2-bg and route these
+   * elevated pieces through --blue2-surface.
+   */
   .dropdown-menu,
   .dropdown-menu__container,
   .dropdown-menu__container__list,
+  .privacy-dropdown__dropdown,
   .modal-root__modal,
   .confirmation-modal,
   .boost-modal,
   .report-dialog-modal,
   .picture-in-picture,
-  .privacy-dropdown__dropdown,
   .status-card,
   .account-card,
   .hero-widget,
@@ -69,7 +71,7 @@ body[data-theme='blue-2'] {
     background: var(--blue2-hover) !important;
   }
 
-  /* Rails administration/settings secondary containers follow the same token. */
+  /* Rails administration/settings secondary containers use the same surface. */
   &.admin table,
   &.admin .batch-table,
   &.admin .batch-table__toolbar,
@@ -85,7 +87,7 @@ body[data-theme='blue-2'] {
     border-color: var(--blue2-border-soft) !important;
   }
 
-  /* Inputs and informational secondary areas stay derived from surface + text. */
+  /* Inputs/search derive from the selected surface + text palette at runtime. */
   input,
   textarea,
   .search__input,
@@ -102,7 +104,7 @@ body[data-theme='blue-2'] {
     border-color: var(--blue2-border-soft) !important;
   }
 
-  /* Force primary/focus/selected details back through the editable accent. */
+  /* Primary/focus/selected details follow the editable accent. */
   .button:not(.button-secondary, .button-tertiary),
   button.button:not(.button-secondary, .button-tertiary),
   .account__relationship .button:not(.button-secondary, .button-tertiary),
