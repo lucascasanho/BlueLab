@@ -1,5 +1,5 @@
 import { accountFactoryImmutable } from '@/testing/factories';
-import { render, screen } from '@/testing/rendering';
+import { fireEvent, render, screen } from '@/testing/rendering';
 
 import { DisplayName } from '../display_name';
 
@@ -64,5 +64,70 @@ describe('<DisplayName />', () => {
     const { container } = render(<DisplayName account={account} />);
 
     expect(container.querySelector('.display-name__locked')).toBeNull();
+  });
+
+  it('renders the instance verification badge immediately after the display name', () => {
+    const verifiedAccount = account.set('verified_by_role', true);
+    render(<DisplayName account={verifiedAccount} />);
+
+    const displayName = screen.getByText('Alice');
+    const badge = screen.getByRole('button', { name: 'Verified account' });
+
+    expect(displayName.nextElementSibling).toBe(badge);
+  });
+
+  it('supports the exact Verificado role as a backward-compatible fallback', () => {
+    const verifiedAccount = accountFactoryImmutable({
+      username: 'verified',
+      display_name: 'Verified',
+      roles: [{ id: '1', name: 'Verificado', color: '' }],
+    });
+    render(<DisplayName account={verifiedAccount} />);
+
+    expect(
+      screen.getByRole('button', { name: 'Verified account' }),
+    ).toBeTruthy();
+  });
+
+  it('does not infer verification from a differently-cased role name', () => {
+    const unverifiedAccount = accountFactoryImmutable({
+      username: 'unverified',
+      display_name: 'Unverified',
+      roles: [{ id: '1', name: 'verificado', color: '' }],
+    });
+    render(<DisplayName account={unverifiedAccount} />);
+
+    expect(
+      screen.queryByRole('button', { name: 'Verified account' }),
+    ).toBeNull();
+  });
+
+  it('opens an accessible popover with the persisted verification date', () => {
+    const verifiedAccount = account
+      .set('verified_by_role', true)
+      .set('verified_by_role_since', '2026-09-05T12:00:00.000Z');
+    render(<DisplayName account={verifiedAccount} />, { locale: 'en' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Verified account' }));
+
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    expect(screen.getByText(/Verified since:/)).toBeTruthy();
+  });
+
+  it('uses a distinct SVG gradient for every rendered badge', () => {
+    const verifiedAccount = account.set('verified_by_role', true);
+    const { container } = render(
+      <>
+        <DisplayName account={verifiedAccount} />
+        <DisplayName account={verifiedAccount.set('id', '2')} />
+      </>,
+    );
+    const gradientIds = Array.from(
+      container.querySelectorAll('linearGradient[id^="bluelab-verified-"]'),
+      (gradient) => gradient.id,
+    );
+
+    expect(gradientIds).toHaveLength(2);
+    expect(new Set(gradientIds).size).toBe(gradientIds.length);
   });
 });

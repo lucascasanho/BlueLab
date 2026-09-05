@@ -179,12 +179,16 @@ class REST::AccountSerializer < ActiveModel::Serializer
   def verified_by_role
     return false if object.unavailable?
 
-    object.user_role&.name.to_s.strip == 'Verificado'
+    object.user_role&.verified_by_instance? || false
   end
 
   def verified_by_role_since
     return unless verified_by_role
 
+    object.verified_by_role_since || latest_verified_role_assignment
+  end
+
+  def latest_verified_role_assignment
     user = object.user
     return if user.nil?
 

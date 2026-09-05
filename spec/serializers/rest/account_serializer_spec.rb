@@ -47,6 +47,24 @@ RSpec.describe REST::AccountSerializer do
       let(:role) { Fabricate(:user_role, name: 'Verificado', highlighted: false) }
 
       before do
+        account.update!(verified_by_role_since: default_datetime)
+      end
+
+      it 'marks the account as verified' do
+        expect(subject['verified_by_role']).to be true
+      end
+
+      it 'exposes the persisted verification date' do
+        expect(subject).to include(
+          'verified_by_role_since' => match_api_datetime_format
+        )
+      end
+    end
+
+    context 'when a persisted date is unavailable for a previously verified account' do
+      let(:role) { Fabricate(:user_role, name: 'Verificado', highlighted: false) }
+
+      before do
         Admin::ActionLog.create!(
           account: current_user.account,
           action: 'change_role',
@@ -56,26 +74,14 @@ RSpec.describe REST::AccountSerializer do
         )
       end
 
-      it 'marks the account as verified' do
-        expect(subject['verified_by_role']).to be true
-      end
-
-      it 'exposes the most recent moderation role-change date' do
+      it 'preserves the verification date from the moderation audit history' do
         expect(subject).to include(
           'verified_by_role_since' => match_api_datetime_format
         )
       end
     end
 
-    context 'when the account role only contains Verificado as part of its name' do
-      let(:role) { Fabricate(:user_role, name: 'Usuário Verificado', highlighted: true) }
-
-      it 'does not mark the account as verified' do
-        expect(subject['verified_by_role']).to be false
-      end
-    end
-
-    context 'when the account role differs by letter case' do
+    context 'when the account role differs from Verificado by case' do
       let(:role) { Fabricate(:user_role, name: 'verificado', highlighted: true) }
 
       it 'does not mark the account as verified' do
@@ -83,14 +89,102 @@ RSpec.describe REST::AccountSerializer do
       end
     end
 
-    context 'when the account role does not contain Verificado' do
+    context 'when the account role has administrator privileges' do
+      let(:role) do
+        Fabricate(
+          :user_role,
+          name: 'Owner',
+          permissions: UserRole::FLAGS[:administrator],
+          highlighted: false
+        )
+      end
+
+      it 'marks the account as verified' do
+        expect(subject['verified_by_role']).to be true
+      end
+    end
+
+    context 'when the account role has a moderation privilege' do
+      let(:role) do
+        Fabricate(
+          :user_role,
+          name: 'Community team',
+          permissions: UserRole::FLAGS[:manage_reports],
+          highlighted: false
+        )
+      end
+
+      it 'marks the account as verified' do
+        expect(subject['verified_by_role']).to be true
+      end
+    end
+
+    context 'when the account role has an administration privilege' do
+      let(:role) do
+        Fabricate(
+          :user_role,
+          name: 'Configuration team',
+          permissions: UserRole::FLAGS[:manage_settings],
+          highlighted: false
+        )
+      end
+
+      it 'marks the account as verified' do
+        expect(subject['verified_by_role']).to be true
+      end
+    end
+
+    context 'when the account role only contains Verificado as part of its name' do
+      let(:role) { Fabricate(:user_role, name: 'Usuário Verificado especial', highlighted: true) }
+
+      it 'does not mark the account as verified' do
+        expect(subject['verified_by_role']).to be false
+      end
+    end
+
+    context 'when the account role is named Administrador but grants no privilege' do
+      let(:role) { Fabricate(:user_role, name: 'Administrador', highlighted: true) }
+
+      it 'does not mark the account as verified' do
+        expect(subject['verified_by_role']).to be false
+      end
+    end
+
+    context 'when the account role is named Moderador but grants no privilege' do
       let(:role) { Fabricate(:user_role, name: 'Moderador', highlighted: true) }
 
       it 'does not mark the account as verified' do
         expect(subject['verified_by_role']).to be false
       end
+    end
 
-      it 'does not expose a verification date' do
+    context 'when the account role only has a non-moderation privilege' do
+      let(:role) do
+        Fabricate(
+          :user_role,
+          name: 'Inviter',
+          permissions: UserRole::FLAGS[:invite_users],
+          highlighted: false
+        )
+      end
+
+      it 'does not mark the account as verified' do
+        expect(subject['verified_by_role']).to be false
+      end
+    end
+
+    context 'when the account role is not eligible' do
+      let(:role) { Fabricate(:user_role, name: 'Community member', highlighted: true) }
+
+      before do
+        account.update!(verified_by_role_since: default_datetime)
+      end
+
+      it 'does not mark the account as verified' do
+        expect(subject['verified_by_role']).to be false
+      end
+
+      it 'does not expose a stale verification date' do
         expect(subject['verified_by_role_since']).to be_nil
       end
     end

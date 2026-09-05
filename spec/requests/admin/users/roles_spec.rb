@@ -42,5 +42,24 @@ RSpec.describe 'Admin Users Roles' do
       expect(response)
         .to have_http_status(400)
     end
+
+    it 'records when an eligible role is assigned' do
+      verified_role = Fabricate(:user_role, name: 'Verificado')
+
+      expect do
+        put admin_user_role_path(user.id), params: { user: { role_id: verified_role.id } }
+      end.to change { user.account.reload.verified_by_role_since }.from(nil).to(be_present)
+    end
+
+    it 'clears the date when an eligible role is removed' do
+      verified_role = Fabricate(:user_role, name: 'Verificado')
+      common_role = Fabricate(:user_role, name: 'Community member')
+      user.update!(role: verified_role)
+      user.account.update!(verified_by_role_since: 1.day.ago)
+
+      expect do
+        put admin_user_role_path(user.id), params: { user: { role_id: common_role.id } }
+      end.to change { user.account.reload.verified_by_role_since }.to(nil)
+    end
   end
 end
