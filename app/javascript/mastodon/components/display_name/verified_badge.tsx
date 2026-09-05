@@ -1,7 +1,7 @@
 import { useCallback, useId, useState } from 'react';
 import type { FC, KeyboardEvent, MouseEvent } from 'react';
 
-import { defineMessages, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 
 import { domain, title as instanceTitle } from 'mastodon/initial_state';
 
@@ -12,25 +12,22 @@ import classes from './verified_badge.module.scss';
 
 const VERIFIED_ROLE_NAME = 'Verificado';
 
-const messages = defineMessages({
-  title: {
-    id: 'account.verified_badge.title',
-    defaultMessage: 'Verified account',
+const copy = {
+  en: {
+    title: 'Verified account',
+    description: (instance: string) =>
+      `This account was verified by the moderation team of ${instance}.`,
+    since: (date: string) => `Verified since: ${date}`,
+    sinceUnknown: 'Verification date not recorded',
   },
-  description: {
-    id: 'account.verified_badge.description',
-    defaultMessage:
-      'This account was verified by the moderation team of {instance}.',
+  pt: {
+    title: 'Conta verificada',
+    description: (instance: string) =>
+      `Esta conta foi verificada pela moderação de ${instance}.`,
+    since: (date: string) => `Verificado desde: ${date}`,
+    sinceUnknown: 'Data da verificação não registrada',
   },
-  since: {
-    id: 'account.verified_badge.since',
-    defaultMessage: 'Verified since: {date}',
-  },
-  sinceUnknown: {
-    id: 'account.verified_badge.since_unknown',
-    defaultMessage: 'Verification date not recorded',
-  },
-});
+} as const;
 
 export function hasVerifiedRole(account: DisplayNameProps['account']) {
   if (!account) {
@@ -90,33 +87,26 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
     return null;
   }
 
-  const isPortuguese = intl.locale.toLowerCase().startsWith('pt');
+  const language = intl.locale.toLowerCase().split(/[-_]/)[0];
+  const localizedCopy = language === 'pt' ? copy.pt : copy.en;
   const instanceName = instanceTitle ?? domain ?? 'Mastodon';
   const verifiedAt = account.verified_by_role_since
     ? new Date(account.verified_by_role_since)
     : null;
-  const hasValidDate = verifiedAt && !Number.isNaN(verifiedAt.getTime());
-  const formattedDate = hasValidDate
-    ? intl.formatDate(verifiedAt, {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      })
-    : null;
+  const formattedDate =
+    verifiedAt && !Number.isNaN(verifiedAt.getTime())
+      ? intl.formatDate(verifiedAt, {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        })
+      : null;
 
-  const titleText = isPortuguese
-    ? 'Conta verificada'
-    : intl.formatMessage(messages.title);
-  const descriptionText = isPortuguese
-    ? `Esta conta foi verificada pela moderação de ${instanceName}.`
-    : intl.formatMessage(messages.description, { instance: instanceName });
+  const titleText = localizedCopy.title;
+  const descriptionText = localizedCopy.description(instanceName);
   const sinceText = formattedDate
-    ? isPortuguese
-      ? `Verificado desde: ${formattedDate}`
-      : intl.formatMessage(messages.since, { date: formattedDate })
-    : isPortuguese
-      ? 'Data da verificação não registrada'
-      : intl.formatMessage(messages.sinceUnknown);
+    ? localizedCopy.since(formattedDate)
+    : localizedCopy.sinceUnknown;
 
   return (
     <>
@@ -147,7 +137,10 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
               y2='22'
               gradientUnits='userSpaceOnUse'
             >
-              <stop offset='0' stopColor='var(--color-text-brand-soft)' />
+              <stop
+                offset='0'
+                stopColor='var(--color-text-brand-soft, var(--color-text-brand))'
+              />
               <stop offset='0.5' stopColor='var(--color-bg-brand-base)' />
               <stop offset='1' stopColor='var(--color-text-brand)' />
             </linearGradient>
