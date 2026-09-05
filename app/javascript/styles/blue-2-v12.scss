@@ -10,6 +10,14 @@
  * and route elevated/secondary UI through the surface token instead.
  */
 body[data-theme='blue-2'] {
+  /*
+   * BlueLab custom React modules historically compiled a few literal Bluesky
+   * blues. Bind the theme's accent layer to the saved instance value first so
+   * every --blue2-blue consumer resolves to the administrator-selected accent.
+   */
+  --blue2-blue: var(--bluelab-instance-accent, #0085ff);
+  --blue2-blue-hover: color-mix(in srgb, var(--blue2-blue), black 15%);
+
   /* Keep Mastodon's semantic aliases attached to the administrator palette. */
   --color-bg: var(--blue2-bg);
   --color-bg-primary: var(--blue2-bg);
@@ -36,6 +44,10 @@ body[data-theme='blue-2'] {
   --color-border-primary: var(--blue2-border-soft);
   --color-border-strong: var(--blue2-border);
   --color-border-brand: var(--blue2-blue);
+
+  ::selection {
+    background: color-mix(in srgb, var(--blue2-blue) 35%, transparent);
+  }
 
   /* Cards, panels, menus and other elevated surfaces use the editable surface. */
   .dropdown-menu,
