@@ -117,15 +117,6 @@ module ThemeHelper
         --color-bg-brand-soft: color-mix(in srgb, #{accent} 14%, transparent);
         --color-bg-brand-softest: color-mix(in srgb, #{accent} 8%, transparent);
       }
-
-      /* Feed tabs are implemented by a CSS Module that used a compiled BlueLab
-         blue. Override only the Following/Global indicator at runtime so the
-         administrator-selected accent stays authoritative even with stale assets. */
-      body[data-theme=blue-2] main > header > a[href$=home]::after,
-      body[data-theme=blue-2] main > header > a[href$=public]::after {
-        background: #{accent} !important;
-      }
-
       body[data-theme=blue-2] ::selection {
         background: color-mix(in srgb, #{accent}, transparent 65%);
       }
