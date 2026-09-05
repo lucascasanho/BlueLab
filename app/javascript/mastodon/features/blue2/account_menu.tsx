@@ -127,12 +127,13 @@ export const Blue2AccountMenu: React.FC = () => {
 
       <button
         type='button'
-        className={classes.compactHomeButton}
+        className={classes.homeButton}
         onClick={goHome}
         aria-label={homeLabel}
         title={homeLabel}
       >
         <HouseIcon size={27} />
+        <span>{homeLabel}</span>
       </button>
 
       {open && (
