@@ -74,7 +74,9 @@ export const Picker: FC<PickerProps> = ({
       observer.observe(root, { childList: true, subtree: true });
     }
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, [emojis]);
 
   return (
