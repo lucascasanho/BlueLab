@@ -62,11 +62,13 @@ export const ComposeEmojiButton: React.FC<{ onPick: OnEmojiPick }> = ({
       return;
     }
 
-    void Promise.all([emojiPickerModule, waitForCustomEmojiImages()])
-      .then(() => {
-        onTrue();
-      })
-      .catch(() => undefined);
+    // Opening the picker must never wait for every custom emoji image to warm.
+    // The picker bundle is already requested when this module loads, and
+    // Suspense can cover the rare case where it is still being evaluated.
+    // Continue warming custom emoji images concurrently after the popover is
+    // visible so first-open latency is independent of emoji count or network.
+    onTrue();
+    void waitForCustomEmojiImages().catch(() => undefined);
   }, [onFalse, onTrue, open]);
 
   return (
