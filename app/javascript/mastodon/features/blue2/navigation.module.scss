@@ -128,9 +128,8 @@
   }
 }
 
-// Keep every navigation entry on the same rendering path when the BlueLab
-// shell collapses its navigation column. Home is the first item in .items, so
-// compact mode naturally renders account/profile -> Home -> Search.
+// In compact BlueLab rail geometry, Home is owned by Blue2AccountMenu directly
+// below the account control. Hide this wide-list copy to keep one Home action.
 @media (width < 1180px) {
   .root {
     width: 76px;
@@ -140,6 +139,10 @@
 
   .avatarLink {
     margin-inline: 0;
+  }
+
+  .wideHomeItem {
+    display: none;
   }
 
   .item {
