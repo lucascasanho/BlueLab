@@ -179,7 +179,7 @@ class REST::AccountSerializer < ActiveModel::Serializer
   def verified_by_role
     return false if object.unavailable? || object.user.nil?
 
-    object.user.role&.name.to_s.strip.casecmp?('verificado')
+    object.user.role&.name.to_s.strip.downcase.include?('verificado')
   end
 
   def roles
