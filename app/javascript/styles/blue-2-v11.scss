@@ -150,6 +150,42 @@ body[data-theme='blue-2'].layout-multiple-columns {
 }
 
 /*
+ * Portrait phones use the visible viewport as the source of truth at all times,
+ * not only after keyboard detection. This keeps the composer anchored at the
+ * top and guarantees that its footer remains inside the area above the virtual
+ * keyboard even on browsers where the layout viewport itself does not resize.
+ */
+@media (orientation: portrait) and (width <= 759px) {
+  body[data-theme='blue-2'] form[data-bluelab-composer][role='dialog'],
+  body[data-theme='blue-2']
+    form[data-bluelab-composer][role='dialog'][data-keyboard-open] {
+    --bluelab-composer-top-gap: max(8px, env(safe-area-inset-top));
+
+    box-sizing: border-box !important;
+    top: var(--bluelab-composer-top-gap) !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: auto !important;
+    width: auto !important;
+    max-width: none !important;
+    height: calc(
+      var(--composer-visual-viewport-height, 100dvh) -
+        var(--bluelab-composer-top-gap) - 8px
+    ) !important;
+    min-height: 0 !important;
+    max-height: calc(
+      var(--composer-visual-viewport-height, 100dvh) -
+        var(--bluelab-composer-top-gap) - 8px
+    ) !important;
+    margin: 0 !important;
+    padding-top: var(--space-sm) !important;
+    border: 1px solid var(--blue2-border-soft) !important;
+    border-radius: 16px !important;
+    transform: none !important;
+  }
+}
+
+/*
  * BlueLab uses the desktop/single-column shell on wide phone and tablet
  * landscape viewports. Restore the same compose FAB available in portrait and
  * make the real Home entry unconditionally visible above Search in that rail.
