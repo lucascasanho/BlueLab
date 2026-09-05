@@ -42,10 +42,8 @@
 
     = yield :header_tags
 
-    -# Keep administrator-selected palette tokens last so page-specific assets cannot override them.
+    -# Keep instance palette tokens last, then bridge the saved accent into BlueLab's own semantic token.
     = instance_customization_styles
-    -# BlueLab custom components use their own semantic accent token. Keep it
-    -# sourced from the saved instance accent instead of compiled blue literals.
     = render 'layouts/bluelab_instance_accent'
 
   %body{ class: body_classes, data: { theme: current_theme } }
