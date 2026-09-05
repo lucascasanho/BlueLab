@@ -42,6 +42,32 @@ RSpec.describe REST::AccountSerializer do
     end
   end
 
+  describe '#verified_by_role' do
+    context 'when the account role is Verificado but is not highlighted' do
+      let(:role) { Fabricate(:user_role, name: 'Verificado', highlighted: false) }
+
+      it 'marks the account as verified' do
+        expect(subject['verified_by_role']).to be true
+      end
+    end
+
+    context 'when the account role contains Verificado' do
+      let(:role) { Fabricate(:user_role, name: 'Usuário Verificado', highlighted: true) }
+
+      it 'marks the account as verified' do
+        expect(subject['verified_by_role']).to be true
+      end
+    end
+
+    context 'when the account role does not contain Verificado' do
+      let(:role) { Fabricate(:user_role, name: 'Moderador', highlighted: true) }
+
+      it 'does not mark the account as verified' do
+        expect(subject['verified_by_role']).to be false
+      end
+    end
+  end
+
   context 'when the account is memorialized' do
     before do
       account.memorialize!
