@@ -76,6 +76,10 @@
   display: flex;
 }
 
+.compactHomeItem {
+  display: none;
+}
+
 .trendingIcon,
 .trendingIcon path {
   fill: currentColor !important;
@@ -133,8 +137,8 @@
 }
 
 // Keep the navigation contents compact whenever the BlueLab shell collapses
-// its navigation column to 76px. Home is a single real item in .items and must
-// remain the first action immediately above Search.
+// its navigation column to 76px. In this geometry, the dedicated Home shortcut
+// is rendered immediately after the account control and before Search.
 @media (width < 1180px) {
   .root {
     width: 76px;
@@ -146,8 +150,7 @@
     margin-inline: 0;
   }
 
-  .item,
-  .homeItem {
+  .item {
     width: 48px;
     height: 48px;
     min-height: 48px;
@@ -157,6 +160,53 @@
 
     > span:not(.badge) {
       display: none;
+    }
+  }
+
+  .homeItem {
+    display: none;
+  }
+
+  .compactHomeItem {
+    box-sizing: border-box;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    flex: 0 0 48px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--blue2-text, #f7f7f8) !important;
+    text-decoration: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+
+    > span {
+      display: none;
+    }
+
+    svg {
+      display: block !important;
+      width: 29px;
+      height: 29px;
+      flex: 0 0 29px;
+      color: currentColor !important;
+      fill: currentColor;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+
+    &:hover,
+    &:focus-visible {
+      background: var(--blue2-hover, #111820);
+      color: var(--blue2-text, #f7f7f8) !important;
+      outline: none;
     }
   }
 
