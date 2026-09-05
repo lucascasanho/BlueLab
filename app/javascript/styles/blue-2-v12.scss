@@ -1,0 +1,136 @@
+@use 'blue-2-v11';
+
+/*
+ * BlueLab twelfth refinement layer.
+ *
+ * The administrator palette is emitted at runtime through --blue2-* tokens.
+ * Earlier BlueLab layers intentionally kept several cards, dialogs and admin
+ * widgets on --blue2-bg, which meant the editable surface color was technically
+ * present but barely visible. Keep the feed/page canvas on the background token
+ * and route elevated/secondary UI through the surface token instead.
+ */
+body[data-theme='blue-2'] {
+  /* Keep Mastodon's semantic aliases attached to the administrator palette. */
+  --color-bg: var(--blue2-bg);
+  --color-bg-primary: var(--blue2-bg);
+  --color-bg-ambient: var(--blue2-bg);
+  --color-bg-elevated: var(--blue2-surface);
+  --color-bg-secondary-base: var(--blue2-surface);
+  --color-bg-secondary: var(--blue2-surface);
+  --color-bg-secondary-solid: var(--blue2-surface);
+  --color-fg: var(--blue2-text);
+  --color-text-primary: var(--blue2-text);
+  --color-text-secondary: var(--blue2-muted);
+  --color-text-tertiary: var(--blue2-muted-2);
+  --color-text-brand: var(--blue2-blue);
+  --color-text-brand-soft: var(--blue2-blue);
+  --color-text-status-links: var(--blue2-blue);
+  --color-bg-brand-base: var(--blue2-blue);
+  --color-bg-brand-base-hover: var(--blue2-blue-hover);
+  --color-bg-brand-soft: color-mix(in srgb, var(--blue2-blue) 14%, transparent);
+  --color-bg-brand-softest: color-mix(
+    in srgb,
+    var(--blue2-blue) 8%,
+    transparent
+  );
+  --color-border-primary: var(--blue2-border-soft);
+  --color-border-strong: var(--blue2-border);
+  --color-border-brand: var(--blue2-blue);
+
+  /* Cards, panels, menus and other elevated surfaces use the editable surface. */
+  .dropdown-menu,
+  .dropdown-menu__container,
+  .dropdown-menu__container__list,
+  .modal-root__modal,
+  .confirmation-modal,
+  .boost-modal,
+  .report-dialog-modal,
+  .picture-in-picture,
+  .privacy-dropdown__dropdown,
+  .status-card,
+  .account-card,
+  .hero-widget,
+  .box-widget,
+  .landing-page__forms,
+  .about__meta {
+    background: var(--blue2-surface) !important;
+    color: var(--blue2-text);
+    border-color: var(--blue2-border-soft) !important;
+  }
+
+  .dropdown-menu__item a:hover,
+  .dropdown-menu__item button:hover,
+  .dropdown-menu__item button:focus,
+  .status-card:hover {
+    background: var(--blue2-hover) !important;
+  }
+
+  /* Rails administration/settings secondary containers follow the same token. */
+  &.admin table,
+  &.admin .batch-table,
+  &.admin .batch-table__toolbar,
+  &.admin .filters,
+  &.admin .dashboard__counters,
+  &.admin .dashboard__widgets,
+  &.admin .announcements-list,
+  &.admin .directory__tag,
+  &.admin .speech-bubble,
+  &.admin .account-card {
+    background: var(--blue2-surface) !important;
+    color: var(--blue2-text) !important;
+    border-color: var(--blue2-border-soft) !important;
+  }
+
+  /* Inputs and informational secondary areas stay derived from surface + text. */
+  input,
+  textarea,
+  .search__input,
+  .setting-text,
+  .compose-form__autosuggest-wrapper textarea,
+  &.admin .content input,
+  &.admin .content textarea,
+  &.admin .content select,
+  &.admin .callout,
+  &.admin .flash-message,
+  aside[data-variant] {
+    background: var(--blue2-search) !important;
+    color: var(--blue2-text) !important;
+    border-color: var(--blue2-border-soft) !important;
+  }
+
+  /* Force primary/focus/selected details back through the editable accent. */
+  .button:not(.button-secondary, .button-tertiary),
+  button.button:not(.button-secondary, .button-tertiary),
+  .account__relationship .button:not(.button-secondary, .button-tertiary),
+  .account__header__tabs__buttons
+    .button:not(.button-secondary, .button-tertiary),
+  button[data-bluelab-compose='true'],
+  .blue2-auth-panel .blue2-login-submit,
+  .blue2-auth-panel .js-passkey-authentication {
+    background: var(--blue2-blue) !important;
+  }
+
+  .button:not(.button-secondary, .button-tertiary):hover,
+  button.button:not(.button-secondary, .button-tertiary):hover,
+  .account__relationship
+    .button:not(.button-secondary, .button-tertiary):hover,
+  .account__header__tabs__buttons
+    .button:not(.button-secondary, .button-tertiary):hover,
+  button[data-bluelab-compose='true']:hover,
+  button[data-bluelab-compose='true']:focus-visible,
+  .blue2-auth-panel .blue2-login-submit:hover,
+  .blue2-auth-panel .blue2-login-submit:focus-visible,
+  .blue2-auth-panel .js-passkey-authentication:hover,
+  .blue2-auth-panel .js-passkey-authentication:focus-visible {
+    background: var(--blue2-blue-hover) !important;
+  }
+
+  .simple_form input:focus,
+  .simple_form textarea:focus,
+  .simple_form select:focus,
+  button[data-bluelab-compose='true']:focus-visible,
+  .blue2-auth-intro__brand:focus-visible {
+    border-color: var(--blue2-blue) !important;
+    outline-color: var(--blue2-blue) !important;
+  }
+}
