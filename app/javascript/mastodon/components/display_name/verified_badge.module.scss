@@ -55,17 +55,32 @@
   line-height: 24px;
 }
 
-.description,
-.since {
+.detailRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  & + & {
+    margin-top: 12px;
+  }
+}
+
+.detailText {
+  min-width: 0;
   margin: 0;
   color: var(--color-text-secondary);
 }
 
-.since {
-  margin-top: 12px;
+.detailVerificationIcon,
+.detailIcon {
+  display: block;
+  flex: 0 0 auto;
+  width: 1em;
+  height: 1em;
+  margin-top: 2px;
+  overflow: visible;
 }
 
-.instance {
-  color: var(--color-text-primary);
-  font-weight: 500;
+.detailIcon {
+  color: var(--color-text-brand);
 }
