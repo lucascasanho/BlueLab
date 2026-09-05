@@ -25,4 +25,14 @@ RSpec.describe AccountUsernameReservation do
 
     expect(account.username_reservations.sole.username).to eq('application.internal')
   end
+
+  it 'lets an application actor reclaim an orphaned reservation' do
+    original_account = Fabricate(:account, username: 'application.internal')
+    reservation = original_account.username_reservations.sole
+    original_account.destroy!
+
+    application_account = Fabricate(:account, actor_type: 'Application', username: 'application.internal')
+
+    expect(reservation.reload).to have_attributes(account: application_account, relinquished_at: nil)
+  end
 end
