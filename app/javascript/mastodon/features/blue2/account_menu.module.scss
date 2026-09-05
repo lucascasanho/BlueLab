@@ -1,11 +1,11 @@
 .root {
   position: relative;
   z-index: 12;
-  flex: 0 0 54px;
+  flex: 0 0 104px;
   width: 216px;
-  height: 54px;
-  min-height: 54px;
-  margin-bottom: 8px;
+  height: 104px;
+  min-height: 104px;
+  margin-bottom: 1px;
   overflow: visible;
   cursor: pointer;
 }
@@ -107,8 +107,43 @@
   opacity: 1;
 }
 
-.compactHomeButton {
-  display: none;
+.homeButton {
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 1;
+  top: 60px;
+  left: 0;
+  width: 216px;
+  min-height: 42px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  color: var(--blue2-text, #f7f7f8);
+  font: inherit;
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 400;
+  text-align: start;
+  cursor: pointer;
+
+  svg {
+    width: 27px;
+    height: 27px;
+    flex: 0 0 27px;
+    display: block;
+    color: currentColor;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: var(--blue2-hover, #111820);
+    color: var(--blue2-text, #f7f7f8);
+    outline: none;
+  }
 }
 
 .menu {
@@ -162,10 +197,6 @@
   }
 }
 
-// The account control owns the first two compact rail slots: account/profile
-// followed by Home. Because the navigation itself is a flex column, reserve
-// both slots through flex-basis/min-height as well as height so this block
-// cannot shrink and let the Search item overlap the Home button.
 @media (width < 1180px) {
   .root {
     flex: 0 0 110px;
@@ -191,35 +222,18 @@
     opacity: 0;
   }
 
-  .compactHomeButton {
-    box-sizing: border-box;
-    position: absolute;
-    z-index: 1;
+  .homeButton {
     top: 58px;
     left: 2px;
     width: 48px;
     height: 48px;
+    min-height: 48px;
     padding: 0;
-    border: 0;
-    border-radius: 9px;
-    display: grid;
-    place-items: center;
-    background: transparent;
-    color: var(--blue2-text, #f7f7f8);
-    cursor: pointer;
+    justify-content: center;
+    gap: 0;
 
-    svg {
-      width: 27px;
-      height: 27px;
-      display: block;
-      color: currentColor;
-    }
-
-    &:hover,
-    &:focus-visible {
-      background: var(--blue2-hover, #111820);
-      color: var(--blue2-text, #f7f7f8);
-      outline: none;
+    > span {
+      display: none;
     }
   }
 
