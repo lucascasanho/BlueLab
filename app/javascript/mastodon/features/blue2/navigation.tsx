@@ -22,7 +22,6 @@ import {
   Blue2BookmarkIcon,
   Blue2ComposeIcon,
   Blue2FeedIcon,
-  Blue2HomeIcon,
   Blue2ListIcon,
   Blue2MessageIcon,
   Blue2ProfileIcon,
@@ -94,33 +93,8 @@ export const Blue2Navigation: React.FC = () => {
     <nav className={classes.root} aria-label='BLUE 2.0'>
       {signedIn && <Blue2AccountMenu />}
 
-      <NavLink
-        to={homePath}
-        exact
-        className={classes.compactHomeItem}
-        activeClassName={classes.itemActive}
-        aria-label={intl.formatMessage({
-          id: 'tabs_bar.home',
-          defaultMessage: 'Home',
-        })}
-        title={intl.formatMessage({
-          id: 'tabs_bar.home',
-          defaultMessage: 'Home',
-        })}
-      >
-        <HouseIcon size={29} weight='regular' />
-        <span>
-          <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
-        </span>
-      </NavLink>
-
       <div className={classes.items}>
-        <Item
-          to={homePath}
-          exact
-          icon={Blue2HomeIcon}
-          className={classes.homeItem}
-        >
+        <Item to={homePath} exact icon={HouseIcon}>
           <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
         </Item>
         <Item to='/explore' icon={Blue2SearchIcon}>
@@ -143,6 +117,7 @@ export const Blue2Navigation: React.FC = () => {
               <FormattedMessage
                 id='tabs_bar.messages'
                 defaultMessage='Messages'
+                description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
               />
             </Item>
           </>
