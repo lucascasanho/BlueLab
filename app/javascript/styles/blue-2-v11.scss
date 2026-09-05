@@ -59,12 +59,11 @@ body[data-theme='blue-2'].layout-multiple-columns {
 }
 
 /*
- * Final BlueLab phone composer geometry. An older BlueLab refinement allows
- * composer popovers to escape with `overflow: visible !important`; that also
- * defeated the mobile dialog clipping/scroll rules from the CSS module. Keep
- * the phone dialog self-contained here, after every previous theme layer.
+ * Preserve the existing narrow-landscape composer behavior. The portrait rules
+ * below deliberately do not share this geometry so rotating a phone/tablet does
+ * not change the landscape layout that is already working.
  */
-@media (width <= 759px) {
+@media (orientation: landscape) and (width <= 759px) {
   body[data-theme='blue-2'] form[data-bluelab-composer][role='dialog'] {
     position: fixed !important;
     top: 50% !important;
@@ -124,12 +123,6 @@ body[data-theme='blue-2'].layout-multiple-columns {
     background: var(--color-bg-primary) !important;
   }
 
-  /*
-   * Do not add VisualViewport.offsetTop to the closed-keyboard center: on iOS
-   * that can double-count the visual viewport displacement and push the sheet
-   * downward. Once the keyboard is open, pin the form to the visible top and
-   * constrain it to the VisualViewport height; only the middle section scrolls.
-   */
   body[data-theme='blue-2']
     form[data-bluelab-composer][role='dialog'][data-keyboard-open] {
     top: 0 !important;
@@ -150,38 +143,78 @@ body[data-theme='blue-2'].layout-multiple-columns {
 }
 
 /*
- * Portrait phones use the visible viewport as the source of truth at all times,
- * not only after keyboard detection. This keeps the composer anchored at the
- * top and guarantees that its footer remains inside the area above the virtual
- * keyboard even on browsers where the layout viewport itself does not resize.
+ * Portrait phones use one geometry only: a sheet that occupies exactly the
+ * browser's VisualViewport. VisualViewport shrinks when the virtual keyboard
+ * appears even on browsers where the layout viewport stays unchanged, so the
+ * footer remains above the keyboard and only the middle section scrolls.
  */
 @media (orientation: portrait) and (width <= 759px) {
   body[data-theme='blue-2'] form[data-bluelab-composer][role='dialog'],
   body[data-theme='blue-2']
     form[data-bluelab-composer][role='dialog'][data-keyboard-open] {
-    --bluelab-composer-top-gap: max(8px, env(safe-area-inset-top));
-
     box-sizing: border-box !important;
-    top: var(--bluelab-composer-top-gap) !important;
-    left: 12px !important;
-    right: 12px !important;
+    position: fixed !important;
+    top: var(--composer-visual-viewport-offset-top, 0px) !important;
+    left: 0 !important;
+    right: 0 !important;
     bottom: auto !important;
-    width: auto !important;
+    inset-inline-end: auto !important;
+    width: 100vw !important;
     max-width: none !important;
-    height: calc(
-      var(--composer-visual-viewport-height, 100dvh) -
-        var(--bluelab-composer-top-gap) - 8px
-    ) !important;
+    height: var(--composer-visual-viewport-height, 100dvh) !important;
     min-height: 0 !important;
-    max-height: calc(
-      var(--composer-visual-viewport-height, 100dvh) -
-        var(--bluelab-composer-top-gap) - 8px
-    ) !important;
+    max-height: var(--composer-visual-viewport-height, 100dvh) !important;
     margin: 0 !important;
-    padding-top: var(--space-sm) !important;
-    border: 1px solid var(--blue2-border-soft) !important;
-    border-radius: 16px !important;
+    padding: max(var(--space-sm), env(safe-area-inset-top)) var(--space-sm)
+      max(var(--space-sm), env(safe-area-inset-bottom)) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    border-radius: 0 !important;
     transform: none !important;
+    box-shadow: none !important;
+  }
+
+  body[data-theme='blue-2']
+    form[data-bluelab-composer][role='dialog']
+    > header {
+    order: 0 !important;
+    flex: 0 0 auto !important;
+    position: relative !important;
+    inset: auto !important;
+    z-index: 3;
+    display: flex !important;
+    visibility: visible !important;
+    background: var(--color-bg-primary) !important;
+  }
+
+  body[data-theme='blue-2']
+    form[data-bluelab-composer][role='dialog']
+    > [data-compose-scroll-container] {
+    order: 1 !important;
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body[data-theme='blue-2']
+    form[data-bluelab-composer][role='dialog']
+    > [data-bluelab-compose-footer] {
+    order: 2 !important;
+    flex: 0 0 auto !important;
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    z-index: 3;
+    margin-top: 0 !important;
+    padding-bottom: 0 !important;
+    background: var(--color-bg-primary) !important;
   }
 }
 
