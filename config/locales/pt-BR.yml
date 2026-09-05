@@ -1,7 +1,5 @@
 ---
 pt-BR:
-  time_zones:
-    campo_grande: Campo Grande (Brasil)
   about:
     about_mastodon_html: 'A rede social do futuro: Sem anúncios, sem vigilância corporativa, com design ético e muita descentralização! Possua seus próprios dados com o Mastodon!'
     contact_missing: Não definido
@@ -183,7 +181,6 @@ pt-BR:
       whitelisted: Permitido para federação
     action_logs:
       action_types:
-        update_instance_customization_account: Atualizar customização da instância
         approve_appeal: Aprovar recurso
         approve_user: Aprovar usuário
         assigned_to_self_report: Atribuir denúncia
@@ -202,7 +199,6 @@ pt-BR:
         create_unavailable_domain: Criar domínio indisponível
         create_user_role: Criar cargo
         create_username_block: Criar regra de usuário
-        username_change_account: Alterar nome de usuário
         demote_user: Rebaixar usuário
         destroy_announcement: Excluir anúncio
         destroy_canonical_email_block: Excluir bloqueio de e-mail
@@ -247,13 +243,14 @@ pt-BR:
         update_announcement: Editar anúncio
         update_custom_emoji: Editar Emoji Personalizado
         update_domain_block: Atualizar bloqueio de domínio
+        update_instance_customization_account: Atualizar customização da instância
         update_ip_block: Atualizar regra de IP
         update_report: Atualizar denúncia
         update_status: Editar publicação
         update_user_role: Atualizar cargo
         update_username_block: Atualizar regra de usuário
+        username_change_account: Alterar nome de usuário
       actions:
-        update_instance_customization_account_html: "%{name} atualizou a customização da instância"
         approve_appeal_html: "%{name} aprovou a revisão da decisão da moderação em %{target}"
         approve_user_html: "%{name} aprovou a inscrição de %{target}"
         assigned_to_self_report_html: "%{name} atribuiu a denúncia %{target} para si"
@@ -298,7 +295,6 @@ pt-BR:
         enable_user_html: "%{name} ativou o login para %{target}"
         listable_tag_html: pode ser sugerido
         memorialize_account_html: "%{name} transformou a conta de %{target} em um memorial"
-        username_change_account_html: "%{name} alterou o nome de usuário de %{target}"
         not_listable_tag_html: não será sugerido
         not_trendable_tag_html: não aparecerá em alta
         not_usable_tag_html: não pode ser usado
@@ -324,6 +320,7 @@ pt-BR:
         update_collection_html: "%{name} atualizou a coleção de %{target}"
         update_custom_emoji_html: "%{name} atualizou o emoji %{target}"
         update_domain_block_html: "%{name} atualizou o bloqueio de domínio de %{target}"
+        update_instance_customization_account_html: "%{name} atualizou a customização da instância"
         update_ip_block_html: "%{name} alterou a regra para o IP %{target}"
         update_report_html: "%{name} atualizou a denúncia %{target}"
         update_status_html: "%{name} atualizou a publicação de %{target}"
@@ -331,6 +328,7 @@ pt-BR:
         update_user_role_html: "%{name} alterou o cargo %{target}"
         update_username_block_html: Regra %{name} atualizada para nomes de usuários contendo %{target}
         usable_tag_html: pode ser usado;
+        username_change_account_html: "%{name} alterou o nome de usuário de %{target}"
       deleted_account: conta excluída
       empty: Nenhum registro encontrado.
       filter_by_action: Filtrar por ação
@@ -944,73 +942,6 @@ pt-BR:
       translations: Traduções
       translations_explanation: Você pode opcionalmente adicionar traduções para as regras. O valor padrão será mostrado se nenhuma versão traduzida estiver disponível. Por favor, sempre se certifique de que qualquer tradução fornecida está em sincronia com o valor padrão.
     settings:
-      instance_customization:
-        admin_status_limit: Limite de caracteres para administradores
-        auth_logo: Logo das páginas de autenticação
-        auth_logo_hint: Exibido nas páginas de login, cadastro e outras páginas de autenticação. PNG, JPEG ou WebP; máximo de 2 MB; imagem quadrada de pelo menos 64 × 64 px (recomendado 128 × 128 px ou maior).
-        branding: Identidade visual
-        branding_hint_html: Favicon, ícones PWA/Apple e imagem OpenGraph continuam na <a href="%{branding_path}">página Marca</a>, que já fornece armazenamento e tamanhos adequados. Logos SVG internos da SPA permanecem versionados para não permitir SVG arbitrário.
-        colors_hint: A cor é aplicada aos tokens semânticos de destaque; neutros e características próprias de cada tema são preservados.
-        contrast_error: precisa atingir contraste mínimo de %{ratio}:1 contra fundo branco
-        dark_theme: Tema escuro
-        effective_color: "Cor efetiva:"
-        email: Emails
-        email_background_color: Fundo externo dos emails
-        email_background_color_hint: Fundo ao redor do cartão principal no modo claro.
-        email_button_color: Cor do botão principal dos emails
-        email_button_color_hint: Preenchimento dos botões de ação principais nos templates de email.
-        email_link_color: Cor dos links dos emails
-        email_link_color_hint: Links no conteúdo, ações de texto e links com seta.
-        email_dark_background_color: Fundo externo dos emails no modo escuro
-        email_dark_background_color_hint: Fundo ao redor do cartão principal quando o cliente de email usa modo escuro.
-        email_dark_muted_color: Texto secundário dos emails no modo escuro
-        email_dark_muted_color_hint: Nomes de usuário, metadados, descrições e rodapé no modo escuro.
-        email_dark_surface_color: Fundo do conteúdo dos emails no modo escuro
-        email_dark_surface_color_hint: Cartões e áreas de conteúdo principais no modo escuro.
-        email_dark_text_color: Texto principal dos emails no modo escuro
-        email_dark_text_color_hint: Títulos e conteúdo principal no modo escuro.
-        email_dark_theme: Modo escuro dos emails
-        email_logo: Logo do cabeçalho dos emails
-        email_logo_hint: Exibido somente no cabeçalho dos emails, ao lado do nome da instância. PNG, JPEG ou WebP; máximo de 2 MB; imagem quadrada de pelo menos 64 × 64 px (recomendado 128 × 128 px ou maior).
-        email_muted_color: Texto secundário dos emails
-        email_muted_color_hint: Nomes de usuário, metadados, descrições e rodapé no modo claro.
-        email_primary_color: Cor de destaque do cabeçalho dos emails
-        email_primary_color_hint: Borda e destaque estrutural do cabeçalho do email.
-        email_surface_color: Fundo do conteúdo dos emails
-        email_surface_color_hint: Cartões e áreas de conteúdo principais no modo claro.
-        email_text_color: Texto principal dos emails
-        email_text_color_hint: Títulos e conteúdo principal no modo claro.
-        hide_admin_status_character_counter: Ocultar contador de caracteres para administradores
-        hide_status_character_counter: Ocultar contador de caracteres para usuários padrão
-        image_limit: Limite de imagem (MB)
-        instance_accent_color: Cor de destaque da interface
-        instance_accent_color_hint: Botões principais, links, foco, domínio de contas remotas e demais tokens semânticos de destaque.
-        instance_dark_background_color: Fundo do modo escuro
-        instance_dark_background_color_hint: Fundo principal de páginas e colunas nos temas escuros do Mastodon e Bird UI.
-        instance_dark_surface_color: Superfície do modo escuro
-        instance_dark_surface_color_hint: Cartões, painéis, menus e áreas secundárias nos temas escuros do Mastodon e Bird UI.
-        instance_dark_text_color: Texto principal do modo escuro
-        instance_dark_text_color_hint: Nomes, títulos e conteúdo principal nos temas escuros do Mastodon e Bird UI.
-        instance_light_background_color: Fundo do modo claro
-        instance_light_background_color_hint: Fundo principal de páginas e colunas nos temas claros do Mastodon e Bird UI.
-        instance_light_surface_color: Superfície do modo claro
-        instance_light_surface_color_hint: Cartões, painéis, menus e áreas secundárias nos temas claros do Mastodon e Bird UI.
-        instance_light_text_color: Texto principal do modo claro
-        instance_light_text_color_hint: Nomes, títulos e conteúdo principal nos temas claros do Mastodon e Bird UI.
-        interface: Interface e temas
-        light_theme: Tema claro
-        media: Mídia
-        nginx_warning: "Configuração local detectada: nginx aceita no máximo %{limit} MB. Valores maiores serão recusados pelo proxy antes de chegar ao Mastodon."
-        posts: Publicações
-        pair_contrast_error: precisa atingir contraste mínimo de %{ratio}:1 contra o fundo correspondente
-        preamble: Configurações persistentes e validadas deste servidor. Alterações não editam arquivos-fonte e passam a valer após salvar.
-        proxy_warning: O limite configurado aqui é o aceito pelo Mastodon. Proxies, CDNs ou túneis, incluindo Cloudflare, podem impor limites menores e precisam ser configurados separadamente.
-        restore_defaults: Restaurar todos os padrões
-        restore_color_default: Restaurar esta cor
-        restore_defaults_confirm: Isso removerá todas as customizações desta página e restaurará os valores padrão. Deseja continuar?
-        status_limit: Limite de caracteres para usuário padrão
-        title: Customização da instância
-        video_limit: Limite de vídeo (MB)
       about:
         manage_rules: Gerenciar regras do servidor
         preamble: Forneça informações detalhadas sobre como o servidor é operado, moderado e financiado.
@@ -1059,6 +990,73 @@ pt-BR:
           authenticated: Apenas usuários autenticados
           disabled: Exige função específica de usuário
           public: Todos
+      instance_customization:
+        admin_status_limit: Limite de caracteres para administradores
+        auth_logo: Logo das páginas de autenticação
+        auth_logo_hint: Exibido nas páginas de login, cadastro e outras páginas de autenticação. PNG, JPEG ou WebP; máximo de 2 MB; imagem quadrada de pelo menos 64 × 64 px (recomendado 128 × 128 px ou maior).
+        branding: Identidade visual
+        branding_hint_html: Favicon, ícones PWA/Apple e imagem OpenGraph continuam na <a href="%{branding_path}">página Marca</a>, que já fornece armazenamento e tamanhos adequados. Logos SVG internos da SPA permanecem versionados para não permitir SVG arbitrário.
+        colors_hint: A cor é aplicada aos tokens semânticos de destaque; neutros e características próprias de cada tema são preservados.
+        contrast_error: precisa atingir contraste mínimo de %{ratio}:1 contra fundo branco
+        dark_theme: Tema escuro
+        effective_color: 'Cor efetiva:'
+        email: Emails
+        email_background_color: Fundo externo dos emails
+        email_background_color_hint: Fundo ao redor do cartão principal no modo claro.
+        email_button_color: Cor do botão principal dos emails
+        email_button_color_hint: Preenchimento dos botões de ação principais nos templates de email.
+        email_dark_background_color: Fundo externo dos emails no modo escuro
+        email_dark_background_color_hint: Fundo ao redor do cartão principal quando o cliente de email usa modo escuro.
+        email_dark_muted_color: Texto secundário dos emails no modo escuro
+        email_dark_muted_color_hint: Nomes de usuário, metadados, descrições e rodapé no modo escuro.
+        email_dark_surface_color: Fundo do conteúdo dos emails no modo escuro
+        email_dark_surface_color_hint: Cartões e áreas de conteúdo principais no modo escuro.
+        email_dark_text_color: Texto principal dos emails no modo escuro
+        email_dark_text_color_hint: Títulos e conteúdo principal no modo escuro.
+        email_dark_theme: Modo escuro dos emails
+        email_link_color: Cor dos links dos emails
+        email_link_color_hint: Links no conteúdo, ações de texto e links com seta.
+        email_logo: Logo do cabeçalho dos emails
+        email_logo_hint: Exibido somente no cabeçalho dos emails, ao lado do nome da instância. PNG, JPEG ou WebP; máximo de 2 MB; imagem quadrada de pelo menos 64 × 64 px (recomendado 128 × 128 px ou maior).
+        email_muted_color: Texto secundário dos emails
+        email_muted_color_hint: Nomes de usuário, metadados, descrições e rodapé no modo claro.
+        email_primary_color: Cor de destaque do cabeçalho dos emails
+        email_primary_color_hint: Borda e destaque estrutural do cabeçalho do email.
+        email_surface_color: Fundo do conteúdo dos emails
+        email_surface_color_hint: Cartões e áreas de conteúdo principais no modo claro.
+        email_text_color: Texto principal dos emails
+        email_text_color_hint: Títulos e conteúdo principal no modo claro.
+        hide_admin_status_character_counter: Ocultar contador de caracteres para administradores
+        hide_status_character_counter: Ocultar contador de caracteres para usuários padrão
+        image_limit: Limite de imagem (MB)
+        instance_accent_color: Cor de destaque da interface
+        instance_accent_color_hint: Botões principais, links, foco, domínio de contas remotas e demais tokens semânticos de destaque.
+        instance_dark_background_color: Fundo do modo escuro
+        instance_dark_background_color_hint: Fundo principal de páginas e colunas nos temas escuros do Mastodon e Bird UI.
+        instance_dark_surface_color: Superfície do modo escuro
+        instance_dark_surface_color_hint: Cartões, painéis, menus e áreas secundárias nos temas escuros do Mastodon e Bird UI.
+        instance_dark_text_color: Texto principal do modo escuro
+        instance_dark_text_color_hint: Nomes, títulos e conteúdo principal nos temas escuros do Mastodon e Bird UI.
+        instance_light_background_color: Fundo do modo claro
+        instance_light_background_color_hint: Fundo principal de páginas e colunas nos temas claros do Mastodon e Bird UI.
+        instance_light_surface_color: Superfície do modo claro
+        instance_light_surface_color_hint: Cartões, painéis, menus e áreas secundárias nos temas claros do Mastodon e Bird UI.
+        instance_light_text_color: Texto principal do modo claro
+        instance_light_text_color_hint: Nomes, títulos e conteúdo principal nos temas claros do Mastodon e Bird UI.
+        interface: Interface e temas
+        light_theme: Tema claro
+        media: Mídia
+        nginx_warning: 'Configuração local detectada: nginx aceita no máximo %{limit} MB. Valores maiores serão recusados pelo proxy antes de chegar ao Mastodon.'
+        pair_contrast_error: precisa atingir contraste mínimo de %{ratio}:1 contra o fundo correspondente
+        posts: Publicações
+        preamble: Configurações persistentes e validadas deste servidor. Alterações não editam arquivos-fonte e passam a valer após salvar.
+        proxy_warning: O limite configurado aqui é o aceito pelo Mastodon. Proxies, CDNs ou túneis, incluindo Cloudflare, podem impor limites menores e precisam ser configurados separadamente.
+        restore_color_default: Restaurar esta cor
+        restore_defaults: Restaurar todos os padrões
+        restore_defaults_confirm: Isso removerá todas as customizações desta página e restaurará os valores padrão. Deseja continuar?
+        status_limit: Limite de caracteres para usuário padrão
+        title: Customização da instância
+        video_limit: Limite de vídeo (MB)
       landing_page:
         hints:
           about_html: Uma página com descrição, informações de contato, regra e qualquer outra informação sobre este servidor.
@@ -1515,7 +1513,7 @@ pt-BR:
       title: Entrar em %{domain}
     sign_up:
       manual_review: Inscrições no %{domain} passam pela revisão manual dos nossos moderadores. Para nos ajudar a processar o seu cadastro, escreva um pouco sobre você e por que você quer uma conta no %{domain}.
-      preamble: Com uma conta em %{site_title}, você poderá seguir qualquer outra pessoa no fediverso, independentemente de onde a conta dela esteja hospedada.
+      preamble: Com uma conta neste servidor Mastodon, você poderá seguir qualquer outra pessoa no fediverso, independentemente de onde a conta dela esteja hospedada.
       title: Então vamos lá criar uma conta em %{domain}.
     status:
       account_status: Status da conta
@@ -2040,6 +2038,26 @@ pt-BR:
     older: Mais antigo
     prev: Anterior
     truncate_html: "&hellip;"
+  passkeys:
+    add: Adicionar passkey
+    authentication_error: Não foi possível usar esta passkey. Tente novamente ou use sua senha.
+    cancelled: A autenticação por passkey foi cancelada.
+    create:
+      error: Não foi possível adicionar esta passkey. Tente novamente.
+      success: Passkey adicionada com sucesso.
+    delete: Excluir
+    delete_confirmation: Tem certeza de que deseja excluir esta passkey?
+    description: Use uma passkey para entrar em %{site_title} sem precisar digitar sua senha.
+    destroy:
+      error: Não foi possível excluir esta passkey. Tente novamente.
+      success: Passkey removida.
+    empty: Você ainda não adicionou nenhuma passkey.
+    nickname: Nome da passkey
+    nickname_hint: Por exemplo, iPhone, Windows Hello ou YubiKey
+    not_supported: Este navegador não oferece suporte a passkeys.
+    registered_on: Adicionada em %{date}
+    sign_in: Entrar com uma passkey
+    title: Passkeys
   polls:
     errors:
       already_voted: Enquete votada
@@ -2054,12 +2072,16 @@ pt-BR:
       too_many_options: não pode ter mais que %{max} itens
     vote: Votar
   posting_defaults:
-    explanation: Estas configurações serão usadas como padrão quando você criar publicações, mas você pode editá-las por postagem no compositor.
     composer_editor: Editor de publicação
     composer_editor_hint: Escolha o editor usado ao criar uma nova publicação.
     composer_editors:
       bluelab: Composer BlueLab
       mastodon: Composer padrão do Mastodon
+    content_type: Formato da publicação
+    content_types:
+      markdown: Markdown
+      plain: Texto básico (sem formatação)
+    explanation: Estas configurações serão usadas como padrão quando você criar publicações, mas você pode editá-las por postagem no compositor.
   preferences:
     other: Outro
     posting_defaults: Padrões de publicação
@@ -2191,7 +2213,6 @@ pt-BR:
     statuses_cleanup: Exclusão automatizada de publicações
     strikes: Avisos de moderação
     two_factor_authentication: Autenticação de dois fatores
-    webauthn_authentication: Chaves de segurança
     username_changes:
       confirmation: Entendo as consequências e quero alterar meu nome de usuário
       cooldown: Você poderá escolher outro nome de usuário depois de %{date}. Durante esse período, só poderá voltar para o nome imediatamente anterior.
@@ -2217,7 +2238,8 @@ pt-BR:
       submit: Alterar meu nome de usuário
       success: Seu nome de usuário foi alterado de @%{old_username} para @%{new_username}.
       title: Alterar nome de usuário
-      warning: 'Seu endereço será alterado do nome atual para o novo nome neste servidor. Sua conta continuará sendo a mesma. Seguidores, pessoas que você segue, publicações, mídias, chaves e configurações serão preservados. Outros servidores do Fediverso podem levar algum tempo para reconhecer o novo endereço. Seus nomes anteriores continuarão reservados para sua conta. Depois da alteração, você deverá esperar 15 dias para escolher um terceiro nome, mas poderá voltar imediatamente para o nome anterior.'
+      warning: Seu endereço será alterado de %{current} para o novo nome neste servidor. Sua conta continuará sendo a mesma. Seguidores, pessoas que você segue, publicações, mídias, chaves e configurações serão preservados. Outros servidores do Fediverso podem levar algum tempo para reconhecer o novo endereço. Seus nomes anteriores continuarão reservados para sua conta. Depois da alteração, você deverá esperar 15 dias para escolher um terceiro nome, mas poderá voltar imediatamente para o nome anterior.
+    webauthn_authentication: Chaves de segurança
   severed_relationships:
     download: Download  %{count}
     event_type:
@@ -2328,14 +2350,17 @@ pt-BR:
     review_link: Revisar os termos do serviço
     title: Os termos de serviço do %{domain} estão mudando
   themes:
-    mastodon-bird-ui-auto: "%{site_title}"
+    blue-2: BlueLab
     default: Vanilla
+    mastodon-bird-ui-auto: Bird UI
   time:
     formats:
       default: "%H:%M em %d de %b de %Y"
       month: "%b de %Y"
       time: "%H:%M"
       with_time_zone: "%d de %b de %Y, %H:%M %Z"
+  time_zones:
+    campo_grande: Campo Grande (Brasil)
   translation:
     errors:
       quota_exceeded: A cota de uso do servidor para o serviço de tradução foi excedida.
@@ -2509,27 +2534,6 @@ pt-BR:
     verification: Verificação
     verified_links: Seus links verificados
     website_verification: Verificação do site
-  passkeys:
-    add: Adicionar passkey
-    authentication_error: Não foi possível usar esta passkey. Tente novamente ou use sua senha.
-    cancelled: A autenticação por passkey foi cancelada.
-    create:
-      error: Não foi possível adicionar esta passkey. Tente novamente.
-      success: Passkey adicionada com sucesso.
-    delete: Excluir
-    delete_confirmation: Tem certeza de que deseja excluir esta passkey?
-    description: Use uma passkey para entrar em %{site_title} sem precisar digitar sua senha.
-    destroy:
-      error: Não foi possível excluir esta passkey. Tente novamente.
-      success: Passkey removida.
-    empty: Você ainda não adicionou nenhuma passkey.
-    invalid_for_account: Esta passkey não é válida para esta conta.
-    nickname: Nome da passkey
-    nickname_hint: Por exemplo, iPhone, Windows Hello ou YubiKey
-    not_supported: Este navegador não oferece suporte a passkeys.
-    registered_on: Adicionada em %{date}
-    sign_in: Entrar com uma passkey
-    title: Passkeys
   webauthn_credentials:
     add: Adicionar nova chave de segurança
     create:

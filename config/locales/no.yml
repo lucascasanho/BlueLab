@@ -1571,7 +1571,7 @@
     aliases: Kontoaliaser
     appearance: Utseende
     authorized_apps: Autoriserte applikasjoner
-    back: Tilbake til Espelunca
+    back: Tilbake til %{site_title}
     delete: Kontosletting
     development: Utvikling
     edit_profile: Endre profil

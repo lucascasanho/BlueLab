@@ -14,7 +14,7 @@ class Settings::UsernameChangesController < Settings::BaseController
         username: @username_change.username,
         current_password: @username_change.current_password
       )
-      redirect_to settings_username_change_path, notice: t('.success', old_username:, new_username: current_account.reload.username)
+      redirect_to settings_username_change_path, notice: t('settings.username_changes.success', old_username:, new_username: current_account.reload.username)
     else
       render :show, status: 422
     end

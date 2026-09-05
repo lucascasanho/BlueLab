@@ -121,7 +121,7 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
           <MenuItemLink to='/favourites' icon={HeartIcon}>
             <FormattedMessage
               id='navigation_bar.favourites'
-              defaultMessage='Favourites'
+              defaultMessage='Favorites'
             />
           </MenuItemLink>
 
@@ -174,7 +174,7 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
           <MenuItem onClick={confirmLogout} icon={SignOutIcon}>
             <FormattedMessage
               id='navigation_bar.logout'
-              defaultMessage='Log out'
+              defaultMessage='Logout'
             />
           </MenuItem>
         </MenuList>

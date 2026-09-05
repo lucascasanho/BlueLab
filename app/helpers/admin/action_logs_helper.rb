@@ -45,6 +45,7 @@ module Admin::ActionLogsHelper
   def chain_multiple_translations(action_log)
     case action_log.target_type
     when 'Account'
+      # i18n-tasks-use t('admin.action_logs.instance_customization_changes')
       :'admin.action_logs.instance_customization_changes' if action_log.action == :update_instance_customization
     when 'Tag'
       %i(usable trendable listable).filter_map do |key|

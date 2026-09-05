@@ -1234,7 +1234,7 @@ lt:
     aliases: Paskyros pseudonimai
     appearance: Išvaizda
     authorized_apps: Leidžiamos programėlės
-    back: Grįžti į Espelunca
+    back: Grįžti į %{site_title}
     delete: Paskyros trynimas
     development: Kūrimas
     edit_profile: Redaguoti profilį

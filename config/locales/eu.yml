@@ -1784,7 +1784,7 @@ eu:
     aliases: Kontuaren ezizenak
     appearance: Itxura
     authorized_apps: Baimendutako aplikazioak
-    back: Itzuli Espeluncara
+    back: Itzuli %{site_title}ra
     delete: Kontuaren ezabaketa
     development: Garapena
     edit_profile: Editatu profila

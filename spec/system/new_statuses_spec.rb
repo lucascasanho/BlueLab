@@ -16,9 +16,12 @@ RSpec.describe 'NewStatuses', :inline_jobs, :js, :streaming do
   it 'can be posted' do
     visit_homepage
 
-    within('.compose-form') do
-      fill_in frontend_translations('compose_form.placeholder'), with: status_text
-      click_on 'Post'
+    click_button frontend_translations('compose.new')
+    click_button frontend_translations('compose.new.post')
+
+    within('[data-bluelab-composer]') do
+      find('[role="textbox"]').set(status_text)
+      click_button frontend_translations('compose.publish')
     end
 
     expect(page)
@@ -30,6 +33,6 @@ RSpec.describe 'NewStatuses', :inline_jobs, :js, :streaming do
 
     expect(page)
       .to have_css('div.app-holder')
-      .and have_css('form.compose-form')
+      .and have_button(frontend_translations('compose.new'))
   end
 end

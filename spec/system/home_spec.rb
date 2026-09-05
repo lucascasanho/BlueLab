@@ -31,10 +31,10 @@ RSpec.describe 'Home page' do
         Setting.landing_page = 'about'
       end
 
-      it 'visits the root path and is redirected to the about page', :js do
+      it 'visits the root path and is redirected to the BlueLab overview', :js do
         visit root_path
 
-        expect(page).to have_current_path('/about')
+        expect(page).to have_current_path('/overview')
       end
     end
 

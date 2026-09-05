@@ -1,0 +1,71 @@
+.trigger {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  margin-inline-start: 0.22em;
+  border-radius: 999px;
+  cursor: pointer;
+  line-height: 1;
+  vertical-align: -0.1em;
+
+  &:focus-visible {
+    outline: var(--outline-focus-default);
+    outline-offset: 2px;
+  }
+}
+
+.badge {
+  display: block;
+  width: 0.9em;
+  height: 0.9em;
+  overflow: visible;
+  transition:
+    filter 120ms ease-out,
+    transform 120ms ease-out;
+}
+
+.trigger:hover .badge,
+.trigger:focus-visible .badge {
+  filter: brightness(1.08);
+}
+
+.trigger:active .badge {
+  transform: scale(0.94);
+}
+
+.popover {
+  box-sizing: border-box;
+  width: min(340px, calc(100vw - 24px));
+  padding: 17px 18px;
+  border: 1px solid var(--color-border-primary);
+  border-radius: 14px;
+  background: var(--color-bg-primary);
+  box-shadow: var(--dropdown-shadow);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.title {
+  margin: 0 0 12px;
+  color: var(--color-text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.description,
+.since {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.since {
+  margin-top: 12px;
+}
+
+.instance {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}

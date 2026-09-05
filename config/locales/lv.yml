@@ -1820,7 +1820,7 @@ lv:
     aliases: Konta aizstājvārdi
     appearance: Izskats
     authorized_apps: Pilnvarotās lietotnes
-    back: Atgriezties Espelunca
+    back: Atgriezties %{site_title}
     delete: Konta izdzēšana
     development: Izstrāde
     edit_profile: Labot profilu

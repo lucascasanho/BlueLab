@@ -2089,7 +2089,7 @@ fr:
     aliases: Alias du compte
     appearance: Apparence
     authorized_apps: Applications autorisées
-    back: Retour vers Espelunca
+    back: Retour vers %{site_title}
     delete: Suppression du compte
     development: Développement
     edit_profile: Modifier le profil

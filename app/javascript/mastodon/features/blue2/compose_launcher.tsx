@@ -35,7 +35,7 @@ export const Blue2ComposeLauncher: React.FC = () => {
       <span className={classes.prompt}>
         <FormattedMessage
           id='compose_form.placeholder'
-          defaultMessage="What's on your mind?"
+          defaultMessage='What is on your mind?'
         />
       </span>
       <Blue2ComposeIcon size={22} />

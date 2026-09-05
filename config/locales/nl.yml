@@ -2089,7 +2089,7 @@ nl:
     aliases: Accountaliassen
     appearance: Uiterlijk
     authorized_apps: Geautoriseerde apps
-    back: Terug naar Espelunca
+    back: Terug naar %{site_title}
     delete: Account verwijderen
     development: Ontwikkelaars
     edit_profile: Profiel bewerken

@@ -1760,7 +1760,7 @@ lad:
     aliases: Aliases del kuento
     appearance: Aparensya
     authorized_apps: Aplikasyones autorizadas
-    back: Retorna a Espelunca
+    back: Retorna a %{site_title}
     delete: Efasa kuento
     development: Dezvelopamiento
     edit_profile: Edita profil

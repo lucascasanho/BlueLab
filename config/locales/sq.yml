@@ -2074,7 +2074,7 @@ sq:
     aliases: Aliase llogarish
     appearance: Dukje
     authorized_apps: Aplikacione të autorizuara
-    back: Mbrapsht te Espelunca
+    back: Mbrapsht te %{site_title}
     delete: Fshirje llogarie
     development: Zhvillim
     edit_profile: Përpunoni profilin

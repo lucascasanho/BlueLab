@@ -7,7 +7,11 @@ RSpec.describe 'Channel Subscriptions', :inline_jobs, :streaming do
   let(:scopes) { nil }
   let(:access_token) { Fabricate(:accessible_access_token, resource_owner_id: user_account.user.id, application: application, scopes: scopes) }
 
-  let(:user_account) { Fabricate(:account, username: 'alice', domain: nil) }
+  let(:user_account) do
+    Fabricate(:account, username: 'alice', domain: nil).tap do |account|
+      account.user.update!(chosen_languages: ['en'])
+    end
+  end
   let(:bob_account) { Fabricate(:account, username: 'bob') }
 
   after do
@@ -41,6 +45,7 @@ RSpec.describe 'Channel Subscriptions', :inline_jobs, :streaming do
 
       streaming_client.connect
       streaming_client.subscribe('public:local')
+      streaming_client.wait_until_subscribed('timeline:public:local')
 
       # We need to publish a status as there is no positive acknowledgement of
       # subscriptions:
@@ -86,6 +91,7 @@ RSpec.describe 'Channel Subscriptions', :inline_jobs, :streaming do
 
       streaming_client.connect
       streaming_client.subscribe('public:local')
+      streaming_client.wait_until_subscribed('timeline:public:local')
 
       # We need to publish a status as there is no positive acknowledgement of
       # subscriptions:

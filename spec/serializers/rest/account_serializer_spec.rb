@@ -46,8 +46,24 @@ RSpec.describe REST::AccountSerializer do
     context 'when the account role is Verificado but is not highlighted' do
       let(:role) { Fabricate(:user_role, name: 'Verificado', highlighted: false) }
 
+      before do
+        Admin::ActionLog.create!(
+          account: current_user.account,
+          action: 'change_role',
+          target: user,
+          created_at: default_datetime,
+          updated_at: default_datetime
+        )
+      end
+
       it 'marks the account as verified' do
         expect(subject['verified_by_role']).to be true
+      end
+
+      it 'exposes the most recent moderation role-change date' do
+        expect(subject).to include(
+          'verified_by_role_since' => match_api_datetime_format
+        )
       end
     end
 
@@ -72,6 +88,10 @@ RSpec.describe REST::AccountSerializer do
 
       it 'does not mark the account as verified' do
         expect(subject['verified_by_role']).to be false
+      end
+
+      it 'does not expose a verification date' do
+        expect(subject['verified_by_role_since']).to be_nil
       end
     end
   end

@@ -2044,7 +2044,7 @@ zh-CN:
     aliases: 账号别名
     appearance: 外观
     authorized_apps: 已授权的应用
-    back: 返回 Espelunca
+    back: 返回 %{site_title}
     delete: 删除账号
     development: 开发
     edit_profile: 更改个人资料

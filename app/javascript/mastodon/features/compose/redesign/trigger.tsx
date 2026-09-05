@@ -101,10 +101,7 @@ export const ComposeRedesignButton: React.FC<{
       const visualViewport = window.visualViewport;
       const height = visualViewport?.height ?? window.innerHeight;
       const offsetTop = visualViewport?.offsetTop ?? 0;
-      const bottomInset = Math.max(
-        0,
-        window.innerHeight - offsetTop - height,
-      );
+      const bottomInset = Math.max(0, window.innerHeight - offsetTop - height);
 
       setViewport({
         height,

@@ -2089,7 +2089,7 @@ pt-PT:
     aliases: Pseudónimos da conta
     appearance: Aparência
     authorized_apps: Aplicações autorizadas
-    back: Voltar à Espelunca
+    back: Voltar à %{site_title}
     delete: Eliminação da conta
     development: Desenvolvimento
     edit_profile: Editar perfil

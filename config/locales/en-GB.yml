@@ -1943,7 +1943,7 @@ en-GB:
     aliases: Account aliases
     appearance: Appearance
     authorized_apps: Authorised apps
-    back: Back to Espelunca
+    back: Back to %{site_title}
     delete: Account deletion
     development: Development
     edit_profile: Edit profile

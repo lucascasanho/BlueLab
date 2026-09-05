@@ -1992,7 +1992,7 @@ ko:
     aliases: 계정 별명
     appearance: 외관
     authorized_apps: 승인된 애플리케이션
-    back: Espelunca로 돌아가기
+    back: "%{site_title}로 돌아가기"
     delete: 계정 삭제
     development: 개발
     edit_profile: 프로필 편집

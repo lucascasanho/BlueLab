@@ -160,7 +160,7 @@ export const Blue2RightRail: React.FC = () => {
         <Link to='/keyboard-shortcuts'>
           <FormattedMessage
             id='keyboard_shortcuts.heading'
-            defaultMessage='Keyboard shortcuts'
+            defaultMessage='Keyboard Shortcuts'
           />
         </Link>
       </footer>

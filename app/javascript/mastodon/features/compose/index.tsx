@@ -28,9 +28,9 @@ import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
 import { messages as navbarMessages } from '../ui/components/navigation_bar';
 
-import { RedesignComposeForm } from './redesign';
 import { Search } from './components/search';
 import ComposeFormContainer from './containers/compose_form_container';
+import { RedesignComposeForm } from './redesign';
 
 const messages = defineMessages({
   live_feed_public: {

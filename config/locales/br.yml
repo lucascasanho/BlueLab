@@ -792,7 +792,7 @@ br:
     account_settings: Arventennoù ar gont
     aliases: Aliasoù ar gont
     appearance: Neuz
-    back: Distreiñ da vEspelunca
+    back: Distreiñ da v%{site_title}
     delete: Dilemel ar gont
     development: Diorren
     edit_profile: Kemmañ ar profil

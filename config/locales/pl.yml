@@ -1999,7 +1999,7 @@ pl:
     aliases: Aliasy konta
     appearance: Wygląd
     authorized_apps: Uwierzytelnione aplikacje
-    back: Powrót do Espelunki
+    back: Powrót do %{site_title}
     delete: Usuń konto
     development: Tworzenie aplikacji
     edit_profile: Edytuj profil

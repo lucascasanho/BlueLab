@@ -1848,7 +1848,7 @@ ca:
     aliases: Àlies de compte
     appearance: Aparença
     authorized_apps: Aplicacions autoritzades
-    back: Torna a Espelunca
+    back: Torna a %{site_title}
     delete: Eliminació del compte
     development: Desenvolupament
     edit_profile: Edita el perfil

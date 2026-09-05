@@ -404,7 +404,7 @@ ka:
     title: სესიები
   settings:
     authorized_apps: ავტორიზირებული აპლიკაციები
-    back: უკან Espelunca-სკენ
+    back: უკან %{site_title}-სკენ
     delete: ანგარიშის გაუქმება
     development: დეველოპმენტი
     edit_profile: პროფილის ცვლილება

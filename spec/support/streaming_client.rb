@@ -159,12 +159,29 @@ class StreamingClient
     @connection.wait_for_event(event)
   end
 
-  def wait_for_message
-    message = @connection.wait_for_event(:message)
+  def wait_for_message(timeout: 10)
+    message = @connection.wait_for_event(:message, timeout:)
     event = JSON.parse(message)
     event['payload'] = JSON.parse(event['payload']) if event['payload']
 
     event.deep_symbolize_keys
+  end
+
+  def wait_until_subscribed(redis_channel, timeout: 10)
+    probe = JSON.generate(event: 'filters_changed', payload: {})
+
+    Timeout.timeout(timeout) do
+      loop do
+        RedisConnection.with { |redis| redis.publish(redis_channel, probe) }
+
+        begin
+          message = wait_for_message(timeout: 0.1)
+          return if message[:event] == 'filters_changed'
+        rescue Timeout::Error
+          # The streaming server may still be resolving feed access settings.
+        end
+      end
+    end
   end
 
   delegate :status, :state, to: :'@connection.driver'

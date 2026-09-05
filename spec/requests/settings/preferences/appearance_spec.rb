@@ -10,7 +10,7 @@ RSpec.describe 'Settings Preferences Appearance' do
     end
 
     it 'does not expose a per-user theme selector' do
-      expect(response.body).not_to include('user[settings_attributes][theme]')
+      expect(response.body).to_not include('user[settings_attributes][theme]')
     end
 
     it 'keeps the light, dark, and automatic color scheme preference' do

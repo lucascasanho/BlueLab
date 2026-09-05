@@ -1676,7 +1676,7 @@ io:
     aliases: Kontoaltnomi
     appearance: Aspekto
     authorized_apps: Yurizita apliki
-    back: Retro a Espelunca
+    back: Retro a %{site_title}
     delete: Kontoefaco
     development: Developo
     edit_profile: Redaktar la profilo

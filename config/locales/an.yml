@@ -1353,7 +1353,7 @@ an:
     aliases: Alias d'a cuenta
     appearance: Apariencia
     authorized_apps: Aplicacions autorizadas
-    back: Tornar ta l'inicio
+    back: Tornar ta %{site_title}
     delete: Borrar cuenta
     development: Desembolique
     edit_profile: Editar perfil

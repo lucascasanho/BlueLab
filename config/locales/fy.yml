@@ -1817,7 +1817,7 @@ fy:
     aliases: Accountaliassen
     appearance: Werjefte
     authorized_apps: Autorisearre apps
-    back: Tebek nei Espelunca
+    back: Tebek nei %{site_title}
     delete: Account fuortsmite
     development: Untwikkelers
     edit_profile: Profyl bewurkje

@@ -1910,7 +1910,7 @@ sl:
     aliases: Vzdevki računa
     appearance: Videz
     authorized_apps: Pooblaščene aplikacije
-    back: Nazaj na Espelunca
+    back: Nazaj na %{site_title}
     delete: Brisanje računa
     development: Razvoj
     edit_profile: Uredi profil
