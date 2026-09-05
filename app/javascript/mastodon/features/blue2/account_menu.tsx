@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
-import { NavLink } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
+
+import { HouseIcon } from '@phosphor-icons/react';
 
 import { Avatar } from '@/mastodon/components/avatar';
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
@@ -22,6 +24,8 @@ const csrfToken = () =>
     ?.getAttribute('content') ?? '';
 
 export const Blue2AccountMenu: React.FC = () => {
+  const intl = useIntl();
+  const history = useHistory();
   const { accountId } = useIdentity();
   const account = useAccount(accountId);
   const localCustomEmojis = useCustomEmojis();
@@ -56,6 +60,11 @@ export const Blue2AccountMenu: React.FC = () => {
     setOpen(false);
   }, []);
 
+  const goHome = useCallback(() => {
+    setOpen(false);
+    history.push('/home');
+  }, [history]);
+
   const signOut = useCallback(async () => {
     try {
       const token = csrfToken();
@@ -84,6 +93,10 @@ export const Blue2AccountMenu: React.FC = () => {
     ...(cleanExtraEmojis(account.emojis) ?? {}),
   };
   const displayNameEmojiVersion = `${Object.keys(localCustomEmojis).length}-${account.emojis.size}`;
+  const homeLabel = intl.formatMessage({
+    id: 'tabs_bar.home',
+    defaultMessage: 'Home',
+  });
 
   return (
     <div className={classes.root} ref={rootRef}>
@@ -110,6 +123,16 @@ export const Blue2AccountMenu: React.FC = () => {
           <span>@{account.acct}</span>
         </span>
         <MoreHorizIcon className={classes.moreIcon} />
+      </button>
+
+      <button
+        type='button'
+        className={classes.compactHomeButton}
+        onClick={goHome}
+        aria-label={homeLabel}
+        title={homeLabel}
+      >
+        <HouseIcon size={27} />
       </button>
 
       {open && (
