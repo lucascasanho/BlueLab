@@ -105,6 +105,10 @@
   opacity: 1;
 }
 
+.compactHomeButton {
+  display: none;
+}
+
 .menu {
   box-sizing: border-box;
   position: absolute;
@@ -156,11 +160,13 @@
   }
 }
 
-// The account control must collapse at the same breakpoint as the BlueLab
-// navigation rail. Otherwise its 216px box can spill out of the 76px rail.
+// The account control owns the first two compact rail slots: account/profile
+// followed by Home. Keeping both inside this BlueLab-only component avoids
+// generic navigation-list rules from dropping the first item at this breakpoint.
 @media (width < 1180px) {
   .root {
     width: 52px;
+    height: 110px;
   }
 
   .root:hover .accountButton,
@@ -178,6 +184,38 @@
   .accountButton[aria-expanded='true'] .moreIcon {
     max-width: 0;
     opacity: 0;
+  }
+
+  .compactHomeButton {
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 1;
+    top: 58px;
+    left: 2px;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 0;
+    border-radius: 9px;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    color: var(--blue2-text, #f7f7f8);
+    cursor: pointer;
+
+    svg {
+      width: 27px;
+      height: 27px;
+      display: block;
+      color: currentColor;
+    }
+
+    &:hover,
+    &:focus-visible {
+      background: var(--blue2-hover, #111820);
+      color: var(--blue2-text, #f7f7f8);
+      outline: none;
+    }
   }
 
   .menu {
