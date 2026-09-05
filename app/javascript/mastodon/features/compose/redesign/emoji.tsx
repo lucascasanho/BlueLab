@@ -12,6 +12,7 @@ import { emojiUse } from '@/mastodon/actions/emojis';
 import { changeSetting } from '@/mastodon/actions/settings';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { CircularProgress } from '@/mastodon/components/circular_progress';
+import { waitForCustomEmojiImages } from '@/mastodon/features/emoji';
 import { MenuCard } from '@/mastodon/components/menu/card';
 import type { PopoverChildProps } from '@/mastodon/components/popover';
 import { Popover } from '@/mastodon/components/popover';
@@ -43,14 +44,30 @@ const messages = defineMessages({
   flags: { id: 'emoji_button.flags', defaultMessage: 'Flags' },
 });
 
+// Start fetching the shared picker bundle with the compose UI instead of on
+// the first click. React.lazy reuses this promise when the picker is rendered.
+const emojiPickerModule = import('@/mastodon/features/emoji/emoji_picker');
+
 export const ComposeEmojiButton: React.FC<{ onPick: OnEmojiPick }> = ({
   onPick,
 }) => {
-  const [open, { onToggle, onFalse }] = useToggle();
+  const [open, { onTrue, onFalse }] = useToggle();
   const [target, setTarget] = useState<HTMLButtonElement | null>(null);
   const handleEmojiButtonMouseDown = useCallback(() => {
     captureComposerSelectionOffset();
   }, []);
+  const handleEmojiButtonClick = useCallback(() => {
+    if (open) {
+      onFalse();
+      return;
+    }
+
+    void Promise.all([emojiPickerModule, waitForCustomEmojiImages()])
+      .then(() => {
+        onTrue();
+      })
+      .catch(() => undefined);
+  }, [onFalse, onTrue, open]);
 
   return (
     <>
@@ -59,7 +76,7 @@ export const ComposeEmojiButton: React.FC<{ onPick: OnEmojiPick }> = ({
         icon={SmileyIcon}
         ref={setTarget}
         onMouseDown={handleEmojiButtonMouseDown}
-        onClick={onToggle}
+        onClick={handleEmojiButtonClick}
         aria-expanded={open}
       >
         <FormattedMessage
@@ -90,12 +107,12 @@ export const ComposeEmojiButton: React.FC<{ onPick: OnEmojiPick }> = ({
 };
 
 const EmojiPicker = lazy(() =>
-  import('@/mastodon/features/emoji/emoji_picker').then(({ Picker }) => ({
+  emojiPickerModule.then(({ Picker }) => ({
     default: Picker,
   })),
 );
 const Emoji = lazy(() =>
-  import('@/mastodon/features/emoji/emoji_picker').then(({ Emoji }) => ({
+  emojiPickerModule.then(({ Emoji }) => ({
     default: Emoji,
   })),
 );
@@ -208,8 +225,6 @@ const ComposeEmojiDropdown: React.FC<
           showSkinTones={false}
           // We need to cast as unknown as this requires a legacy class component.
           notFound={NotFound as unknown as () => React.Component}
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus
           emojiTooltip
         />
 
