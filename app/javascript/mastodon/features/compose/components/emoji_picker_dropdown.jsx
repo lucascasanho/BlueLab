@@ -9,6 +9,7 @@ import { supportsPassiveEvents } from 'detect-passive-events';
 
 import MoodIcon from '@/material-icons/400-20px/mood.svg?react';
 import { IconButton } from '@/mastodon/components/icon_button';
+import { waitForCustomEmojiImages } from '@/mastodon/features/emoji';
 import { injectIntl } from '@/mastodon/components/intl';
 import { Popover } from '@/mastodon/components/popover';
 
@@ -31,6 +32,27 @@ const messages = defineMessages({
 });
 
 let EmojiPicker, Emoji; // load asynchronously
+let emojiPickerPromise;
+
+const loadEmojiPicker = () => {
+  if (!emojiPickerPromise) {
+    emojiPickerPromise = EmojiPickerAsync()
+      .then(EmojiMart => {
+        EmojiPicker = EmojiMart.Picker;
+        Emoji = EmojiMart.Emoji;
+      })
+      .catch(error => {
+        emojiPickerPromise = null;
+        throw error;
+      });
+  }
+
+  return emojiPickerPromise;
+};
+
+// Warm the picker bundle as soon as the compose controls mount so opening the
+// picker does not need to fetch or evaluate its component chunk on demand.
+void loadEmojiPicker().catch(() => undefined);
 
 const listenerOptions = supportsPassiveEvents ? { passive: true, capture: true } : true;
 
@@ -172,20 +194,7 @@ class EmojiPickerMenuImpl extends PureComponent {
 
   state = {
     modifierOpen: false,
-    readyToFocus: false,
   };
-
-  componentDidMount() {
-    // Because of https://github.com/react-bootstrap/react-bootstrap/issues/2614 we need
-    // to wait for a frame before focusing
-    requestAnimationFrame(() => {
-      this.setState({ readyToFocus: true });
-      if (this.node) {
-        const element = this.node.querySelector('input[type="search"]');
-        if (element) element.focus();
-      }
-    });
-  }
 
   setRef = c => {
     this.node = c;
@@ -260,7 +269,6 @@ class EmojiPickerMenuImpl extends PureComponent {
           showPreview={false}
           showSkinTones={false}
           notFound={notFoundFn}
-          autoFocus={this.state.readyToFocus}
           emojiTooltip
         />
 
@@ -300,19 +308,15 @@ class EmojiPickerDropdown extends PureComponent {
   };
 
   onShowDropdown = () => {
-    this.setState({ active: true });
+    this.setState({ loading: true });
 
-    if (!EmojiPicker) {
-      this.setState({ loading: true });
-
-      EmojiPickerAsync().then(EmojiMart => {
-        EmojiPicker = EmojiMart.Picker;
-        Emoji = EmojiMart.Emoji;
-        this.setState({ loading: false });
-      }).catch(() => {
+    void Promise.all([loadEmojiPicker(), waitForCustomEmojiImages()])
+      .then(() => {
+        this.setState({ loading: false, active: true });
+      })
+      .catch(() => {
         this.setState({ loading: false, active: false });
       });
-    }
   };
 
   onHideDropdown = () => {
