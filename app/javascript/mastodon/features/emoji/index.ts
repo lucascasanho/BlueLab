@@ -84,7 +84,7 @@ function preloadCustomEmojiImage(
       preloadedCustomEmojiUrls.add(url);
       void image
         .decode()
-        .catch(() => {})
+        .catch(() => undefined)
         .finally(() => {
           finish(true);
         });
