@@ -9,7 +9,7 @@ class REST::AccountSerializer < ActiveModel::Serializer
   attributes :id, :username, :acct, :display_name, :locked, :bot, :discoverable, :indexable, :group, :created_at,
              :note, :url, :uri, :avatar, :avatar_static, :avatar_description, :header, :header_static, :header_description,
              :followers_count, :following_count, :statuses_count, :last_status_at, :hide_collections,
-             :show_media, :show_media_replies, :show_featured, :verified_by_role
+             :show_media, :show_media_replies, :show_featured, :verified_by_role, :verified_by_role_since
 
   has_one :moved_to_account, key: :moved, serializer: REST::AccountSerializer, if: :moved_and_not_nested?
 
@@ -180,6 +180,20 @@ class REST::AccountSerializer < ActiveModel::Serializer
     return false if object.unavailable?
 
     object.user_role&.name.to_s.strip == 'Verificado'
+  end
+
+  def verified_by_role_since
+    return unless verified_by_role
+
+    user = object.user
+    return if user.nil?
+
+    Rails.cache.fetch(['verified-role-since', user.id, user.role_id, user.updated_at.to_i], expires_in: 6.hours) do
+      Admin::ActionLog
+        .where(action: 'change_role', target_type: 'User', target_id: user.id)
+        .order(created_at: :desc)
+        .pick(:created_at)
+    end
   end
 
   def roles
