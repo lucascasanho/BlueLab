@@ -94,7 +94,12 @@ export const Blue2Navigation: React.FC = () => {
       {signedIn && <Blue2AccountMenu />}
 
       <div className={classes.items}>
-        <Item to={homePath} exact icon={HouseIcon}>
+        <Item
+          to={homePath}
+          exact
+          icon={HouseIcon}
+          className={classes.wideHomeItem}
+        >
           <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
         </Item>
         <Item to='/explore' icon={Blue2SearchIcon}>
