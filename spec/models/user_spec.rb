@@ -65,6 +65,22 @@ RSpec.describe User do
     end
   end
 
+  describe 'defaults for new registrations' do
+    it 'applies the BlueLab defaults when the user has a registration IP' do
+      user = Fabricate(:user, sign_up_ip: '192.0.2.1')
+
+      expect(user.chosen_languages).to eq(%w(pt))
+      expect(user.settings['web.auto_play']).to be(true)
+    end
+
+    it 'does not apply registration defaults to internally-created users' do
+      user = Fabricate(:user)
+
+      expect(user.chosen_languages).to be_nil
+      expect(user.settings['web.auto_play']).to be_nil
+    end
+  end
+
   describe 'scopes', :inline_jobs do
     describe 'recent' do
       it 'returns an array of recent users ordered by id' do

@@ -17,13 +17,12 @@ RSpec.describe 'Settings preferences appearance page' do
     uncheck confirm_delete_field
 
     check advanced_layout_field
-    select alternate_theme_label, from: theme_field
+    expect(page).to have_no_field(theme_field)
 
     expect { save_changes }
       .to change { user.reload.settings['web.reblog_modal'] }.to(true)
       .and change { user.reload.settings['web.delete_modal'] }.to(false)
       .and(change { user.reload.settings['web.advanced_layout'] }.to(true))
-      .and(change { user.reload.settings['theme'] }.to(alternate_theme))
     expect(page)
       .to have_title(I18n.t('settings.appearance'))
   end
@@ -42,14 +41,6 @@ RSpec.describe 'Settings preferences appearance page' do
 
   def advanced_layout_field
     form_label('defaults.setting_advanced_layout')
-  end
-
-  def alternate_theme
-    Themes.instance.names.find { |theme| theme != user.settings['theme'] }
-  end
-
-  def alternate_theme_label
-    I18n.t("themes.#{alternate_theme}", default: alternate_theme)
   end
 
   def theme_field

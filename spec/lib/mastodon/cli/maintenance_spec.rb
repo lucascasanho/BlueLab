@@ -95,7 +95,13 @@ RSpec.describe Mastodon::CLI::Maintenance do
           ActiveRecord::Base.connection.add_index :accounts, :uri
 
           duplicate_record(:account, username: duplicate_account_username, domain: duplicate_account_domain, legacy_keypair: true)
-          duplicate_record(:account, username: duplicate_account_username, domain: nil)
+          duplicate_local_account_without_reservation
+        end
+
+        def duplicate_local_account_without_reservation
+          account = Fabricate.build(:account, username: duplicate_account_username, domain: 'temporary.invalid')
+          account.save!(validate: false)
+          account.update_column(:domain, nil)
         end
 
         def choose_local_account_to_keep

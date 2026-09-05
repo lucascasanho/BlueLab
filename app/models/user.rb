@@ -124,7 +124,7 @@ class User < ApplicationRecord
   normalizes :chosen_languages, with: ->(chosen_languages) { chosen_languages.compact_blank.presence }
 
   def set_new_local_account_defaults
-    return unless account&.local?
+    return unless account&.local? && sign_up_ip.present?
 
     account.discoverable = true if account.discoverable.nil?
     self.chosen_languages = DEFAULT_CHOSEN_LANGUAGES if chosen_languages.blank?

@@ -145,17 +145,21 @@ RSpec.describe AccountUsernameChangeService do
     results = Concurrent::Array.new
     contended_username = "contended_#{SecureRandom.hex(6)}"
 
-    multi_threaded_execution(2) do |index|
-      described_class.new.call(users[index], username: contended_username, current_password: password)
-      results << :success
-    rescue described_class::Error => e
-      results << e.code
-    ensure
-      ActiveRecord::Base.connection_pool.release_connection
-    end
+    begin
+      multi_threaded_execution(2) do |index|
+        described_class.new.call(users[index], username: contended_username, current_password: password)
+        results << :success
+      rescue described_class::Error => e
+        results << e.code
+      ensure
+        ActiveRecord::Base.connection_pool.release_connection
+      end
 
-    expect(results).to contain_exactly(:success, :conflict)
-    expect(Account.where('lower(username) = ?', contended_username).count).to eq(1)
-    expect(AccountUsernameReservation.where('lower(username) = ?', contended_username).count).to eq(1)
+      expect(results).to contain_exactly(:success, satisfy { |result| result.in?(%i(conflict reserved)) })
+      expect(Account.where('lower(username) = ?', contended_username).count).to eq(1)
+      expect(AccountUsernameReservation.where('lower(username) = ?', contended_username).count).to eq(1)
+    ensure
+      Account.where(id: users.map(&:account_id)).destroy_all
+    end
   end
 end

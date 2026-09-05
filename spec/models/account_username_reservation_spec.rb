@@ -21,8 +21,8 @@ RSpec.describe AccountUsernameReservation do
   end
 
   it 'accepts the dotted username used by local application actors' do
-    account = Fabricate(:account, actor_type: 'Application', username: 'mastodon.internal')
+    account = Fabricate(:account, actor_type: 'Application', username: 'application.internal')
 
-    expect(account.username_reservations.sole.username).to eq('mastodon.internal')
+    expect(account.username_reservations.sole.username).to eq('application.internal')
   end
 end

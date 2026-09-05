@@ -556,7 +556,13 @@ class Account < ApplicationRecord
   end
 
   def reserve_local_username
-    username_reservations.create!(username:)
+    reservation = AccountUsernameReservation.find_by('lower(username) = lower(?)', username) if actor_type_application?
+
+    if reservation&.account_id.nil?
+      reservation.update!(account: self, relinquished_at: nil)
+    else
+      username_reservations.create!(username:)
+    end
   end
 
   def generate_keys

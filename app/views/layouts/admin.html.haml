@@ -7,7 +7,7 @@
 - blue2_theme = current_theme == 'blue-2'
 
 - content_for :content do
-  - mobile_page_title = strip_tags(content_for(:page_title)).strip
+  - mobile_page_title = strip_tags(content_for(:page_title)).to_s.strip
   %a.navigation-skip-link{ href: '#content' }= t('admin.skip_to_content')
   .admin-wrapper
     %header.sidebar-wrapper

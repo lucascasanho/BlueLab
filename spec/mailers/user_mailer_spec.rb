@@ -66,12 +66,12 @@ RSpec.describe UserMailer do
     end
 
     it 'uses customized light and dark colors in the HTML layout' do
-      Setting.email_background_color = '#123456'
-      Setting.email_surface_color = '#234567'
-      Setting.email_text_color = '#345678'
-      Setting.email_dark_background_color = '#102030'
-      Setting.email_dark_surface_color = '#203040'
-      Setting.email_dark_text_color = '#f0f1f2'
+      Setting.instance_light_background_color = '#123456'
+      Setting.instance_light_surface_color = '#234567'
+      Setting.instance_light_text_color = '#345678'
+      Setting.instance_dark_background_color = '#102030'
+      Setting.instance_dark_surface_color = '#203040'
+      Setting.instance_dark_text_color = '#f0f1f2'
 
       html = mail.html_part.body.decoded
 

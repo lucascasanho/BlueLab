@@ -14,6 +14,8 @@ class UniqueUsernameValidator < ActiveModel::Validator
     return unless account.local? && defined?(AccountUsernameReservation)
 
     reservation = AccountUsernameReservation.find_by('lower(username) = lower(?)', account.username)
+    return if account.actor_type_application? && reservation&.account_id.nil?
+
     account.errors.add(:username, :reserved) if reservation.present? && reservation.account_id != account.id
   end
 end
