@@ -146,30 +146,30 @@ RSpec.describe REST::AccountSerializer do
           end
         end
       end
-    end
 
-    context 'when account is not discoverable' do
-      let(:account) { Fabricate(:account, discoverable: false) }
+      context 'when account is not discoverable' do
+        let(:account) { Fabricate(:account, discoverable: false) }
 
-      it 'includes a policy that disallows featuring' do
-        expect(subject['feature_approval']).to include({
-          'automatic' => [],
-          'manual' => [],
-          'current_user' => 'denied',
-        })
+        it 'includes a policy that disallows featuring' do
+          expect(subject['feature_approval']).to include({
+            'automatic' => [],
+            'manual' => [],
+            'current_user' => 'denied',
+          })
+        end
       end
     end
-  end
 
-  context 'when account is remote' do
-    let(:account) { Fabricate(:account, domain: 'example.com', feature_approval_policy: 0b11000000000000000010) }
+    context 'when account is remote' do
+      let(:account) { Fabricate(:account, domain: 'example.com', feature_approval_policy: 0b11000000000000000010) }
 
-    it 'includes the matching policy' do
-      expect(subject['feature_approval']).to include({
-        'automatic' => ['followers', 'following'],
-        'manual' => ['public'],
-        'current_user' => 'manual',
-      })
+      it 'includes the matching policy' do
+        expect(subject['feature_approval']).to include({
+          'automatic' => ['followers', 'following'],
+          'manual' => ['public'],
+          'current_user' => 'manual',
+        })
+      end
     end
   end
 end
