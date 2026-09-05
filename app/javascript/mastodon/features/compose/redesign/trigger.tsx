@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { createPortal } from 'react-dom';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -64,6 +65,10 @@ export const ComposeRedesignButton: React.FC<{
   > | null>(null);
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const portalBlue2InlineOverlay = (content: React.ReactNode) =>
+    isBlue2 && inline && typeof document !== 'undefined'
+      ? createPortal(content, document.body)
+      : content;
 
   // Update viewport based on visual size in order to account for the virtual keyboard.
   const [viewportHeight, setViewportHeight] = useState<null | number>(null);
@@ -203,10 +208,10 @@ export const ComposeRedesignButton: React.FC<{
   }
 
   if (displayState === 'minimized') {
-    return (
+    return portalBlue2InlineOverlay(
       <MenuCard className={classes.composerMinimized} elevation={2}>
         <ComposeFormHeader />
-      </MenuCard>
+      </MenuCard>,
     );
   }
 
@@ -216,7 +221,7 @@ export const ComposeRedesignButton: React.FC<{
       '--viewport-height': viewportHeight ? `${viewportHeight}px` : undefined,
     } as React.CSSProperties;
 
-    return (
+    return portalBlue2InlineOverlay(
       <Suspense fallback={<CircularProgress strokeWidth={2} size={50} />}>
         <ComposeLazyForm
           ref={composerRef}
@@ -224,7 +229,7 @@ export const ComposeRedesignButton: React.FC<{
           className={classes.composer}
           style={style}
         />
-      </Suspense>
+      </Suspense>,
     );
   }
 
