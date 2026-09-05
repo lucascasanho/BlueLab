@@ -1819,7 +1819,7 @@ eo:
     aliases: Kontoj alinomoj
     appearance: Apero
     authorized_apps: Rajtigitaj aplikaĵoj
-    back: Reveni al Espelunca
+    back: Reveni al %{site_title}
     delete: Konta forigo
     development: Evoluigado
     edit_profile: Redakti profilon

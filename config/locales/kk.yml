@@ -610,7 +610,7 @@ kk:
     aliases: Аккаунт алиастары
     appearance: Сыртқы түрі
     authorized_apps: Authorizеd apps
-    back: Желіге оралу
+    back: "%{site_title} желісіне оралу"
     delete: Аккаунт өшіру
     development: Жасаушы топ
     edit_profile: Профиль өңдеу

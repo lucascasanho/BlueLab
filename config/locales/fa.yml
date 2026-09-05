@@ -1987,7 +1987,7 @@ fa:
     aliases: نام‌های مستعار
     appearance: نما
     authorized_apps: برنامه‌های مجاز
-    back: بازگشت به Espelunca
+    back: بازگشت به %{site_title}
     delete: پاک‌کردن حساب
     development: فرابری
     edit_profile: ویرایش نمایه

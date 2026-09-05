@@ -1338,7 +1338,7 @@ sco:
     aliases: Accoont aliases
     appearance: Appearance
     authorized_apps: Authorized apps
-    back: Back tae Espelunca
+    back: Back tae %{site_title}
     delete: Accoont deletion
     development: Development
     edit_profile: Edit profile

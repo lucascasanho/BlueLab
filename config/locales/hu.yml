@@ -2089,7 +2089,7 @@ hu:
     aliases: Fiók aliasok
     appearance: Megjelenés
     authorized_apps: Jóváhagyott alkalmazások
-    back: Vissza az Espeluncához
+    back: 'Vissza ide: %{site_title}'
     delete: Fiók törlése
     development: Fejlesztőknek
     edit_profile: Profil szerkesztése

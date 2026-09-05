@@ -1560,7 +1560,7 @@ zh-HK:
     aliases: 帳戶別名(aliases)
     appearance: 外觀設定
     authorized_apps: 授權應用程式
-    back: 回到 Espelunca
+    back: 回到 %{site_title}
     delete: 刪除帳戶
     development: 開發
     edit_profile: 修改個人資料

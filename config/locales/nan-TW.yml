@@ -2044,7 +2044,7 @@ nan-TW:
     aliases: 口座ê別名
     appearance: 外觀
     authorized_apps: 受授權ê應用程式
-    back: 轉去Espelunca
+    back: 轉去%{site_title}
     delete: Thâi掉口座
     development: 開發
     edit_profile: 編輯個人資料

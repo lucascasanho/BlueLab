@@ -1726,7 +1726,7 @@ th:
     aliases: นามแฝงบัญชี
     appearance: ลักษณะที่ปรากฏ
     authorized_apps: แอปที่ได้รับอนุญาต
-    back: กลับไปที่ Espelunca
+    back: กลับไปที่ %{site_title}
     delete: การลบบัญชี
     development: การพัฒนา
     edit_profile: แก้ไขโปรไฟล์

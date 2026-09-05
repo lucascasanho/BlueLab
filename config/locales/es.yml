@@ -2091,7 +2091,7 @@ es:
     aliases: Alias de la cuenta
     appearance: Apariencia
     authorized_apps: Aplicaciones autorizadas
-    back: Volver al inicio
+    back: Volver a %{site_title}
     delete: Borrar cuenta
     development: Desarrollo
     edit_profile: Editar perfil

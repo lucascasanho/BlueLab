@@ -2226,7 +2226,7 @@ ga:
     aliases: Ailiasanna cuntais
     appearance: Cuma
     authorized_apps: Aipeanna údaraithe
-    back: Ar ais go Espelunca
+    back: Ar ais go %{site_title}
     delete: Scriosadh cuntais
     development: Forbairt
     edit_profile: Cuir an phróifíl in eagar

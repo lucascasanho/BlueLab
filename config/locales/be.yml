@@ -2179,7 +2179,7 @@ be:
     aliases: Псеўданімы ўліковага запісу
     appearance: Выгляд
     authorized_apps: Аўтарызаваныя праграмы
-    back: Назад да Espelunca
+    back: Назад да %{site_title}
     delete: Выдаленне ўліковага запісу
     development: Распрацоўка
     edit_profile: Рэдагаваць профіль

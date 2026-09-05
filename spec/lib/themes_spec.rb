@@ -23,7 +23,7 @@ RSpec.describe Themes do
 
   describe 'BlueLab stylesheet' do
     it 'keeps the latest BlueLab 2.0 entrypoint in the repository' do
-      expect(Rails.root.join('app/javascript/styles/blue-2-v7.scss')).to exist
+      expect(Rails.root / 'app/javascript/styles/blue-2-v7.scss').to exist
     end
   end
 end

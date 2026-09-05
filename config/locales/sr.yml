@@ -1606,7 +1606,7 @@ sr:
     aliases: Псеудоними налога
     appearance: Изглед
     authorized_apps: Ауторизоване апликације
-    back: Назад на Espelunca
+    back: Назад на %{site_title}
     delete: Брисање налога
     development: Развој
     edit_profile: Уређивање профила

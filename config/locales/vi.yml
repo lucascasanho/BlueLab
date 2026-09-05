@@ -2044,7 +2044,7 @@ vi:
     aliases: Kết nối tài khoản
     appearance: Giao diện
     authorized_apps: Ứng dụng
-    back: Quay lại Espelunca
+    back: Quay lại %{site_title}
     delete: Xóa tài khoản
     development: Lập trình
     edit_profile: Sửa hồ sơ

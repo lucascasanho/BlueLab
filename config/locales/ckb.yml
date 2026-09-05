@@ -890,7 +890,7 @@ ckb:
     aliases: نازناوەی هەژمارە
     appearance: ڕووخسار
     authorized_apps: ئەپەکانی ڕێگەپێدراو
-    back: گەڕانەوە بۆ Espelunca
+    back: گەڕانەوە بۆ %{site_title}
     delete: سڕینەوەی هەژمارە
     development: گەشەپێدان
     edit_profile: دەستکاری پرۆفایل

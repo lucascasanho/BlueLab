@@ -2089,7 +2089,7 @@ el:
     aliases: Ψευδώνυμα λογαριασμών
     appearance: Εμφάνιση
     authorized_apps: Εγκεκριμένες εφαρμογές
-    back: Πίσω στην Espelunca
+    back: Πίσω στην %{site_title}
     delete: Διαγραφή λογαριασμού
     development: Ανάπτυξη
     edit_profile: Επεξεργασία προφίλ

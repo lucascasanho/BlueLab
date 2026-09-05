@@ -876,7 +876,7 @@ co:
     aliases: Pseudonimi di contu
     appearance: Apparenza
     authorized_apps: Applicazione auturizate
-    back: Ritornu nant’à Espelunca
+    back: Ritornu nant’à %{site_title}
     delete: Suppressione di u contu
     development: Sviluppu
     edit_profile: Mudificà u prufile

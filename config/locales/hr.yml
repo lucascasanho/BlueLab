@@ -195,7 +195,7 @@ hr:
     aliases: Pseudonimi računa
     appearance: Izgled
     authorized_apps: Autorizirane aplikacije
-    back: Natrag na Espelunca
+    back: Natrag na %{site_title}
     delete: Brisanje računa
     development: Razvijanje
     edit_profile: Uredi profil

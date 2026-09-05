@@ -1,7 +1,5 @@
 ---
 en:
-  time_zones:
-    campo_grande: Campo Grande - Mato Grosso do Sul, Brazil
   about:
     about_mastodon_html: 'The social network of the future: No ads, no corporate surveillance, ethical design, and decentralization! Own your data with Mastodon!'
     contact_missing: Not set
@@ -183,7 +181,6 @@ en:
       whitelisted: Allowed for federation
     action_logs:
       action_types:
-        update_instance_customization_account: Update instance customization
         approve_appeal: Approve Appeal
         approve_user: Approve User
         assigned_to_self_report: Assign Report
@@ -202,7 +199,6 @@ en:
         create_unavailable_domain: Create Unavailable Domain
         create_user_role: Create Role
         create_username_block: Create Username Rule
-        username_change_account: Change Username
         demote_user: Demote User
         destroy_announcement: Delete Announcement
         destroy_canonical_email_block: Delete Email Block
@@ -247,13 +243,14 @@ en:
         update_announcement: Update Announcement
         update_custom_emoji: Update Custom Emoji
         update_domain_block: Update Domain Block
+        update_instance_customization_account: Update instance customization
         update_ip_block: Update IP rule
         update_report: Update Report
         update_status: Update Post
         update_user_role: Update Role
         update_username_block: Update Username Rule
+        username_change_account: Change Username
       actions:
-        update_instance_customization_account_html: "%{name} updated instance customization"
         approve_appeal_html: "%{name} approved moderation decision appeal from %{target}"
         approve_user_html: "%{name} approved sign-up from %{target}"
         assigned_to_self_report_html: "%{name} assigned report %{target} to themselves"
@@ -298,7 +295,6 @@ en:
         enable_user_html: "%{name} enabled login for user %{target}"
         listable_tag_html: can be suggested
         memorialize_account_html: "%{name} turned %{target}'s account into a memoriam page"
-        username_change_account_html: "%{name} changed the username of %{target}"
         not_listable_tag_html: won't be suggested
         not_trendable_tag_html: won't appear under trends
         not_usable_tag_html: cannot be used
@@ -324,6 +320,7 @@ en:
         update_collection_html: "%{name} updated collection by %{target}"
         update_custom_emoji_html: "%{name} updated emoji %{target}"
         update_domain_block_html: "%{name} updated domain block for %{target}"
+        update_instance_customization_account_html: "%{name} updated instance customization"
         update_ip_block_html: "%{name} changed rule for IP %{target}"
         update_report_html: "%{name} updated report %{target}"
         update_status_html: "%{name} updated post by %{target}"
@@ -331,6 +328,7 @@ en:
         update_user_role_html: "%{name} changed %{target} role"
         update_username_block_html: "%{name} updated rule for usernames containing %{target}"
         usable_tag_html: can be used;
+        username_change_account_html: "%{name} changed the username of %{target}"
       deleted_account: deleted account
       empty: No logs found.
       filter_by_action: Filter by action
@@ -944,73 +942,6 @@ en:
       translations: Translations
       translations_explanation: You can optionally add translations for the rules. The default value will be shown if no translated version is available. Please always ensure any provided translation is in sync with the default value.
     settings:
-      instance_customization:
-        admin_status_limit: Character limit for administrators
-        auth_logo: Authentication pages logo
-        auth_logo_hint: Shown on sign-in, registration and other authentication pages. PNG, JPEG or WebP; maximum 2 MB; square image of at least 64 × 64 px (128 × 128 px or larger recommended).
-        branding: Branding
-        branding_hint_html: Favicon, PWA/Apple icons and the OpenGraph image remain on the <a href="%{branding_path}">Branding page</a>. Internal SPA SVG logos remain versioned to prevent arbitrary SVG.
-        colors_hint: The color overrides semantic accent tokens while preserving each theme's neutral palette.
-        contrast_error: must reach a minimum contrast of %{ratio}:1 against white
-        dark_theme: Dark theme
-        effective_color: "Effective color:"
-        email: Email
-        email_background_color: Email outer background
-        email_background_color_hint: Background around the main email card in light mode.
-        email_button_color: Primary email button color
-        email_button_color_hint: Fill color for primary action buttons in email templates.
-        email_link_color: Email link color
-        email_link_color_hint: Links in content, text actions, and arrow links.
-        email_dark_background_color: Email outer background in dark mode
-        email_dark_background_color_hint: Background around the main email card when the email client uses dark mode.
-        email_dark_muted_color: Email secondary text in dark mode
-        email_dark_muted_color_hint: Handles, metadata, descriptions and footer text in dark mode.
-        email_dark_surface_color: Email content background in dark mode
-        email_dark_surface_color_hint: Main cards and content areas in dark mode.
-        email_dark_text_color: Email primary text in dark mode
-        email_dark_text_color_hint: Headings and main content in dark mode.
-        email_dark_theme: Email dark mode
-        email_logo: Email header logo
-        email_logo_hint: Shown only in email headers beside the instance name. PNG, JPEG or WebP; maximum 2 MB; square image of at least 64 × 64 px (128 × 128 px or larger recommended).
-        email_muted_color: Email secondary text
-        email_muted_color_hint: Handles, metadata, descriptions and footer text in light mode.
-        email_primary_color: Email header accent color
-        email_primary_color_hint: Border and structural accent in the email header.
-        email_surface_color: Email content background
-        email_surface_color_hint: Main cards and content areas in light mode.
-        email_text_color: Email primary text
-        email_text_color_hint: Headings and main content in light mode.
-        hide_admin_status_character_counter: Hide character counter for administrators
-        hide_status_character_counter: Hide character counter for standard users
-        image_limit: Image limit (MB)
-        instance_accent_color: Interface accent color
-        instance_accent_color_hint: Primary buttons, links, focus, remote account domains, and other semantic accent tokens.
-        instance_dark_background_color: Dark mode background
-        instance_dark_background_color_hint: Main page and column background in Mastodon and Bird UI dark themes.
-        instance_dark_surface_color: Dark mode surface
-        instance_dark_surface_color_hint: Cards, panels, menus and secondary areas in Mastodon and Bird UI dark themes.
-        instance_dark_text_color: Dark mode primary text
-        instance_dark_text_color_hint: Names, headings and main content in Mastodon and Bird UI dark themes.
-        instance_light_background_color: Light mode background
-        instance_light_background_color_hint: Main page and column background in Mastodon and Bird UI light themes.
-        instance_light_surface_color: Light mode surface
-        instance_light_surface_color_hint: Cards, panels, menus and secondary areas in Mastodon and Bird UI light themes.
-        instance_light_text_color: Light mode primary text
-        instance_light_text_color_hint: Names, headings and main content in Mastodon and Bird UI light themes.
-        interface: Interface and themes
-        light_theme: Light theme
-        media: Media
-        nginx_warning: "Detected local configuration: nginx accepts at most %{limit} MB. Larger values are rejected before reaching Mastodon."
-        posts: Posts
-        pair_contrast_error: must reach a minimum contrast of %{ratio}:1 against its corresponding background
-        preamble: Persistent, validated server customization. Saving does not edit source files and changes apply immediately.
-        proxy_warning: This is the Mastodon limit. Proxies, CDNs or tunnels, including Cloudflare, may impose smaller limits and must be configured separately.
-        restore_defaults: Restore all defaults
-        restore_color_default: Restore this color
-        restore_defaults_confirm: This removes every customization on this page and restores the default values. Do you want to continue?
-        status_limit: Character limit for standard users
-        title: Instance customization
-        video_limit: Video limit (MB)
       about:
         manage_rules: Manage server rules
         preamble: Provide in-depth information about how the server is operated, moderated, funded.
@@ -1059,6 +990,73 @@ en:
           authenticated: Authenticated users only
           disabled: Require specific user role
           public: Everyone
+      instance_customization:
+        admin_status_limit: Character limit for administrators
+        auth_logo: Authentication pages logo
+        auth_logo_hint: Shown on sign-in, registration and other authentication pages. PNG, JPEG or WebP; maximum 2 MB; square image of at least 64 × 64 px (128 × 128 px or larger recommended).
+        branding: Branding
+        branding_hint_html: Favicon, PWA/Apple icons and the OpenGraph image remain on the <a href="%{branding_path}">Branding page</a>. Internal SPA SVG logos remain versioned to prevent arbitrary SVG.
+        colors_hint: The color overrides semantic accent tokens while preserving each theme's neutral palette.
+        contrast_error: must reach a minimum contrast of %{ratio}:1 against white
+        dark_theme: Dark theme
+        effective_color: 'Effective color:'
+        email: Email
+        email_background_color: Email outer background
+        email_background_color_hint: Background around the main email card in light mode.
+        email_button_color: Primary email button color
+        email_button_color_hint: Fill color for primary action buttons in email templates.
+        email_dark_background_color: Email outer background in dark mode
+        email_dark_background_color_hint: Background around the main email card when the email client uses dark mode.
+        email_dark_muted_color: Email secondary text in dark mode
+        email_dark_muted_color_hint: Handles, metadata, descriptions and footer text in dark mode.
+        email_dark_surface_color: Email content background in dark mode
+        email_dark_surface_color_hint: Main cards and content areas in dark mode.
+        email_dark_text_color: Email primary text in dark mode
+        email_dark_text_color_hint: Headings and main content in dark mode.
+        email_dark_theme: Email dark mode
+        email_link_color: Email link color
+        email_link_color_hint: Links in content, text actions, and arrow links.
+        email_logo: Email header logo
+        email_logo_hint: Shown only in email headers beside the instance name. PNG, JPEG or WebP; maximum 2 MB; square image of at least 64 × 64 px (128 × 128 px or larger recommended).
+        email_muted_color: Email secondary text
+        email_muted_color_hint: Handles, metadata, descriptions and footer text in light mode.
+        email_primary_color: Email header accent color
+        email_primary_color_hint: Border and structural accent in the email header.
+        email_surface_color: Email content background
+        email_surface_color_hint: Main cards and content areas in light mode.
+        email_text_color: Email primary text
+        email_text_color_hint: Headings and main content in light mode.
+        hide_admin_status_character_counter: Hide character counter for administrators
+        hide_status_character_counter: Hide character counter for standard users
+        image_limit: Image limit (MB)
+        instance_accent_color: Interface accent color
+        instance_accent_color_hint: Primary buttons, links, focus, remote account domains, and other semantic accent tokens.
+        instance_dark_background_color: Dark mode background
+        instance_dark_background_color_hint: Main page and column background in Mastodon and Bird UI dark themes.
+        instance_dark_surface_color: Dark mode surface
+        instance_dark_surface_color_hint: Cards, panels, menus and secondary areas in Mastodon and Bird UI dark themes.
+        instance_dark_text_color: Dark mode primary text
+        instance_dark_text_color_hint: Names, headings and main content in Mastodon and Bird UI dark themes.
+        instance_light_background_color: Light mode background
+        instance_light_background_color_hint: Main page and column background in Mastodon and Bird UI light themes.
+        instance_light_surface_color: Light mode surface
+        instance_light_surface_color_hint: Cards, panels, menus and secondary areas in Mastodon and Bird UI light themes.
+        instance_light_text_color: Light mode primary text
+        instance_light_text_color_hint: Names, headings and main content in Mastodon and Bird UI light themes.
+        interface: Interface and themes
+        light_theme: Light theme
+        media: Media
+        nginx_warning: 'Detected local configuration: nginx accepts at most %{limit} MB. Larger values are rejected before reaching Mastodon.'
+        pair_contrast_error: must reach a minimum contrast of %{ratio}:1 against its corresponding background
+        posts: Posts
+        preamble: Persistent, validated server customization. Saving does not edit source files and changes apply immediately.
+        proxy_warning: This is the Mastodon limit. Proxies, CDNs or tunnels, including Cloudflare, may impose smaller limits and must be configured separately.
+        restore_color_default: Restore this color
+        restore_defaults: Restore all defaults
+        restore_defaults_confirm: This removes every customization on this page and restores the default values. Do you want to continue?
+        status_limit: Character limit for standard users
+        title: Instance customization
+        video_limit: Video limit (MB)
       landing_page:
         hints:
           about_html: A page with the description, contact information, rules and other information regarding this server.
@@ -2040,6 +2038,26 @@ en:
     older: Older
     prev: Prev
     truncate_html: "&hellip;"
+  passkeys:
+    add: Add passkey
+    authentication_error: We couldn't use this passkey. Please try again or use your password.
+    cancelled: Passkey authentication was cancelled.
+    create:
+      error: We couldn't add this passkey. Please try again.
+      success: Passkey added successfully.
+    delete: Delete
+    delete_confirmation: Are you sure you want to delete this passkey?
+    description: Use a passkey to sign in to %{site_title} without typing your password.
+    destroy:
+      error: We couldn't delete this passkey. Please try again.
+      success: Passkey removed.
+    empty: You haven't added any passkeys yet.
+    nickname: Passkey name
+    nickname_hint: For example, iPhone, Windows Hello, or YubiKey
+    not_supported: This browser doesn't support passkeys.
+    registered_on: Added on %{date}
+    sign_in: Sign in with a passkey
+    title: Passkeys
   polls:
     errors:
       already_voted: You have already voted on this poll
@@ -2054,12 +2072,16 @@ en:
       too_many_options: can't contain more than %{max} items
     vote: Vote
   posting_defaults:
-    explanation: These settings will be used as defaults when you create new posts, but you can edit them per post within the composer.
     composer_editor: Publication editor
     composer_editor_hint: Choose the editor used when creating a new post.
     composer_editors:
       bluelab: Composer BlueLab
       mastodon: Standard Mastodon composer
+    content_type: Post format
+    content_types:
+      markdown: Markdown
+      plain: Basic text (no formatting)
+    explanation: These settings will be used as defaults when you create new posts, but you can edit them per post within the composer.
   preferences:
     other: Other
     posting_defaults: Posting defaults
@@ -2191,7 +2213,6 @@ en:
     statuses_cleanup: Automated post deletion
     strikes: Moderation strikes
     two_factor_authentication: Two-factor Auth
-    webauthn_authentication: Security keys
     username_changes:
       confirmation: I understand the consequences and want to change my username
       cooldown: You can choose a different username after %{date}. During this period, you may only return to your immediately previous username.
@@ -2217,7 +2238,8 @@ en:
       submit: Change my username
       success: Your username was changed from @%{old_username} to @%{new_username}.
       title: Change username
-      warning: 'Your address will change from %{current} to the new username on this server. Your account, followers, follows, posts, media, keys, and settings will remain the same. Other fediverse servers may take time to recognize the new address. Your former usernames remain reserved to your account. After changing, you must wait 15 days before choosing a third username, but you may immediately return to the previous one.'
+      warning: Your address will change from %{current} to the new username on this server. Your account, followers, follows, posts, media, keys, and settings will remain the same. Other fediverse servers may take time to recognize the new address. Your former usernames remain reserved to your account. After changing, you must wait 15 days before choosing a third username, but you may immediately return to the previous one.
+    webauthn_authentication: Security keys
   severed_relationships:
     download: Download (%{count})
     event_type:
@@ -2328,13 +2350,17 @@ en:
     review_link: Review terms of service
     title: The terms of service of %{domain} are changing
   themes:
+    blue-2: BlueLab
     default: Vanilla
+    mastodon-bird-ui-auto: Bird UI
   time:
     formats:
       default: "%b %d, %Y, %H:%M"
       month: "%b %Y"
       time: "%H:%M"
       with_time_zone: "%b %d, %Y, %H:%M %Z"
+  time_zones:
+    campo_grande: Campo Grande - Mato Grosso do Sul, Brazil
   translation:
     errors:
       quota_exceeded: The server-wide usage quota for the translation service has been exceeded.
@@ -2508,27 +2534,6 @@ en:
     verification: Verification
     verified_links: Your verified links
     website_verification: Website verification
-  passkeys:
-    add: Add passkey
-    authentication_error: We couldn't use this passkey. Please try again or use your password.
-    cancelled: Passkey authentication was cancelled.
-    create:
-      error: We couldn't add this passkey. Please try again.
-      success: Passkey added successfully.
-    delete: Delete
-    delete_confirmation: Are you sure you want to delete this passkey?
-    description: Use a passkey to sign in to %{site_title} without typing your password.
-    destroy:
-      error: We couldn't delete this passkey. Please try again.
-      success: Passkey removed.
-    empty: You haven't added any passkeys yet.
-    invalid_for_account: This passkey is not valid for this account.
-    nickname: Passkey name
-    nickname_hint: For example, iPhone, Windows Hello, or YubiKey
-    not_supported: This browser doesn't support passkeys.
-    registered_on: Added on %{date}
-    sign_in: Sign in with a passkey
-    title: Passkeys
   webauthn_credentials:
     add: Add new security key
     create:

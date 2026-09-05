@@ -2089,7 +2089,7 @@ gl:
     aliases: Alcumes da conta
     appearance: Aparencia
     authorized_apps: Apps autorizadas
-    back: Volver a Espelunca
+    back: Volver a %{site_title}
     delete: Eliminación da conta
     development: Desenvolvemento
     edit_profile: Editar perfil

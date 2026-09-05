@@ -27,6 +27,7 @@ import {
   expandConversations,
 } from 'mastodon/actions/conversations';
 import { connectDirectStream } from 'mastodon/actions/streaming';
+import { title as siteTitle } from 'mastodon/initial_state';
 
 import blue2Classes from './blue2.module.scss';
 import { ConversationsList } from './components/conversations_list';
@@ -34,7 +35,12 @@ import { ConversationsList } from './components/conversations_list';
 const messages = defineMessages({
   title: { id: 'column.direct', defaultMessage: 'Private mentions' },
   title_redesign: { id: 'tab_bar.messages', defaultMessage: 'Messages' },
-  blue2Title: { id: 'tabs_bar.messages', defaultMessage: 'Messages' },
+  blue2Title: {
+    id: 'tabs_bar.messages',
+    defaultMessage: 'Messages',
+    description:
+      'Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.',
+  },
 });
 
 interface ColumnBase {
@@ -202,7 +208,8 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
             <span>
               <FormattedMessage
                 id='compose_form.encryption_warning'
-                defaultMessage='Posts on Mastodon are not end-to-end encrypted. Do not share any dangerous information over Mastodon.'
+                defaultMessage='Posts on {siteTitle} are not end-to-end encrypted. Do not share any sensitive information on {siteTitle}.'
+                values={{ siteTitle }}
               />{' '}
               <a
                 href='https://docs.joinmastodon.org/user/posting/#private'

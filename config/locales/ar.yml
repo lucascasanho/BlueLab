@@ -2020,7 +2020,7 @@ ar:
     aliases: كُنيات الحساب
     appearance: المظهر
     authorized_apps: التطبيقات المرخص لها
-    back: عودة إلى Espelunca
+    back: عودة إلى %{site_title}
     delete: حذف الحسابات
     development: التطوير
     edit_profile: تعديل الصفحة التعريفية

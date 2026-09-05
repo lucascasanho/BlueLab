@@ -2090,7 +2090,7 @@ de:
     aliases: Konto-Aliasse
     appearance: Design
     authorized_apps: Genehmigte Apps
-    back: Zurück zu Espelunca
+    back: Zurück zu %{site_title}
     delete: Kontolöschung
     development: Entwicklung
     edit_profile: Profil bearbeiten

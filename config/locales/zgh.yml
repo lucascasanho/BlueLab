@@ -107,6 +107,6 @@ zgh:
   settings:
     account: ⴰⵎⵉⴹⴰⵏ
     account_settings: ⵜⵉⵙⵖⴰⵍ ⵏ ⵓⵎⵉⴹⴰⵏ
-    back: ⴰⵖⵓⵍ ⵖⵔ Espelunca
+    back: ⴰⵖⵓⵍ ⵖⵔ %{site_title}
     edit_profile: ⵙⵏⴼⵍ ⵉⴼⵔⵙ
     profile: ⵉⴼⵔⵙ

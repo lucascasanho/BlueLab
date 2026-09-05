@@ -1844,7 +1844,7 @@ ia:
     aliases: Aliases de conto
     appearance: Apparentia
     authorized_apps: Apps autorisate
-    back: Retornar a Espelunca
+    back: Retornar a %{site_title}
     delete: Deletion de conto
     development: Disveloppamento
     edit_profile: Modificar profilo

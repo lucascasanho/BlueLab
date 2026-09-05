@@ -2089,7 +2089,7 @@ nn:
     aliases: Kallenamn til kontoen
     appearance: Utsjånad
     authorized_apps: Godkjende appar
-    back: Tilbake til Espelunca
+    back: Tilbake til %{site_title}
     delete: Kontosletting
     development: Utvikling
     edit_profile: Endr profil

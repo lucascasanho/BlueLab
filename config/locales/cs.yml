@@ -2179,7 +2179,7 @@ cs:
     aliases: Aliasy účtů
     appearance: Vzhled
     authorized_apps: Autorizované aplikace
-    back: Zpět na Espelunca
+    back: Zpět na %{site_title}
     delete: Smazání účtu
     development: Vývoj
     edit_profile: Upravit profil

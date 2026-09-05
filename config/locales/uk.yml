@@ -1797,7 +1797,7 @@ uk:
     aliases: Псевдоніми облікового запису
     appearance: Вигляд
     authorized_apps: Авторизовані застосунки
-    back: Назад до Espelunca
+    back: Назад до %{site_title}
     delete: Видалення облікового запису
     development: Розробка
     edit_profile: Редагувати профіль
