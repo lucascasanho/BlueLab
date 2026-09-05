@@ -1,8 +1,10 @@
 .root {
   position: relative;
   z-index: 12;
+  flex: 0 0 54px;
   width: 216px;
   height: 54px;
+  min-height: 54px;
   margin-bottom: 8px;
   overflow: visible;
   cursor: pointer;
@@ -161,12 +163,15 @@
 }
 
 // The account control owns the first two compact rail slots: account/profile
-// followed by Home. Keeping both inside this BlueLab-only component avoids
-// generic navigation-list rules from dropping the first item at this breakpoint.
+// followed by Home. Because the navigation itself is a flex column, reserve
+// both slots through flex-basis/min-height as well as height so this block
+// cannot shrink and let the Search item overlap the Home button.
 @media (width < 1180px) {
   .root {
+    flex: 0 0 110px;
     width: 52px;
     height: 110px;
+    min-height: 110px;
   }
 
   .root:hover .accountButton,
