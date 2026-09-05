@@ -6,8 +6,12 @@ import type { DisplayNameProps } from './index';
 const VERIFIED_ROLE_FRAGMENT = 'verificado';
 
 export function hasVerifiedRole(account: DisplayNameProps['account']) {
-  if (!account?.roles) {
+  if (!account) {
     return false;
+  }
+
+  if (account.verified_by_role) {
+    return true;
   }
 
   return Array.from(account.roles).some((role) =>
