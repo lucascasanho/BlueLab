@@ -42,6 +42,40 @@ RSpec.describe REST::AccountSerializer do
     end
   end
 
+  describe '#verified_by_role' do
+    context 'when the account role is Verificado but is not highlighted' do
+      let(:role) { Fabricate(:user_role, name: 'Verificado', highlighted: false) }
+
+      it 'marks the account as verified' do
+        expect(subject['verified_by_role']).to be true
+      end
+    end
+
+    context 'when the account role only contains Verificado as part of its name' do
+      let(:role) { Fabricate(:user_role, name: 'Usuário Verificado', highlighted: true) }
+
+      it 'does not mark the account as verified' do
+        expect(subject['verified_by_role']).to be false
+      end
+    end
+
+    context 'when the account role differs by letter case' do
+      let(:role) { Fabricate(:user_role, name: 'verificado', highlighted: true) }
+
+      it 'does not mark the account as verified' do
+        expect(subject['verified_by_role']).to be false
+      end
+    end
+
+    context 'when the account role does not contain Verificado' do
+      let(:role) { Fabricate(:user_role, name: 'Moderador', highlighted: true) }
+
+      it 'does not mark the account as verified' do
+        expect(subject['verified_by_role']).to be false
+      end
+    end
+  end
+
   context 'when the account is memorialized' do
     before do
       account.memorialize!
@@ -112,30 +146,30 @@ RSpec.describe REST::AccountSerializer do
           end
         end
       end
-
-      context 'when account is not discoverable' do
-        let(:account) { Fabricate(:account, discoverable: false) }
-
-        it 'includes a policy that disallows featuring' do
-          expect(subject['feature_approval']).to include({
-            'automatic' => [],
-            'manual' => [],
-            'current_user' => 'denied',
-          })
-        end
-      end
     end
 
-    context 'when account is remote' do
-      let(:account) { Fabricate(:account, domain: 'example.com', feature_approval_policy: 0b11000000000000000010) }
+    context 'when account is not discoverable' do
+      let(:account) { Fabricate(:account, discoverable: false) }
 
-      it 'includes the matching policy' do
+      it 'includes a policy that disallows featuring' do
         expect(subject['feature_approval']).to include({
-          'automatic' => ['followers', 'following'],
-          'manual' => ['public'],
-          'current_user' => 'manual',
+          'automatic' => [],
+          'manual' => [],
+          'current_user' => 'denied',
         })
       end
+    end
+  end
+
+  context 'when account is remote' do
+    let(:account) { Fabricate(:account, domain: 'example.com', feature_approval_policy: 0b11000000000000000010) }
+
+    it 'includes the matching policy' do
+      expect(subject['feature_approval']).to include({
+        'automatic' => ['followers', 'following'],
+        'manual' => ['public'],
+        'current_user' => 'manual',
+      })
     end
   end
 end
