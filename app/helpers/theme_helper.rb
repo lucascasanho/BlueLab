@@ -60,6 +60,11 @@ module ThemeHelper
     custom_logo = nil unless custom_logo&.match?(%r{\A/[a-zA-Z0-9_./-]+\z})
     logo_token = "--instance-logo: url(#{custom_logo});" if custom_logo.present?
 
+    # This CSS is passed through safe_join before it is placed in a <style> RAWTEXT
+    # element. HTML-escaped quotes are not decoded inside <style>, so quoted
+    # attribute selectors would reach the CSS parser as &#39; and become invalid.
+    # All attribute values below are valid CSS identifiers and therefore stay
+    # intentionally unquoted.
     css = <<~CSS
       :root {
         #{logo_token}
@@ -106,23 +111,23 @@ module ThemeHelper
       /* BlueLab owns a second semantic layer (--blue2-*). Mirror the instance
          palette into that layer at runtime so compiled theme defaults cannot
          mask administrator-selected colors. This is intentionally theme-gated. */
-      body[data-theme='blue-2'] {
+      body[data-theme=blue-2] {
         --blue2-blue: #{accent};
         --blue2-blue-hover: color-mix(in srgb, #{accent}, black 15%);
         --color-bg-brand-soft: color-mix(in srgb, #{accent} 14%, transparent);
         --color-bg-brand-softest: color-mix(in srgb, #{accent} 8%, transparent);
       }
-      body[data-theme='blue-2'] ::selection {
+      body[data-theme=blue-2] ::selection {
         background: color-mix(in srgb, #{accent}, transparent 65%);
       }
-      body[data-theme='blue-2'] .status:hover,
-      body[data-theme='blue-2'] .notification:hover,
-      body[data-theme='blue-2'] .notification-group:hover {
+      body[data-theme=blue-2] .status:hover,
+      body[data-theme=blue-2] .notification:hover,
+      body[data-theme=blue-2] .notification-group:hover {
         background: var(--blue2-hover);
       }
-      html[data-color-scheme='dark'] body[data-theme='blue-2'],
-      html[data-color-scheme='auto'] body[data-theme='blue-2'],
-      html:not([data-color-scheme]) body[data-theme='blue-2'] {
+      html[data-color-scheme=dark] body[data-theme=blue-2],
+      html[data-color-scheme=auto] body[data-theme=blue-2],
+      html:not([data-color-scheme]) body[data-theme=blue-2] {
         --blue2-bg: #{dark_background};
         --blue2-surface: #{dark_surface};
         --blue2-surface-raised: #{dark_surface};
@@ -134,7 +139,7 @@ module ThemeHelper
         --blue2-muted: color-mix(in srgb, #{dark_text} 66%, #{dark_background});
         --blue2-muted-2: color-mix(in srgb, #{dark_text} 50%, #{dark_background});
       }
-      html[data-color-scheme='light'] body[data-theme='blue-2'] {
+      html[data-color-scheme=light] body[data-theme=blue-2] {
         --blue2-bg: #{light_background};
         --blue2-surface: #{light_surface};
         --blue2-surface-raised: #{light_surface};
@@ -147,8 +152,8 @@ module ThemeHelper
         --blue2-muted-2: color-mix(in srgb, #{light_text} 50%, #{light_background});
       }
       @media (prefers-color-scheme: light) {
-        html[data-color-scheme='auto'] body[data-theme='blue-2'],
-        html:not([data-color-scheme]) body[data-theme='blue-2'] {
+        html[data-color-scheme=auto] body[data-theme=blue-2],
+        html:not([data-color-scheme]) body[data-theme=blue-2] {
           --blue2-bg: #{light_background};
           --blue2-surface: #{light_surface};
           --blue2-surface-raised: #{light_surface};
