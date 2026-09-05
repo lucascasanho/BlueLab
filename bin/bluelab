@@ -5,14 +5,15 @@
 # - Blue:      atualiza ~/blue e reinicia blue-web/sidekiq/streaming
 # - Espelunca: atualiza ~/espelunca e reinicia espelunca-web/sidekiq/streaming
 # - Busca todas as branches, tags e commits do remoto BlueLab.
-# - Implanta o HEAD da branch sincronizada BlueLab-Testing.
+# - Blue usa BlueLab-Test por padrão para receber alterações ainda em validação.
+# - Espelunca usa BlueLab-Testing por padrão para receber apenas alterações promovidas.
+# - BLUELAB_BRANCH continua podendo sobrescrever explicitamente a branch.
 # - Preserva alterações locais em stash e histórico divergente em branch de backup.
 
 set -Eeuo pipefail
 
 REMOTE="${BLUELAB_REMOTE:-bluelab}"
 REMOTE_URL="${BLUELAB_REMOTE_URL:-https://github.com/lucascasanho/BlueLab.git}"
-BRANCH="${BLUELAB_BRANCH:-BlueLab-Testing}"
 INSTALL_DIR="${BLUELAB_INSTALL_DIR:-$HOME/.local/bin}"
 INSTALL_PATH="$INSTALL_DIR/bluelab"
 
@@ -95,6 +96,14 @@ select_target() {
 }
 
 select_target
+
+if [[ -n "${BLUELAB_BRANCH:-}" ]]; then
+  BRANCH="$BLUELAB_BRANCH"
+elif [[ "$TARGET" == "blue" ]]; then
+  BRANCH="BlueLab-Test"
+else
+  BRANCH="BlueLab-Testing"
+fi
 
 printf '\n============================================================\n'
 printf ' BLUELAB — ATUALIZAÇÃO COMPLETA\n'
