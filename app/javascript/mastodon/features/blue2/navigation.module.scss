@@ -128,8 +128,6 @@
   }
 }
 
-// In compact BlueLab rail geometry, Home is owned by Blue2AccountMenu directly
-// below the account control. Hide this wide-list copy to keep one Home action.
 @media (width < 1180px) {
   .root {
     width: 76px;
@@ -139,10 +137,6 @@
 
   .avatarLink {
     margin-inline: 0;
-  }
-
-  .wideHomeItem {
-    display: none;
   }
 
   .item {
