@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { NavLink } from 'react-router-dom';
 
-import { StackIcon } from '@phosphor-icons/react';
+import { HouseIcon, StackIcon } from '@phosphor-icons/react';
 
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
@@ -63,34 +63,6 @@ const Item: React.FC<ItemProps> = ({
   </NavLink>
 );
 
-const isCompactLandscapeViewport = () =>
-  typeof window !== 'undefined' &&
-  window.innerWidth < 1180 &&
-  window.innerWidth > window.innerHeight;
-
-const useCompactLandscapeViewport = () => {
-  const [compactLandscape, setCompactLandscape] = useState(
-    isCompactLandscapeViewport,
-  );
-
-  useEffect(() => {
-    const update = () => {
-      setCompactLandscape(isCompactLandscapeViewport());
-    };
-
-    update();
-    window.addEventListener('resize', update);
-    window.addEventListener('orientationchange', update);
-
-    return () => {
-      window.removeEventListener('resize', update);
-      window.removeEventListener('orientationchange', update);
-    };
-  }, []);
-
-  return compactLandscape;
-};
-
 export const Blue2Navigation: React.FC = () => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -99,7 +71,6 @@ export const Blue2Navigation: React.FC = () => {
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
   );
-  const compactLandscape = useCompactLandscapeViewport();
 
   const openComposer = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -119,26 +90,39 @@ export const Blue2Navigation: React.FC = () => {
     : '/home';
   const homePath = signedIn ? '/home' : '/';
 
-  const homeItem = (
-    <Item
-      to={homePath}
-      exact
-      icon={Blue2HomeIcon}
-      className={classes.homeItem}
-    >
-      <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
-    </Item>
-  );
-
   return (
     <nav className={classes.root} aria-label='BLUE 2.0'>
       {signedIn && <Blue2AccountMenu />}
 
-      {compactLandscape && homeItem}
+      <NavLink
+        to={homePath}
+        exact
+        className={classes.compactHomeItem}
+        activeClassName={classes.itemActive}
+        aria-label={intl.formatMessage({
+          id: 'tabs_bar.home',
+          defaultMessage: 'Home',
+        })}
+        title={intl.formatMessage({
+          id: 'tabs_bar.home',
+          defaultMessage: 'Home',
+        })}
+      >
+        <HouseIcon size={29} weight='regular' />
+        <span>
+          <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
+        </span>
+      </NavLink>
 
       <div className={classes.items}>
-        {!compactLandscape && homeItem}
-
+        <Item
+          to={homePath}
+          exact
+          icon={Blue2HomeIcon}
+          className={classes.homeItem}
+        >
+          <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
+        </Item>
         <Item to='/explore' icon={Blue2SearchIcon}>
           <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
         </Item>
