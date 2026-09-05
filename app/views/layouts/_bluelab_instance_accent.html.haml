@@ -1,4 +1,6 @@
 - if current_theme == 'blue-2'
   - configured_accent = Setting.find_by(var: :instance_accent_color)&.value.to_s
   - accent = configured_accent.match?(/\A#[0-9a-fA-F]{6}\z/) ? configured_accent.downcase : '#0085ff'
-  %style{ nonce: request.content_security_policy_nonce }= ":root { --bluelab-instance-accent: #{accent}; }"
+  %style{ nonce: request.content_security_policy_nonce }
+    :plain
+      :root { --bluelab-instance-accent: #{accent}; }
