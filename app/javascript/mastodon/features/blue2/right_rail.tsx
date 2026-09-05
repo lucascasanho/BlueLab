@@ -2,16 +2,15 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-import { clickSearchResult } from '@/mastodon/actions/search';
+import { Search } from '@/mastodon/features/compose/components/search';
 import { useIdentity } from '@/mastodon/identity_context';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
-import { useAppDispatch } from '@/mastodon/store';
 
-import { Blue2HomeIcon, Blue2SearchIcon } from './icons';
+import { Blue2HomeIcon } from './icons';
 import { blue2Text } from './locale';
 import classes from './right_rail.module.scss';
 
@@ -21,10 +20,7 @@ interface TrendTag {
 
 export const Blue2RightRail: React.FC = () => {
   const intl = useIntl();
-  const dispatch = useAppDispatch();
-  const history = useHistory();
   const { signedIn } = useIdentity();
-  const [query, setQuery] = useState('');
   const [tags, setTags] = useState<TrendTag[]>([]);
   const [trendMenuOpen, setTrendMenuOpen] = useState(false);
   const [trendsHidden, setTrendsHidden] = useState(false);
@@ -54,34 +50,6 @@ export const Blue2RightRail: React.FC = () => {
     };
   }, []);
 
-  const searchPlaceholder = intl.formatMessage({
-    id: 'search.placeholder',
-    defaultMessage: 'Search',
-  });
-
-  const submitSearch: React.SubmitEventHandler<HTMLFormElement> = useCallback(
-    (event) => {
-      event.preventDefault();
-      const value = query.trim();
-      if (!value) return;
-
-      void dispatch(clickSearchResult({ q: value }));
-      const queryParams = new URLSearchParams({ q: value });
-      history.push({
-        pathname: '/search',
-        search: queryParams.toString(),
-      });
-    },
-    [dispatch, history, query],
-  );
-
-  const handleQueryChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setQuery(event.currentTarget.value);
-    },
-    [],
-  );
-
   const openTrendMenu = useCallback(() => {
     setTrendMenuOpen(true);
   }, []);
@@ -107,18 +75,9 @@ export const Blue2RightRail: React.FC = () => {
   return (
     <aside className={classes.root}>
       <div className={classes.content}>
-        <form className={classes.search} role='search' onSubmit={submitSearch}>
-          <button type='submit' aria-label={searchPlaceholder}>
-            <Blue2SearchIcon size={19} />
-          </button>
-          <input
-            type='search'
-            value={query}
-            onChange={handleQueryChange}
-            placeholder={searchPlaceholder}
-            aria-label={searchPlaceholder}
-          />
-        </form>
+        <div className={classes.searchHost}>
+          <Search singleColumn />
+        </div>
 
         <nav className={classes.feeds} aria-label='Timelines'>
           {signedIn && (
