@@ -4,6 +4,7 @@ import { EmojiHTML } from '../emoji/html';
 
 import type { DisplayNameProps } from './index';
 import { AccountLock } from './lock';
+import { VerifiedBadge } from './verified_badge';
 
 export const DisplayNameSimple: FC<
   Omit<DisplayNameProps, 'variant'> & ComponentPropsWithoutRef<'span'>
@@ -20,6 +21,7 @@ export const DisplayNameSimple: FC<
         htmlString={account.display_name_html}
         extraEmojis={account.emojis}
       />
+      <VerifiedBadge account={account} />
       {account.locked && <AccountLock />}
     </bdi>
   );
