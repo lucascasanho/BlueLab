@@ -1,7 +1,7 @@
 import { useCallback, useId, useState } from 'react';
 import type { FC, KeyboardEvent, MouseEvent } from 'react';
 
-import { defineMessages, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 
 import { domain, title as instanceTitle } from 'mastodon/initial_state';
 
@@ -12,25 +12,22 @@ import classes from './verified_badge.module.scss';
 
 const VERIFIED_ROLE_NAME = 'Verificado';
 
-const messages = defineMessages({
-  title: {
-    id: 'account.verified_badge.title',
-    defaultMessage: 'Verified account',
+const copy = {
+  en: {
+    title: 'Verified account',
+    description: (instance: string) =>
+      `This account was verified by the moderation team of ${instance}.`,
+    since: (date: string) => `Verified since: ${date}`,
+    sinceUnknown: 'Verification date not recorded',
   },
-  description: {
-    id: 'account.verified_badge.description',
-    defaultMessage:
-      'This account was verified by the moderation team of {instance}.',
+  pt: {
+    title: 'Conta verificada',
+    description: (instance: string) =>
+      `Esta conta foi verificada pela moderação de ${instance}.`,
+    since: (date: string) => `Verificado desde: ${date}`,
+    sinceUnknown: 'Data da verificação não registrada',
   },
-  since: {
-    id: 'account.verified_badge.since',
-    defaultMessage: 'Verified since: {date}',
-  },
-  sinceUnknown: {
-    id: 'account.verified_badge.since_unknown',
-    defaultMessage: 'Verification date not recorded',
-  },
-});
+} as const;
 
 export function hasVerifiedRole(account: DisplayNameProps['account']) {
   if (!account) {
@@ -85,7 +82,8 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
     return null;
   }
 
-  const isPortuguese = intl.locale.toLowerCase().startsWith('pt');
+  const language = intl.locale.toLowerCase().split(/[-_]/)[0];
+  const localizedCopy = language === 'pt' ? copy.pt : copy.en;
   const instanceName = instanceTitle ?? domain ?? 'Mastodon';
   const verifiedAt = account.verified_by_role_since
     ? new Date(account.verified_by_role_since)
@@ -99,23 +97,11 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
         })
       : null;
 
-  const titleText = isPortuguese
-    ? 'Conta verificada'
-    : intl.formatMessage(messages.title);
-  const descriptionText = isPortuguese
-    ? `Esta conta foi verificada pela moderação de ${instanceName}.`
-    : intl.formatMessage(messages.description, { instance: instanceName });
-
-  let sinceText: string;
-  if (formattedDate) {
-    sinceText = isPortuguese
-      ? `Verificado desde: ${formattedDate}`
-      : intl.formatMessage(messages.since, { date: formattedDate });
-  } else {
-    sinceText = isPortuguese
-      ? 'Data da verificação não registrada'
-      : intl.formatMessage(messages.sinceUnknown);
-  }
+  const titleText = localizedCopy.title;
+  const descriptionText = localizedCopy.description(instanceName);
+  const sinceText = formattedDate
+    ? localizedCopy.since(formattedDate)
+    : localizedCopy.sinceUnknown;
 
   return (
     <>
@@ -160,7 +146,7 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
             BlueLab adds the palette-aware gradient and interactive integration.
           */}
           <path
-            d='M22.51,13.76a3,3,0,0,1,0-3.52l.76-1.05a1,1,0,0,0,.14-.9,1.018,1.018,0,0,0-.64-.64l-1.23-.4A2.987,2.987,0,0,1,19.47,4.4V3.1a1,1,0,0,0-1.31-.95l-1.24.4a3,3,0,0,1-3.35-1.09L12.81.41a1.036,1.036,0,0,0-1.62,0l-.76,1.05A3,3,0,0,1,7.08,2.55l-1.24-.4a1,1,0,0,0-1.31.95V4.4A2.987,2.987,0,0,1,2.46,7.25l-1.23.4a1.018,1.018,0,0,0-.64.64,1,1,0,0,0,.14.9l.76,1.05a3,3,0,0,1,0,3.52L.73,14.81a1,1,0,0,0-.14.9,1.018,1.018,0,0,0,.64.64l1.23.4A2.987,2.987,0,0,1,4.53,19.6v1.3a1,1,0,0,0,1.31.95l1.23-.4a2.994,2.994,0,0,1,3.36,1.09l.76,1.05a1.005,1.005,0,0,0,1.62,0l.76-1.05a3,3,0,0,1,3.36-1.09l1.23.4a1,1,0,0,0,1.31-.95V19.6a2.987,2.987,0,0,1,2.07-2.85l1.23-.4a1.018,1.018,0,0,0,.64-.64,1,1,0,0,0-.14-.9Zm-5.8-3.053-5,5a1,1,0,0,1-1.414,0l-3-3a1,1,0,1,1,1.414-1.414L11,13.586l4.293-4.293a1,1,0,0,1,1.414,1.414Z'
+            d='M22.51,13.76a3,3,0,0,1,0-3.52l.76-1.05a1,1,0,0,0,.14-.9,1.018,1.018,0,0,0-.64-.64l-1.23-.4A2.987,2.987,0,0,1,19.47,4.4V3.1a1,1,0,0,0-1.31-.95l-1.24.4a3,3,0,0,1-3.35-1.09L12.81.41a1.036,1.036,0,0,0-1.62,0l-.76,1.05A3,3,0,0,1,7.08,2.55l-1.24-.4a1,1,0,0,0-1.31.95V4.4A2.987,2.987,0,0,1,2.46,7.25l-1.23.4a1.018,1.018,0,0,0-.64.64,1,1,0,0,0,.14.9l.76,1.05a3,3,0,0,1,0,3.52L.73,14.81a1,1,0,0,0-.14.9,1.018,1.018,0,0,0,.64.64l1.23.4A2.987,2.987,0,0,1,4.53,19.6v1.3a1,1,0,0,0,1.31.95l1.23-.4a2.994,2.994,0,0,1,3.36,1.09l.76,1.05a1.005,1.005,0,0,0,1.62,0l.76-1.05a3,3,0,0,1,3.36-1.09l1.23.4a1,1,0,0,1,1.31-.95V19.6a2.987,2.987,0,0,1,2.07-2.85l1.23-.4a1.018,1.018,0,0,0,.64-.64,1,1,0,0,0-.14-.9Zm-5.8-3.053-5,5a1,1,0,0,1-1.414,0l-3-3a1,1,0,1,1,1.414-1.414L11,13.586l4.293-4.293a1,1,0,0,1,1.414,1.414Z'
             fill={`url(#${gradientId})`}
           />
         </svg>
