@@ -9,7 +9,7 @@ class REST::AccountSerializer < ActiveModel::Serializer
   attributes :id, :username, :acct, :display_name, :locked, :bot, :discoverable, :indexable, :group, :created_at,
              :note, :url, :uri, :avatar, :avatar_static, :avatar_description, :header, :header_static, :header_description,
              :followers_count, :following_count, :statuses_count, :last_status_at, :hide_collections,
-             :show_media, :show_media_replies, :show_featured
+             :show_media, :show_media_replies, :show_featured, :verified_by_role
 
   has_one :moved_to_account, key: :moved, serializer: REST::AccountSerializer, if: :moved_and_not_nested?
 
@@ -175,6 +175,12 @@ class REST::AccountSerializer < ActiveModel::Serializer
     object.invalidated_username?
   end
   alias invalid_handle? invalid_handle
+
+  def verified_by_role
+    return false if object.unavailable? || object.user.nil?
+
+    object.user.role&.name.to_s.strip.casecmp?('verificado')
+  end
 
   def roles
     if object.unavailable? || object.user.nil?
