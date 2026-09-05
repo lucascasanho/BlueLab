@@ -12,7 +12,11 @@ let worker: Worker | null = null;
 const log = emojiLogger('index');
 const workerLog = emojiLogger('worker');
 
-type CustomEmojiAsset = { url: string; static_url: string };
+interface CustomEmojiAsset {
+  url: string;
+  static_url: string;
+}
+
 type EmojiPreloadPriority = 'low' | 'high';
 
 const CUSTOM_EMOJI_BACKGROUND_DELAY = 1_000;
@@ -80,14 +84,17 @@ function preloadCustomEmojiImage(
       preloadedCustomEmojiUrls.add(url);
       void image
         .decode()
-        .catch(() => undefined)
-        .finally(() => finish(true));
+        .catch(() => {})
+        .finally(() => {
+          finish(true);
+        });
     };
-    image.onerror = () => finish(false);
-    timeoutId = window.setTimeout(
-      () => finish(false),
-      CUSTOM_EMOJI_IMAGE_TIMEOUT,
-    );
+    image.onerror = () => {
+      finish(false);
+    };
+    timeoutId = window.setTimeout(() => {
+      finish(false);
+    }, CUSTOM_EMOJI_IMAGE_TIMEOUT);
     image.src = url;
   }).finally(() => {
     image.onload = null;
