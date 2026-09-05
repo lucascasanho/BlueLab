@@ -41,6 +41,7 @@ RSpec.describe 'Channel Subscriptions', :inline_jobs, :streaming do
 
       streaming_client.connect
       streaming_client.subscribe('public:local')
+      streaming_client.wait_until_subscribed('timeline:public:local')
 
       # We need to publish a status as there is no positive acknowledgement of
       # subscriptions:
@@ -86,6 +87,7 @@ RSpec.describe 'Channel Subscriptions', :inline_jobs, :streaming do
 
       streaming_client.connect
       streaming_client.subscribe('public:local')
+      streaming_client.wait_until_subscribed('timeline:public:local')
 
       # We need to publish a status as there is no positive acknowledgement of
       # subscriptions:
