@@ -1,4 +1,4 @@
-import { autoPlayGif, initialState } from '@/mastodon/initial_state';
+import { initialState } from '@/mastodon/initial_state';
 
 import { EMOJI_DB_RELOAD_EVENT } from './constants';
 import { toSupportedLocale } from './locale';
@@ -19,15 +19,16 @@ interface CustomEmojiAsset {
 
 type EmojiPreloadPriority = 'low' | 'high';
 
-const CUSTOM_EMOJI_BACKGROUND_DELAY = 1_000;
+const CUSTOM_EMOJI_BACKGROUND_DELAY = 5_000;
 const CUSTOM_EMOJI_IMAGE_TIMEOUT = 3_000;
-const CUSTOM_EMOJI_FOREGROUND_TIMEOUT = 4_500;
-const CUSTOM_EMOJI_BACKGROUND_CONCURRENCY = 3;
-const CUSTOM_EMOJI_FOREGROUND_CONCURRENCY = 12;
+const CUSTOM_EMOJI_FOREGROUND_TIMEOUT = 2_500;
+const CUSTOM_EMOJI_BACKGROUND_CONCURRENCY = 1;
+const CUSTOM_EMOJI_FOREGROUND_CONCURRENCY = 4;
 
-// Custom emoji assets are deliberately warmed only after the initial page has
-// finished loading. This keeps avatars, feed media and other user-visible
-// content ahead of the picker on the browser's network queue.
+// Only lightweight static thumbnails are warmed in the background. Animated
+// custom emoji files can be much larger and must never compete with avatars or
+// timeline media during the initial page load. The picker swaps visible entries
+// to their animated URL separately when animation is enabled.
 const knownCustomEmojiUrls = new Set<string>();
 const preloadedCustomEmojiUrls = new Set<string>();
 const customEmojiPreloadImages = new Map<string, HTMLImageElement>();
@@ -36,7 +37,7 @@ let customEmojiBackgroundPreloadScheduled = false;
 
 function rememberCustomEmojiImages(emojis: Record<string, CustomEmojiAsset>) {
   for (const emoji of Object.values(emojis)) {
-    const url = autoPlayGif ? emoji.url : emoji.static_url;
+    const url = emoji.static_url || emoji.url;
     if (url) {
       knownCustomEmojiUrls.add(url);
     }
@@ -79,8 +80,8 @@ function preloadCustomEmojiImage(
     };
 
     image.onload = () => {
-      // The network resource is already warm at this point. Wait for decode as
-      // well when possible so the picker can paint from cache immediately.
+      // The resource is already warm at this point. Decode when possible so a
+      // picker fallback can paint from cache without a second decoding pause.
       preloadedCustomEmojiUrls.add(url);
       void image
         .decode()
@@ -173,9 +174,9 @@ function scheduleCustomEmojiImagePreload(
 }
 
 export async function waitForCustomEmojiImages() {
-  // If the user opens the picker before the background warm-up has completed,
-  // temporarily increase concurrency. The hard cap prevents a single broken
-  // custom emoji URL from making the desktop picker appear to never open.
+  // Opening the picker no longer waits for this promise. Warm only static
+  // fallbacks here, with bounded concurrency, so the picker can become useful
+  // quickly without starving avatars or media already being fetched by the feed.
   await Promise.race([
     preloadPendingCustomEmojiImages(
       'high',
