@@ -90,14 +90,14 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
   const verifiedAt = account.verified_by_role_since
     ? new Date(account.verified_by_role_since)
     : null;
-  const hasValidDate = verifiedAt && !Number.isNaN(verifiedAt.getTime());
-  const formattedDate = hasValidDate
-    ? intl.formatDate(verifiedAt, {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      })
-    : null;
+  const formattedDate =
+    verifiedAt && !Number.isNaN(verifiedAt.getTime())
+      ? intl.formatDate(verifiedAt, {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        })
+      : null;
 
   const titleText = isPortuguese
     ? 'Conta verificada'
@@ -105,13 +105,17 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
   const descriptionText = isPortuguese
     ? `Esta conta foi verificada pela moderação de ${instanceName}.`
     : intl.formatMessage(messages.description, { instance: instanceName });
-  const sinceText = formattedDate
-    ? isPortuguese
+
+  let sinceText: string;
+  if (formattedDate) {
+    sinceText = isPortuguese
       ? `Verificado desde: ${formattedDate}`
-      : intl.formatMessage(messages.since, { date: formattedDate })
-    : isPortuguese
+      : intl.formatMessage(messages.since, { date: formattedDate });
+  } else {
+    sinceText = isPortuguese
       ? 'Data da verificação não registrada'
       : intl.formatMessage(messages.sinceUnknown);
+  }
 
   return (
     <>
@@ -142,7 +146,10 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
               y2='22'
               gradientUnits='userSpaceOnUse'
             >
-              <stop offset='0' stopColor='var(--color-text-brand-soft)' />
+              <stop
+                offset='0'
+                stopColor='var(--color-text-brand-soft, var(--color-text-brand))'
+              />
               <stop offset='0.5' stopColor='var(--color-bg-brand-base)' />
               <stop offset='1' stopColor='var(--color-text-brand)' />
             </linearGradient>
@@ -178,9 +185,7 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
             <h3 id={headingId} className={classes.title}>
               {titleText}
             </h3>
-            <p className={classes.description}>
-              {descriptionText}
-            </p>
+            <p className={classes.description}>{descriptionText}</p>
             <p className={classes.since}>{sinceText}</p>
           </div>
         )}
