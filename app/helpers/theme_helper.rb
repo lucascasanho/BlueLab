@@ -165,16 +165,18 @@ module ThemeHelper
     tag.style(safe_join([css]), nonce: request.content_security_policy_nonce)
   end
 
+  # Theme selection is instance-wide. Per-user theme values are deliberately
+  # ignored so accounts with an older saved preference always follow the theme
+  # selected by an administrator. Keep BlueLab as the safe fallback if the
+  # configured global theme is missing or no longer available.
   def current_theme
     available_themes = Themes.instance.names
-
-    user_theme = current_user&.setting_theme
-    return user_theme if user_theme && available_themes.include?(user_theme)
-
     site_theme = Setting.theme
-    return site_theme if available_themes.include?(site_theme)
 
-    'default' # Fallback
+    return site_theme if available_themes.include?(site_theme)
+    return 'blue-2' if available_themes.include?('blue-2')
+
+    'default'
   end
 
   def color_scheme
