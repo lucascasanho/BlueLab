@@ -3,19 +3,19 @@ import type { FC } from 'react';
 
 import type { DisplayNameProps } from './index';
 
-const VERIFIED_ROLE_FRAGMENT = 'verificado';
+const VERIFIED_ROLE_NAME = 'Verificado';
 
 export function hasVerifiedRole(account: DisplayNameProps['account']) {
   if (!account) {
     return false;
   }
 
-  if (account.verified_by_role) {
+  if (account.verified_by_role === true) {
     return true;
   }
 
-  return Array.from(account.roles).some((role) =>
-    role.name.trim().toLocaleLowerCase().includes(VERIFIED_ROLE_FRAGMENT),
+  return Array.from(account.roles).some(
+    (role) => role.name.trim() === VERIFIED_ROLE_NAME,
   );
 }
 
@@ -35,7 +35,6 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
       viewBox='0 0 24 24'
       focusable='false'
       style={{
-        color: 'var(--color-text-brand)',
         display: 'inline-block',
         flex: '0 0 auto',
         height: '0.95em',
@@ -49,42 +48,25 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
       <defs>
         <linearGradient
           id={gradientId}
-          x1='3'
-          x2='21'
-          y1='3'
-          y2='21'
+          x1='2'
+          x2='22'
+          y1='2'
+          y2='22'
           gradientUnits='userSpaceOnUse'
         >
-          <stop offset='0' stopColor='currentColor' stopOpacity='0.72' />
-          <stop offset='0.48' stopColor='currentColor' stopOpacity='1' />
-          <stop offset='1' stopColor='currentColor' stopOpacity='0.68' />
+          <stop offset='0' stopColor='#67d8ff' />
+          <stop offset='0.5' stopColor='#3e9ed1' />
+          <stop offset='1' stopColor='#635bff' />
         </linearGradient>
       </defs>
 
       {/*
-        Visual reference/credit: Bluesky Social PBC's trusted verifier
-        `assets/icons/verifierCheck.svg`.
-        https://github.com/bluesky-social/social-app/blob/main/assets/icons/verifierCheck.svg
-
-        The Bluesky vector path is intentionally NOT copied. Bluesky's ASSETS.md
-        identifies verifierCheck.svg as a Bluesky trademark asset outside the
-        repository's MIT license. This BlueLab rosette geometry is original.
+        SVG path supplied by Lucas in the Sistema de verificação request.
+        BlueLab adds only the inline gradient treatment and React integration.
       */}
-      <polygon
-        points='12,2 15.33,3.96 19.07,4.93 20.04,8.67 22,12 20.04,15.33 19.07,19.07 15.33,20.04 12,22 8.67,20.04 4.93,19.07 3.96,15.33 2,12 3.96,8.67 4.93,4.93 8.67,3.96'
-        fill={`url(#${gradientId})`}
-        stroke='var(--color-text-on-brand-base)'
-        strokeLinejoin='round'
-        strokeOpacity='0.28'
-        strokeWidth='0.65'
-      />
       <path
-        d='m7.5 12.2 2.75 2.75 6.35-6.35'
-        fill='none'
-        stroke='var(--color-text-on-brand-base)'
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        strokeWidth='2.15'
+        d='M22.51,13.76a3,3,0,0,1,0-3.52l.76-1.05a1,1,0,0,0,.14-.9,1.018,1.018,0,0,0-.64-.64l-1.23-.4A2.987,2.987,0,0,1,19.47,4.4V3.1a1,1,0,0,0-1.31-.95l-1.24.4a3,3,0,0,1-3.35-1.09L12.81.41a1.036,1.036,0,0,0-1.62,0l-.76,1.05A3,3,0,0,1,7.08,2.55l-1.24-.4a1,1,0,0,0-1.31.95V4.4A2.987,2.987,0,0,1,2.46,7.25l-1.23.4a1.018,1.018,0,0,0-.64.64,1,1,0,0,0,.14.9l.76,1.05a3,3,0,0,1,0,3.52L.73,14.81a1,1,0,0,0-.14.9,1.018,1.018,0,0,0,.64.64l1.23.4A2.987,2.987,0,0,1,4.53,19.6v1.3a1,1,0,0,0,1.31.95l1.23-.4a2.994,2.994,0,0,1,3.36,1.09l.76,1.05a1.005,1.005,0,0,0,1.62,0l.76-1.05a3,3,0,0,1,3.36-1.09l1.23.4a1,1,0,0,0,1.31-.95V19.6a2.987,2.987,0,0,1,2.07-2.85l1.23-.4a1.018,1.018,0,0,0,.64-.64,1,1,0,0,0-.14-.9Zm-5.8-3.053-5,5a1,1,0,0,1-1.414,0l-3-3a1,1,0,1,1,1.414-1.414L11,13.586l4.293-4.293a1,1,0,0,1,1.414,1.414Z'
+        fill={`url(#${gradientId})`}
       />
     </svg>
   );

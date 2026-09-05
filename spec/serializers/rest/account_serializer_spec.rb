@@ -51,11 +51,19 @@ RSpec.describe REST::AccountSerializer do
       end
     end
 
-    context 'when the account role contains Verificado' do
+    context 'when the account role only contains Verificado as part of its name' do
       let(:role) { Fabricate(:user_role, name: 'Usuário Verificado', highlighted: true) }
 
-      it 'marks the account as verified' do
-        expect(subject['verified_by_role']).to be true
+      it 'does not mark the account as verified' do
+        expect(subject['verified_by_role']).to be false
+      end
+    end
+
+    context 'when the account role differs by letter case' do
+      let(:role) { Fabricate(:user_role, name: 'verificado', highlighted: true) }
+
+      it 'does not mark the account as verified' do
+        expect(subject['verified_by_role']).to be false
       end
     end
 

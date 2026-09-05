@@ -177,9 +177,9 @@ class REST::AccountSerializer < ActiveModel::Serializer
   alias invalid_handle? invalid_handle
 
   def verified_by_role
-    return false if object.unavailable? || object.user.nil?
+    return false if object.unavailable?
 
-    object.user.role&.name.to_s.strip.downcase.include?('verificado')
+    object.user_role&.name.to_s.strip == 'Verificado'
   end
 
   def roles
