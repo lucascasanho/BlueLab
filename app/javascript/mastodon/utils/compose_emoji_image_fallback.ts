@@ -1,5 +1,4 @@
 type StaticEmojiUrlLoader = (shortcode: string) => Promise<string | undefined>;
-type PreferredEmojiImagePreloader = (url: string) => Promise<void>;
 
 const attemptedStaticFallbacks = new WeakSet<HTMLImageElement>();
 const preparedComposeImages = new WeakSet<HTMLImageElement>();
@@ -9,32 +8,6 @@ const loadStaticEmojiUrl: StaticEmojiUrlLoader = async (shortcode) => {
     await import('../features/emoji/database');
   const emoji = await loadCustomEmojiByShortcode(shortcode);
   return emoji?.static_url;
-};
-
-const preloadPreferredEmojiImage: PreferredEmojiImagePreloader = async (url) => {
-  const image = new Image();
-  image.decoding = 'async';
-  image.src = url;
-
-  if (typeof image.decode === 'function') {
-    await image.decode();
-    return;
-  }
-
-  await new Promise<void>((resolve, reject) => {
-    if (image.complete) {
-      if (image.naturalWidth > 0) resolve();
-      else reject(new Error('Emoji image failed to load'));
-      return;
-    }
-
-    image.addEventListener('load', () => resolve(), { once: true });
-    image.addEventListener(
-      'error',
-      () => reject(new Error('Emoji image failed to load')),
-      { once: true },
-    );
-  });
 };
 
 const bareShortcode = (shortcode: string) =>
@@ -56,6 +29,24 @@ const composeEmojiContext = (image: HTMLImageElement) => {
   return { emojiElement, shortcode };
 };
 
+const clearLoadingPlaceholder = (image: HTMLImageElement) => {
+  image.style.backgroundImage = '';
+  image.style.backgroundPosition = '';
+  image.style.backgroundRepeat = '';
+  image.style.backgroundSize = '';
+};
+
+const applyLoadingPlaceholder = (
+  image: HTMLImageElement,
+  staticUrl: string,
+) => {
+  const normalizedUrl = new URL(staticUrl, document.baseURI).href;
+  image.style.backgroundImage = `url("${normalizedUrl}")`;
+  image.style.backgroundPosition = 'center';
+  image.style.backgroundRepeat = 'no-repeat';
+  image.style.backgroundSize = 'contain';
+};
+
 const tryStaticComposeEmojiImage = async (
   image: HTMLImageElement,
   shortcode: string,
@@ -65,11 +56,10 @@ const tryStaticComposeEmojiImage = async (
     const staticUrl = await loadStaticUrl(bareShortcode(shortcode));
     if (!image.isConnected) return false;
 
-    if (staticUrl) {
+    if (staticUrl && staticUrl !== image.getAttribute('src')) {
       attemptedStaticFallbacks.add(image);
-      if (staticUrl !== image.getAttribute('src')) {
-        image.src = staticUrl;
-      }
+      clearLoadingPlaceholder(image);
+      image.src = staticUrl;
       return true;
     }
   } catch {
@@ -83,16 +73,16 @@ const tryStaticComposeEmojiImage = async (
 export const prepareComposeEmojiImage = async (
   image: HTMLImageElement,
   loadStaticUrl: StaticEmojiUrlLoader = loadStaticEmojiUrl,
-  preloadPreferredUrl: PreferredEmojiImagePreloader = preloadPreferredEmojiImage,
 ) => {
   const context = composeEmojiContext(image);
   if (!context || preparedComposeImages.has(image)) return false;
 
   preparedComposeImages.add(image);
 
-  // If the preferred image is already available (for example because it was
-  // just displayed in the picker), leave it alone so animated emoji keep
-  // animating in the compose editor without an unnecessary source swap.
+  // Keep the preferred URL in src so an animated custom emoji starts loading
+  // immediately. The static image is only a paint-time placeholder behind it;
+  // it must never replace/cancel the preferred request while that request is
+  // still healthy.
   if (image.complete && image.naturalWidth > 0) return false;
 
   const preferredUrl = image.getAttribute('src');
@@ -108,28 +98,28 @@ export const prepareComposeEmojiImage = async (
   if (
     !image.isConnected ||
     !staticUrl ||
-    staticUrl === preferredUrl
+    staticUrl === preferredUrl ||
+    (image.complete && image.naturalWidth > 0)
   ) {
     return false;
   }
 
-  // Avoid a blank inline object while a heavier animated file is still
-  // decoding. The lightweight static thumbnail is only a temporary visual
-  // placeholder; once the preferred file is decoded we restore its URL.
-  attemptedStaticFallbacks.add(image);
-  image.src = staticUrl;
+  applyLoadingPlaceholder(image, staticUrl);
 
-  try {
-    await preloadPreferredUrl(preferredUrl);
-  } catch {
-    // Keep the valid static image if the animated/preferred source cannot load.
-    return true;
+  const clearPlaceholder = () => {
+    clearLoadingPlaceholder(image);
+  };
+
+  image.addEventListener('load', clearPlaceholder, { once: true });
+  image.addEventListener('error', clearPlaceholder, { once: true });
+
+  // Close the small race where the image finished between the previous check
+  // and the event listeners being attached.
+  if (image.complete && image.naturalWidth > 0) {
+    clearLoadingPlaceholder(image);
+    return false;
   }
 
-  if (!image.isConnected || image.getAttribute('src') !== staticUrl) return true;
-
-  attemptedStaticFallbacks.delete(image);
-  image.src = preferredUrl;
   return true;
 };
 
@@ -139,6 +129,8 @@ export const applyComposeEmojiImageFallback = async (
 ) => {
   const context = composeEmojiContext(image);
   if (!context) return false;
+
+  clearLoadingPlaceholder(image);
 
   if (!attemptedStaticFallbacks.has(image)) {
     const staticApplied = await tryStaticComposeEmojiImage(
