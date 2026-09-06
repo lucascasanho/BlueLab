@@ -161,10 +161,9 @@ const ComposeEmojiDropdown: React.FC<
 
       const isCustomEmoji = 'custom' in rawEmoji && rawEmoji.custom === true;
 
-      // Keep the caret aligned to the active editor state for every pick, even
-      // when the picker remains open across multiple emoji selections.
-      captureComposerSelectionOffset();
-
+      // The caret was captured before the picker opened. While the picker owns
+      // focus, keep using that saved logical offset instead of re-reading a
+      // stale DOM selection that may point before the last rendered emoji.
       if (!isCustomEmoji && !(event.ctrlKey || event.metaKey)) {
         // Keep the picker open so it can stay usable until the user clicks
         // outside or toggles it closed explicitly.
@@ -265,7 +264,7 @@ const ModifierButton: React.FC<{ skin: EmojiSkin; onClose: () => void }> = ({
   );
   return (
     <button type='button' onClick={handleClick} data-index={1}>
-      <Emoji emoji='fist' size={22} skin={skin} />
+      <Emoji emoji='fist' size={22} skin={skin} onClick={onTrue} />
     </button>
   );
 };
