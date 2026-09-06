@@ -35,7 +35,18 @@
     --account-handle-size: var(--fs-2xs);
   }
 
-  :global(.display-name__name),
+  :global(.display-name__name) {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+  }
+
+  :global(.display-name__html) {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   :global(.display-name__account) {
     overflow: hidden;
     text-overflow: ellipsis;

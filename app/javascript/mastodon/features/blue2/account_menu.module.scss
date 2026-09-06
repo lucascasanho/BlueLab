@@ -56,27 +56,35 @@
   transition:
     max-width 150ms ease,
     opacity 100ms ease;
+}
 
-  strong,
-  span {
+.displayName,
+.handle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.displayName {
+  display: flex;
+  align-items: center;
+  color: var(--blue2-text, #f7f7f8);
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 650;
+
+  strong {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
   }
+}
 
-  strong {
-    color: var(--blue2-text, #f7f7f8);
-    font-size: 14px;
-    line-height: 1.2;
-    font-weight: 650;
-  }
-
-  span {
-    color: var(--blue2-muted, #9aa8b4);
-    font-size: 12px;
-    line-height: 1.2;
-  }
+.handle {
+  color: var(--blue2-muted, #9aa8b4);
+  font-size: 12px;
+  line-height: 1.2;
 }
 
 .moreIcon {

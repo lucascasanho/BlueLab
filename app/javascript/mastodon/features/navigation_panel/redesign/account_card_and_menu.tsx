@@ -19,6 +19,7 @@ import { openModal } from '@/mastodon/actions/modal';
 import { Avatar } from '@/mastodon/components/avatar';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { AccountLock } from '@/mastodon/components/display_name/lock';
+import { VerifiedBadge } from '@/mastodon/components/display_name/verified_badge';
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import {
   Menu,
@@ -81,6 +82,7 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
                 as='strong'
                 extraEmojis={displayNameEmojis}
               />
+              <VerifiedBadge account={account} />
               {account.locked && <AccountLock />}
             </bdi>{' '}
             <span className='display-name__account'>@{account.username}</span>

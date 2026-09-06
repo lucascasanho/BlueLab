@@ -7,6 +7,7 @@ import { NavLink, useHistory } from 'react-router-dom';
 import { HouseIcon } from '@phosphor-icons/react';
 
 import { Avatar } from '@/mastodon/components/avatar';
+import { VerifiedBadge } from '@/mastodon/components/display_name/verified_badge';
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
 import { useAccount } from '@/mastodon/hooks/useAccount';
@@ -109,18 +110,21 @@ export const Blue2AccountMenu: React.FC = () => {
       >
         <Avatar account={account} size={42} />
         <span className={classes.identity}>
-          {account.display_name_html ? (
-            <EmojiHTML
-              key={`${account.id}-${displayNameEmojiVersion}`}
-              className='display-name__html'
-              htmlString={account.display_name_html}
-              as='strong'
-              extraEmojis={displayNameEmojis}
-            />
-          ) : (
-            <strong>{displayName}</strong>
-          )}
-          <span>@{account.acct}</span>
+          <span className={classes.displayName}>
+            {account.display_name_html ? (
+              <EmojiHTML
+                key={`${account.id}-${displayNameEmojiVersion}`}
+                className='display-name__html'
+                htmlString={account.display_name_html}
+                as='strong'
+                extraEmojis={displayNameEmojis}
+              />
+            ) : (
+              <strong>{displayName}</strong>
+            )}
+            <VerifiedBadge account={account} />
+          </span>
+          <span className={classes.handle}>@{account.acct}</span>
         </span>
         <MoreHorizIcon className={classes.moreIcon} />
       </button>
