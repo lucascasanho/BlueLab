@@ -230,38 +230,18 @@ function useComposeHandlers(redirectOnSuccess?: boolean) {
           editor.getAttribute('contenteditable') === 'true' ||
           editor.getAttribute('contenteditable') === 'plaintext-only');
       const savedSelectionStart = getSavedComposerSelectionOffset();
+      const activeEditorSelectionStart =
+        editor && isContentEditable ? getEditorSelectionOffset(editor) : null;
 
-      const selectionFromEditor = (() => {
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return null;
-
-        const range = selection.getRangeAt(0);
-        let container: Node | null =
-          range.startContainer instanceof Element
-            ? range.startContainer
-            : range.startContainer.parentElement;
-
-        while (container) {
-          if (
-            container instanceof HTMLElement &&
-            (container.isContentEditable ||
-              container.contentEditable === 'true' ||
-              container.contentEditable === 'plaintext-only' ||
-              container.getAttribute('contenteditable') === 'true' ||
-              container.getAttribute('contenteditable') === 'plaintext-only')
-          ) {
-            return getEditorSelectionOffset(container);
-          }
-          container = container.parentNode;
-        }
-
-        return null;
-      })();
-
+      // When the picker owns focus, the browser may keep a stale DOM Selection
+      // inside the editor. Re-reading that stale range can move the next emoji
+      // before the one that was just inserted. Only trust the live editor range
+      // while the editor itself is active; otherwise use the saved logical
+      // offset that is advanced after every picker insertion.
       const selectionStart =
         composerTextArea && activeElement === composerTextArea
           ? composerTextArea.selectionStart || 0
-          : (selectionFromEditor ?? savedSelectionStart);
+          : (activeEditorSelectionStart ?? savedSelectionStart);
 
       const beforePosition = text[selectionStart - 1];
       const needsSpace =
