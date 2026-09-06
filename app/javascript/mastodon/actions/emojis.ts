@@ -11,5 +11,5 @@ export const emojiUse = createAppThunk((emoji: EmojiData, { dispatch }) => {
     type: EMOJI_USE,
     emoji,
   });
-  dispatch(saveSettings());
+  dispatch(saveSettings({ bestEffortCsrf: true }));
 });
