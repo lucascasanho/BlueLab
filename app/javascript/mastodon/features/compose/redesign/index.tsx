@@ -32,7 +32,6 @@ import { ComposeHints } from './hints';
 import { LanguageButton } from './language';
 import { ComposeReply } from './reply';
 import {
-  captureComposerSelectionOffset,
   editorText,
   getEditorSelectionOffset,
   getSavedComposerSelectionOffset,
@@ -218,8 +217,6 @@ function useComposeHandlers(redirectOnSuccess?: boolean) {
 
   const onEmojiPick: OnEmojiPick = useCallback(
     (emoji) => {
-      captureComposerSelectionOffset();
-
       const activeElement = document.activeElement;
       const editor =
         activeElement instanceof HTMLElement ? activeElement : null;
@@ -313,7 +310,6 @@ function useComposeHandlers(redirectOnSuccess?: boolean) {
           caretRange.collapse(true);
           selection.removeAllRanges();
           selection.addRange(caretRange);
-          captureComposerSelectionOffset();
           dispatch(changeCompose(editorText(editor)));
           return;
         }
