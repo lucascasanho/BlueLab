@@ -14,7 +14,7 @@ import { usePickerEmojis } from './picker';
 
 const backgroundImageFnDefault = () => `${assetHost}/emoji/sheet_16_0.png`;
 
-function preparePickerCustomEmojiImages(
+export function preparePickerCustomEmojiImages(
   root: ParentNode,
   staticEmojiFallbacks: ReadonlyMap<string, string>,
 ) {
@@ -28,11 +28,14 @@ function preparePickerCustomEmojiImages(
 
     // emoji-mart-lazyload normally uses a transparent 1px placeholder until a
     // custom emoji reaches the viewport. Replace that placeholder with the
-    // lightweight static thumbnail while preserving emoji-mart's lazy class and
-    // data-src. Its own IntersectionObserver can then swap visible entries to
-    // the preferred animated URL without downloading every animation at once.
+    // lightweight static thumbnail immediately while preserving emoji-mart's
+    // lazy class and data-src. Native lazy loading can leave images inside the
+    // picker's nested scrolling area blank on mobile browsers. The package's
+    // own IntersectionObserver can still swap visible entries to the preferred
+    // animated URL without downloading every animation at once.
     image.decoding = 'async';
-    image.loading = 'lazy';
+    image.loading = 'eager';
+    image.setAttribute('fetchpriority', 'low');
     image.src = staticEmojiFallbacks.get(source) ?? source;
   }
 }
