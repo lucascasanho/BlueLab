@@ -29,19 +29,48 @@ const buildEditorEmoji = () => {
 };
 
 describe('compose custom emoji image fallback', () => {
-  test('prefers the lightweight static thumbnail as soon as the emoji is rendered', async () => {
+  test('uses the static thumbnail only while the animated image is warming, then restores animation', async () => {
     const { image, emojiElement } = buildEditorEmoji();
     const loadStaticUrl = vi
       .fn()
       .mockResolvedValue('https://example.test/static.png');
+    const preloadPreferredUrl = vi.fn(async (url: string) => {
+      expect(url).toBe('https://example.test/animated.gif');
+      expect(image.getAttribute('src')).toBe('https://example.test/static.png');
+    });
 
     await expect(
-      prepareComposeEmojiImage(image, loadStaticUrl),
+      prepareComposeEmojiImage(
+        image,
+        loadStaticUrl,
+        preloadPreferredUrl,
+      ),
     ).resolves.toBe(true);
 
     expect(loadStaticUrl).toHaveBeenCalledWith('party');
-    expect(image.getAttribute('src')).toBe('https://example.test/static.png');
+    expect(preloadPreferredUrl).toHaveBeenCalledOnce();
+    expect(image.getAttribute('src')).toBe('https://example.test/animated.gif');
     expect(emojiElement.dataset.emojiShortcode).toBe(':party:');
+  });
+
+  test('keeps the static thumbnail if the animated image cannot be preloaded', async () => {
+    const { image } = buildEditorEmoji();
+    const loadStaticUrl = vi
+      .fn()
+      .mockResolvedValue('https://example.test/static.png');
+    const preloadPreferredUrl = vi
+      .fn()
+      .mockRejectedValue(new Error('animated image unavailable'));
+
+    await expect(
+      prepareComposeEmojiImage(
+        image,
+        loadStaticUrl,
+        preloadPreferredUrl,
+      ),
+    ).resolves.toBe(true);
+
+    expect(image.getAttribute('src')).toBe('https://example.test/static.png');
   });
 
   test('retries a failed animated image with the static custom emoji URL', async () => {
@@ -64,8 +93,15 @@ describe('compose custom emoji image fallback', () => {
     const loadStaticUrl = vi
       .fn()
       .mockResolvedValue('https://example.test/static.png');
+    const preloadPreferredUrl = vi
+      .fn()
+      .mockRejectedValue(new Error('animated image unavailable'));
 
-    await prepareComposeEmojiImage(image, loadStaticUrl);
+    await prepareComposeEmojiImage(
+      image,
+      loadStaticUrl,
+      preloadPreferredUrl,
+    );
     await applyComposeEmojiImageFallback(image, loadStaticUrl);
 
     expect(loadStaticUrl).toHaveBeenCalledOnce();
@@ -89,14 +125,20 @@ describe('compose custom emoji image fallback', () => {
     image.src = 'https://example.test/broken.gif';
     document.body.appendChild(image);
     const loadStaticUrl = vi.fn();
+    const preloadPreferredUrl = vi.fn();
 
     await expect(
-      prepareComposeEmojiImage(image, loadStaticUrl),
+      prepareComposeEmojiImage(
+        image,
+        loadStaticUrl,
+        preloadPreferredUrl,
+      ),
     ).resolves.toBe(false);
     await expect(
       applyComposeEmojiImageFallback(image, loadStaticUrl),
     ).resolves.toBe(false);
 
     expect(loadStaticUrl).not.toHaveBeenCalled();
+    expect(preloadPreferredUrl).not.toHaveBeenCalled();
   });
 });
