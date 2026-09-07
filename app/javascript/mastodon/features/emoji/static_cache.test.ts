@@ -1,4 +1,4 @@
-import { isStandalonePwa } from './static_cache';
+import { getWarmableStaticEmojiUrls, isStandalonePwa } from './static_cache';
 
 describe('isStandalonePwa', () => {
   test('detects Chromium and modern WebKit standalone display mode', () => {
@@ -37,5 +37,54 @@ describe('isStandalonePwa', () => {
         navigatorObject: {},
       }),
     ).toBe(false);
+  });
+});
+
+describe('getWarmableStaticEmojiUrls', () => {
+  const origin = 'https://mastodon.blue';
+
+  test('keeps only same-origin static thumbnails', () => {
+    expect(
+      getWarmableStaticEmojiUrls(
+        [
+          { static_url: '/system/custom_emojis/images/1/static/a.png' },
+          {
+            static_url:
+              'https://mastodon.blue/system/custom_emojis/images/2/static/b.png',
+          },
+          {
+            static_url:
+              'https://cdn.example/system/custom_emojis/images/3/static/c.png',
+          },
+        ],
+        origin,
+      ),
+    ).toEqual([
+      'https://mastodon.blue/system/custom_emojis/images/1/static/a.png',
+      'https://mastodon.blue/system/custom_emojis/images/2/static/b.png',
+    ]);
+  });
+
+  test('deduplicates shared static thumbnail URLs', () => {
+    expect(
+      getWarmableStaticEmojiUrls(
+        [
+          { static_url: '/system/custom_emojis/images/1/static/a.png' },
+          { static_url: '/system/custom_emojis/images/1/static/a.png' },
+        ],
+        origin,
+      ),
+    ).toEqual([
+      'https://mastodon.blue/system/custom_emojis/images/1/static/a.png',
+    ]);
+  });
+
+  test('ignores malformed static thumbnail URLs', () => {
+    expect(
+      getWarmableStaticEmojiUrls(
+        [{ static_url: 'http://[invalid' }],
+        origin,
+      ),
+    ).toEqual([]);
   });
 });
