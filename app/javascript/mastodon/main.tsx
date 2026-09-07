@@ -58,6 +58,17 @@ function main() {
         type: 'module',
       });
 
+      // Do not put custom emoji preloading on the application startup path.
+      // The dynamically loaded coordinator immediately exits in a normal
+      // browser tab and only schedules background work for an installed PWA.
+      void import('./features/emoji/static_cache')
+        .then(({ scheduleCustomEmojiStaticCacheWarmup }) => {
+          scheduleCustomEmojiStaticCacheWarmup();
+        })
+        .catch((error: unknown) => {
+          console.warn('Unable to schedule custom emoji cache warmup:', error);
+        });
+
       if (isProduction()) {
         if ('Notification' in window && Notification.permission === 'granted') {
           const registerPushNotifications =
