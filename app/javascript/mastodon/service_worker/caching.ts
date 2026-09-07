@@ -6,6 +6,22 @@ import { DAY } from '../utils/time';
 const CACHE_NAME_PREFIX = 'mastodon-';
 const CACHE_HEADER_TTL = 'x-timestamp';
 
+export const CUSTOM_EMOJI_STATIC_CACHE_NAME =
+  'mastodon-custom-emoji-static-v1';
+
+export function isCustomEmojiStaticImageRequest(request: Request) {
+  if (request.method !== 'GET' || request.destination !== 'image') {
+    return false;
+  }
+
+  const url = new URL(request.url);
+
+  return (
+    url.origin === self.location.origin &&
+    /\/custom_emojis\/images\/.+\/static\/[^/]+$/.test(url.pathname)
+  );
+}
+
 export async function cacheRoot() {
   const cache = await openWebCache();
   const response = await fetch('/', {
@@ -29,8 +45,21 @@ export function handleFetch(event: FetchEvent) {
   } else if (event.request.destination === 'font') {
     event.respondWith(cacheFirst({ event, name: 'fonts' }));
   } else if (event.request.destination === 'image') {
-    event.respondWith(cacheFirst({ event, name: 'images', ttl: DAY * 7 }));
+    event.respondWith(handleImageFetch(event));
   }
+}
+
+async function handleImageFetch(event: FetchEvent) {
+  if (isCustomEmojiStaticImageRequest(event.request)) {
+    const customEmojiCache = await caches.open(CUSTOM_EMOJI_STATIC_CACHE_NAME);
+    const cachedResponse = await customEmojiCache.match(event.request);
+
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+  }
+
+  return cacheFirst({ event, name: 'images', ttl: DAY * 7 });
 }
 
 async function cacheFirst({
