@@ -102,11 +102,12 @@ describe('handleFetch', () => {
     const fetch = vi.fn();
     vi.stubGlobal('fetch', fetch);
 
-    const { event, respondWith } = createFetchEvent(request);
+    const { event, respondWith, waitUntil } = createFetchEvent(request);
 
     handleFetch(event);
 
     await expect(respondWith()).resolves.toBe(cachedResponse);
+    await waitUntil();
     expect(fetch).not.toHaveBeenCalled();
   });
 
@@ -132,16 +133,46 @@ describe('handleFetch', () => {
     const fetch = vi.fn().mockResolvedValue(networkResponse);
     vi.stubGlobal('fetch', fetch);
 
-    const { event, respondWith } = createFetchEvent(request);
+    const { event, respondWith, waitUntil } = createFetchEvent(request);
 
     handleFetch(event);
 
     await expect(respondWith()).resolves.toBe(networkResponse);
     expect(fetch).toHaveBeenCalledWith(request);
+    await waitUntil();
     expect(putSpy).toHaveBeenCalledWith(request, expect.any(Response));
     expect(
       imageCache.store.get(request.url)?.response?.headers.get('x-timestamp'),
     ).toBe(now.toString());
+  });
+
+  test('returns a network image before its CacheStorage write completes', async () => {
+    const imageCache = new MockCache();
+    const request = createRequest('/fast.png', 'image');
+    const networkResponse = new Response('fresh', { status: 200 });
+
+    let releasePut: (() => void) | undefined;
+    vi.spyOn(imageCache, 'put').mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          releasePut = resolve;
+        }),
+    );
+
+    vi.stubGlobal('caches', {
+      open: vi.fn().mockResolvedValue(imageCache),
+    });
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(networkResponse));
+
+    const { event, respondWith, waitUntil } = createFetchEvent(request);
+
+    handleFetch(event);
+
+    await expect(respondWith()).resolves.toBe(networkResponse);
+    expect(releasePut).toBeTypeOf('function');
+
+    releasePut?.();
+    await waitUntil();
   });
 
   test('does not cache opaque image responses with status zero', async () => {
@@ -157,12 +188,13 @@ describe('handleFetch', () => {
     const fetch = vi.fn().mockResolvedValue(opaqueResponse);
     vi.stubGlobal('fetch', fetch);
 
-    const { event, respondWith } = createFetchEvent(request);
+    const { event, respondWith, waitUntil } = createFetchEvent(request);
 
     handleFetch(event);
 
     await expect(respondWith()).resolves.toBe(opaqueResponse);
     expect(fetch).toHaveBeenCalledWith(request);
+    await waitUntil();
     expect(putSpy).not.toHaveBeenCalled();
     expect(imageCache.store.size).toBe(0);
   });
@@ -186,11 +218,12 @@ describe('handleFetch', () => {
       const fetch = vi.fn().mockResolvedValue(networkResponse);
       vi.stubGlobal('fetch', fetch);
 
-      const { event, respondWith } = createFetchEvent(request);
+      const { event, respondWith, waitUntil } = createFetchEvent(request);
 
       handleFetch(event);
 
       await expect(respondWith()).resolves.toBe(networkResponse);
+      await waitUntil();
       expect(fetch).toHaveBeenCalledWith(request);
       expect(open).toHaveBeenCalledWith(cacheName);
     },
@@ -375,16 +408,23 @@ function createRequest(pathname: string, destination = '') {
 
 function createFetchEvent(request: Request) {
   let responsePromise: Promise<Response> | undefined;
+  const lifetimePromises: Promise<unknown>[] = [];
   const respondWith = vi.fn((response: Response | Promise<Response>) => {
     responsePromise = Promise.resolve(response);
+  });
+  const waitUntilMock = vi.fn((promise: Promise<unknown>) => {
+    lifetimePromises.push(Promise.resolve(promise));
   });
 
   return {
     event: {
       request,
       respondWith,
+      waitUntil: waitUntilMock,
     } as unknown as FetchEvent,
     respondWith: () => responsePromise,
     respondWithMock: respondWith,
+    waitUntil: () => Promise.all(lifetimePromises),
+    waitUntilMock,
   };
 }
