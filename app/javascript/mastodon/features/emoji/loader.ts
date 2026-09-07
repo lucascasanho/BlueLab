@@ -58,7 +58,13 @@ async function importEmojiDataImpl(locale: Locale, shortcodes: boolean) {
   return emojis;
 }
 
+const importCustomEmojiDataOnce = onceAsyncByArgs(importCustomEmojiDataImpl);
+
 export async function importCustomEmojiData() {
+  return importCustomEmojiDataOnce();
+}
+
+async function importCustomEmojiDataImpl() {
   const response = await fetchAndCheckEtag({
     oldEtag: await loadCacheValue('custom'),
     path: '/api/v1/custom_emojis',
@@ -69,6 +75,13 @@ export async function importCustomEmojiData() {
   }
 
   const etag = response.headers.get('ETag');
+  const emojis = (await response.json()) as CustomEmojiData[];
+
+  // Replace the catalog first. If IndexedDB fails here, keep the previous ETag
+  // so the next initialization retries the API instead of accepting a new ETag
+  // while still exposing stale emoji data.
+  await putCustomEmojiData({ emojis, clear: true });
+
   if (etag) {
     log('Custom emoji data fetched successfully, storing etag %s', etag);
     await putCacheValue('custom', etag);
@@ -76,8 +89,6 @@ export async function importCustomEmojiData() {
     log('No etag found in response for custom emoji data');
   }
 
-  const emojis = (await response.json()) as CustomEmojiData[];
-  await putCustomEmojiData({ emojis, clear: true });
   return emojis;
 }
 
