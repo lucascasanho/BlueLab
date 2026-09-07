@@ -74,6 +74,14 @@ export function getWarmableStaticEmojiUrls(
   return [...urls];
 }
 
+export function getStaleStaticEmojiCacheRequests(
+  cachedRequests: readonly Request[],
+  activeUrls: readonly string[],
+): Request[] {
+  const activeUrlSet = new Set(activeUrls);
+  return cachedRequests.filter((request) => !activeUrlSet.has(request.url));
+}
+
 /**
  * Starts a low-priority, installed-PWA-only warmup of static custom emoji
  * thumbnails. The browser version remains lazy and unchanged.
@@ -137,8 +145,21 @@ export async function warmCustomEmojiStaticCache() {
   }
 
   const cache = await caches.open(CUSTOM_EMOJI_STATIC_CACHE_NAME);
+  const cachedRequests = await cache.keys();
+  const staleRequests = getStaleStaticEmojiCacheRequests(cachedRequests, urls);
+
+  // The catalog is authoritative. Remove static thumbnails whose emoji was
+  // deleted or whose static_url changed, while keeping the cache shared across
+  // accounts on the same instance because these assets are public.
+  if (staleRequests.length > 0) {
+    await Promise.all(staleRequests.map((request) => cache.delete(request)));
+  }
+
+  const staleUrls = new Set(staleRequests.map((request) => request.url));
   const existingUrls = new Set(
-    (await cache.keys()).map((request) => request.url),
+    cachedRequests
+      .filter((request) => !staleUrls.has(request.url))
+      .map((request) => request.url),
   );
   const pendingUrls = urls.filter((url) => !existingUrls.has(url));
 
