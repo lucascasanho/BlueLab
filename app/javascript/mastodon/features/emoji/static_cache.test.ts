@@ -1,4 +1,8 @@
-import { getWarmableStaticEmojiUrls, isStandalonePwa } from './static_cache';
+import {
+  getStaleStaticEmojiCacheRequests,
+  getWarmableStaticEmojiUrls,
+  isStandalonePwa,
+} from './static_cache';
 
 describe('isStandalonePwa', () => {
   test('detects Chromium and modern WebKit standalone display mode', () => {
@@ -84,6 +88,40 @@ describe('getWarmableStaticEmojiUrls', () => {
       getWarmableStaticEmojiUrls(
         [{ static_url: 'http://[invalid' }],
         origin,
+      ),
+    ).toEqual([]);
+  });
+});
+
+describe('getStaleStaticEmojiCacheRequests', () => {
+  test('returns only cached thumbnails that no longer belong to the catalog', () => {
+    const active = new Request(
+      'https://mastodon.blue/system/custom_emojis/images/1/static/a.png',
+    );
+    const removed = new Request(
+      'https://mastodon.blue/system/custom_emojis/images/2/static/old.png',
+    );
+
+    expect(
+      getStaleStaticEmojiCacheRequests(
+        [active, removed],
+        [active.url],
+      ).map((request) => request.url),
+    ).toEqual([removed.url]);
+  });
+
+  test('keeps the cache untouched when every cached thumbnail is current', () => {
+    const first = new Request(
+      'https://mastodon.blue/system/custom_emojis/images/1/static/a.png',
+    );
+    const second = new Request(
+      'https://mastodon.blue/system/custom_emojis/images/2/static/b.png',
+    );
+
+    expect(
+      getStaleStaticEmojiCacheRequests(
+        [first, second],
+        [first.url, second.url],
       ),
     ).toEqual([]);
   });
