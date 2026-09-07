@@ -1,5 +1,10 @@
+import type { ApiCustomEmojiJSON } from '@/mastodon/api_types/custom_emoji';
+
 type StandaloneNavigator = Navigator & {
   standalone?: boolean;
+  connection?: {
+    saveData?: boolean;
+  };
 };
 
 type MatchMedia = (
@@ -10,6 +15,22 @@ interface StandaloneEnvironment {
   matchMedia?: MatchMedia;
   navigatorObject?: Pick<StandaloneNavigator, 'standalone'>;
 }
+
+interface IdleWindow extends Window {
+  requestIdleCallback?: (
+    callback: () => void,
+    options?: { timeout?: number },
+  ) => number;
+}
+
+const CUSTOM_EMOJI_STATIC_CACHE_NAME = 'mastodon-custom-emoji-static-v1';
+const WARMUP_DELAY_MS = 3_000;
+const WARMUP_CONCURRENCY = 2;
+const MAX_SESSION_BYTES = 64 * 1024 * 1024;
+const MIN_STORAGE_HEADROOM_BYTES = 64 * 1024 * 1024;
+const STORAGE_RECHECK_INTERVAL = 50;
+
+let warmupScheduled = false;
 
 /**
  * Returns whether the current Mastodon window is running as an installed app.
@@ -37,4 +58,259 @@ export function isStandalonePwa(
     matchMedia?.('(display-mode: standalone)').matches === true ||
     navigatorObject?.standalone === true
   );
+}
+
+export function getWarmableStaticEmojiUrls(
+  emojis: readonly Pick<ApiCustomEmojiJSON, 'static_url'>[],
+  origin = window.location.origin,
+): string[] {
+  const urls = new Set<string>();
+
+  for (const emoji of emojis) {
+    try {
+      const url = new URL(emoji.static_url, origin);
+      if (url.origin === origin) {
+        urls.add(url.href);
+      }
+    } catch {
+      // Ignore malformed catalog entries. They can still fall back to the
+      // picker's existing network behavior when requested directly.
+    }
+  }
+
+  return [...urls];
+}
+
+/**
+ * Starts a low-priority, installed-PWA-only warmup of static custom emoji
+ * thumbnails. The browser version remains lazy and unchanged.
+ */
+export function scheduleCustomEmojiStaticCacheWarmup() {
+  if (
+    warmupScheduled ||
+    !isStandalonePwa() ||
+    typeof window === 'undefined' ||
+    !('caches' in window)
+  ) {
+    return;
+  }
+
+  const standaloneNavigator = navigator as StandaloneNavigator;
+  if (standaloneNavigator.connection?.saveData === true) {
+    return;
+  }
+
+  // The dedicated cache only helps once a service worker controls the page.
+  // A newly installed/updated worker may take control on the next app launch;
+  // in that case skip this session instead of adding background traffic early.
+  if (!navigator.serviceWorker?.controller) {
+    return;
+  }
+
+  warmupScheduled = true;
+
+  const scheduleAfterLoad = () => {
+    window.setTimeout(() => {
+      const idleWindow = window as IdleWindow;
+      if (idleWindow.requestIdleCallback) {
+        idleWindow.requestIdleCallback(
+          () => void warmCustomEmojiStaticCache(),
+          { timeout: 5_000 },
+        );
+      } else {
+        window.setTimeout(() => void warmCustomEmojiStaticCache(), 0);
+      }
+    }, WARMUP_DELAY_MS);
+  };
+
+  if (document.readyState === 'complete') {
+    scheduleAfterLoad();
+  } else {
+    window.addEventListener('load', scheduleAfterLoad, { once: true });
+  }
+}
+
+export async function warmCustomEmojiStaticCache() {
+  if (!isStandalonePwa() || !canWarmNow()) {
+    return;
+  }
+
+  const { loadAllCustomEmoji } = await import('./database');
+  const emojis = await loadAllCustomEmoji();
+  if (!emojis?.length) {
+    return;
+  }
+
+  const urls = getWarmableStaticEmojiUrls(emojis);
+  if (!urls.length || !(await hasStorageHeadroom())) {
+    return;
+  }
+
+  const cache = await caches.open(CUSTOM_EMOJI_STATIC_CACHE_NAME);
+  const existingUrls = new Set(
+    (await cache.keys()).map((request) => request.url),
+  );
+  const pendingUrls = urls.filter((url) => !existingUrls.has(url));
+
+  let nextIndex = 0;
+  let downloadedBytes = 0;
+  let completedItems = 0;
+  let stopped = false;
+
+  const warmNext = async () => {
+    while (!stopped) {
+      if (!(await waitUntilCanWarm())) {
+        return;
+      }
+
+      const index = nextIndex++;
+      const url = pendingUrls[index];
+      if (!url) {
+        return;
+      }
+
+      if (
+        completedItems > 0 &&
+        completedItems % STORAGE_RECHECK_INTERVAL === 0 &&
+        !(await hasStorageHeadroom())
+      ) {
+        stopped = true;
+        return;
+      }
+
+      try {
+        const response = await fetch(url, {
+          cache: 'force-cache',
+          credentials: 'omit',
+        });
+
+        if (!isSafeStaticEmojiResponse(response)) {
+          completedItems += 1;
+          continue;
+        }
+
+        const responseBytes = await getResponseSize(response);
+        if (
+          responseBytes > 0 &&
+          downloadedBytes + responseBytes > MAX_SESSION_BYTES
+        ) {
+          stopped = true;
+          return;
+        }
+
+        downloadedBytes += responseBytes;
+        await cache.put(url, response);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+          stopped = true;
+          return;
+        }
+        // A single unavailable emoji must not abort the rest of the warmup.
+      }
+
+      completedItems += 1;
+    }
+  };
+
+  await Promise.all(
+    Array.from({ length: WARMUP_CONCURRENCY }, () => warmNext()),
+  );
+}
+
+function canWarmNow() {
+  const standaloneNavigator = navigator as StandaloneNavigator;
+
+  return (
+    document.visibilityState === 'visible' &&
+    navigator.onLine !== false &&
+    standaloneNavigator.connection?.saveData !== true
+  );
+}
+
+async function waitUntilCanWarm(): Promise<boolean> {
+  const standaloneNavigator = navigator as StandaloneNavigator;
+  if (standaloneNavigator.connection?.saveData === true) {
+    return false;
+  }
+
+  if (canWarmNow()) {
+    return true;
+  }
+
+  return new Promise((resolve) => {
+    const check = () => {
+      if ((navigator as StandaloneNavigator).connection?.saveData === true) {
+        cleanup();
+        resolve(false);
+      } else if (canWarmNow()) {
+        cleanup();
+        resolve(true);
+      }
+    };
+    const cleanup = () => {
+      document.removeEventListener('visibilitychange', check);
+      window.removeEventListener('online', check);
+    };
+
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('online', check);
+  });
+}
+
+async function hasStorageHeadroom() {
+  if (!navigator.storage?.estimate) {
+    return true;
+  }
+
+  try {
+    const { quota, usage } = await navigator.storage.estimate();
+    if (!quota) {
+      return true;
+    }
+
+    return quota - (usage ?? 0) >= MIN_STORAGE_HEADROOM_BYTES;
+  } catch {
+    // Storage estimates are advisory and not universally implemented. A later
+    // CacheStorage QuotaExceededError remains the final safety stop.
+    return true;
+  }
+}
+
+function isSafeStaticEmojiResponse(response: Response) {
+  if (!response.ok || response.type === 'opaque') {
+    return false;
+  }
+
+  const contentType = response.headers.get('Content-Type') ?? '';
+  if (!contentType.toLowerCase().startsWith('image/')) {
+    return false;
+  }
+
+  const cacheControl = response.headers.get('Cache-Control') ?? '';
+  if (/\b(?:private|no-store)\b/i.test(cacheControl)) {
+    return false;
+  }
+
+  const vary = response.headers.get('Vary') ?? '';
+  if (/\b(?:cookie|authorization)\b/i.test(vary)) {
+    return false;
+  }
+
+  return true;
+}
+
+async function getResponseSize(response: Response) {
+  const contentLength = Number.parseInt(
+    response.headers.get('Content-Length') ?? '',
+    10,
+  );
+  if (Number.isFinite(contentLength) && contentLength > 0) {
+    return contentLength;
+  }
+
+  try {
+    return (await response.clone().blob()).size;
+  } catch {
+    return 0;
+  }
 }
