@@ -58,13 +58,7 @@ async function importEmojiDataImpl(locale: Locale, shortcodes: boolean) {
   return emojis;
 }
 
-const importCustomEmojiDataOnce = onceAsyncByArgs(importCustomEmojiDataImpl);
-
 export async function importCustomEmojiData() {
-  return importCustomEmojiDataOnce();
-}
-
-async function importCustomEmojiDataImpl() {
   const response = await fetchAndCheckEtag({
     oldEtag: await loadCacheValue('custom'),
     path: '/api/v1/custom_emojis',
