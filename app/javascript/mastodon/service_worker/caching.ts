@@ -48,25 +48,24 @@ async function cacheFirst({
   const request = event.request;
   const cachedResponse = await cache.match(request);
 
-  // Start expiring cache items while the process continues.
-  void expireCachedItems({ name, ttl, max });
-
   if (cachedResponse) {
-    // If we have a cached response, check the TTL header.
     const ttlHeader = Number.parseInt(
       cachedResponse.headers.get(CACHE_HEADER_TTL) ?? '0',
     );
 
     if (!ttlHeader || ttlHeader + ttl > Date.now()) {
+      event.waitUntil(expireCachedItems({ name, ttl, max }));
       return cachedResponse;
     }
   }
 
   const networkResponse = await fetch(request);
 
-  // For opaque responses, the status will be zero so we can't clone them.
+  // Cache maintenance must not sit on the critical image-rendering path. In
+  // particular, opening the custom emoji picker can create many concurrent
+  // image requests; awaiting CacheStorage writes here delays avatars, headers,
+  // media and emoji painting even after their network response has arrived.
   if (networkResponse.status !== 0) {
-    // Clone request with a custom header to store timestamp.
     const cloneHeaders = new Headers(networkResponse.headers);
     cloneHeaders.set(CACHE_HEADER_TTL, Date.now().toString());
 
@@ -76,7 +75,14 @@ async function cacheFirst({
       statusText: networkResponse.statusText,
     });
 
-    await cache.put(request, cloneResponse);
+    event.waitUntil(
+      (async () => {
+        await cache.put(request, cloneResponse);
+        await expireCachedItems({ name, ttl, max });
+      })(),
+    );
+  } else {
+    event.waitUntil(expireCachedItems({ name, ttl, max }));
   }
 
   return networkResponse;
