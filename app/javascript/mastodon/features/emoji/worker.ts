@@ -30,7 +30,10 @@ async function loadData(storeName: string) {
     importCount = (await importEmojiData(storeName))?.length;
   }
 
-  if (importCount) {
+  // An imported empty custom-emoji catalog is still a real update. Notify the
+  // main thread so Redux can clear emojis/categories that no longer exist.
+  // `undefined` continues to mean "nothing changed" (for example an ETag 304).
+  if (importCount !== undefined) {
     self.postMessage({
       type: 'done',
       storeName,
