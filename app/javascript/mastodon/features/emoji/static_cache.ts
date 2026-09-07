@@ -100,13 +100,11 @@ export function scheduleCustomEmojiStaticCacheWarmup() {
     return;
   }
 
-  // The dedicated cache only helps once a service worker controls the page.
-  // A newly installed/updated worker may take control on the next app launch;
-  // in that case skip this session instead of adding background traffic early.
-  if (!navigator.serviceWorker?.controller) {
-    return;
-  }
-
+  // CacheStorage can be populated before the current page is controlled by the
+  // newly registered service worker. Requiring controller here makes first-run
+  // and waiting-worker PWA sessions skip the warmup permanently. Once the
+  // worker controls a later page it will consume the same dedicated cache; the
+  // network requests below also warm the browser HTTP cache for this session.
   warmupScheduled = true;
 
   const scheduleAfterLoad = () => {
@@ -131,7 +129,7 @@ export function scheduleCustomEmojiStaticCacheWarmup() {
 }
 
 export async function warmCustomEmojiStaticCache() {
-  if (!isStandalonePwa() || !canWarmNow()) {
+  if (!isStandalonePwa() || !(await waitUntilCanWarm())) {
     return;
   }
 
