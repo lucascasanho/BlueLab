@@ -1,6 +1,11 @@
 import { DAY } from '../utils/time';
 
-import { expireCachedItems, handleFetch } from './caching';
+import {
+  CUSTOM_EMOJI_STATIC_CACHE_NAME,
+  expireCachedItems,
+  handleFetch,
+  isCustomEmojiStaticImageRequest,
+} from './caching';
 
 const now = 1_700_000_000_000;
 
@@ -77,6 +82,31 @@ describe('expireCachedItems', () => {
   });
 });
 
+describe('custom emoji static image routing', () => {
+  test('matches only same-origin static custom emoji image requests', () => {
+    const staticRequest = createAbsoluteRequest(
+      `${self.location.origin}/system/custom_emojis/images/000/001/234/static/example.png`,
+      'image',
+    );
+    const originalRequest = createAbsoluteRequest(
+      `${self.location.origin}/system/custom_emojis/images/000/001/234/original/example.gif`,
+      'image',
+    );
+    const crossOriginRequest = createAbsoluteRequest(
+      'https://cdn.example.com/system/custom_emojis/images/000/001/234/static/example.png',
+      'image',
+    );
+    const nonImageRequest = createAbsoluteRequest(
+      `${self.location.origin}/system/custom_emojis/images/000/001/234/static/example.png`,
+    );
+
+    expect(isCustomEmojiStaticImageRequest(staticRequest)).toBe(true);
+    expect(isCustomEmojiStaticImageRequest(originalRequest)).toBe(false);
+    expect(isCustomEmojiStaticImageRequest(crossOriginRequest)).toBe(false);
+    expect(isCustomEmojiStaticImageRequest(nonImageRequest)).toBe(false);
+  });
+});
+
 describe('handleFetch', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -87,6 +117,111 @@ describe('handleFetch', () => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
   });
+
+  test('serves a static custom emoji from its dedicated cache before the generic image cache', async () => {
+    const customEmojiCache = new MockCache();
+    const imageCache = new MockCache();
+    const request = createAbsoluteRequest(
+      `${self.location.origin}/system/custom_emojis/images/000/001/234/static/example.png`,
+      'image',
+    );
+    const cachedResponse = new Response('cached emoji', {
+      headers: { 'content-type': 'image/png' },
+    });
+
+    customEmojiCache.store.set(request.url, { request, response: cachedResponse });
+
+    const open = vi.fn().mockImplementation((name: string) => {
+      if (name === CUSTOM_EMOJI_STATIC_CACHE_NAME) {
+        return Promise.resolve(customEmojiCache);
+      }
+      if (name === 'mastodon-images') {
+        return Promise.resolve(imageCache);
+      }
+      throw new Error(`Unexpected cache ${name}`);
+    });
+    vi.stubGlobal('caches', { open });
+
+    const fetch = vi.fn();
+    vi.stubGlobal('fetch', fetch);
+
+    const { event, respondWith } = createFetchEvent(request);
+
+    handleFetch(event);
+
+    await expect(respondWith()).resolves.toBe(cachedResponse);
+    expect(fetch).not.toHaveBeenCalled();
+    expect(open).toHaveBeenCalledTimes(1);
+    expect(open).toHaveBeenCalledWith(CUSTOM_EMOJI_STATIC_CACHE_NAME);
+  });
+
+  test('falls back to the existing generic image path when the dedicated custom emoji cache misses', async () => {
+    const customEmojiCache = new MockCache();
+    const imageCache = new MockCache();
+    const request = createAbsoluteRequest(
+      `${self.location.origin}/system/custom_emojis/images/000/001/234/static/example.png`,
+      'image',
+    );
+    const networkResponse = new Response('network emoji', {
+      headers: { 'content-type': 'image/png' },
+      status: 200,
+    });
+
+    const open = vi.fn().mockImplementation((name: string) => {
+      if (name === CUSTOM_EMOJI_STATIC_CACHE_NAME) {
+        return Promise.resolve(customEmojiCache);
+      }
+      if (name === 'mastodon-images') {
+        return Promise.resolve(imageCache);
+      }
+      throw new Error(`Unexpected cache ${name}`);
+    });
+    vi.stubGlobal('caches', { open });
+
+    const fetch = vi.fn().mockResolvedValue(networkResponse);
+    vi.stubGlobal('fetch', fetch);
+
+    const { event, respondWith, waitUntil } = createFetchEvent(request);
+
+    handleFetch(event);
+
+    await expect(respondWith()).resolves.toBe(networkResponse);
+    expect(fetch).toHaveBeenCalledWith(request);
+    await waitUntil();
+    expect(open).toHaveBeenCalledWith(CUSTOM_EMOJI_STATIC_CACHE_NAME);
+    expect(open).toHaveBeenCalledWith('mastodon-images');
+    expect(imageCache.store.has(request.url)).toBe(true);
+  });
+
+  test.each([
+    ['/avatar.png', 'image'],
+    ['/system/custom_emojis/images/000/001/234/original/example.gif', 'image'],
+  ])(
+    'does not consult the dedicated custom emoji cache for %s',
+    async (pathname, destination) => {
+      const imageCache = new MockCache();
+      const request = createAbsoluteRequest(
+        `${self.location.origin}${pathname}`,
+        destination,
+      );
+      const networkResponse = new Response('image', { status: 200 });
+      const open = vi.fn().mockImplementation((name: string) => {
+        expect(name).toBe('mastodon-images');
+        return Promise.resolve(imageCache);
+      });
+
+      vi.stubGlobal('caches', { open });
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(networkResponse));
+
+      const { event, respondWith, waitUntil } = createFetchEvent(request);
+
+      handleFetch(event);
+
+      await expect(respondWith()).resolves.toBe(networkResponse);
+      await waitUntil();
+      expect(open).not.toHaveBeenCalledWith(CUSTOM_EMOJI_STATIC_CACHE_NAME);
+    },
+  );
 
   test('serves cached images without hitting the network while the TTL is valid', async () => {
     const imageCache = new MockCache();
@@ -396,7 +531,11 @@ function createResponse(timestamp?: number) {
 }
 
 function createRequest(pathname: string, destination = '') {
-  const request = new Request(`https://example.com${pathname}`);
+  return createAbsoluteRequest(`https://example.com${pathname}`, destination);
+}
+
+function createAbsoluteRequest(url: string, destination = '') {
+  const request = new Request(url);
 
   Object.defineProperty(request, 'destination', {
     value: destination,
