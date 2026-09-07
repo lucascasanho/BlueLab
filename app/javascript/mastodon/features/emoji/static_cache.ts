@@ -16,13 +16,6 @@ interface StandaloneEnvironment {
   navigatorObject?: Pick<StandaloneNavigator, 'standalone'>;
 }
 
-interface IdleWindow extends Window {
-  requestIdleCallback?: (
-    callback: () => void,
-    options?: { timeout?: number },
-  ) => number;
-}
-
 const CUSTOM_EMOJI_STATIC_CACHE_NAME = 'mastodon-custom-emoji-static-v1';
 const WARMUP_DELAY_MS = 3_000;
 const WARMUP_CONCURRENCY = 2;
@@ -109,9 +102,8 @@ export function scheduleCustomEmojiStaticCacheWarmup() {
 
   const scheduleAfterLoad = () => {
     window.setTimeout(() => {
-      const idleWindow = window as IdleWindow;
-      if (idleWindow.requestIdleCallback) {
-        idleWindow.requestIdleCallback(
+      if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(
           () => void warmCustomEmojiStaticCache(),
           { timeout: 5_000 },
         );
