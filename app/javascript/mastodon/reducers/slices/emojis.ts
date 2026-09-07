@@ -35,26 +35,32 @@ const emojisSlice = createSlice({
   extraReducers(builder) {
     builder.addAsyncThunk(loadCustomEmojis, {
       fulfilled(state, action) {
-        if (!action.payload?.length) {
+        // `null` means the IndexedDB catalog has not been initialized yet.
+        // An empty array is different: it is a valid catalog and must clear any
+        // emojis/categories left from an older load.
+        if (action.payload === null) {
           return;
         }
 
+        const custom: EmojisState['custom'] = {};
+        const customCategories: EmojisState['customCategories'] = {};
+
         for (const emoji of action.payload) {
           const { shortcode, category, url, static_url } = emoji;
-          state.custom[shortcode] = {
+          custom[shortcode] = {
             url,
             static_url,
           };
 
           if (category) {
-            state.customCategories[category] ??= [];
-            if (!state.customCategories[category].includes(shortcode)) {
-              state.customCategories[category].push(shortcode);
-            }
+            customCategories[category] ??= [];
+            customCategories[category].push(shortcode);
           }
-
-          state.customLoaded = true;
         }
+
+        state.custom = custom;
+        state.customCategories = customCategories;
+        state.customLoaded = true;
       },
     });
   },
