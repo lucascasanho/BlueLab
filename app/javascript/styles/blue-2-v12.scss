@@ -35,8 +35,16 @@ body[data-theme='blue-2'] {
   /* Success surfaces are confirmations, so they follow the instance accent. */
   --color-text-success: var(--color-text-brand);
   --color-bg-success-base: var(--color-bg-brand-base);
-  --color-bg-success-soft: var(--color-bg-brand-soft);
-  --color-bg-success-softest: var(--color-bg-brand-softest);
+  --color-bg-success-soft: color-mix(
+    in srgb,
+    var(--blue2-blue) 24%,
+    var(--blue2-bg)
+  );
+  --color-bg-success-softest: color-mix(
+    in srgb,
+    var(--blue2-blue) 16%,
+    var(--blue2-bg)
+  );
   --color-border-success-soft: color-mix(
     in srgb,
     var(--color-text-brand) 50%,
@@ -48,6 +56,10 @@ body[data-theme='blue-2'] {
 
   ::selection {
     background: color-mix(in srgb, var(--blue2-blue) 35%, transparent);
+  }
+
+  .icon-verified {
+    color: var(--color-text-success);
   }
 
   /*
