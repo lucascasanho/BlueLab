@@ -6,7 +6,7 @@
 
 ## Estado
 
-- Status: em andamento
+- Status: aguardando teste do usuário
 - Atualizado em: 2026-09-08 — America/Cuiaba
 - Objetivo: promover o lote aprovado de cores de sucesso/links verificados para a Espelunca e ajustar somente no Blue as linhas grossas dos cabeçalhos das Preferências em modo claro.
 - Alvos: `BlueLab`/espelunca.social para o lote já aprovado; `BlueLab-Test`/mastodon.blue para o novo ajuste ainda não aprovado.
@@ -21,6 +21,9 @@
 - `BlueLab` foi promovida por fast-forward ao commit exato `ebc55e8eef`.
 - Espelunca atualizada para `ebc55e8eef`; backup de 105 MB criado antes do cutover.
 - Serviços web, Sidekiq, streaming e nginx ativos; banco sem migrations pendentes; saúde local e API pública HTTP 200.
+- Ajuste de Preferências publicado em `BlueLab-Test` no commit `84ab011af1` e implantado somente no mastodon.blue.
+- O CSS publicado foi confirmado por HTTP; health local e API pública do Blue responderam HTTP 200, sem erros novos nos serviços.
+- Espelunca permanece limpa no commit estável `ebc55e8eef`, com todos os serviços ativos.
 
 ## Plano atual
 
@@ -30,8 +33,8 @@
 - [x] Reproduzir e localizar as linhas grossas no topo das Preferências em modo claro.
 - [x] Aplicar o menor ajuste possível somente em `BlueLab-Test`.
 - [x] Executar lint/build e validação visual claro/escuro.
-- [ ] Publicar e atualizar somente mastodon.blue.
-- [ ] Confirmar que Espelunca permanece no lote aprovado, sem o novo ajuste.
+- [x] Publicar e atualizar somente mastodon.blue.
+- [x] Confirmar que Espelunca permanece no lote aprovado, sem o novo ajuste.
 
 ## Decisões e cuidados
 
@@ -41,4 +44,4 @@
 
 ## Próximo passo seguro
 
-Criar e publicar o commit de teste em `BlueLab-Test`, atualizar somente o mastodon.blue e validar o ambiente publicado.
+Aguardar o teste do usuário no mastodon.blue. Só promover o ajuste de Preferências para `BlueLab` e Espelunca após aprovação explícita.
