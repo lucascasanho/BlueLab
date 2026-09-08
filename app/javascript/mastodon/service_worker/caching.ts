@@ -5,6 +5,27 @@ import { DAY } from '../utils/time';
 
 const CACHE_NAME_PREFIX = 'mastodon-';
 const CACHE_HEADER_TTL = 'x-timestamp';
+const OFFLINE_NAVIGATION_EXCLUSIONS = [
+  '/api',
+  '/auth',
+  '/oauth',
+  '/admin',
+  '/settings',
+  '/moderation',
+  '/web',
+  '/users',
+  '/inbox',
+  '/.well-known',
+  '/nodeinfo',
+  '/system',
+  '/packs',
+  '/assets',
+  '/rails',
+  '/sidekiq',
+  '/health',
+  '/sw.js',
+  '/manifest',
+] as const;
 
 export const CUSTOM_EMOJI_STATIC_CACHE_NAME =
   'mastodon-custom-emoji-static-v1';
@@ -23,11 +44,29 @@ export function isCustomEmojiStaticImageRequest(request: Request) {
   );
 }
 
+export function isSafeNavigationRequest(
+  request: Request,
+  origin = self.location.origin,
+) {
+  if (request.method !== 'GET' || request.mode !== 'navigate') {
+    return false;
+  }
+
+  const url = new URL(request.url);
+  if (url.origin !== origin) {
+    return false;
+  }
+
+  return !OFFLINE_NAVIGATION_EXCLUSIONS.some(
+    (prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`),
+  );
+}
+
 export async function cacheRoot() {
   // Never persist the authenticated root document in CacheStorage. It contains
   // session-specific bootstrap data and must never become an offline fallback.
   // Keep only a synthetic, identity-free document that is safe to serve later
-  // when navigation fallback is implemented in a separate phase.
+  // when a safe document navigation cannot reach the network.
   const cache = await openWebCache();
   await cache.delete('/');
   await cache.put(OFFLINE_SHELL_CACHE_KEY, createOfflineShellResponse());
@@ -100,12 +139,32 @@ export function handleFetch(event: FetchEvent) {
 
   if (url.pathname === '/auth/sign_out') {
     event.respondWith(handleLogout(event));
+  } else if (isSafeNavigationRequest(event.request)) {
+    event.respondWith(handleNavigationFetch(event.request));
   } else if (/intl\/.*\.js$/.test(url.pathname)) {
     event.respondWith(cacheFirst({ event, name: 'locales' }));
   } else if (event.request.destination === 'font') {
     event.respondWith(cacheFirst({ event, name: 'fonts' }));
   } else if (event.request.destination === 'image') {
     event.respondWith(handleImageFetch(event));
+  }
+}
+
+async function handleNavigationFetch(request: Request) {
+  try {
+    // Navigation stays network-first and no successful authenticated document is
+    // persisted. The synthetic shell is only a last-resort response when the
+    // network request itself rejects (for example while offline).
+    return await fetch(request);
+  } catch (error) {
+    const cache = await openWebCache();
+    const offlineShell = await cache.match(OFFLINE_SHELL_CACHE_KEY);
+
+    if (offlineShell) {
+      return offlineShell;
+    }
+
+    throw error;
   }
 }
 
@@ -182,6 +241,7 @@ export async function expireCachedItems({
   ttl = DAY * 30,
   max = 5,
 }: {
+  event?: FetchEvent;
   name: string;
   ttl?: number;
   max?: number;
