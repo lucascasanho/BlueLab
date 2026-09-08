@@ -23,12 +23,12 @@ export function isCustomEmojiStaticImageRequest(request: Request) {
 }
 
 export async function cacheRoot() {
+  // Never persist the authenticated root document in CacheStorage. It contains
+  // session-specific bootstrap data and is not used as a navigation fallback.
+  // Remove any legacy entry left by older workers while keeping the cache name
+  // available for the existing logout cleanup path.
   const cache = await openWebCache();
-  const response = await fetch('/', {
-    credentials: 'include',
-    redirect: 'manual',
-  });
-  await cache.put('/', response);
+  await cache.delete('/');
 }
 
 export function handleFetch(event: FetchEvent) {
