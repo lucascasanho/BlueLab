@@ -3,8 +3,8 @@
   <path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.333" d="m6 8 1.333 1.333L10 6.667"/>
   <defs>
     <linearGradient id="VerifiedGradient" x1="7.99512" y1="0.836914" x2="7.99512" y2="15.1689" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#00BC7D"/>
-      <stop offset="1" stop-color="#00BBA7"/>
+      <stop stop-color="var(--color-text-success, #00BC7D)"/>
+      <stop offset="1" stop-color="var(--color-bg-success-base, #00BBA7)"/>
     </linearGradient>
   </defs>
 </svg>
