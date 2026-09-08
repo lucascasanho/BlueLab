@@ -3,6 +3,7 @@ import type { FC, KeyboardEvent, MouseEvent } from 'react';
 
 import { useIntl } from 'react-intl';
 
+import type { ApiInstanceVerificationBadgeJSON } from 'mastodon/api_types/accounts';
 import { domain, title as instanceTitle } from 'mastodon/initial_state';
 
 import { Popover } from '../popover';
@@ -31,16 +32,32 @@ const copy = {
 
 interface IconProps {
   className?: string;
+  remoteBadge?: ApiInstanceVerificationBadgeJSON | null;
+  useRemoteFallback?: boolean;
 }
 
-const VerifiedMark: FC<IconProps> = ({ className }) => {
+const REMOTE_FALLBACK_COLORS = ['#60a5fa', '#1d9bf0', '#1d4ed8'];
+
+const VerifiedMark: FC<IconProps> = ({
+  className,
+  remoteBadge,
+  useRemoteFallback = false,
+}) => {
   const gradientId = `bluelab-verified-${useId().replace(/:/g, '')}`;
+  const remoteColors = remoteBadge?.colors.length
+    ? remoteBadge.colors
+    : useRemoteFallback
+      ? REMOTE_FALLBACK_COLORS
+      : null;
+  const startColor = remoteColors?.[0];
+  const middleColor = remoteColors?.[1] ?? startColor;
+  const endColor = remoteColors?.[2] ?? middleColor;
 
   return (
     <svg
       className={className}
       aria-hidden='true'
-      viewBox='0 0 24 24'
+      viewBox={remoteBadge?.view_box ?? '0 0 24 24'}
       focusable='false'
     >
       <defs>
@@ -54,13 +71,21 @@ const VerifiedMark: FC<IconProps> = ({ className }) => {
         >
           <stop
             offset='0'
-            stopColor='var(--color-text-brand-soft, currentColor)'
+            stopColor={
+              startColor ?? 'var(--color-text-brand-soft, currentColor)'
+            }
           />
           <stop
             offset='0.5'
-            stopColor='var(--color-bg-brand-base, var(--color-text-brand, currentColor))'
+            stopColor={
+              middleColor ??
+              'var(--color-bg-brand-base, var(--color-text-brand, currentColor))'
+            }
           />
-          <stop offset='1' stopColor='var(--color-text-brand, currentColor)' />
+          <stop
+            offset='1'
+            stopColor={endColor ?? 'var(--color-text-brand, currentColor)'}
+          />
         </linearGradient>
       </defs>
 
@@ -69,7 +94,10 @@ const VerifiedMark: FC<IconProps> = ({ className }) => {
         BlueLab adds the palette-aware gradient and interactive integration.
       */}
       <path
-        d='M22.51,13.76a3,3,0,0,1,0-3.52l.76-1.05a1,1,0,0,0,.14-.9,1.018,1.018,0,0,0-.64-.64l-1.23-.4A2.987,2.987,0,0,1,19.47,4.4V3.1a1,1,0,0,0-1.31-.95l-1.24.4a3,3,0,0,1-3.35-1.09L12.81.41a1.036,1.036,0,0,0-1.62,0l-.76,1.05A3,3,0,0,1,7.08,2.55l-1.24-.4a1,1,0,0,0-1.31.95V4.4A2.987,2.987,0,0,1,2.46,7.25l-1.23.4a1.018,1.018,0,0,0-.64.64,1,1,0,0,0,.14.9l.76,1.05a3,3,0,0,1,0,3.52L.73,14.81a1,1,0,0,0-.14.9,1.018,1.018,0,0,0,.64.64l1.23.4A2.987,2.987,0,0,1,4.53,19.6v1.3a1,1,0,0,0,1.31.95l1.23-.4a2.994,2.994,0,0,1,3.36,1.09l.76,1.05a1.005,1.005,0,0,0,1.62,0l.76-1.05a3,3,0,0,1,3.36-1.09l1.23.4a1,1,0,0,0,1.31-.95V19.6a2.987,2.987,0,0,1,2.07-2.85l1.23-.4a1.018,1.018,0,0,0,.64-.64,1,1,0,0,0-.14-.9Zm-5.8-3.053-5,5a1,1,0,0,1-1.414,0l-3-3a1,1,0,1,1,1.414-1.414L11,13.586l4.293-4.293a1,1,0,0,1,1.414,1.414Z'
+        d={
+          remoteBadge?.path ??
+          'M22.51,13.76a3,3,0,0,1,0-3.52l.76-1.05a1,1,0,0,0,.14-.9,1.018,1.018,0,0,0-.64-.64l-1.23-.4A2.987,2.987,0,0,1,19.47,4.4V3.1a1,1,0,0,0-1.31-.95l-1.24.4a3,3,0,0,1-3.35-1.09L12.81.41a1.036,1.036,0,0,0-1.62,0l-.76,1.05A3,3,0,0,1,7.08,2.55l-1.24-.4a1,1,0,0,0-1.31.95V4.4A2.987,2.987,0,0,1,2.46,7.25l-1.23.4a1.018,1.018,0,0,0-.64.64,1,1,0,0,0,.14.9l.76,1.05a3,3,0,0,1,0,3.52L.73,14.81a1,1,0,0,0-.14.9,1.018,1.018,0,0,0,.64.64l1.23.4A2.987,2.987,0,0,1,4.53,19.6v1.3a1,1,0,0,0,1.31.95l1.23-.4a2.994,2.994,0,0,1,3.36,1.09l.76,1.05a1.005,1.005,0,0,0,1.62,0l.76-1.05a3,3,0,0,1,3.36-1.09l1.23.4a1,1,0,0,0,1.31-.95V19.6a2.987,2.987,0,0,1,2.07-2.85l1.23-.4a1.018,1.018,0,0,0,.64-.64,1,1,0,0,0-.14-.9Zm-5.8-3.053-5,5a1,1,0,0,1-1.414,0l-3-3a1,1,0,1,1,1.414-1.414L11,13.586l4.293-4.293a1,1,0,0,1,1.414,1.414Z'
+        }
         fill={`url(#${gradientId})`}
       />
     </svg>
@@ -149,10 +177,18 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
 
   const language = intl.locale.toLowerCase().split(/[-_]/)[0];
   const localizedCopy = language === 'pt' ? copy.pt : copy.en;
-  const instanceName = instanceTitle ?? domain ?? 'Mastodon';
-  const verifiedAt = account.verified_by_role_since
-    ? new Date(account.verified_by_role_since)
-    : null;
+  const isRemote = account.acct.includes('@');
+  const verification = account.instance_verification;
+  const remoteBadge = isRemote ? verification?.badge : null;
+  const instanceName = isRemote
+    ? (verification?.issuer ??
+      verification?.issuer_domain ??
+      account.acct.split('@').at(-1) ??
+      'Mastodon')
+    : (instanceTitle ?? domain ?? 'Mastodon');
+  const verifiedSince =
+    verification?.verified_at ?? account.verified_by_role_since;
+  const verifiedAt = verifiedSince ? new Date(verifiedSince) : null;
   const formattedDate =
     verifiedAt && !Number.isNaN(verifiedAt.getTime())
       ? intl.formatDate(verifiedAt, {
@@ -182,7 +218,11 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
         onClick={handleClick}
         onKeyDown={handleKeyDown}
       >
-        <VerifiedMark className={classes.badge} />
+        <VerifiedMark
+          className={classes.badge}
+          remoteBadge={remoteBadge}
+          useRemoteFallback={isRemote}
+        />
       </span>
 
       <Popover
@@ -205,7 +245,11 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
               {titleText}
             </h3>
             <div className={classes.infoRow}>
-              <VerifiedMark className={classes.inlineBadge} />
+              <VerifiedMark
+                className={classes.inlineBadge}
+                remoteBadge={remoteBadge}
+                useRemoteFallback={isRemote}
+              />
               <p className={classes.description}>{descriptionText}</p>
             </div>
             <div className={classes.infoRow}>

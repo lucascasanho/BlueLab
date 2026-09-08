@@ -49,6 +49,9 @@ RSpec.describe 'Admin Users Roles' do
       expect do
         put admin_user_role_path(user.id), params: { user: { role_id: verified_role.id } }
       end.to change { user.account.reload.verified_by_role_since }.from(nil).to(be_present)
+
+      expect(ActivityPub::UpdateDistributionWorker)
+        .to have_enqueued_sidekiq_job(user.account_id)
     end
 
     it 'clears the date when an eligible role is removed' do

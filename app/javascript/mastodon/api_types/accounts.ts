@@ -12,6 +12,19 @@ export interface ApiAccountRoleJSON {
   name: string;
 }
 
+export interface ApiInstanceVerificationBadgeJSON {
+  view_box: string;
+  path: string;
+  colors: string[];
+}
+
+export interface ApiInstanceVerificationJSON {
+  issuer: string;
+  issuer_domain: string;
+  verified_at?: string | null;
+  badge?: ApiInstanceVerificationBadgeJSON | null;
+}
+
 type ApiFeaturePolicy =
   | 'public'
   | 'followers'
@@ -74,6 +87,7 @@ export interface BaseApiAccountJSON {
   invalid_handle?: boolean;
   verified_by_role?: boolean;
   verified_by_role_since?: string | null;
+  instance_verification?: ApiInstanceVerificationJSON | null;
 }
 
 // See app/serializers/rest/muted_account_serializer.rb

@@ -8,7 +8,8 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
 
   context_extensions :manually_approves_followers, :featured, :also_known_as,
                      :moved_to, :property_value, :discoverable, :suspended,
-                     :memorial, :indexable, :attribution_domains, :profile_settings
+                     :memorial, :indexable, :attribution_domains, :profile_settings,
+                     :instance_verification
 
   context_extensions :interaction_policies
 
@@ -33,6 +34,7 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
   attribute :also_known_as, if: :also_known_as?
   attribute :suspended, if: :suspended?
   attribute :attribution_domains, if: -> { object.attribution_domains.any? }
+  attribute :instance_verification, if: :verified_by_instance?
 
   class EndpointsSerializer < ActivityPub::Serializer
     include RoutingHelper
@@ -183,6 +185,19 @@ class ActivityPub::ActorSerializer < ActivityPub::Serializer
 
   def published
     object.created_at.midnight.iso8601
+  end
+
+  def instance_verification
+    {
+      type: 'InstanceVerification',
+      name: Setting.site_title,
+      verified_at: object.verified_by_role_since&.iso8601(3),
+      icon: InstanceVerification.activitypub_badge,
+    }.compact
+  end
+
+  def verified_by_instance?
+    !object.unavailable? && object.local? && object.user_role&.verified_by_instance?
   end
 
   def interaction_policy

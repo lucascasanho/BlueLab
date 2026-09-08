@@ -9,7 +9,8 @@ class REST::AccountSerializer < ActiveModel::Serializer
   attributes :id, :username, :acct, :display_name, :locked, :bot, :discoverable, :indexable, :group, :created_at,
              :note, :url, :uri, :avatar, :avatar_static, :avatar_description, :header, :header_static, :header_description,
              :followers_count, :following_count, :statuses_count, :last_status_at, :hide_collections,
-             :show_media, :show_media_replies, :show_featured, :verified_by_role, :verified_by_role_since
+             :show_media, :show_media_replies, :show_featured, :verified_by_role, :verified_by_role_since,
+             :instance_verification
 
   has_one :moved_to_account, key: :moved, serializer: REST::AccountSerializer, if: :moved_and_not_nested?
 
@@ -179,13 +180,34 @@ class REST::AccountSerializer < ActiveModel::Serializer
   def verified_by_role
     return false if object.unavailable?
 
-    object.user_role&.verified_by_instance? || false
+    if object.local?
+      object.user_role&.verified_by_instance? || false
+    else
+      object.remote_instance_verification.present?
+    end
   end
 
   def verified_by_role_since
     return unless verified_by_role
 
-    object.verified_by_role_since || latest_verified_role_assignment
+    if object.local?
+      object.verified_by_role_since || latest_verified_role_assignment
+    else
+      object.remote_instance_verification['verified_at']
+    end
+  end
+
+  def instance_verification
+    return unless verified_by_role
+
+    metadata = object.remote? ? object.remote_instance_verification : {}
+
+    {
+      issuer: object.local? ? Setting.site_title : metadata['issuer'],
+      issuer_domain: object.local? ? Rails.configuration.x.local_domain : object.domain,
+      verified_at: verified_by_role_since,
+      badge: object.local? ? InstanceVerification.local_badge : metadata['badge'],
+    }.compact
   end
 
   def latest_verified_role_assignment

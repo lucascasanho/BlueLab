@@ -188,6 +188,42 @@ RSpec.describe REST::AccountSerializer do
         expect(subject['verified_by_role_since']).to be_nil
       end
     end
+
+    context 'when the account was verified by its remote instance' do
+      let(:account) do
+        Fabricate(
+          :account,
+          domain: 'remote.example',
+          remote_instance_verification: {
+            'source' => 'activitypub',
+            'issuer' => 'Remote Community',
+            'verified_at' => '2026-09-05T12:00:00.000Z',
+            'badge' => {
+              'view_box' => '0 0 16 16',
+              'path' => 'M1 1L15 15Z',
+              'colors' => ['#d52a96'],
+            },
+          }
+        )
+      end
+
+      it 'exposes its issuer, date, and safe source vector' do
+        expect(subject).to include(
+          'verified_by_role' => true,
+          'verified_by_role_since' => match_api_datetime_format,
+          'instance_verification' => {
+            'issuer' => 'Remote Community',
+            'issuer_domain' => 'remote.example',
+            'verified_at' => match_api_datetime_format,
+            'badge' => {
+              'view_box' => '0 0 16 16',
+              'path' => 'M1 1L15 15Z',
+              'colors' => ['#d52a96'],
+            },
+          }
+        )
+      end
+    end
   end
 
   context 'when the account is memorialized' do

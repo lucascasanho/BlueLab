@@ -76,6 +76,7 @@ class ActivityPub::ProcessAccountService < BaseService
 
       update_account
       process_tags
+      schedule_legacy_instance_verification_fetch unless @only_key || @account.suspended?
 
       # NOTE: while this case is unlikely due to the `rename_account!` above,
       # we do not have a uniqueness constraint on URI, so this still needs to run
@@ -257,6 +258,7 @@ class ActivityPub::ProcessAccountService < BaseService
     @account.show_media              = @json['showMedia'] if @json.key?('showMedia')
     @account.show_media_replies      = @json['showRepliesInMedia'] if @json.key?('showRepliesInMedia')
     @account.attribution_domains     = as_array(@json['attributionDomains'] || []).take(Account::ATTRIBUTION_DOMAINS_HARD_LIMIT).grep(String)
+    @account.remote_instance_verification = remote_instance_verification
   end
 
   def set_fetchable_key!
@@ -466,6 +468,41 @@ class ActivityPub::ProcessAccountService < BaseService
       .select { |attachment| attachment['type'] == 'PropertyValue' }
       .take(MAX_PROFILE_FIELDS)
       .map { |attachment| attachment.slice('name', 'value') }
+  end
+
+  def remote_instance_verification
+    value = first_of_value(
+      @json['instanceVerification'] ||
+      @json['bluelab:instanceVerification'] ||
+      @json["#{InstanceVerification::NAMESPACE}instanceVerification"]
+    )
+    return @account.remote_instance_verification if value.nil? && @account.remote_instance_verification['source'] == 'rest'
+    return {} if value.nil? || value == false
+
+    if value == true
+      return {
+        'source' => 'activitypub',
+        'issuer' => @account.domain,
+      }
+    end
+
+    return {} unless value.is_a?(Hash)
+
+    supported_types = ['InstanceVerification', 'bluelab:InstanceVerification', "#{InstanceVerification::NAMESPACE}InstanceVerification"]
+    return {} if value['type'].present? && !equals_or_includes_any?(value['type'], supported_types)
+
+    {
+      'source' => 'activitypub',
+      'issuer' => InstanceVerification.normalize_issuer_name(first_lang_string(value, 'name'), fallback: @account.domain),
+      'verified_at' => InstanceVerification.normalize_verified_at(value['verifiedAt']),
+      'badge' => InstanceVerification.normalize_badge(first_of_value(value['icon'])),
+    }.compact
+  end
+
+  def schedule_legacy_instance_verification_fetch
+    return if @account.remote_instance_verification['source'] == 'activitypub'
+
+    RemoteInstanceVerificationWorker.perform_async(@account.id)
   end
 
   def mismatching_origin?(url)

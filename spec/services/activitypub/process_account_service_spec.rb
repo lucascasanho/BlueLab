@@ -862,6 +862,8 @@ RSpec.describe ActivityPub::ProcessAccountService do
         stub_request(:get, "https://foo.test/users/#{i}/status").to_return(status: 200, body: status_json.to_json, headers: { 'Content-Type': 'application/activity+json' })
         stub_request(:get, "https://foo.test/.well-known/webfinger?resource=acct:user#{i}@foo.test").to_return(body: webfinger.to_json, headers: { 'Content-Type': 'application/jrd+json' })
       end
+
+      stub_request(:get, 'https://foo.test/api/v2/instance').to_return(status: 404)
     end
 
     it 'creates accounts without exceeding rate limit', :inline_jobs do
@@ -905,6 +907,47 @@ RSpec.describe ActivityPub::ProcessAccountService do
 
         expect(account.feature_approval_policy).to eq 0b100000000000000001100
       end
+    end
+  end
+
+  context 'with instance verification metadata' do
+    let(:payload) do
+      {
+        id: 'https://foo.test/users/alice',
+        preferredUsername: 'alice',
+        type: 'Person',
+        inbox: 'https://foo.test/inbox',
+        instanceVerification: {
+          type: 'InstanceVerification',
+          name: 'Foo Community',
+          verifiedAt: '2026-09-05T12:00:00.000Z',
+          icon: {
+            type: 'Image',
+            mediaType: 'image/svg+xml',
+            viewBox: '0 0 16 16',
+            svgPath: 'M1 1L15 15Z',
+            colors: ['#d52a96'],
+          },
+        },
+      }.deep_stringify_keys
+    end
+
+    before { stub_webfinger! }
+
+    it 'stores only the validated source data without scheduling a legacy lookup' do
+      account = subject.call(payload)
+
+      expect(account.remote_instance_verification).to eq(
+        'source' => 'activitypub',
+        'issuer' => 'Foo Community',
+        'verified_at' => '2026-09-05T12:00:00.000Z',
+        'badge' => {
+          'view_box' => '0 0 16 16',
+          'path' => 'M1 1L15 15Z',
+          'colors' => ['#d52a96'],
+        }
+      )
+      expect(RemoteInstanceVerificationWorker).to_not have_enqueued_sidekiq_job(account.id)
     end
   end
 

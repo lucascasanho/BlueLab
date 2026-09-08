@@ -33,6 +33,15 @@ module ContextHelper
       'showMedia' => 'toot:showMedia',
       'showRepliesInMedia' => 'toot:showRepliesInMedia',
     },
+    instance_verification: {
+      'bluelab' => InstanceVerification::NAMESPACE,
+      'InstanceVerification' => 'bluelab:InstanceVerification',
+      'instanceVerification' => 'bluelab:instanceVerification',
+      'verifiedAt' => { '@id' => 'bluelab:verifiedAt', '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime' },
+      'viewBox' => 'bluelab:viewBox',
+      'svgPath' => 'bluelab:svgPath',
+      'colors' => { '@id' => 'bluelab:colors', '@container' => '@list' },
+    },
     quote_requests: { 'QuoteRequest' => 'https://w3id.org/fep/044f#QuoteRequest' },
     quotes: {
       'quote' => { '@id' => 'https://w3id.org/fep/044f#quote', '@type' => '@id' },

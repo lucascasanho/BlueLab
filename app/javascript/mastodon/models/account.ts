@@ -115,6 +115,7 @@ export const accountDefaultValues: AccountShape = {
   invalid_handle: false,
   verified_by_role: false,
   verified_by_role_since: null,
+  instance_verification: null,
   // This comes from `ApiMutedAccountJSON`, but we should eventually
   // store that in a different object.
   mute_expires_at: null,

@@ -88,6 +88,9 @@ RSpec.describe UserRole do
         .to change { account.reload.verified_by_role_since }
         .from(nil)
         .to(be_present)
+
+      expect(ActivityPub::UpdateDistributionWorker)
+        .to have_enqueued_sidekiq_job(account.id)
     end
 
     it 'clears the time when an assigned role stops being eligible' do

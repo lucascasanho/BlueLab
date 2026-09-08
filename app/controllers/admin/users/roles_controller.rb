@@ -39,6 +39,7 @@ module Admin
         verified_by_role_since: currently_verified ? now : nil,
         updated_at: now
       )
+      ActivityPub::UpdateDistributionWorker.perform_in(ActivityPub::UpdateDistributionWorker::DEBOUNCE_DELAY, @user.account_id)
     end
 
     def resource_params

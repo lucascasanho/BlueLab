@@ -238,10 +238,15 @@ class UserRole < ApplicationRecord
   def sync_assigned_accounts_verification_timestamp
     now = Time.current
     verified_since = verified_by_instance? ? now : nil
+    account_ids = users.pluck(:account_id)
 
     Account
-      .where(id: users.select(:account_id))
+      .where(id: account_ids)
       .update_all(verified_by_role_since: verified_since, updated_at: now)
+
+    account_ids.each do |account_id|
+      ActivityPub::UpdateDistributionWorker.perform_in(ActivityPub::UpdateDistributionWorker::DEBOUNCE_DELAY, account_id)
+    end
   end
 
   def validate_own_role_edition

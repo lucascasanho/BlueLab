@@ -84,4 +84,30 @@ RSpec.describe ActivityPub::ActorSerializer do
       ))
     end
   end
+
+  describe 'instance verification' do
+    let(:role) { Fabricate(:user_role, name: 'Verificado') }
+    let(:record) { Fabricate(:user, role: role).account }
+
+    before do
+      record.update!(verified_by_role_since: Time.utc(2026, 9, 5, 12))
+      Setting.instance_accent_color = '#d52a96'
+    end
+
+    it 'publishes the source badge and moderation metadata' do
+      expect(subject).to include(
+        'instanceVerification' => a_hash_including(
+          'type' => 'InstanceVerification',
+          'name' => Setting.site_title,
+          'verifiedAt' => match_api_datetime_format,
+          'icon' => a_hash_including(
+            'mediaType' => 'image/svg+xml',
+            'viewBox' => '0 0 24 24',
+            'svgPath' => InstanceVerification::BADGE_PATH,
+            'colors' => ['#dd55ab', '#d52a96', '#aa2278']
+          )
+        )
+      )
+    end
+  end
 end

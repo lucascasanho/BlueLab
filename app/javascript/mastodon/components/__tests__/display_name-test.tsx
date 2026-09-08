@@ -114,6 +114,61 @@ describe('<DisplayName />', () => {
     expect(screen.getByText(/Verified since:/)).toBeTruthy();
   });
 
+  it('uses a validated badge and issuer supplied by the remote instance', () => {
+    const verifiedAccount = accountFactoryImmutable({
+      username: 'alice',
+      acct: 'alice@remote.example',
+      display_name: 'Alice',
+      verified_by_role: true,
+      instance_verification: {
+        issuer: 'Remote Community',
+        issuer_domain: 'remote.example',
+        verified_at: '2026-09-05T12:00:00.000Z',
+        badge: {
+          view_box: '0 0 16 16',
+          path: 'M1 1L15 15Z',
+          colors: ['#f06ab5', '#d52a96', '#a82075'],
+        },
+      },
+    });
+    render(<DisplayName account={verifiedAccount} />, { locale: 'en' });
+
+    const badge = screen.getByRole('button', { name: 'Verified account' });
+    expect(badge.querySelector('svg')?.getAttribute('viewBox')).toBe(
+      '0 0 16 16',
+    );
+    expect(badge.querySelector('path')?.getAttribute('d')).toBe('M1 1L15 15Z');
+    expect(badge.querySelector('stop')?.getAttribute('stop-color')).toBe(
+      '#f06ab5',
+    );
+
+    fireEvent.click(badge);
+    expect(
+      screen.getByText(/moderation team of Remote Community/),
+    ).toBeTruthy();
+    expect(screen.getByText(/Verified since:/)).toBeTruthy();
+  });
+
+  it('uses a fixed common-blue badge when a remote source has no vector', () => {
+    const verifiedAccount = accountFactoryImmutable({
+      username: 'alice',
+      acct: 'alice@remote.example',
+      display_name: 'Alice',
+      verified_by_role: true,
+      instance_verification: {
+        issuer: 'Remote Community',
+        issuer_domain: 'remote.example',
+        badge: null,
+      },
+    });
+    render(<DisplayName account={verifiedAccount} />);
+
+    const badge = screen.getByRole('button', { name: 'Verified account' });
+    expect(badge.querySelector('stop')?.getAttribute('stop-color')).toBe(
+      '#60a5fa',
+    );
+  });
+
   it('uses a distinct SVG gradient for every rendered badge', () => {
     const verifiedAccount = account.set('verified_by_role', true);
     const { container } = render(
