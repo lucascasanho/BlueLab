@@ -8,6 +8,7 @@ const CACHE_HEADER_TTL = 'x-timestamp';
 
 export const CUSTOM_EMOJI_STATIC_CACHE_NAME =
   'mastodon-custom-emoji-static-v1';
+export const OFFLINE_SHELL_CACHE_KEY = '/__bluelab_offline_shell__';
 
 export function isCustomEmojiStaticImageRequest(request: Request) {
   if (request.method !== 'GET' || request.destination !== 'image') {
@@ -24,11 +25,70 @@ export function isCustomEmojiStaticImageRequest(request: Request) {
 
 export async function cacheRoot() {
   // Never persist the authenticated root document in CacheStorage. It contains
-  // session-specific bootstrap data and is not used as a navigation fallback.
-  // Remove any legacy entry left by older workers while keeping the cache name
-  // available for the existing logout cleanup path.
+  // session-specific bootstrap data and must never become an offline fallback.
+  // Keep only a synthetic, identity-free document that is safe to serve later
+  // when navigation fallback is implemented in a separate phase.
   const cache = await openWebCache();
   await cache.delete('/');
+  await cache.put(OFFLINE_SHELL_CACHE_KEY, createOfflineShellResponse());
+}
+
+export function createOfflineShellResponse(
+  language = self.navigator.language,
+): Response {
+  const portuguese = /^pt(?:-|$)/i.test(language);
+  const copy = portuguese
+    ? {
+        language: 'pt-BR',
+        title: 'Sem conexão',
+        heading: 'Sem conexão com o servidor',
+        body: 'O aplicativo está disponível, mas o conteúdo precisa de conexão para ser atualizado.',
+      }
+    : {
+        language: 'en',
+        title: 'Offline',
+        heading: 'Unable to reach the server',
+        body: 'The app is available, but content needs a connection to update.',
+      };
+
+  const html = `<!doctype html>
+<html lang="${copy.language}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>${copy.title}</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; background: #17191f; color: #f5f5f5; }
+    main { width: min(34rem, calc(100% - 2rem)); padding: 2rem; text-align: center; }
+    .mark { width: 3rem; height: 3rem; margin: 0 auto 1.25rem; border: .25rem solid currentColor; border-radius: 50%; opacity: .78; }
+    h1 { margin: 0 0 .75rem; font-size: clamp(1.35rem, 4vw, 1.8rem); line-height: 1.2; }
+    p { margin: 0; opacity: .72; line-height: 1.55; }
+    @media (prefers-color-scheme: light) { body { background: #f7f7f8; color: #202126; } }
+  </style>
+</head>
+<body>
+  <main role="main" aria-live="polite">
+    <div class="mark" aria-hidden="true"></div>
+    <h1>${copy.heading}</h1>
+    <p>${copy.body}</p>
+  </main>
+</body>
+</html>`;
+
+  return new Response(html, {
+    status: 200,
+    headers: {
+      'Cache-Control': 'no-store',
+      'Content-Security-Policy':
+        "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+      'Content-Type': 'text/html; charset=utf-8',
+      'Referrer-Policy': 'no-referrer',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  });
 }
 
 export function handleFetch(event: FetchEvent) {
