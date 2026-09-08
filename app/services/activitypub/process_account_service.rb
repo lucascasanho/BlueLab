@@ -76,7 +76,7 @@ class ActivityPub::ProcessAccountService < BaseService
 
       update_account
       process_tags
-      schedule_legacy_instance_verification_fetch unless @only_key || @account.suspended?
+      schedule_remote_instance_verification_fetch unless @only_key || @account.suspended?
 
       # NOTE: while this case is unlikely due to the `rename_account!` above,
       # we do not have a uniqueness constraint on URI, so this still needs to run
@@ -476,7 +476,7 @@ class ActivityPub::ProcessAccountService < BaseService
       @json['bluelab:instanceVerification'] ||
       @json["#{InstanceVerification::NAMESPACE}instanceVerification"]
     )
-    return @account.remote_instance_verification if value.nil? && @account.remote_instance_verification['source'] == 'rest'
+    return @account.remote_instance_verification if value.nil? && %w(rest threads).include?(@account.remote_instance_verification['source'])
     return {} if value.nil? || value == false
 
     if value == true
@@ -499,7 +499,7 @@ class ActivityPub::ProcessAccountService < BaseService
     }.compact
   end
 
-  def schedule_legacy_instance_verification_fetch
+  def schedule_remote_instance_verification_fetch
     return if @account.remote_instance_verification['source'] == 'activitypub'
 
     RemoteInstanceVerificationWorker.perform_async(@account.id)

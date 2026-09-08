@@ -934,7 +934,7 @@ RSpec.describe ActivityPub::ProcessAccountService do
 
     before { stub_webfinger! }
 
-    it 'stores only the validated source data without scheduling a legacy lookup' do
+    it 'stores only the validated source data without scheduling a secondary lookup' do
       account = subject.call(payload)
 
       expect(account.remote_instance_verification).to eq(
@@ -948,6 +948,26 @@ RSpec.describe ActivityPub::ProcessAccountService do
         }
       )
       expect(RemoteInstanceVerificationWorker).to_not have_enqueued_sidekiq_job(account.id)
+    end
+
+    it 'preserves a Threads fallback when the actor still publishes no verification metadata' do
+      threads_verification = {
+        'source' => 'threads',
+        'issuer' => 'Threads',
+        'badge' => InstanceVerification.threads_badge,
+      }
+      account = Fabricate(
+        :account,
+        username: 'alice',
+        domain: 'foo.test',
+        uri: payload['id'],
+        remote_instance_verification: threads_verification
+      )
+
+      processed_account = subject.call(payload.except('instanceVerification'), account: account)
+
+      expect(processed_account.remote_instance_verification).to eq(threads_verification)
+      expect(RemoteInstanceVerificationWorker).to have_enqueued_sidekiq_job(account.id)
     end
   end
 

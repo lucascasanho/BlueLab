@@ -15,6 +15,17 @@ RSpec.describe InstanceVerification do
     end
   end
 
+  describe '.threads_badge' do
+    it 'uses the official Threads vector and color without executable SVG markup' do
+      expect(described_class.threads_badge).to eq(
+        'view_box' => '0 0 24 24',
+        'path' => described_class::THREADS_BADGE_PATH,
+        'colors' => ['#0095f6']
+      )
+      expect(described_class.normalize_badge(described_class.threads_badge)).to eq(described_class.threads_badge)
+    end
+  end
+
   describe '.normalize_badge' do
     it 'accepts only declarative SVG path and hexadecimal palette data' do
       badge = {
