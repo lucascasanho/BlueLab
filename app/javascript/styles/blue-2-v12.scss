@@ -169,3 +169,33 @@ body[data-theme='blue-2'] {
     outline-color: var(--blue2-blue) !important;
   }
 }
+
+/* Light settings shell dividers should remain subtle against the page canvas. */
+html[data-color-scheme='light'] body[data-theme='blue-2'].admin {
+  .sidebar-wrapper,
+  .content-wrapper,
+  .content__heading,
+  .content > .simple_form > h2:first-child {
+    border-color: color-mix(
+      in srgb,
+      var(--blue2-bg) 92%,
+      var(--blue2-text)
+    ) !important;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  html[data-color-scheme='auto'] body[data-theme='blue-2'].admin,
+  html:not([data-color-scheme]) body[data-theme='blue-2'].admin {
+    .sidebar-wrapper,
+    .content-wrapper,
+    .content__heading,
+    .content > .simple_form > h2:first-child {
+      border-color: color-mix(
+        in srgb,
+        var(--blue2-bg) 92%,
+        var(--blue2-text)
+      ) !important;
+    }
+  }
+}
