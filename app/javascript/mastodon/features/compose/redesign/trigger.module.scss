@@ -169,6 +169,7 @@
   z-index: 120;
   pointer-events: auto;
   box-shadow: 0 8px 24px rgb(0 0 0 / 28%);
+  transition: bottom 180ms ease;
 }
 
 :global(body[data-theme='blue-2']) .composer {
@@ -204,9 +205,32 @@
     bottom: calc(var(--mobile-bottom-nav-height, 64px) + var(--space-sm));
   }
 
+  // The minimized launcher is portaled to <body>, while the scroll state class
+  // lives on .ui. Use :has() so the fixed button follows the same chrome state:
+  // above the bottom nav while it is visible, and near the viewport edge after
+  // the nav is hidden by downward scrolling.
+  :global(body:has(.ui--mobile-chrome-hidden)) .blue2ResumeButton {
+    bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blue2ResumeButton {
+      transition: none;
+    }
+  }
+
+  :global(.reduce-motion) .blue2ResumeButton {
+    transition: none;
+  }
+
   // Keep the old minimized card safe as a fallback for non-standard mounts.
   :global(body[data-theme='blue-2']) .composerMinimized {
     bottom: calc(var(--mobile-bottom-nav-height, 64px) + var(--space-sm));
+  }
+
+  :global(body[data-theme='blue-2']:has(.ui--mobile-chrome-hidden))
+    .composerMinimized {
+    bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
   }
 
   // On phones the BlueLab composer is centered using VisualViewport's actual
