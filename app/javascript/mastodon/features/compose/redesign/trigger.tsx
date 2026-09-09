@@ -79,6 +79,22 @@ export const ComposerBackdrop: React.FC<{ onMinimize: () => void }> = ({
   />
 );
 
+export const ComposerResumeButton: React.FC<{ onResume: () => void }> = ({
+  onResume,
+}) => (
+  <IconButton
+    icon={PenNibIcon}
+    variant='solid'
+    color='accent'
+    className={classes.blue2ResumeButton}
+    size='lg'
+    data-blue2-compose-resume
+    onClick={onResume}
+  >
+    <FormattedMessage id='compose.expand' defaultMessage='Show composer' />
+  </IconButton>
+);
+
 export const ComposeRedesignButton: React.FC<{
   /**
    * Render the button in regular document flow instead of fixed positioning for mobile layout
@@ -223,10 +239,16 @@ export const ComposeRedesignButton: React.FC<{
   }
 
   if (displayState === 'minimized') {
-    return portalBlue2InlineOverlay(
+    if (isBlue2) {
+      return portalBlue2InlineOverlay(
+        <ComposerResumeButton onResume={handleBackdropClick} />,
+      );
+    }
+
+    return (
       <MenuCard className={classes.composerMinimized} elevation={2}>
         <ComposeFormHeader />
-      </MenuCard>,
+      </MenuCard>
     );
   }
 
