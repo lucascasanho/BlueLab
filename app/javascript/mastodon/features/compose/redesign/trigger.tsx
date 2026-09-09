@@ -112,16 +112,22 @@ export const ComposerBackdrop: React.FC<{ onMinimize: () => void }> = ({
   />
 );
 
-export const ComposerResumeButton: React.FC<{ onResume: () => void }> = ({
-  onResume,
-}) => (
+export const ComposerResumeButton: React.FC<{
+  onResume: () => void;
+  inline?: boolean;
+}> = ({ onResume, inline }) => (
   <IconButton
     icon={PenNibIcon}
     variant='solid'
     color='accent'
-    className={classes.blue2ResumeButton}
+    className={classNames(
+      classes.button,
+      inline && classes.buttonInline,
+      !inline && classes.blue2ResumeButton,
+    )}
     size='lg'
     data-blue2-compose-resume
+    data-blue2-compose-resume-inline={inline ? 'true' : undefined}
     onClick={onResume}
   >
     <FormattedMessage id='compose.expand' defaultMessage='Show composer' />
@@ -278,8 +284,12 @@ export const ComposeRedesignButton: React.FC<{
 
   if (displayState === 'minimized') {
     if (isBlue2) {
-      return portalBlue2InlineOverlay(
-        <ComposerResumeButton onResume={handleBackdropClick} />,
+      // Keep the minimized launcher inside RedesignMobileNavigation instead of
+      // portaling it to <body>. The Blue 2 navigation shell already owns the
+      // proven portrait behavior: above the bottom row while visible and down
+      // into the vacated row when mobile chrome auto-hides during scrolling.
+      return (
+        <ComposerResumeButton inline={inline} onResume={handleBackdropClick} />
       );
     }
 
