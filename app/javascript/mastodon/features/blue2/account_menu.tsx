@@ -4,8 +4,21 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { NavLink, useHistory } from 'react-router-dom';
 
-import { HouseIcon } from '@phosphor-icons/react';
+import {
+  CalendarDotsIcon,
+  GavelIcon,
+  GearIcon,
+  HeartIcon,
+  HouseIcon,
+  ProhibitIcon,
+  ShieldStarIcon,
+  SignOutIcon,
+  StackIcon,
+  UserIcon,
+  UsersThreeIcon,
+} from '@phosphor-icons/react';
 
+import { openModal } from '@/mastodon/actions/modal';
 import { Avatar } from '@/mastodon/components/avatar';
 import { VerifiedBadge } from '@/mastodon/components/display_name/verified_badge';
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
@@ -13,21 +26,20 @@ import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import { useIdentity } from '@/mastodon/identity_context';
-import LogoutIcon from '@/material-icons/400-24px/logout.svg?react';
+import {
+  canManageReports,
+  canViewAdminDashboard,
+} from '@/mastodon/permissions';
+import { useAppDispatch } from '@/mastodon/store';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 
 import classes from './account_menu.module.scss';
-import { Blue2ProfileIcon } from './icons';
-
-const csrfToken = () =>
-  document
-    .querySelector<HTMLMetaElement>('meta[name="csrf-token"]')
-    ?.getAttribute('content') ?? '';
 
 export const Blue2AccountMenu: React.FC = () => {
   const intl = useIntl();
   const history = useHistory();
-  const { accountId } = useIdentity();
+  const dispatch = useAppDispatch();
+  const { accountId, permissions } = useIdentity();
   const account = useAccount(accountId);
   const localCustomEmojis = useCustomEmojis();
   const [open, setOpen] = useState(false);
@@ -66,26 +78,16 @@ export const Blue2AccountMenu: React.FC = () => {
     history.push('/home');
   }, [history]);
 
-  const signOut = useCallback(async () => {
-    try {
-      const token = csrfToken();
-      await fetch('/auth/sign_out', {
-        method: 'DELETE',
-        credentials: 'same-origin',
-        headers: token ? { 'X-CSRF-Token': token } : undefined,
-      });
-    } finally {
-      window.location.assign('/');
-    }
-  }, []);
+  const confirmLogout = useCallback(() => {
+    setOpen(false);
+    dispatch(openModal({ modalType: 'CONFIRM_LOG_OUT', modalProps: {} }));
+  }, [dispatch]);
 
-  const handleSignOut = useCallback(() => {
-    void signOut();
-  }, [signOut]);
+  if (!accountId || !account) return null;
 
-  if (!account) return null;
-
-  const profilePath = account.acct ? `/@${account.acct}` : '/home';
+  const isManager = canManageReports(permissions);
+  const isAdmin = canViewAdminDashboard(permissions);
+  const accountBasePath = `/@${account.acct}`;
   const displayName = account.display_name.trim()
     ? account.display_name
     : account.username;
@@ -143,25 +145,145 @@ export const Blue2AccountMenu: React.FC = () => {
       {open && (
         <div className={classes.menu} role='menu'>
           <NavLink
-            to={profilePath}
+            to='/profile/edit'
             className={classes.menuItem}
             onClick={closeMenu}
             role='menuitem'
           >
-            <Blue2ProfileIcon size={22} />
+            <UserIcon />
             <FormattedMessage
-              id='account.go_to_profile'
-              defaultMessage='Go to profile'
+              id='account.edit_profile'
+              defaultMessage='Edit profile'
             />
           </NavLink>
+
+          <a
+            href='/settings/preferences'
+            className={classes.menuItem}
+            onClick={closeMenu}
+            role='menuitem'
+          >
+            <GearIcon />
+            <FormattedMessage
+              id='navigation_bar.preferences'
+              defaultMessage='Preferences'
+            />
+          </a>
+
+          <div className={classes.menuDivider} role='separator' />
+
+          <NavLink
+            to={`${accountBasePath}/collections`}
+            className={classes.menuItem}
+            onClick={closeMenu}
+            role='menuitem'
+          >
+            <StackIcon />
+            <FormattedMessage
+              id='navigation_bar.collections'
+              defaultMessage='Collections'
+            />
+          </NavLink>
+
+          <NavLink
+            to='/scheduled'
+            className={classes.menuItem}
+            onClick={closeMenu}
+            role='menuitem'
+          >
+            <CalendarDotsIcon />
+            <FormattedMessage
+              id='navigation_bar.scheduled_publications'
+              defaultMessage='Scheduled publications'
+            />
+          </NavLink>
+
+          <NavLink
+            to='/favourites'
+            className={classes.menuItem}
+            onClick={closeMenu}
+            role='menuitem'
+          >
+            <HeartIcon />
+            <FormattedMessage
+              id='navigation_bar.favourites'
+              defaultMessage='Favorites'
+            />
+          </NavLink>
+
+          <div className={classes.menuDivider} role='separator' />
+
+          <a
+            href='/relationships'
+            className={classes.menuItem}
+            onClick={closeMenu}
+            role='menuitem'
+          >
+            <UsersThreeIcon />
+            <FormattedMessage
+              id='navigation_bar.follows_and_followers'
+              defaultMessage='Follows and followers'
+            />
+          </a>
+
+          <NavLink
+            to='/blocks'
+            className={classes.menuItem}
+            onClick={closeMenu}
+            role='menuitem'
+          >
+            <ProhibitIcon />
+            <FormattedMessage
+              id='navigation_bar.blocks'
+              defaultMessage='Blocked users'
+            />
+          </NavLink>
+
+          {(isManager || isAdmin) && (
+            <>
+              <div className={classes.menuDivider} role='separator' />
+
+              {isAdmin && (
+                <a
+                  href='/admin/dashboard'
+                  className={classes.menuItem}
+                  onClick={closeMenu}
+                  role='menuitem'
+                >
+                  <GavelIcon />
+                  <FormattedMessage
+                    id='navigation_bar.administration'
+                    defaultMessage='Administration'
+                  />
+                </a>
+              )}
+
+              {isManager && (
+                <a
+                  href='/admin/reports'
+                  className={classes.menuItem}
+                  onClick={closeMenu}
+                  role='menuitem'
+                >
+                  <ShieldStarIcon />
+                  <FormattedMessage
+                    id='navigation_bar.moderation'
+                    defaultMessage='Moderation'
+                  />
+                </a>
+              )}
+            </>
+          )}
+
+          <div className={classes.menuDivider} role='separator' />
 
           <button
             type='button'
             className={classes.menuItem}
-            onClick={handleSignOut}
+            onClick={confirmLogout}
             role='menuitem'
           >
-            <LogoutIcon />
+            <SignOutIcon />
             <FormattedMessage
               id='navigation_bar.logout'
               defaultMessage='Logout'
