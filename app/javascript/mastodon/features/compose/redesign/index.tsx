@@ -361,6 +361,7 @@ function useComposeHandlers(
           editor.contentEditable === 'plaintext-only' ||
           editor.getAttribute('contenteditable') === 'true' ||
           editor.getAttribute('contenteditable') === 'plaintext-only');
+      const editorOwnsFocus = !!editor && activeElement === editor;
       const savedSelectionStart = getSavedComposerSelectionOffset();
       const selection = window.getSelection();
       const hasEditorSelection =
@@ -369,14 +370,18 @@ function useComposeHandlers(
         !!selection.anchorNode &&
         editor.contains(selection.anchorNode);
       const activeEditorSelectionStart =
-        editor && isContentEditable && hasEditorSelection
+        editor && isContentEditable && editorOwnsFocus && hasEditorSelection
           ? getEditorSelectionOffset(editor)
           : null;
 
-      const selectionStart =
+      const rawSelectionStart =
         composerTextArea && activeElement === composerTextArea
           ? composerTextArea.selectionStart || 0
           : (activeEditorSelectionStart ?? savedSelectionStart);
+      const selectionStart = Math.min(
+        targetText.length,
+        Math.max(0, rawSelectionStart),
+      );
 
       const beforePosition = targetText[selectionStart - 1];
       const needsSpace =
@@ -385,7 +390,17 @@ function useComposeHandlers(
         !!beforePosition &&
         !allowedAroundShortCode.includes(beforePosition);
 
-      if (editor && isContentEditable && hasEditorSelection && selection) {
+      // When the picker owns focus, the browser can retain a stale DOM range
+      // inside a contentEditable. Never mutate that stale range: use the
+      // logical offset captured before the picker opened instead. This keeps
+      // custom emoji insertion stable in both the main editor and thread rows.
+      if (
+        editor &&
+        isContentEditable &&
+        editorOwnsFocus &&
+        hasEditorSelection &&
+        selection
+      ) {
         const range = selection.getRangeAt(0).cloneRange();
         range.deleteContents();
         const inserted = document.createTextNode(
