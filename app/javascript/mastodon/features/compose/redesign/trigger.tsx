@@ -66,6 +66,39 @@ const emptyVisualViewportMetrics: VisualViewportMetrics = {
   keyboardOpen: false,
 };
 
+export const useBlue2Theme = () => {
+  const [isBlue2, setIsBlue2] = useState(
+    () =>
+      typeof document !== 'undefined' &&
+      document.body.dataset.theme === 'blue-2',
+  );
+
+  useLayoutEffect(() => {
+    if (typeof document === 'undefined') return undefined;
+
+    const body = document.body;
+    const syncTheme = () => {
+      setIsBlue2(body.dataset.theme === 'blue-2');
+    };
+
+    syncTheme();
+
+    if (typeof MutationObserver === 'undefined') return undefined;
+
+    const observer = new MutationObserver(syncTheme);
+    observer.observe(body, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  return isBlue2;
+};
+
 export const ComposerBackdrop: React.FC<{ onMinimize: () => void }> = ({
   onMinimize,
 }) => (
@@ -109,8 +142,7 @@ export const ComposeRedesignButton: React.FC<{
   const launcherOriginRef = useRef<ReturnType<
     typeof composerOriginFromElement
   > | null>(null);
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const isBlue2 = useBlue2Theme();
   const portalBlue2InlineOverlay = (content: React.ReactNode) =>
     isBlue2 && inline && typeof document !== 'undefined'
       ? createPortal(content, document.body)
@@ -216,6 +248,12 @@ export const ComposeRedesignButton: React.FC<{
   }, [displayState, origin]);
 
   if (!signedIn) return null;
+
+  // BLUE 2.0 owns a dedicated inline launcher in the timeline. Never let the
+  // generic fixed launcher become a second owner of the global composer state:
+  // during theme hydration it could otherwise survive below the mobile nav and
+  // also render duplicate minimized/showing composer surfaces.
+  if (isBlue2 && !inline) return null;
 
   // BLUE 2.0 always uses the redesigned composer so the theme can provide the
   // Bluesky-like compose experience without changing the editor used by other themes.
