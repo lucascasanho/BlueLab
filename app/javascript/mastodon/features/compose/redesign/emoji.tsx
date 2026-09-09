@@ -77,6 +77,7 @@ export const ComposeEmojiButton: React.FC<{ onPick: OnEmojiPick }> = ({
         size='sm'
         icon={SmileyIcon}
         ref={setTarget}
+        onPointerDown={handleEmojiButtonMouseDown}
         onMouseDown={handleEmojiButtonMouseDown}
         onClick={handleEmojiButtonClick}
         aria-expanded={open}
