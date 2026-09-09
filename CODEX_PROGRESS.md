@@ -6,42 +6,39 @@
 
 ## Estado
 
-- Status: aguardando teste do usuário
+- Status: em andamento
 - Atualizado em: 2026-09-08 — America/Cuiaba
-- Objetivo: promover o lote aprovado de cores de sucesso/links verificados para a Espelunca e ajustar somente no Blue as linhas grossas dos cabeçalhos das Preferências em modo claro.
-- Alvos: `BlueLab`/espelunca.social para o lote já aprovado; `BlueLab-Test`/mastodon.blue para o novo ajuste ainda não aprovado.
+- Objetivo: promover o ajuste aprovado de Preferências para a Espelunca e corrigir somente no Blue a regressão visual dos links verificados.
+- Alvos: `BlueLab`/espelunca.social para o lote aprovado; `BlueLab-Test`/mastodon.blue para a nova correção ainda não aprovada.
 
 ## Estado confirmado
 
 - Branch de trabalho: `BlueLab-Test`.
-- HEAD inicial desta etapa: `ebc55e8eef57e202679a30b80ef20e6d2964d0ae`.
+- HEAD inicial desta etapa: `e61da25a9cfb38d3c743997a54f1ad4f2d604c50`.
 - Working tree inicial: limpo.
-- `BlueLab` era ancestral direto de `BlueLab-Test`.
-- Lote aprovado: `60674b521c` e `ebc55e8eef`, somente em `icon_verified.svg` e `blue-2-v12.scss`.
-- `BlueLab` foi promovida por fast-forward ao commit exato `ebc55e8eef`.
-- Espelunca atualizada para `ebc55e8eef`; backup de 105 MB criado antes do cutover.
-- Serviços web, Sidekiq, streaming e nginx ativos; banco sem migrations pendentes; saúde local e API pública HTTP 200.
-- Ajuste de Preferências publicado em `BlueLab-Test` no commit `84ab011af1` e implantado somente no mastodon.blue.
-- O CSS publicado foi confirmado por HTTP; health local e API pública do Blue responderam HTTP 200, sem erros novos nos serviços.
-- Espelunca permanece limpa no commit estável `ebc55e8eef`, com todos os serviços ativos.
+- O ajuste aprovado de Preferências foi promovido por fast-forward; `BlueLab` e `BlueLab-Test` passaram a apontar para `e61da25a9c`.
+- Espelunca atualizada para `e61da25a9c` após backup de 105 MB; o lote promovido continha somente o CSS das Preferências e este checkpoint.
+- Serviços web, Sidekiq, streaming e nginx da Espelunca ficaram ativos; banco sem migrations pendentes e API pública HTTP 200.
+- A regressão dos links verificados foi localizada no cartão novo de campos do perfil: fundo “softest” quase preto no tema escuro do Blue e conteúdo herdando a cor comum.
+- A correção local usa fundo de sucesso mais visível e fixa nome, valor, link e SVG oficial em `--color-text-success`; campos comuns permanecem inalterados.
+- Stylelint, formatação, build de produção e prova visual/computada passaram para Blue e Espelunca em claro e escuro.
 
 ## Plano atual
 
-- [x] Validar limpeza, conteúdo e ancestralidade antes da promoção.
-- [x] Promover `BlueLab` ao commit aprovado exato `ebc55e8eef`.
-- [x] Atualizar e validar espelunca.social a partir de `BlueLab`.
-- [x] Reproduzir e localizar as linhas grossas no topo das Preferências em modo claro.
-- [x] Aplicar o menor ajuste possível somente em `BlueLab-Test`.
-- [x] Executar lint/build e validação visual claro/escuro.
-- [x] Publicar e atualizar somente mastodon.blue.
-- [x] Confirmar que Espelunca permanece no lote aprovado, sem o novo ajuste.
+- [x] Promover o ajuste aprovado de Preferências e atualizar a Espelunca.
+- [x] Confirmar que a promoção não contém mudanças em links verificados.
+- [x] Localizar a causa visual específica do Blue.
+- [x] Restaurar fundo, conteúdo e SVG legado na cor semântica de destaque.
+- [ ] Validar, publicar somente em `BlueLab-Test` e atualizar mastodon.blue.
+- [ ] Confirmar que `BlueLab` e Espelunca não receberam a correção ainda não aprovada.
 
 ## Decisões e cuidados
 
-- A nova alteração de Preferências não será promovida para `BlueLab` sem novo teste e aprovação explícita do usuário.
-- A Espelunca deve consumir somente o commit estável promovido pelo GitHub.
+- A correção de links verificados não será promovida para `BlueLab` nem enviada à Espelunca sem novo teste e aprovação explícita do usuário.
+- A correção usa os tokens semânticos de sucesso; no Blue eles seguem o azul e, em futura promoção aprovada, na Espelunca seguirão o rosa.
+- O sistema novo de selo por cargo/instância não será alterado.
 - Não usar force-push, reset destrutivo ou reconstrução por cherry-pick.
 
 ## Próximo passo seguro
 
-Aguardar o teste do usuário no mastodon.blue. Só promover o ajuste de Preferências para `BlueLab` e Espelunca após aprovação explícita.
+Validar a correção dos campos verificados em claro/escuro, criar o commit de teste e publicar somente no mastodon.blue.

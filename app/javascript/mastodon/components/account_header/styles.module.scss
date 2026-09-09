@@ -340,11 +340,17 @@ $button-breakpoint: 420px;
 }
 
 .fieldVerified {
-  background-color: var(--color-bg-success-softest);
+  background-color: var(--color-bg-success-soft);
+  color: var(--color-text-success);
 
   &.fieldItem {
     border-color: var(--color-border-success-soft);
     padding-right: 30px; // 8px padding + 16px for the icon + 8px gap - 2px tolerance
+
+    :is(dt, dd),
+    :is(dt, dd) a {
+      color: var(--color-text-success);
+    }
   }
 }
 
@@ -355,6 +361,7 @@ $button-breakpoint: 420px;
   height: 16px;
   top: 8px;
   right: 8px;
+  color: var(--color-text-success);
 
   > svg {
     width: 100%;
