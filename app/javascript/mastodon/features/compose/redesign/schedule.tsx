@@ -144,16 +144,9 @@ export const ComposeSchedule: React.FC = () => {
       setDateTime(event.target.value);
     }, []);
   const changeTimezone: React.ChangeEventHandler<HTMLSelectElement> =
-    useCallback(
-      (event) => {
-        const nextTimezone = event.target.value;
-        setDateTime((value) =>
-          localValue(scheduledIso(value, timezone), nextTimezone),
-        );
-        setTimezone(nextTimezone);
-      },
-      [timezone],
-    );
+    useCallback((event) => {
+      setTimezone(event.target.value);
+    }, []);
   const panelKeyDown: React.KeyboardEventHandler<HTMLDivElement> = useCallback(
     (event) => {
       if (event.key !== 'Escape') return;
