@@ -5,6 +5,18 @@
   = button_tag t('generic.save_changes'), class: 'button', form: 'edit_user'
 
 = simple_form_for current_user, url: settings_preferences_appearance_path, html: { id: :edit_user } do |f|
+  - if current_user.can?(:manage_settings)
+    .fields-group
+      = f.input :setting_theme,
+                collection: Themes.instance.names,
+                hint: t('appearance.instance_theme_hint'),
+                include_blank: false,
+                input_html: { id: :instance_theme, name: :instance_theme },
+                label: t('appearance.instance_theme'),
+                label_method: ->(theme) { I18n.t("themes.#{theme}", default: theme, site_title: site_title) },
+                selected: Setting.theme,
+                wrapper: :with_label
+
   .fields-row
     .fields-group.fields-row__column.fields-row__column-6
       = f.input :locale,

@@ -7,6 +7,7 @@ class Settings::Preferences::BaseController < Settings::BaseController
 
   def update
     if current_user.update(user_params)
+      after_preferences_update
       I18n.locale = current_user.locale
       redirect_to after_update_redirect_path, notice: I18n.t('generic.changes_saved_msg')
     else
@@ -19,6 +20,8 @@ class Settings::Preferences::BaseController < Settings::BaseController
   def after_update_redirect_path
     raise 'Override in controller'
   end
+
+  def after_preferences_update; end
 
   def user_params
     # BlueLab themes are instance-wide and may only be changed through the
