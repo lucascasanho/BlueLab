@@ -27,16 +27,20 @@ describe('BlueLab composer trigger controls', () => {
     expect(onMinimize).toHaveBeenCalledOnce();
   });
 
-  test('restores a minimized Blue 2 composer from its dedicated launcher', () => {
+  test('restores a minimized Blue 2 composer from its inline mobile launcher', () => {
     const onResume = vi.fn();
     const { container } = render(
       <IntlProvider locale='en'>
-        <ComposerResumeButton onResume={onResume} />
+        <ComposerResumeButton inline onResume={onResume} />
       </IntlProvider>,
     );
 
     const resumeButton = container.querySelector('[data-blue2-compose-resume]');
     expect(resumeButton).not.toBeNull();
+    expect(resumeButton).toHaveAttribute(
+      'data-blue2-compose-resume-inline',
+      'true',
+    );
 
     fireEvent.click(resumeButton as Element);
     expect(onResume).toHaveBeenCalledOnce();
