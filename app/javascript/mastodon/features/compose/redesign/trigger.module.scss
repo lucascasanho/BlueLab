@@ -159,6 +159,18 @@
   display: none;
 }
 
+.blue2ResumeButton {
+  position: fixed;
+  inset-inline-end: max(
+    calc(var(--space-md) + env(safe-area-inset-left)),
+    calc(var(--space-md) + env(safe-area-inset-right))
+  );
+  bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+  z-index: 120;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 28%);
+}
+
 :global(body[data-theme='blue-2']) .composer {
   top: 50%;
   left: 50%;
@@ -188,6 +200,15 @@
 }
 
 @media (width < #{variables.$mobile-menu-breakpoint}) {
+  .blue2ResumeButton {
+    bottom: calc(var(--mobile-bottom-nav-height, 64px) + var(--space-sm));
+  }
+
+  // Keep the old minimized card safe as a fallback for non-standard mounts.
+  :global(body[data-theme='blue-2']) .composerMinimized {
+    bottom: calc(var(--mobile-bottom-nav-height, 64px) + var(--space-sm));
+  }
+
   // On phones the BlueLab composer is centered using VisualViewport's actual
   // center instead of top: 50%, which can be wrong on iOS when the layout and
   // visual viewports differ. The form flow is also forced back to
