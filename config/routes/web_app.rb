@@ -31,6 +31,7 @@
   /public/remote
   /publish
   /search
+  /scheduled
   /start/(*any)
   /statuses/(*any)
   /overview
