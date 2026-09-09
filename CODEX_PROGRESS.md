@@ -6,7 +6,7 @@
 
 ## Estado
 
-- Status: validações concluídas; publicação no Blue pendente
+- Status: concluído no Blue; aguardando teste do usuário
 - Atualizado em: 2026-09-09 — America/Cuiaba
 - Objetivo: fazer o botão “Publicar” do composer BlueLab seguir a paleta de cores da instância, preservando cumulativamente a correção de links verificados ainda em teste.
 - Alvo: somente `BlueLab-Test`/mastodon.blue; `BlueLab` e Espelunca devem permanecer inalterados até aprovação explícita.
@@ -29,6 +29,10 @@
 - Causa do botão localizada no novo composer: o `Button` de envio usava `variant='solid'`, mas mantinha a cor padrão `neutral`, que usa a superfície invertida em vez da paleta.
 - Ajuste mínimo aplicado: `color='accent'` no botão de envio; o componente passa a consumir `--color-bg-brand-base`, já mapeado para `--blue2-blue` e injetado pela configuração da instância.
 - Formatação focada, ESLint focado, TypeScript e build Vite de produção passaram; o build exibiu somente os avisos preexistentes sobre o futuro `configLoader: native` do Vite.
+- Alteração funcional publicada em `BlueLab-Test` no commit `efcedcb95b` e implantada somente no mastodon.blue com `blue-atualizar`.
+- O bundle público HTTP 200 contém `variant: solid`, `color: accent` e `type: submit` no botão; a página pública injeta `--blue2-blue: #4054ff`.
+- Web, Sidekiq, streaming e nginx do Blue estão ativos; health local e API pública retornam HTTP 200; não apareceram novos erros nos logs da janela do deploy.
+- `BlueLab` permanece inalterada em `e61da25a9c`; nenhuma operação foi executada na Espelunca.
 
 ## Plano atual
 
@@ -41,8 +45,8 @@
 - [x] Identificar o botão de envio real, sem confundi-lo com o botão lateral que abre o composer.
 - [x] Aplicar a cor semântica de destaque ao botão de envio.
 - [x] Executar validações focadas e build de produção.
-- [ ] Publicar em `BlueLab-Test` e atualizar somente mastodon.blue.
-- [ ] Validar serviços, endpoints e asset público; confirmar novamente que estável/Espelunca não mudaram.
+- [x] Publicar em `BlueLab-Test` e atualizar somente mastodon.blue.
+- [x] Validar serviços, endpoints e asset público; confirmar novamente que a branch estável não mudou e que a Espelunca não foi acessada.
 
 ## Decisões e cuidados
 
@@ -54,4 +58,4 @@
 
 ## Próximo passo seguro
 
-Concluir testes, publicar o lote cumulativo apenas em `BlueLab-Test`, atualizar mastodon.blue e aguardar o teste do usuário. Só promover para `BlueLab` após aprovação explícita.
+Aguardar o teste do usuário no botão “Publicar” do composer em mastodon.blue. Só promover o lote cumulativo para `BlueLab` após aprovação explícita.
