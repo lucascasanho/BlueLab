@@ -52,7 +52,7 @@ export const ComposeThreadItems: React.FC<{
         }
       ).isEmpty(),
   );
-  const previousSize = useRef(items.size);
+  const previousSize = useRef(0);
 
   useEffect(() => {
     if (items.size > previousSize.current) {
@@ -168,7 +168,6 @@ const ComposeThreadItem: React.FC<{
       )}
       data-thread-item-id={id}
       onFocusCapture={onFocus}
-      onPointerDown={onFocus}
     >
       <IconButton
         as='button'

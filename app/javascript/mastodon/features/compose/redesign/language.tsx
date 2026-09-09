@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import type { Map as ImmutableMap } from 'immutable';
+import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import { MagnifyingGlassIcon } from '@phosphor-icons/react';
 
@@ -39,12 +39,12 @@ export const LanguageButton: React.FC<{
   );
   const threadLangCode = useAppSelector((state) => {
     if (!activeThreadItemId) return null;
-    const item = state.compose
-      .get('thread_items')
-      .find(
-        (candidate: ImmutableMap<string, unknown>) =>
-          candidate.get('id') === activeThreadItemId,
-      ) as ImmutableMap<string, unknown> | undefined;
+    const items = state.compose.get('thread_items') as ImmutableList<
+      ImmutableMap<string, unknown>
+    >;
+    const item = items.find(
+      (candidate) => candidate.get('id') === activeThreadItemId,
+    );
     return (item?.get('language') as string | undefined) ?? null;
   });
   const langCode = threadLangCode ?? rootLangCode;
