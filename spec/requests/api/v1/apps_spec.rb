@@ -55,6 +55,24 @@ RSpec.describe 'Apps' do
       end
     end
 
+    context 'with the observed automated probe signature' do
+      let(:client_name) { 'BoomProtocolProbe' }
+      let(:website) { 'https://example.com' }
+
+      around do |example|
+        ClimateControl.modify BLUELAB_REGISTRATION_PROTECTION: 'true' do
+          example.run
+        end
+      end
+
+      it 'blocks the application before persisting it' do
+        expect { subject }.to not_change(Doorkeeper::Application, :count)
+
+        expect(response).to have_http_status(403)
+        expect(response.parsed_body[:error]).to eq(I18n.t('auth.registration_protection.automation_detected'))
+      end
+    end
+
     context 'without scopes being supplied' do
       let(:scopes) { nil }
 

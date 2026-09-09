@@ -107,6 +107,7 @@ en:
         silenced: Limited
         suspended: Suspended
         title: Moderation
+        unconfirmed: Awaiting email confirmation
       moderation_notes: Moderation notes
       most_recent_activity: Most recent activity
       most_recent_ip: Most recent IP
@@ -1226,6 +1227,9 @@ en:
       rules_check:
         action: Manage server rules
         message_html: You haven't defined any server rules.
+      registration_abuse_check:
+        action: Review unconfirmed attempts
+        message_html: An unusual volume of unconfirmed registrations was detected in the last 24 hours (%{value}).
       sidekiq_process_check:
         message_html: No Sidekiq process running for the %{value} queue(s). Please review your Sidekiq configuration
       software_version_check:
@@ -1573,6 +1577,10 @@ en:
       redirecting_to: Your account is inactive because it is currently redirecting to %{acct}.
       self_destruct: As %{domain} is closing down, you will only get limited access to your account.
       view_strikes: View past strikes against your account
+    registration_protection:
+      api_sign_up_disabled: Account creation through apps is disabled on this server. Please use the accessible web sign-up form.
+      automation_detected: This automated application registration was blocked.
+      invalid_intent: Your sign-up form expired or was already submitted. Please review the information and submit it again.
     too_fast: Form submitted too fast, try again.
     use_security_key: Use security key
     user_agreement_html: I have read and agree to the <a href="%{terms_of_service_path}" target="_blank">terms of service</a> and <a href="%{privacy_policy_path}" target="_blank">privacy policy</a>

@@ -104,6 +104,23 @@ RSpec.describe '/api/v1/accounts' do
     let(:agreement) { nil }
     let(:date_of_birth) { nil }
 
+    context 'when BlueLab registration protection disables API sign-up' do
+      around do |example|
+        ClimateControl.modify BLUELAB_REGISTRATION_PROTECTION: 'true', BLUELAB_DISABLE_API_SIGN_UP: 'true' do
+          example.run
+        end
+      end
+
+      it 'rejects account creation without affecting OAuth login endpoints' do
+        expect { subject }.to not_change(User, :count).and not_change(Account, :count)
+
+        expect(response)
+          .to have_http_status(403)
+        expect(response.parsed_body[:error])
+          .to eq(I18n.t('auth.registration_protection.api_sign_up_disabled'))
+      end
+    end
+
     context 'when not using client credentials token' do
       let(:token) { Fabricate(:accessible_access_token, application: client_app, scopes: 'read write', resource_owner_id: user.id) }
 

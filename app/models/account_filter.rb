@@ -89,7 +89,9 @@ class AccountFilter
     when 'active'
       Account.without_suspended
     when 'pending'
-      accounts_with_users.merge(User.pending)
+      accounts_with_users.merge(User.pending_review)
+    when 'unconfirmed'
+      accounts_with_users.merge(User.unconfirmed)
     when 'suspended'
       Account.suspended
     when 'disabled'

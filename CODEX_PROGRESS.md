@@ -6,10 +6,10 @@
 
 ## Estado
 
-- Status: implementação publicada e validada no Blue; aguardando teste do usuário
+- Status: escudo de cadastro em implementação no BlueLab-Test
 - Atualizado em: 2026-09-09 — America/Cuiaba
-- Objetivo: minimizar o compose BlueLab ao clicar fora e persistir o rascunho localmente entre navegação, reload e fechamento do site/PWA até publicação, descarte ou remoção do conteúdo.
-- Alvo: somente `BlueLab-Test`/mastodon.blue para teste; `BlueLab` e Espelunca permanecem inalterados até aprovação explícita.
+- Objetivo: conter criação automatizada de contas sem CAPTCHA, fechar cadastro público pela API por configuração, endurecer limites, separar não confirmados da fila de aprovação e alertar administradores sobre surtos.
+- Alvo: implementar/testar primeiro em `BlueLab-Test`/mastodon.blue. A rejeição pontual dos bots confirmados na Espelunca foi autorizada; promoção de código deve respeitar a regra de segurança do `AGENTS.md`.
 
 ## Estado confirmado
 
@@ -93,4 +93,21 @@
 
 ## Próximo passo seguro
 
-Aguardar o teste do usuário no mastodon.blue. Somente após aprovação explícita, comparar as branches e promover o commit exato testado para `BlueLab`; a Espelunca continua inalterada até essa aprovação.
+Implementar e validar o escudo no `BlueLab-Test`, publicar no mastodon.blue e verificar o fluxo acessível de cadastro. Antes de mover `BlueLab`, confirmar se o lote cumulativo ainda não aprovado do compose também foi autorizado, pois a branch de teste está à frente da estável.
+
+## Auditoria e contenção de cadastros automatizados
+
+- Branch/HEAD inicial: `BlueLab-Test` em `6c07418568030dd93f49a3c11363a2685bd16e3e`; working tree inicialmente limpo.
+- Espelunca auditada somente por consultas: 42 pendências, todas não confirmadas, criadas pela API, com cliente `BoomProtocolProbe` e motivo `Automated protocol deliverability probe`.
+- Foram encontrados 199 clientes OAuth idênticos criados em 24 horas; 157 não estavam ligados a cadastro concluído. A criação do cliente precedia o cadastro em 1,24 a 11,4 segundos.
+- Histórico legítimo: todas as contas confirmadas que efetivamente entraram no último ano vieram do formulário web; nenhuma conta criada pela API foi usada.
+- Rejeição autorizada executada pelo fluxo nativo em lote: 42 contas selecionadas por quatro condições simultâneas, 42 logs administrativos de rejeição, fila pendente zerada e workers concluídos.
+- Backup restrito criado em `/home/espelunca/espelunca-backups/bot-pending-rejections-20260909-203754.json` com permissão 0600.
+- Após a contenção, web, Sidekiq, streaming, nginx e health público/local da Espelunca permaneceram operacionais.
+- Nenhum arquivo de código ou configuração da working tree da Espelunca foi modificado.
+- Escudo implementado no working tree do `BlueLab-Test`: fechamento configurável de `POST /api/v1/accounts`, intenção web de uso único no Redis, bloqueio da assinatura observada, limites diário/IP/rede/assinatura para cadastro e clientes OAuth, `Retry-After`, fila de aprovação somente após confirmação e filtro separado para não confirmados.
+- Alerta administrativo usa o sistema nativo de system checks e aparece com 10 ou mais cadastros não confirmados em 24 horas para quem possui `manage_users`.
+- Retenção de não confirmados tornou-se configurável; o Blue foi preparado localmente com proteção ativa, cadastro por API fechado e retenção de 3 dias. O `.env.production` é ignorado pelo Git e não contém alterações publicáveis.
+- Testes focados: 124 exemplos, 0 falhas. Testes adicionais de administração/system checks/modelo de usuário: 195 exemplos, 0 falhas.
+- RuboCop focado: 21 arquivos sem ofensas. HAML-Lint: 1 arquivo sem ofensas. YAML en/pt-BR carregado com sucesso; `git diff --check` passou.
+- Smoke de produção sem reinício: proteção habilitada, API configurada como fechada, primeiro uso da intenção aceito, replay recusado, retenção efetiva de 3 dias e 1 cadastro não confirmado recente no Blue.

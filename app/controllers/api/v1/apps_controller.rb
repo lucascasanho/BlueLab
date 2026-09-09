@@ -2,6 +2,7 @@
 
 class Api::V1::AppsController < Api::BaseController
   skip_before_action :require_authenticated_user!
+  before_action :block_known_registration_automation, only: :create
 
   def create
     @app = Doorkeeper::Application.create!(application_options)
@@ -25,5 +26,11 @@ class Api::V1::AppsController < Api::BaseController
 
   def app_params
     params.permit(:client_name, :scopes, :website, :redirect_uris, redirect_uris: [])
+  end
+
+  def block_known_registration_automation
+    return unless RegistrationProtection.known_automation_application?(app_params)
+
+    render json: { error: I18n.t('auth.registration_protection.automation_detected') }, status: 403
   end
 end

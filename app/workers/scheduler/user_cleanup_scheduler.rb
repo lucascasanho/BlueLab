@@ -3,7 +3,7 @@
 class Scheduler::UserCleanupScheduler
   include Sidekiq::Worker
 
-  UNCONFIRMED_ACCOUNTS_MAX_AGE_DAYS = 7
+  UNCONFIRMED_ACCOUNTS_MAX_AGE_DAYS = ENV.fetch('BLUELAB_UNCONFIRMED_ACCOUNT_RETENTION_DAYS', '7').to_i.clamp(1, 30)
   DISCARDED_STATUSES_MAX_AGE_DAYS = 30
 
   sidekiq_options retry: 0, lock: :until_executed, lock_ttl: 1.day.to_i

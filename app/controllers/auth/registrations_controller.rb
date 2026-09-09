@@ -57,6 +57,11 @@ class Auth::RegistrationsController < Devise::RegistrationsController
     resource.registration_form_time = session[:registration_form_time]
     resource.sign_up_ip             = request.remote_ip
 
+    if action_name == 'create' && RegistrationProtection.enabled?
+      resource.registration_intent_required = true
+      resource.registration_intent_valid    = consume_registration_intent
+    end
+
     resource.build_account if resource.account.nil?
   end
 

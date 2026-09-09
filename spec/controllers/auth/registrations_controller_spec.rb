@@ -183,6 +183,46 @@ RSpec.describe Auth::RegistrationsController do
       end
     end
 
+    context 'with BlueLab registration protection enabled' do
+      around do |example|
+        ClimateControl.modify BLUELAB_REGISTRATION_PROTECTION: 'true' do
+          example.run
+        end
+      end
+
+      before do
+        Setting.registrations_mode = 'open'
+      end
+
+      it 'preserves the accessible form and includes a hidden one-use intent' do
+        get :new
+
+        expect(response).to have_http_status(200)
+        expect(response.parsed_body.at_css('input[name="registration_intent"]')['value']).to be_present
+      end
+
+      it 'rejects a direct submission without an issued intent' do
+        expect do
+          post :create, params: { user: { account_attributes: { username: 'direct' }, email: 'direct@example.com', password: '12345678', password_confirmation: '12345678', agreement: 'true' } }
+        end.to not_change(User, :count)
+
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include(I18n.t('auth.registration_protection.invalid_intent'))
+      end
+
+      it 'accepts the intent issued with the form' do
+        get :new
+        intent = response.parsed_body.at_css('input[name="registration_intent"]')['value']
+        travel 4.seconds
+
+        expect do
+          post :create, params: { registration_intent: intent, user: { account_attributes: { username: 'protected' }, email: 'protected@example.com', password: '12345678', password_confirmation: '12345678', agreement: 'true' } }
+        end.to change(User, :count).by(1)
+
+        expect(response).to redirect_to(auth_setup_path)
+      end
+    end
+
     context 'when an accept language is present in headers' do
       subject do
         Setting.registrations_mode = 'open'

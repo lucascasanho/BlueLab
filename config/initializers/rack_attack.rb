@@ -29,6 +29,26 @@ class Rack::Attack
       end.to_s
     end
 
+    def registration_network
+      @registration_network ||= begin
+        ip = IPAddr.new(remote_ip)
+        ip.mask(ip.ipv4? ? 24 : 64)
+      end.to_s
+    end
+
+    def oauth_application_fingerprint
+      return unless post? && path == '/api/v1/apps'
+
+      values = [
+        params['client_name'],
+        Array(params['redirect_uris']).join(' '),
+        params['website'],
+        params['scopes'],
+      ]
+
+      Digest::SHA256.hexdigest(values.map { |value| value.to_s.strip.downcase }.join("\0"))
+    end
+
     def authenticated_user_id
       authenticated_token&.resource_owner_id
     end
@@ -98,6 +118,14 @@ class Rack::Attack
     req.throttleable_remote_ip if req.post? && req.path == '/api/v1/accounts'
   end
 
+  throttle('throttle_api_sign_up/daily_ip', limit: 5, period: 1.day) do |req|
+    req.throttleable_remote_ip if RegistrationProtection.enabled? && req.post? && req.path == '/api/v1/accounts'
+  end
+
+  throttle('throttle_api_sign_up/daily_network', limit: 20, period: 1.day) do |req|
+    req.registration_network if RegistrationProtection.enabled? && req.post? && req.path == '/api/v1/accounts'
+  end
+
   throttle('throttle_authenticated_paging', limit: 300, period: 15.minutes) do |req|
     req.authenticated_user_id if req.paging_request?
   end
@@ -115,6 +143,18 @@ class Rack::Attack
 
   throttle('throttle_oauth_application_registrations/ip', limit: 5, period: 10.minutes) do |req|
     req.throttleable_remote_ip if req.post? && req.path == '/api/v1/apps'
+  end
+
+  throttle('throttle_oauth_application_registrations/daily_ip', limit: 20, period: 1.day) do |req|
+    req.throttleable_remote_ip if RegistrationProtection.enabled? && req.post? && req.path == '/api/v1/apps'
+  end
+
+  throttle('throttle_oauth_application_registrations/daily_network', limit: 50, period: 1.day) do |req|
+    req.registration_network if RegistrationProtection.enabled? && req.post? && req.path == '/api/v1/apps'
+  end
+
+  throttle('throttle_oauth_application_registrations/fingerprint', limit: 25, period: 1.day) do |req|
+    req.oauth_application_fingerprint if RegistrationProtection.enabled?
   end
 
   throttle('throttle_sign_up_attempts/ip', limit: 25, period: 5.minutes) do |req|
@@ -169,11 +209,13 @@ class Rack::Attack
     now        = Time.now.utc
     match_data = request.env['rack.attack.match_data']
 
+    retry_after = match_data[:period] - (now.to_i % match_data[:period])
     headers = {
       'Content-Type' => 'application/json',
+      'Retry-After' => retry_after.to_s,
       'X-RateLimit-Limit' => match_data[:limit].to_s,
       'X-RateLimit-Remaining' => '0',
-      'X-RateLimit-Reset' => (now + (match_data[:period] - (now.to_i % match_data[:period]))).iso8601(6),
+      'X-RateLimit-Reset' => (now + retry_after).iso8601(6),
     }
 
     [429, headers, [{ error: I18n.t('errors.429') }.to_json]]

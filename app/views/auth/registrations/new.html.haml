@@ -77,6 +77,7 @@
                                       wrapper: :with_block_label
 
   = hidden_field_tag :accept, params[:accept]
+  = hidden_field_tag :registration_intent, @registration_intent_token if RegistrationProtection.enabled?
   = f.input :invite_code, as: :hidden
   = f.input :time_zone, as: :hidden
 

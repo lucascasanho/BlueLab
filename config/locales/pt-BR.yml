@@ -107,6 +107,7 @@ pt-BR:
         silenced: Limitado
         suspended: Suspenso
         title: Moderação
+        unconfirmed: Aguardando confirmação por e-mail
       moderation_notes: Notas de moderação
       most_recent_activity: Atividade mais recente
       most_recent_ip: IP mais recente
@@ -1226,6 +1227,9 @@ pt-BR:
       rules_check:
         action: Gerenciar regras do servidor
         message_html: Você não definiu nenhuma regra de servidor.
+      registration_abuse_check:
+        action: Revisar tentativas não confirmadas
+        message_html: Foi detectado um volume incomum de cadastros não confirmados nas últimas 24 horas (%{value}).
       sidekiq_process_check:
         message_html: Nenhum processo Sidekiq rodando para a(s) fila(s) %{value}. Por favor, revise a sua configuração para Sidekiq
       software_version_check:
@@ -1573,6 +1577,10 @@ pt-BR:
       redirecting_to: Sua conta está inativa porque atualmente está redirecionando para %{acct}.
       self_destruct: Como %{domain} está se encerrando, você só terá acesso limitado à sua conta.
       view_strikes: Veja os avisos anteriores em relação à sua conta
+    registration_protection:
+      api_sign_up_disabled: A criação de contas por aplicativos está desativada neste servidor. Use o formulário web acessível de cadastro.
+      automation_detected: Este registro automatizado de aplicativo foi bloqueado.
+      invalid_intent: Seu formulário de cadastro expirou ou já foi enviado. Revise as informações e envie novamente.
     too_fast: O formulário foi enviado muito rapidamente, tente novamente.
     use_security_key: Usar chave de segurança
     user_agreement_html: Eu li e concordo com os <a href="%{terms_of_service_path}" target="_blank">termos de serviço</a> e <a href="%{privacy_policy_path}" target="_blank">política de privacidade</a>.

@@ -39,6 +39,7 @@ RSpec.describe Rack::Attack, type: :request do
       it 'returns http too many requests after limit and returns to normal status after period' do
         expect { request.call }.to change { throttle_count }.by(1)
         expect(response).to have_http_status(429)
+        expect(response.headers['Retry-After'].to_i).to be_positive
 
         travel period
 
@@ -111,6 +112,21 @@ RSpec.describe Rack::Attack, type: :request do
           expect(response).to have_http_status(404)
         end
       end
+
+      context 'with BlueLab daily protection enabled' do
+        let(:throttle) { 'throttle_api_sign_up/daily_ip' }
+        let(:limit) { 5 }
+        let(:period) { 1.day }
+        let(:path) { '/api/v1/accounts' }
+
+        around do |example|
+          ClimateControl.modify BLUELAB_REGISTRATION_PROTECTION: 'true' do
+            example.run
+          end
+        end
+
+        it_behaves_like 'throttled endpoint'
+      end
     end
   end
 
@@ -149,6 +165,41 @@ RSpec.describe Rack::Attack, type: :request do
     let(:request) { -> { post path, params: params, headers: { 'REMOTE_ADDR' => remote_ip } } }
 
     it_behaves_like 'throttled endpoint'
+
+    context 'with BlueLab daily protection enabled' do
+      let(:throttle) { 'throttle_oauth_application_registrations/daily_ip' }
+      let(:limit) { 20 }
+      let(:period) { 1.day }
+
+      around do |example|
+        ClimateControl.modify BLUELAB_REGISTRATION_PROTECTION: 'true' do
+          example.run
+        end
+      end
+
+      it_behaves_like 'throttled endpoint'
+    end
+
+    context 'with repeated application metadata from different addresses' do
+      let(:throttle) { 'throttle_oauth_application_registrations/fingerprint' }
+      let(:limit) { 25 }
+      let(:period) { 1.day }
+      let(:discriminator) do
+        Digest::SHA256.hexdigest(
+          [params[:client_name], Array(params[:redirect_uris]).join(' '), params[:website], params[:scopes]]
+            .map { |value| value.to_s.strip.downcase }
+            .join("\0")
+        )
+      end
+
+      around do |example|
+        ClimateControl.modify BLUELAB_REGISTRATION_PROTECTION: 'true' do
+          example.run
+        end
+      end
+
+      it_behaves_like 'throttled endpoint'
+    end
   end
 
   describe 'throttle excessive password change requests by account' do

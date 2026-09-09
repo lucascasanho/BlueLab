@@ -63,4 +63,20 @@ RSpec.describe AccountFilter do
       expect(filter.results).to_not contain_exactly(local_account)
     end
   end
+
+  describe 'with registration review status' do
+    let!(:confirmed_pending_user) { Fabricate(:user).tap { |user| user.update!(approved: false, confirmed_at: 1.hour.ago) } }
+    let!(:unconfirmed_pending_user) { Fabricate(:user).tap { |user| user.update!(approved: false, confirmed_at: nil) } }
+
+    let(:confirmed_pending) { confirmed_pending_user.account }
+    let(:unconfirmed_pending) { unconfirmed_pending_user.account }
+
+    it 'lists only confirmed users as pending review' do
+      expect(described_class.new(status: 'pending').results).to contain_exactly(confirmed_pending)
+    end
+
+    it 'lists unconfirmed users separately' do
+      expect(described_class.new(status: 'unconfirmed').results).to contain_exactly(unconfirmed_pending)
+    end
+  end
 end

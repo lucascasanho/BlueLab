@@ -8,12 +8,17 @@ module Admin::AccountsHelper
       [t('admin.accounts.moderation.disabled'), 'disabled'],
       [t('admin.accounts.moderation.suspended'), 'suspended'],
       [safe_join([t('admin.accounts.moderation.pending'), "(#{pending_user_count_label})"], ' '), 'pending'],
+      [safe_join([t('admin.accounts.moderation.unconfirmed'), "(#{unconfirmed_user_count_label})"], ' '), 'unconfirmed'],
     ]
   end
 
   private
 
   def pending_user_count_label
-    number_with_delimiter User.pending.count
+    number_with_delimiter User.pending_review.count
+  end
+
+  def unconfirmed_user_count_label
+    number_with_delimiter User.unconfirmed.count
   end
 end

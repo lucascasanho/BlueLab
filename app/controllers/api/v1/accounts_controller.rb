@@ -15,6 +15,7 @@ class Api::V1::AccountsController < Api::BaseController
   before_action :set_accounts, only: [:index]
   before_action :check_account_approval, except: [:index, :create]
   before_action :check_account_confirmation, except: [:index, :create]
+  before_action :check_api_sign_up_enabled, only: [:create]
   before_action :check_enabled_registrations, only: [:create]
   before_action :check_accounts_limit, only: [:index]
   before_action :check_following_self, only: [:follow]
@@ -129,5 +130,11 @@ class Api::V1::AccountsController < Api::BaseController
 
   def check_enabled_registrations
     forbidden unless allowed_registration?(request.remote_ip, invite)
+  end
+
+  def check_api_sign_up_enabled
+    return unless RegistrationProtection.api_sign_up_disabled?
+
+    render json: { error: I18n.t('auth.registration_protection.api_sign_up_disabled') }, status: 403
   end
 end

@@ -94,17 +94,19 @@ class User < ApplicationRecord
   validates :agreement, acceptance: { allow_nil: false, accept: [true, 'true', '1'] }, on: :create
 
   # Honeypot/anti-spam fields
-  attr_accessor :registration_form_time, :website, :confirm_password
+  attr_accessor :registration_form_time, :website, :confirm_password, :registration_intent_required, :registration_intent_valid
 
   validates_with RegistrationFormTimeValidator, on: :create
   validates :website, absence: true, on: :create
   validates :confirm_password, absence: true, on: :create
+  validate :validate_registration_intent, on: :create, if: :registration_intent_required
   validates :date_of_birth, presence: true, date_of_birth: true, on: :create, if: -> { Setting.min_age.present? && !bypass_registration_checks? }
   validate :validate_role_elevation
 
   scope :account_available, -> { joins(:account).merge(Account.without_suspended.without_requested_deletion) }
   scope :recent, -> { order(id: :desc) }
   scope :pending, -> { where(approved: false) }
+  scope :pending_review, -> { pending.confirmed }
   scope :approved, -> { where(approved: true) }
   scope :enabled, -> { where(disabled: false) }
   scope :disabled, -> { where(disabled: true) }
@@ -164,6 +166,10 @@ class User < ApplicationRecord
 
   def self.skip_mx_check?
     Rails.env.local?
+  end
+
+  def validate_registration_intent
+    errors.add(:base, I18n.t('auth.registration_protection.invalid_intent')) unless registration_intent_valid
   end
 
   def role
