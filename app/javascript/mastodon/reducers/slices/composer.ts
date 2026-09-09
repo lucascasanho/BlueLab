@@ -96,6 +96,11 @@ const composerSlice = createSlice({
       state.origin = null;
       state.closeOnSubmitSuccess = false;
     },
+    showRestoredComposer(state) {
+      state.displayState = 'minimized';
+      state.origin = null;
+      state.closeOnSubmitSuccess = false;
+    },
     setCloseOnSubmitSuccess(state, action: PayloadAction<boolean>) {
       state.closeOnSubmitSuccess = action.payload;
     },
@@ -112,6 +117,8 @@ const composerSlice = createSlice({
 });
 
 export const composer = composerSlice.reducer;
+
+export const showRestoredComposer = composerSlice.actions.showRestoredComposer;
 
 export const minimizeComposerToggle = createAppThunk(
   (_arg, { dispatch, getState }) => {

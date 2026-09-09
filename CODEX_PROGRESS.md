@@ -6,10 +6,10 @@
 
 ## Estado
 
-- Status: concluído
+- Status: implementação e validações concluídas; publicação no Blue pendente
 - Atualizado em: 2026-09-09 — America/Cuiaba
-- Objetivo: fazer o botão “Publicar” do composer BlueLab seguir a paleta de cores da instância, preservando cumulativamente a correção de links verificados ainda em teste.
-- Alvos: `BlueLab` no GitHub e espelunca.social, após aprovação explícita do usuário em 2026-09-09.
+- Objetivo: minimizar o compose BlueLab ao clicar fora e persistir o rascunho localmente entre navegação, reload e fechamento do site/PWA até publicação, descarte ou remoção do conteúdo.
+- Alvo: somente `BlueLab-Test`/mastodon.blue para teste; `BlueLab` e Espelunca permanecem inalterados até aprovação explícita.
 
 ## Estado confirmado
 
@@ -42,6 +42,15 @@
 - O aviso de health local emitido imediatamente após o restart foi transitório: na repetição, Rails e nginx retornaram HTTP 200; home e API públicas também retornaram HTTP 200.
 - Espelunca ficou com working tree limpo; web, Sidekiq, streaming e nginx ativos; banco sem migrations pendentes e sem novos erros nos logs da janela do deploy.
 - A página pública injeta `--blue2-blue: #b5128a`, e o bundle público contém o botão de envio com `variant: solid`, `color: accent` e `type: submit`.
+- Nova tarefa iniciada com branch `BlueLab-Test`, HEAD `8bfa72d6f5` e working tree limpo; `BlueLab` e `BlueLab-Test` estavam alinhadas.
+- Auditoria confirmou que a navegação SPA já preserva o Redux em memória, mas reload/fechamento perde o rascunho; não há persistência de draft existente.
+- O fundo escuro do modal BlueLab é hoje uma sombra extensa do formulário, sem elemento clicável; será adicionado um backdrop somente no tema BlueLab, ligado à ação existente de minimizar.
+- Persistência planejada: `localStorage` versionado e separado por ID da conta/origin, whitelist de campos coerentes do compose, restauração minimizada e remoção em reset/publicação/descarte ou quando todo conteúdo significativo for apagado.
+- Backdrop transparente implementado somente no modal do tema BlueLab; ele intercepta o clique externo e despacha a mesma ação usada pelo botão de minimizar, sem alterar menus/popovers acima do modal.
+- Persistência implementada na inicialização pós-hidratação: grava imediatamente por mudança do compose, restaura o draft minimizado e elimina `File` local não serializável mantendo metadados de anexos já enviados.
+- Leitura local valida versão, tipos, enquete e IDs de mídia antes de restaurar; conteúdo corrompido/incompatível é ignorado.
+- Foram adicionados testes para clique no backdrop, restauração coerente e minimizada, gravação imediata, reset/descarte, publicação, apagamento total, isolamento entre contas e ausência de efeito no composer Mastodon regular.
+- ESLint focado, Stylelint focado, TypeScript, 12 testes focados e build Vite de produção passaram; apenas os avisos preexistentes do futuro `configLoader: native` do Vite foram emitidos.
 
 ## Plano atual
 
@@ -60,6 +69,12 @@
 - [x] Promover `BlueLab` por fast-forward para o commit exato testado.
 - [x] Executar `espelunca-atualizar` e acompanhar backup, dependências, migrations, assets e restart.
 - [x] Validar commit, working tree, serviços, health, API, paleta e bundle público na Espelunca.
+- [x] Auditar modal, ações de minimizar/descartar, reducer do compose, hidratação e armazenamento existentes.
+- [x] Implementar backdrop clicável reutilizando `minimizeComposerToggle`.
+- [x] Implementar persistência/restauração por conta sem afetar a branch estável.
+- [x] Adicionar testes automatizados de persistência, isolamento, limpeza e restauração minimizada.
+- [x] Executar lint, tipos, testes focados e build de produção.
+- [ ] Publicar em `BlueLab-Test`, atualizar somente mastodon.blue e validar o deploy.
 
 ## Decisões e cuidados
 
@@ -67,8 +82,11 @@
 - A correção usa os tokens semânticos de sucesso; no Blue eles seguem o azul e, em futura promoção aprovada, na Espelunca seguirão o rosa.
 - O sistema novo de selo por cargo/instância não será alterado.
 - A alteração do botão é feita pela API já existente do componente, sem seletor CSS adicional; por isso acompanha qualquer paleta de instância após futura promoção.
+- A persistência deve preservar texto, CW, visibilidade, idioma, formato, contexto de resposta/edição/citação, enquete e metadados de anexos já enviados; `File` local e upload ainda em andamento não são recuperáveis após fechamento.
+- O draft deve ser isolado por conta para não aparecer ao trocar de usuário no mesmo domínio; o origin do navegador já separa instâncias diferentes.
+- Nenhuma expiração automática será usada, conforme o pedido de manter o conteúdo até ação do usuário.
 - Não usar force-push, reset destrutivo ou reconstrução por cherry-pick.
 
 ## Próximo passo seguro
 
-Nenhuma ação pendente. Em novos ajustes, voltar ao fluxo cumulativo de testes em `BlueLab-Test` antes de qualquer nova promoção.
+Implementar o patch mínimo, validar e implantar somente no mastodon.blue. Aguardar aprovação antes de qualquer promoção ou atualização da Espelunca.

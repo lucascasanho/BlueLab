@@ -35,6 +35,7 @@ import {
   composerOriginFromElement,
   openNewComposer,
   openPreferredComposer,
+  minimizeComposerToggle,
   selectComposerEditor,
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
@@ -64,6 +65,19 @@ const emptyVisualViewportMetrics: VisualViewportMetrics = {
   centerY: null,
   keyboardOpen: false,
 };
+
+export const ComposerBackdrop: React.FC<{ onMinimize: () => void }> = ({
+  onMinimize,
+}) => (
+  <button
+    type='button'
+    tabIndex={-1}
+    aria-hidden='true'
+    className={classes.composerBackdrop}
+    data-bluelab-composer-backdrop
+    onClick={onMinimize}
+  />
+);
 
 export const ComposeRedesignButton: React.FC<{
   /**
@@ -125,6 +139,9 @@ export const ComposeRedesignButton: React.FC<{
   }, []);
 
   const dispatch = useAppDispatch();
+  const handleBackdropClick = useCallback(() => {
+    dispatch(minimizeComposerToggle());
+  }, [dispatch]);
   const captureLauncherPointerOrigin: React.PointerEventHandler<HTMLButtonElement> =
     useCallback((event) => {
       launcherOriginRef.current = composerOriginFromElement(
@@ -227,15 +244,18 @@ export const ComposeRedesignButton: React.FC<{
     } as React.CSSProperties;
 
     return portalBlue2InlineOverlay(
-      <Suspense fallback={<CircularProgress strokeWidth={2} size={50} />}>
-        <ComposeLazyForm
-          ref={composerRef}
-          autoFocus
-          className={classes.composer}
-          style={style}
-          data-keyboard-open={viewport.keyboardOpen ? 'true' : undefined}
-        />
-      </Suspense>,
+      <>
+        {isBlue2 && <ComposerBackdrop onMinimize={handleBackdropClick} />}
+        <Suspense fallback={<CircularProgress strokeWidth={2} size={50} />}>
+          <ComposeLazyForm
+            ref={composerRef}
+            autoFocus
+            className={classes.composer}
+            style={style}
+            data-keyboard-open={viewport.keyboardOpen ? 'true' : undefined}
+          />
+        </Suspense>
+      </>,
     );
   }
 

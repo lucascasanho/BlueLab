@@ -14,6 +14,7 @@ import {
   updatePollOption,
   deletePollOption,
 } from '@/mastodon/actions/compose_typed';
+import { restoreComposeDraft } from '@/mastodon/actions/compose_draft';
 import { timelineDelete } from 'mastodon/actions/timelines_typed';
 
 import {
@@ -348,7 +349,31 @@ const calculateProgress = (loaded, total) => Math.min(Math.round((loaded / total
 
 /** @type {import('@reduxjs/toolkit').Reducer<typeof initialState>} */
 export const composeReducer = (state = initialState, action) => {
-  if (changeComposeVisibility.match(action)) {
+  if (restoreComposeDraft.match(action)) {
+    const draft = action.payload;
+
+    return clearAll(state).withMutations(map => {
+      map.set('id', draft.id);
+      map.set('text', draft.text);
+      map.set('content_type', draft.content_type);
+      map.set('spoiler', draft.spoiler);
+      map.set('spoiler_text', draft.spoiler_text);
+      map.set('in_reply_to', draft.in_reply_to);
+      map.set('privacy', draft.privacy ?? state.get('default_privacy'));
+      map.set('sensitive', draft.sensitive);
+      map.set('language', draft.language);
+      map.set('media_attachments', fromJS(draft.media_attachments));
+      map.set('poll', draft.poll ? fromJS(draft.poll) : null);
+      map.set('quoted_status_id', draft.quoted_status_id);
+      map.set('quote_policy', draft.quote_policy);
+      map.set('focusDate', draft.text ? new Date() : null);
+      map.set('pending_media_attachments', 0);
+      map.set('is_uploading', false);
+      map.set('is_processing', false);
+      map.set('fetching_link', null);
+      map.set('idempotencyKey', uuid());
+    });
+  } else if (changeComposeVisibility.match(action)) {
     return state
       .set('privacy', action.payload)
       .set('idempotencyKey', uuid());

@@ -17,6 +17,7 @@ import { IntlProvider } from 'mastodon/locales';
 import { store } from 'mastodon/store';
 import { isProduction } from 'mastodon/utils/environment';
 import { BodyScrollLock } from 'mastodon/features/ui/components/body_scroll_lock';
+import { startComposeDraftPersistence } from 'mastodon/features/compose/redesign/draft_persistence';
 
 import { ScrollContext } from './scroll_container/scroll_context';
 
@@ -25,6 +26,7 @@ const title = isProduction() ? siteTitle : `${siteTitle} (Dev)`;
 const hydrateAction = hydrateStore(initialState);
 
 store.dispatch(hydrateAction);
+startComposeDraftPersistence(store);
 
 export default class Mastodon extends PureComponent {
   identity = createIdentityContext(initialState);
