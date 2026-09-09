@@ -6,10 +6,10 @@
 
 ## Estado
 
-- Status: concluído no Blue; aguardando teste do usuário
+- Status: concluído
 - Atualizado em: 2026-09-09 — America/Cuiaba
 - Objetivo: fazer o botão “Publicar” do composer BlueLab seguir a paleta de cores da instância, preservando cumulativamente a correção de links verificados ainda em teste.
-- Alvo: somente `BlueLab-Test`/mastodon.blue; `BlueLab` e Espelunca devem permanecer inalterados até aprovação explícita.
+- Alvos: `BlueLab` no GitHub e espelunca.social, após aprovação explícita do usuário em 2026-09-09.
 
 ## Estado confirmado
 
@@ -33,6 +33,15 @@
 - O bundle público HTTP 200 contém `variant: solid`, `color: accent` e `type: submit` no botão; a página pública injeta `--blue2-blue: #4054ff`.
 - Web, Sidekiq, streaming e nginx do Blue estão ativos; health local e API pública retornam HTTP 200; não apareceram novos erros nos logs da janela do deploy.
 - `BlueLab` permanece inalterada em `e61da25a9c`; nenhuma operação foi executada na Espelunca.
+- O usuário aprovou o lote cumulativo e autorizou sua promoção e implantação na Espelunca.
+- Pré-promoção confirmada: working tree limpo; `BlueLab` (`e61da25a9c`) era ancestral de `BlueLab-Test` (`200854bb9b`), com quatro commits à frente e nenhuma divergência.
+- `BlueLab` foi promovida por fast-forward para o mesmo commit `200854bb9b`; `BlueLab` e `BlueLab-Test` no GitHub apontam exatamente para esse commit.
+- Antes da atualização, a Espelunca estava limpa, saudável e no commit estável anterior `e61da25a9c`.
+- Backup PostgreSQL concluído em `/home/espelunca/espelunca-backups/espelunca-20260909-004244-e61da25a9cfb.dump` (105 MB).
+- Espelunca sincronizada e implantada no commit aprovado `200854bb9b`; dependências, assets, migrations pré/pós-deploy e reinícios concluíram sem falha.
+- O aviso de health local emitido imediatamente após o restart foi transitório: na repetição, Rails e nginx retornaram HTTP 200; home e API públicas também retornaram HTTP 200.
+- Espelunca ficou com working tree limpo; web, Sidekiq, streaming e nginx ativos; banco sem migrations pendentes e sem novos erros nos logs da janela do deploy.
+- A página pública injeta `--blue2-blue: #b5128a`, e o bundle público contém o botão de envio com `variant: solid`, `color: accent` e `type: submit`.
 
 ## Plano atual
 
@@ -47,10 +56,14 @@
 - [x] Executar validações focadas e build de produção.
 - [x] Publicar em `BlueLab-Test` e atualizar somente mastodon.blue.
 - [x] Validar serviços, endpoints e asset público; confirmar novamente que a branch estável não mudou e que a Espelunca não foi acessada.
+- [x] Confirmar aprovação, ancestralidade e conteúdo cumulativo do lote.
+- [x] Promover `BlueLab` por fast-forward para o commit exato testado.
+- [x] Executar `espelunca-atualizar` e acompanhar backup, dependências, migrations, assets e restart.
+- [x] Validar commit, working tree, serviços, health, API, paleta e bundle público na Espelunca.
 
 ## Decisões e cuidados
 
-- A correção de links verificados não será promovida para `BlueLab` nem enviada à Espelunca sem novo teste e aprovação explícita do usuário.
+- O usuário aprovou a promoção do lote cumulativo, incluindo a correção de links verificados e o botão “Publicar” pela paleta.
 - A correção usa os tokens semânticos de sucesso; no Blue eles seguem o azul e, em futura promoção aprovada, na Espelunca seguirão o rosa.
 - O sistema novo de selo por cargo/instância não será alterado.
 - A alteração do botão é feita pela API já existente do componente, sem seletor CSS adicional; por isso acompanha qualquer paleta de instância após futura promoção.
@@ -58,4 +71,4 @@
 
 ## Próximo passo seguro
 
-Aguardar o teste do usuário no botão “Publicar” do composer em mastodon.blue. Só promover o lote cumulativo para `BlueLab` após aprovação explícita.
+Nenhuma ação pendente. Em novos ajustes, voltar ao fluxo cumulativo de testes em `BlueLab-Test` antes de qualquer nova promoção.
