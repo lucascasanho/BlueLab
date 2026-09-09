@@ -6,7 +6,7 @@
 
 ## Estado
 
-- Status: em andamento
+- Status: aguardando teste do usuário
 - Atualizado em: 2026-09-08 — America/Cuiaba
 - Objetivo: promover o ajuste aprovado de Preferências para a Espelunca e corrigir somente no Blue a regressão visual dos links verificados.
 - Alvos: `BlueLab`/espelunca.social para o lote aprovado; `BlueLab-Test`/mastodon.blue para a nova correção ainda não aprovada.
@@ -22,6 +22,9 @@
 - A regressão dos links verificados foi localizada no cartão novo de campos do perfil: fundo “softest” quase preto no tema escuro do Blue e conteúdo herdando a cor comum.
 - A correção local usa fundo de sucesso mais visível e fixa nome, valor, link e SVG oficial em `--color-text-success`; campos comuns permanecem inalterados.
 - Stylelint, formatação, build de produção e prova visual/computada passaram para Blue e Espelunca em claro e escuro.
+- Correção publicada em `BlueLab-Test` no commit `341fe87f75` e implantada somente no mastodon.blue.
+- Asset público da correção confirmado por HTTP; serviços do Blue ativos, health local e API pública HTTP 200, sem novos erros.
+- `BlueLab` e Espelunca permanecem limpos em `e61da25a9c`, sem a correção ainda não aprovada.
 
 ## Plano atual
 
@@ -29,8 +32,8 @@
 - [x] Confirmar que a promoção não contém mudanças em links verificados.
 - [x] Localizar a causa visual específica do Blue.
 - [x] Restaurar fundo, conteúdo e SVG legado na cor semântica de destaque.
-- [ ] Validar, publicar somente em `BlueLab-Test` e atualizar mastodon.blue.
-- [ ] Confirmar que `BlueLab` e Espelunca não receberam a correção ainda não aprovada.
+- [x] Validar, publicar somente em `BlueLab-Test` e atualizar mastodon.blue.
+- [x] Confirmar que `BlueLab` e Espelunca não receberam a correção ainda não aprovada.
 
 ## Decisões e cuidados
 
@@ -41,4 +44,4 @@
 
 ## Próximo passo seguro
 
-Validar a correção dos campos verificados em claro/escuro, criar o commit de teste e publicar somente no mastodon.blue.
+Aguardar o teste do usuário no mastodon.blue. Só promover a correção de links verificados após aprovação explícita.
