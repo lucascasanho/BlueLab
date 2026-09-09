@@ -6,7 +6,7 @@
 
 ## Estado
 
-- Status: implementação e validações concluídas; publicação no Blue pendente
+- Status: implementação publicada e validada no Blue; aguardando teste do usuário
 - Atualizado em: 2026-09-09 — America/Cuiaba
 - Objetivo: minimizar o compose BlueLab ao clicar fora e persistir o rascunho localmente entre navegação, reload e fechamento do site/PWA até publicação, descarte ou remoção do conteúdo.
 - Alvo: somente `BlueLab-Test`/mastodon.blue para teste; `BlueLab` e Espelunca permanecem inalterados até aprovação explícita.
@@ -51,6 +51,10 @@
 - Leitura local valida versão, tipos, enquete e IDs de mídia antes de restaurar; conteúdo corrompido/incompatível é ignorado.
 - Foram adicionados testes para clique no backdrop, restauração coerente e minimizada, gravação imediata, reset/descarte, publicação, apagamento total, isolamento entre contas e ausência de efeito no composer Mastodon regular.
 - ESLint focado, Stylelint focado, TypeScript, 12 testes focados e build Vite de produção passaram; apenas os avisos preexistentes do futuro `configLoader: native` do Vite foram emitidos.
+- Alteração funcional publicada somente em `BlueLab-Test` no commit `290a37dd0a` e implantada no mastodon.blue com `blue-atualizar`.
+- Web, Sidekiq, streaming e nginx do Blue estão ativos; health local e API pública retornam HTTP 200, sem erros novos nos journals da janela do deploy.
+- Os bundles servidos publicamente por mastodon.blue retornam HTTP 200 e contêm os marcadores da persistência (`mastodon_bluelab_compose_draft`) e do backdrop (`data-bluelab-composer-backdrop`).
+- `BlueLab` permanece inalterada em `8bfa72d6f5`; nenhuma operação foi feita na Espelunca nesta etapa.
 
 ## Plano atual
 
@@ -74,7 +78,7 @@
 - [x] Implementar persistência/restauração por conta sem afetar a branch estável.
 - [x] Adicionar testes automatizados de persistência, isolamento, limpeza e restauração minimizada.
 - [x] Executar lint, tipos, testes focados e build de produção.
-- [ ] Publicar em `BlueLab-Test`, atualizar somente mastodon.blue e validar o deploy.
+- [x] Publicar em `BlueLab-Test`, atualizar somente mastodon.blue e validar o deploy.
 
 ## Decisões e cuidados
 
@@ -89,4 +93,4 @@
 
 ## Próximo passo seguro
 
-Implementar o patch mínimo, validar e implantar somente no mastodon.blue. Aguardar aprovação antes de qualquer promoção ou atualização da Espelunca.
+Aguardar o teste do usuário no mastodon.blue. Somente após aprovação explícita, comparar as branches e promover o commit exato testado para `BlueLab`; a Espelunca continua inalterada até essa aprovação.
