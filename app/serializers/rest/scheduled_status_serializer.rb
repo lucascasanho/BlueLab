@@ -1,12 +1,16 @@
 # frozen_string_literal: true
 
 class REST::ScheduledStatusSerializer < ActiveModel::Serializer
-  attributes :id, :scheduled_at, :params
+  attributes :id, :scheduled_at, :params, :published_status_id
 
   has_many :media_attachments, serializer: REST::MediaAttachmentSerializer
 
   def id
     object.id.to_s
+  end
+
+  def published_status_id
+    object.published_status_id&.to_s
   end
 
   def params

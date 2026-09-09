@@ -44,6 +44,12 @@ const draft = (text = 'A persistent draft'): PersistedComposeDraft => ({
   },
   quoted_status_id: null,
   quote_policy: 'followers',
+  scheduled_at: null,
+  scheduled_timezone: null,
+  idempotency_key: 'first-post-idempotency-key',
+  thread_items: [],
+  thread_published_ids: {},
+  thread_error_index: null,
 });
 
 const createStore = () =>
@@ -76,6 +82,9 @@ describe('BlueLab compose draft persistence', () => {
     );
     expect(store.getState().compose.get('privacy')).toBe('private');
     expect(store.getState().compose.get('in_reply_to')).toBe('status-1');
+    expect(store.getState().compose.get('idempotencyKey')).toBe(
+      'first-post-idempotency-key',
+    );
     const restoredAttachments = store
       .getState()
       .compose.get('media_attachments') as { size: number };
@@ -86,6 +95,42 @@ describe('BlueLab compose draft persistence', () => {
     expect(restoredAttachments.size).toBe(1);
     expect(restoredPollOptions.toJS()).toEqual(['One', 'Two']);
 
+    unsubscribe();
+  });
+
+  test('restores thread progress and the exact failed position for a safe retry', () => {
+    const interrupted = draft('First');
+    interrupted.thread_items = [
+      {
+        id: 'item-2',
+        text: 'Second',
+        spoiler_text: '',
+        sensitive: false,
+        visibility: 'public',
+        language: 'pt',
+        content_type: 'text/plain',
+        media_attachments: [],
+        idempotencyKey: 'second-post-key',
+      },
+    ];
+    interrupted.thread_published_ids = { '0': 'published-status-1' };
+    interrupted.thread_error_index = 1;
+    writePersistedComposeDraft(accountOne, interrupted);
+    const store = createStore();
+
+    const unsubscribe = startComposeDraftPersistence(
+      store,
+      accountOne,
+      'blue-2',
+    );
+
+    expect(store.getState().compose.getIn(['thread_published_ids', '0'])).toBe(
+      'published-status-1',
+    );
+    expect(store.getState().compose.get('thread_error_index')).toBe(1);
+    expect(
+      store.getState().compose.getIn(['thread_items', 0, 'idempotencyKey']),
+    ).toBe('second-post-key');
     unsubscribe();
   });
 

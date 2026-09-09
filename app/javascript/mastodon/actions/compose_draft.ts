@@ -16,6 +16,12 @@ export interface PersistedComposeDraft {
   poll: Record<string, unknown> | null;
   quoted_status_id: string | null;
   quote_policy: string;
+  scheduled_at: string | null;
+  scheduled_timezone: string | null;
+  idempotency_key: string;
+  thread_items: Record<string, unknown>[];
+  thread_published_ids: Record<string, string>;
+  thread_error_index: number | null;
 }
 
 export const restoreComposeDraft = createAction<PersistedComposeDraft>(

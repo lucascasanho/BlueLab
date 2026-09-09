@@ -13,6 +13,7 @@ import {
   GavelIcon,
   ShieldStarIcon,
   SignOutIcon,
+  CalendarDotsIcon,
 } from '@phosphor-icons/react';
 
 import { openModal } from '@/mastodon/actions/modal';
@@ -118,6 +119,12 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
             <FormattedMessage
               id='navigation_bar.collections'
               defaultMessage='Collections'
+            />
+          </MenuItemLink>
+          <MenuItemLink to='/scheduled' icon={CalendarDotsIcon}>
+            <FormattedMessage
+              id='navigation_bar.scheduled_publications'
+              defaultMessage='Scheduled publications'
             />
           </MenuItemLink>
           <MenuItemLink to='/favourites' icon={HeartIcon}>

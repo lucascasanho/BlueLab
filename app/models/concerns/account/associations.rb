@@ -37,6 +37,7 @@ module Account::Associations
         has_many :reports
         has_many :resumable_media_uploads
         has_many :scheduled_statuses
+        has_many :scheduled_threads
         has_many :status_pins
         has_many :statuses
         has_many :keypairs

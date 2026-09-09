@@ -79,7 +79,12 @@ namespace :api, format: false do
 
     resources :custom_emojis, only: [:index]
     resources :suggestions, only: [:index, :destroy]
-    resources :scheduled_statuses, only: [:index, :show, :update, :destroy]
+    resources :scheduled_statuses, only: [:index, :show, :update, :destroy] do
+      put :replace, on: :member
+    end
+    resources :scheduled_threads, only: [:index, :show, :create, :update, :destroy] do
+      post :retry, on: :member
+    end
     resources :preferences, only: [:index]
     resources :donation_campaigns, only: [:index]
 

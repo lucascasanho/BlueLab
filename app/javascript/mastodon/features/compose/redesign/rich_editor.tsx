@@ -561,14 +561,36 @@ export const RichComposeEditor: React.FC<{
   onSubmit: (event?: React.SubmitEvent) => void;
   children?: React.ReactNode;
   autoFocus?: boolean;
-}> = ({ onSubmit, children, autoFocus }) => {
+  value?: string;
+  contentType?: string;
+  editorId?: string;
+  onChange?: (value: string) => void;
+  onContentTypeChange?: (value: string) => void;
+  onFiles?: (files: FileList) => void;
+  dismissOnEscape?: boolean;
+}> = ({
+  onSubmit,
+  children,
+  autoFocus,
+  value,
+  contentType: contentTypeProp,
+  editorId,
+  onChange,
+  onContentTypeChange,
+  onFiles,
+  dismissOnEscape = true,
+}) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
-  const text = useAppSelector((state) => state.compose.get('text') as string);
+  const globalText = useAppSelector(
+    (state) => state.compose.get('text') as string,
+  );
   const type = useAppSelector(selectComposeType);
-  const contentType = useAppSelector(
+  const globalContentType = useAppSelector(
     (state) => state.compose.get('content_type') as string,
   );
+  const text = value ?? globalText;
+  const contentType = contentTypeProp ?? globalContentType;
   const isMarkdown = contentType === 'text/markdown';
   const customEmojis = useCustomEmojis();
   const ref = useRef<HTMLDivElement>(null);
@@ -654,7 +676,8 @@ export const RichComposeEditor: React.FC<{
       ? editorText(ref.current)
       : editorPlainText(ref.current);
     localValueRef.current = value;
-    dispatch(changeCompose(value));
+    if (onChange) onChange(value);
+    else dispatch(changeCompose(value));
     if (hiddenRef.current) {
       hiddenRef.current.value = value;
       hiddenRef.current.setSelectionRange(value.length, value.length);
@@ -699,7 +722,8 @@ export const RichComposeEditor: React.FC<{
       // eslint-disable-next-line @typescript-eslint/no-deprecated
       document.execCommand(command, false, button.dataset.value);
     }
-    dispatch(changeComposeContentType('text/markdown'));
+    if (onContentTypeChange) onContentTypeChange('text/markdown');
+    else dispatch(changeComposeContentType('text/markdown'));
     sync();
     updateActiveFormats();
   };
@@ -730,7 +754,8 @@ export const RichComposeEditor: React.FC<{
       }
       // eslint-disable-next-line @typescript-eslint/no-deprecated
       document.execCommand('createLink', false, url);
-      dispatch(changeComposeContentType('text/markdown'));
+      if (onContentTypeChange) onContentTypeChange('text/markdown');
+      else dispatch(changeComposeContentType('text/markdown'));
       sync();
       updateActiveFormats();
     }
@@ -741,7 +766,7 @@ export const RichComposeEditor: React.FC<{
     if (key === 'enter' && (event.ctrlKey || event.metaKey)) {
       event.preventDefault();
       onSubmit();
-    } else if (key === 'escape') {
+    } else if (key === 'escape' && dismissOnEscape) {
       event.preventDefault();
       event.stopPropagation();
       dispatch(dismissComposer());
@@ -765,13 +790,15 @@ export const RichComposeEditor: React.FC<{
       'clipboardData' in event ? event.clipboardData : event.dataTransfer;
     if (data.files.length > 0) {
       event.preventDefault();
+      if (onFiles) onFiles(data.files);
+      else dispatch(processPasteOrDrop(data));
     } else if (!isMarkdown && 'clipboardData' in event) {
       event.preventDefault();
       // Keep plain-text mode visually plain while preserving native undo/redo.
       // eslint-disable-next-line @typescript-eslint/no-deprecated
       document.execCommand('insertText', false, data.getData('text/plain'));
     }
-    dispatch(processPasteOrDrop(data));
+    if (data.files.length === 0) dispatch(processPasteOrDrop(data));
   };
 
   return (
@@ -846,7 +873,7 @@ export const RichComposeEditor: React.FC<{
       {children}
       <textarea
         ref={hiddenRef}
-        id={COMPOSER_TEXTAREA_ID}
+        id={editorId ?? COMPOSER_TEXTAREA_ID}
         className={classes.richEditorTransport}
         tabIndex={-1}
         aria-hidden='true'

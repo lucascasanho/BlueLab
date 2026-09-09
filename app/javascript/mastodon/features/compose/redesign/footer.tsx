@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useCallback, useRef } from 'react';
 
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import classNames from 'classnames';
 
@@ -10,12 +10,14 @@ import {
   ChartBarHorizontalIcon,
   WarningCircleIcon,
   MarkdownLogoIcon,
+  PlusIcon,
 } from '@phosphor-icons/react';
 
 import {
   addPoll,
   changeComposeContentType,
   uploadCompose,
+  addComposeThreadItem,
 } from '@/mastodon/actions/compose';
 import { Button, IconButton } from '@/mastodon/components/button/redesign';
 import { hideStatusCharacterCounter } from '@/mastodon/initial_state';
@@ -29,6 +31,7 @@ import { shouldShowCharacterCounter } from '../components/character_counter';
 
 import type { OnEmojiPick } from './emoji';
 import { ComposeEmojiButton } from './emoji';
+import { ComposeSchedule } from './schedule';
 import {
   selectComposeAttachments,
   selectComposeCanSubmit,
@@ -38,9 +41,17 @@ import {
 } from './selectors';
 import classes from './styles.module.scss';
 
+const messages = defineMessages({
+  addThreadItem: {
+    id: 'compose.thread.add',
+    defaultMessage: 'Add another post to this thread',
+  },
+});
+
 export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
   onEmojiPick,
 }) => {
+  const intl = useIntl();
   const type = useAppSelector(selectComposeType);
   const { current, max } = useAppSelector(selectComposeCharsCount);
   const { hasPoll, quotedStatusId } = useAppSelector(
@@ -55,6 +66,21 @@ export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
     (state) => state.compose.get('content_type') as string,
   );
   const dispatch = useAppDispatch();
+  const scheduledAt = useAppSelector(
+    (state) => state.compose.get('scheduled_at') as string | null,
+  );
+  const threadItemCount = useAppSelector(
+    (state) =>
+      (state.compose.get('thread_items') as unknown as { size: number }).size,
+  );
+  const hasPublishedThreadItems = useAppSelector(
+    (state) =>
+      !(
+        state.compose.get('thread_published_ids') as unknown as {
+          isEmpty: () => boolean;
+        }
+      ).isEmpty(),
+  );
   const handlePoll = useCallback(() => {
     dispatch(addPoll());
   }, [dispatch]);
@@ -65,6 +91,9 @@ export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
       ),
     );
   }, [contentType, dispatch]);
+  const handleAddThreadItem = useCallback(() => {
+    dispatch(addComposeThreadItem());
+  }, [dispatch]);
 
   return (
     <footer className={classes.footer} data-bluelab-compose-footer>
@@ -98,6 +127,8 @@ export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
         />
       </IconButton>
 
+      {type !== 'message' && <ComposeSchedule />}
+
       <div className={classes.flexGrowWrap}>
         {shouldShowCharacterCounter(
           hideStatusCharacterCounter,
@@ -119,24 +150,46 @@ export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
           </span>
         )}
 
-        <Button
-          variant='solid'
-          color='accent'
-          type='submit'
-          className={classes.submitButton}
-          disabled={!canSubmit}
-          loading={isSubmitting}
-        >
+        <div className={classes.primaryActions} data-compose-primary-actions>
           {type !== 'message' && (
-            <FormattedMessage id='compose.publish' defaultMessage='Publish' />
+            <IconButton
+              as='button'
+              type='button'
+              size='sm'
+              icon={PlusIcon}
+              className={classes.threadAddButton}
+              title={intl.formatMessage(messages.addThreadItem)}
+              disabled={threadItemCount >= 24 || hasPublishedThreadItems}
+              onClick={handleAddThreadItem}
+            >
+              <FormattedMessage {...messages.addThreadItem} />
+            </IconButton>
           )}
-          {type === 'message' && (
-            <FormattedMessage
-              id='compose.message.publish'
-              defaultMessage='Send'
-            />
-          )}
-        </Button>
+          <Button
+            variant='solid'
+            color='accent'
+            type='submit'
+            className={classes.submitButton}
+            disabled={!canSubmit}
+            loading={isSubmitting}
+          >
+            {type !== 'message' && !scheduledAt && (
+              <FormattedMessage id='compose.publish' defaultMessage='Publish' />
+            )}
+            {type !== 'message' && scheduledAt && (
+              <FormattedMessage
+                id='compose.schedule.submit'
+                defaultMessage='Schedule'
+              />
+            )}
+            {type === 'message' && (
+              <FormattedMessage
+                id='compose.message.publish'
+                defaultMessage='Send'
+              />
+            )}
+          </Button>
+        </div>
       </div>
     </footer>
   );

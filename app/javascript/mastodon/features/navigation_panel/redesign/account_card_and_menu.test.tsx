@@ -1,5 +1,11 @@
+import { fireEvent } from '@testing-library/react';
+
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
+import {
+  PERMISSION_MANAGE_REPORTS,
+  PERMISSION_VIEW_DASHBOARD,
+} from '@/mastodon/permissions';
 import { accountFactoryImmutable } from '@/testing/factories';
 import { render, screen } from '@/testing/rendering';
 
@@ -15,21 +21,64 @@ vi.mock('@/mastodon/store', async () => {
 });
 
 describe('<NavigationAccountCardAndMenu />', () => {
-  it('renders the verification badge immediately after the display name', () => {
-    const account = accountFactoryImmutable({
-      id: '123',
-      username: 'alice',
-      display_name: 'Alice',
-      verified_by_role: true,
-    });
+  const account = accountFactoryImmutable({
+    id: '123',
+    username: 'alice',
+    display_name: 'Alice',
+    verified_by_role: true,
+  });
+
+  beforeEach(() => {
     vi.mocked(useAccount).mockReturnValue(account);
     vi.mocked(useCustomEmojis).mockReturnValue({});
+  });
 
+  it('renders the verification badge immediately after the display name', () => {
     render(<NavigationAccountCardAndMenu />);
 
     const displayName = screen.getByText('Alice');
     const badge = screen.getByRole('button', { name: 'Verified account' });
 
     expect(displayName.nextElementSibling).toBe(badge);
+  });
+
+  it('puts scheduled publications in this account submenu for signed-in users', () => {
+    render(<NavigationAccountCardAndMenu />);
+    fireEvent.click(screen.getByRole('button', { name: 'More' }));
+
+    expect(
+      screen
+        .getByRole('link', { name: 'Scheduled publications' })
+        .getAttribute('href'),
+    ).toBe('/scheduled');
+  });
+
+  it('hides moderation and administration from users without permissions', () => {
+    render(<NavigationAccountCardAndMenu />);
+    fireEvent.click(screen.getByRole('button', { name: 'More' }));
+
+    expect(screen.queryByRole('link', { name: 'Moderation' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Administration' })).toBeNull();
+  });
+
+  it('reflects granular moderation and administration permissions independently', () => {
+    const { unmount } = render(<NavigationAccountCardAndMenu />, {
+      permissions: PERMISSION_MANAGE_REPORTS,
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'More' }));
+    expect(
+      screen.getByRole('link', { name: 'Moderation' }).getAttribute('href'),
+    ).toBe('/admin/reports');
+    expect(screen.queryByRole('link', { name: 'Administration' })).toBeNull();
+    unmount();
+
+    render(<NavigationAccountCardAndMenu />, {
+      permissions: PERMISSION_VIEW_DASHBOARD,
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'More' }));
+    expect(
+      screen.getByRole('link', { name: 'Administration' }).getAttribute('href'),
+    ).toBe('/admin/dashboard');
+    expect(screen.queryByRole('link', { name: 'Moderation' })).toBeNull();
   });
 });

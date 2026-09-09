@@ -7,6 +7,8 @@ class PublishScheduledStatusWorker
 
   def perform(scheduled_status_id)
     scheduled_status = ScheduledStatus.find(scheduled_status_id)
+    return true if scheduled_status.scheduled_thread_id?
+
     scheduled_status.destroy!
 
     return true if scheduled_status.account.user_disabled?

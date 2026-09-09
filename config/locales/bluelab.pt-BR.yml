@@ -1,0 +1,7 @@
+---
+pt-BR:
+  scheduled_threads:
+    errors:
+      already_started: Esta sequência agendada já começou a ser publicada. Você pode tentar novamente ou cancelar os posts restantes, mas ela não pode mais ser editada.
+      item_count: Uma sequência deve conter entre %{min} e %{max} publicações
+      use_thread_editor: Use o editor da sequência agendada para alterar esta publicação

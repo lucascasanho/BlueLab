@@ -361,6 +361,210 @@ textarea.textarea {
   margin-inline-start: auto;
 }
 
+.primaryActions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-inline-start: auto;
+  white-space: nowrap;
+}
+
+.threadAddButton {
+  box-sizing: border-box;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  border-radius: var(--radius-round);
+}
+
+.scheduleControl {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.scheduledSummary {
+  @include mixins.type-body-compact;
+  @include mixins.line-clamp(1);
+
+  max-width: 13rem;
+  color: var(--color-text-secondary);
+}
+
+.schedulePanel {
+  @include mixins.elevation-2;
+
+  position: absolute;
+  z-index: 5;
+  inset-inline-start: 0;
+  bottom: calc(100% + var(--space-xs));
+  display: flex;
+  box-sizing: border-box;
+  width: min(22rem, calc(100vw - 2 * var(--space-md)));
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-primary);
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+
+  input,
+  select {
+    box-sizing: border-box;
+    width: 100%;
+    padding: var(--space-xs);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-sm);
+    outline: none;
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+
+    &:focus-visible {
+      outline: 2px solid var(--color-border-brand);
+      outline-offset: 1px;
+    }
+  }
+}
+
+.scheduleTimezone {
+  color: var(--color-text-secondary);
+}
+
+.scheduleActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.threadItems {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.threadItem {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border-primary);
+  border-inline-start: 3px solid var(--color-border-brand);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: -3px;
+    top: calc(-1 * var(--space-md));
+    width: 3px;
+    height: var(--space-md);
+    background: var(--color-border-brand);
+  }
+}
+
+.threadItemHeader,
+.threadItemFooter {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2xs);
+  flex-wrap: wrap;
+}
+
+.threadItemHeader {
+  justify-content: space-between;
+}
+
+.threadField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  color: var(--color-text-secondary);
+
+  input {
+    padding: var(--space-xs);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-sm);
+    outline: none;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+
+    &:focus-visible {
+      outline: 2px solid var(--color-border-brand);
+      outline-offset: 1px;
+    }
+  }
+}
+
+.threadCompactField {
+  select,
+  input {
+    box-sizing: border-box;
+    max-width: 8rem;
+    min-height: 32px;
+    padding: var(--space-3xs) var(--space-2xs);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+  }
+}
+
+.threadMedia {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs);
+}
+
+.threadMediaItem {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-2xs);
+
+  img {
+    width: 100%;
+    max-height: 10rem;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+
+  input {
+    min-width: 0;
+    padding: var(--space-xs);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+  }
+}
+
+.threadFailure {
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border-error);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-error);
+}
+
 // Language selector
 
 .languageMenu {
@@ -411,6 +615,18 @@ textarea.textarea {
     z-index: 2;
     background: var(--color-bg-primary);
     padding-bottom: max(var(--space-xs), env(safe-area-inset-bottom));
+  }
+
+  .root[role='dialog'] .primaryActions {
+    flex-shrink: 0;
+  }
+
+  .root[role='dialog'] .scheduledSummary {
+    display: none;
+  }
+
+  .threadMedia {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .languageMenu {

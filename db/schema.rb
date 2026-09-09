@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_08_135000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_09_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1164,9 +1164,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_08_135000) do
   create_table "scheduled_statuses", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.jsonb "params"
+    t.bigint "published_status_id"
     t.datetime "scheduled_at", precision: nil
+    t.bigint "scheduled_thread_id"
+    t.integer "thread_position"
     t.index ["account_id"], name: "index_scheduled_statuses_on_account_id"
+    t.index ["published_status_id"], name: "index_scheduled_statuses_on_published_status_id", unique: true, where: "(published_status_id IS NOT NULL)"
     t.index ["scheduled_at"], name: "index_scheduled_statuses_on_scheduled_at"
+    t.index ["scheduled_thread_id", "thread_position"], name: "idx_on_scheduled_thread_id_thread_position_75847a7b57", unique: true, where: "(scheduled_thread_id IS NOT NULL)"
+    t.index ["scheduled_thread_id"], name: "index_scheduled_statuses_on_scheduled_thread_id"
+  end
+
+  create_table "scheduled_threads", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.integer "attempts", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.string "idempotency_key"
+    t.text "last_error"
+    t.datetime "next_retry_at"
+    t.datetime "scheduled_at", null: false
+    t.string "state", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "idempotency_key"], name: "index_scheduled_threads_on_account_id_and_idempotency_key", unique: true, where: "(idempotency_key IS NOT NULL)"
+    t.index ["account_id"], name: "index_scheduled_threads_on_account_id"
+    t.index ["scheduled_at"], name: "index_scheduled_threads_on_scheduled_at"
+    t.index ["state", "next_retry_at"], name: "index_scheduled_threads_on_state_and_next_retry_at"
   end
 
   create_table "session_activations", force: :cascade do |t|
@@ -1658,6 +1680,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_08_135000) do
   add_foreign_key "resumable_media_uploads", "media_attachments", on_delete: :nullify
   add_foreign_key "rule_translations", "rules", on_delete: :cascade
   add_foreign_key "scheduled_statuses", "accounts", on_delete: :cascade
+  add_foreign_key "scheduled_statuses", "scheduled_threads", on_delete: :cascade
+  add_foreign_key "scheduled_threads", "accounts", on_delete: :cascade
   add_foreign_key "session_activations", "oauth_access_tokens", column: "access_token_id", name: "fk_957e5bda89", on_delete: :cascade
   add_foreign_key "session_activations", "users", name: "fk_e5fda67334", on_delete: :cascade
   add_foreign_key "severed_relationships", "accounts", column: "local_account_id", on_delete: :cascade

@@ -2,9 +2,10 @@
 
 class Api::V1::ScheduledStatusesController < Api::BaseController
   include Authorization
+  include Api::ScheduledPostParamsConcern
 
-  before_action -> { doorkeeper_authorize! :read, :'read:statuses' }, except: [:update, :destroy]
-  before_action -> { doorkeeper_authorize! :write, :'write:statuses' }, only: [:update, :destroy]
+  before_action -> { doorkeeper_authorize! :read, :'read:statuses' }, except: [:update, :destroy, :replace]
+  before_action -> { doorkeeper_authorize! :write, :'write:statuses' }, only: [:update, :destroy, :replace]
 
   before_action :require_user!
   before_action :set_statuses, only: :index
@@ -30,10 +31,19 @@ class Api::V1::ScheduledStatusesController < Api::BaseController
     render_empty
   end
 
+  def replace
+    @status = ReplaceScheduledStatusService.new.call(
+      @status,
+      options: normalized_scheduled_item(params.permit(*scheduled_item_params).merge(scheduled_at: params[:scheduled_at])),
+      application: doorkeeper_token.application
+    )
+    render json: @status, serializer: REST::ScheduledStatusSerializer
+  end
+
   private
 
   def set_statuses
-    @statuses = current_account.scheduled_statuses.to_a_paginated_by_id(limit_param(DEFAULT_STATUSES_LIMIT), params_slice(:max_id, :since_id, :min_id))
+    @statuses = current_account.scheduled_statuses.where(scheduled_thread_id: nil).to_a_paginated_by_id(limit_param(DEFAULT_STATUSES_LIMIT), params_slice(:max_id, :since_id, :min_id))
   end
 
   def set_status

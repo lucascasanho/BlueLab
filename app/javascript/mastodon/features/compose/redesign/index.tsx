@@ -46,6 +46,7 @@ import {
   selectComposeType,
 } from './selectors';
 import classes from './styles.module.scss';
+import { ComposeThreadItems } from './thread';
 import { ComposeVisibility } from './visibility';
 
 const messages = defineMessages({
@@ -181,11 +182,32 @@ export const RedesignComposeForm: React.FC<
           </RichComposeEditor>
         </ComposeAutocomplete>
 
+        <ComposeThreadItems onSubmit={onSubmit} />
+
+        <ThreadFailure />
+
         <ComposeHints />
       </div>
 
       <ComposeFooter onEmojiPick={onEmojiPick} />
     </form>
+  );
+};
+
+const ThreadFailure: React.FC = () => {
+  const index = useAppSelector(
+    (state) => state.compose.get('thread_error_index') as number | null,
+  );
+  if (index === null) return null;
+
+  return (
+    <p role='alert' className={classes.threadFailure}>
+      <FormattedMessage
+        id='compose.thread.failure_inline'
+        defaultMessage='Publication stopped at post {index}. Posts already published were kept. Press Publish again to retry safely from this point.'
+        values={{ index: index + 1 }}
+      />
+    </p>
   );
 };
 

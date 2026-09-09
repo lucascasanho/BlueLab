@@ -18,7 +18,11 @@ class ScheduledStatus < ApplicationRecord
   MINIMUM_OFFSET = 5.minutes.freeze
 
   belongs_to :account, inverse_of: :scheduled_statuses
+  belongs_to :scheduled_thread, inverse_of: :scheduled_statuses, optional: true
+  belongs_to :published_status, class_name: 'Status', optional: true
   has_many :media_attachments, inverse_of: :scheduled_status, dependent: :nullify
+
+  validates :thread_position, presence: true, uniqueness: { scope: :scheduled_thread_id }, if: :scheduled_thread_id?
 
   validate :validate_future_date
   validate :validate_total_limit
@@ -31,10 +35,10 @@ class ScheduledStatus < ApplicationRecord
   end
 
   def validate_total_limit
-    errors.add(:base, I18n.t('scheduled_statuses.over_total_limit', limit: TOTAL_LIMIT)) if account.scheduled_statuses.count >= TOTAL_LIMIT
+    errors.add(:base, I18n.t('scheduled_statuses.over_total_limit', limit: TOTAL_LIMIT)) if new_record? && account.scheduled_statuses.count >= TOTAL_LIMIT
   end
 
   def validate_daily_limit
-    errors.add(:base, I18n.t('scheduled_statuses.over_daily_limit', limit: DAILY_LIMIT)) if account.scheduled_statuses.where('scheduled_at::date = ?::date', scheduled_at).count >= DAILY_LIMIT
+    errors.add(:base, I18n.t('scheduled_statuses.over_daily_limit', limit: DAILY_LIMIT)) if new_record? && account.scheduled_statuses.where('scheduled_at::date = ?::date', scheduled_at).count >= DAILY_LIMIT
   end
 end

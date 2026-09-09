@@ -1,0 +1,7 @@
+---
+en:
+  scheduled_threads:
+    errors:
+      already_started: This scheduled thread has already started publishing. You can retry or cancel the remaining posts, but it can no longer be edited.
+      item_count: A thread must contain between %{min} and %{max} posts
+      use_thread_editor: Use the scheduled thread editor to update this post

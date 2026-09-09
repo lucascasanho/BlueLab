@@ -21,14 +21,19 @@ function render(
   {
     locale = 'en',
     signedIn = true,
+    permissions = 0,
     ...renderOptions
-  }: RenderOptions & { locale?: string; signedIn?: boolean } = {},
+  }: RenderOptions & {
+    locale?: string;
+    signedIn?: boolean;
+    permissions?: number;
+  } = {},
 ) {
   const fakeIdentity = {
     signedIn: signedIn,
     accountId: '123',
     disabledAccountId: undefined,
-    permissions: 0,
+    permissions,
   };
 
   const Wrapper = (props: { children: React.ReactNode }) => {

@@ -60,6 +60,14 @@ import {
   COMPOSE_CHANGE_MEDIA_ORDER,
   COMPOSE_SET_STATUS,
   COMPOSE_FOCUS,
+  COMPOSE_SCHEDULE_CHANGE,
+  COMPOSE_THREAD_ITEM_ADD,
+  COMPOSE_THREAD_ITEM_REMOVE,
+  COMPOSE_THREAD_ITEM_CHANGE,
+  COMPOSE_THREAD_MEDIA_ADD,
+  COMPOSE_THREAD_MEDIA_REMOVE,
+  COMPOSE_THREAD_PROGRESS,
+  COMPOSE_THREAD_FAILURE,
 } from '../actions/compose';
 import { REDRAFT } from '../actions/statuses';
 import { STORE_HYDRATE } from '../actions/store';
@@ -105,6 +113,11 @@ const initialState = ImmutableMap({
   resetFileKey: Math.floor((Math.random() * 0x10000)),
   idempotencyKey: null,
   tagHistory: ImmutableList(),
+  scheduled_at: null,
+  scheduled_timezone: null,
+  thread_items: ImmutableList(),
+  thread_published_ids: ImmutableMap(),
+  thread_error_index: null,
 
   // Quotes
   quoted_status_id: null,
@@ -156,6 +169,11 @@ function clearAll(state) {
     map.set('quoted_status_id', null);
     map.set('quote_policy', state.get('default_quote_policy'));
     map.set('isDragDisabled', false);
+    map.set('scheduled_at', null);
+    map.set('scheduled_timezone', null);
+    map.set('thread_items', ImmutableList());
+    map.set('thread_published_ids', ImmutableMap());
+    map.set('thread_error_index', null);
   });
 }
 
@@ -366,12 +384,17 @@ export const composeReducer = (state = initialState, action) => {
       map.set('poll', draft.poll ? fromJS(draft.poll) : null);
       map.set('quoted_status_id', draft.quoted_status_id);
       map.set('quote_policy', draft.quote_policy);
+      map.set('scheduled_at', draft.scheduled_at);
+      map.set('scheduled_timezone', draft.scheduled_timezone);
+      map.set('thread_items', fromJS(draft.thread_items));
+      map.set('thread_published_ids', fromJS(draft.thread_published_ids));
+      map.set('thread_error_index', draft.thread_error_index);
       map.set('focusDate', draft.text ? new Date() : null);
       map.set('pending_media_attachments', 0);
       map.set('is_uploading', false);
       map.set('is_processing', false);
       map.set('fetching_link', null);
-      map.set('idempotencyKey', uuid());
+      map.set('idempotencyKey', draft.idempotency_key);
     });
   } else if (changeComposeVisibility.match(action)) {
     return state
@@ -740,6 +763,51 @@ export const composeReducer = (state = initialState, action) => {
       .set('focusDate', new Date())
       .update('text', text => text.length > 0 ? text : action.defaultText)
       .update('caretPosition', position => action.caretStart ? 0 : position);
+  case COMPOSE_SCHEDULE_CHANGE:
+    return state
+      .set('scheduled_at', action.scheduledAt)
+      .set('scheduled_timezone', action.timezone)
+      .set('idempotencyKey', uuid());
+  case COMPOSE_THREAD_ITEM_ADD:
+    return state
+      .update('thread_items', items => items.push(ImmutableMap({
+        id: uuid(),
+        text: '',
+        spoiler_text: '',
+        sensitive: state.get('sensitive'),
+        visibility: state.get('privacy'),
+        language: state.get('language'),
+        content_type: state.get('content_type'),
+        media_attachments: ImmutableList(),
+        idempotencyKey: uuid(),
+      })))
+      .set('thread_error_index', null);
+  case COMPOSE_THREAD_ITEM_REMOVE:
+    // Positions are part of the durable retry checkpoint. Once any item has
+    // been published, changing the sequence would make a retry ambiguous.
+    if (!state.get('thread_published_ids').isEmpty()) return state;
+
+    return state
+      .update('thread_items', items => items.filterNot(item => item.get('id') === action.id))
+      .set('thread_error_index', null);
+  case COMPOSE_THREAD_ITEM_CHANGE:
+    return state
+      .update('thread_items', items => items.map(item => item.get('id') === action.id ? item.set(action.field, action.value).set('idempotencyKey', uuid()) : item))
+      .set('thread_error_index', null);
+  case COMPOSE_THREAD_MEDIA_ADD:
+    return state
+      .update('thread_items', items => items.map(item => item.get('id') === action.id ? item.update('media_attachments', media => media.push(fromJS(action.media))).set('idempotencyKey', uuid()) : item));
+  case COMPOSE_THREAD_MEDIA_REMOVE:
+    return state
+      .update('thread_items', items => items.map(item => item.get('id') === action.id ? item.update('media_attachments', media => media.filterNot(attachment => attachment.get('id') === action.mediaId)).set('idempotencyKey', uuid()) : item));
+  case COMPOSE_THREAD_PROGRESS:
+    return state
+      .setIn(['thread_published_ids', String(action.index)], action.statusId)
+      .set('thread_error_index', null);
+  case COMPOSE_THREAD_FAILURE:
+    return state
+      .set('is_submitting', false)
+      .set('thread_error_index', action.index);
   case COMPOSE_CHANGE_MEDIA_ORDER:
     return state.update('media_attachments', list => {
       const indexA = list.findIndex(x => x.get('id') === action.a);

@@ -142,14 +142,27 @@ export const selectComposerIsChanged = createAppSelector(
         'media_attachments',
       ) as unknown as Immutable.List<unknown>,
     (state) => Number(state.compose.get('pending_media_attachments')),
+    (state) =>
+      state.compose.get('thread_items') as unknown as Immutable.List<
+        Immutable.Map<string, unknown>
+      >,
   ],
-  (text, spoilerText, hasPoll, hasQuote, attachments, pendingAttachmentsNum) =>
+  (
+    text,
+    spoilerText,
+    hasPoll,
+    hasQuote,
+    attachments,
+    pendingAttachmentsNum,
+    threadItems,
+  ) =>
     text.trim().length > 0 ||
     spoilerText.trim().length > 0 ||
     hasPoll ||
     hasQuote ||
     attachments.size > 0 ||
-    pendingAttachmentsNum > 0,
+    pendingAttachmentsNum > 0 ||
+    threadItems.size > 0,
 );
 
 interface ComposeNewPost {

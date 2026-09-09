@@ -86,6 +86,14 @@ export const COMPOSE_CHANGE_MEDIA_ORDER       = 'COMPOSE_CHANGE_MEDIA_ORDER';
 
 export const COMPOSE_SET_STATUS = 'COMPOSE_SET_STATUS';
 export const COMPOSE_FOCUS = 'COMPOSE_FOCUS';
+export const COMPOSE_SCHEDULE_CHANGE = 'COMPOSE_SCHEDULE_CHANGE';
+export const COMPOSE_THREAD_ITEM_ADD = 'COMPOSE_THREAD_ITEM_ADD';
+export const COMPOSE_THREAD_ITEM_REMOVE = 'COMPOSE_THREAD_ITEM_REMOVE';
+export const COMPOSE_THREAD_ITEM_CHANGE = 'COMPOSE_THREAD_ITEM_CHANGE';
+export const COMPOSE_THREAD_MEDIA_ADD = 'COMPOSE_THREAD_MEDIA_ADD';
+export const COMPOSE_THREAD_MEDIA_REMOVE = 'COMPOSE_THREAD_MEDIA_REMOVE';
+export const COMPOSE_THREAD_PROGRESS = 'COMPOSE_THREAD_PROGRESS';
+export const COMPOSE_THREAD_FAILURE = 'COMPOSE_THREAD_FAILURE';
 
 const messages = defineMessages({
   uploadErrorLimit: { id: 'upload_error.limit', defaultMessage: 'File upload limit exceeded.' },
@@ -94,6 +102,9 @@ const messages = defineMessages({
   open: { id: 'compose.published.open', defaultMessage: 'Open' },
   published: { id: 'compose.published.body', defaultMessage: 'Post published.' },
   saved: { id: 'compose.saved.body', defaultMessage: 'Post saved.' },
+  scheduled: { id: 'compose.scheduled.body', defaultMessage: 'Publication scheduled.' },
+  threadPublished: { id: 'compose.thread_published.body', defaultMessage: 'Thread published.' },
+  threadFailed: { id: 'compose.thread_failed.body', defaultMessage: 'The thread stopped at post {index}. Published posts were kept; retry will continue safely.' },
   blankPostError: { id: 'compose.error.blank_post', defaultMessage: 'Post can\'t be blank.' },
 });
 
@@ -129,6 +140,30 @@ export function changeCompose(text) {
     type: COMPOSE_CHANGE,
     text: text,
   };
+}
+
+export function changeComposeSchedule(scheduledAt, timezone) {
+  return { type: COMPOSE_SCHEDULE_CHANGE, scheduledAt, timezone };
+}
+
+export function addComposeThreadItem() {
+  return { type: COMPOSE_THREAD_ITEM_ADD };
+}
+
+export function removeComposeThreadItem(id) {
+  return { type: COMPOSE_THREAD_ITEM_REMOVE, id };
+}
+
+export function changeComposeThreadItem(id, field, value) {
+  return { type: COMPOSE_THREAD_ITEM_CHANGE, id, field, value };
+}
+
+export function addComposeThreadMedia(id, media) {
+  return { type: COMPOSE_THREAD_MEDIA_ADD, id, media };
+}
+
+export function removeComposeThreadMedia(id, mediaId) {
+  return { type: COMPOSE_THREAD_MEDIA_REMOVE, id, mediaId };
 }
 
 export function replyCompose(status) {
@@ -206,11 +241,15 @@ export function directCompose(account) {
 
 export function submitCompose(successCallback) {
   return function (dispatch, getState) {
+    if (getState().getIn(['compose', 'is_submitting'])) return;
+
     const statusText   = getState().getIn(['compose', 'text'], '');
     const media        = getState().getIn(['compose', 'media_attachments']);
     const statusId     = getState().getIn(['compose', 'id'], null);
     const hasQuote     = !!getState().getIn(['compose', 'quoted_status_id']);
     const spoiler_text = getState().getIn(['compose', 'spoiler']) ? getState().getIn(['compose', 'spoiler_text'], '') : '';
+    const threadItems = getState().getIn(['compose', 'thread_items']);
+    const scheduledAt = getState().getIn(['compose', 'scheduled_at'], null);
 
     const fulltext = `${spoiler_text ?? ''}${countableText(statusText ?? '')}`;
     const hasText = fulltext.trim().length > 0;
@@ -225,6 +264,11 @@ export function submitCompose(successCallback) {
     }
 
     dispatch(submitComposeRequest());
+
+    if (statusId === null && threadItems.size > 0) {
+      void submitComposeThread(dispatch, getState, scheduledAt);
+      return;
+    }
 
     // If we're editing a post with media attachments, those have not
     // necessarily been changed on the server. Do it now in the same
@@ -263,11 +307,18 @@ export function submitCompose(successCallback) {
         language: getState().getIn(['compose', 'language']),
         quoted_status_id: getState().getIn(['compose', 'quoted_status_id']),
         quote_approval_policy: visibility === 'private' || visibility === 'direct' ? 'nobody' : getState().getIn(['compose', 'quote_policy']),
+        scheduled_at: scheduledAt,
       },
       headers: {
         'Idempotency-Key': getState().getIn(['compose', 'idempotencyKey']),
       },
     }).then(function (response) {
+      if (scheduledAt) {
+        dispatch(submitComposeSuccess({ ...response.data }));
+        dispatch(showAlert({ message: messages.scheduled }));
+        return;
+      }
+
       if ((browserHistory.location.pathname === '/publish' || browserHistory.location.pathname === '/statuses/new') && window.history.state) {
         browserHistory.goBack();
       }
@@ -318,6 +369,95 @@ export function submitCompose(successCallback) {
     });
   };
 }
+
+const composeThreadItemData = (state, index) => {
+  if (index === 0) {
+    const visibility = state.getIn(['compose', 'privacy']);
+    return {
+      status: state.getIn(['compose', 'text'], ''),
+      spoiler_text: state.getIn(['compose', 'spoiler']) ? state.getIn(['compose', 'spoiler_text'], '') : '',
+      content_type: state.getIn(['compose', 'content_type']),
+      in_reply_to_id: state.getIn(['compose', 'in_reply_to'], null),
+      media_ids: state.getIn(['compose', 'media_attachments']).map(item => item.get('id')).toArray(),
+      sensitive: state.getIn(['compose', 'sensitive']),
+      visibility,
+      poll: state.getIn(['compose', 'poll'], null)?.toJS(),
+      language: state.getIn(['compose', 'language']),
+      quoted_status_id: state.getIn(['compose', 'quoted_status_id']),
+      quote_approval_policy: visibility === 'private' || visibility === 'direct' ? 'nobody' : state.getIn(['compose', 'quote_policy']),
+    };
+  }
+
+  const item = state.getIn(['compose', 'thread_items', index - 1]);
+  const visibility = item.get('visibility');
+  return {
+    status: item.get('text'),
+    spoiler_text: item.get('spoiler_text'),
+    content_type: item.get('content_type'),
+    media_ids: item.get('media_attachments').map(media => media.get('id')).toArray(),
+    sensitive: item.get('sensitive') || item.get('spoiler_text').length > 0,
+    visibility,
+    language: item.get('language'),
+    quote_approval_policy: visibility === 'private' || visibility === 'direct' ? 'nobody' : 'public',
+  };
+};
+
+export const submitComposeThread = async (dispatch, getState, scheduledAt) => {
+  const initialState = getState();
+  const itemCount = initialState.getIn(['compose', 'thread_items']).size + 1;
+  const items = Array.from({ length: itemCount }, (_unused, index) => composeThreadItemData(initialState, index));
+
+  if (scheduledAt) {
+    try {
+      await api().post('/api/v1/scheduled_threads', { scheduled_at: scheduledAt, items }, {
+        headers: { 'Idempotency-Key': initialState.getIn(['compose', 'idempotencyKey']) },
+      });
+      dispatch(submitComposeSuccess({}));
+      dispatch(showAlert({ message: messages.scheduled }));
+    } catch (error) {
+      dispatch(submitComposeFail(error));
+    }
+    return;
+  }
+
+  let previousStatusId = initialState.getIn(['compose', 'in_reply_to'], null);
+  let lastStatus = null;
+
+  for (let index = 0; index < items.length; index += 1) {
+    const state = getState();
+    const publishedId = state.getIn(['compose', 'thread_published_ids', String(index)]);
+    if (publishedId) {
+      previousStatusId = publishedId;
+      continue;
+    }
+
+    const data = { ...items[index], in_reply_to_id: index === 0 ? items[index].in_reply_to_id : previousStatusId };
+    const idempotencyKey = index === 0
+      ? state.getIn(['compose', 'idempotencyKey'])
+      : state.getIn(['compose', 'thread_items', index - 1, 'idempotencyKey']);
+
+    try {
+      const response = await api().post('/api/v1/statuses', data, {
+        headers: { 'Idempotency-Key': idempotencyKey },
+      });
+      lastStatus = response.data;
+      previousStatusId = response.data.id;
+      dispatch({ type: COMPOSE_THREAD_PROGRESS, index, statusId: response.data.id });
+    } catch (error) {
+      dispatch({ type: COMPOSE_THREAD_FAILURE, index, error });
+      dispatch(showAlert({ message: messages.threadFailed, values: { index: index + 1 } }));
+      return;
+    }
+  }
+
+  dispatch(submitComposeSuccess(lastStatus || {}));
+  dispatch(showAlert({
+    message: messages.threadPublished,
+    action: lastStatus ? messages.open : undefined,
+    dismissAfter: 10000,
+    onClick: lastStatus ? () => browserHistory.push(`/@${lastStatus.account.username}/${lastStatus.id}`, { focusTarget: 'detailed-status' }) : undefined,
+  }));
+};
 
 export function submitComposeRequest() {
   return {

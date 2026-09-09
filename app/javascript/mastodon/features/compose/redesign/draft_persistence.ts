@@ -8,7 +8,7 @@ import { showRestoredComposer } from '@/mastodon/reducers/slices/composer';
 import { Settings } from '@/mastodon/settings';
 import type { RootState } from '@/mastodon/store';
 
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 3;
 
 interface StoredComposeDraft {
   version: typeof STORAGE_VERSION;
@@ -37,6 +37,11 @@ const stringOr = (value: unknown, fallback: string): string =>
 
 const booleanOr = (value: unknown, fallback: boolean): boolean =>
   typeof value === 'boolean' ? value : fallback;
+
+const nullableIndex = (value: unknown): number | null =>
+  typeof value === 'number' && Number.isInteger(value) && value >= 0
+    ? value
+    : null;
 
 const visibilityOrNull = (value: unknown): StatusVisibility | null =>
   statusVisibilities.includes(value as StatusVisibility)
@@ -72,6 +77,32 @@ const normalizePoll = (value: unknown): Record<string, unknown> | null => {
   };
 };
 
+const sanitizeThreadItems = (value: unknown): Record<string, unknown>[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value.filter(isRecord).map((item) => ({
+    id: stringOr(item.id, crypto.randomUUID()),
+    text: stringOr(item.text, ''),
+    spoiler_text: stringOr(item.spoiler_text, ''),
+    sensitive: booleanOr(item.sensitive, false),
+    visibility: visibilityOrNull(item.visibility) ?? 'public',
+    language: stringOr(item.language, 'en'),
+    content_type: stringOr(item.content_type, 'text/markdown'),
+    media_attachments: sanitizeAttachments(item.media_attachments),
+    idempotencyKey: stringOr(item.idempotencyKey, crypto.randomUUID()),
+  }));
+};
+
+const normalizePublishedIds = (value: unknown): Record<string, string> => {
+  if (!isRecord(value)) return {};
+
+  return Object.fromEntries(
+    Object.entries(value).filter(
+      (entry): entry is [string, string] => typeof entry[1] === 'string',
+    ),
+  );
+};
+
 const normalizeDraft = (value: unknown): PersistedComposeDraft | null => {
   if (!isRecord(value)) return null;
 
@@ -89,6 +120,12 @@ const normalizeDraft = (value: unknown): PersistedComposeDraft | null => {
     poll: normalizePoll(value.poll),
     quoted_status_id: nullableString(value.quoted_status_id),
     quote_policy: stringOr(value.quote_policy, 'public'),
+    scheduled_at: nullableString(value.scheduled_at),
+    scheduled_timezone: nullableString(value.scheduled_timezone),
+    idempotency_key: stringOr(value.idempotency_key, crypto.randomUUID()),
+    thread_items: sanitizeThreadItems(value.thread_items),
+    thread_published_ids: normalizePublishedIds(value.thread_published_ids),
+    thread_error_index: nullableIndex(value.thread_error_index),
   };
 };
 
@@ -97,7 +134,8 @@ export const composeDraftHasContent = (draft: PersistedComposeDraft) =>
   draft.spoiler_text.trim().length > 0 ||
   draft.media_attachments.length > 0 ||
   draft.poll !== null ||
-  draft.quoted_status_id !== null;
+  draft.quoted_status_id !== null ||
+  draft.thread_items.length > 0;
 
 export const serializeComposeDraft = (
   state: RootState,
@@ -107,6 +145,12 @@ export const serializeComposeDraft = (
     | { toJS: () => unknown }
     | undefined;
   const poll = compose.get('poll') as { toJS: () => unknown } | null;
+  const threadItems = compose.get('thread_items') as
+    | { toJS: () => unknown }
+    | undefined;
+  const publishedIds = compose.get('thread_published_ids') as
+    | { toJS: () => unknown }
+    | undefined;
 
   return {
     id: nullableString(compose.get('id')),
@@ -122,6 +166,15 @@ export const serializeComposeDraft = (
     poll: normalizePoll(poll?.toJS()),
     quoted_status_id: nullableString(compose.get('quoted_status_id')),
     quote_policy: stringOr(compose.get('quote_policy'), 'public'),
+    scheduled_at: nullableString(compose.get('scheduled_at')),
+    scheduled_timezone: nullableString(compose.get('scheduled_timezone')),
+    idempotency_key: stringOr(
+      compose.get('idempotencyKey'),
+      crypto.randomUUID(),
+    ),
+    thread_items: sanitizeThreadItems(threadItems?.toJS()),
+    thread_published_ids: normalizePublishedIds(publishedIds?.toJS()),
+    thread_error_index: nullableIndex(compose.get('thread_error_index')),
   };
 };
 

@@ -61,13 +61,40 @@ export const selectComposeCanSubmit = createAppSelector(
     (state) => !!state.compose.get('is_uploading'),
     (state) => !!state.compose.get('is_changing_upload'),
     selectComposeCharsCount,
+    (state) =>
+      (state.compose.get('media_attachments') as unknown as { size: number })
+        .size,
+    (state) => !!state.compose.get('quoted_status_id'),
+    (state) =>
+      state.compose.get('thread_items') as unknown as Immutable.List<
+        Immutable.Map<string, unknown>
+      >,
   ],
-  (isSubmitting, isUploading, isChangingUpload, { text, max }) =>
+  (
+    isSubmitting,
+    isUploading,
+    isChangingUpload,
+    { text, current, max },
+    mediaCount,
+    hasQuote,
+    threadItems,
+  ) =>
     !isSubmitting &&
     !isUploading &&
     !isChangingUpload &&
-    text.trim().length <= max &&
-    text.trim().length > 0,
+    current <= max &&
+    (text.trim().length > 0 || mediaCount > 0 || hasQuote) &&
+    threadItems.every((item) => {
+      const itemText = item.get('text') as string;
+      const spoilerText = item.get('spoiler_text') as string;
+      const attachments = item.get(
+        'media_attachments',
+      ) as Immutable.List<unknown>;
+      const current = length(`${countableText(itemText)}${spoilerText}`);
+      return (
+        current <= max && (itemText.trim().length > 0 || attachments.size > 0)
+      );
+    }),
 );
 
 export const selectComposeMentions = createAppSelector(

@@ -7,6 +7,7 @@ class Scheduler::ScheduledStatusesScheduler
 
   def perform
     publish_scheduled_statuses!
+    publish_scheduled_threads!
     publish_scheduled_announcements!
     unpublish_expired_announcements!
   end
@@ -20,7 +21,13 @@ class Scheduler::ScheduledStatusesScheduler
   end
 
   def due_statuses
-    ScheduledStatus.where(scheduled_at: ..time_due_at)
+    ScheduledStatus.where(scheduled_thread_id: nil, scheduled_at: ..time_due_at)
+  end
+
+  def publish_scheduled_threads!
+    ScheduledThread.where(scheduled_at: ..time_due_at).where(state: ScheduledThread::STATES).where('next_retry_at IS NULL OR next_retry_at <= ?', Time.now.utc).find_each do |scheduled_thread|
+      PublishScheduledThreadWorker.perform_at(scheduled_thread.scheduled_at, scheduled_thread.id)
+    end
   end
 
   def publish_scheduled_announcements!
