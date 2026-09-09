@@ -4,8 +4,8 @@ import { useCallback, useRef, useState } from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import classNames from 'classnames';
+
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
-import { length } from 'stringz';
 
 import {
   ImageSquareIcon,
@@ -14,6 +14,7 @@ import {
   MarkdownLogoIcon,
   PlusIcon,
 } from '@phosphor-icons/react';
+import { length } from 'stringz';
 
 import {
   addPoll,
@@ -79,9 +80,11 @@ export const ComposeFooter: React.FC<{
   const activeThreadItem = useAppSelector((state) => {
     if (!activeThreadItemId) return null;
     return (
-      (state.compose.get('thread_items') as ImmutableList<
-        ImmutableMap<string, unknown>
-      >).find((item) => item.get('id') === activeThreadItemId) ?? null
+      (
+        state.compose.get('thread_items') as ImmutableList<
+          ImmutableMap<string, unknown>
+        >
+      ).find((item) => item.get('id') === activeThreadItemId) ?? null
     );
   });
   const threadMax = useAppSelector(
@@ -93,9 +96,11 @@ export const ComposeFooter: React.FC<{
   const contentType = activeThreadItem
     ? (activeThreadItem.get('content_type') as string)
     : rootContentType;
+  const activeText = activeThreadItem?.get('text');
+  const activeSpoiler = activeThreadItem?.get('spoiler_text');
   const current = activeThreadItem
     ? length(
-        `${countableText(activeThreadItem.get('text') as string)}${activeThreadItem.get('spoiler_text') as string}`,
+        `${countableText(typeof activeText === 'string' ? activeText : '')}${typeof activeSpoiler === 'string' ? activeSpoiler : ''}`,
       )
     : rootCounter.current;
   const max = activeThreadItem ? threadMax : rootCounter.max;
@@ -326,7 +331,7 @@ const ComposeUploadButton: React.FC<{
         .join(',')
     : rootUpload.accepted;
   const disabled = isThreadTarget
-    ? (threadMedia?.size ?? 0) >= maxAttachments || threadHasVideoOrAudio
+    ? threadMedia.size >= maxAttachments || threadHasVideoOrAudio
     : rootUpload.disabled;
   const loading = isThreadTarget ? threadUploading : rootUpload.loading;
 

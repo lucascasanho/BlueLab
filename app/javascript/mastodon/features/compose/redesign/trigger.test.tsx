@@ -1,6 +1,12 @@
 import { IntlProvider } from 'react-intl';
 
-import { act, fireEvent, render, renderHook, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  waitFor,
+} from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
 
 import {

@@ -8,6 +8,7 @@ import {
   GearIcon,
   StackIcon,
   HeartIcon,
+  BookmarkSimpleIcon,
   UsersThreeIcon,
   ProhibitIcon,
   GavelIcon,
@@ -19,9 +20,15 @@ import {
 import { openModal } from '@/mastodon/actions/modal';
 import { Avatar } from '@/mastodon/components/avatar';
 import { IconButton } from '@/mastodon/components/button/redesign';
+import { DisplayName } from '@/mastodon/components/display_name';
+import { useAccountHandle } from '@/mastodon/components/display_name/default';
 import { AccountLock } from '@/mastodon/components/display_name/lock';
 import { VerifiedBadge } from '@/mastodon/components/display_name/verified_badge';
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
+import {
+  ListItemContent,
+  ListItemWrapper,
+} from '@/mastodon/components/list_item';
 import {
   Menu,
   MenuItem,
@@ -43,22 +50,14 @@ import { useAppDispatch } from '@/mastodon/store';
 import classes from './account_card_and_menu.module.scss';
 
 export const NavigationAccountCardAndMenu: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { accountId, permissions } = useIdentity();
+  const { accountId } = useIdentity();
   const account = useAccount(accountId);
   const localCustomEmojis = useCustomEmojis();
-
-  const confirmLogout = useCallback(() => {
-    dispatch(openModal({ modalType: 'CONFIRM_LOG_OUT', modalProps: {} }));
-  }, [dispatch]);
 
   if (!accountId || !account) {
     return null;
   }
 
-  const isManager = canManageReports(permissions);
-  const isAdmin = canViewAdminDashboard(permissions);
-  const accountBasePath = `/@${account.acct}`;
   const displayNameEmojis = {
     ...localCustomEmojis,
     ...(cleanExtraEmojis(account.emojis) ?? {}),
@@ -97,97 +96,158 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
           variant='ghost'
           size='sm'
         >
-          <FormattedMessage id='tabs_bar.more' defaultMessage='More' />
+          <FormattedMessage
+            id='tabs_bar.account_settings'
+            defaultMessage='Account settings'
+          />
         </MenuTrigger>
         <MenuList placement='top' offset={8}>
-          <MenuItemLink to='/profile/edit' icon={UserIcon}>
-            <FormattedMessage
-              id='account.edit_profile'
-              defaultMessage='Edit profile'
-            />
-          </MenuItemLink>
-          <MenuItemLink as='a' href='/settings/preferences' icon={GearIcon}>
-            <FormattedMessage
-              id='navigation_bar.preferences'
-              defaultMessage='Preferences'
-            />
-          </MenuItemLink>
-
-          <MenuItemDivider />
-
-          <MenuItemLink to={`${accountBasePath}/collections`} icon={StackIcon}>
-            <FormattedMessage
-              id='navigation_bar.collections'
-              defaultMessage='Collections'
-            />
-          </MenuItemLink>
-          <MenuItemLink to='/scheduled' icon={CalendarDotsIcon}>
-            <FormattedMessage
-              id='navigation_bar.scheduled_publications'
-              defaultMessage='Scheduled publications'
-            />
-          </MenuItemLink>
-          <MenuItemLink to='/favourites' icon={HeartIcon}>
-            <FormattedMessage
-              id='navigation_bar.favourites'
-              defaultMessage='Favorites'
-            />
-          </MenuItemLink>
-
-          <MenuItemDivider />
-
-          <MenuItemLink as='a' href='/relationships' icon={UsersThreeIcon}>
-            <FormattedMessage
-              id='navigation_bar.follows_and_followers'
-              defaultMessage='Follows and followers'
-            />
-          </MenuItemLink>
-
-          <MenuItemLink to='/blocks' icon={ProhibitIcon}>
-            <FormattedMessage
-              id='navigation_bar.blocks'
-              defaultMessage='Blocked users'
-            />
-          </MenuItemLink>
-
-          {(isManager || isAdmin) && (
-            <>
-              <MenuItemDivider />
-
-              {isAdmin && (
-                <MenuItemLink as='a' href='/admin/dashboard' icon={GavelIcon}>
-                  <FormattedMessage
-                    id='navigation_bar.administration'
-                    defaultMessage='Administration'
-                  />
-                </MenuItemLink>
-              )}
-
-              {isManager && (
-                <MenuItemLink
-                  as='a'
-                  href='/admin/reports'
-                  icon={ShieldStarIcon}
-                >
-                  <FormattedMessage
-                    id='navigation_bar.moderation'
-                    defaultMessage='Moderation'
-                  />
-                </MenuItemLink>
-              )}
-            </>
-          )}
-
-          <MenuItemDivider />
-
-          <MenuItem onClick={confirmLogout} icon={SignOutIcon}>
-            <FormattedMessage
-              id='navigation_bar.logout'
-              defaultMessage='Logout'
-            />
-          </MenuItem>
+          <AccountMenuItems />
         </MenuList>
       </Menu>
     </div>
+  );
+};
+
+export const AccountMenuItems: React.FC<{
+  context?: 'default' | 'mobile';
+}> = ({ context = 'default' }) => {
+  const dispatch = useAppDispatch();
+  const { accountId, permissions } = useIdentity();
+  const account = useAccount(accountId);
+
+  const confirmLogout = useCallback(() => {
+    dispatch(openModal({ modalType: 'CONFIRM_LOG_OUT', modalProps: {} }));
+  }, [dispatch]);
+
+  if (!accountId || !account) {
+    return null;
+  }
+
+  const isManager = canManageReports(permissions);
+  const isAdmin = canViewAdminDashboard(permissions);
+  const accountBasePath = `/@${account.acct}`;
+
+  return (
+    <>
+      {context === 'mobile' && <ProfileMenuItem />}
+
+      <MenuItemLink to='/profile/edit' icon={UserIcon}>
+        <FormattedMessage
+          id='account.edit_profile'
+          defaultMessage='Edit profile'
+        />
+      </MenuItemLink>
+
+      <MenuItemLink as='a' href='/settings/preferences' icon={GearIcon}>
+        <FormattedMessage id='tabs_bar.settings' defaultMessage='Settings' />
+      </MenuItemLink>
+
+      <MenuItemDivider />
+
+      <MenuItemLink to={`${accountBasePath}/collections`} icon={StackIcon}>
+        <FormattedMessage
+          id='navigation_bar.collections'
+          defaultMessage='Collections'
+        />
+      </MenuItemLink>
+
+      <MenuItemLink to='/scheduled' icon={CalendarDotsIcon}>
+        <FormattedMessage
+          id='navigation_bar.scheduled_publications'
+          defaultMessage='Scheduled publications'
+        />
+      </MenuItemLink>
+
+      <MenuItemLink to='/favourites' icon={HeartIcon}>
+        <FormattedMessage
+          id='navigation_bar.liked_posts'
+          defaultMessage='Liked Posts'
+        />
+      </MenuItemLink>
+
+      {context === 'mobile' && (
+        <MenuItemLink to='/bookmarks' icon={BookmarkSimpleIcon}>
+          <FormattedMessage
+            id='navigation_bar.saved_posts'
+            defaultMessage='Saved Posts'
+          />
+        </MenuItemLink>
+      )}
+
+      <MenuItemDivider />
+
+      <MenuItemLink as='a' href='/relationships' icon={UsersThreeIcon}>
+        <FormattedMessage
+          id='navigation_bar.followers_and_following'
+          defaultMessage='Followers & Following'
+        />
+      </MenuItemLink>
+
+      <MenuItemLink to='/blocks' icon={ProhibitIcon}>
+        <FormattedMessage
+          id='navigation_bar.blocked_accounts'
+          defaultMessage='Blocked accounts'
+        />
+      </MenuItemLink>
+
+      {(isManager || isAdmin) && (
+        <>
+          <MenuItemDivider />
+
+          {isAdmin && (
+            <MenuItemLink as='a' href='/admin/dashboard' icon={GavelIcon}>
+              <FormattedMessage
+                id='navigation_bar.administration'
+                defaultMessage='Administration'
+              />
+            </MenuItemLink>
+          )}
+
+          {isManager && (
+            <MenuItemLink as='a' href='/admin/reports' icon={ShieldStarIcon}>
+              <FormattedMessage
+                id='navigation_bar.moderation'
+                defaultMessage='Moderation'
+              />
+            </MenuItemLink>
+          )}
+        </>
+      )}
+
+      <MenuItemDivider />
+
+      <MenuItem onClick={confirmLogout} icon={SignOutIcon}>
+        <FormattedMessage
+          id='navigation_bar.sign_out'
+          defaultMessage='Sign out'
+        />
+      </MenuItem>
+    </>
+  );
+};
+
+const ProfileMenuItem: React.FC = () => {
+  const { accountId } = useIdentity();
+  const account = useAccount(accountId);
+  const handle = useAccountHandle(account);
+
+  if (!accountId) {
+    return null;
+  }
+
+  const accountBasePath = `/@${account?.acct}`;
+
+  return (
+    <MenuItemLink to={accountBasePath}>
+      <ListItemWrapper
+        icon={<Avatar account={account} size={40} />}
+        className={classes.profileMenuItem}
+      >
+        <ListItemContent subtitle={handle}>
+          <DisplayName variant='simple' account={account} />
+        </ListItemContent>
+      </ListItemWrapper>
+    </MenuItemLink>
   );
 };

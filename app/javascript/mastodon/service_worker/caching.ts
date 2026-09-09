@@ -27,8 +27,7 @@ const OFFLINE_NAVIGATION_EXCLUSIONS = [
   '/manifest',
 ] as const;
 
-export const CUSTOM_EMOJI_STATIC_CACHE_NAME =
-  'mastodon-custom-emoji-static-v1';
+export const CUSTOM_EMOJI_STATIC_CACHE_NAME = 'mastodon-custom-emoji-static-v1';
 export const OFFLINE_SHELL_CACHE_KEY = '/__bluelab_offline_shell__';
 
 export function isCustomEmojiStaticImageRequest(request: Request) {
@@ -58,7 +57,8 @@ export function isSafeNavigationRequest(
   }
 
   return !OFFLINE_NAVIGATION_EXCLUSIONS.some(
-    (prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`),
+    (prefix) =>
+      url.pathname === prefix || url.pathname.startsWith(`${prefix}/`),
   );
 }
 

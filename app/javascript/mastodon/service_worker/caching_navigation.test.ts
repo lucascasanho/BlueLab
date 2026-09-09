@@ -93,7 +93,7 @@ describe('offline navigation fallback', () => {
       headers: { 'content-type': 'text/html; charset=utf-8' },
     });
     const match = vi.fn().mockResolvedValue(shell);
-    const open = vi.fn().mockResolvedValue({ match } as Partial<Cache>);
+    const open = vi.fn().mockResolvedValue({ match });
 
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('offline')));
     vi.stubGlobal('caches', { open });

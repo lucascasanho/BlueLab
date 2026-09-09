@@ -118,7 +118,10 @@ export const Picker: FC<PickerProps> = ({
       const imageObserver = new IntersectionObserver(
         (entries, observer) => {
           for (const entry of entries) {
-            if (!entry.isIntersecting || !(entry.target instanceof HTMLImageElement)) {
+            if (
+              !entry.isIntersecting ||
+              !(entry.target instanceof HTMLImageElement)
+            ) {
               continue;
             }
 

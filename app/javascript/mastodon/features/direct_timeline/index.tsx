@@ -2,12 +2,14 @@ import { useCallback, useEffect } from 'react';
 
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 
+import { PlusIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';
 import {
   ColumnHeader,
+  ColumnHeaderButton,
   ColumnSettingsMenu,
 } from '@/mastodon/components/column_header';
 import { MultiColumnMenuItems } from '@/mastodon/components/column_header/multicolumn_settings';
@@ -61,6 +63,10 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
         ? messages.title_redesign
         : messages.title,
   );
+
+  const composeNewMessage = useCallback(() => {
+    dispatch(openNewComposer({ type: 'message' }));
+  }, [dispatch]);
 
   const handlePin = useCallback(() => {
     if (columnId) {
@@ -167,17 +173,27 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
           title={intl.formatMessage(messages.title_redesign)}
           withBackButton={multiColumn && !pinned && 'auto'}
           extraButtons={
-            multiColumn && (
-              <ColumnSettingsMenu
-                labelPrefix={intl.formatMessage(messages.title_redesign)}
+            <>
+              <ColumnHeaderButton
+                showTextOnDesktop
+                variant='solid'
+                icon={PlusIcon}
+                onClick={composeNewMessage}
               >
-                <MultiColumnMenuItems
-                  onPin={handlePin}
-                  onMove={handleMove}
-                  pinned={pinned}
-                />
-              </ColumnSettingsMenu>
-            )
+                <FormattedMessage id='messages.new' defaultMessage='New' />
+              </ColumnHeaderButton>
+              {multiColumn && (
+                <ColumnSettingsMenu
+                  labelPrefix={intl.formatMessage(messages.title_redesign)}
+                >
+                  <MultiColumnMenuItems
+                    onPin={handlePin}
+                    onMove={handleMove}
+                    pinned={pinned}
+                  />
+                </ColumnSettingsMenu>
+              )}
+            </>
           }
         />
       ) : (

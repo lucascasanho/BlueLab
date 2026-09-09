@@ -53,10 +53,7 @@ describe('preparePickerCustomEmojiImages', () => {
     image.src = animatedUrl;
 
     expect(
-      preparePickerCustomEmojiImage(
-        image,
-        new Map([[animatedUrl, staticUrl]]),
-      ),
+      preparePickerCustomEmojiImage(image, new Map([[animatedUrl, staticUrl]])),
     ).toBe(false);
     expect(image.src).toBe(animatedUrl);
   });

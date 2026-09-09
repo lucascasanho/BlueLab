@@ -128,11 +128,15 @@ export const ComposeSchedule: React.FC = () => {
     if (typeof window === 'undefined') return;
 
     const mediaQuery = window.matchMedia(MOBILE_SCHEDULE_QUERY);
-    const sync = () => setIsMobileSchedule(mediaQuery.matches);
+    const sync = () => {
+      setIsMobileSchedule(mediaQuery.matches);
+    };
     sync();
     mediaQuery.addEventListener('change', sync);
 
-    return () => mediaQuery.removeEventListener('change', sync);
+    return () => {
+      mediaQuery.removeEventListener('change', sync);
+    };
   }, []);
 
   const closeAndRestoreFocus = useCallback(() => {
@@ -189,10 +193,8 @@ export const ComposeSchedule: React.FC = () => {
               zIndex: 10000,
               insetInlineStart: 'var(--space-sm)',
               insetInlineEnd: 'var(--space-sm)',
-              bottom:
-                'calc(env(safe-area-inset-bottom, 0px) + 4.75rem)',
-              width:
-                'min(22rem, calc(100vw - 2 * var(--space-sm)))',
+              bottom: 'calc(env(safe-area-inset-bottom, 0px) + 4.75rem)',
+              width: 'min(22rem, calc(100vw - 2 * var(--space-sm)))',
               maxWidth: 'calc(100vw - 2 * var(--space-sm))',
               maxHeight: 'min(70dvh, 26rem)',
               marginInline: 'auto',

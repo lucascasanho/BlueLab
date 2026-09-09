@@ -35,7 +35,9 @@ describe('<Blue2AccountMenu />', () => {
   });
 
   const openAccountMenu = () => {
-    fireEvent.click(screen.getByRole('button', { expanded: false }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Account settings', expanded: false }),
+    );
   };
 
   it('renders the verification badge immediately after the display name', () => {
@@ -66,7 +68,9 @@ describe('<Blue2AccountMenu />', () => {
         href,
       );
     });
-    expect(screen.getByRole('menuitem', { name: 'Logout' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('menuitem', { name: 'Logout' }),
+    ).toBeInTheDocument();
   });
 
   it('hides moderation and administration from users without permissions', () => {

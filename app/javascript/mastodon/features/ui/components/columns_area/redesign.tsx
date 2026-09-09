@@ -200,7 +200,7 @@ export const ColumnsAreaRedesign: React.FC<{
 
         {isMobile ? (
           <div className={mobileChromeClasses.mobileNavigation}>
-            <RedesignMobileNavigation hideMenuButton />
+            <RedesignMobileNavigation />
           </div>
         ) : (
           <ComposeRedesignButton />
@@ -350,11 +350,7 @@ export const ColumnsAreaRedesign: React.FC<{
           <ComposeRedesignButton />
         )}
 
-        <main className={classes.main}>
-          <TabsBarPortal className={classes.columnHeader} />
-
-          <div className={classes.content}>{children}</div>
-        </main>
+        <main className={classes.main}>{children}</main>
       </div>
     );
   }

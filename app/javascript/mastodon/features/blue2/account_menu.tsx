@@ -100,6 +100,10 @@ export const Blue2AccountMenu: React.FC = () => {
     id: 'tabs_bar.home',
     defaultMessage: 'Home',
   });
+  const accountSettingsLabel = intl.formatMessage({
+    id: 'tabs_bar.account_settings',
+    defaultMessage: 'Account settings',
+  });
 
   return (
     <div className={classes.root} ref={rootRef}>
@@ -109,6 +113,7 @@ export const Blue2AccountMenu: React.FC = () => {
         onClick={toggleMenu}
         aria-expanded={open}
         aria-haspopup='menu'
+        aria-label={accountSettingsLabel}
       >
         <Avatar account={account} size={42} />
         <span className={classes.identity}>

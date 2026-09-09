@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import classNames from 'classnames';
+
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import { XIcon } from '@phosphor-icons/react';

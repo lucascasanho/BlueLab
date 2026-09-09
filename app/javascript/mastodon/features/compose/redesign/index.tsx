@@ -4,6 +4,7 @@ import { useCallback, useEffect, useId, useState } from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import classNames from 'classnames';
+
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import { LockSimpleOpenIcon, PepperIcon } from '@phosphor-icons/react';
@@ -45,8 +46,8 @@ import {
 } from './selectors';
 import classes from './styles.module.scss';
 import { ComposeThreadItems } from './thread';
-import { ComposeThreadFormattingToolbar } from './thread_formatting_toolbar';
 import threadClasses from './thread.module.scss';
+import { ComposeThreadFormattingToolbar } from './thread_formatting_toolbar';
 import { ComposeVisibility } from './visibility';
 
 const messages = defineMessages({
@@ -96,12 +97,6 @@ export const RedesignComposeForm: React.FC<
     ? ((activeThreadItem.get('spoiler_text') as string | undefined) ?? '')
     : rootSensitive.sensitiveText;
 
-  useEffect(() => {
-    if (activeThreadItemId && !activeThreadItem) {
-      setActiveThreadItemId(null);
-    }
-  }, [activeThreadItem, activeThreadItemId]);
-
   const { onSensitiveChange, onSensitiveTextChange, onEmojiPick, onSubmit } =
     useComposeHandlers(redirectOnSuccess, activeThreadItemId);
 
@@ -131,6 +126,10 @@ export const RedesignComposeForm: React.FC<
       element.scrollTop = nextScrollTop;
     }, []);
 
+  const handlePrimaryEditorFocus = useCallback(() => {
+    setActiveThreadItemId(null);
+  }, []);
+
   const mainEditor = (
     <ComposeAutocomplete>
       <RichComposeEditor
@@ -155,7 +154,9 @@ export const RedesignComposeForm: React.FC<
       aria-labelledby={titleId}
       className={classNames(className, classes.root)}
     >
-      {type === 'message' && <div className={classes.background} />}
+      {(type === 'message' || type === 'replyPrivate') && (
+        <div className={classes.background} />
+      )}
 
       <ComposeFormHeader
         id={titleId}
@@ -197,6 +198,7 @@ export const RedesignComposeForm: React.FC<
             <FormattedMessage
               id='compose.message.notice'
               defaultMessage='Messages are not end-to-end encrypted'
+              description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
             />
           </p>
         )}
@@ -222,7 +224,7 @@ export const RedesignComposeForm: React.FC<
             <div
               className={threadClasses.primaryPost}
               data-compose-thread-main
-              onFocusCapture={() => setActiveThreadItemId(null)}
+              onFocusCapture={handlePrimaryEditorFocus}
             >
               {mainEditor}
             </div>
@@ -305,11 +307,7 @@ function useComposeHandlers(
     if (activeThreadItemId) {
       const nextSensitive = !isSensitive;
       dispatch(
-        changeComposeThreadItem(
-          activeThreadItemId,
-          'sensitive',
-          nextSensitive,
-        ),
+        changeComposeThreadItem(activeThreadItemId, 'sensitive', nextSensitive),
       );
       if (!nextSensitive) {
         dispatch(

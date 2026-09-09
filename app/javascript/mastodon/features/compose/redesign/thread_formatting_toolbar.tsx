@@ -25,10 +25,7 @@ import { IconButton } from '@/mastodon/components/button/redesign';
 import type { IconProp } from '@/mastodon/components/icon';
 import { useAppDispatch } from '@/mastodon/store';
 
-import {
-  editorText,
-  toggleInlineCommand,
-} from './rich_editor';
+import { editorText, toggleInlineCommand } from './rich_editor';
 import classes from './thread.module.scss';
 
 const messages = defineMessages({
@@ -188,7 +185,11 @@ export const ComposeThreadFormattingToolbar: React.FC<{
   const updateActiveFormats = useCallback(() => {
     const editor = getTargetEditor();
     const selection = window.getSelection();
-    if (!editor || !selection?.anchorNode || !editor.contains(selection.anchorNode)) {
+    if (
+      !editor ||
+      !selection?.anchorNode ||
+      !editor.contains(selection.anchorNode)
+    ) {
       setActiveFormats(new Set());
       return;
     }
@@ -217,7 +218,10 @@ export const ComposeThreadFormattingToolbar: React.FC<{
 
   useEffect(() => {
     selectionRef.current = null;
-    updateActiveFormats();
+    const frame = window.requestAnimationFrame(updateActiveFormats);
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
   }, [activeThreadItemId, updateActiveFormats]);
 
   useEffect(() => {
@@ -244,21 +248,18 @@ export const ComposeThreadFormattingToolbar: React.FC<{
     [getTargetEditor],
   );
 
-  const restoreSelection = useCallback(
-    (editor: HTMLElement) => {
-      const selection = window.getSelection();
-      const saved = selectionRef.current;
-      if (selection && saved && editor.contains(saved.commonAncestorContainer)) {
-        editor.focus({ preventScroll: true });
-        selection.removeAllRanges();
-        selection.addRange(saved);
-        return;
-      }
+  const restoreSelection = useCallback((editor: HTMLElement) => {
+    const selection = window.getSelection();
+    const saved = selectionRef.current;
+    if (selection && saved && editor.contains(saved.commonAncestorContainer)) {
+      editor.focus({ preventScroll: true });
+      selection.removeAllRanges();
+      selection.addRange(saved);
+      return;
+    }
 
-      focusAtEnd(editor);
-    },
-    [],
-  );
+    focusAtEnd(editor);
+  }, []);
 
   const syncEditor = useCallback(
     (editor: HTMLElement) => {
@@ -298,7 +299,9 @@ export const ComposeThreadFormattingToolbar: React.FC<{
         document.execCommand(
           'formatBlock',
           false,
-          activeFormats.has(button.dataset.value) ? 'div' : button.dataset.value,
+          activeFormats.has(button.dataset.value)
+            ? 'div'
+            : button.dataset.value,
         );
       } else if (command === 'code') {
         const code = closestWithin(selectionElement(), 'code', editor);
@@ -312,32 +315,45 @@ export const ComposeThreadFormattingToolbar: React.FC<{
       syncEditor(editor);
       updateActiveFormats();
     },
-    [activeFormats, getTargetEditor, restoreSelection, syncEditor, updateActiveFormats],
+    [
+      activeFormats,
+      getTargetEditor,
+      restoreSelection,
+      syncEditor,
+      updateActiveFormats,
+    ],
   );
 
-  const handleLink: React.MouseEventHandler<HTMLButtonElement> = useCallback(() => {
-    const editor = getTargetEditor();
-    if (!editor) return;
+  const handleLink: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(() => {
+      const editor = getTargetEditor();
+      if (!editor) return;
 
-    restoreSelection(editor);
-    const link = closestWithin(selectionElement(), 'a', editor);
-    if (link) {
+      restoreSelection(editor);
+      const link = closestWithin(selectionElement(), 'a', editor);
+      if (link) {
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        document.execCommand('unlink');
+        syncEditor(editor);
+        updateActiveFormats();
+        return;
+      }
+
+      const url = window.prompt(intl.formatMessage(messages.linkUrl));
+      if (!url) return;
+
+      restoreSelection(editor);
       // eslint-disable-next-line @typescript-eslint/no-deprecated
-      document.execCommand('unlink');
+      document.execCommand('createLink', false, url);
       syncEditor(editor);
       updateActiveFormats();
-      return;
-    }
-
-    const url = window.prompt(intl.formatMessage(messages.linkUrl));
-    if (!url) return;
-
-    restoreSelection(editor);
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    document.execCommand('createLink', false, url);
-    syncEditor(editor);
-    updateActiveFormats();
-  }, [getTargetEditor, intl, restoreSelection, syncEditor, updateActiveFormats]);
+    }, [
+      getTargetEditor,
+      intl,
+      restoreSelection,
+      syncEditor,
+      updateActiveFormats,
+    ]);
 
   return (
     <div

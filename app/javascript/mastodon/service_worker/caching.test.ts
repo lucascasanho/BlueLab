@@ -129,7 +129,10 @@ describe('handleFetch', () => {
       headers: { 'content-type': 'image/png' },
     });
 
-    customEmojiCache.store.set(request.url, { request, response: cachedResponse });
+    customEmojiCache.store.set(request.url, {
+      request,
+      response: cachedResponse,
+    });
 
     const open = vi.fn().mockImplementation((name: string) => {
       if (name === CUSTOM_EMOJI_STATIC_CACHE_NAME) {

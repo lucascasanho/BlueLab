@@ -22,7 +22,12 @@ const composeEmojiContext = (image: HTMLImageElement) => {
   const emojiElement = image.closest<HTMLElement>('[data-emoji-shortcode]');
   const shortcode = emojiElement?.dataset.emojiShortcode;
 
-  if (!editor || !emojiElement || !shortcode || !editor.contains(emojiElement)) {
+  if (
+    !editor ||
+    !emojiElement ||
+    !shortcode ||
+    !editor.contains(emojiElement)
+  ) {
     return null;
   }
 

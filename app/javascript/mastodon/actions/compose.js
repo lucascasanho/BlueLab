@@ -3,12 +3,16 @@ import { defineMessages } from 'react-intl';
 import axios from 'axios';
 import { throttle } from 'lodash';
 
-import api from 'mastodon/api';
-import { browserHistory } from 'mastodon/components/router';
-import { countableText } from 'mastodon/features/compose/util/counter';
-import { tagHistory } from 'mastodon/settings';
-import { cancelResumableMediaUpload, shouldUseResumableMediaUpload, uploadResumableMedia } from 'mastodon/utils/resumable_media_upload';
+import api from '@/mastodon/api';
+import { browserHistory } from '@/mastodon/components/router';
+import { countableText } from '@/mastodon/features/compose/util/counter';
+import { tagHistory } from '@/mastodon/settings';
 import { emojiMartSearch } from '@/mastodon/features/emoji/picker';
+import {
+  cancelResumableMediaUpload,
+  shouldUseResumableMediaUpload,
+  uploadResumableMedia,
+} from '@/mastodon/utils/resumable_media_upload';
 
 import { showAlert, showAlertForError } from './alerts';
 import { emojiUse } from './emojis';

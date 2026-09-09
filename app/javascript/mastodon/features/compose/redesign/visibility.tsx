@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
-import type { Map as ImmutableMap } from 'immutable';
+import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import {
   ChatCircleIcon,
@@ -41,12 +41,12 @@ const useThreadPrivacy = (activeThreadItemId: string | null) => {
   const rootPrivacy = useAppSelector(selectComposePrivacy);
   const threadPrivacy = useAppSelector((state) => {
     if (!activeThreadItemId) return null;
-    const item = state.compose
-      .get('thread_items')
-      .find(
-        (candidate: ImmutableMap<string, unknown>) =>
-          candidate.get('id') === activeThreadItemId,
-      ) as ImmutableMap<string, unknown> | undefined;
+    const items = state.compose.get('thread_items') as ImmutableList<
+      ImmutableMap<string, unknown>
+    >;
+    const item = items.find(
+      (candidate) => candidate.get('id') === activeThreadItemId,
+    );
     return (item?.get('visibility') as StatusVisibility | undefined) ?? null;
   });
 
@@ -139,6 +139,8 @@ const ComposeVisibilityMenu: React.FC<{
   );
   const quotePolicy = currentQuotePolicy ?? defaultQuotePolicy;
 
+  const isReply = useAppSelector((state) => !!state.compose.get('in_reply_to'));
+
   const dispatch = useAppDispatch();
   const applyPrivacy = useCallback(
     (value: StatusVisibility) => {
@@ -164,6 +166,7 @@ const ComposeVisibilityMenu: React.FC<{
     },
     [applyPrivacy, defaultPrivacy, privacy],
   );
+
   const handleQuotePolicyChange = useCallback(
     ({ value, checked }: { value: string; checked?: boolean }) => {
       if (activeThreadItemId) return;
@@ -301,11 +304,18 @@ const ComposeVisibilityMenu: React.FC<{
       <MenuItemDivider />
 
       <MenuItem icon={ChatCircleIcon} onClick={handleSwitchToMessage}>
-        <FormattedMessage
-          id='compose.post.to_message'
-          defaultMessage='Compose a message instead'
-          description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
-        />
+        {isReply ? (
+          <FormattedMessage
+            id='compose.post.to_private_reply'
+            defaultMessage='Reply privately instead'
+          />
+        ) : (
+          <FormattedMessage
+            id='compose.post.to_message'
+            defaultMessage='Compose a message instead'
+            description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
+          />
+        )}
       </MenuItem>
     </MenuList>
   );
@@ -335,6 +345,8 @@ const ComposeDirectMenu: React.FC<{
       }
     }, [activeThreadItemId, defaultPrivacy, dispatch]);
 
+  const isReply = useAppSelector((state) => !!state.compose.get('in_reply_to'));
+
   return (
     <MenuList placement='bottom-start' offset={4} maxWidth={280}>
       <MenuItemGroup
@@ -356,10 +368,17 @@ const ComposeDirectMenu: React.FC<{
       <MenuItemDivider />
 
       <MenuItem icon={NewspaperIcon} onClick={handleSwitchToPost}>
-        <FormattedMessage
-          id='compose.visibility.to_post'
-          defaultMessage='Compose a post instead'
-        />
+        {isReply ? (
+          <FormattedMessage
+            id='compose.visibility.to_reply'
+            defaultMessage='Reply publicly instead'
+          />
+        ) : (
+          <FormattedMessage
+            id='compose.visibility.to_post'
+            defaultMessage='Compose a post instead'
+          />
+        )}
       </MenuItem>
     </MenuList>
   );

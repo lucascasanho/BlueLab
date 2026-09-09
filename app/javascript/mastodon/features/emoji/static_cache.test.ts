@@ -85,10 +85,7 @@ describe('getWarmableStaticEmojiUrls', () => {
 
   test('ignores malformed static thumbnail URLs', () => {
     expect(
-      getWarmableStaticEmojiUrls(
-        [{ static_url: 'http://[invalid' }],
-        origin,
-      ),
+      getWarmableStaticEmojiUrls([{ static_url: 'http://[invalid' }], origin),
     ).toEqual([]);
   });
 });
@@ -103,10 +100,9 @@ describe('getStaleStaticEmojiCacheRequests', () => {
     );
 
     expect(
-      getStaleStaticEmojiCacheRequests(
-        [active, removed],
-        [active.url],
-      ).map((request) => request.url),
+      getStaleStaticEmojiCacheRequests([active, removed], [active.url]).map(
+        (request) => request.url,
+      ),
     ).toEqual([removed.url]);
   });
 

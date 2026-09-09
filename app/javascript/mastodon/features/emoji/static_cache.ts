@@ -7,9 +7,7 @@ type StandaloneNavigator = Navigator & {
   };
 };
 
-type MatchMedia = (
-  query: string,
-) => Pick<MediaQueryList, 'matches'>;
+type MatchMedia = (query: string) => Pick<MediaQueryList, 'matches'>;
 
 interface StandaloneEnvironment {
   matchMedia?: MatchMedia;
@@ -111,10 +109,9 @@ export function scheduleCustomEmojiStaticCacheWarmup() {
   const scheduleAfterLoad = () => {
     window.setTimeout(() => {
       if (typeof window.requestIdleCallback === 'function') {
-        window.requestIdleCallback(
-          () => void warmCustomEmojiStaticCache(),
-          { timeout: 5_000 },
-        );
+        window.requestIdleCallback(() => void warmCustomEmojiStaticCache(), {
+          timeout: 5_000,
+        });
       } else {
         window.setTimeout(() => void warmCustomEmojiStaticCache(), 0);
       }
@@ -212,7 +209,10 @@ export async function warmCustomEmojiStaticCache() {
         downloadedBytes += responseBytes;
         await cache.put(url, response);
       } catch (error) {
-        if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+        if (
+          error instanceof DOMException &&
+          error.name === 'QuotaExceededError'
+        ) {
           stopped = true;
           return;
         }
@@ -233,7 +233,7 @@ function canWarmNow() {
 
   return (
     document.visibilityState === 'visible' &&
-    navigator.onLine !== false &&
+    navigator.onLine &&
     standaloneNavigator.connection?.saveData !== true
   );
 }
@@ -269,12 +269,13 @@ async function waitUntilCanWarm(): Promise<boolean> {
 }
 
 async function hasStorageHeadroom() {
-  if (!navigator.storage?.estimate) {
+  const storage = (navigator as Partial<Pick<Navigator, 'storage'>>).storage;
+  if (!storage) {
     return true;
   }
 
   try {
-    const { quota, usage } = await navigator.storage.estimate();
+    const { quota, usage } = await storage.estimate();
     if (!quota) {
       return true;
     }

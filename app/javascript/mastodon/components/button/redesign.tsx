@@ -24,6 +24,11 @@ interface ButtonPropsBase<As extends 'a' | 'button'> {
     As extends 'button' ? HTMLButtonElement : HTMLAnchorElement
   >;
   loading?: boolean;
+  /**
+   * Prevents visual highlight on the button when `aria-expanded`
+   * or `aria-pressed` are used.
+   */
+  noActiveHighlight?: boolean;
   children: ReactNode;
 }
 
@@ -45,6 +50,7 @@ const BaseButton: React.FC<BaseButtonProps> = ({
   className,
   onClick,
   loading,
+  noActiveHighlight,
   'aria-disabled': ariaDisabled,
   'aria-live': ariaLive,
   ...props
@@ -79,6 +85,7 @@ const BaseButton: React.FC<BaseButtonProps> = ({
         classes[size],
         classes[color],
         classes[variant],
+        noActiveHighlight && classes.noActiveHighlight,
       )}
       onClick={handleClick}
       // Disabled buttons can't have focus, so we don't really
@@ -162,6 +169,18 @@ export const ToggleButton: React.FC<ButtonProps & { active?: boolean }> = ({
   ...props
 }) => (
   <Button
+    aria-pressed={active}
+    {...props}
+    // Toggle buttons always have neutral until pressed.
+    color='neutral'
+    className={classNames(className, classes.toggle)}
+  />
+);
+
+export const ToggleIconButton: React.FC<
+  IconButtonProps & { active?: boolean }
+> = ({ active, className, ...props }) => (
+  <IconButton
     aria-pressed={active}
     {...props}
     // Toggle buttons always have neutral until pressed.

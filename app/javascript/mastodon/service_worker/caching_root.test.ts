@@ -15,7 +15,7 @@ describe('cacheRoot', () => {
     const open = vi.fn().mockResolvedValue({
       delete: deleteRoot,
       put,
-    } as Partial<Cache>);
+    });
     const fetch = vi.fn();
 
     vi.stubGlobal('caches', { open });
@@ -33,7 +33,7 @@ describe('cacheRoot', () => {
     const open = vi.fn().mockResolvedValue({
       delete: vi.fn().mockResolvedValue(true),
       put,
-    } as Partial<Cache>);
+    });
 
     vi.stubGlobal('caches', { open });
     vi.stubGlobal('fetch', vi.fn());

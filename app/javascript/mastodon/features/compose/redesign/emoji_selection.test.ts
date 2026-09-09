@@ -77,8 +77,6 @@ describe('BlueLab emoji selection tracking', () => {
 
     placeCaret(tail, ' world'.length);
 
-    expect(getEditorSelectionOffset(editor)).toBe(
-      'hello :party: world'.length,
-    );
+    expect(getEditorSelectionOffset(editor)).toBe('hello :party: world'.length);
   });
 });

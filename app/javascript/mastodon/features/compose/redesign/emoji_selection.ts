@@ -9,8 +9,7 @@ const composerEditorFromNode = (node: Node | null): HTMLElement | null => {
     node instanceof HTMLElement ? node : (node?.parentElement ?? null);
 
   return (
-    element?.closest<HTMLElement>("[data-compose-scroll-zone='editor']") ??
-    null
+    element?.closest<HTMLElement>("[data-compose-scroll-zone='editor']") ?? null
   );
 };
 
@@ -18,7 +17,7 @@ const pathFromRoot = (root: Node, target: Node): number[] | null => {
   const path: number[] = [];
   let current: Node | null = target;
 
-  while (current && current !== root) {
+  while (current !== root) {
     const parent: Node | null = current.parentNode;
     if (!parent) return null;
 
@@ -29,15 +28,14 @@ const pathFromRoot = (root: Node, target: Node): number[] | null => {
     current = parent;
   }
 
-  return current === root ? path : null;
+  return path;
 };
 
 const nodeAtPath = (root: Node, path: readonly number[]): Node | null => {
   let current: Node | null = root;
 
   for (const index of path) {
-    current = current?.childNodes.item(index) ?? null;
-    if (!current) return null;
+    current = current.childNodes.item(index);
   }
 
   return current;
@@ -75,7 +73,10 @@ export const getEditorSelectionOffset = (
     const tail = textNode.splitText(offset);
     tail.parentNode?.insertBefore(marker, tail);
   } else {
-    const offset = Math.min(range.startOffset, cloneContainer.childNodes.length);
+    const offset = Math.min(
+      range.startOffset,
+      cloneContainer.childNodes.length,
+    );
     cloneContainer.insertBefore(marker, cloneContainer.childNodes.item(offset));
   }
 
@@ -105,8 +106,7 @@ export const captureComposerSelectionOffset = (): number => {
   return lastComposeSelectionOffset;
 };
 
-export const getSavedComposerSelectionOffset = () =>
-  lastComposeSelectionOffset;
+export const getSavedComposerSelectionOffset = () => lastComposeSelectionOffset;
 
 export const setSavedComposerSelectionOffset = (offset: number) => {
   lastComposeSelectionOffset = Math.max(0, offset);

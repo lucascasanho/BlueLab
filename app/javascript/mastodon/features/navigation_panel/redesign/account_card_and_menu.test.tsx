@@ -44,7 +44,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
 
   it('puts scheduled publications in this account submenu for signed-in users', () => {
     render(<NavigationAccountCardAndMenu />);
-    fireEvent.click(screen.getByRole('button', { name: 'More' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
 
     expect(
       screen
@@ -55,7 +55,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
 
   it('hides moderation and administration from users without permissions', () => {
     render(<NavigationAccountCardAndMenu />);
-    fireEvent.click(screen.getByRole('button', { name: 'More' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
 
     expect(screen.queryByRole('link', { name: 'Moderation' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'Administration' })).toBeNull();
@@ -65,7 +65,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
     const { unmount } = render(<NavigationAccountCardAndMenu />, {
       permissions: PERMISSION_MANAGE_REPORTS,
     });
-    fireEvent.click(screen.getByRole('button', { name: 'More' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
     expect(
       screen.getByRole('link', { name: 'Moderation' }).getAttribute('href'),
     ).toBe('/admin/reports');
@@ -75,7 +75,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
     render(<NavigationAccountCardAndMenu />, {
       permissions: PERMISSION_VIEW_DASHBOARD,
     });
-    fireEvent.click(screen.getByRole('button', { name: 'More' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
     expect(
       screen.getByRole('link', { name: 'Administration' }).getAttribute('href'),
     ).toBe('/admin/dashboard');

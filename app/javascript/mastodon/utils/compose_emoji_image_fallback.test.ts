@@ -35,9 +35,9 @@ describe('compose custom emoji image fallback', () => {
       .fn()
       .mockResolvedValue('https://example.test/static.png');
 
-    await expect(
-      prepareComposeEmojiImage(image, loadStaticUrl),
-    ).resolves.toBe(true);
+    await expect(prepareComposeEmojiImage(image, loadStaticUrl)).resolves.toBe(
+      true,
+    );
 
     expect(loadStaticUrl).toHaveBeenCalledWith('party');
     expect(image.getAttribute('src')).toBe('https://example.test/animated.gif');
@@ -94,7 +94,9 @@ describe('compose custom emoji image fallback', () => {
 
   test('shows the shortcode when the local emoji lookup fails after an image error', async () => {
     const { image, emojiElement } = buildEditorEmoji();
-    const loadStaticUrl = vi.fn().mockRejectedValue(new Error('db unavailable'));
+    const loadStaticUrl = vi
+      .fn()
+      .mockRejectedValue(new Error('db unavailable'));
 
     await expect(
       applyComposeEmojiImageFallback(image, loadStaticUrl),
@@ -122,9 +124,9 @@ describe('compose custom emoji image fallback', () => {
     document.body.appendChild(image);
     const loadStaticUrl = vi.fn();
 
-    await expect(
-      prepareComposeEmojiImage(image, loadStaticUrl),
-    ).resolves.toBe(false);
+    await expect(prepareComposeEmojiImage(image, loadStaticUrl)).resolves.toBe(
+      false,
+    );
     await expect(
       applyComposeEmojiImageFallback(image, loadStaticUrl),
     ).resolves.toBe(false);
