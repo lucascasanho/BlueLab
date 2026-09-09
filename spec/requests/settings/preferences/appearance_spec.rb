@@ -3,9 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe 'Settings Preferences Appearance' do
+  let(:user) { Fabricate(:user) }
+
   describe 'GET /settings/preferences/appearance' do
     before do
-      sign_in Fabricate(:user)
+      sign_in user
       get settings_preferences_appearance_path
     end
 
@@ -22,7 +24,17 @@ RSpec.describe 'Settings Preferences Appearance' do
   end
 
   describe 'PUT /settings/preferences/appearance' do
-    before { sign_in Fabricate(:user) }
+    before { sign_in user }
+
+    it 'does not accept the legacy per-user theme parameter' do
+      user.settings['theme'] = 'blue-2'
+      user.save!
+
+      put settings_preferences_appearance_path, params: { user: { settings_attributes: { theme: 'default' } } }
+
+      expect(response).to redirect_to(settings_preferences_appearance_path)
+      expect(user.reload.settings['theme']).to eq('blue-2')
+    end
 
     it 'gracefully handles invalid nested params' do
       put settings_preferences_appearance_path(user: 'invalid')
