@@ -19,7 +19,7 @@ import { waitForCustomEmojiImages } from '@/mastodon/features/emoji';
 import { useToggle } from '@/mastodon/hooks/useToggle';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
-import { captureComposerSelectionOffset } from './rich_editor';
+import { captureComposerSelectionOffset } from './emoji_selection';
 import { PER_LINE, selectFrequentlyUsedEmoji } from './selectors';
 import classes from './styles.module.scss';
 
