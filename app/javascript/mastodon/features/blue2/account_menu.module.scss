@@ -162,12 +162,22 @@
   inset-inline-start: 0;
   width: 216px;
   max-width: 100%;
+  max-height: calc(100vh - 72px);
+  max-height: calc(100dvh - 72px);
   padding: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border: 1px solid var(--blue2-border-soft, #17232c);
   border-radius: 12px;
   background: var(--blue2-surface-raised, #101820);
   color: var(--blue2-text, #f7f7f8);
   box-shadow: 0 12px 36px rgb(0 0 0 / 38%);
+}
+
+.menuDivider {
+  height: 1px;
+  margin: 4px 2px;
+  background: var(--blue2-border-soft, #17232c);
 }
 
 .menuItem {
