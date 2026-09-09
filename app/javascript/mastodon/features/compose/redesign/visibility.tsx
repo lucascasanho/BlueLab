@@ -3,6 +3,8 @@ import { useCallback } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
+import type { Map as ImmutableMap } from 'immutable';
+
 import {
   ChatCircleIcon,
   MagnifyingGlassIcon,
@@ -10,6 +12,7 @@ import {
   QuotesIcon,
 } from '@phosphor-icons/react';
 
+import { changeComposeThreadItem } from '@/mastodon/actions/compose';
 import {
   changeComposeVisibility,
   setComposeQuotePolicy,
@@ -34,10 +37,27 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { selectComposeMentions, selectComposePrivacy } from './selectors';
 
-export const ComposeVisibility: React.FC<{ className?: string }> = ({
-  className,
-}) => {
-  const privacy = useAppSelector(selectComposePrivacy);
+const useThreadPrivacy = (activeThreadItemId: string | null) => {
+  const rootPrivacy = useAppSelector(selectComposePrivacy);
+  const threadPrivacy = useAppSelector((state) => {
+    if (!activeThreadItemId) return null;
+    const item = state.compose
+      .get('thread_items')
+      .find(
+        (candidate: ImmutableMap<string, unknown>) =>
+          candidate.get('id') === activeThreadItemId,
+      ) as ImmutableMap<string, unknown> | undefined;
+    return (item?.get('visibility') as StatusVisibility | undefined) ?? null;
+  });
+
+  return threadPrivacy ?? rootPrivacy;
+};
+
+export const ComposeVisibility: React.FC<{
+  className?: string;
+  activeThreadItemId?: string | null;
+}> = ({ className, activeThreadItemId = null }) => {
+  const privacy = useThreadPrivacy(activeThreadItemId);
 
   return (
     <div className={className}>
@@ -48,13 +68,16 @@ export const ComposeVisibility: React.FC<{ className?: string }> = ({
       />
       <Menu>
         <MenuTrigger size='sm' trailingIcon={CaretIcon}>
-          <ComposeVisibilityButtonText privacy={privacy} />
+          <ComposeVisibilityButtonText
+            privacy={privacy}
+            activeThreadItemId={activeThreadItemId}
+          />
         </MenuTrigger>
 
         {privacy !== 'direct' ? (
-          <ComposeVisibilityMenu />
+          <ComposeVisibilityMenu activeThreadItemId={activeThreadItemId} />
         ) : (
-          <ComposeDirectMenu />
+          <ComposeDirectMenu activeThreadItemId={activeThreadItemId} />
         )}
       </Menu>
     </div>
@@ -63,8 +86,10 @@ export const ComposeVisibility: React.FC<{ className?: string }> = ({
 
 const ComposeVisibilityButtonText: React.FC<{
   privacy: StatusVisibility;
-}> = ({ privacy }) => {
-  const mentions = useAppSelector(selectComposeMentions);
+  activeThreadItemId: string | null;
+}> = ({ privacy, activeThreadItemId }) => {
+  const rootMentions = useAppSelector(selectComposeMentions);
+  const mentions = activeThreadItemId ? [] : rootMentions;
   const firstMentionedAccount = useAppSelector((state) =>
     selectPlainAccount(state, mentions.at(0)),
   );
@@ -99,8 +124,10 @@ const ComposeVisibilityButtonText: React.FC<{
   return '-';
 };
 
-const ComposeVisibilityMenu: React.FC = () => {
-  const privacy = useAppSelector(selectComposePrivacy);
+const ComposeVisibilityMenu: React.FC<{
+  activeThreadItemId: string | null;
+}> = ({ activeThreadItemId }) => {
+  const privacy = useThreadPrivacy(activeThreadItemId);
   const defaultPrivacy = useAppSelector(
     (state) => state.compose.get('default_privacy') as StatusVisibility,
   );
@@ -113,26 +140,34 @@ const ComposeVisibilityMenu: React.FC = () => {
   const quotePolicy = currentQuotePolicy ?? defaultQuotePolicy;
 
   const dispatch = useAppDispatch();
+  const applyPrivacy = useCallback(
+    (value: StatusVisibility) => {
+      if (activeThreadItemId) {
+        dispatch(
+          changeComposeThreadItem(activeThreadItemId, 'visibility', value),
+        );
+      } else {
+        dispatch(changeComposeVisibility(value));
+      }
+    },
+    [activeThreadItemId, dispatch],
+  );
   const handlePrivacyChange = useCallback(
     ({ value }: { value: string }) => {
       if (value === 'private' && privacy !== 'private') {
-        dispatch(changeComposeVisibility(value));
+        applyPrivacy('private');
       } else if (value === 'public' && privacy === 'private') {
-        dispatch(
-          changeComposeVisibility(
-            defaultPrivacy === 'unlisted' ? 'unlisted' : 'public',
-          ),
-        );
+        applyPrivacy(defaultPrivacy === 'unlisted' ? 'unlisted' : 'public');
       } else if (value === 'unlisted' && privacy !== 'private') {
-        dispatch(
-          changeComposeVisibility(privacy === 'public' ? 'unlisted' : 'public'),
-        );
+        applyPrivacy(privacy === 'public' ? 'unlisted' : 'public');
       }
     },
-    [defaultPrivacy, dispatch, privacy],
+    [applyPrivacy, defaultPrivacy, privacy],
   );
   const handleQuotePolicyChange = useCallback(
     ({ value, checked }: { value: string; checked?: boolean }) => {
+      if (activeThreadItemId) return;
+
       let newQuotePolicy: ApiQuotePolicy = 'nobody';
       switch (value) {
         case 'public':
@@ -142,9 +177,7 @@ const ComposeVisibilityMenu: React.FC = () => {
           newQuotePolicy = 'followers';
           break;
         case 'others':
-          // If it's not checked, then it's nobody.
           if (checked) {
-            // Only use the default if it's not nobody, as then it'll never be enabled.
             newQuotePolicy =
               defaultQuotePolicy !== 'nobody' ? defaultQuotePolicy : 'public';
           }
@@ -152,13 +185,13 @@ const ComposeVisibilityMenu: React.FC = () => {
       }
       dispatch(setComposeQuotePolicy(newQuotePolicy));
     },
-    [defaultQuotePolicy, dispatch],
+    [activeThreadItemId, defaultQuotePolicy, dispatch],
   );
 
   const handleSwitchToMessage: React.MouseEventHandler<HTMLButtonElement> =
     useCallback(() => {
-      dispatch(changeComposeVisibility('direct'));
-    }, [dispatch]);
+      applyPrivacy('direct');
+    }, [applyPrivacy]);
 
   return (
     <MenuList placement='bottom-start' offset={4} maxWidth={280}>
@@ -209,57 +242,61 @@ const ComposeVisibilityMenu: React.FC = () => {
           />
         </MenuItemCheckbox>
 
-        <MenuItemCheckbox
-          value='others'
-          disabled={privacy === 'private'}
-          checked={quotePolicy !== 'nobody' && privacy !== 'private'}
-          onChange={handleQuotePolicyChange}
-          icon={QuotesIcon}
-          keepMenuOpenOnClick
-        >
-          <FormattedMessage
-            id='compose.quotable'
-            defaultMessage='Allow others to quote'
-          />
-        </MenuItemCheckbox>
+        {!activeThreadItemId && (
+          <MenuItemCheckbox
+            value='others'
+            disabled={privacy === 'private'}
+            checked={quotePolicy !== 'nobody' && privacy !== 'private'}
+            onChange={handleQuotePolicyChange}
+            icon={QuotesIcon}
+            keepMenuOpenOnClick
+          >
+            <FormattedMessage
+              id='compose.quotable'
+              defaultMessage='Allow others to quote'
+            />
+          </MenuItemCheckbox>
+        )}
       </MenuItemGroup>
 
-      {quotePolicy !== 'nobody' && privacy !== 'private' && (
-        <MenuItemGroup
-          label={
-            <FormattedMessage
-              id='compose.visibility.quote_policy'
-              defaultMessage='Who can quote'
-            />
-          }
-        >
-          <MenuItemRadio
-            name='quote_policy'
-            value='public'
-            checked={quotePolicy === 'public'}
-            onChange={handleQuotePolicyChange}
-            keepMenuOpenOnClick
+      {!activeThreadItemId &&
+        quotePolicy !== 'nobody' &&
+        privacy !== 'private' && (
+          <MenuItemGroup
+            label={
+              <FormattedMessage
+                id='compose.visibility.quote_policy'
+                defaultMessage='Who can quote'
+              />
+            }
           >
-            <FormattedMessage
-              id='compose.visibility.quote_policy.anyone'
-              defaultMessage='Anyone'
-            />
-          </MenuItemRadio>
+            <MenuItemRadio
+              name='quote_policy'
+              value='public'
+              checked={quotePolicy === 'public'}
+              onChange={handleQuotePolicyChange}
+              keepMenuOpenOnClick
+            >
+              <FormattedMessage
+                id='compose.visibility.quote_policy.anyone'
+                defaultMessage='Anyone'
+              />
+            </MenuItemRadio>
 
-          <MenuItemRadio
-            name='quote_policy'
-            value='followers'
-            checked={quotePolicy === 'followers'}
-            onChange={handleQuotePolicyChange}
-            keepMenuOpenOnClick
-          >
-            <FormattedMessage
-              id='compose.visibility.quote_policy.followers'
-              defaultMessage='Followers'
-            />
-          </MenuItemRadio>
-        </MenuItemGroup>
-      )}
+            <MenuItemRadio
+              name='quote_policy'
+              value='followers'
+              checked={quotePolicy === 'followers'}
+              onChange={handleQuotePolicyChange}
+              keepMenuOpenOnClick
+            >
+              <FormattedMessage
+                id='compose.visibility.quote_policy.followers'
+                defaultMessage='Followers'
+              />
+            </MenuItemRadio>
+          </MenuItemGroup>
+        )}
 
       <MenuItemDivider />
 
@@ -274,14 +311,29 @@ const ComposeVisibilityMenu: React.FC = () => {
   );
 };
 
-const ComposeDirectMenu: React.FC = () => {
+const ComposeDirectMenu: React.FC<{
+  activeThreadItemId: string | null;
+}> = ({ activeThreadItemId }) => {
   const dispatch = useAppDispatch();
+  const defaultPrivacy = useAppSelector(
+    (state) => state.compose.get('default_privacy') as StatusVisibility,
+  );
   const handleSwitchToPost: React.MouseEventHandler<HTMLButtonElement> =
     useCallback(() => {
-      dispatch(
-        openModal({ modalType: 'COMPOSER_SWITCH_TO_POST', modalProps: {} }),
-      );
-    }, [dispatch]);
+      if (activeThreadItemId) {
+        dispatch(
+          changeComposeThreadItem(
+            activeThreadItemId,
+            'visibility',
+            defaultPrivacy === 'direct' ? 'public' : defaultPrivacy,
+          ),
+        );
+      } else {
+        dispatch(
+          openModal({ modalType: 'COMPOSER_SWITCH_TO_POST', modalProps: {} }),
+        );
+      }
+    }, [activeThreadItemId, defaultPrivacy, dispatch]);
 
   return (
     <MenuList placement='bottom-start' offset={4} maxWidth={280}>

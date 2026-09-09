@@ -3,9 +3,14 @@ import { useCallback } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import type { Map as ImmutableMap } from 'immutable';
+
 import { MagnifyingGlassIcon } from '@phosphor-icons/react';
 
-import { changeComposeLanguage } from '@/mastodon/actions/compose';
+import {
+  changeComposeLanguage,
+  changeComposeThreadItem,
+} from '@/mastodon/actions/compose';
 import { CaretIcon } from '@/mastodon/components/button/redesign';
 import { TextInput } from '@/mastodon/components/form_fields/redesign';
 import {
@@ -26,10 +31,23 @@ const messages = defineMessages({
   },
 });
 
-export const LanguageButton: React.FC = () => {
-  const langCode = useAppSelector(
+export const LanguageButton: React.FC<{
+  activeThreadItemId?: string | null;
+}> = ({ activeThreadItemId = null }) => {
+  const rootLangCode = useAppSelector(
     (state) => state.compose.get('language') as string,
   );
+  const threadLangCode = useAppSelector((state) => {
+    if (!activeThreadItemId) return null;
+    const item = state.compose
+      .get('thread_items')
+      .find(
+        (candidate: ImmutableMap<string, unknown>) =>
+          candidate.get('id') === activeThreadItemId,
+      ) as ImmutableMap<string, unknown> | undefined;
+    return (item?.get('language') as string | undefined) ?? null;
+  });
+  const langCode = threadLangCode ?? rootLangCode;
 
   return (
     <Menu>
@@ -42,13 +60,15 @@ export const LanguageButton: React.FC = () => {
         className={classes.languageMenu}
         maxWidth={280}
       >
-        <LanguageDropdown />
+        <LanguageDropdown activeThreadItemId={activeThreadItemId} />
       </MenuList>
     </Menu>
   );
 };
 
-export const LanguageDropdown = () => {
+export const LanguageDropdown: React.FC<{
+  activeThreadItemId?: string | null;
+}> = ({ activeThreadItemId = null }) => {
   const { languages, onSearch } = useLanguageList();
 
   const dispatch = useAppDispatch();
@@ -56,10 +76,20 @@ export const LanguageDropdown = () => {
     (event) => {
       const newLanguage = event.currentTarget.dataset.language;
       if (newLanguage) {
-        dispatch(changeComposeLanguage(newLanguage));
+        if (activeThreadItemId) {
+          dispatch(
+            changeComposeThreadItem(
+              activeThreadItemId,
+              'language',
+              newLanguage,
+            ),
+          );
+        } else {
+          dispatch(changeComposeLanguage(newLanguage));
+        }
       }
     },
-    [dispatch],
+    [activeThreadItemId, dispatch],
   );
 
   const intl = useIntl();

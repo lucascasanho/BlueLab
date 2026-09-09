@@ -1,0 +1,195 @@
+.threadEditorScope {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+
+  // Thread mode uses one shared formatting toolbar. The editor's built-in
+  // toolbar stays available outside thread mode, but is hidden inside this
+  // scope to avoid repeating the same controls for every post.
+  :global([role='toolbar']) {
+    display: none;
+  }
+}
+
+.formattingToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3xs);
+  padding-block: var(--space-3xs);
+  border-bottom: 1px solid var(--color-border-primary);
+  background: var(--color-bg-primary);
+}
+
+.primaryPost {
+  position: relative;
+  padding-inline-start: var(--space-xl);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 10px;
+    top: 14px;
+    bottom: calc(-1 * var(--space-md));
+    width: 2px;
+    border-radius: var(--radius-round);
+    background: var(--color-border-primary);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: 6px;
+    top: 10px;
+    width: 10px;
+    height: 10px;
+    box-sizing: border-box;
+    border: 2px solid var(--color-border-brand);
+    border-radius: var(--radius-round);
+    background: var(--color-bg-primary);
+  }
+}
+
+.threadItems {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.threadItem {
+  position: relative;
+  min-width: 0;
+  padding: var(--space-sm) 2.75rem var(--space-md) var(--space-xl);
+  background: transparent;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    border-radius: var(--radius-round);
+    background: var(--color-border-primary);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: 6px;
+    top: calc(var(--space-sm) + 4px);
+    width: 10px;
+    height: 10px;
+    box-sizing: border-box;
+    border: 2px solid var(--color-border-primary);
+    border-radius: var(--radius-round);
+    background: var(--color-bg-primary);
+    transition:
+      border-color 120ms ease,
+      background-color 120ms ease;
+  }
+
+  &:last-child::before {
+    bottom: calc(100% - var(--space-sm) - 10px);
+  }
+}
+
+.threadItemActive::after {
+  border-color: var(--color-border-brand);
+  background: var(--color-border-brand);
+}
+
+.threadEditor {
+  min-width: 0;
+}
+
+.threadItemRemove {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: var(--space-xs);
+  inset-inline-end: 0;
+}
+
+.threadMedia {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+}
+
+.threadMediaItem {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+
+  img {
+    display: block;
+    width: 100%;
+    max-height: 12rem;
+    object-fit: cover;
+  }
+}
+
+.mediaRemove {
+  position: absolute;
+  z-index: 1;
+  inset-block-start: var(--space-2xs);
+  inset-inline-end: var(--space-2xs);
+  border-radius: var(--radius-round);
+  background: var(--color-bg-primary);
+}
+
+.mediaAlt {
+  display: block;
+  padding: var(--space-2xs);
+
+  input {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    padding: var(--space-2xs) var(--space-xs);
+    border: 0;
+    border-radius: var(--radius-sm);
+    outline: none;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+
+    &:focus-visible {
+      outline: 2px solid var(--color-border-brand);
+      outline-offset: 1px;
+    }
+  }
+}
+
+@media screen and (width <= 759px) {
+  .formattingToolbar {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: thin;
+  }
+
+  .primaryPost,
+  .threadItem {
+    padding-inline-start: var(--space-lg);
+  }
+
+  .threadItem {
+    padding-inline-end: 2.5rem;
+  }
+
+  .primaryPost::before,
+  .threadItem::before {
+    inset-inline-start: 7px;
+  }
+
+  .primaryPost::after,
+  .threadItem::after {
+    inset-inline-start: 3px;
+  }
+
+  .threadMedia {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

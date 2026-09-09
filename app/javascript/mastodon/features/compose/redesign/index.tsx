@@ -1,9 +1,10 @@
 import type React from 'react';
-import { useCallback, useEffect, useId } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import classNames from 'classnames';
+import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import { LockSimpleOpenIcon, PepperIcon } from '@phosphor-icons/react';
 
@@ -11,6 +12,7 @@ import {
   changeCompose,
   changeComposeSpoilerness,
   changeComposeSpoilerText,
+  changeComposeThreadItem,
   insertEmojiCompose,
 } from '@/mastodon/actions/compose';
 import { ToggleButton } from '@/mastodon/components/button/redesign';
@@ -47,6 +49,8 @@ import {
 } from './selectors';
 import classes from './styles.module.scss';
 import { ComposeThreadItems } from './thread';
+import { ComposeThreadFormattingToolbar } from './thread_formatting_toolbar';
+import threadClasses from './thread.module.scss';
 import { ComposeVisibility } from './visibility';
 
 const messages = defineMessages({
@@ -64,6 +68,8 @@ interface RedesignComposeFormProps {
   redirectOnSuccess?: boolean;
 }
 
+type ThreadItem = ImmutableMap<string, unknown>;
+
 export const RedesignComposeForm: React.FC<
   RedesignComposeFormProps & React.ComponentPropsWithRef<'form'>
 > = ({
@@ -76,10 +82,32 @@ export const RedesignComposeForm: React.FC<
   ...props
 }) => {
   const type = useAppSelector(selectComposeType);
-  const { sensitive, sensitiveText } = useAppSelector(selectComposeSensitive);
+  const rootSensitive = useAppSelector(selectComposeSensitive);
+  const threadItems = useAppSelector(
+    (state) => state.compose.get('thread_items') as ImmutableList<ThreadItem>,
+  );
+  const [activeThreadItemId, setActiveThreadItemId] = useState<string | null>(
+    null,
+  );
+  const activeThreadItem = activeThreadItemId
+    ? threadItems.find((item) => item.get('id') === activeThreadItemId)
+    : undefined;
+  const threadMode = !threadItems.isEmpty();
+  const sensitive = activeThreadItem
+    ? !!activeThreadItem.get('sensitive')
+    : rootSensitive.sensitive;
+  const sensitiveText = activeThreadItem
+    ? ((activeThreadItem.get('spoiler_text') as string | undefined) ?? '')
+    : rootSensitive.sensitiveText;
+
+  useEffect(() => {
+    if (activeThreadItemId && !activeThreadItem) {
+      setActiveThreadItemId(null);
+    }
+  }, [activeThreadItem, activeThreadItemId]);
 
   const { onSensitiveChange, onSensitiveTextChange, onEmojiPick, onSubmit } =
-    useComposeHandlers(redirectOnSuccess);
+    useComposeHandlers(redirectOnSuccess, activeThreadItemId);
 
   const intl = useIntl();
   const titleId = useId();
@@ -106,6 +134,18 @@ export const RedesignComposeForm: React.FC<
       event.preventDefault();
       element.scrollTop = nextScrollTop;
     }, []);
+
+  const mainEditor = (
+    <ComposeAutocomplete>
+      <RichComposeEditor
+        // eslint-disable-next-line jsx-a11y/no-autofocus
+        autoFocus={autoFocus}
+        onSubmit={onSubmit}
+      >
+        <ComposeAttachments className={classes.attachments} />
+      </RichComposeEditor>
+    </ComposeAutocomplete>
+  );
 
   return (
     <form
@@ -135,9 +175,12 @@ export const RedesignComposeForm: React.FC<
         <ComposeReply />
 
         <div className={classes.toolbar} data-bluelab-compose-toolbar>
-          <ComposeVisibility className={classes.flexGrowWrap} />
+          <ComposeVisibility
+            className={classes.flexGrowWrap}
+            activeThreadItemId={activeThreadItemId}
+          />
 
-          <LanguageButton />
+          <LanguageButton activeThreadItemId={activeThreadItemId} />
 
           <ToggleButton
             size='sm'
@@ -172,24 +215,40 @@ export const RedesignComposeForm: React.FC<
           />
         )}
 
-        <ComposeAutocomplete>
-          <RichComposeEditor
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus={autoFocus}
-            onSubmit={onSubmit}
-          >
-            <ComposeAttachments className={classes.attachments} />
-          </RichComposeEditor>
-        </ComposeAutocomplete>
+        {threadMode && (
+          <ComposeThreadFormattingToolbar
+            activeThreadItemId={activeThreadItemId}
+          />
+        )}
 
-        <ComposeThreadItems onSubmit={onSubmit} />
+        {threadMode ? (
+          <div className={threadClasses.threadEditorScope}>
+            <div
+              className={threadClasses.primaryPost}
+              data-compose-thread-main
+              onFocusCapture={() => setActiveThreadItemId(null)}
+            >
+              {mainEditor}
+            </div>
+            <ComposeThreadItems
+              activeItemId={activeThreadItemId}
+              onFocusItem={setActiveThreadItemId}
+              onSubmit={onSubmit}
+            />
+          </div>
+        ) : (
+          mainEditor
+        )}
 
         <ThreadFailure />
 
         <ComposeHints />
       </div>
 
-      <ComposeFooter onEmojiPick={onEmojiPick} />
+      <ComposeFooter
+        onEmojiPick={onEmojiPick}
+        activeThreadItemId={activeThreadItemId}
+      />
     </form>
   );
 };
@@ -214,36 +273,87 @@ const ThreadFailure: React.FC = () => {
 const allowedAroundShortCode =
   '><\u0085\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029\u0009\u000a\u000b\u000c\u000d';
 
-function useComposeHandlers(redirectOnSuccess?: boolean) {
+function useComposeHandlers(
+  redirectOnSuccess?: boolean,
+  activeThreadItemId: string | null = null,
+) {
   const text = useAppSelector((state) => state.compose.get('text') as string);
+  const activeThreadItem = useAppSelector((state) => {
+    if (!activeThreadItemId) return null;
+    return (
+      (state.compose.get('thread_items') as ImmutableList<ThreadItem>).find(
+        (item) => item.get('id') === activeThreadItemId,
+      ) ?? null
+    );
+  });
+  const targetText = activeThreadItem
+    ? ((activeThreadItem.get('text') as string | undefined) ?? '')
+    : text;
 
   const dispatch = useAppDispatch();
 
-  // Sensitive handling
-  const isSensitive = useAppSelector((state) => !!state.compose.get('spoiler'));
+  // Sensitive / CW handling follows the post that currently owns focus.
+  const rootSensitive = useAppSelector(
+    (state) => !!state.compose.get('spoiler'),
+  );
+  const isSensitive = activeThreadItem
+    ? !!activeThreadItem.get('sensitive')
+    : rootSensitive;
   useEffect(() => {
-    if (!isSensitive) {
+    if (!isSensitive && !activeThreadItemId) {
       focusComposerTextarea();
     }
-  }, [isSensitive]);
+  }, [activeThreadItemId, isSensitive]);
 
   const onSensitiveChange = useCallback(() => {
-    dispatch(changeComposeSpoilerness());
-  }, [dispatch]);
+    if (activeThreadItemId) {
+      const nextSensitive = !isSensitive;
+      dispatch(
+        changeComposeThreadItem(
+          activeThreadItemId,
+          'sensitive',
+          nextSensitive,
+        ),
+      );
+      if (!nextSensitive) {
+        dispatch(
+          changeComposeThreadItem(activeThreadItemId, 'spoiler_text', ''),
+        );
+      }
+    } else {
+      dispatch(changeComposeSpoilerness());
+    }
+  }, [activeThreadItemId, dispatch, isSensitive]);
   const onSensitiveTextChange: React.ChangeEventHandler<HTMLInputElement> =
     useCallback(
       (event) => {
-        dispatch(changeComposeSpoilerText(event.target.value));
+        if (activeThreadItemId) {
+          dispatch(
+            changeComposeThreadItem(
+              activeThreadItemId,
+              'spoiler_text',
+              event.target.value,
+            ),
+          );
+        } else {
+          dispatch(changeComposeSpoilerText(event.target.value));
+        }
       },
-      [dispatch],
+      [activeThreadItemId, dispatch],
     );
 
   const onEmojiPick: OnEmojiPick = useCallback(
     (emoji) => {
       const activeElement = document.activeElement;
+      const threadEditor = activeThreadItemId
+        ? document.querySelector<HTMLElement>(
+            `[data-thread-item-id="${activeThreadItemId}"] [data-compose-scroll-zone='editor']`,
+          )
+        : null;
       const editor =
-        activeElement instanceof HTMLElement ? activeElement : null;
-      const composerTextArea = getComposerTextarea();
+        threadEditor ??
+        (activeElement instanceof HTMLElement ? activeElement : null);
+      const composerTextArea = activeThreadItemId ? null : getComposerTextarea();
       const isContentEditable =
         !!editor &&
         (editor.isContentEditable ||
@@ -252,81 +362,72 @@ function useComposeHandlers(redirectOnSuccess?: boolean) {
           editor.getAttribute('contenteditable') === 'true' ||
           editor.getAttribute('contenteditable') === 'plaintext-only');
       const savedSelectionStart = getSavedComposerSelectionOffset();
+      const selection = window.getSelection();
+      const hasEditorSelection =
+        !!editor &&
+        !!selection?.rangeCount &&
+        !!selection.anchorNode &&
+        editor.contains(selection.anchorNode);
       const activeEditorSelectionStart =
-        editor && isContentEditable ? getEditorSelectionOffset(editor) : null;
+        editor && isContentEditable && hasEditorSelection
+          ? getEditorSelectionOffset(editor)
+          : null;
 
-      // When the picker owns focus, the browser may keep a stale DOM Selection
-      // inside the editor. Re-reading that stale range can move the next emoji
-      // before the one that was just inserted. Only trust the live editor range
-      // while the editor itself is active; otherwise use the saved logical
-      // offset that is advanced after every picker insertion.
       const selectionStart =
         composerTextArea && activeElement === composerTextArea
           ? composerTextArea.selectionStart || 0
           : (activeEditorSelectionStart ?? savedSelectionStart);
 
-      const beforePosition = text[selectionStart - 1];
+      const beforePosition = targetText[selectionStart - 1];
       const needsSpace =
         'custom' in emoji &&
         !!emoji.custom &&
         !!beforePosition &&
         !allowedAroundShortCode.includes(beforePosition);
 
-      if (editor && isContentEditable) {
-        const selection = window.getSelection();
-        if (selection) {
-          const range = document.createRange();
-          let currentOffset = 0;
-          const walker = document.createTreeWalker(
-            editor,
-            NodeFilter.SHOW_TEXT,
+      if (editor && isContentEditable && hasEditorSelection && selection) {
+        const range = selection.getRangeAt(0).cloneRange();
+        range.deleteContents();
+        const inserted = document.createTextNode(
+          'native' in emoji && emoji.native ? emoji.native : `:${emoji.id}:`,
+        );
+        range.insertNode(inserted);
+        range.setStartAfter(inserted);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        captureComposerSelectionOffset();
+        const updatedText = editorText(editor);
+        if (activeThreadItemId) {
+          dispatch(
+            changeComposeThreadItem(activeThreadItemId, 'text', updatedText),
           );
-          let node: Node | null = walker.nextNode();
-
-          while (node) {
-            const length = node.textContent?.length ?? 0;
-            if (currentOffset + length >= selectionStart) {
-              range.setStart(node, selectionStart - currentOffset);
-              range.collapse(true);
-              selection.removeAllRanges();
-              selection.addRange(range);
-              break;
-            }
-            currentOffset += length;
-            node = walker.nextNode();
-          }
-
-          if (!selection.rangeCount) {
-            range.selectNodeContents(editor);
-            range.collapse(false);
-            selection.removeAllRanges();
-            selection.addRange(range);
-          }
-
-          const caretRange = selection.getRangeAt(0).cloneRange();
-          caretRange.deleteContents();
-          const inserted = document.createTextNode(
-            'native' in emoji && emoji.native ? emoji.native : `:${emoji.id}:`,
-          );
-          caretRange.insertNode(inserted);
-          caretRange.setStartAfter(inserted);
-          caretRange.collapse(true);
-          selection.removeAllRanges();
-          selection.addRange(caretRange);
-          captureComposerSelectionOffset();
-          dispatch(changeCompose(editorText(editor)));
-          return;
+        } else {
+          dispatch(changeCompose(updatedText));
         }
+        return;
       }
 
       const emojiText =
         'native' in emoji && emoji.native ? emoji.native : `:${emoji.id}:`;
       const insertedLength = emojiText.length + (needsSpace ? 1 : 0) + 1;
 
-      dispatch(insertEmojiCompose(selectionStart, emoji, needsSpace));
-      setSavedComposerSelectionOffset(selectionStart + insertedLength);
+      if (activeThreadItemId) {
+        const insertion = `${needsSpace ? ' ' : ''}${emojiText} `;
+        dispatch(
+          changeComposeThreadItem(
+            activeThreadItemId,
+            'text',
+            `${targetText.slice(0, selectionStart)}${insertion}${targetText.slice(selectionStart)}`,
+          ),
+        );
+        setSavedComposerSelectionOffset(selectionStart + insertedLength);
+      } else {
+        dispatch(insertEmojiCompose(selectionStart, emoji, needsSpace));
+        setSavedComposerSelectionOffset(selectionStart + insertedLength);
+      }
     },
-    [dispatch, text],
+    [activeThreadItemId, dispatch, targetText],
   );
 
   // Submit status
