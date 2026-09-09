@@ -1,0 +1,72 @@
+- commit_word = t('admin.software_updates.upstream.commit', count: upstream_update_batch.total_commits)
+
+%article.upstream-update{ id: dom_id(upstream_update_batch), class: upstream_update_batch.reviewed_at? ? 'upstream-update--reviewed' : nil }
+  .upstream-update__header
+    %div
+      %h3
+        = link_to upstream_update_batch.head_sha.first(12), upstream_update_batch.compare_url, target: '_blank', rel: 'noopener noreferrer'
+        - if upstream_update_batch.large?
+          %span.upstream-update__badge= t('admin.software_updates.upstream.large_update')
+      .upstream-update__meta
+        = t('admin.software_updates.upstream.batch_meta', channel: upstream_update_batch.channel, commits: commit_word, date: l(upstream_update_batch.detected_at, format: :long))
+    - if upstream_update_batch.reviewed_at?
+      %span.upstream-update__reviewed= t('admin.software_updates.upstream.reviewed_badge')
+
+  .upstream-update__stats{ aria: { label: t('admin.software_updates.upstream.stats_label') } }
+    %span= t('admin.software_updates.upstream.files', count: upstream_update_batch.files.size)
+    %span.upstream-update__additions +#{number_with_delimiter(upstream_update_batch.additions)}
+    %span.upstream-update__deletions −#{number_with_delimiter(upstream_update_batch.deletions)}
+    - if upstream_update_batch.includes_migration?
+      %span.upstream-update__warning= t('admin.software_updates.upstream.includes_migration')
+
+  - if upstream_update_batch.impact_areas.any?
+    .upstream-update__impact
+      %strong= t('admin.software_updates.upstream.impact_title')
+      %ul
+        - upstream_update_batch.impact_areas.each do |area|
+          %li= t("admin.software_updates.upstream.impact.#{area}")
+
+  %p.upstream-update__compatibility
+    = material_symbol('info')
+    = t('admin.software_updates.upstream.compatibility', channel: upstream_update_batch.channel, version: Mastodon::Version.to_s)
+
+  %details.upstream-update__notes{ open: upstream_update_batch.large? }
+    %summary= t('admin.software_updates.upstream.patch_notes')
+
+    %h4= t('admin.software_updates.upstream.commits_title')
+    %ol.upstream-update__commits
+      - upstream_update_batch.commits.each do |commit|
+        %li
+          .upstream-update__commit-heading
+            = link_to commit['sha'].first(12), upstream_update_batch.commit_url(commit['sha']), target: '_blank', rel: 'noopener noreferrer'
+            %span= commit['author']
+            - if commit['committed_at'].present?
+              %time{ datetime: commit['committed_at'] }= l(Time.zone.parse(commit['committed_at']), format: :long)
+            - if commit['verified']
+              %span.upstream-update__verified= t('admin.software_updates.upstream.verified')
+          .upstream-update__message= simple_format(commit['message'])
+
+    %h4= t('admin.software_updates.upstream.files_title')
+    .table-wrapper
+      %table.table
+        %thead
+          %tr
+            %th= t('admin.software_updates.upstream.file')
+            %th= t('admin.software_updates.upstream.status')
+            %th= t('admin.software_updates.upstream.changes')
+        %tbody
+          - upstream_update_batch.files.each do |file|
+            %tr
+              %td
+                %code= file['filename']
+              %td= t("admin.software_updates.upstream.file_status.#{file['status']}", default: file['status'])
+              %td
+                %span.upstream-update__additions +#{number_with_delimiter(file['additions'])}
+                %span.upstream-update__deletions −#{number_with_delimiter(file['deletions'])}
+
+    - if upstream_update_batch.truncated?
+      .flash-message.warning= t('admin.software_updates.upstream.truncated')
+
+  - unless upstream_update_batch.reviewed_at?
+    .upstream-update__actions
+      = button_to t('admin.software_updates.upstream.mark_reviewed'), review_upstream_admin_software_updates_path(batch_id: upstream_update_batch.id), method: :post, class: 'button button-secondary'

@@ -25,3 +25,22 @@
           %th
       %tbody
         = render collection: @software_updates, partial: 'admin/software_updates/software_update'
+
+- if UpstreamUpdateBatch.check_enabled?
+  %hr.spacer
+
+  .upstream-updates
+    %h2= t('admin.software_updates.upstream.title')
+    %p.lead= t('admin.software_updates.upstream.description', repository: Rails.configuration.x.mastodon.upstream_repository, channel: Rails.configuration.x.mastodon.upstream_channel)
+
+    - if @upstream_update_check&.last_error.present?
+      .flash-message.warning
+        = t('admin.software_updates.upstream.check_error')
+        %code= @upstream_update_check.last_error
+    - elsif @upstream_update_check&.last_checked_at.present?
+      %p.upstream-updates__last-check= t('admin.software_updates.upstream.last_checked', date: l(@upstream_update_check.last_checked_at, format: :long))
+
+    - if @upstream_update_batches.empty?
+      .muted-hint.center-text= t('admin.software_updates.upstream.empty')
+    - else
+      = render collection: @upstream_update_batches, partial: 'admin/software_updates/upstream_update_batch'

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_09_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_09_130100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1428,6 +1428,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_120100) do
     t.string "domain", default: "", null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["domain"], name: "index_unavailable_domains_on_domain", unique: true
+  end
+
+  create_table "upstream_update_batches", force: :cascade do |t|
+    t.integer "additions", default: 0, null: false
+    t.string "base_sha", null: false
+    t.string "channel", null: false
+    t.jsonb "commits", default: [], null: false
+    t.datetime "created_at", null: false
+    t.integer "deletions", default: 0, null: false
+    t.datetime "detected_at", null: false
+    t.jsonb "files", default: [], null: false
+    t.string "head_sha", null: false
+    t.string "repository", null: false
+    t.datetime "reviewed_at"
+    t.integer "total_commits", default: 0, null: false
+    t.boolean "truncated", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.index ["repository", "channel", "head_sha"], name: "index_upstream_update_batches_on_source_and_head", unique: true
+    t.index ["reviewed_at"], name: "index_upstream_update_batches_on_reviewed_at", where: "(reviewed_at IS NULL)"
+  end
+
+  create_table "upstream_update_checks", force: :cascade do |t|
+    t.string "channel", null: false
+    t.datetime "created_at", null: false
+    t.datetime "last_checked_at"
+    t.text "last_error"
+    t.string "last_sha"
+    t.string "repository", null: false
+    t.datetime "updated_at", null: false
+    t.index ["repository", "channel"], name: "index_upstream_update_checks_on_repository_and_channel", unique: true
   end
 
   create_table "user_invite_requests", force: :cascade do |t|

@@ -4,6 +4,10 @@ shared:
   limited_federation_mode: <%= (ENV.fetch('LIMITED_FEDERATION_MODE', nil) || ENV.fetch('WHITELIST_MODE', nil)) == 'true' %>
   self_destruct_value: <%= ENV.fetch('SELF_DESTRUCT', nil)&.to_json %>
   software_update_url: <%= ENV.fetch('UPDATE_CHECK_URL', 'https://api.joinmastodon.org/update-check')&.to_json %>
+  upstream_commit_check_enabled: <%= ENV.fetch('UPSTREAM_COMMIT_CHECK_ENABLED', 'true') == 'true' %>
+  upstream_repository: <%= ENV.fetch('UPSTREAM_MASTODON_REPOSITORY', 'mastodon/mastodon') %>
+  upstream_channel: <%= ENV.fetch('UPSTREAM_MASTODON_CHANNEL', 'main') %>
+  upstream_initial_lookback_hours: <%= ENV.fetch('UPSTREAM_INITIAL_LOOKBACK_HOURS', 24).to_i.clamp(1, 168) %>
   donation_campaigns:
     api_url: <%= ENV.fetch('DONATION_CAMPAIGNS_URL', nil)&.to_json %>
     environment: <%= ENV.fetch('DONATION_CAMPAIGNS_ENVIRONMENT', nil)&.to_json %>
@@ -16,3 +20,4 @@ shared:
     prerelease: <%= ENV.fetch('MASTODON_VERSION_PRERELEASE', nil)&.to_json %>
 test:
   experimental_features: <%= [ENV.fetch('EXPERIMENTAL_FEATURES', nil), 'testing_only'].compact.join(',') %>
+  upstream_commit_check_enabled: false

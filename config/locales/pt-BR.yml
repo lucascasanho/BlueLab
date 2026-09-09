@@ -1103,6 +1103,56 @@ pt-BR:
         patch: Versão de atualização — correções de erros e alterações de fácil aplicação
       unsupported_branch: O atual branch em execução não é mais suportado, por favor, atualize o mais rápido possível.
       unsupported_since: Sem suporte desde %{date}
+      upstream:
+        alert:
+          one: 1 commit oficial para analisar
+          other: "%{count} commits oficiais para analisar"
+        batch_meta: "%{channel} · %{commits} · detectado em %{date}"
+        changes: Alterações
+        check_error: 'A última consulta de commits oficiais falhou:'
+        commit:
+          one: 1 commit
+          other: "%{count} commits"
+        commits_title: Notas completas dos commits
+        compatibility: Este código pertence ao canal oficial %{channel}, correspondente ao Mastodon %{version}. Ele ainda não foi integrado nem testado com o BlueLab; analise conflitos, migrations, dependências e instruções de lançamento antes de aplicá-lo.
+        description: Cada commit novo detectado em %{repository}:%{channel} aparece aqui para análise. Este monitor nunca aplica, integra ou publica atualizações.
+        empty: Nenhum commit oficial foi detectado desde o início do monitoramento.
+        file: Arquivo
+        file_status:
+          added: Adicionado
+          changed: Alterado
+          copied: Copiado
+          modified: Modificado
+          removed: Removido
+          renamed: Renomeado
+          unchanged: Sem alteração
+        files:
+          one: 1 arquivo alterado
+          other: "%{count} arquivos alterados"
+        files_title: Arquivos alterados
+        impact:
+          backend: Backend, API ou workers
+          database: Banco de dados ou models
+          dependencies: Dependências
+          documentation: Documentação
+          frontend: Interface web
+          infrastructure: Configuração ou infraestrutura
+          security: Autenticação, autorização ou segurança operacional
+          tests: Testes
+          translations: Traduções
+        impact_title: Áreas afetadas
+        includes_migration: Inclui migration de banco
+        large_update: Atualização grande
+        last_checked: Última consulta bem-sucedida em %{date}
+        mark_reviewed: Marcar como analisado
+        patch_notes: Ver patch notes completo
+        reviewed: Lote de commits oficiais marcado como analisado.
+        reviewed_badge: Analisado
+        stats_label: Estatísticas das alterações
+        status: Estado
+        title: Commits oficiais do Mastodon
+        truncated: O GitHub limitou esta comparação extensa. Use o link oficial de comparação acima para analisar os commits ou arquivos restantes antes de aplicar qualquer alteração.
+        verified: Assinatura verificada
       version: Versão
     statuses:
       account: Autor

@@ -1103,6 +1103,56 @@ en:
         patch: Patch release — bugfixes and easy to apply changes
       unsupported_branch: The branch you are currently running is unsupported, please update as soon as possible.
       unsupported_since: Unsupported since %{date}
+      upstream:
+        alert:
+          one: 1 official commit to review
+          other: "%{count} official commits to review"
+        batch_meta: "%{channel} · %{commits} · detected %{date}"
+        changes: Changes
+        check_error: 'The latest official commit check failed:'
+        commit:
+          one: 1 commit
+          other: "%{count} commits"
+        commits_title: Complete commit notes
+        compatibility: This code is from the official %{channel} channel corresponding to Mastodon %{version}. It has not been merged or tested with BlueLab yet; review conflicts, migrations, dependencies, and release instructions before applying it.
+        description: Every new commit detected in %{repository}:%{channel} appears here for review. This monitor never applies, merges, or deploys updates.
+        empty: No official commits have been detected since monitoring began.
+        file: File
+        file_status:
+          added: Added
+          changed: Changed
+          copied: Copied
+          modified: Modified
+          removed: Removed
+          renamed: Renamed
+          unchanged: Unchanged
+        files:
+          one: 1 changed file
+          other: "%{count} changed files"
+        files_title: Changed files
+        impact:
+          backend: Backend, API, or workers
+          database: Database or models
+          dependencies: Dependencies
+          documentation: Documentation
+          frontend: Web interface
+          infrastructure: Configuration or infrastructure
+          security: Authentication, authorization, or operational security
+          tests: Tests
+          translations: Translations
+        impact_title: Areas touched
+        includes_migration: Includes database migration
+        large_update: Large update
+        last_checked: Last successful check %{date}
+        mark_reviewed: Mark as reviewed
+        patch_notes: View complete patch notes
+        reviewed: Official commit batch marked as reviewed.
+        reviewed_badge: Reviewed
+        stats_label: Change statistics
+        status: Status
+        title: Official Mastodon commits
+        truncated: GitHub limited this large comparison. Use the official comparison link above to review the remaining commits or files before applying anything.
+        verified: Verified signature
       version: Version
     statuses:
       account: Author

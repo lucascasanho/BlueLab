@@ -7,5 +7,6 @@ class Scheduler::SoftwareUpdateCheckScheduler
 
   def perform
     SoftwareUpdateCheckService.new.call
+    UpstreamSoftwareUpdateCheckService.new.call
   end
 end
