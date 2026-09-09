@@ -9,7 +9,6 @@ import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 import { LockSimpleOpenIcon, PepperIcon } from '@phosphor-icons/react';
 
 import {
-  changeCompose,
   changeComposeSpoilerness,
   changeComposeSpoilerText,
   changeComposeThreadItem,
@@ -20,7 +19,6 @@ import { TextInputField } from '@/mastodon/components/form_fields/redesign';
 import { Icon } from '@/mastodon/components/icon';
 import {
   focusComposerTextarea,
-  getComposerTextarea,
   submitComposer,
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
@@ -28,19 +26,17 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { ComposeAttachments } from './attachments';
 import { ComposeAutocomplete } from './autocomplete';
 import type { OnEmojiPick } from './emoji';
+import {
+  getEditorSelectionOffset,
+  getSavedComposerSelectionOffset,
+  setSavedComposerSelectionOffset,
+} from './emoji_selection';
 import { ComposeFooter } from './footer';
 import { ComposeFormHeader } from './header';
 import { ComposeHints } from './hints';
 import { LanguageButton } from './language';
 import { ComposeReply } from './reply';
-import {
-  captureComposerSelectionOffset,
-  editorText,
-  getEditorSelectionOffset,
-  getSavedComposerSelectionOffset,
-  RichComposeEditor,
-  setSavedComposerSelectionOffset,
-} from './rich_editor';
+import { RichComposeEditor } from './rich_editor';
 import { resolveComposeScrollTarget } from './scroll';
 import {
   selectComposeCanSubmit,
@@ -344,7 +340,6 @@ function useComposeHandlers(
 
   const onEmojiPick: OnEmojiPick = useCallback(
     (emoji) => {
-      const activeElement = document.activeElement;
       const threadEditor = activeThreadItemId
         ? document.querySelector<HTMLElement>(
             `[data-thread-item-id="${activeThreadItemId}"] [data-compose-scroll-zone='editor']`,
@@ -352,32 +347,22 @@ function useComposeHandlers(
         : null;
       const editor =
         threadEditor ??
-        (activeElement instanceof HTMLElement ? activeElement : null);
-      const composerTextArea = activeThreadItemId ? null : getComposerTextarea();
-      const isContentEditable =
-        !!editor &&
-        (editor.isContentEditable ||
-          editor.contentEditable === 'true' ||
-          editor.contentEditable === 'plaintext-only' ||
-          editor.getAttribute('contenteditable') === 'true' ||
-          editor.getAttribute('contenteditable') === 'plaintext-only');
-      const editorOwnsFocus = !!editor && activeElement === editor;
-      const savedSelectionStart = getSavedComposerSelectionOffset();
+        document.querySelector<HTMLElement>(
+          "[data-bluelab-composer] [data-compose-scroll-zone='editor']",
+        );
+      const activeElement = document.activeElement;
       const selection = window.getSelection();
-      const hasEditorSelection =
+      const hasLiveEditorSelection =
         !!editor &&
+        activeElement === editor &&
         !!selection?.rangeCount &&
         !!selection.anchorNode &&
         editor.contains(selection.anchorNode);
-      const activeEditorSelectionStart =
-        editor && isContentEditable && editorOwnsFocus && hasEditorSelection
-          ? getEditorSelectionOffset(editor)
-          : null;
-
+      const liveSelectionStart = hasLiveEditorSelection
+        ? getEditorSelectionOffset(editor)
+        : null;
       const rawSelectionStart =
-        composerTextArea && activeElement === composerTextArea
-          ? composerTextArea.selectionStart || 0
-          : (activeEditorSelectionStart ?? savedSelectionStart);
+        liveSelectionStart ?? getSavedComposerSelectionOffset();
       const selectionStart = Math.min(
         targetText.length,
         Math.max(0, rawSelectionStart),
@@ -389,40 +374,6 @@ function useComposeHandlers(
         !!emoji.custom &&
         !!beforePosition &&
         !allowedAroundShortCode.includes(beforePosition);
-
-      // When the picker owns focus, the browser can retain a stale DOM range
-      // inside a contentEditable. Never mutate that stale range: use the
-      // logical offset captured before the picker opened instead. This keeps
-      // custom emoji insertion stable in both the main editor and thread rows.
-      if (
-        editor &&
-        isContentEditable &&
-        editorOwnsFocus &&
-        hasEditorSelection &&
-        selection
-      ) {
-        const range = selection.getRangeAt(0).cloneRange();
-        range.deleteContents();
-        const inserted = document.createTextNode(
-          'native' in emoji && emoji.native ? emoji.native : `:${emoji.id}:`,
-        );
-        range.insertNode(inserted);
-        range.setStartAfter(inserted);
-        range.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(range);
-        captureComposerSelectionOffset();
-        const updatedText = editorText(editor);
-        if (activeThreadItemId) {
-          dispatch(
-            changeComposeThreadItem(activeThreadItemId, 'text', updatedText),
-          );
-        } else {
-          dispatch(changeCompose(updatedText));
-        }
-        return;
-      }
-
       const emojiText =
         'native' in emoji && emoji.native ? emoji.native : `:${emoji.id}:`;
       const insertedLength = emojiText.length + (needsSpace ? 1 : 0) + 1;
@@ -436,11 +387,11 @@ function useComposeHandlers(
             `${targetText.slice(0, selectionStart)}${insertion}${targetText.slice(selectionStart)}`,
           ),
         );
-        setSavedComposerSelectionOffset(selectionStart + insertedLength);
       } else {
         dispatch(insertEmojiCompose(selectionStart, emoji, needsSpace));
-        setSavedComposerSelectionOffset(selectionStart + insertedLength);
       }
+
+      setSavedComposerSelectionOffset(selectionStart + insertedLength);
     },
     [activeThreadItemId, dispatch, targetText],
   );
