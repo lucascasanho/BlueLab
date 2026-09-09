@@ -187,17 +187,18 @@ export const ComposeSchedule: React.FC = () => {
           ? {
               position: 'fixed',
               zIndex: 10000,
-              left: '50%',
-              right: 'auto',
-              insetInlineStart: 'auto',
+              insetInlineStart: 'var(--space-sm)',
+              insetInlineEnd: 'var(--space-sm)',
               bottom:
                 'calc(env(safe-area-inset-bottom, 0px) + 4.75rem)',
               width:
                 'min(22rem, calc(100vw - 2 * var(--space-sm)))',
-              maxHeight: 'min(70vh, 26rem)',
+              maxWidth: 'calc(100vw - 2 * var(--space-sm))',
+              maxHeight: 'min(70dvh, 26rem)',
+              marginInline: 'auto',
               overflowY: 'auto',
               overscrollBehavior: 'contain',
-              transform: 'translateX(-50%)',
+              transform: 'none',
             }
           : undefined
       }
