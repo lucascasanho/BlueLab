@@ -111,3 +111,9 @@ Implementar e validar o escudo no `BlueLab-Test`, publicar no mastodon.blue e ve
 - Testes focados: 124 exemplos, 0 falhas. Testes adicionais de administração/system checks/modelo de usuário: 195 exemplos, 0 falhas.
 - RuboCop focado: 21 arquivos sem ofensas. HAML-Lint: 1 arquivo sem ofensas. YAML en/pt-BR carregado com sucesso; `git diff --check` passou.
 - Smoke de produção sem reinício: proteção habilitada, API configurada como fechada, primeiro uso da intenção aceito, replay recusado, retenção efetiva de 3 dias e 1 cadastro não confirmado recente no Blue.
+- Commit funcional criado e publicado em `BlueLab-Test`: `b0f3359f49fd47771672e95479fba19784eb057f` (`Add accessible registration abuse protection`).
+- `blue-atualizar` concluiu dependências, migrations sem mudanças, build Vite e restart. Avisos de peer dependencies e futuro `configLoader: native` já eram preexistentes.
+- Smoke HTTP público no Blue: tela de regras HTTP 200; após aceitação, formulário HTTP 200 com uma intenção e os dois honeypots; assinatura `BoomProtocolProbe` recebeu 403; cliente OAuth temporário válido recebeu 403 em `POST /api/v1/accounts`.
+- Cliente OAuth temporário removido, nenhum usuário de teste criado, web/Sidekiq/streaming/nginx ativos, health local e público HTTP 200 e nenhum warning/error novo no journal do web.
+- Nova varredura da Espelunca após o desenvolvimento confirmou zero bots correspondentes e zero pendências totais.
+- Bloqueio de promoção identificado: `BlueLab-Test` está nove commits à frente de `BlueLab`; oito commits anteriores ao escudo pertencem ao compose Blue 2 ainda registrado como aguardando aprovação. Fast-forward levaria esse lote inteiro para a Espelunca, portanto a branch estável não foi movida sem confirmação explícita do conjunto cumulativo.
