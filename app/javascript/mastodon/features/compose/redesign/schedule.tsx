@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions -- Escape dismisses the non-modal schedule control group and restores trigger focus. */
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -21,6 +22,8 @@ const messages = defineMessages({
     defaultMessage: 'Remove schedule and publish immediately',
   },
 });
+
+const MOBILE_SCHEDULE_QUERY = '(max-width: 759px)';
 
 const browserTimezone = () =>
   Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
@@ -112,9 +115,26 @@ export const ComposeSchedule: React.FC = () => {
   const [timezone, setTimezone] = useState(savedTimezone ?? browserTimezone());
   const [timezones] = useState(() => supportedTimezones());
   const [open, setOpen] = useState(false);
+  const [isMobileSchedule, setIsMobileSchedule] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia(MOBILE_SCHEDULE_QUERY).matches,
+  );
   const [dateTime, setDateTime] = useState(() =>
     localValue(scheduledAt, timezone),
   );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const mediaQuery = window.matchMedia(MOBILE_SCHEDULE_QUERY);
+    const sync = () => setIsMobileSchedule(mediaQuery.matches);
+    sync();
+    mediaQuery.addEventListener('change', sync);
+
+    return () => mediaQuery.removeEventListener('change', sync);
+  }, []);
+
   const closeAndRestoreFocus = useCallback(() => {
     setOpen(false);
     window.requestAnimationFrame(() =>
@@ -156,6 +176,72 @@ export const ComposeSchedule: React.FC = () => {
     [closeAndRestoreFocus],
   );
 
+  const schedulePanel = (
+    <div
+      className={classes.schedulePanel}
+      role='group'
+      aria-label={intl.formatMessage(messages.schedule)}
+      onKeyDown={panelKeyDown}
+      style={
+        isMobileSchedule
+          ? {
+              position: 'fixed',
+              zIndex: 10000,
+              left: '50%',
+              right: 'auto',
+              insetInlineStart: 'auto',
+              bottom:
+                'calc(env(safe-area-inset-bottom, 0px) + 4.75rem)',
+              width:
+                'min(22rem, calc(100vw - 2 * var(--space-sm)))',
+              maxHeight: 'min(70vh, 26rem)',
+              overflowY: 'auto',
+              overscrollBehavior: 'contain',
+              transform: 'translateX(-50%)',
+            }
+          : undefined
+      }
+    >
+      <label>
+        <FormattedMessage
+          id='compose.schedule.date_time'
+          defaultMessage='Date and time'
+        />
+        <input
+          type='datetime-local'
+          value={dateTime}
+          onChange={changeDateTime}
+        />
+      </label>
+      <label className={classes.scheduleTimezone}>
+        <FormattedMessage
+          id='compose.schedule.timezone'
+          defaultMessage='Timezone'
+        />
+        <select value={timezone} onChange={changeTimezone}>
+          {timezones.map((zone) => (
+            <option key={zone} value={zone}>
+              {zone}
+            </option>
+          ))}
+        </select>
+      </label>
+      <div className={classes.scheduleActions}>
+        {scheduledAt && (
+          <Button size='sm' leadingIcon={XIcon} onClick={remove}>
+            <FormattedMessage {...messages.remove} />
+          </Button>
+        )}
+        <Button size='sm' variant='solid' color='accent' onClick={apply}>
+          <FormattedMessage
+            id='compose.schedule.confirm'
+            defaultMessage='Confirm schedule'
+          />
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
     <div ref={rootRef} className={classes.scheduleControl}>
       <IconButton
@@ -169,52 +255,10 @@ export const ComposeSchedule: React.FC = () => {
       >
         <FormattedMessage {...messages.schedule} />
       </IconButton>
-      {open && (
-        <div
-          className={classes.schedulePanel}
-          role='group'
-          aria-label={intl.formatMessage(messages.schedule)}
-          onKeyDown={panelKeyDown}
-        >
-          <label>
-            <FormattedMessage
-              id='compose.schedule.date_time'
-              defaultMessage='Date and time'
-            />
-            <input
-              type='datetime-local'
-              value={dateTime}
-              onChange={changeDateTime}
-            />
-          </label>
-          <label className={classes.scheduleTimezone}>
-            <FormattedMessage
-              id='compose.schedule.timezone'
-              defaultMessage='Timezone'
-            />
-            <select value={timezone} onChange={changeTimezone}>
-              {timezones.map((zone) => (
-                <option key={zone} value={zone}>
-                  {zone}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className={classes.scheduleActions}>
-            {scheduledAt && (
-              <Button size='sm' leadingIcon={XIcon} onClick={remove}>
-                <FormattedMessage {...messages.remove} />
-              </Button>
-            )}
-            <Button size='sm' variant='solid' color='accent' onClick={apply}>
-              <FormattedMessage
-                id='compose.schedule.confirm'
-                defaultMessage='Confirm schedule'
-              />
-            </Button>
-          </div>
-        </div>
-      )}
+      {open &&
+        (isMobileSchedule && typeof document !== 'undefined'
+          ? createPortal(schedulePanel, document.body)
+          : schedulePanel)}
       {scheduledAt && (
         <span className={classes.scheduledSummary}>
           <FormattedMessage
