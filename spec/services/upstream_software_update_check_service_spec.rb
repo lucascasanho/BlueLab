@@ -81,9 +81,11 @@ RSpec.describe UpstreamSoftwareUpdateCheckService do
       check = UpstreamUpdateCheck.create!(repository: repository, channel: channel, last_sha: base_sha)
       stub_head(head_sha)
       stub_version(head_sha, 'alpha.2')
-      stub_releases([
-        { tag_name: 'v4.7.1', draft: false, prerelease: false, html_url: 'https://github.com/mastodon/mastodon/releases/tag/v4.7.1', published_at: '2026-09-01T14:00:36Z' },
-      ])
+      stub_releases(
+        [
+          { tag_name: 'v4.7.1', draft: false, prerelease: false, html_url: 'https://github.com/mastodon/mastodon/releases/tag/v4.7.1', published_at: '2026-09-01T14:00:36Z' },
+        ]
+      )
 
       expect { service.call }.to not_change(UpstreamUpdateBatch, :count)
       expect(check.reload).to have_attributes(last_sha: head_sha, last_error: nil)
@@ -125,9 +127,11 @@ RSpec.describe UpstreamSoftwareUpdateCheckService do
       UpstreamUpdateCheck.create!(repository: repository, channel: channel, last_sha: head_sha)
       stub_head(head_sha)
       stub_version(head_sha, 'alpha.2')
-      stub_releases([
-        { tag_name: 'v4.8.0', draft: false, prerelease: false, html_url: 'https://github.com/mastodon/mastodon/releases/tag/v4.8.0', published_at: '2026-10-01T12:00:00Z' },
-      ])
+      stub_releases(
+        [
+          { tag_name: 'v4.8.0', draft: false, prerelease: false, html_url: 'https://github.com/mastodon/mastodon/releases/tag/v4.8.0', published_at: '2026-10-01T12:00:00Z' },
+        ]
+      )
       stub_request(:get, "https://api.github.com/repos/#{repository}/commits/v4.8.0")
         .to_return(status: 200, body: { sha: release_sha }.to_json)
 
