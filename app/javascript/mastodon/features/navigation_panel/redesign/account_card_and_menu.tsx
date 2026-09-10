@@ -49,7 +49,9 @@ import { useAppDispatch } from '@/mastodon/store';
 
 import classes from './account_card_and_menu.module.scss';
 
-export const NavigationAccountCardAndMenu: React.FC = () => {
+export const NavigationAccountCardAndMenu: React.FC<{
+  inSlideOut?: boolean;
+}> = ({ inSlideOut = false }) => {
   const { accountId } = useIdentity();
   const account = useAccount(accountId);
   const localCustomEmojis = useCustomEmojis();
@@ -101,7 +103,15 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
             defaultMessage='Account settings'
           />
         </MenuTrigger>
-        <MenuList placement='top' offset={8}>
+        <MenuList
+          placement='top'
+          offset={8}
+          mobilePresentation={inSlideOut ? 'popover' : 'bottom-sheet'}
+          container={
+            inSlideOut && typeof document !== 'undefined' ? document.body : null
+          }
+          className={inSlideOut ? classes.slideOutMenu : undefined}
+        >
           <AccountMenuItems />
         </MenuList>
       </Menu>
