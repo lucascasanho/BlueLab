@@ -12,6 +12,7 @@ import { afterEach, vi } from 'vitest';
 import {
   ComposerBackdrop,
   ComposerResumeButton,
+  shouldHideBlue2GlobalTrigger,
   useBlue2Theme,
 } from './trigger';
 
@@ -50,6 +51,16 @@ describe('BlueLab composer trigger controls', () => {
 
     fireEvent.click(resumeButton as Element);
     expect(onResume).toHaveBeenCalledOnce();
+  });
+
+  test('keeps the Blue 2 global composer host mounted while showing', () => {
+    expect(shouldHideBlue2GlobalTrigger(true, undefined, 'hidden')).toBe(true);
+    expect(shouldHideBlue2GlobalTrigger(true, undefined, 'minimized')).toBe(
+      true,
+    );
+    expect(shouldHideBlue2GlobalTrigger(true, undefined, 'showing')).toBe(
+      false,
+    );
   });
 
   test('reacts when Blue 2 is applied after the compose trigger mounts', async () => {
