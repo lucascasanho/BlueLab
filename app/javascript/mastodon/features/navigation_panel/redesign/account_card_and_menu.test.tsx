@@ -67,7 +67,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
     expect(screen.getByTestId('slide-out-account-menu')).toBeInTheDocument();
     expect(
       screen
-        .getByRole('link', { name: 'Scheduled publications' })
+        .getByRole('menuitem', { name: 'Scheduled publications' })
         .getAttribute('href'),
     ).toBe('/scheduled');
 
