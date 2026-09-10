@@ -51,11 +51,7 @@ export const ThreadVisibilityToggle: React.FC<{
   const intl = useIntl();
   const key: CompactLabelKey = hidden ? 'showAll' : 'showLess';
   const message = hidden ? messages.showAll : messages.showLess;
-  const label = getCompactLabel(
-    intl.locale,
-    key,
-    intl.formatMessage(message),
-  );
+  const label = getCompactLabel(intl.locale, key, intl.formatMessage(message));
 
   return (
     <div className={styles.wrapper}>
