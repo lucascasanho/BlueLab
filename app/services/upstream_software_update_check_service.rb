@@ -94,8 +94,7 @@ class UpstreamSoftwareUpdateCheckService < BaseService
     UpstreamUpdateBatch
       .for_repository(repository)
       .official_versions
-      .where('commits @> ?', [{ kind: UpstreamUpdateBatch::VERSION_METADATA_KIND, version: version }].to_json)
-      .exists?
+      .exists?(['commits @> ?', [{ kind: UpstreamUpdateBatch::VERSION_METADATA_KIND, version: version }].to_json])
   end
 
   def fetch_channel_head_sha
