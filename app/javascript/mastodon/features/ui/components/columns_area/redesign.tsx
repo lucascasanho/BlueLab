@@ -234,11 +234,21 @@ export const ColumnsAreaRedesign: React.FC<{
                 <MenuIcon width={28} height={28} fill='currentColor' />
               </button>
 
-              <img
-                src={blue2Brand}
-                alt=''
-                className={classes.blue2MobileBrand}
-              />
+              <Link
+                to='/home'
+                className={classes.blue2MobileUtilityButton}
+                style={{ justifySelf: 'center', textDecoration: 'none' }}
+                aria-label={intl.formatMessage({
+                  id: 'tabs_bar.home',
+                  defaultMessage: 'Home',
+                })}
+              >
+                <img
+                  src={blue2Brand}
+                  alt=''
+                  className={classes.blue2MobileBrand}
+                />
+              </Link>
 
               <button
                 type='button'
