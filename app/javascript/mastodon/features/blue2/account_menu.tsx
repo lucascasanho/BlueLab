@@ -307,7 +307,6 @@ export const Blue2AccountMenu: React.FC = () => {
               className={classes.menu}
               role='menu'
               onPointerDown={stopMenuEventPropagation}
-              onClick={stopMenuEventPropagation}
             >
               {menuContent}
             </div>
