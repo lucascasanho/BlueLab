@@ -97,6 +97,29 @@ describe('<NavigationAccountCardAndMenu />', () => {
     expect(screen.queryByRole('link', { name: 'Moderation' })).toBeNull();
   });
 
+  it('opens the mobile drawer submenu from pointerup even when no click follows', () => {
+    vi.mocked(useBreakpoint).mockReturnValue(true);
+    render(<NavigationAccountCardAndMenu inSlideOut />);
+    const trigger = screen.getByRole('button', { name: 'Account settings' });
+
+    fireEvent.pointerUp(trigger, { pointerType: 'touch', button: 0 });
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('slide-out-account-menu')).toBeInTheDocument();
+  });
+
+  it('does not immediately close after pointerup when the synthesized click arrives', () => {
+    vi.mocked(useBreakpoint).mockReturnValue(true);
+    render(<NavigationAccountCardAndMenu inSlideOut />);
+    const trigger = screen.getByRole('button', { name: 'Account settings' });
+
+    fireEvent.pointerUp(trigger, { pointerType: 'touch', button: 0 });
+    fireEvent.click(trigger);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('slide-out-account-menu')).toBeInTheDocument();
+  });
+
   it('uses a dedicated body-portal popover in the mobile drawer and isolates drawer gestures', async () => {
     vi.mocked(useBreakpoint).mockReturnValue(true);
     const drawerTouchStart = vi.fn();
