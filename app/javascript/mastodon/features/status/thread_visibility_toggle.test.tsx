@@ -30,6 +30,8 @@ describe('<ThreadVisibilityToggle />', () => {
 
     render(<ThreadVisibilityToggle hidden={false} onClick={onClick} />);
 
-    expect(screen.getByRole('button', { name: 'Show less' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Show less' }),
+    ).toBeInTheDocument();
   });
 });
