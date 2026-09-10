@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -139,14 +139,15 @@ export const NavigationAccountCardAndMenu: React.FC<{
 
 /**
  * The true mobile navigation lives inside a transformed, gesture-driven drawer.
- * Use the same direct trigger + body-level Popover architecture that is proven
- * in Blue2AccountMenu instead of routing the trigger through the generic Menu
- * lifecycle. The nested Menu below only supplies navigation semantics and the
- * close-on-item-click behavior expected by AccountMenuItems.
+ * Use a direct pointer trigger so the drawer's gesture recognizer cannot delay
+ * or swallow the synthesized click. A subsequent click from the same pointer
+ * sequence is ignored; keyboard-generated clicks remain supported.
  */
 const SlideOutAccountMenu: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
+  const pointerHandledRef = useRef(false);
+  const pointerResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const toggleMenu = useCallback(() => {
     setOpen((value) => !value);
@@ -157,6 +158,47 @@ const SlideOutAccountMenu: React.FC = () => {
     anchor?.focus({ preventScroll: true });
   }, [anchor]);
 
+  const handlePointerUp = useCallback<React.PointerEventHandler<HTMLButtonElement>>(
+    (event) => {
+      event.stopPropagation();
+
+      if (event.pointerType === 'mouse' && event.button !== 0) {
+        return;
+      }
+
+      pointerHandledRef.current = true;
+      if (pointerResetTimerRef.current) {
+        clearTimeout(pointerResetTimerRef.current);
+      }
+      pointerResetTimerRef.current = setTimeout(() => {
+        pointerHandledRef.current = false;
+        pointerResetTimerRef.current = null;
+      }, 0);
+
+      toggleMenu();
+    },
+    [toggleMenu],
+  );
+
+  const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
+    (event) => {
+      event.stopPropagation();
+
+      if (pointerHandledRef.current) {
+        pointerHandledRef.current = false;
+        if (pointerResetTimerRef.current) {
+          clearTimeout(pointerResetTimerRef.current);
+          pointerResetTimerRef.current = null;
+        }
+        return;
+      }
+
+      // Keyboard activation does not produce the pointerup handled above.
+      toggleMenu();
+    },
+    [toggleMenu],
+  );
+
   return (
     <>
       <IconButton
@@ -164,7 +206,8 @@ const SlideOutAccountMenu: React.FC = () => {
         icon={DotsThreeIcon}
         variant='ghost'
         size='sm'
-        onClick={toggleMenu}
+        onPointerUp={handlePointerUp}
+        onClick={handleClick}
         aria-expanded={open}
         aria-haspopup='menu'
       >
