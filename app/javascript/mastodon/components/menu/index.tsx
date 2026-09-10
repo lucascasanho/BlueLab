@@ -268,6 +268,7 @@ export type MenuListProps<As extends React.ElementType> = Omit<
 
 export const MenuList = <As extends React.ElementType = 'div'>({
   children,
+  container,
   ...props
 }: MenuListProps<As>) => {
   const { popover, menuListProps, type } = useMenuContext();
@@ -278,7 +279,7 @@ export const MenuList = <As extends React.ElementType = 'div'>({
       onClose={popover.closeMenu}
       reference={popover.reference}
       popoverElement={popover.popover}
-      container={null}
+      container={container}
       {...(props as React.ComponentPropsWithoutRef<As>)}
       {...menuListProps}
     >
