@@ -24,6 +24,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
   const account = accountFactoryImmutable({
     id: '123',
     username: 'alice',
+    acct: 'alice',
     display_name: 'Alice',
     verified_by_role: true,
   });
@@ -88,10 +89,10 @@ describe('<NavigationAccountCardAndMenu />', () => {
     expect(screen.queryByRole('menuitem', { name: 'Moderation' })).toBeNull();
   });
 
-  it('opens and closes the drawer-specific anchored menu without a bottom sheet', async () => {
+  it('portals the drawer account menu above clipping ancestors and keeps drawer gestures isolated', async () => {
     const drawerTouchStart = vi.fn();
     render(
-      <div onTouchStart={drawerTouchStart}>
+      <div data-testid='drawer-ancestor' onTouchStart={drawerTouchStart}>
         <NavigationAccountCardAndMenu inSlideOut />
       </div>,
     );
@@ -103,6 +104,11 @@ describe('<NavigationAccountCardAndMenu />', () => {
 
     const menu = screen.getByTestId('slide-out-account-menu');
     expect(menu).toHaveAttribute('role', 'menu');
+    expect(menu.parentElement).toBe(document.body);
+    expect(screen.getByTestId('drawer-ancestor')).not.toContainElement(menu);
+    await waitFor(() => {
+      expect(menu).toHaveAttribute('data-positioned', 'true');
+    });
     expect(
       screen
         .getByRole('menuitem', { name: 'Scheduled publications' })

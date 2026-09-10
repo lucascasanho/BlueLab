@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
+import { createPortal } from 'react-dom';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -124,60 +131,73 @@ export const NavigationAccountCardAndMenu: React.FC<{
   );
 };
 
+interface SlideOutMenuPosition {
+  left: number;
+  bottom: number;
+  width: number;
+  maxHeight: number;
+}
+
 /**
- * The account card lives inside a scrollable, gesture-enabled drawer. The
- * generic MenuList intentionally becomes a bottom sheet at mobile widths,
- * which makes it unsuitable for this particular anchored menu. Keep the
- * shared Menu state, keyboard handling and AccountMenuItems, but render the
- * list next to its card so it stays inside the drawer's stacking context.
+ * The account card lives inside the drawer's scroll container. An absolutely
+ * positioned submenu is still clipped by that ancestor even when the card and
+ * footer themselves use overflow: visible. Render the opened list in a portal
+ * and position it from the card's viewport rect so the drawer can keep its own
+ * scrolling while the submenu remains visibly anchored above the card.
  */
 const SlideOutAccountMenu: React.FC<{ accountCard: React.ReactNode }> = ({
   accountCard,
 }) => {
   const rootRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [menuPosition, setMenuPosition] = useState<SlideOutMenuPosition | null>(
+    null,
+  );
   const { popover, menuTriggerProps, menuListProps } = useMenuContext();
+  const { ref: menuListRef, ...menuListElementProps } = menuListProps;
+
+  const updateMenuPosition = useCallback(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const rect = root.getBoundingClientRect();
+    const visualViewport = window.visualViewport;
+    const viewportTop = visualViewport?.offsetTop ?? 0;
+    const viewportHeight = visualViewport?.height ?? window.innerHeight;
+    const viewportBottom = viewportTop + viewportHeight;
+    const gap = 8;
+    const left = Math.max(gap, rect.left);
+    const width = Math.max(
+      0,
+      Math.min(rect.width, window.innerWidth - left - gap),
+    );
+    const anchorTop = Math.min(rect.top, viewportBottom - gap);
+    const maxHeight = Math.max(gap, anchorTop - viewportTop - gap * 2);
+    const bottom = Math.max(gap, window.innerHeight - anchorTop + gap);
+
+    setMenuPosition({ left, bottom, width, maxHeight });
+  }, []);
 
   useLayoutEffect(() => {
     if (!popover.isMenuOpen) {
       return undefined;
     }
 
-    const constrainMenuToViewport = () => {
-      const root = rootRef.current;
-      if (!root) return;
+    updateMenuPosition();
 
-      const viewportTop = window.visualViewport?.offsetTop ?? 0;
-      const menuGap =
-        Number.parseFloat(
-          getComputedStyle(root).getPropertyValue('--space-xs'),
-        ) || 8;
-      const availableAbove = Math.max(
-        0,
-        root.getBoundingClientRect().top - viewportTop - menuGap,
-      );
-      root.style.setProperty(
-        '--slide-out-account-menu-max-height',
-        `${Math.floor(availableAbove)}px`,
-      );
-    };
-
-    constrainMenuToViewport();
-    window.addEventListener('resize', constrainMenuToViewport);
-    window.visualViewport?.addEventListener('resize', constrainMenuToViewport);
-    window.visualViewport?.addEventListener('scroll', constrainMenuToViewport);
+    const visualViewport = window.visualViewport;
+    window.addEventListener('resize', updateMenuPosition);
+    window.addEventListener('scroll', updateMenuPosition, true);
+    visualViewport?.addEventListener('resize', updateMenuPosition);
+    visualViewport?.addEventListener('scroll', updateMenuPosition);
 
     return () => {
-      window.removeEventListener('resize', constrainMenuToViewport);
-      window.visualViewport?.removeEventListener(
-        'resize',
-        constrainMenuToViewport,
-      );
-      window.visualViewport?.removeEventListener(
-        'scroll',
-        constrainMenuToViewport,
-      );
+      window.removeEventListener('resize', updateMenuPosition);
+      window.removeEventListener('scroll', updateMenuPosition, true);
+      visualViewport?.removeEventListener('resize', updateMenuPosition);
+      visualViewport?.removeEventListener('scroll', updateMenuPosition);
     };
-  }, [popover.isMenuOpen]);
+  }, [popover.isMenuOpen, updateMenuPosition]);
 
   useEffect(() => {
     if (!popover.isMenuOpen) {
@@ -185,10 +205,12 @@ const SlideOutAccountMenu: React.FC<{ accountCard: React.ReactNode }> = ({
     }
 
     const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (
-        event.target instanceof Node &&
-        !rootRef.current?.contains(event.target)
-      ) {
+      if (!(event.target instanceof Node)) return;
+
+      const isInsideCard = rootRef.current?.contains(event.target) ?? false;
+      const isInsideMenu = menuRef.current?.contains(event.target) ?? false;
+
+      if (!isInsideCard && !isInsideMenu) {
         popover.closeMenu();
       }
     };
@@ -221,40 +243,67 @@ const SlideOutAccountMenu: React.FC<{ accountCard: React.ReactNode }> = ({
     },
     [menuTriggerProps],
   );
+  const setMenuElement = useCallback(
+    (element: HTMLDivElement | null) => {
+      menuRef.current = element;
+      menuListRef(element);
+    },
+    [menuListRef],
+  );
+
+  const menu =
+    popover.isMenuOpen && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            {...menuListElementProps}
+            ref={setMenuElement}
+            className={classes.slideOutMenu}
+            data-testid='slide-out-account-menu'
+            data-positioned={menuPosition ? 'true' : 'false'}
+            style={
+              menuPosition
+                ? {
+                    left: menuPosition.left,
+                    bottom: menuPosition.bottom,
+                    width: menuPosition.width,
+                    maxHeight: menuPosition.maxHeight,
+                  }
+                : undefined
+            }
+            onPointerDown={stopDrawerGesture}
+            onTouchStart={stopDrawerGesture}
+          >
+            <AccountMenuItems context='mobile' />
+          </div>,
+          document.body,
+        )
+      : null;
 
   return (
-    <div
-      ref={rootRef}
-      className={classes.root}
-      data-in-slide-out='true'
-      onPointerDown={stopDrawerGesture}
-      onTouchStart={stopDrawerGesture}
-    >
-      {accountCard}
-      <IconButton
-        {...menuTriggerProps}
-        icon={DotsThreeIcon}
-        variant='ghost'
-        size='sm'
-        onClick={toggleMenuWithoutDrawerClick}
+    <>
+      <div
+        ref={rootRef}
+        className={classes.root}
+        data-in-slide-out='true'
+        onPointerDown={stopDrawerGesture}
+        onTouchStart={stopDrawerGesture}
       >
-        <FormattedMessage
-          id='tabs_bar.account_settings'
-          defaultMessage='Account settings'
-        />
-      </IconButton>
-      {popover.isMenuOpen && (
-        <div
-          {...menuListProps}
-          className={classes.slideOutMenu}
-          data-testid='slide-out-account-menu'
-          onPointerDown={stopDrawerGesture}
-          onTouchStart={stopDrawerGesture}
+        {accountCard}
+        <IconButton
+          {...menuTriggerProps}
+          icon={DotsThreeIcon}
+          variant='ghost'
+          size='sm'
+          onClick={toggleMenuWithoutDrawerClick}
         >
-          <AccountMenuItems context='mobile' />
-        </div>
-      )}
-    </div>
+          <FormattedMessage
+            id='tabs_bar.account_settings'
+            defaultMessage='Account settings'
+          />
+        </IconButton>
+      </div>
+      {menu}
+    </>
   );
 };
 
