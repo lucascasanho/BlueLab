@@ -10,22 +10,18 @@
 
   &[data-in-slide-out='true'] {
     z-index: 1;
-    overflow: visible;
   }
 }
 
 .slideOutMenu {
   @include mixins.elevation-2;
 
-  position: absolute;
-  z-index: 1;
-  inset-inline: 0;
-  bottom: calc(100% + var(--space-xs));
+  position: fixed;
+  z-index: 500;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-height: min(70dvh, var(--slide-out-account-menu-max-height, 560px));
+  min-height: 0;
   padding: var(--space-2xs);
   border-radius: var(--radius-md);
   background: var(--color-bg-primary);
@@ -34,6 +30,10 @@
   overscroll-behavior: contain;
   scrollbar-width: thin;
   text-align: start;
+
+  &[data-positioned='false'] {
+    visibility: hidden;
+  }
 }
 
 .accountLink {
