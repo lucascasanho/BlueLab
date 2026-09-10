@@ -50,7 +50,7 @@
 .slideOutWrapper {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 300;
   pointer-events: none;
   background: rgb(from var(--color-bg-overlay) r g b/50%);
   opacity: 0;
@@ -69,6 +69,7 @@
   --pull-tolerance: 70px;
 
   position: fixed;
+  z-index: 1;
   inset-block: 0;
   inset-inline-start: calc(-1 * var(--pull-tolerance));
   width: var(--navigation-max-width);
