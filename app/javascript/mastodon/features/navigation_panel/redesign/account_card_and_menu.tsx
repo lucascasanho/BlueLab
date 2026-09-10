@@ -79,6 +79,20 @@ export const NavigationAccountCardAndMenu: React.FC<{
     };
   }, [inSlideOut, slideOutOpen]);
 
+  const stopSlideOutPointerDown = useCallback((event: React.PointerEvent) => {
+    event.stopPropagation();
+  }, []);
+
+  const toggleSlideOutMenu = useCallback((event: React.MouseEvent) => {
+    event.stopPropagation();
+    setSlideOutOpen((value) => !value);
+  }, []);
+
+  const closeSlideOutMenu = useCallback((event: React.MouseEvent) => {
+    event.stopPropagation();
+    setSlideOutOpen(false);
+  }, []);
+
   if (!accountId || !account) {
     return null;
   }
@@ -124,11 +138,8 @@ export const NavigationAccountCardAndMenu: React.FC<{
           variant='ghost'
           size='sm'
           aria-expanded={slideOutOpen}
-          onPointerDown={(event) => event.stopPropagation()}
-          onClick={(event) => {
-            event.stopPropagation();
-            setSlideOutOpen((value) => !value);
-          }}
+          onPointerDown={stopSlideOutPointerDown}
+          onClick={toggleSlideOutMenu}
         >
           <FormattedMessage
             id='tabs_bar.account_settings'
@@ -140,11 +151,8 @@ export const NavigationAccountCardAndMenu: React.FC<{
             <div
               className={classes.slideOutMenu}
               data-testid='slide-out-account-menu'
-              onPointerDown={(event) => event.stopPropagation()}
-              onClick={(event) => {
-                event.stopPropagation();
-                setSlideOutOpen(false);
-              }}
+              onPointerDown={stopSlideOutPointerDown}
+              onClick={closeSlideOutMenu}
             >
               <ul>
                 <AccountMenuItems context='mobile' />
