@@ -1,3 +1,5 @@
+import { useLocation } from 'react-router';
+
 import { fireEvent } from '@testing-library/react';
 
 import { useAccount } from '@/mastodon/hooks/useAccount';
@@ -19,6 +21,11 @@ vi.mock('@/mastodon/store', async () => {
 
   return { ...store, useAppDispatch: () => vi.fn() };
 });
+
+const LocationProbe: React.FC = () => {
+  const location = useLocation();
+  return <output data-testid='location'>{location.pathname}</output>;
+};
 
 describe('<Blue2AccountMenu />', () => {
   const account = accountFactoryImmutable({
@@ -81,6 +88,38 @@ describe('<Blue2AccountMenu />', () => {
 
     expect(document.body.contains(menu)).toBe(true);
     expect(container.contains(menu)).toBe(false);
+  });
+
+  it('keeps the portaled submenu mounted through pointerdown and navigates on click', () => {
+    render(
+      <>
+        <Blue2AccountMenu />
+        <LocationProbe />
+      </>,
+    );
+    openAccountMenu();
+
+    const favorites = screen.getByRole('menuitem', { name: 'Favorites' });
+
+    fireEvent.pointerDown(favorites);
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+
+    fireEvent.click(favorites);
+    expect(screen.getByTestId('location')).toHaveTextContent('/favourites');
+    expect(screen.queryByRole('menu')).toBeNull();
+  });
+
+  it('keeps action buttons alive through pointerdown before their click handler', () => {
+    render(<Blue2AccountMenu />);
+    openAccountMenu();
+
+    const logout = screen.getByRole('menuitem', { name: 'Logout' });
+
+    fireEvent.pointerDown(logout);
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+
+    fireEvent.click(logout);
+    expect(screen.queryByRole('menu')).toBeNull();
   });
 
   it('hides moderation and administration from users without permissions', () => {

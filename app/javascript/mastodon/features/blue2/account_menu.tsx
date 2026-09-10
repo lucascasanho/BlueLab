@@ -56,6 +56,13 @@ export const Blue2AccountMenu: React.FC = () => {
     setOpen(false);
   }, []);
 
+  const stopMenuEventPropagation = useCallback(
+    (event: React.SyntheticEvent) => {
+      event.stopPropagation();
+    },
+    [],
+  );
+
   const goHome = useCallback(() => {
     setOpen(false);
     history.push('/home');
@@ -295,7 +302,12 @@ export const Blue2AccountMenu: React.FC = () => {
           offset={4}
         >
           {({ props: popoverProps }) => (
-            <div {...popoverProps} className={classes.menu} role='menu'>
+            <div
+              {...popoverProps}
+              className={classes.menu}
+              role='menu'
+              onPointerDown={stopMenuEventPropagation}
+            >
               {menuContent}
             </div>
           )}
