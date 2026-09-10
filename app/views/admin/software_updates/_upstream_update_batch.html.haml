@@ -1,8 +1,14 @@
+- upstream_repository = Rails.configuration.x.mastodon.upstream_repository
+- official_url = if upstream_update_batch.stable_release?
+  - "https://github.com/#{upstream_repository}/releases/tag/v#{ERB::Util.url_encode(upstream_update_batch.version)}"
+- else
+  - "https://github.com/#{upstream_repository}/commit/#{ERB::Util.url_encode(upstream_update_batch.head_sha)}"
+
 %article.upstream-update{ id: dom_id(upstream_update_batch), class: upstream_update_batch.reviewed_at? ? 'upstream-update--reviewed' : nil }
   .upstream-update__header
     %div
       %h3
-        = link_to "Mastodon #{upstream_update_batch.version}", upstream_update_batch.release_url, target: '_blank', rel: 'noopener noreferrer'
+        = link_to "Mastodon #{upstream_update_batch.version}", official_url, target: '_blank', rel: 'noopener noreferrer'
         - if upstream_update_batch.stable_release?
           %span.upstream-update__badge= t('admin.software_updates.upstream.release_badge.stable')
         - else
@@ -20,6 +26,6 @@
     = t('admin.software_updates.upstream.compatibility', installed: Mastodon::Version.to_s, available: upstream_update_batch.version)
 
   .upstream-update__actions
-    = link_to t('admin.software_updates.upstream.view_official'), upstream_update_batch.release_url, target: '_blank', rel: 'noopener noreferrer', class: 'button button-secondary'
+    = link_to t('admin.software_updates.upstream.view_official'), official_url, target: '_blank', rel: 'noopener noreferrer', class: 'button button-secondary'
     - unless upstream_update_batch.reviewed_at?
       = button_to t('admin.software_updates.upstream.mark_reviewed'), review_upstream_admin_software_updates_path(batch_id: upstream_update_batch.id), method: :post, class: 'button button-secondary'
