@@ -13,6 +13,7 @@ import {
   ComposerBackdrop,
   ComposerResumeButton,
   shouldHideBlue2GlobalTrigger,
+  shouldUseDirectBlue2InlineLauncher,
   useBlue2Theme,
 } from './trigger';
 
@@ -59,6 +60,22 @@ describe('BlueLab composer trigger controls', () => {
       true,
     );
     expect(shouldHideBlue2GlobalTrigger(true, undefined, 'showing')).toBe(
+      false,
+    );
+  });
+
+  test('uses the direct post launcher only for the idle Blue 2 inline mobile FAB', () => {
+    expect(shouldUseDirectBlue2InlineLauncher(true, true, 'hidden')).toBe(true);
+    expect(shouldUseDirectBlue2InlineLauncher(true, true, 'showing')).toBe(
+      false,
+    );
+    expect(shouldUseDirectBlue2InlineLauncher(true, true, 'minimized')).toBe(
+      false,
+    );
+    expect(shouldUseDirectBlue2InlineLauncher(true, false, 'hidden')).toBe(
+      false,
+    );
+    expect(shouldUseDirectBlue2InlineLauncher(false, true, 'hidden')).toBe(
       false,
     );
   });
