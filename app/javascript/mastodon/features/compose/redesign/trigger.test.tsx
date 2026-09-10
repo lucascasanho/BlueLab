@@ -45,10 +45,7 @@ describe('BlueLab composer trigger controls', () => {
 
     const trigger = container.querySelector('[data-blue2-compose-resume]');
     expect(trigger).not.toBeNull();
-    expect(trigger).toHaveAttribute(
-      'data-blue2-compose-resume-inline',
-      'true',
-    );
+    expect(trigger).toHaveAttribute('data-blue2-compose-resume-inline', 'true');
 
     fireEvent.click(trigger as Element);
     expect(onSelect).not.toHaveBeenCalled();
