@@ -10,3 +10,16 @@
     backdrop-filter: blur(6px);
   }
 }
+
+// The mobile Bird UI uses separate top-bar surfaces. Override the older
+// 90%-opaque backgrounds here, after the mobile module in the cascade, so
+// both surfaces use the same 80% glass treatment without changing shared
+// Mastodon or other theme styles.
+@media screen and (width <= 1174px) {
+  .app-body:not(.layout-multiple-columns) .ui__header,
+  .app-body:not(.layout-multiple-columns):has(.column-header)
+    .tabs-bar__wrapper::after {
+    background-color: rgb(from var(--color-bg) r g b / 80%);
+    backdrop-filter: blur(6px);
+  }
+}
