@@ -49,9 +49,18 @@ describe('<NavigationAccountCardAndMenu />', () => {
   });
 
   it('puts scheduled publications in this account submenu for signed-in users', () => {
-    render(<NavigationAccountCardAndMenu />);
+    render(
+      <div data-testid='static-sidebar-ancestor'>
+        <NavigationAccountCardAndMenu />
+      </div>,
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
 
+    const menu = screen.getByTestId('account-menu');
+    expect(menu.parentElement).toBe(document.body);
+    expect(screen.getByTestId('static-sidebar-ancestor')).not.toContainElement(
+      menu,
+    );
     expect(
       screen
         .getByRole('link', { name: 'Scheduled publications' })

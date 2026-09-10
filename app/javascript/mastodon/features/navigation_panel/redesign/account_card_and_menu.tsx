@@ -111,7 +111,14 @@ export const NavigationAccountCardAndMenu: React.FC<{
             defaultMessage='Account settings'
           />
         </MenuTrigger>
-        <MenuList placement='top' offset={8}>
+        <MenuList
+          portal
+          mobilePresentation='popover'
+          placement='top-end'
+          offset={8}
+          maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
+          data-testid='account-menu'
+        >
           <AccountMenuItems />
         </MenuList>
       </Menu>
