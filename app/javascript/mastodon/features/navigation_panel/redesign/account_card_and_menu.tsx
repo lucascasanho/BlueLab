@@ -39,6 +39,7 @@ import {
   useMenuContext,
 } from '@/mastodon/components/menu';
 import { Popover } from '@/mastodon/components/popover';
+import type { PopoverChildProps } from '@/mastodon/components/popover';
 import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
@@ -162,27 +163,47 @@ const SlideOutAccountMenuList: React.FC = () => {
       strategy='fixed'
       offset={8}
     >
-      {({ props: floatingProps }) => {
-        const { ref: floatingRef, ...floatingRest } = floatingProps;
-
-        return (
-          <div
-            {...floatingRest}
-            {...menuListRest}
-            ref={(element) => {
-              floatingRef?.(element);
-              menuListRef(element);
-            }}
-            className={classes.slideOutMenu}
-            data-testid='slide-out-account-menu'
-          >
-            <ul>
-              <AccountMenuItems />
-            </ul>
-          </div>
-        );
-      }}
+      {({ props: floatingProps }) => (
+        <SlideOutAccountMenuSurface
+          floatingProps={floatingProps}
+          menuListRef={menuListRef}
+          menuListProps={menuListRest}
+        />
+      )}
     </Popover>
+  );
+};
+
+interface SlideOutAccountMenuSurfaceProps {
+  floatingProps: PopoverChildProps;
+  menuListRef: (list: HTMLDivElement | null) => void;
+  menuListProps: Omit<React.ComponentProps<'div'>, 'ref'>;
+}
+
+const SlideOutAccountMenuSurface: React.FC<
+  SlideOutAccountMenuSurfaceProps
+> = ({ floatingProps, menuListRef, menuListProps }) => {
+  const { ref: floatingRef, ...floatingRest } = floatingProps;
+  const setMenuRef = useCallback(
+    (element: HTMLDivElement | null) => {
+      floatingRef?.(element);
+      menuListRef(element);
+    },
+    [floatingRef, menuListRef],
+  );
+
+  return (
+    <div
+      {...floatingRest}
+      {...menuListProps}
+      ref={setMenuRef}
+      className={classes.slideOutMenu}
+      data-testid='slide-out-account-menu'
+    >
+      <ul>
+        <AccountMenuItems />
+      </ul>
+    </div>
   );
 };
 
