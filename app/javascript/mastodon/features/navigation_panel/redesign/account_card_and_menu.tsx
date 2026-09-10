@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -36,10 +36,8 @@ import {
   MenuItemLink,
   MenuList,
   MenuTrigger,
-  useMenuContext,
 } from '@/mastodon/components/menu';
 import { Popover } from '@/mastodon/components/popover';
-import type { PopoverChildProps } from '@/mastodon/components/popover';
 import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
@@ -107,21 +105,21 @@ export const NavigationAccountCardAndMenu: React.FC<{
       onTouchStart={inSlideOut ? stopDrawerGesture : undefined}
     >
       {accountCard}
-      <Menu type='navigation'>
-        <MenuTrigger
-          as={IconButton}
-          icon={DotsThreeIcon}
-          variant='ghost'
-          size='sm'
-        >
-          <FormattedMessage
-            id='tabs_bar.account_settings'
-            defaultMessage='Account settings'
-          />
-        </MenuTrigger>
-        {inSlideOut ? (
-          <SlideOutAccountMenuList />
-        ) : (
+      {inSlideOut ? (
+        <SlideOutAccountMenu />
+      ) : (
+        <Menu type='navigation'>
+          <MenuTrigger
+            as={IconButton}
+            icon={DotsThreeIcon}
+            variant='ghost'
+            size='sm'
+          >
+            <FormattedMessage
+              id='tabs_bar.account_settings'
+              defaultMessage='Account settings'
+            />
+          </MenuTrigger>
           <MenuList
             portal
             mobilePresentation='popover'
@@ -133,79 +131,76 @@ export const NavigationAccountCardAndMenu: React.FC<{
           >
             <AccountMenuItems />
           </MenuList>
-        )}
-      </Menu>
+        </Menu>
+      )}
     </div>
   );
 };
 
 /**
  * The true mobile navigation lives inside a transformed, gesture-driven drawer.
- * Render its account list through the plain Popover portal instead of MenuCard:
- * this is the same escape-from-overflow strategy used by Blue2AccountMenu and
- * avoids both the drawer stacking context and native-popover lifecycle here.
+ * Use the same direct trigger + body-level Popover architecture that is proven
+ * in Blue2AccountMenu instead of routing the trigger through the generic Menu
+ * lifecycle. The nested Menu below only supplies navigation semantics and the
+ * close-on-item-click behavior expected by AccountMenuItems.
  */
-const SlideOutAccountMenuList: React.FC = () => {
-  const { popover, menuListProps } = useMenuContext();
+const SlideOutAccountMenu: React.FC = () => {
+  const [open, setOpen] = useState(false);
+  const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
 
-  if (!popover.isMenuOpen) {
-    return null;
-  }
+  const toggleMenu = useCallback(() => {
+    setOpen((value) => !value);
+  }, []);
 
-  const { ref: menuListRef, ...menuListRest } = menuListProps;
+  const closeMenu = useCallback(() => {
+    setOpen(false);
+    anchor?.focus({ preventScroll: true });
+  }, [anchor]);
 
   return (
-    <Popover
-      isOpen
-      onClose={popover.closeMenu}
-      reference={popover.reference}
-      placement='top-end'
-      strategy='fixed'
-      offset={8}
-    >
-      {({ props: floatingProps }) => (
-        <SlideOutAccountMenuSurface
-          floatingProps={floatingProps}
-          menuListRef={menuListRef}
-          menuListProps={menuListRest}
+    <>
+      <IconButton
+        ref={setAnchor}
+        icon={DotsThreeIcon}
+        variant='ghost'
+        size='sm'
+        onClick={toggleMenu}
+        aria-expanded={open}
+        aria-haspopup='menu'
+      >
+        <FormattedMessage
+          id='tabs_bar.account_settings'
+          defaultMessage='Account settings'
         />
+      </IconButton>
+
+      {open && anchor && (
+        <Popover
+          isOpen={open}
+          onClose={closeMenu}
+          reference={anchor}
+          placement='top-end'
+          strategy='fixed'
+          offset={8}
+        >
+          {({ props: floatingProps }) => (
+            <div
+              {...floatingProps}
+              className={classes.slideOutMenu}
+              data-testid='slide-out-account-menu'
+              onPointerDown={stopDrawerGesture}
+              onTouchStart={stopDrawerGesture}
+            >
+              <Menu type='navigation' onClose={closeMenu}>
+                <ul>
+                  <AccountMenuItems />
+                </ul>
+              </Menu>
+            </div>
+          )}
+        </Popover>
       )}
-    </Popover>
-  );
-};
-
-interface SlideOutAccountMenuSurfaceProps {
-  floatingProps: PopoverChildProps;
-  menuListRef: (list: HTMLDivElement | null) => void;
-  menuListProps: Omit<React.ComponentProps<'div'>, 'ref'>;
-}
-
-const SlideOutAccountMenuSurface: React.FC<SlideOutAccountMenuSurfaceProps> = ({
-  floatingProps,
-  menuListRef,
-  menuListProps,
-}) => {
-  const { ref: floatingRef, ...floatingRest } = floatingProps;
-  const setMenuRef = useCallback(
-    (element: HTMLDivElement | null) => {
-      floatingRef?.(element);
-      menuListRef(element);
-    },
-    [floatingRef, menuListRef],
-  );
-
-  return (
-    <div
-      {...floatingRest}
-      {...menuListProps}
-      ref={setMenuRef}
-      className={classes.slideOutMenu}
-      data-testid='slide-out-account-menu'
-    >
-      <ul>
-        <AccountMenuItems />
-      </ul>
-    </div>
+    </>
   );
 };
 
