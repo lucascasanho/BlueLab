@@ -65,3 +65,11 @@
 
   color: inherit;
 }
+
+.slideOutMenu {
+  z-index: 400;
+  max-height: calc(100dvh - 24px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
