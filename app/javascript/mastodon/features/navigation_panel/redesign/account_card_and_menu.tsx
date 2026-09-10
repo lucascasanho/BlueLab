@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback } from 'react';
+import type { PointerEvent } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -55,29 +56,12 @@ export const NavigationAccountCardAndMenu: React.FC<{
   const { accountId } = useIdentity();
   const account = useAccount(accountId);
   const localCustomEmojis = useCustomEmojis();
-  const [slideOutOpen, setSlideOutOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!inSlideOut || !slideOutOpen) return undefined;
-
-    const closeOnOutside = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setSlideOutOpen(false);
-      }
-    };
-
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setSlideOutOpen(false);
-    };
-
-    document.addEventListener('pointerdown', closeOnOutside, true);
-    document.addEventListener('keydown', closeOnEscape);
-    return () => {
-      document.removeEventListener('pointerdown', closeOnOutside, true);
-      document.removeEventListener('keydown', closeOnEscape);
-    };
-  }, [inSlideOut, slideOutOpen]);
+  const handleTriggerPointerDown = useCallback(
+    (event: PointerEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+    },
+    [],
+  );
 
   if (!accountId || !account) {
     return null;
@@ -115,60 +99,30 @@ export const NavigationAccountCardAndMenu: React.FC<{
     </a>
   );
 
-  if (inSlideOut) {
-    return (
-      <div className={classes.root} ref={rootRef}>
-        {accountCard}
-        <IconButton
-          icon={DotsThreeIcon}
-          variant='ghost'
-          size='sm'
-          aria-expanded={slideOutOpen}
-          aria-haspopup='menu'
-          onPointerDown={(event) => event.stopPropagation()}
-          onClick={(event) => {
-            event.stopPropagation();
-            setSlideOutOpen((value) => !value);
-          }}
-        >
-          <FormattedMessage
-            id='tabs_bar.account_settings'
-            defaultMessage='Account settings'
-          />
-        </IconButton>
-        {slideOutOpen && (
-          <div
-            className={classes.slideOutMenu}
-            role='menu'
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <ul>
-              <AccountMenuItems context='mobile' />
-            </ul>
-          </div>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div className={classes.root}>
       {accountCard}
-      <Menu type='navigation'>
+      <Menu type='navigation' noFocus={inSlideOut}>
         <MenuTrigger
           as={IconButton}
           icon={DotsThreeIcon}
           variant='ghost'
           size='sm'
+          onPointerDown={inSlideOut ? handleTriggerPointerDown : undefined}
         >
           <FormattedMessage
             id='tabs_bar.account_settings'
             defaultMessage='Account settings'
           />
         </MenuTrigger>
-        <MenuList placement='top-end' offset={8}>
-          <AccountMenuItems />
+        <MenuList
+          placement='top-end'
+          offset={8}
+          container={typeof document !== 'undefined' ? document.body : null}
+          mobilePresentation='popover'
+          className={inSlideOut ? classes.slideOutMenu : undefined}
+        >
+          <AccountMenuItems context={inSlideOut ? 'mobile' : 'default'} />
         </MenuList>
       </Menu>
     </div>
@@ -206,7 +160,10 @@ export const AccountMenuItems: React.FC<{
       </MenuItemLink>
 
       <MenuItemLink as='a' href='/settings/preferences' icon={GearIcon}>
-        <FormattedMessage id='tabs_bar.settings' defaultMessage='Settings' />
+        <FormattedMessage
+          id='navigation_bar.preferences'
+          defaultMessage='Preferences'
+        />
       </MenuItemLink>
 
       <MenuItemDivider />
@@ -227,16 +184,16 @@ export const AccountMenuItems: React.FC<{
 
       <MenuItemLink to='/favourites' icon={HeartIcon}>
         <FormattedMessage
-          id='navigation_bar.liked_posts'
-          defaultMessage='Liked Posts'
+          id='navigation_bar.favourites'
+          defaultMessage='Favorites'
         />
       </MenuItemLink>
 
       {context === 'mobile' && (
         <MenuItemLink to='/bookmarks' icon={BookmarkSimpleIcon}>
           <FormattedMessage
-            id='navigation_bar.saved_posts'
-            defaultMessage='Saved Posts'
+            id='navigation_bar.bookmarks'
+            defaultMessage='Bookmarks'
           />
         </MenuItemLink>
       )}
@@ -245,15 +202,15 @@ export const AccountMenuItems: React.FC<{
 
       <MenuItemLink as='a' href='/relationships' icon={UsersThreeIcon}>
         <FormattedMessage
-          id='navigation_bar.followers_and_following'
-          defaultMessage='Followers & Following'
+          id='navigation_bar.follows_and_followers'
+          defaultMessage='Follows and followers'
         />
       </MenuItemLink>
 
       <MenuItemLink to='/blocks' icon={ProhibitIcon}>
         <FormattedMessage
-          id='navigation_bar.blocked_accounts'
-          defaultMessage='Blocked accounts'
+          id='navigation_bar.blocks'
+          defaultMessage='Blocked users'
         />
       </MenuItemLink>
 
@@ -284,10 +241,7 @@ export const AccountMenuItems: React.FC<{
       <MenuItemDivider />
 
       <MenuItem onClick={confirmLogout} icon={SignOutIcon}>
-        <FormattedMessage
-          id='navigation_bar.sign_out'
-          defaultMessage='Sign out'
-        />
+        <FormattedMessage id='navigation_bar.logout' defaultMessage='Logout' />
       </MenuItem>
     </>
   );

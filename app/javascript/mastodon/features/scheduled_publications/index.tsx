@@ -664,8 +664,8 @@ const ItemEditor: React.FC<{
           </option>
           <option value='direct'>
             {intl.formatMessage({
-              id: 'privacy.direct.short',
-              defaultMessage: 'Private mention',
+              id: 'navigation_bar.direct',
+              defaultMessage: 'Private mentions',
             })}
           </option>
         </select>

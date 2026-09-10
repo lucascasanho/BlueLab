@@ -5,13 +5,14 @@ import {
   fireEvent,
   render,
   renderHook,
+  screen,
   waitFor,
 } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
 
 import {
   ComposerBackdrop,
-  ComposerResumeButton,
+  ComposerModeMenuButton,
   shouldHideBlue2GlobalTrigger,
   useBlue2Theme,
 } from './trigger';
@@ -34,23 +35,26 @@ describe('BlueLab composer trigger controls', () => {
     expect(onMinimize).toHaveBeenCalledOnce();
   });
 
-  test('restores a minimized Blue 2 composer from its inline mobile launcher', () => {
-    const onResume = vi.fn();
+  test('opens the mode chooser for a minimized Blue 2 launcher', () => {
+    const onSelect = vi.fn();
     const { container } = render(
       <IntlProvider locale='en'>
-        <ComposerResumeButton inline onResume={onResume} />
+        <ComposerModeMenuButton inline resume onSelect={onSelect} />
       </IntlProvider>,
     );
 
-    const resumeButton = container.querySelector('[data-blue2-compose-resume]');
-    expect(resumeButton).not.toBeNull();
-    expect(resumeButton).toHaveAttribute(
-      'data-blue2-compose-resume-inline',
-      'true',
-    );
+    const trigger = container.querySelector('[data-blue2-compose-resume]');
+    expect(trigger).not.toBeNull();
+    expect(trigger).toHaveAttribute('data-blue2-compose-resume-inline', 'true');
 
-    fireEvent.click(resumeButton as Element);
-    expect(onResume).toHaveBeenCalledOnce();
+    fireEvent.click(trigger as Element);
+    expect(onSelect).not.toHaveBeenCalled();
+
+    expect(screen.getByText('Post')).toBeInTheDocument();
+    expect(screen.getByText('Message')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Post'));
+    expect(onSelect).toHaveBeenCalledOnce();
   });
 
   test('keeps the Blue 2 global composer host mounted while showing', () => {
@@ -63,7 +67,7 @@ describe('BlueLab composer trigger controls', () => {
     );
   });
 
-  test('reacts when Blue 2 is applied after the compose trigger mounts', async () => {
+  test('reacts when Blue 2 is applied after mount', async () => {
     delete document.body.dataset.theme;
     const { result } = renderHook(() => useBlue2Theme());
 

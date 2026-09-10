@@ -75,11 +75,20 @@ export const NavigationLink: React.FC<NavigationLinkProps> = ({
 type MobileNavLink = NavLinkProps & {
   withDot?: boolean;
   children: ReactNode;
-  iconComponent: Icon | React.FC<SVGProps<SVGSVGElement>>;
-};
+} & (
+    | {
+        iconComponent: Icon | React.FC<SVGProps<SVGSVGElement>>;
+        customIcon?: never;
+      }
+    | {
+        customIcon: ReactNode;
+        iconComponent?: never;
+      }
+  );
 
 export const MobileNavLink: React.FC<MobileNavLink> = ({
   iconComponent: IconComp,
+  customIcon,
   withDot,
   children,
   ...otherProps
@@ -97,31 +106,14 @@ export const MobileNavLink: React.FC<MobileNavLink> = ({
         <span
           className={classNames(classes.icon, withDot && classes.iconWithDot)}
         >
-          <IconComp size={24} weight={isActive ? 'fill' : undefined} />
+          {IconComp ? (
+            <IconComp size={24} weight={isActive ? 'fill' : undefined} />
+          ) : (
+            customIcon
+          )}
         </span>
         <span className='sr-only'>{children}</span>
       </NavLink>
-    </li>
-  );
-};
-
-export const MobileNavProfileButton: React.FC<
-  { avatar?: ReactNode } & Pick<MobileNavLink, 'children' | 'withDot'>
-> = ({ children, avatar, withDot, ...otherProps }) => {
-  return (
-    <li>
-      <button
-        type='button'
-        {...otherProps}
-        className={classNames(classes.link, classes.linkMobile)}
-      >
-        <span
-          className={classNames(classes.icon, withDot && classes.iconWithDot)}
-        >
-          {avatar}
-        </span>
-        <span className='sr-only'>{children}</span>
-      </button>
     </li>
   );
 };

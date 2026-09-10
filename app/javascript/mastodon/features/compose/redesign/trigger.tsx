@@ -36,6 +36,7 @@ import {
   openNewComposer,
   openPreferredComposer,
   minimizeComposerToggle,
+  resumeComposer,
   selectComposerEditor,
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
@@ -118,26 +119,51 @@ export const ComposerBackdrop: React.FC<{ onMinimize: () => void }> = ({
   />
 );
 
-export const ComposerResumeButton: React.FC<{
-  onResume: () => void;
+export const ComposerModeMenuButton: React.FC<{
+  onSelect: React.MouseEventHandler<HTMLButtonElement>;
+  onPointerDown?: React.PointerEventHandler<HTMLButtonElement>;
+  onFocus?: React.FocusEventHandler<HTMLButtonElement>;
   inline?: boolean;
-}> = ({ onResume, inline }) => (
-  <IconButton
-    icon={PenNibIcon}
-    variant='solid'
-    color='accent'
-    className={classNames(
-      classes.button,
-      inline && classes.buttonInline,
-      !inline && classes.blue2ResumeButton,
-    )}
-    size='lg'
-    data-blue2-compose-resume
-    data-blue2-compose-resume-inline={inline ? 'true' : undefined}
-    onClick={onResume}
-  >
-    <FormattedMessage id='compose.expand' defaultMessage='Show composer' />
-  </IconButton>
+  resume?: boolean;
+}> = ({ onSelect, onPointerDown, onFocus, inline, resume = false }) => (
+  <Menu>
+    <MenuTrigger
+      as={IconButton}
+      icon={PenNibIcon}
+      variant='solid'
+      color='accent'
+      className={classNames(
+        classes.button,
+        inline && classes.buttonInline,
+        resume && !inline && classes.blue2ResumeButton,
+      )}
+      size='lg'
+      data-blue2-compose-fab={!resume ? 'true' : undefined}
+      data-blue2-compose-resume={resume ? 'true' : undefined}
+      data-blue2-compose-resume-inline={resume && inline ? 'true' : undefined}
+      onPointerDown={onPointerDown}
+      onFocus={onFocus}
+    >
+      <FormattedMessage
+        id='compose.new'
+        defaultMessage='Write a new post or messsage'
+      />
+    </MenuTrigger>
+
+    <MenuList maxWidth={180} placement='top-end'>
+      <MenuItem name='post' onClick={onSelect} icon={NewspaperIcon}>
+        <FormattedMessage id='compose.new.post' defaultMessage='Post' />
+      </MenuItem>
+
+      <MenuItem name='message' onClick={onSelect} icon={ChatCircleIcon}>
+        <FormattedMessage
+          id='compose.new.message'
+          defaultMessage='Message'
+          description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
+        />
+      </MenuItem>
+    </MenuList>
+  </Menu>
 );
 
 export const ComposeRedesignButton: React.FC<{
@@ -149,6 +175,9 @@ export const ComposeRedesignButton: React.FC<{
   const displayState = useAppSelector((state) => state.composer.displayState);
   const origin = useAppSelector((state) => state.composer.origin);
   const editor = useAppSelector(selectComposerEditor);
+  const currentComposeType = useAppSelector((state) =>
+    state.compose.get('privacy') === 'direct' ? 'message' : 'post',
+  );
   const { signedIn } = useIdentity();
   const composerRef = useRef<HTMLFormElement>(null);
   const launcherOriginRef = useRef<ReturnType<
@@ -224,6 +253,23 @@ export const ComposeRedesignButton: React.FC<{
       },
       [dispatch],
     );
+  const handleMinimizedComposerOpen: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(
+      (event) => {
+        const {
+          currentTarget: { name },
+        } = event;
+        if (name !== 'post' && name !== 'message') return;
+
+        const launcherOrigin = launcherOriginRef.current ?? undefined;
+        if (name === currentComposeType) {
+          dispatch(resumeComposer(launcherOrigin));
+        } else {
+          dispatch(openNewComposer({ type: name, origin: launcherOrigin }));
+        }
+      },
+      [currentComposeType, dispatch],
+    );
 
   const handleMastodonOpen: React.MouseEventHandler<HTMLButtonElement> =
     useCallback(
@@ -278,7 +324,13 @@ export const ComposeRedesignButton: React.FC<{
   if (displayState === 'minimized') {
     if (isBlue2) {
       return (
-        <ComposerResumeButton inline={inline} onResume={handleBackdropClick} />
+        <ComposerModeMenuButton
+          inline={inline}
+          resume
+          onSelect={handleMinimizedComposerOpen}
+          onPointerDown={captureLauncherPointerOrigin}
+          onFocus={captureLauncherFocusOrigin}
+        />
       );
     }
 
@@ -319,41 +371,11 @@ export const ComposeRedesignButton: React.FC<{
   }
 
   return (
-    <Menu>
-      <MenuTrigger
-        as={IconButton}
-        icon={PenNibIcon}
-        variant='solid'
-        color='accent'
-        className={classNames(classes.button, inline && classes.buttonInline)}
-        size='lg'
-        data-blue2-compose-fab={isBlue2 && !inline ? 'true' : undefined}
-        onPointerDown={captureLauncherPointerOrigin}
-        onFocus={captureLauncherFocusOrigin}
-      >
-        <FormattedMessage
-          id='compose.new'
-          defaultMessage='Write a new post or messsage'
-        />
-      </MenuTrigger>
-
-      <MenuList maxWidth={180} placement='top-end'>
-        <MenuItem name='post' onClick={handleComposerOpen} icon={NewspaperIcon}>
-          <FormattedMessage id='compose.new.post' defaultMessage='Post' />
-        </MenuItem>
-
-        <MenuItem
-          name='message'
-          onClick={handleComposerOpen}
-          icon={ChatCircleIcon}
-        >
-          <FormattedMessage
-            id='compose.new.message'
-            defaultMessage='Message'
-            description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
-          />
-        </MenuItem>
-      </MenuList>
-    </Menu>
+    <ComposerModeMenuButton
+      inline={inline}
+      onSelect={handleComposerOpen}
+      onPointerDown={captureLauncherPointerOrigin}
+      onFocus={captureLauncherFocusOrigin}
+    />
   );
 };
