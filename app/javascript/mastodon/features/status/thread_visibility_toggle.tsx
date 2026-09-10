@@ -1,8 +1,8 @@
 import { defineMessages, useIntl } from 'react-intl';
 
+import { Icon } from '@/mastodon/components/icon';
 import VisibilityIcon from '@/material-icons/400-24px/visibility.svg?react';
 import VisibilityOffIcon from '@/material-icons/400-24px/visibility_off.svg?react';
-import { Icon } from '@/mastodon/components/icon';
 
 import styles from './thread_visibility_toggle.module.scss';
 
