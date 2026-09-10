@@ -70,6 +70,7 @@
   width: min(280px, calc(100vw - 2 * var(--space-sm)));
   max-height: calc(100dvh - 24px);
   padding: var(--space-2xs);
+  border: 1px solid var(--blue2-border-soft, var(--color-border-primary));
   border-radius: var(--radius-md);
   background: var(--color-bg-primary);
   overflow-x: hidden;
