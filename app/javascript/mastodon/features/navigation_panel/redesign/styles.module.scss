@@ -21,7 +21,6 @@
   &[data-mode='slide-out'] {
     --navigation-background-color: var(--color-bg-primary);
 
-    overflow: visible;
     isolation: isolate;
   }
 }
