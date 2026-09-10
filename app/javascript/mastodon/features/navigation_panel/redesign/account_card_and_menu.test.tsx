@@ -24,6 +24,9 @@ vi.mock('@/mastodon/store', async () => {
   return { ...store, useAppDispatch: () => vi.fn() };
 });
 
+const getMenuLink = (menu: HTMLElement, href: string) =>
+  menu.querySelector<HTMLAnchorElement>(`a[href="${href}"]`);
+
 describe('<NavigationAccountCardAndMenu />', () => {
   const account = accountFactoryImmutable({
     id: '123',
@@ -61,21 +64,22 @@ describe('<NavigationAccountCardAndMenu />', () => {
     expect(screen.getByTestId('static-sidebar-ancestor')).not.toContainElement(
       menu,
     );
-    expect(
-      screen
-        .getByRole('link', { name: 'Scheduled publications' })
-        .getAttribute('href'),
-    ).toBe('/scheduled');
+    expect(menu).toHaveAttribute('popover', 'manual');
+
+    // jsdom does not model the native popover top layer, so Testing Library
+    // excludes opened [popover] descendants from accessible role queries.
+    const scheduled = getMenuLink(menu, '/scheduled');
+    expect(scheduled).not.toBeNull();
+    expect(scheduled).toHaveTextContent('Scheduled publications');
   });
 
   it('hides moderation and administration from users without permissions', () => {
     render(<NavigationAccountCardAndMenu inSlideOut />);
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
 
-    expect(screen.queryByRole('menuitem', { name: 'Moderation' })).toBeNull();
-    expect(
-      screen.queryByRole('menuitem', { name: 'Administration' }),
-    ).toBeNull();
+    const menu = screen.getByTestId('slide-out-account-menu');
+    expect(getMenuLink(menu, '/admin/reports')).toBeNull();
+    expect(getMenuLink(menu, '/admin/dashboard')).toBeNull();
   });
 
   it('reflects granular moderation and administration permissions independently', () => {
@@ -83,24 +87,23 @@ describe('<NavigationAccountCardAndMenu />', () => {
       permissions: PERMISSION_MANAGE_REPORTS,
     });
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
-    expect(
-      screen.getByRole('menuitem', { name: 'Moderation' }).getAttribute('href'),
-    ).toBe('/admin/reports');
-    expect(
-      screen.queryByRole('menuitem', { name: 'Administration' }),
-    ).toBeNull();
+    let menu = screen.getByTestId('slide-out-account-menu');
+    let moderation = getMenuLink(menu, '/admin/reports');
+    expect(moderation).not.toBeNull();
+    expect(moderation).toHaveTextContent('Moderation');
+    expect(getMenuLink(menu, '/admin/dashboard')).toBeNull();
     unmount();
 
     render(<NavigationAccountCardAndMenu inSlideOut />, {
       permissions: PERMISSION_VIEW_DASHBOARD,
     });
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
-    expect(
-      screen
-        .getByRole('menuitem', { name: 'Administration' })
-        .getAttribute('href'),
-    ).toBe('/admin/dashboard');
-    expect(screen.queryByRole('menuitem', { name: 'Moderation' })).toBeNull();
+    menu = screen.getByTestId('slide-out-account-menu');
+    const administration = getMenuLink(menu, '/admin/dashboard');
+    expect(administration).not.toBeNull();
+    expect(administration).toHaveTextContent('Administration');
+    moderation = getMenuLink(menu, '/admin/reports');
+    expect(moderation).toBeNull();
   });
 
   it('portals the drawer account menu above clipping ancestors and keeps drawer gestures isolated', async () => {
@@ -119,14 +122,13 @@ describe('<NavigationAccountCardAndMenu />', () => {
 
     const menu = screen.getByTestId('slide-out-account-menu');
     expect(menu).toHaveAttribute('role', 'menu');
+    expect(menu).toHaveAttribute('popover', 'manual');
     expect(menu.parentElement).toBe(document.body);
     expect(screen.getByTestId('drawer-ancestor')).not.toContainElement(menu);
     expect(menu).toHaveAttribute('data-popover-placement');
-    expect(
-      screen
-        .getByRole('menuitem', { name: 'Scheduled publications' })
-        .getAttribute('href'),
-    ).toBe('/scheduled');
+    const scheduled = getMenuLink(menu, '/scheduled');
+    expect(scheduled).not.toBeNull();
+    expect(scheduled).toHaveTextContent('Scheduled publications');
     expect(document.querySelector('[role="dialog"]')).toBeNull();
 
     fireEvent.keyUp(document, { key: 'Escape' });
