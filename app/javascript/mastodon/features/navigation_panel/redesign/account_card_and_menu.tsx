@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -55,32 +55,6 @@ export const NavigationAccountCardAndMenu: React.FC<{
   const { accountId } = useIdentity();
   const account = useAccount(accountId);
   const localCustomEmojis = useCustomEmojis();
-  const [slideOutOpen, setSlideOutOpen] = useState(false);
-  const slideOutRootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!inSlideOut || !slideOutOpen) return undefined;
-
-    const handlePointerDown = (event: PointerEvent) => {
-      if (!slideOutRootRef.current?.contains(event.target as Node)) {
-        setSlideOutOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setSlideOutOpen(false);
-      }
-    };
-
-    document.addEventListener('pointerdown', handlePointerDown);
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('pointerdown', handlePointerDown);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [inSlideOut, slideOutOpen]);
 
   if (!accountId || !account) {
     return null;
@@ -93,59 +67,35 @@ export const NavigationAccountCardAndMenu: React.FC<{
   const displayNameEmojiVersion = `${Object.keys(localCustomEmojis).length}-${account.emojis.size}`;
 
   const accountCard = (
-    <>
-      <a
-        className={classes.accountLink}
-        href={account.url}
-        data-hover-card-account={accountId}
-      >
-        <Avatar account={account} size={32} />
-        <span className={classes.accountText}>
-          <span className='display-name'>
-            <bdi className='display-name__name'>
-              <EmojiHTML
-                key={`${account.id}-${displayNameEmojiVersion}`}
-                className='display-name__html'
-                htmlString={account.display_name_html}
-                as='strong'
-                extraEmojis={displayNameEmojis}
-              />
-              <VerifiedBadge account={account} />
-              {account.locked && <AccountLock />}
-            </bdi>{' '}
-            <span className='display-name__account'>@{account.username}</span>
-          </span>
+    <a
+      className={classes.accountLink}
+      href={account.url}
+      data-hover-card-account={accountId}
+    >
+      <Avatar account={account} size={32} />
+      <span className={classes.accountText}>
+        <span className='display-name'>
+          <bdi className='display-name__name'>
+            <EmojiHTML
+              key={`${account.id}-${displayNameEmojiVersion}`}
+              className='display-name__html'
+              htmlString={account.display_name_html}
+              as='strong'
+              extraEmojis={displayNameEmojis}
+            />
+            <VerifiedBadge account={account} />
+            {account.locked && <AccountLock />}
+          </bdi>{' '}
+          <span className='display-name__account'>@{account.username}</span>
         </span>
-      </a>
-    </>
+      </span>
+    </a>
   );
-
-  if (inSlideOut) {
-    return (
-      <div className={classes.root} ref={slideOutRootRef}>
-        {accountCard}
-        <IconButton
-          icon={DotsThreeIcon}
-          variant='ghost'
-          size='sm'
-          aria-expanded={slideOutOpen}
-          aria-haspopup='menu'
-          aria-label='Account settings'
-          onClick={() => setSlideOutOpen((value) => !value)}
-        />
-        {slideOutOpen && (
-          <div className={classes.slideOutMenu} role='menu'>
-            <AccountMenuItems />
-          </div>
-        )}
-      </div>
-    );
-  }
 
   return (
     <div className={classes.root}>
       {accountCard}
-      <Menu type='navigation'>
+      <Menu type='navigation' noFocus={inSlideOut}>
         <MenuTrigger
           as={IconButton}
           icon={DotsThreeIcon}
@@ -157,8 +107,14 @@ export const NavigationAccountCardAndMenu: React.FC<{
             defaultMessage='Account settings'
           />
         </MenuTrigger>
-        <MenuList placement='top' offset={8}>
-          <AccountMenuItems />
+        <MenuList
+          placement='top-end'
+          offset={8}
+          container={typeof document !== 'undefined' ? document.body : null}
+          mobilePresentation='popover'
+          className={inSlideOut ? classes.slideOutMenu : undefined}
+        >
+          <AccountMenuItems context={inSlideOut ? 'mobile' : 'default'} />
         </MenuList>
       </Menu>
     </div>
