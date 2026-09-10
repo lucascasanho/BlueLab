@@ -24,6 +24,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
   const account = accountFactoryImmutable({
     id: '123',
     username: 'alice',
+    acct: 'alice',
     display_name: 'Alice',
     verified_by_role: true,
   });
@@ -51,6 +52,28 @@ describe('<NavigationAccountCardAndMenu />', () => {
         .getByRole('link', { name: 'Scheduled publications' })
         .getAttribute('href'),
     ).toBe('/scheduled');
+  });
+
+  it('opens and closes the dedicated slide-out submenu without the generic mobile menu presentation', () => {
+    render(<NavigationAccountCardAndMenu inSlideOut />);
+
+    const trigger = screen.getByRole('button', { name: 'Account settings' });
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByRole('menu')).toBeNull();
+
+    fireEvent.click(trigger);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+    expect(
+      screen
+        .getByRole('link', { name: 'Scheduled publications' })
+        .getAttribute('href'),
+    ).toBe('/scheduled');
+
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByRole('menu')).toBeNull();
   });
 
   it('hides moderation and administration from users without permissions', () => {
