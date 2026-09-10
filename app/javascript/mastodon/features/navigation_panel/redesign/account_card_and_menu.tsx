@@ -124,7 +124,6 @@ export const NavigationAccountCardAndMenu: React.FC<{
           variant='ghost'
           size='sm'
           aria-expanded={slideOutOpen}
-          aria-haspopup='menu'
           onPointerDown={(event) => event.stopPropagation()}
           onClick={(event) => {
             event.stopPropagation();
@@ -137,16 +136,21 @@ export const NavigationAccountCardAndMenu: React.FC<{
           />
         </IconButton>
         {slideOutOpen && (
-          <div
-            className={classes.slideOutMenu}
-            role='menu'
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <ul>
-              <AccountMenuItems context='mobile' />
-            </ul>
-          </div>
+          <Menu type='navigation' noFocus>
+            <div
+              className={classes.slideOutMenu}
+              data-testid='slide-out-account-menu'
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                setSlideOutOpen(false);
+              }}
+            >
+              <ul>
+                <AccountMenuItems context='mobile' />
+              </ul>
+            </div>
+          </Menu>
         )}
       </div>
     );
