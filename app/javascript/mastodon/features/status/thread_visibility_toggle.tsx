@@ -17,7 +17,11 @@ const messages = defineMessages({
   },
 });
 
-const getCompactLabel = (locale: string, hidden: boolean, fallback: string) => {
+const getCompactLabel = (
+  locale: string,
+  hidden: boolean,
+  fallback: string,
+) => {
   const language = locale.toLowerCase().split(/[-_]/)[0];
 
   if (language === 'pt') {
