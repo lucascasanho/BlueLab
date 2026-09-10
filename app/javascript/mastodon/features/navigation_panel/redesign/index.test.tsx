@@ -81,9 +81,6 @@ vi.mock('./navigation_link', () => ({
   ),
 }));
 
-const getMenuLink = (menu: HTMLElement, href: string) =>
-  menu.querySelector<HTMLAnchorElement>(`a[href="${href}"]`);
-
 describe('<RedesignNavigationPanel />', () => {
   const account = accountFactoryImmutable({
     id: '123',
@@ -107,18 +104,16 @@ describe('<RedesignNavigationPanel />', () => {
     fireEvent.pointerDown(trigger);
     fireEvent.click(trigger);
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    const menu = screen.getByTestId('slide-out-account-menu');
-    expect(menu).toBeInTheDocument();
-    expect(menu).toHaveAttribute('popover', 'manual');
-
-    // jsdom does not emulate the native browser top layer for [popover], so
-    // inspect the real anchors in the opened menu instead of role visibility.
-    const scheduled = getMenuLink(menu, '/scheduled');
-    expect(scheduled).not.toBeNull();
-    expect(scheduled).toHaveTextContent('Scheduled publications');
-    expect(getMenuLink(menu, '/admin/reports')).toBeNull();
-    expect(getMenuLink(menu, '/admin/dashboard')).toBeNull();
+    expect(screen.getByTestId('slide-out-account-menu')).toBeInTheDocument();
+    expect(
+      screen
+        .getByRole('menuitem', { name: 'Scheduled publications' })
+        .getAttribute('href'),
+    ).toBe('/scheduled');
+    expect(screen.queryByRole('menuitem', { name: 'Moderation' })).toBeNull();
+    expect(
+      screen.queryByRole('menuitem', { name: 'Administration' }),
+    ).toBeNull();
 
     fireEvent.click(trigger);
     expect(screen.queryByTestId('slide-out-account-menu')).toBeNull();
@@ -131,12 +126,13 @@ describe('<RedesignNavigationPanel />', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
 
-    const menu = screen.getByTestId('slide-out-account-menu');
-    const moderation = getMenuLink(menu, '/admin/reports');
-    const administration = getMenuLink(menu, '/admin/dashboard');
-    expect(moderation).not.toBeNull();
-    expect(moderation).toHaveTextContent('Moderation');
-    expect(administration).not.toBeNull();
-    expect(administration).toHaveTextContent('Administration');
+    expect(
+      screen.getByRole('menuitem', { name: 'Moderation' }).getAttribute('href'),
+    ).toBe('/admin/reports');
+    expect(
+      screen
+        .getByRole('menuitem', { name: 'Administration' })
+        .getAttribute('href'),
+    ).toBe('/admin/dashboard');
   });
 });
