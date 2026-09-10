@@ -19,6 +19,7 @@ export type MenuCardProps<As extends React.ElementType> = PolymorphicProps<
     elevation?: 1 | 2;
     maxWidth?: number | string;
     style?: React.CSSProperties;
+    popover?: React.HTMLAttributes<As>['popover'];
   },
   As
 >;
@@ -30,9 +31,9 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
   elevation = 1,
   maxWidth,
   style,
-  // Upstream #40448 uses the native Popover API when available so menus are
-  // promoted to the browser top layer instead of fighting drawer stacking and
-  // clipping contexts. Passing popover={undefined} still opts out explicitly.
+  // Use the native top layer when the browser exposes the Popover API. Keep
+  // the attribute off the fallback element so browsers/test environments that
+  // do not implement showPopover do not treat the portaled menu as hidden.
   popover = 'manual',
   ...props
 }: MenuCardProps<As>) => {
@@ -73,14 +74,12 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
 };
 
 function isPopoverAPISupported() {
+  if (typeof HTMLElement === 'undefined') return false;
+
   return (
-    typeof HTMLElement !== 'undefined' &&
-    typeof CSS !== 'undefined' &&
     'popover' in HTMLElement.prototype &&
     typeof HTMLElement.prototype.showPopover === 'function' &&
-    typeof HTMLElement.prototype.hidePopover === 'function' &&
-    typeof CSS.supports === 'function' &&
-    CSS.supports('selector(:popover-open)')
+    typeof HTMLElement.prototype.hidePopover === 'function'
   );
 }
 
