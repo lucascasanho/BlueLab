@@ -180,7 +180,6 @@ const SlideOutAccountMenu: React.FC<{ accountCard: React.ReactNode }> = ({
 
   useLayoutEffect(() => {
     if (!popover.isMenuOpen) {
-      setMenuPosition(null);
       return undefined;
     }
 
