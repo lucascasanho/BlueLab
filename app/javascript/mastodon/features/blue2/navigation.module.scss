@@ -6,6 +6,7 @@
   padding: 14px 12px 24px;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   overflow-y: auto;
   color: var(--blue2-text, #f7f7f8);
   scrollbar-width: none;

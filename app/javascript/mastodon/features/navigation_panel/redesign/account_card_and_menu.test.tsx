@@ -1,5 +1,6 @@
-import { fireEvent } from '@testing-library/react';
+import { act, fireEvent, waitFor } from '@testing-library/react';
 
+import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import {
@@ -13,6 +14,9 @@ import { NavigationAccountCardAndMenu } from './account_card_and_menu';
 
 vi.mock('@/mastodon/hooks/useAccount');
 vi.mock('@/mastodon/hooks/useCustomEmojis');
+vi.mock('@/mastodon/features/ui/hooks/useBreakpoint', () => ({
+  useBreakpoint: vi.fn(),
+}));
 vi.mock('@/mastodon/store', async () => {
   const store =
     await vi.importActual<Record<string, unknown>>('@/mastodon/store');
@@ -30,6 +34,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
   });
 
   beforeEach(() => {
+    vi.mocked(useBreakpoint).mockReturnValue(false);
     vi.mocked(useAccount).mockReturnValue(account);
     vi.mocked(useCustomEmojis).mockReturnValue({});
   });
@@ -44,40 +49,27 @@ describe('<NavigationAccountCardAndMenu />', () => {
   });
 
   it('puts scheduled publications in this account submenu for signed-in users', () => {
-    render(<NavigationAccountCardAndMenu />);
+    render(
+      <div data-testid='static-sidebar-ancestor'>
+        <NavigationAccountCardAndMenu />
+      </div>,
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
 
+    const menu = screen.getByTestId('account-menu');
+    expect(menu.parentElement).toBe(document.body);
+    expect(screen.getByTestId('static-sidebar-ancestor')).not.toContainElement(
+      menu,
+    );
     expect(
       screen
         .getByRole('link', { name: 'Scheduled publications' })
         .getAttribute('href'),
     ).toBe('/scheduled');
-  });
-
-  it('opens and closes the dedicated slide-out submenu without the generic mobile menu presentation', () => {
-    render(<NavigationAccountCardAndMenu inSlideOut />);
-
-    const trigger = screen.getByRole('button', { name: 'Account settings' });
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByRole('menu')).toBeNull();
-
-    fireEvent.click(trigger);
-
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('menu')).toBeInTheDocument();
-    expect(
-      screen
-        .getByRole('link', { name: 'Scheduled publications' })
-        .getAttribute('href'),
-    ).toBe('/scheduled');
-
-    fireEvent.click(trigger);
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByRole('menu')).toBeNull();
   });
 
   it('hides moderation and administration from users without permissions', () => {
-    render(<NavigationAccountCardAndMenu />);
+    render(<NavigationAccountCardAndMenu inSlideOut />);
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
 
     expect(screen.queryByRole('link', { name: 'Moderation' })).toBeNull();
@@ -85,7 +77,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
   });
 
   it('reflects granular moderation and administration permissions independently', () => {
-    const { unmount } = render(<NavigationAccountCardAndMenu />, {
+    const { unmount } = render(<NavigationAccountCardAndMenu inSlideOut />, {
       permissions: PERMISSION_MANAGE_REPORTS,
     });
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
@@ -95,7 +87,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
     expect(screen.queryByRole('link', { name: 'Administration' })).toBeNull();
     unmount();
 
-    render(<NavigationAccountCardAndMenu />, {
+    render(<NavigationAccountCardAndMenu inSlideOut />, {
       permissions: PERMISSION_VIEW_DASHBOARD,
     });
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
@@ -103,5 +95,80 @@ describe('<NavigationAccountCardAndMenu />', () => {
       screen.getByRole('link', { name: 'Administration' }).getAttribute('href'),
     ).toBe('/admin/dashboard');
     expect(screen.queryByRole('link', { name: 'Moderation' })).toBeNull();
+  });
+
+  it('opens the mobile drawer submenu from pointerdown even when no click follows', () => {
+    vi.mocked(useBreakpoint).mockReturnValue(true);
+    render(<NavigationAccountCardAndMenu inSlideOut />);
+    const trigger = screen.getByRole('button', { name: 'Account settings' });
+
+    fireEvent.pointerDown(trigger, { pointerType: 'touch', button: 0 });
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('slide-out-account-menu')).toBeInTheDocument();
+  });
+
+  it('keeps the submenu open when the synthesized click is delayed', () => {
+    vi.useFakeTimers();
+    vi.mocked(useBreakpoint).mockReturnValue(true);
+    render(<NavigationAccountCardAndMenu inSlideOut />);
+    const trigger = screen.getByRole('button', { name: 'Account settings' });
+
+    fireEvent.pointerDown(trigger, { pointerType: 'touch', button: 0 });
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    fireEvent.click(trigger);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('slide-out-account-menu')).toBeInTheDocument();
+    vi.useRealTimers();
+  });
+
+  it('uses a dedicated body-portal popover in the mobile drawer and isolates drawer gestures', async () => {
+    vi.mocked(useBreakpoint).mockReturnValue(true);
+    const drawerTouchStart = vi.fn();
+    render(
+      <div data-testid='drawer-ancestor' onTouchStart={drawerTouchStart}>
+        <NavigationAccountCardAndMenu inSlideOut />
+      </div>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Account settings' });
+
+    fireEvent.touchStart(trigger);
+    expect(drawerTouchStart).not.toHaveBeenCalled();
+    fireEvent.click(trigger);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    const menu = screen.getByTestId('slide-out-account-menu');
+    expect(menu.parentElement).toBe(document.body);
+    expect(screen.getByTestId('drawer-ancestor')).not.toContainElement(menu);
+    expect(menu).toHaveAttribute('data-popover-placement');
+    expect(menu).not.toHaveAttribute('popover');
+    expect(menu.style.position).toBe('fixed');
+    expect(menu.querySelector(':scope > ul')).not.toBeNull();
+    expect(
+      screen
+        .getByRole('link', { name: 'Scheduled publications' })
+        .getAttribute('href'),
+    ).toBe('/scheduled');
+    expect(screen.queryByRole('link', { name: 'Profile' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Bookmarks' })).toBeNull();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+
+    fireEvent.pointerDown(menu);
+    expect(screen.getByTestId('slide-out-account-menu')).toBeInTheDocument();
+
+    fireEvent.keyUp(document, { key: 'Escape' });
+    await waitFor(() => {
+      expect(screen.queryByTestId('slide-out-account-menu')).toBeNull();
+    });
+    expect(trigger).toHaveFocus();
+
+    fireEvent.click(trigger);
+    fireEvent.pointerDown(document.body);
+    await waitFor(() => {
+      expect(screen.queryByTestId('slide-out-account-menu')).toBeNull();
+    });
   });
 });

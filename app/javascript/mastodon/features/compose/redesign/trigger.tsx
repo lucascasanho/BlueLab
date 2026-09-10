@@ -155,11 +155,18 @@ export const ComposeRedesignButton: React.FC<{
     typeof composerOriginFromElement
   > | null>(null);
   const isBlue2 = useBlue2Theme();
-  const renderBlue2Overlay = (content: React.ReactNode) =>
-    isBlue2 && typeof document !== 'undefined'
+  const portalBlue2InlineOverlay = (content: React.ReactNode) =>
+    isBlue2 && inline && typeof document !== 'undefined'
       ? createPortal(content, document.body)
       : content;
 
+  /*
+   * Keep VisualViewport metrics in React state instead of mutating the form from
+   * a layout effect. The redesigned form is lazy-loaded; an effect can run while
+   * Suspense is still showing its fallback and never see composerRef.current.
+   * State survives that delay, so the form receives the correct visible height
+   * as soon as it mounts and whenever the software keyboard changes it.
+   */
   const [viewport, setViewport] = useState<VisualViewportMetrics>(
     emptyVisualViewportMetrics,
   );
@@ -254,8 +261,13 @@ export const ComposeRedesignButton: React.FC<{
 
   if (!signedIn) return null;
 
+  // BLUE 2.0 owns its launcher UI elsewhere, so keep this global trigger hidden
+  // while idle/minimized. When the shared state changes to showing, however,
+  // this component must stay mounted because it is the desktop composer host.
   if (shouldHideBlue2GlobalTrigger(isBlue2, inline, displayState)) return null;
 
+  // BLUE 2.0 always uses the redesigned composer so the theme can provide the
+  // Bluesky-like compose experience without changing the editor used by other themes.
   if (editor === 'mastodon' && !isBlue2) {
     return (
       <IconButton
@@ -277,13 +289,21 @@ export const ComposeRedesignButton: React.FC<{
 
   if (displayState === 'minimized') {
     if (isBlue2) {
+      // Keep the minimized launcher inside RedesignMobileNavigation instead of
+      // portaling it to <body>. The Blue 2 navigation shell already owns the
+      // proven portrait behavior: above the bottom row while visible and down
+      // into the vacated row when mobile chrome auto-hides during scrolling.
       return (
         <ComposerResumeButton inline={inline} onResume={handleBackdropClick} />
       );
     }
 
     return (
-      <MenuCard className={classes.composerMinimized} elevation={2}>
+      <MenuCard
+        popover={undefined}
+        className={classes.composerMinimized}
+        elevation={2}
+      >
         <ComposeFormHeader />
       </MenuCard>
     );
@@ -302,7 +322,7 @@ export const ComposeRedesignButton: React.FC<{
       '--composer-visual-viewport-bottom': `${viewport.bottomInset}px`,
     } as React.CSSProperties;
 
-    return renderBlue2Overlay(
+    return portalBlue2InlineOverlay(
       <>
         {isBlue2 && <ComposerBackdrop onMinimize={handleBackdropClick} />}
         <Suspense fallback={<CircularProgress strokeWidth={2} size={50} />}>
@@ -327,7 +347,7 @@ export const ComposeRedesignButton: React.FC<{
         color='accent'
         className={classNames(classes.button, inline && classes.buttonInline)}
         size='lg'
-        data-blue2-compose-fab={isBlue2 && !inline ? 'true' : undefined}
+        data-blue2-compose-fab={isBlue2 ? 'true' : undefined}
         onPointerDown={captureLauncherPointerOrigin}
         onFocus={captureLauncherFocusOrigin}
       >
@@ -337,7 +357,15 @@ export const ComposeRedesignButton: React.FC<{
         />
       </MenuTrigger>
 
-      <MenuList maxWidth={180} placement='top-end'>
+      <MenuList
+        portal
+        mobilePresentation='popover'
+        maxWidth={180}
+        placement='top-end'
+        strategy='fixed'
+        offset={8}
+        data-testid='blue2-compose-type-menu'
+      >
         <MenuItem name='post' onClick={handleComposerOpen} icon={NewspaperIcon}>
           <FormattedMessage id='compose.new.post' defaultMessage='Post' />
         </MenuItem>

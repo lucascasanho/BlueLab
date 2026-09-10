@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   padding: var(--space-2xs);
+  inset: unset; // override default [popover] UA styles (upstream #40448)
   border-radius: var(--radius-md);
   background: var(--color-bg-primary);
   overflow: hidden;
@@ -19,6 +20,11 @@
   }
 
   :global(body[data-theme='blue-2']) & {
+    // Native popovers are rendered in the browser top layer. When that API is
+    // unavailable and the menu falls back to a document-body portal, use a
+    // concrete stacking level above BlueLab's tablet/main-column chrome rather
+    // than relying only on calc(infinity), which older engines may discard.
+    z-index: 1000;
     max-height: calc(100dvh - 24px);
     overflow-x: hidden;
     overflow-y: auto;

@@ -1,6 +1,9 @@
+import { useLayoutEffect, useRef } from 'react';
+
 import classNames from 'classnames';
 
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
+import { useMergedRefs } from '@/mastodon/hooks/useMergedRefs';
 import type { PolymorphicProps } from '@/types/polymorphic';
 
 import { BottomSheet } from '../bottom_sheet';
@@ -16,6 +19,7 @@ export type MenuCardProps<As extends React.ElementType> = PolymorphicProps<
     elevation?: 1 | 2;
     maxWidth?: number | string;
     style?: React.CSSProperties;
+    popover?: React.HTMLAttributes<As>['popover'];
   },
   As
 >;
@@ -27,12 +31,33 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
   elevation = 1,
   maxWidth,
   style,
+  // Use the native top layer when the browser exposes the Popover API. Keep
+  // the attribute off the fallback element so browsers/test environments that
+  // do not implement showPopover do not treat the portaled menu as hidden.
+  popover = 'manual',
   ...props
 }: MenuCardProps<As>) => {
   const Component = asComp ?? 'div';
+  const cardRef = useRef<HTMLDivElement>(null);
+  const nativePopover =
+    popover === 'manual' && isPopoverAPISupported() ? popover : undefined;
+
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    if (nativePopover !== 'manual' || !card) return;
+
+    card.showPopover();
+
+    return () => {
+      card.hidePopover();
+    };
+  }, [nativePopover]);
+
   return (
     <Component
       {...props}
+      ref={useMergedRefs(props.ref, cardRef)}
+      popover={nativePopover}
       className={classNames(className, classes.card)}
       data-elevation={elevation}
       style={
@@ -48,14 +73,19 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
   );
 };
 
+function isPopoverAPISupported() {
+  if (typeof HTMLElement === 'undefined') return false;
+
+  return (
+    'popover' in HTMLElement.prototype &&
+    typeof HTMLElement.prototype.showPopover === 'function' &&
+    typeof HTMLElement.prototype.hidePopover === 'function'
+  );
+}
+
 export type PopoverMenuCardProps<As extends React.ElementType> =
   MenuCardProps<As> &
     Omit<PopoverProps, 'children'> & {
-      /**
-       * Mobile menus use a bottom sheet by default. Some constrained surfaces,
-       * such as the slide-out navigation drawer, need to keep the anchored
-       * popover presentation instead.
-       */
       mobilePresentation?: 'bottom-sheet' | 'popover';
     };
 
@@ -78,6 +108,8 @@ export const PopoverMenuCard = <As extends React.ElementType>({
 }: PopoverMenuCardProps<As>) => {
   const isMobile = useBreakpoint('openable');
 
+  // BlueLab's account card deliberately keeps an anchored popover on mobile;
+  // other Mastodon menus retain the upstream bottom-sheet presentation.
   if (isMobile && isOpen && mobilePresentation === 'bottom-sheet') {
     return (
       <BottomSheet {...props} onClose={onClose}>

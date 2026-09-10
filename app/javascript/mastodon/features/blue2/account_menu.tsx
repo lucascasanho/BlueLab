@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -22,7 +22,9 @@ import { openModal } from '@/mastodon/actions/modal';
 import { Avatar } from '@/mastodon/components/avatar';
 import { VerifiedBadge } from '@/mastodon/components/display_name/verified_badge';
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
+import { Popover } from '@/mastodon/components/popover';
 import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
+import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import { useIdentity } from '@/mastodon/identity_context';
@@ -42,28 +44,9 @@ export const Blue2AccountMenu: React.FC = () => {
   const { accountId, permissions } = useIdentity();
   const account = useAccount(accountId);
   const localCustomEmojis = useCustomEmojis();
+  const compactNavigation = useBreakpoint('full');
   const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return undefined;
-
-    const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
-    };
-
-    document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [open]);
+  const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
 
   const toggleMenu = useCallback(() => {
     setOpen((value) => !value);
@@ -104,10 +87,165 @@ export const Blue2AccountMenu: React.FC = () => {
     id: 'tabs_bar.account_settings',
     defaultMessage: 'Account settings',
   });
+  const isRtl =
+    typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
+  const menuPlacement = compactNavigation
+    ? isRtl
+      ? 'left-start'
+      : 'right-start'
+    : 'bottom-start';
+
+  const menuContent = (
+    <>
+      <NavLink
+        to='/profile/edit'
+        className={classes.menuItem}
+        onClick={closeMenu}
+        role='menuitem'
+      >
+        <UserIcon />
+        <FormattedMessage
+          id='account.edit_profile'
+          defaultMessage='Edit profile'
+        />
+      </NavLink>
+
+      <a
+        href='/settings/preferences'
+        className={classes.menuItem}
+        onClick={closeMenu}
+        role='menuitem'
+      >
+        <GearIcon />
+        <FormattedMessage
+          id='navigation_bar.preferences'
+          defaultMessage='Preferences'
+        />
+      </a>
+
+      <div className={classes.menuDivider} role='separator' />
+
+      <NavLink
+        to={`${accountBasePath}/collections`}
+        className={classes.menuItem}
+        onClick={closeMenu}
+        role='menuitem'
+      >
+        <StackIcon />
+        <FormattedMessage
+          id='navigation_bar.collections'
+          defaultMessage='Collections'
+        />
+      </NavLink>
+
+      <NavLink
+        to='/scheduled'
+        className={classes.menuItem}
+        onClick={closeMenu}
+        role='menuitem'
+      >
+        <CalendarDotsIcon />
+        <FormattedMessage
+          id='navigation_bar.scheduled_publications'
+          defaultMessage='Scheduled publications'
+        />
+      </NavLink>
+
+      <NavLink
+        to='/favourites'
+        className={classes.menuItem}
+        onClick={closeMenu}
+        role='menuitem'
+      >
+        <HeartIcon />
+        <FormattedMessage
+          id='navigation_bar.favourites'
+          defaultMessage='Favorites'
+        />
+      </NavLink>
+
+      <div className={classes.menuDivider} role='separator' />
+
+      <a
+        href='/relationships'
+        className={classes.menuItem}
+        onClick={closeMenu}
+        role='menuitem'
+      >
+        <UsersThreeIcon />
+        <FormattedMessage
+          id='navigation_bar.follows_and_followers'
+          defaultMessage='Follows and followers'
+        />
+      </a>
+
+      <NavLink
+        to='/blocks'
+        className={classes.menuItem}
+        onClick={closeMenu}
+        role='menuitem'
+      >
+        <ProhibitIcon />
+        <FormattedMessage
+          id='navigation_bar.blocks'
+          defaultMessage='Blocked users'
+        />
+      </NavLink>
+
+      {(isManager || isAdmin) && (
+        <>
+          <div className={classes.menuDivider} role='separator' />
+
+          {isAdmin && (
+            <a
+              href='/admin/dashboard'
+              className={classes.menuItem}
+              onClick={closeMenu}
+              role='menuitem'
+            >
+              <GavelIcon />
+              <FormattedMessage
+                id='navigation_bar.administration'
+                defaultMessage='Administration'
+              />
+            </a>
+          )}
+
+          {isManager && (
+            <a
+              href='/admin/reports'
+              className={classes.menuItem}
+              onClick={closeMenu}
+              role='menuitem'
+            >
+              <ShieldStarIcon />
+              <FormattedMessage
+                id='navigation_bar.moderation'
+                defaultMessage='Moderation'
+              />
+            </a>
+          )}
+        </>
+      )}
+
+      <div className={classes.menuDivider} role='separator' />
+
+      <button
+        type='button'
+        className={classes.menuItem}
+        onClick={confirmLogout}
+        role='menuitem'
+      >
+        <SignOutIcon />
+        <FormattedMessage id='navigation_bar.logout' defaultMessage='Logout' />
+      </button>
+    </>
+  );
 
   return (
-    <div className={classes.root} ref={rootRef}>
+    <div className={classes.root}>
       <button
+        ref={setAnchor}
         type='button'
         className={classes.accountButton}
         onClick={toggleMenu}
@@ -147,154 +285,21 @@ export const Blue2AccountMenu: React.FC = () => {
         <span>{homeLabel}</span>
       </button>
 
-      {open && (
-        <div className={classes.menu} role='menu'>
-          <NavLink
-            to='/profile/edit'
-            className={classes.menuItem}
-            onClick={closeMenu}
-            role='menuitem'
-          >
-            <UserIcon />
-            <FormattedMessage
-              id='account.edit_profile'
-              defaultMessage='Edit profile'
-            />
-          </NavLink>
-
-          <a
-            href='/settings/preferences'
-            className={classes.menuItem}
-            onClick={closeMenu}
-            role='menuitem'
-          >
-            <GearIcon />
-            <FormattedMessage
-              id='navigation_bar.preferences'
-              defaultMessage='Preferences'
-            />
-          </a>
-
-          <div className={classes.menuDivider} role='separator' />
-
-          <NavLink
-            to={`${accountBasePath}/collections`}
-            className={classes.menuItem}
-            onClick={closeMenu}
-            role='menuitem'
-          >
-            <StackIcon />
-            <FormattedMessage
-              id='navigation_bar.collections'
-              defaultMessage='Collections'
-            />
-          </NavLink>
-
-          <NavLink
-            to='/scheduled'
-            className={classes.menuItem}
-            onClick={closeMenu}
-            role='menuitem'
-          >
-            <CalendarDotsIcon />
-            <FormattedMessage
-              id='navigation_bar.scheduled_publications'
-              defaultMessage='Scheduled publications'
-            />
-          </NavLink>
-
-          <NavLink
-            to='/favourites'
-            className={classes.menuItem}
-            onClick={closeMenu}
-            role='menuitem'
-          >
-            <HeartIcon />
-            <FormattedMessage
-              id='navigation_bar.favourites'
-              defaultMessage='Favorites'
-            />
-          </NavLink>
-
-          <div className={classes.menuDivider} role='separator' />
-
-          <a
-            href='/relationships'
-            className={classes.menuItem}
-            onClick={closeMenu}
-            role='menuitem'
-          >
-            <UsersThreeIcon />
-            <FormattedMessage
-              id='navigation_bar.follows_and_followers'
-              defaultMessage='Follows and followers'
-            />
-          </a>
-
-          <NavLink
-            to='/blocks'
-            className={classes.menuItem}
-            onClick={closeMenu}
-            role='menuitem'
-          >
-            <ProhibitIcon />
-            <FormattedMessage
-              id='navigation_bar.blocks'
-              defaultMessage='Blocked users'
-            />
-          </NavLink>
-
-          {(isManager || isAdmin) && (
-            <>
-              <div className={classes.menuDivider} role='separator' />
-
-              {isAdmin && (
-                <a
-                  href='/admin/dashboard'
-                  className={classes.menuItem}
-                  onClick={closeMenu}
-                  role='menuitem'
-                >
-                  <GavelIcon />
-                  <FormattedMessage
-                    id='navigation_bar.administration'
-                    defaultMessage='Administration'
-                  />
-                </a>
-              )}
-
-              {isManager && (
-                <a
-                  href='/admin/reports'
-                  className={classes.menuItem}
-                  onClick={closeMenu}
-                  role='menuitem'
-                >
-                  <ShieldStarIcon />
-                  <FormattedMessage
-                    id='navigation_bar.moderation'
-                    defaultMessage='Moderation'
-                  />
-                </a>
-              )}
-            </>
+      {open && anchor && (
+        <Popover
+          isOpen={open}
+          onClose={closeMenu}
+          reference={anchor}
+          placement={menuPlacement}
+          strategy='fixed'
+          offset={4}
+        >
+          {({ props: popoverProps }) => (
+            <div {...popoverProps} className={classes.menu} role='menu'>
+              {menuContent}
+            </div>
           )}
-
-          <div className={classes.menuDivider} role='separator' />
-
-          <button
-            type='button'
-            className={classes.menuItem}
-            onClick={confirmLogout}
-            role='menuitem'
-          >
-            <SignOutIcon />
-            <FormattedMessage
-              id='navigation_bar.logout'
-              defaultMessage='Logout'
-            />
-          </button>
-        </div>
+        </Popover>
       )}
     </div>
   );
