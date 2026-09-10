@@ -97,7 +97,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
     expect(screen.queryByRole('link', { name: 'Moderation' })).toBeNull();
   });
 
-  it('reuses the desktop navigation submenu in the mobile drawer and isolates drawer gestures', async () => {
+  it('uses a dedicated body-portal popover in the mobile drawer and isolates drawer gestures', async () => {
     vi.mocked(useBreakpoint).mockReturnValue(true);
     const drawerTouchStart = vi.fn();
     render(
@@ -111,10 +111,13 @@ describe('<NavigationAccountCardAndMenu />', () => {
     expect(drawerTouchStart).not.toHaveBeenCalled();
     fireEvent.click(trigger);
 
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
     const menu = screen.getByTestId('slide-out-account-menu');
     expect(menu.parentElement).toBe(document.body);
     expect(screen.getByTestId('drawer-ancestor')).not.toContainElement(menu);
     expect(menu).toHaveAttribute('data-popover-placement');
+    expect(menu).not.toHaveAttribute('popover');
+    expect(menu.style.position).toBe('fixed');
     expect(menu.querySelector(':scope > ul')).not.toBeNull();
     expect(
       screen
@@ -124,6 +127,9 @@ describe('<NavigationAccountCardAndMenu />', () => {
     expect(screen.queryByRole('link', { name: 'Profile' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'Bookmarks' })).toBeNull();
     expect(document.querySelector('[role="dialog"]')).toBeNull();
+
+    fireEvent.pointerDown(menu);
+    expect(screen.getByTestId('slide-out-account-menu')).toBeInTheDocument();
 
     fireEvent.keyUp(document, { key: 'Escape' });
     await waitFor(() => {

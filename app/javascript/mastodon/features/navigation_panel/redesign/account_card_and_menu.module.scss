@@ -64,6 +64,27 @@
   }
 }
 
+.slideOutMenu {
+  box-sizing: border-box;
+  z-index: 1000;
+  width: min(280px, calc(100vw - 2 * var(--space-sm)));
+  max-height: calc(100dvh - 24px);
+  padding: var(--space-2xs);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-primary);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-shadow: var(--dropdown-shadow);
+  text-align: start;
+
+  > ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
 .profileMenuItem {
   --list-item-padding: 0;
   --list-item-gap: 8px;
