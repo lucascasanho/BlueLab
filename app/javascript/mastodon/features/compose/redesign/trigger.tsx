@@ -357,7 +357,15 @@ export const ComposeRedesignButton: React.FC<{
         />
       </MenuTrigger>
 
-      <MenuList maxWidth={180} placement='top-end'>
+      <MenuList
+        portal
+        mobilePresentation='popover'
+        maxWidth={180}
+        placement='top-end'
+        strategy='fixed'
+        offset={8}
+        data-testid='blue2-compose-type-menu'
+      >
         <MenuItem name='post' onClick={handleComposerOpen} icon={NewspaperIcon}>
           <FormattedMessage id='compose.new.post' defaultMessage='Post' />
         </MenuItem>
