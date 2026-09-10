@@ -18,7 +18,7 @@ class UpstreamSoftwareUpdateCheckService < BaseService
     @check = UpstreamUpdateCheck.find_or_initialize_by(repository: repository, channel: channel)
     head_sha = fetch_channel_head_sha
 
-    check_development_version!(head_sha) unless @check.last_sha == head_sha
+    check_development_version!(head_sha)
     check_stable_releases!
     advance_cursor!(head_sha)
   rescue *Mastodon::HTTP_CONNECTION_ERRORS, Mastodon::HostValidationError, Mastodon::LengthValidationError, JSON::ParserError, FetchError, ActiveRecord::RecordInvalid, KeyError, TypeError, ArgumentError => e
