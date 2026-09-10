@@ -180,9 +180,11 @@ interface SlideOutAccountMenuSurfaceProps {
   menuListProps: Omit<React.ComponentProps<'div'>, 'ref'>;
 }
 
-const SlideOutAccountMenuSurface: React.FC<
-  SlideOutAccountMenuSurfaceProps
-> = ({ floatingProps, menuListRef, menuListProps }) => {
+const SlideOutAccountMenuSurface: React.FC<SlideOutAccountMenuSurfaceProps> = ({
+  floatingProps,
+  menuListRef,
+  menuListProps,
+}) => {
   const { ref: floatingRef, ...floatingRest } = floatingProps;
   const setMenuRef = useCallback(
     (element: HTMLDivElement | null) => {
