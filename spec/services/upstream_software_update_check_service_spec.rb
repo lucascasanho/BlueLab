@@ -68,6 +68,15 @@ RSpec.describe UpstreamSoftwareUpdateCheckService do
       expect(UpstreamUpdateCheck.last).to have_attributes(last_sha: head_sha, last_error: nil)
     end
 
+    it 'ignores a configured repository override and only queries official Mastodon' do
+      Rails.configuration.x.mastodon.upstream_repository = 'example/bluelab'
+      stub_request(:get, %r{api\.github\.com/repos/mastodon/mastodon/commits\?}).to_return(status: 200, body: [commit_json(head_sha, base_sha)].to_json)
+      stub_request(:get, "https://api.github.com/repos/mastodon/mastodon/compare/#{base_sha}...#{channel}").to_return(status: 200, body: comparison_json.to_json)
+
+      expect { service.call }.to change(UpstreamUpdateBatch.where(repository: 'mastodon/mastodon'), :count).by(1)
+      expect(a_request(:get, %r{api\.github\.com/repos/example/bluelab/})).to_not have_been_made
+    end
+
     it 'uses the persisted cursor after restart and records the next commit only once' do
       Fabricate(:upstream_update_batch, repository: repository, channel: channel, base_sha: base_sha, head_sha: head_sha)
       UpstreamUpdateCheck.create!(repository: repository, channel: channel, last_sha: head_sha)

@@ -9,6 +9,9 @@ module Admin
       @software_updates = SoftwareUpdate.by_version.filter(&:pending?)
       @upstream_update_batches = UpstreamUpdateBatch.for_source(upstream_repository, upstream_channel).recent_first.limit(20)
       @upstream_update_check = UpstreamUpdateCheck.find_by(repository: upstream_repository, channel: upstream_channel)
+      @upstream_update_translations = @upstream_update_batches.index_with do |batch|
+        TranslateUpstreamUpdateBatchService.new.call(batch, I18n.locale.to_s)
+      end
     end
 
     def review_upstream
@@ -24,11 +27,11 @@ module Admin
     end
 
     def upstream_repository
-      Rails.configuration.x.mastodon.upstream_repository
+      UpstreamUpdateBatch.official_repository
     end
 
     def upstream_channel
-      Rails.configuration.x.mastodon.upstream_channel
+      UpstreamUpdateBatch.monitored_channel
     end
   end
 end

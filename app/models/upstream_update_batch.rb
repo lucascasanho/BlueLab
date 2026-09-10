@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class UpstreamUpdateBatch < ApplicationRecord
+  OFFICIAL_REPOSITORY = 'mastodon/mastodon'
+  DEFAULT_CHANNEL = 'main'
+
   LARGE_COMMIT_COUNT = 10
   LARGE_FILE_COUNT = 25
   LARGE_CHANGE_COUNT = 500
@@ -38,7 +41,15 @@ class UpstreamUpdateBatch < ApplicationRecord
   end
 
   def self.current_source
-    for_source(Rails.configuration.x.mastodon.upstream_repository, Rails.configuration.x.mastodon.upstream_channel)
+    for_source(official_repository, monitored_channel)
+  end
+
+  def self.official_repository
+    OFFICIAL_REPOSITORY
+  end
+
+  def self.monitored_channel
+    Rails.configuration.x.mastodon.upstream_channel.presence || DEFAULT_CHANNEL
   end
 
   def large?

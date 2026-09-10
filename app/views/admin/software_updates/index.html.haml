@@ -31,7 +31,7 @@
 
   .upstream-updates
     %h2= t('admin.software_updates.upstream.title')
-    %p.lead= t('admin.software_updates.upstream.description', repository: Rails.configuration.x.mastodon.upstream_repository, channel: Rails.configuration.x.mastodon.upstream_channel)
+    %p.lead= t('admin.software_updates.upstream.description', repository: UpstreamUpdateBatch.official_repository, channel: UpstreamUpdateBatch.monitored_channel)
 
     - if @upstream_update_check&.last_error.present?
       .flash-message.warning
@@ -43,4 +43,4 @@
     - if @upstream_update_batches.empty?
       .muted-hint.center-text= t('admin.software_updates.upstream.empty')
     - else
-      = render collection: @upstream_update_batches, partial: 'admin/software_updates/upstream_update_batch'
+      = render collection: @upstream_update_batches, partial: 'admin/software_updates/upstream_update_batch', locals: { upstream_update_translations: @upstream_update_translations }

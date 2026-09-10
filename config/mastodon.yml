@@ -5,7 +5,7 @@ shared:
   self_destruct_value: <%= ENV.fetch('SELF_DESTRUCT', nil)&.to_json %>
   software_update_url: <%= ENV.fetch('UPDATE_CHECK_URL', 'https://api.joinmastodon.org/update-check')&.to_json %>
   upstream_commit_check_enabled: <%= ENV.fetch('UPSTREAM_COMMIT_CHECK_ENABLED', 'true') == 'true' %>
-  upstream_repository: <%= ENV.fetch('UPSTREAM_MASTODON_REPOSITORY', 'mastodon/mastodon') %>
+  upstream_repository: mastodon/mastodon
   upstream_channel: <%= ENV.fetch('UPSTREAM_MASTODON_CHANNEL', 'main') %>
   upstream_initial_lookback_hours: <%= ENV.fetch('UPSTREAM_INITIAL_LOOKBACK_HOURS', 24).to_i.clamp(1, 168) %>
   donation_campaigns:

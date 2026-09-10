@@ -18,6 +18,14 @@ RSpec.describe UpstreamUpdateBatch do
       expect(described_class).to be_pending
       expect(described_class.pending_count).to eq 1
     end
+
+    it 'never counts pending batches from a non-official repository' do
+      Fabricate(:upstream_update_batch, total_commits: 1)
+      Fabricate(:upstream_update_batch, repository: 'example/bluelab', total_commits: 20)
+
+      expect(described_class.pending_count).to eq 1
+      expect(described_class.current_source.distinct.pluck(:repository)).to eq ['mastodon/mastodon']
+    end
   end
 
   describe '#impact_areas' do

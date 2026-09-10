@@ -1,4 +1,5 @@
 - commit_word = t('admin.software_updates.upstream.commit', count: upstream_update_batch.total_commits)
+- translation = upstream_update_translations.fetch(upstream_update_batch.id, { messages: upstream_update_batch.commits.pluck('message'), translated: false })
 
 %article.upstream-update{ id: dom_id(upstream_update_batch), class: upstream_update_batch.reviewed_at? ? 'upstream-update--reviewed' : nil }
   .upstream-update__header
@@ -33,9 +34,14 @@
   %details.upstream-update__notes{ open: upstream_update_batch.large? }
     %summary= t('admin.software_updates.upstream.patch_notes')
 
+    - if translation[:translated]
+      %p.upstream-update__translation-note
+        = material_symbol('translate')
+        = t('admin.software_updates.upstream.automatic_translation', provider: translation[:provider])
+
     %h4= t('admin.software_updates.upstream.commits_title')
     %ol.upstream-update__commits
-      - upstream_update_batch.commits.each do |commit|
+      - upstream_update_batch.commits.each_with_index do |commit, index|
         %li
           .upstream-update__commit-heading
             = link_to commit['sha'].first(12), upstream_update_batch.commit_url(commit['sha']), target: '_blank', rel: 'noopener noreferrer'
@@ -44,7 +50,11 @@
               %time{ datetime: commit['committed_at'] }= l(Time.zone.parse(commit['committed_at']), format: :long)
             - if commit['verified']
               %span.upstream-update__verified= t('admin.software_updates.upstream.verified')
-          .upstream-update__message= simple_format(commit['message'])
+          .upstream-update__message= simple_format(translation[:messages][index] || commit['message'])
+          - if translation[:translated] && translation[:messages][index] != commit['message']
+            %details.upstream-update__original
+              %summary= t('admin.software_updates.upstream.show_original')
+              .upstream-update__message= simple_format(commit['message'])
 
     %h4= t('admin.software_updates.upstream.files_title')
     .table-wrapper

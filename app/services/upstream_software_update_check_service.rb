@@ -5,7 +5,6 @@ class UpstreamSoftwareUpdateCheckService < BaseService
   API_VERSION = '2022-11-28'
   MAX_COMMITS = 100
   MAX_MESSAGE_LENGTH = 20_000
-  REPOSITORY_PATTERN = %r{\A[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+\z}
   CHANNEL_PATTERN = %r{\A[a-zA-Z0-9_./-]+\z}
 
   class FetchError < StandardError; end
@@ -139,13 +138,11 @@ class UpstreamSoftwareUpdateCheckService < BaseService
   end
 
   def repository
-    @repository ||= Rails.configuration.x.mastodon.upstream_repository.tap do |value|
-      raise FetchError, 'Invalid upstream repository' unless REPOSITORY_PATTERN.match?(value)
-    end
+    UpstreamUpdateBatch.official_repository
   end
 
   def channel
-    @channel ||= Rails.configuration.x.mastodon.upstream_channel.tap do |value|
+    @channel ||= UpstreamUpdateBatch.monitored_channel.tap do |value|
       raise FetchError, 'Invalid upstream channel' unless CHANNEL_PATTERN.match?(value)
     end
   end

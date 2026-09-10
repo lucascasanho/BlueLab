@@ -1108,6 +1108,7 @@ pt-BR:
         alert:
           one: 1 commit oficial para analisar
           other: "%{count} commits oficiais para analisar"
+        automatic_translation: Notas traduzidas automaticamente por %{provider}. Confira o texto original antes de aplicar uma atualização.
         batch_meta: "%{channel} · %{commits} · detectado em %{date}"
         changes: Alterações
         check_error: 'A última consulta de commits oficiais falhou:'
@@ -1149,6 +1150,7 @@ pt-BR:
         patch_notes: Ver patch notes completo
         reviewed: Lote de commits oficiais marcado como analisado.
         reviewed_badge: Analisado
+        show_original: Mostrar texto original
         stats_label: Estatísticas das alterações
         status: Estado
         title: Commits oficiais do Mastodon

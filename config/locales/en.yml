@@ -1124,6 +1124,7 @@ en:
         alert:
           one: 1 official commit to review
           other: "%{count} official commits to review"
+        automatic_translation: Notes automatically translated by %{provider}. Check the original text before applying an update.
         batch_meta: "%{channel} · %{commits} · detected %{date}"
         changes: Changes
         check_error: 'The latest official commit check failed:'
@@ -1165,6 +1166,7 @@ en:
         patch_notes: View complete patch notes
         reviewed: Official commit batch marked as reviewed.
         reviewed_badge: Reviewed
+        show_original: Show original text
         stats_label: Change statistics
         status: Status
         title: Official Mastodon commits
