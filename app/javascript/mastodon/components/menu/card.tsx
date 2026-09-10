@@ -1,6 +1,9 @@
+import { useLayoutEffect, useRef } from 'react';
+
 import classNames from 'classnames';
 
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
+import { useMergedRefs } from '@/mastodon/hooks/useMergedRefs';
 import type { PolymorphicProps } from '@/types/polymorphic';
 
 import { BottomSheet } from '../bottom_sheet';
@@ -27,12 +30,33 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
   elevation = 1,
   maxWidth,
   style,
+  // Upstream #40448 uses the native Popover API when available so menus are
+  // promoted to the browser top layer instead of fighting drawer stacking and
+  // clipping contexts. Passing popover={undefined} still opts out explicitly.
+  popover = 'manual',
   ...props
 }: MenuCardProps<As>) => {
   const Component = asComp ?? 'div';
+  const cardRef = useRef<HTMLDivElement>(null);
+  const nativePopover =
+    popover === 'manual' && isPopoverAPISupported() ? popover : undefined;
+
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    if (nativePopover !== 'manual' || !card) return;
+
+    card.showPopover();
+
+    return () => {
+      card.hidePopover();
+    };
+  }, [nativePopover]);
+
   return (
     <Component
       {...props}
+      ref={useMergedRefs(props.ref, cardRef)}
+      popover={nativePopover}
       className={classNames(className, classes.card)}
       data-elevation={elevation}
       style={
@@ -47,6 +71,18 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
     </Component>
   );
 };
+
+function isPopoverAPISupported() {
+  return (
+    typeof HTMLElement !== 'undefined' &&
+    typeof CSS !== 'undefined' &&
+    'popover' in HTMLElement.prototype &&
+    typeof HTMLElement.prototype.showPopover === 'function' &&
+    typeof HTMLElement.prototype.hidePopover === 'function' &&
+    typeof CSS.supports === 'function' &&
+    CSS.supports('selector(:popover-open)')
+  );
+}
 
 export type PopoverMenuCardProps<As extends React.ElementType> =
   MenuCardProps<As> &
@@ -73,6 +109,8 @@ export const PopoverMenuCard = <As extends React.ElementType>({
 }: PopoverMenuCardProps<As>) => {
   const isMobile = useBreakpoint('openable');
 
+  // BlueLab's account card deliberately keeps an anchored popover on mobile;
+  // other Mastodon menus retain the upstream bottom-sheet presentation.
   if (isMobile && isOpen && mobilePresentation === 'bottom-sheet') {
     return (
       <BottomSheet {...props} onClose={onClose}>

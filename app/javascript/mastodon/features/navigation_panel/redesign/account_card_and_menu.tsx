@@ -204,7 +204,10 @@ export const AccountMenuItems: React.FC<{
       </MenuItemLink>
 
       <MenuItemLink as='a' href='/settings/preferences' icon={GearIcon}>
-        <FormattedMessage id='tabs_bar.settings' defaultMessage='Settings' />
+        <FormattedMessage
+          id='navigation_bar.preferences'
+          defaultMessage='Preferences'
+        />
       </MenuItemLink>
 
       <MenuItemDivider />
@@ -225,16 +228,16 @@ export const AccountMenuItems: React.FC<{
 
       <MenuItemLink to='/favourites' icon={HeartIcon}>
         <FormattedMessage
-          id='navigation_bar.liked_posts'
-          defaultMessage='Liked Posts'
+          id='navigation_bar.favourites'
+          defaultMessage='Favorites'
         />
       </MenuItemLink>
 
       {context === 'mobile' && (
         <MenuItemLink to='/bookmarks' icon={BookmarkSimpleIcon}>
           <FormattedMessage
-            id='navigation_bar.saved_posts'
-            defaultMessage='Saved Posts'
+            id='navigation_bar.bookmarks'
+            defaultMessage='Bookmarks'
           />
         </MenuItemLink>
       )}
@@ -243,15 +246,15 @@ export const AccountMenuItems: React.FC<{
 
       <MenuItemLink as='a' href='/relationships' icon={UsersThreeIcon}>
         <FormattedMessage
-          id='navigation_bar.followers_and_following'
-          defaultMessage='Followers & Following'
+          id='navigation_bar.follows_and_followers'
+          defaultMessage='Follows and followers'
         />
       </MenuItemLink>
 
       <MenuItemLink to='/blocks' icon={ProhibitIcon}>
         <FormattedMessage
-          id='navigation_bar.blocked_accounts'
-          defaultMessage='Blocked accounts'
+          id='navigation_bar.blocks'
+          defaultMessage='Blocked users'
         />
       </MenuItemLink>
 
@@ -282,10 +285,7 @@ export const AccountMenuItems: React.FC<{
       <MenuItemDivider />
 
       <MenuItem onClick={confirmLogout} icon={SignOutIcon}>
-        <FormattedMessage
-          id='navigation_bar.sign_out'
-          defaultMessage='Sign out'
-        />
+        <FormattedMessage id='navigation_bar.logout' defaultMessage='Logout' />
       </MenuItem>
     </>
   );

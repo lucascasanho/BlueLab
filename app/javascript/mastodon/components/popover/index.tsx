@@ -62,8 +62,8 @@ export interface PopoverProps {
    */
   flip?: boolean;
   /**
-   * Change the positioning strategy, defaults to 'fixed'
-   * but can be changed to 'absolute'
+   * Change the positioning strategy. Upstream #40448 defaults to
+   * 'absolute', which behaves better for non-fixed/non-sticky anchors.
    */
   strategy?: Strategy;
   /**
@@ -114,7 +114,7 @@ export const Popover: React.FC<PopoverProps> = ({
   popoverElement,
   placement = 'bottom',
   offset,
-  strategy = 'fixed',
+  strategy = 'absolute',
   flip = true,
   container,
   matchReferenceWidth = false,

@@ -26,7 +26,6 @@ import {
   ComposerResumeButton,
   ComposeRedesignButton,
   shouldHideBlue2GlobalTrigger,
-  shouldUseDirectBlue2InlineLauncher,
   useBlue2Theme,
 } from './trigger';
 
@@ -106,30 +105,20 @@ describe('BlueLab composer trigger controls', () => {
     );
   });
 
-  test('uses a direct launcher only for the idle Blue 2 inline owner', () => {
-    expect(shouldUseDirectBlue2InlineLauncher(true, true, 'hidden')).toBe(true);
-    expect(shouldUseDirectBlue2InlineLauncher(true, true, 'showing')).toBe(
-      false,
-    );
-    expect(shouldUseDirectBlue2InlineLauncher(true, true, 'minimized')).toBe(
-      false,
-    );
-    expect(shouldUseDirectBlue2InlineLauncher(true, false, 'hidden')).toBe(
-      false,
-    );
-    expect(shouldUseDirectBlue2InlineLauncher(false, true, 'hidden')).toBe(
-      false,
-    );
-  });
-
-  test('keeps one mounted owner through FAB open, minimize, and resume', async () => {
-    const { store } = renderBlue2MobileComposerOwner();
+  test('offers post and message before opening the Blue 2 inline composer', async () => {
+    const { store, container } = renderBlue2MobileComposerOwner();
     const owner = screen.getByTestId('blue2-mobile-compose-owner');
-    const fab = screen.getByRole('button', { name: 'New Post' });
+    const fab = container.querySelector('[data-blue2-compose-fab="true"]');
 
-    expect(fab).toHaveAttribute('data-blue2-compose-fab', 'true');
+    expect(fab).not.toBeNull();
     expect(screen.queryByRole('menu')).toBeNull();
-    fireEvent.click(fab);
+    fireEvent.click(fab as Element);
+
+    expect(await screen.findByRole('menu')).toBeVisible();
+    expect(screen.getByRole('menuitem', { name: 'Post' })).toBeVisible();
+    expect(screen.getByRole('menuitem', { name: 'Message' })).toBeVisible();
+
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Post' }));
 
     await waitFor(() => {
       expect(store.getState().composer.displayState).toBe('showing');
