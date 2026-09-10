@@ -35,7 +35,7 @@ describe('BlueLab composer trigger controls', () => {
     expect(onMinimize).toHaveBeenCalledOnce();
   });
 
-  test('opens the Post and Message chooser for a minimized Blue 2 launcher', () => {
+  test('opens the mode chooser for a minimized Blue 2 launcher', () => {
     const onSelect = vi.fn();
     const { container } = render(
       <IntlProvider locale='en'>
