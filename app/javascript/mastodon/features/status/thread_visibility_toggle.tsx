@@ -17,28 +17,15 @@ const messages = defineMessages({
   },
 });
 
-const compactLabels = {
-  en: {
-    showAll: 'Show all',
-    showLess: 'Show less',
-  },
-  pt: {
-    showAll: 'Mostrar tudo',
-    showLess: 'Mostrar menos',
-  },
-} as const;
+const getCompactLabel = (locale: string, hidden: boolean, fallback: string) => {
+  const language = locale.toLowerCase().split(/[-_]/)[0];
 
-type CompactLabelKey = keyof (typeof compactLabels)['en'];
+  if (language === 'pt') {
+    return hidden ? 'Mostrar tudo' : 'Mostrar menos';
+  }
 
-const getCompactLabel = (
-  locale: string,
-  key: CompactLabelKey,
-  fallback: string,
-) => {
-  const language = locale.toLowerCase().split(/[-_]/)[0] ?? 'en';
-
-  if (language === 'en' || language === 'pt') {
-    return compactLabels[language][key];
+  if (language === 'en') {
+    return hidden ? 'Show all' : 'Show less';
   }
 
   return fallback;
@@ -49,9 +36,12 @@ export const ThreadVisibilityToggle: React.FC<{
   onClick: () => void;
 }> = ({ hidden, onClick }) => {
   const intl = useIntl();
-  const key: CompactLabelKey = hidden ? 'showAll' : 'showLess';
   const message = hidden ? messages.showAll : messages.showLess;
-  const label = getCompactLabel(intl.locale, key, intl.formatMessage(message));
+  const label = getCompactLabel(
+    intl.locale,
+    hidden,
+    intl.formatMessage(message),
+  );
 
   return (
     <div className={styles.wrapper}>
