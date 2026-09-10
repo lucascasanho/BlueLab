@@ -93,6 +93,16 @@ export const NavigationAccountCardAndMenu: React.FC<{
     setSlideOutOpen(false);
   }, []);
 
+  const handleSlideOutMenuKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.stopPropagation();
+        setSlideOutOpen(false);
+      }
+    },
+    [],
+  );
+
   if (!accountId || !account) {
     return null;
   }
@@ -147,16 +157,17 @@ export const NavigationAccountCardAndMenu: React.FC<{
           />
         </IconButton>
         {slideOutOpen && (
-          <Menu type='navigation' noFocus>
+          <Menu noFocus>
             <div
               className={classes.slideOutMenu}
               data-testid='slide-out-account-menu'
+              role='menu'
+              tabIndex={-1}
               onPointerDown={stopSlideOutPointerDown}
               onClick={closeSlideOutMenu}
+              onKeyDown={handleSlideOutMenuKeyDown}
             >
-              <ul>
-                <AccountMenuItems context='mobile' />
-              </ul>
+              <AccountMenuItems context='mobile' />
             </div>
           </Menu>
         )}
