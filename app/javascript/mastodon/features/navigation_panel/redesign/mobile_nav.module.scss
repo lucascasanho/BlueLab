@@ -52,13 +52,18 @@
   inset: 0;
   z-index: 300;
   pointer-events: none;
+  visibility: hidden;
   background: rgb(from var(--color-bg-overlay) r g b/50%);
   opacity: 0;
-  transition: opacity 250ms ease;
+  transition:
+    opacity 250ms ease,
+    visibility 0s linear 250ms;
 
   &[data-is-open='true'] {
     pointer-events: auto;
+    visibility: visible;
     opacity: 1;
+    transition-delay: 0s;
   }
 }
 
