@@ -199,15 +199,9 @@ export const ColumnsAreaRedesign: React.FC<{
         )}
 
         {isMobile ? (
-          <>
-            <div className={mobileChromeClasses.mobileNavigation}>
-              <RedesignMobileNavigation />
-            </div>
-            {/* Keep a non-inline composer host mounted on mobile. The mobile
-                navigation owns the launcher, but the host is what renders the
-                global BlueLab composer once shared state becomes `showing`. */}
-            <ComposeRedesignButton />
-          </>
+          <div className={mobileChromeClasses.mobileNavigation}>
+            <RedesignMobileNavigation />
+          </div>
         ) : (
           <ComposeRedesignButton />
         )}
