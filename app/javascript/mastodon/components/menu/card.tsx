@@ -38,23 +38,25 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
 }: MenuCardProps<As>) => {
   const Component = asComp ?? 'div';
   const cardRef = useRef<HTMLDivElement>(null);
+  const nativePopover =
+    popover === 'manual' && isPopoverAPISupported() ? popover : undefined;
 
   useLayoutEffect(() => {
     const card = cardRef.current;
-    if (popover !== 'manual' || !card || !isPopoverAPISupported()) return;
+    if (nativePopover !== 'manual' || !card) return;
 
     card.showPopover();
 
     return () => {
       card.hidePopover();
     };
-  }, [popover]);
+  }, [nativePopover]);
 
   return (
     <Component
       {...props}
       ref={useMergedRefs(props.ref, cardRef)}
-      popover={popover}
+      popover={nativePopover}
       className={classNames(className, classes.card)}
       data-elevation={elevation}
       style={
@@ -71,7 +73,15 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
 };
 
 function isPopoverAPISupported() {
-  return 'popover' in HTMLElement.prototype;
+  return (
+    typeof HTMLElement !== 'undefined' &&
+    typeof CSS !== 'undefined' &&
+    'popover' in HTMLElement.prototype &&
+    typeof HTMLElement.prototype.showPopover === 'function' &&
+    typeof HTMLElement.prototype.hidePopover === 'function' &&
+    typeof CSS.supports === 'function' &&
+    CSS.supports('selector(:popover-open)')
+  );
 }
 
 export type PopoverMenuCardProps<As extends React.ElementType> =
