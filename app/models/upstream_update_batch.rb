@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class UpstreamUpdateBatch < ApplicationRecord
+  VERSION_METADATA_KIND = 'version_update'
+  STABLE_RELEASE_CHANNEL = 'stable-releases'
+
   LARGE_COMMIT_COUNT = 10
   LARGE_FILE_COUNT = 25
   LARGE_CHANGE_COUNT = 500
@@ -20,6 +23,8 @@ class UpstreamUpdateBatch < ApplicationRecord
   scope :pending_review, -> { where(reviewed_at: nil) }
   scope :recent_first, -> { order(detected_at: :desc) }
   scope :for_source, ->(repository, channel) { where(repository: repository, channel: channel) }
+  scope :for_repository, ->(repository) { where(repository: repository) }
+  scope :official_versions, -> { where('commits @> ?', [{ kind: VERSION_METADATA_KIND }].to_json) }
 
   validates :repository, :channel, :base_sha, :head_sha, :detected_at, presence: true
   validates :head_sha, uniqueness: { scope: [:repository, :channel] }
@@ -34,11 +39,42 @@ class UpstreamUpdateBatch < ApplicationRecord
   end
 
   def self.pending_count
-    check_enabled? ? current_source.pending_review.sum(:total_commits) : 0
+    check_enabled? ? current_source.pending_review.count : 0
   end
 
   def self.current_source
-    for_source(Rails.configuration.x.mastodon.upstream_repository, Rails.configuration.x.mastodon.upstream_channel)
+    for_repository(Rails.configuration.x.mastodon.upstream_repository).official_versions
+  end
+
+  def version_metadata
+    commits.find { |entry| entry['kind'] == VERSION_METADATA_KIND } || {}
+  end
+
+  def version
+    version_metadata['version']
+  end
+
+  def release_type
+    version_metadata['release_type']
+  end
+
+  def release_url
+    version_metadata['url'].presence || compare_url
+  end
+
+  def published_at
+    value = version_metadata['published_at']
+    Time.zone.parse(value) if value.present?
+  rescue ArgumentError, TypeError
+    nil
+  end
+
+  def stable_release?
+    release_type == 'stable'
+  end
+
+  def prerelease?
+    release_type == 'prerelease'
   end
 
   def large?
