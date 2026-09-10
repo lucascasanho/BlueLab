@@ -1,3 +1,12 @@
 .tabs-bar__wrapper {
   border-top: 0;
 }
+
+// Keep the Bird UI desktop header translucent so timeline content can remain
+// visible through the fixed/sticky top bar while it is blurred underneath.
+@media screen and (width > 1174px) {
+  .tabs-bar__wrapper {
+    background: rgb(from var(--color-bg) r g b / 80%);
+    backdrop-filter: blur(6px);
+  }
+}
