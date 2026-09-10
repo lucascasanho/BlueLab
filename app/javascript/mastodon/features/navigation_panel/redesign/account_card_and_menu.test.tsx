@@ -59,12 +59,12 @@ describe('<NavigationAccountCardAndMenu />', () => {
 
     const trigger = screen.getByRole('button', { name: 'Account settings' });
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByRole('menu')).toBeNull();
+    expect(screen.queryByTestId('slide-out-account-menu')).toBeNull();
 
     fireEvent.click(trigger);
 
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('menu')).toBeInTheDocument();
+    expect(screen.getByTestId('slide-out-account-menu')).toBeInTheDocument();
     expect(
       screen
         .getByRole('link', { name: 'Scheduled publications' })
@@ -73,7 +73,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
 
     fireEvent.click(trigger);
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByRole('menu')).toBeNull();
+    expect(screen.queryByTestId('slide-out-account-menu')).toBeNull();
   });
 
   it('hides moderation and administration from users without permissions', () => {
