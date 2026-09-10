@@ -1,8 +1,7 @@
 - upstream_repository = Rails.configuration.x.mastodon.upstream_repository
-- official_url = if upstream_update_batch.stable_release?
-  - "https://github.com/#{upstream_repository}/releases/tag/v#{ERB::Util.url_encode(upstream_update_batch.version)}"
-- else
-  - "https://github.com/#{upstream_repository}/commit/#{ERB::Util.url_encode(upstream_update_batch.head_sha)}"
+- stable_release_url = "https://github.com/#{upstream_repository}/releases/tag/v#{ERB::Util.url_encode(upstream_update_batch.version)}"
+- prerelease_url = "https://github.com/#{upstream_repository}/commit/#{ERB::Util.url_encode(upstream_update_batch.head_sha)}"
+- official_url = upstream_update_batch.stable_release? ? stable_release_url : prerelease_url
 
 %article.upstream-update{ id: dom_id(upstream_update_batch), class: upstream_update_batch.reviewed_at? ? 'upstream-update--reviewed' : nil }
   .upstream-update__header
