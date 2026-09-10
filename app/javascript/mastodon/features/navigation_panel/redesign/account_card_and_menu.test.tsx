@@ -54,17 +54,26 @@ describe('<NavigationAccountCardAndMenu />', () => {
     ).toBe('/scheduled');
   });
 
-  it('opens and closes the dedicated slide-out submenu without the generic mobile menu presentation', () => {
-    render(<NavigationAccountCardAndMenu inSlideOut />);
+  it('opens the slide-out account menu without starting the parent drawer gesture', () => {
+    const parentPointerDown = vi.fn();
+    render(
+      <div onPointerDown={parentPointerDown}>
+        <NavigationAccountCardAndMenu inSlideOut />
+      </div>,
+    );
 
     const trigger = screen.getByRole('button', { name: 'Account settings' });
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByRole('menu')).toBeNull();
+    expect(
+      screen.queryByRole('link', { name: 'Scheduled publications' }),
+    ).toBeNull();
+
+    fireEvent.pointerDown(trigger);
+    expect(parentPointerDown).not.toHaveBeenCalled();
 
     fireEvent.click(trigger);
 
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByRole('menu')).toBeInTheDocument();
     expect(
       screen
         .getByRole('link', { name: 'Scheduled publications' })
@@ -73,7 +82,9 @@ describe('<NavigationAccountCardAndMenu />', () => {
 
     fireEvent.click(trigger);
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.queryByRole('menu')).toBeNull();
+    expect(
+      screen.queryByRole('link', { name: 'Scheduled publications' }),
+    ).toBeNull();
   });
 
   it('hides moderation and administration from users without permissions', () => {
