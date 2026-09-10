@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
+require 'base64'
+
 class UpstreamSoftwareUpdateCheckService < BaseService
   API_ROOT = 'https://api.github.com'
   API_VERSION = '2022-11-28'
-  MAX_COMMITS = 100
-  MAX_MESSAGE_LENGTH = 20_000
+  VERSION_FILE = 'lib/mastodon/version.rb'
+  RELEASE_LIMIT = 30
   REPOSITORY_PATTERN = %r{\A[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+\z}
   CHANNEL_PATTERN = %r{\A[a-zA-Z0-9_./-]+\z}
 
@@ -14,97 +16,135 @@ class UpstreamSoftwareUpdateCheckService < BaseService
     return unless UpstreamUpdateBatch.check_enabled?
 
     @check = UpstreamUpdateCheck.find_or_initialize_by(repository: repository, channel: channel)
-    @check.last_sha.present? ? check_from_cursor! : bootstrap!
-  rescue *Mastodon::HTTP_CONNECTION_ERRORS, Mastodon::HostValidationError, Mastodon::LengthValidationError, JSON::ParserError, FetchError, ActiveRecord::RecordInvalid, KeyError, TypeError => e
+    head_sha = fetch_channel_head_sha
+
+    check_development_version!(head_sha) unless @check.last_sha == head_sha
+    check_stable_releases!
+    advance_cursor!(head_sha)
+  rescue *Mastodon::HTTP_CONNECTION_ERRORS, Mastodon::HostValidationError, Mastodon::LengthValidationError, JSON::ParserError, FetchError, ActiveRecord::RecordInvalid, KeyError, TypeError, ArgumentError => e
     record_error!(e)
   end
 
   private
 
-  def bootstrap!
-    recent_commits = fetch_json("/repos/#{repository}/commits?#{URI.encode_www_form(sha: channel, since: lookback.ago.iso8601, per_page: MAX_COMMITS)}")
-    raise FetchError, 'GitHub commits response is not a list' unless recent_commits.is_a?(Array)
+  def check_development_version!(head_sha)
+    version = fetch_declared_version(head_sha)
+    return unless newer_than_runtime?(version)
+    return if version_already_recorded?(version)
 
-    if recent_commits.empty?
-      head = fetch_json("/repos/#{repository}/commits/#{CGI.escape(channel)}")
-      advance_cursor!(head.fetch('sha'))
-      return
-    end
-
-    oldest_parent = recent_commits.last.fetch('parents', []).first&.fetch('sha', nil)
-    unless oldest_parent
-      advance_cursor!(recent_commits.first.fetch('sha'))
-      return
-    end
-
-    process_comparison!(fetch_comparison(oldest_parent), bootstrap_truncated: recent_commits.size >= MAX_COMMITS)
+    record_version_update!(
+      channel: channel,
+      head_sha: head_sha,
+      version: version,
+      release_type: 'prerelease',
+      url: "https://github.com/#{repository}/commit/#{head_sha}"
+    )
   end
 
-  def check_from_cursor!
-    process_comparison!(fetch_comparison(@check.last_sha))
-  end
+  def check_stable_releases!
+    releases = fetch_json("/repos/#{repository}/releases?#{URI.encode_www_form(per_page: RELEASE_LIMIT)}")
+    raise FetchError, 'GitHub releases response is not a list' unless releases.is_a?(Array)
 
-  def fetch_comparison(base_sha)
-    fetch_json("/repos/#{repository}/compare/#{base_sha}...#{CGI.escape(channel)}")
-  end
+    releases.each do |release|
+      next if release.fetch('draft', false) || release.fetch('prerelease', false)
 
-  def process_comparison!(comparison, bootstrap_truncated: false)
-    raise FetchError, 'GitHub comparison response is not an object' unless comparison.is_a?(Hash)
+      version = release_version(release['tag_name'])
+      next if version.nil? || !newer_than_runtime?(version) || version_already_recorded?(version)
 
-    commits = comparison.fetch('commits', [])
-    head_sha = commits.last&.fetch('sha', nil) || comparison.dig('base_commit', 'sha')
-    raise FetchError, 'GitHub comparison did not include a head commit' if head_sha.blank?
-
-    if comparison['status'] == 'identical' || commits.empty?
-      advance_cursor!(head_sha)
-      return
+      head_sha = fetch_release_sha(release.fetch('tag_name'))
+      record_version_update!(
+        channel: UpstreamUpdateBatch::STABLE_RELEASE_CHANNEL,
+        head_sha: head_sha,
+        version: version,
+        release_type: 'stable',
+        url: release['html_url'] || "https://github.com/#{repository}/releases/tag/#{release.fetch('tag_name')}",
+        published_at: release['published_at']
+      )
     end
+  end
 
-    raise FetchError, "GitHub comparison status is #{comparison['status'].inspect}" unless comparison['status'] == 'ahead'
+  def record_version_update!(channel:, head_sha:, version:, release_type:, url:, published_at: nil)
+    metadata = {
+      kind: UpstreamUpdateBatch::VERSION_METADATA_KIND,
+      version: version,
+      release_type: release_type,
+      url: url,
+      published_at: published_at,
+    }.compact
 
-    files = comparison.fetch('files', [])
-    attributes = {
+    UpstreamUpdateBatch.create!(
       repository: repository,
       channel: channel,
-      base_sha: comparison.fetch('base_commit').fetch('sha'),
+      base_sha: head_sha,
       head_sha: head_sha,
-      total_commits: comparison.fetch('total_commits', commits.size),
-      commits: commits.map { |commit| commit_attributes(commit) },
-      files: files.map { |file| file_attributes(file) },
-      additions: files.sum { |file| file.fetch('additions', 0) },
-      deletions: files.sum { |file| file.fetch('deletions', 0) },
-      truncated: bootstrap_truncated || comparison.fetch('total_commits', commits.size) > commits.size || files.size >= 300,
-      detected_at: Time.current,
-    }
-
-    UpstreamUpdateBatch.transaction do
-      UpstreamUpdateBatch.create_with(attributes).find_or_create_by!(repository: repository, channel: channel, head_sha: head_sha)
-      advance_cursor!(head_sha)
-    end
+      total_commits: 0,
+      commits: [metadata],
+      files: [],
+      additions: 0,
+      deletions: 0,
+      truncated: false,
+      detected_at: Time.current
+    )
+  rescue ActiveRecord::RecordNotUnique
+    nil
   end
 
-  def commit_attributes(commit)
-    data = commit.fetch('commit', {})
-    author = data.fetch('author', {})
-    verification = data.fetch('verification', {})
-
-    {
-      sha: commit.fetch('sha'),
-      message: data.fetch('message', '').truncate(MAX_MESSAGE_LENGTH),
-      author: author.fetch('name', ''),
-      committed_at: author['date'],
-      verified: verification.fetch('verified', false),
-    }
+  def version_already_recorded?(version)
+    UpstreamUpdateBatch
+      .for_repository(repository)
+      .official_versions
+      .where('commits @> ?', [{ kind: UpstreamUpdateBatch::VERSION_METADATA_KIND, version: version }].to_json)
+      .exists?
   end
 
-  def file_attributes(file)
-    {
-      filename: file.fetch('filename'),
-      status: file.fetch('status', 'modified'),
-      additions: file.fetch('additions', 0),
-      deletions: file.fetch('deletions', 0),
-      changes: file.fetch('changes', 0),
-    }
+  def fetch_channel_head_sha
+    head = fetch_json("/repos/#{repository}/commits/#{CGI.escape(channel)}")
+    raise FetchError, 'GitHub channel head response is not an object' unless head.is_a?(Hash)
+
+    head.fetch('sha')
+  end
+
+  def fetch_release_sha(tag_name)
+    commit = fetch_json("/repos/#{repository}/commits/#{CGI.escape(tag_name)}")
+    raise FetchError, 'GitHub release commit response is not an object' unless commit.is_a?(Hash)
+
+    commit.fetch('sha')
+  end
+
+  def fetch_declared_version(ref)
+    response = fetch_json("/repos/#{repository}/contents/#{VERSION_FILE}?#{URI.encode_www_form(ref: ref)}")
+    raise FetchError, 'GitHub version file response is not an object' unless response.is_a?(Hash)
+    raise FetchError, 'GitHub version file is not base64 encoded' unless response['encoding'] == 'base64'
+
+    source = Base64.decode64(response.fetch('content'))
+    parse_declared_version(source)
+  end
+
+  def parse_declared_version(source)
+    major = source[/def major\s+(\d+)\s+end/m, 1]
+    minor = source[/def minor\s+(\d+)\s+end/m, 1]
+    patch = source[/def patch\s+(\d+)\s+end/m, 1]
+    prerelease_match = source.match(/def default_prerelease\s+(?:'([^']*)'|"([^"]*)"|nil)\s+end/m)
+
+    raise FetchError, 'Could not parse Mastodon version declaration' if major.nil? || minor.nil? || patch.nil? || prerelease_match.nil?
+
+    version = [major, minor, patch].join('.')
+    prerelease = prerelease_match[1] || prerelease_match[2]
+    prerelease.present? ? "#{version}-#{prerelease}" : version
+  end
+
+  def release_version(tag_name)
+    return if tag_name.blank?
+
+    version = tag_name.delete_prefix('v')
+    Gem::Version.new(version)
+    version
+  rescue ArgumentError
+    nil
+  end
+
+  def newer_than_runtime?(version)
+    Gem::Version.new(version) > Mastodon::Version.gem_version
   end
 
   def fetch_json(path)
@@ -120,7 +160,7 @@ class UpstreamSoftwareUpdateCheckService < BaseService
   def request_headers
     headers = {
       'Accept' => 'application/vnd.github+json',
-      'User-Agent' => 'Mastodon BlueLab upstream update checker',
+      'User-Agent' => 'Mastodon BlueLab upstream version update checker',
       'X-GitHub-Api-Version' => API_VERSION,
     }
     token = ENV.fetch('GITHUB_UPSTREAM_TOKEN', nil)
@@ -133,7 +173,7 @@ class UpstreamSoftwareUpdateCheckService < BaseService
   end
 
   def record_error!(error)
-    Rails.logger.warn("Upstream commit check failed: #{error.class}: #{error.message}")
+    Rails.logger.warn("Upstream version check failed: #{error.class}: #{error.message}")
     @check&.update!(last_checked_at: Time.current, last_error: "#{error.class}: #{error.message}".truncate(2_000))
     nil
   end
@@ -148,9 +188,5 @@ class UpstreamSoftwareUpdateCheckService < BaseService
     @channel ||= Rails.configuration.x.mastodon.upstream_channel.tap do |value|
       raise FetchError, 'Invalid upstream channel' unless CHANNEL_PATTERN.match?(value)
     end
-  end
-
-  def lookback
-    Rails.configuration.x.mastodon.upstream_initial_lookback_hours.hours
   end
 end
