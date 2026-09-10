@@ -73,7 +73,6 @@ import { attachFullscreenListener, detachFullscreenListener, isFullscreen } from
 import ActionBar from './components/action_bar';
 import { DetailedStatus } from './components/detailed_status';
 import { RefreshController } from './components/refresh_controller';
-import { ThreadVisibilityToggle } from './thread_visibility_toggle';
 import { quoteComposeById } from '@/mastodon/actions/compose_typed';
 import { FOCUS_TARGET, NavigationFocusTarget } from '@/mastodon/components/navigation_focus_target';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
@@ -562,11 +561,6 @@ class Status extends ImmutablePureComponent {
     const account = status.get('account');
     const isLocal = status.getIn(['account', 'acct'], '').indexOf('@') === -1;
     const isIndexable = !status.getIn(['account', 'noindex']);
-    const redesignEnabled = isRedesignEnabled();
-    const useBlue2ThreadVisibilityToggle =
-      !redesignEnabled &&
-      typeof document !== 'undefined' &&
-      document.body.dataset.theme === 'blue-2';
 
     const handlers = {
       reply: this.handleHotkeyReply,
@@ -583,7 +577,7 @@ class Status extends ImmutablePureComponent {
 
     return (
       <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.detailedStatus)}>
-        {redesignEnabled ? (
+        {isRedesignEnabled() ? (
           <ColumnHeader
             withBackButton
             title={
@@ -612,7 +606,7 @@ class Status extends ImmutablePureComponent {
           <LegacyColumnHeader
             showBackButton
             multiColumn={multiColumn}
-            extraButton={useBlue2ThreadVisibilityToggle ? undefined : (
+            extraButton={(
               <button type='button' className='column-header__button' title={intl.formatMessage(status.get('hidden') ? messages.revealAll : messages.hideAll)} aria-label={intl.formatMessage(status.get('hidden') ? messages.revealAll : messages.hideAll)} onClick={this.handleToggleAll}><Icon id={status.get('hidden') ? 'eye' : 'eye-slash'} icon={status.get('hidden') ? VisibilityIcon : VisibilityOffIcon} /></button>
             )}
           />
@@ -620,13 +614,6 @@ class Status extends ImmutablePureComponent {
 
         <ScrollContainer scrollKey='thread' shouldUpdateScroll={this.shouldUpdateScroll} childRef={this.setContainerRef}>
           <div className={classNames('item-list scrollable scrollable--flex', { fullscreen })} ref={this.setContainerRef}>
-            {useBlue2ThreadVisibilityToggle && (
-              <ThreadVisibilityToggle
-                hidden={status.get('hidden')}
-                onClick={this.handleToggleAll}
-              />
-            )}
-
             {ancestors}
 
             <Hotkeys handlers={handlers}>
