@@ -111,9 +111,20 @@ RSpec.describe UpstreamSoftwareUpdateCheckService do
       expect(check.reload.last_sha).to eq next_sha
     end
 
+    it 'checks the declared version even when the old commit cursor already points at the current head' do
+      UpstreamUpdateCheck.create!(repository: repository, channel: channel, last_sha: head_sha)
+      stub_head(head_sha)
+      stub_version(head_sha, 'alpha.3')
+      stub_releases
+
+      expect { service.call }.to change(UpstreamUpdateBatch, :count).by(1)
+      expect(UpstreamUpdateBatch.last.version).to eq '4.8.0-alpha.3'
+    end
+
     it 'records a published stable release that is newer than the running prerelease' do
       UpstreamUpdateCheck.create!(repository: repository, channel: channel, last_sha: head_sha)
       stub_head(head_sha)
+      stub_version(head_sha, 'alpha.2')
       stub_releases([
         { tag_name: 'v4.8.0', draft: false, prerelease: false, html_url: 'https://github.com/mastodon/mastodon/releases/tag/v4.8.0', published_at: '2026-10-01T12:00:00Z' },
       ])
