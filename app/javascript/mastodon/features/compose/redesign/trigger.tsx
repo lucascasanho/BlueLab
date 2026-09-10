@@ -99,6 +99,12 @@ export const useBlue2Theme = () => {
   return isBlue2;
 };
 
+export const shouldHideBlue2GlobalTrigger = (
+  isBlue2: boolean,
+  inline: boolean | undefined,
+  displayState: 'hidden' | 'showing' | 'minimized',
+) => isBlue2 && !inline && displayState !== 'showing';
+
 export const ComposerBackdrop: React.FC<{ onMinimize: () => void }> = ({
   onMinimize,
 }) => (
@@ -255,11 +261,10 @@ export const ComposeRedesignButton: React.FC<{
 
   if (!signedIn) return null;
 
-  // BLUE 2.0 owns a dedicated inline launcher in the timeline. Never let the
-  // generic fixed launcher become a second owner of the global composer state:
-  // during theme hydration it could otherwise survive below the mobile nav and
-  // also render duplicate minimized/showing composer surfaces.
-  if (isBlue2 && !inline) return null;
+  // BLUE 2.0 owns its launcher UI elsewhere, so keep this global trigger hidden
+  // while idle/minimized. When the shared state changes to showing, however,
+  // this component must stay mounted because it is the desktop composer host.
+  if (shouldHideBlue2GlobalTrigger(isBlue2, inline, displayState)) return null;
 
   // BLUE 2.0 always uses the redesigned composer so the theme can provide the
   // Bluesky-like compose experience without changing the editor used by other themes.
