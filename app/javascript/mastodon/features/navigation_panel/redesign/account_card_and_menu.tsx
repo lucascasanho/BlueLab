@@ -36,7 +36,9 @@ import {
   MenuItemLink,
   MenuList,
   MenuTrigger,
+  useMenuContext,
 } from '@/mastodon/components/menu';
+import { Popover } from '@/mastodon/components/popover';
 import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
@@ -116,19 +118,71 @@ export const NavigationAccountCardAndMenu: React.FC<{
             defaultMessage='Account settings'
           />
         </MenuTrigger>
-        <MenuList
-          portal
-          mobilePresentation='popover'
-          placement='top-end'
-          strategy='fixed'
-          offset={8}
-          maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
-          data-testid={inSlideOut ? 'slide-out-account-menu' : 'account-menu'}
-        >
-          <AccountMenuItems />
-        </MenuList>
+        {inSlideOut ? (
+          <SlideOutAccountMenuList />
+        ) : (
+          <MenuList
+            portal
+            mobilePresentation='popover'
+            placement='top-end'
+            strategy='fixed'
+            offset={8}
+            maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
+            data-testid='account-menu'
+          >
+            <AccountMenuItems />
+          </MenuList>
+        )}
       </Menu>
     </div>
+  );
+};
+
+/**
+ * The true mobile navigation lives inside a transformed, gesture-driven drawer.
+ * Render its account list through the plain Popover portal instead of MenuCard:
+ * this is the same escape-from-overflow strategy used by Blue2AccountMenu and
+ * avoids both the drawer stacking context and native-popover lifecycle here.
+ */
+const SlideOutAccountMenuList: React.FC = () => {
+  const { popover, menuListProps } = useMenuContext();
+
+  if (!popover.isMenuOpen) {
+    return null;
+  }
+
+  const { ref: menuListRef, ...menuListRest } = menuListProps;
+
+  return (
+    <Popover
+      isOpen
+      onClose={popover.closeMenu}
+      reference={popover.reference}
+      placement='top-end'
+      strategy='fixed'
+      offset={8}
+    >
+      {({ props: floatingProps }) => {
+        const { ref: floatingRef, ...floatingRest } = floatingProps;
+
+        return (
+          <div
+            {...floatingRest}
+            {...menuListRest}
+            ref={(element) => {
+              floatingRef?.(element);
+              menuListRef(element);
+            }}
+            className={classes.slideOutMenu}
+            data-testid='slide-out-account-menu'
+          >
+            <ul>
+              <AccountMenuItems />
+            </ul>
+          </div>
+        );
+      }}
+    </Popover>
   );
 };
 
