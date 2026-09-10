@@ -31,31 +31,33 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
   elevation = 1,
   maxWidth,
   style,
-  // Keep the native popover attribute on the element, matching Mastodon
-  // upstream. Browsers with Popover API support can then promote the menu to
-  // the top layer instead of making it compete with BlueLab column stacking.
+  // Use the native top layer when the browser exposes the Popover API. Keep
+  // the attribute off the fallback element so browsers/test environments that
+  // do not implement showPopover do not treat the portaled menu as hidden.
   popover = 'manual',
   ...props
 }: MenuCardProps<As>) => {
   const Component = asComp ?? 'div';
   const cardRef = useRef<HTMLDivElement>(null);
+  const nativePopover =
+    popover === 'manual' && isPopoverAPISupported() ? popover : undefined;
 
   useLayoutEffect(() => {
     const card = cardRef.current;
-    if (popover !== 'manual' || !card || !isPopoverAPISupported()) return;
+    if (nativePopover !== 'manual' || !card) return;
 
     card.showPopover();
 
     return () => {
       card.hidePopover();
     };
-  }, [popover]);
+  }, [nativePopover]);
 
   return (
     <Component
       {...props}
       ref={useMergedRefs(props.ref, cardRef)}
-      popover={popover}
+      popover={nativePopover}
       className={classNames(className, classes.card)}
       data-elevation={elevation}
       style={
@@ -72,8 +74,12 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
 };
 
 function isPopoverAPISupported() {
+  if (typeof HTMLElement === 'undefined') return false;
+
   return (
-    typeof HTMLElement !== 'undefined' && 'popover' in HTMLElement.prototype
+    'popover' in HTMLElement.prototype &&
+    typeof HTMLElement.prototype.showPopover === 'function' &&
+    typeof HTMLElement.prototype.hidePopover === 'function'
   );
 }
 
