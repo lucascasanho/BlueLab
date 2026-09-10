@@ -108,17 +108,37 @@ describe('BlueLab composer trigger controls', () => {
   test('offers post and message before opening the Blue 2 inline composer', async () => {
     const { store, container } = renderBlue2MobileComposerOwner();
     const owner = screen.getByTestId('blue2-mobile-compose-owner');
-    const fab = container.querySelector('[data-blue2-compose-fab="true"]');
+    const fab = container.querySelector<HTMLButtonElement>(
+      '[data-blue2-compose-fab="true"]',
+    );
 
     expect(fab).not.toBeNull();
     expect(screen.queryByRole('menu')).toBeNull();
     fireEvent.click(fab as Element);
 
-    expect(await screen.findByRole('menu')).toBeVisible();
-    expect(screen.getByRole('menuitem', { name: 'Post' })).toBeVisible();
-    expect(screen.getByRole('menuitem', { name: 'Message' })).toBeVisible();
+    await waitFor(() => {
+      expect(fab).toHaveAttribute('aria-expanded', 'true');
+    });
 
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Post' }));
+    // jsdom exposes the Popover API attribute but does not model the browser
+    // top layer used by upstream #40448, so role queries treat an opened native
+    // popover as hidden. Resolve the list through the trigger's ARIA relation
+    // and assert the actual menu controls instead.
+    const menuId = fab?.getAttribute('aria-controls');
+    expect(menuId).toBeTruthy();
+    const menu = document.getElementById(menuId as string);
+    expect(menu).toHaveAttribute('role', 'menu');
+    expect(menu).toHaveAttribute('popover', 'manual');
+
+    const post = menu?.querySelector<HTMLButtonElement>('button[name="post"]');
+    const message =
+      menu?.querySelector<HTMLButtonElement>('button[name="message"]');
+    expect(post).not.toBeNull();
+    expect(post).toHaveTextContent('Post');
+    expect(message).not.toBeNull();
+    expect(message).toHaveTextContent('Message');
+
+    fireEvent.click(post as Element);
 
     await waitFor(() => {
       expect(store.getState().composer.displayState).toBe('showing');
