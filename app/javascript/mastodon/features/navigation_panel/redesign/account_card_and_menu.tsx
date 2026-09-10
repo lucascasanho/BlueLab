@@ -147,7 +147,9 @@ const SlideOutAccountMenu: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
   const pointerHandledRef = useRef(false);
-  const pointerResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pointerResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   const toggleMenu = useCallback(() => {
     setOpen((value) => !value);
