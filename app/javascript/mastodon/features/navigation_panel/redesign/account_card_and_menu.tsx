@@ -49,6 +49,10 @@ import { useAppDispatch } from '@/mastodon/store';
 
 import classes from './account_card_and_menu.module.scss';
 
+const stopDrawerGesture = (event: React.SyntheticEvent) => {
+  event.stopPropagation();
+};
+
 export const NavigationAccountCardAndMenu: React.FC<{
   inSlideOut?: boolean;
 }> = ({ inSlideOut = false }) => {
@@ -92,12 +96,13 @@ export const NavigationAccountCardAndMenu: React.FC<{
     </a>
   );
 
-  if (inSlideOut) {
-    return <SlideOutAccountMenu accountCard={accountCard} />;
-  }
-
   return (
-    <div className={classes.root}>
+    <div
+      className={classes.root}
+      data-in-slide-out={inSlideOut ? 'true' : undefined}
+      onPointerDown={inSlideOut ? stopDrawerGesture : undefined}
+      onTouchStart={inSlideOut ? stopDrawerGesture : undefined}
+    >
       {accountCard}
       <Menu type='navigation'>
         <MenuTrigger
@@ -118,57 +123,9 @@ export const NavigationAccountCardAndMenu: React.FC<{
           strategy='fixed'
           offset={8}
           maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
-          data-testid='account-menu'
+          data-testid={inSlideOut ? 'slide-out-account-menu' : 'account-menu'}
         >
           <AccountMenuItems />
-        </MenuList>
-      </Menu>
-    </div>
-  );
-};
-
-/**
- * Keep drawer gestures from claiming a tap on the account card or its menu
- * trigger. The shared Popover renders the list through document.body, outside
- * the drawer's clipping ancestor, while retaining the normal menu lifecycle.
- */
-const stopDrawerGesture = (event: React.SyntheticEvent) => {
-  event.stopPropagation();
-};
-
-const SlideOutAccountMenu: React.FC<{ accountCard: React.ReactNode }> = ({
-  accountCard,
-}) => {
-  return (
-    <div
-      className={classes.root}
-      data-in-slide-out='true'
-      onPointerDown={stopDrawerGesture}
-      onTouchStart={stopDrawerGesture}
-    >
-      {accountCard}
-      <Menu>
-        <MenuTrigger
-          as={IconButton}
-          icon={DotsThreeIcon}
-          variant='ghost'
-          size='sm'
-        >
-          <FormattedMessage
-            id='tabs_bar.account_settings'
-            defaultMessage='Account settings'
-          />
-        </MenuTrigger>
-        <MenuList
-          portal
-          mobilePresentation='popover'
-          placement='top-end'
-          strategy='fixed'
-          offset={8}
-          maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
-          data-testid='slide-out-account-menu'
-        >
-          <AccountMenuItems context='mobile' />
         </MenuList>
       </Menu>
     </div>
