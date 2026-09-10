@@ -19,6 +19,7 @@ export type MenuCardProps<As extends React.ElementType> = PolymorphicProps<
     elevation?: 1 | 2;
     maxWidth?: number | string;
     style?: React.CSSProperties;
+    popover?: React.HTMLAttributes<As>['popover'];
   },
   As
 >;
@@ -30,33 +31,31 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
   elevation = 1,
   maxWidth,
   style,
-  // Upstream #40448 uses the native Popover API when available so menus are
-  // promoted to the browser top layer instead of fighting drawer stacking and
-  // clipping contexts. Passing popover={undefined} still opts out explicitly.
+  // Keep the native popover attribute on the element, matching Mastodon
+  // upstream. Browsers with Popover API support can then promote the menu to
+  // the top layer instead of making it compete with BlueLab column stacking.
   popover = 'manual',
   ...props
 }: MenuCardProps<As>) => {
   const Component = asComp ?? 'div';
   const cardRef = useRef<HTMLDivElement>(null);
-  const nativePopover =
-    popover === 'manual' && isPopoverAPISupported() ? popover : undefined;
 
   useLayoutEffect(() => {
     const card = cardRef.current;
-    if (nativePopover !== 'manual' || !card) return;
+    if (popover !== 'manual' || !card || !isPopoverAPISupported()) return;
 
     card.showPopover();
 
     return () => {
       card.hidePopover();
     };
-  }, [nativePopover]);
+  }, [popover]);
 
   return (
     <Component
       {...props}
       ref={useMergedRefs(props.ref, cardRef)}
-      popover={nativePopover}
+      popover={popover}
       className={classNames(className, classes.card)}
       data-elevation={elevation}
       style={
@@ -74,13 +73,7 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
 
 function isPopoverAPISupported() {
   return (
-    typeof HTMLElement !== 'undefined' &&
-    typeof CSS !== 'undefined' &&
-    'popover' in HTMLElement.prototype &&
-    typeof HTMLElement.prototype.showPopover === 'function' &&
-    typeof HTMLElement.prototype.hidePopover === 'function' &&
-    typeof CSS.supports === 'function' &&
-    CSS.supports('selector(:popover-open)')
+    typeof HTMLElement !== 'undefined' && 'popover' in HTMLElement.prototype
   );
 }
 
