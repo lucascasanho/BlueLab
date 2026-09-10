@@ -1,12 +1,14 @@
 .root {
   position: relative;
-  z-index: 260;
   display: flex;
   align-items: center;
   padding: var(--space-xs);
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-sm);
-  overflow: visible;
+
+  &[data-in-slide-out='true'] {
+    z-index: 1;
+  }
 }
 
 .accountLink {
@@ -62,27 +64,31 @@
   }
 }
 
-.profileMenuItem {
-  --list-item-padding: 0;
-  --list-item-gap: 8px;
-
-  color: inherit;
-}
-
 .slideOutMenu {
-  position: absolute;
-  z-index: 400;
-  inset-inline: 0;
-  bottom: calc(100% + 8px);
   box-sizing: border-box;
-  width: 100%;
-  max-height: min(70dvh, 560px);
+  z-index: 1000;
+  width: min(280px, calc(100vw - 2 * var(--space-sm)));
+  max-height: calc(100dvh - 24px);
   padding: var(--space-2xs);
+  border: 1px solid var(--blue2-border-soft, var(--color-border-primary));
   border-radius: var(--radius-md);
   background: var(--color-bg-primary);
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   box-shadow: var(--dropdown-shadow);
-  isolation: isolate;
+  text-align: start;
+
+  > ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+.profileMenuItem {
+  --list-item-padding: 0;
+  --list-item-gap: 8px;
+
+  color: inherit;
 }

@@ -90,12 +90,19 @@ interface MenuProps {
    * Note that navigation menus don't support `MenuItemRadio` and `MenuItemCheckbox`.
    */
   type?: MenuType;
+  /** Run before opening. Returning false prevents the menu from opening. */
+  onOpen?: (() => void) | (() => boolean);
+  /** Run before closing. Returning false prevents the menu from closing. */
+  onClose?: (() => void) | (() => boolean);
   children: React.ReactNode;
+  /** Don't set initial focus on the first menu item when opening the menu. */
   noFocus?: boolean;
 }
 
 export const Menu: React.FC<MenuProps> = ({
   type = 'actions',
+  onOpen,
+  onClose,
   children,
   noFocus,
 }) => {
@@ -113,7 +120,7 @@ export const Menu: React.FC<MenuProps> = ({
       if (element && type === 'actions' && !noFocus) {
         const menuItems = getAllMenuItems(element);
         const elementToFocus = menuItems[0] ?? element;
-        elementToFocus.focus();
+        elementToFocus.focus({ preventScroll: true });
       }
     },
     [noFocus, type],
@@ -122,13 +129,19 @@ export const Menu: React.FC<MenuProps> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const openMenu = useCallback(() => {
+    const shouldOpen = onOpen?.();
+    if (shouldOpen === false) return;
+
     setIsMenuOpen(true);
-  }, []);
+  }, [onOpen]);
 
   const closeMenu = useCallback(() => {
+    const shouldClose = onClose?.();
+    if (shouldClose === false) return;
+
     setIsMenuOpen(false);
-    triggerElement?.focus();
-  }, [triggerElement]);
+    triggerElement?.focus({ preventScroll: true });
+  }, [triggerElement, onClose]);
 
   const toggleMenu = isMenuOpen ? closeMenu : openMenu;
 
@@ -264,11 +277,19 @@ export const MenuTrigger = <As extends React.ElementType = typeof Button>({
 export type MenuListProps<As extends React.ElementType> = Omit<
   PopoverMenuCardProps<As>,
   'isOpen' | 'onClose' | 'reference' | 'popoverElement'
->;
+> & {
+  /**
+   * Compatibility switch for BlueLab call sites that previously needed a
+   * document-body portal to escape drawer clipping. Native popover top-layer
+   * rendering now handles clipping when supported; the portal remains as the
+   * fallback for older browsers.
+   */
+  portal?: boolean;
+};
 
 export const MenuList = <As extends React.ElementType = 'div'>({
   children,
-  container,
+  portal = false,
   ...props
 }: MenuListProps<As>) => {
   const { popover, menuListProps, type } = useMenuContext();
@@ -279,7 +300,7 @@ export const MenuList = <As extends React.ElementType = 'div'>({
       onClose={popover.closeMenu}
       reference={popover.reference}
       popoverElement={popover.popover}
-      container={container}
+      container={portal ? undefined : null}
       {...(props as React.ComponentPropsWithoutRef<As>)}
       {...menuListProps}
     >

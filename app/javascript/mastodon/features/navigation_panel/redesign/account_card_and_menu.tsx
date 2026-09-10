@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -37,6 +37,7 @@ import {
   MenuList,
   MenuTrigger,
 } from '@/mastodon/components/menu';
+import { Popover } from '@/mastodon/components/popover';
 import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
@@ -49,35 +50,16 @@ import { useAppDispatch } from '@/mastodon/store';
 
 import classes from './account_card_and_menu.module.scss';
 
+const stopDrawerGesture = (event: React.SyntheticEvent) => {
+  event.stopPropagation();
+};
+
 export const NavigationAccountCardAndMenu: React.FC<{
   inSlideOut?: boolean;
 }> = ({ inSlideOut = false }) => {
   const { accountId } = useIdentity();
   const account = useAccount(accountId);
   const localCustomEmojis = useCustomEmojis();
-  const [slideOutOpen, setSlideOutOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!inSlideOut || !slideOutOpen) return undefined;
-
-    const closeOnOutside = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setSlideOutOpen(false);
-      }
-    };
-
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setSlideOutOpen(false);
-    };
-
-    document.addEventListener('pointerdown', closeOnOutside, true);
-    document.addEventListener('keydown', closeOnEscape);
-    return () => {
-      document.removeEventListener('pointerdown', closeOnOutside, true);
-      document.removeEventListener('keydown', closeOnEscape);
-    };
-  }, [inSlideOut, slideOutOpen]);
 
   if (!accountId || !account) {
     return null;
@@ -115,63 +97,168 @@ export const NavigationAccountCardAndMenu: React.FC<{
     </a>
   );
 
-  if (inSlideOut) {
-    return (
-      <div className={classes.root} ref={rootRef}>
-        {accountCard}
-        <IconButton
-          icon={DotsThreeIcon}
-          variant='ghost'
-          size='sm'
-          aria-expanded={slideOutOpen}
-          aria-haspopup='menu'
-          onPointerDown={(event) => event.stopPropagation()}
-          onClick={(event) => {
-            event.stopPropagation();
-            setSlideOutOpen((value) => !value);
-          }}
-        >
-          <FormattedMessage
-            id='tabs_bar.account_settings'
-            defaultMessage='Account settings'
-          />
-        </IconButton>
-        {slideOutOpen && (
-          <div
-            className={classes.slideOutMenu}
-            role='menu'
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={(event) => event.stopPropagation()}
+  return (
+    <div
+      className={classes.root}
+      data-in-slide-out={inSlideOut ? 'true' : undefined}
+      onPointerDown={inSlideOut ? stopDrawerGesture : undefined}
+      onTouchStart={inSlideOut ? stopDrawerGesture : undefined}
+    >
+      {accountCard}
+      {inSlideOut ? (
+        <SlideOutAccountMenu />
+      ) : (
+        <Menu type='navigation'>
+          <MenuTrigger
+            as={IconButton}
+            icon={DotsThreeIcon}
+            variant='ghost'
+            size='sm'
           >
-            <ul>
-              <AccountMenuItems context='mobile' />
-            </ul>
-          </div>
-        )}
-      </div>
-    );
-  }
+            <FormattedMessage
+              id='tabs_bar.account_settings'
+              defaultMessage='Account settings'
+            />
+          </MenuTrigger>
+          <MenuList
+            portal
+            mobilePresentation='popover'
+            placement='top-end'
+            strategy='fixed'
+            offset={8}
+            maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
+            data-testid='account-menu'
+          >
+            <AccountMenuItems />
+          </MenuList>
+        </Menu>
+      )}
+    </div>
+  );
+};
+
+/**
+ * The true mobile navigation lives inside a transformed, gesture-driven drawer.
+ * Open on pointerdown so a later gesture cancellation cannot swallow the
+ * activation. Browsers synthesize a click after touch/pointer activation, so
+ * ignore that follow-up click for a short window instead of toggling twice.
+ */
+const SlideOutAccountMenu: React.FC = () => {
+  const [open, setOpen] = useState(false);
+  const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
+  const pointerHandledRef = useRef(false);
+  const pointerResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
+  const toggleMenu = useCallback(() => {
+    setOpen((value) => !value);
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    setOpen(false);
+    anchor?.focus({ preventScroll: true });
+  }, [anchor]);
+
+  const markPointerHandled = useCallback(() => {
+    pointerHandledRef.current = true;
+
+    if (pointerResetTimerRef.current) {
+      clearTimeout(pointerResetTimerRef.current);
+    }
+
+    // A synthetic click may be queued after timers while the initial page is
+    // busy. Keep the guard alive long enough to cover delayed mobile clicks.
+    pointerResetTimerRef.current = setTimeout(() => {
+      pointerHandledRef.current = false;
+      pointerResetTimerRef.current = null;
+    }, 750);
+  }, []);
+
+  const handlePointerDown = useCallback<
+    React.PointerEventHandler<HTMLButtonElement>
+  >(
+    (event) => {
+      event.stopPropagation();
+
+      if (event.pointerType === 'mouse' && event.button !== 0) {
+        return;
+      }
+
+      // Do not depend on the ref callback having completed during hydration.
+      // The event target is the actual DOM button and is safe as the anchor.
+      setAnchor(event.currentTarget);
+      markPointerHandled();
+      toggleMenu();
+    },
+    [markPointerHandled, toggleMenu],
+  );
+
+  const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
+    (event) => {
+      event.stopPropagation();
+
+      if (pointerHandledRef.current) {
+        pointerHandledRef.current = false;
+        if (pointerResetTimerRef.current) {
+          clearTimeout(pointerResetTimerRef.current);
+          pointerResetTimerRef.current = null;
+        }
+        return;
+      }
+
+      // Keyboard activation does not produce the pointerdown handled above.
+      setAnchor(event.currentTarget);
+      toggleMenu();
+    },
+    [toggleMenu],
+  );
 
   return (
-    <div className={classes.root}>
-      {accountCard}
-      <Menu type='navigation'>
-        <MenuTrigger
-          as={IconButton}
-          icon={DotsThreeIcon}
-          variant='ghost'
-          size='sm'
+    <>
+      <IconButton
+        ref={setAnchor}
+        icon={DotsThreeIcon}
+        variant='ghost'
+        size='sm'
+        onPointerDown={handlePointerDown}
+        onClick={handleClick}
+        aria-expanded={open}
+        aria-haspopup='menu'
+      >
+        <FormattedMessage
+          id='tabs_bar.account_settings'
+          defaultMessage='Account settings'
+        />
+      </IconButton>
+
+      {open && anchor && (
+        <Popover
+          isOpen={open}
+          onClose={closeMenu}
+          reference={anchor}
+          placement='top-end'
+          strategy='fixed'
+          offset={8}
         >
-          <FormattedMessage
-            id='tabs_bar.account_settings'
-            defaultMessage='Account settings'
-          />
-        </MenuTrigger>
-        <MenuList placement='top-end' offset={8}>
-          <AccountMenuItems />
-        </MenuList>
-      </Menu>
-    </div>
+          {({ props: floatingProps }) => (
+            <div
+              {...floatingProps}
+              className={classes.slideOutMenu}
+              data-testid='slide-out-account-menu'
+              onPointerDown={stopDrawerGesture}
+              onTouchStart={stopDrawerGesture}
+            >
+              <Menu type='navigation' onClose={closeMenu}>
+                <ul>
+                  <AccountMenuItems />
+                </ul>
+              </Menu>
+            </div>
+          )}
+        </Popover>
+      )}
+    </>
   );
 };
 
@@ -206,7 +293,10 @@ export const AccountMenuItems: React.FC<{
       </MenuItemLink>
 
       <MenuItemLink as='a' href='/settings/preferences' icon={GearIcon}>
-        <FormattedMessage id='tabs_bar.settings' defaultMessage='Settings' />
+        <FormattedMessage
+          id='navigation_bar.preferences'
+          defaultMessage='Preferences'
+        />
       </MenuItemLink>
 
       <MenuItemDivider />
@@ -227,16 +317,16 @@ export const AccountMenuItems: React.FC<{
 
       <MenuItemLink to='/favourites' icon={HeartIcon}>
         <FormattedMessage
-          id='navigation_bar.liked_posts'
-          defaultMessage='Liked Posts'
+          id='navigation_bar.favourites'
+          defaultMessage='Favorites'
         />
       </MenuItemLink>
 
       {context === 'mobile' && (
         <MenuItemLink to='/bookmarks' icon={BookmarkSimpleIcon}>
           <FormattedMessage
-            id='navigation_bar.saved_posts'
-            defaultMessage='Saved Posts'
+            id='navigation_bar.bookmarks'
+            defaultMessage='Bookmarks'
           />
         </MenuItemLink>
       )}
@@ -245,15 +335,15 @@ export const AccountMenuItems: React.FC<{
 
       <MenuItemLink as='a' href='/relationships' icon={UsersThreeIcon}>
         <FormattedMessage
-          id='navigation_bar.followers_and_following'
-          defaultMessage='Followers & Following'
+          id='navigation_bar.follows_and_followers'
+          defaultMessage='Follows and followers'
         />
       </MenuItemLink>
 
       <MenuItemLink to='/blocks' icon={ProhibitIcon}>
         <FormattedMessage
-          id='navigation_bar.blocked_accounts'
-          defaultMessage='Blocked accounts'
+          id='navigation_bar.blocks'
+          defaultMessage='Blocked users'
         />
       </MenuItemLink>
 
@@ -284,10 +374,7 @@ export const AccountMenuItems: React.FC<{
       <MenuItemDivider />
 
       <MenuItem onClick={confirmLogout} icon={SignOutIcon}>
-        <FormattedMessage
-          id='navigation_bar.sign_out'
-          defaultMessage='Sign out'
-        />
+        <FormattedMessage id='navigation_bar.logout' defaultMessage='Logout' />
       </MenuItem>
     </>
   );
