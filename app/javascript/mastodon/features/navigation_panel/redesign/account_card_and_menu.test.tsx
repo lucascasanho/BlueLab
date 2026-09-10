@@ -1,5 +1,6 @@
 import { fireEvent, waitFor } from '@testing-library/react';
 
+import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import {
@@ -13,6 +14,9 @@ import { NavigationAccountCardAndMenu } from './account_card_and_menu';
 
 vi.mock('@/mastodon/hooks/useAccount');
 vi.mock('@/mastodon/hooks/useCustomEmojis');
+vi.mock('@/mastodon/features/ui/hooks/useBreakpoint', () => ({
+  useBreakpoint: vi.fn(),
+}));
 vi.mock('@/mastodon/store', async () => {
   const store =
     await vi.importActual<Record<string, unknown>>('@/mastodon/store');
@@ -30,6 +34,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
   });
 
   beforeEach(() => {
+    vi.mocked(useBreakpoint).mockReturnValue(false);
     vi.mocked(useAccount).mockReturnValue(account);
     vi.mocked(useCustomEmojis).mockReturnValue({});
   });
@@ -90,6 +95,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
   });
 
   it('portals the drawer account menu above clipping ancestors and keeps drawer gestures isolated', async () => {
+    vi.mocked(useBreakpoint).mockReturnValue(true);
     const drawerTouchStart = vi.fn();
     render(
       <div data-testid='drawer-ancestor' onTouchStart={drawerTouchStart}>
@@ -106,9 +112,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
     expect(menu).toHaveAttribute('role', 'menu');
     expect(menu.parentElement).toBe(document.body);
     expect(screen.getByTestId('drawer-ancestor')).not.toContainElement(menu);
-    await waitFor(() => {
-      expect(menu).toHaveAttribute('data-positioned', 'true');
-    });
+    expect(menu).toHaveAttribute('data-popover-placement');
     expect(
       screen
         .getByRole('menuitem', { name: 'Scheduled publications' })
@@ -116,7 +120,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
     ).toBe('/scheduled');
     expect(document.querySelector('[role="dialog"]')).toBeNull();
 
-    fireEvent.keyDown(document, { key: 'Escape' });
+    fireEvent.keyUp(document, { key: 'Escape' });
     await waitFor(() => {
       expect(screen.queryByTestId('slide-out-account-menu')).toBeNull();
     });

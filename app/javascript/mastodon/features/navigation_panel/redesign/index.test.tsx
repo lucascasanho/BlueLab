@@ -23,6 +23,9 @@ vi.mock('@/mastodon/actions/tags_typed', () => ({
 vi.mock('@/mastodon/hooks/useScrollSensor', () => ({
   useScrollSensor: vi.fn(() => ({ sensor: null, isInViewport: true })),
 }));
+vi.mock('@/mastodon/features/ui/hooks/useBreakpoint', () => ({
+  useBreakpoint: () => true,
+}));
 vi.mock('@/mastodon/hooks/useAccount', () => ({ useAccount: vi.fn() }));
 vi.mock('@/mastodon/hooks/useCustomEmojis', () => ({
   useCustomEmojis: vi.fn(),

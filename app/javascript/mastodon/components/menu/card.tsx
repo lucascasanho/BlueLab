@@ -49,7 +49,10 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
 };
 
 export type PopoverMenuCardProps<As extends React.ElementType> =
-  MenuCardProps<As> & Omit<PopoverProps, 'children'>;
+  MenuCardProps<As> &
+    Omit<PopoverProps, 'children'> & {
+      mobilePresentation?: 'bottom-sheet' | 'popover';
+    };
 
 export const PopoverMenuCard = <As extends React.ElementType>({
   isOpen,
@@ -63,13 +66,14 @@ export const PopoverMenuCard = <As extends React.ElementType>({
   strategy,
   matchReferenceWidth,
   closeOnClickOutside,
+  mobilePresentation = 'bottom-sheet',
   children,
   className,
   ...props
 }: PopoverMenuCardProps<As>) => {
   const isMobile = useBreakpoint('openable');
 
-  if (isMobile && isOpen) {
+  if (isMobile && isOpen && mobilePresentation === 'bottom-sheet') {
     return (
       <BottomSheet {...props} onClose={onClose}>
         {children}

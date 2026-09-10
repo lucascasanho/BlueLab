@@ -264,10 +264,14 @@ export const MenuTrigger = <As extends React.ElementType = typeof Button>({
 export type MenuListProps<As extends React.ElementType> = Omit<
   PopoverMenuCardProps<As>,
   'isOpen' | 'onClose' | 'reference' | 'popoverElement'
->;
+> & {
+  /** Render outside clipping ancestors, using the Popover portal. */
+  portal?: boolean;
+};
 
 export const MenuList = <As extends React.ElementType = 'div'>({
   children,
+  portal = false,
   ...props
 }: MenuListProps<As>) => {
   const { popover, menuListProps, type } = useMenuContext();
@@ -278,7 +282,7 @@ export const MenuList = <As extends React.ElementType = 'div'>({
       onClose={popover.closeMenu}
       reference={popover.reference}
       popoverElement={popover.popover}
-      container={null}
+      container={portal ? undefined : null}
       {...(props as React.ComponentPropsWithoutRef<As>)}
       {...menuListProps}
     >

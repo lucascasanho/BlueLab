@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
-import { createPortal } from 'react-dom';
+import { useCallback } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -43,7 +36,6 @@ import {
   MenuItemLink,
   MenuList,
   MenuTrigger,
-  useMenuContext,
 } from '@/mastodon/components/menu';
 import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
 import { useAccount } from '@/mastodon/hooks/useAccount';
@@ -101,11 +93,7 @@ export const NavigationAccountCardAndMenu: React.FC<{
   );
 
   if (inSlideOut) {
-    return (
-      <Menu>
-        <SlideOutAccountMenu accountCard={accountCard} />
-      </Menu>
-    );
+    return <SlideOutAccountMenu accountCard={accountCard} />;
   }
 
   return (
@@ -131,179 +119,50 @@ export const NavigationAccountCardAndMenu: React.FC<{
   );
 };
 
-interface SlideOutMenuPosition {
-  left: number;
-  bottom: number;
-  width: number;
-  maxHeight: number;
-}
-
 /**
- * The account card lives inside the drawer's scroll container. An absolutely
- * positioned submenu is still clipped by that ancestor even when the card and
- * footer themselves use overflow: visible. Render the opened list in a portal
- * and position it from the card's viewport rect so the drawer can keep its own
- * scrolling while the submenu remains visibly anchored above the card.
+ * Keep drawer gestures from claiming a tap on the account card or its menu
+ * trigger. The shared Popover renders the list through document.body, outside
+ * the drawer's clipping ancestor, while retaining the normal menu lifecycle.
  */
+const stopDrawerGesture = (event: React.SyntheticEvent) => {
+  event.stopPropagation();
+};
+
 const SlideOutAccountMenu: React.FC<{ accountCard: React.ReactNode }> = ({
   accountCard,
 }) => {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const [menuPosition, setMenuPosition] = useState<SlideOutMenuPosition | null>(
-    null,
-  );
-  const { popover, menuTriggerProps, menuListProps } = useMenuContext();
-  const { ref: menuListRef, ...menuListElementProps } = menuListProps;
-
-  const updateMenuPosition = useCallback(() => {
-    const root = rootRef.current;
-    if (!root) return;
-
-    const rect = root.getBoundingClientRect();
-    const visualViewport = window.visualViewport;
-    const viewportTop = visualViewport?.offsetTop ?? 0;
-    const viewportHeight = visualViewport?.height ?? window.innerHeight;
-    const viewportBottom = viewportTop + viewportHeight;
-    const gap = 8;
-    const left = Math.max(gap, rect.left);
-    const width = Math.max(
-      0,
-      Math.min(rect.width, window.innerWidth - left - gap),
-    );
-    const anchorTop = Math.min(rect.top, viewportBottom - gap);
-    const maxHeight = Math.max(gap, anchorTop - viewportTop - gap * 2);
-    const bottom = Math.max(gap, window.innerHeight - anchorTop + gap);
-
-    setMenuPosition({ left, bottom, width, maxHeight });
-  }, []);
-
-  useLayoutEffect(() => {
-    if (!popover.isMenuOpen) {
-      return undefined;
-    }
-
-    updateMenuPosition();
-
-    const visualViewport = window.visualViewport;
-    window.addEventListener('resize', updateMenuPosition);
-    window.addEventListener('scroll', updateMenuPosition, true);
-    visualViewport?.addEventListener('resize', updateMenuPosition);
-    visualViewport?.addEventListener('scroll', updateMenuPosition);
-
-    return () => {
-      window.removeEventListener('resize', updateMenuPosition);
-      window.removeEventListener('scroll', updateMenuPosition, true);
-      visualViewport?.removeEventListener('resize', updateMenuPosition);
-      visualViewport?.removeEventListener('scroll', updateMenuPosition);
-    };
-  }, [popover.isMenuOpen, updateMenuPosition]);
-
-  useEffect(() => {
-    if (!popover.isMenuOpen) {
-      return undefined;
-    }
-
-    const closeOnOutsidePointer = (event: PointerEvent) => {
-      if (!(event.target instanceof Node)) return;
-
-      const isInsideCard = rootRef.current?.contains(event.target) ?? false;
-      const isInsideMenu = menuRef.current?.contains(event.target) ?? false;
-
-      if (!isInsideCard && !isInsideMenu) {
-        popover.closeMenu();
-      }
-    };
-
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        popover.closeMenu();
-      }
-    };
-
-    document.addEventListener('pointerdown', closeOnOutsidePointer, true);
-    document.addEventListener('keydown', closeOnEscape);
-
-    return () => {
-      document.removeEventListener('pointerdown', closeOnOutsidePointer, true);
-      document.removeEventListener('keydown', closeOnEscape);
-    };
-  }, [popover]);
-
-  const stopDrawerGesture = useCallback((event: React.SyntheticEvent) => {
-    event.stopPropagation();
-  }, []);
-  const toggleMenuWithoutDrawerClick = useCallback<
-    React.MouseEventHandler<HTMLButtonElement>
-  >(
-    (event) => {
-      event.stopPropagation();
-      menuTriggerProps.onClick(event);
-    },
-    [menuTriggerProps],
-  );
-  const setMenuElement = useCallback(
-    (element: HTMLDivElement | null) => {
-      menuRef.current = element;
-      menuListRef(element);
-    },
-    [menuListRef],
-  );
-
-  const menu =
-    popover.isMenuOpen && typeof document !== 'undefined'
-      ? createPortal(
-          <div
-            {...menuListElementProps}
-            ref={setMenuElement}
-            className={classes.slideOutMenu}
-            data-testid='slide-out-account-menu'
-            data-positioned={menuPosition ? 'true' : 'false'}
-            style={
-              menuPosition
-                ? {
-                    left: menuPosition.left,
-                    bottom: menuPosition.bottom,
-                    width: menuPosition.width,
-                    maxHeight: menuPosition.maxHeight,
-                  }
-                : undefined
-            }
-            onPointerDown={stopDrawerGesture}
-            onTouchStart={stopDrawerGesture}
-          >
-            <AccountMenuItems context='mobile' />
-          </div>,
-          document.body,
-        )
-      : null;
-
   return (
-    <>
-      <div
-        ref={rootRef}
-        className={classes.root}
-        data-in-slide-out='true'
-        onPointerDown={stopDrawerGesture}
-        onTouchStart={stopDrawerGesture}
-      >
-        {accountCard}
-        <IconButton
-          {...menuTriggerProps}
+    <div
+      className={classes.root}
+      data-in-slide-out='true'
+      onPointerDown={stopDrawerGesture}
+      onTouchStart={stopDrawerGesture}
+    >
+      {accountCard}
+      <Menu>
+        <MenuTrigger
+          as={IconButton}
           icon={DotsThreeIcon}
           variant='ghost'
           size='sm'
-          onClick={toggleMenuWithoutDrawerClick}
         >
           <FormattedMessage
             id='tabs_bar.account_settings'
             defaultMessage='Account settings'
           />
-        </IconButton>
-      </div>
-      {menu}
-    </>
+        </MenuTrigger>
+        <MenuList
+          portal
+          mobilePresentation='popover'
+          placement='top-end'
+          offset={8}
+          maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
+          data-testid='slide-out-account-menu'
+        >
+          <AccountMenuItems context='mobile' />
+        </MenuList>
+      </Menu>
+    </div>
   );
 };
 
