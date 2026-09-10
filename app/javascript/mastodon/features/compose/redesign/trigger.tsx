@@ -105,6 +105,12 @@ export const shouldHideBlue2GlobalTrigger = (
   displayState: 'hidden' | 'showing' | 'minimized',
 ) => isBlue2 && !inline && displayState !== 'showing';
 
+export const shouldUseDirectBlue2InlineLauncher = (
+  isBlue2: boolean,
+  inline: boolean | undefined,
+  displayState: 'hidden' | 'showing' | 'minimized',
+) => isBlue2 && !!inline && displayState === 'hidden';
+
 export const ComposerBackdrop: React.FC<{ onMinimize: () => void }> = ({
   onMinimize,
 }) => (
@@ -331,6 +337,27 @@ export const ComposeRedesignButton: React.FC<{
           />
         </Suspense>
       </>,
+    );
+  }
+
+  // The Blue 2 mobile FAB is both the launcher and the single mobile composer
+  // host. Do not put its state transition inside the generic Menu lifecycle:
+  // closing that menu restores focus while the editor is mounting and the
+  // VisualViewport is changing. All other Blue 2 launchers open directly, so
+  // make this path use the same transition and keep this owner mounted.
+  if (shouldUseDirectBlue2InlineLauncher(isBlue2, inline, displayState)) {
+    return (
+      <IconButton
+        icon={PenNibIcon}
+        variant='solid'
+        color='accent'
+        className={classNames(classes.button, classes.buttonInline)}
+        size='lg'
+        data-blue2-compose-fab='true'
+        onClick={handleMastodonOpen}
+      >
+        <FormattedMessage id='tabs_bar.publish' defaultMessage='New Post' />
+      </IconButton>
     );
   }
 

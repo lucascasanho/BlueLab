@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -36,6 +36,7 @@ import {
   MenuItemLink,
   MenuList,
   MenuTrigger,
+  useMenuContext,
 } from '@/mastodon/components/menu';
 import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
 import { useAccount } from '@/mastodon/hooks/useAccount';
@@ -49,7 +50,9 @@ import { useAppDispatch } from '@/mastodon/store';
 
 import classes from './account_card_and_menu.module.scss';
 
-export const NavigationAccountCardAndMenu: React.FC = () => {
+export const NavigationAccountCardAndMenu: React.FC<{
+  inSlideOut?: boolean;
+}> = ({ inSlideOut = false }) => {
   const { accountId } = useIdentity();
   const account = useAccount(accountId);
   const localCustomEmojis = useCustomEmojis();
@@ -64,31 +67,43 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
   };
   const displayNameEmojiVersion = `${Object.keys(localCustomEmojis).length}-${account.emojis.size}`;
 
+  const accountCard = (
+    <a
+      className={classes.accountLink}
+      href={account.url}
+      data-hover-card-account={accountId}
+    >
+      <Avatar account={account} size={32} />
+      <span className={classes.accountText}>
+        <span className='display-name'>
+          <bdi className='display-name__name'>
+            <EmojiHTML
+              key={`${account.id}-${displayNameEmojiVersion}`}
+              className='display-name__html'
+              htmlString={account.display_name_html}
+              as='strong'
+              extraEmojis={displayNameEmojis}
+            />
+            <VerifiedBadge account={account} />
+            {account.locked && <AccountLock />}
+          </bdi>{' '}
+          <span className='display-name__account'>@{account.username}</span>
+        </span>
+      </span>
+    </a>
+  );
+
+  if (inSlideOut) {
+    return (
+      <Menu>
+        <SlideOutAccountMenu accountCard={accountCard} />
+      </Menu>
+    );
+  }
+
   return (
     <div className={classes.root}>
-      <a
-        className={classes.accountLink}
-        href={account.url}
-        data-hover-card-account={accountId}
-      >
-        <Avatar account={account} size={32} />
-        <span className={classes.accountText}>
-          <span className='display-name'>
-            <bdi className='display-name__name'>
-              <EmojiHTML
-                key={`${account.id}-${displayNameEmojiVersion}`}
-                className='display-name__html'
-                htmlString={account.display_name_html}
-                as='strong'
-                extraEmojis={displayNameEmojis}
-              />
-              <VerifiedBadge account={account} />
-              {account.locked && <AccountLock />}
-            </bdi>{' '}
-            <span className='display-name__account'>@{account.username}</span>
-          </span>
-        </span>
-      </a>
+      {accountCard}
       <Menu type='navigation'>
         <MenuTrigger
           as={IconButton}
@@ -105,6 +120,140 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
           <AccountMenuItems />
         </MenuList>
       </Menu>
+    </div>
+  );
+};
+
+/**
+ * The account card lives inside a scrollable, gesture-enabled drawer. The
+ * generic MenuList intentionally becomes a bottom sheet at mobile widths,
+ * which makes it unsuitable for this particular anchored menu. Keep the
+ * shared Menu state, keyboard handling and AccountMenuItems, but render the
+ * list next to its card so it stays inside the drawer's stacking context.
+ */
+const SlideOutAccountMenu: React.FC<{ accountCard: React.ReactNode }> = ({
+  accountCard,
+}) => {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const { popover, menuTriggerProps, menuListProps } = useMenuContext();
+
+  useLayoutEffect(() => {
+    if (!popover.isMenuOpen) {
+      return undefined;
+    }
+
+    const constrainMenuToViewport = () => {
+      const root = rootRef.current;
+      if (!root) return;
+
+      const viewportTop = window.visualViewport?.offsetTop ?? 0;
+      const menuGap =
+        Number.parseFloat(
+          getComputedStyle(root).getPropertyValue('--space-xs'),
+        ) || 8;
+      const availableAbove = Math.max(
+        0,
+        root.getBoundingClientRect().top - viewportTop - menuGap,
+      );
+      root.style.setProperty(
+        '--slide-out-account-menu-max-height',
+        `${Math.floor(availableAbove)}px`,
+      );
+    };
+
+    constrainMenuToViewport();
+    window.addEventListener('resize', constrainMenuToViewport);
+    window.visualViewport?.addEventListener('resize', constrainMenuToViewport);
+    window.visualViewport?.addEventListener('scroll', constrainMenuToViewport);
+
+    return () => {
+      window.removeEventListener('resize', constrainMenuToViewport);
+      window.visualViewport?.removeEventListener(
+        'resize',
+        constrainMenuToViewport,
+      );
+      window.visualViewport?.removeEventListener(
+        'scroll',
+        constrainMenuToViewport,
+      );
+    };
+  }, [popover.isMenuOpen]);
+
+  useEffect(() => {
+    if (!popover.isMenuOpen) {
+      return undefined;
+    }
+
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !rootRef.current?.contains(event.target)
+      ) {
+        popover.closeMenu();
+      }
+    };
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        popover.closeMenu();
+      }
+    };
+
+    document.addEventListener('pointerdown', closeOnOutsidePointer, true);
+    document.addEventListener('keydown', closeOnEscape);
+
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePointer, true);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [popover]);
+
+  const stopDrawerGesture = useCallback((event: React.SyntheticEvent) => {
+    event.stopPropagation();
+  }, []);
+  const toggleMenuWithoutDrawerClick = useCallback<
+    React.MouseEventHandler<HTMLButtonElement>
+  >(
+    (event) => {
+      event.stopPropagation();
+      menuTriggerProps.onClick(event);
+    },
+    [menuTriggerProps],
+  );
+
+  return (
+    <div
+      ref={rootRef}
+      className={classes.root}
+      data-in-slide-out='true'
+      onPointerDown={stopDrawerGesture}
+      onTouchStart={stopDrawerGesture}
+    >
+      {accountCard}
+      <IconButton
+        {...menuTriggerProps}
+        icon={DotsThreeIcon}
+        variant='ghost'
+        size='sm'
+        onClick={toggleMenuWithoutDrawerClick}
+      >
+        <FormattedMessage
+          id='tabs_bar.account_settings'
+          defaultMessage='Account settings'
+        />
+      </IconButton>
+      {popover.isMenuOpen && (
+        <div
+          {...menuListProps}
+          className={classes.slideOutMenu}
+          data-testid='slide-out-account-menu'
+          onPointerDown={stopDrawerGesture}
+          onTouchStart={stopDrawerGesture}
+        >
+          <AccountMenuItems context='mobile' />
+        </div>
+      )}
     </div>
   );
 };

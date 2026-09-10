@@ -1,4 +1,4 @@
-import { fireEvent } from '@testing-library/react';
+import { fireEvent, waitFor } from '@testing-library/react';
 
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
@@ -54,31 +54,72 @@ describe('<NavigationAccountCardAndMenu />', () => {
   });
 
   it('hides moderation and administration from users without permissions', () => {
-    render(<NavigationAccountCardAndMenu />);
+    render(<NavigationAccountCardAndMenu inSlideOut />);
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
 
-    expect(screen.queryByRole('link', { name: 'Moderation' })).toBeNull();
-    expect(screen.queryByRole('link', { name: 'Administration' })).toBeNull();
+    expect(screen.queryByRole('menuitem', { name: 'Moderation' })).toBeNull();
+    expect(
+      screen.queryByRole('menuitem', { name: 'Administration' }),
+    ).toBeNull();
   });
 
   it('reflects granular moderation and administration permissions independently', () => {
-    const { unmount } = render(<NavigationAccountCardAndMenu />, {
+    const { unmount } = render(<NavigationAccountCardAndMenu inSlideOut />, {
       permissions: PERMISSION_MANAGE_REPORTS,
     });
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
     expect(
-      screen.getByRole('link', { name: 'Moderation' }).getAttribute('href'),
+      screen.getByRole('menuitem', { name: 'Moderation' }).getAttribute('href'),
     ).toBe('/admin/reports');
-    expect(screen.queryByRole('link', { name: 'Administration' })).toBeNull();
+    expect(
+      screen.queryByRole('menuitem', { name: 'Administration' }),
+    ).toBeNull();
     unmount();
 
-    render(<NavigationAccountCardAndMenu />, {
+    render(<NavigationAccountCardAndMenu inSlideOut />, {
       permissions: PERMISSION_VIEW_DASHBOARD,
     });
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
     expect(
-      screen.getByRole('link', { name: 'Administration' }).getAttribute('href'),
+      screen
+        .getByRole('menuitem', { name: 'Administration' })
+        .getAttribute('href'),
     ).toBe('/admin/dashboard');
-    expect(screen.queryByRole('link', { name: 'Moderation' })).toBeNull();
+    expect(screen.queryByRole('menuitem', { name: 'Moderation' })).toBeNull();
+  });
+
+  it('opens and closes the drawer-specific anchored menu without a bottom sheet', async () => {
+    const drawerTouchStart = vi.fn();
+    render(
+      <div onTouchStart={drawerTouchStart}>
+        <NavigationAccountCardAndMenu inSlideOut />
+      </div>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Account settings' });
+
+    fireEvent.touchStart(trigger);
+    expect(drawerTouchStart).not.toHaveBeenCalled();
+    fireEvent.click(trigger);
+
+    const menu = screen.getByTestId('slide-out-account-menu');
+    expect(menu).toHaveAttribute('role', 'menu');
+    expect(
+      screen
+        .getByRole('menuitem', { name: 'Scheduled publications' })
+        .getAttribute('href'),
+    ).toBe('/scheduled');
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    await waitFor(() => {
+      expect(screen.queryByTestId('slide-out-account-menu')).toBeNull();
+    });
+    expect(trigger).toHaveFocus();
+
+    fireEvent.click(trigger);
+    fireEvent.pointerDown(document.body);
+    await waitFor(() => {
+      expect(screen.queryByTestId('slide-out-account-menu')).toBeNull();
+    });
   });
 });

@@ -277,7 +277,7 @@ export const RedesignNavigationPanel: React.FC<{
                 <FormattedMessage id='tabs_bar.saved' defaultMessage='Saved' />
               </NavigationLink>
             </ul>
-            <NavigationAccountCardAndMenu />
+            <NavigationAccountCardAndMenu inSlideOut={mode === 'slide-out'} />
             <NavigationFooterLinks siteName={siteName} />
           </footer>
         </>
