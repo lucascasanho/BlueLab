@@ -1,4 +1,5 @@
-import { useCallback, type PointerEvent } from 'react';
+import { useCallback } from 'react';
+import type { PointerEvent } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
