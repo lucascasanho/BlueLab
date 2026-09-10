@@ -139,9 +139,9 @@ export const NavigationAccountCardAndMenu: React.FC<{
 
 /**
  * The true mobile navigation lives inside a transformed, gesture-driven drawer.
- * Use a direct pointer trigger so the drawer's gesture recognizer cannot delay
- * or swallow the synthesized click. A subsequent click from the same pointer
- * sequence is ignored; keyboard-generated clicks remain supported.
+ * Open on pointerdown so a later gesture cancellation cannot swallow the
+ * activation. Browsers synthesize a click after touch/pointer activation, so
+ * ignore that follow-up click for a short window instead of toggling twice.
  */
 const SlideOutAccountMenu: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -158,7 +158,24 @@ const SlideOutAccountMenu: React.FC = () => {
     anchor?.focus({ preventScroll: true });
   }, [anchor]);
 
-  const handlePointerUp = useCallback<React.PointerEventHandler<HTMLButtonElement>>(
+  const markPointerHandled = useCallback(() => {
+    pointerHandledRef.current = true;
+
+    if (pointerResetTimerRef.current) {
+      clearTimeout(pointerResetTimerRef.current);
+    }
+
+    // A synthetic click may be queued after timers while the initial page is
+    // busy. Keep the guard alive long enough to cover delayed mobile clicks.
+    pointerResetTimerRef.current = setTimeout(() => {
+      pointerHandledRef.current = false;
+      pointerResetTimerRef.current = null;
+    }, 750);
+  }, []);
+
+  const handlePointerDown = useCallback<
+    React.PointerEventHandler<HTMLButtonElement>
+  >(
     (event) => {
       event.stopPropagation();
 
@@ -166,18 +183,13 @@ const SlideOutAccountMenu: React.FC = () => {
         return;
       }
 
-      pointerHandledRef.current = true;
-      if (pointerResetTimerRef.current) {
-        clearTimeout(pointerResetTimerRef.current);
-      }
-      pointerResetTimerRef.current = setTimeout(() => {
-        pointerHandledRef.current = false;
-        pointerResetTimerRef.current = null;
-      }, 0);
-
+      // Do not depend on the ref callback having completed during hydration.
+      // The event target is the actual DOM button and is safe as the anchor.
+      setAnchor(event.currentTarget);
+      markPointerHandled();
       toggleMenu();
     },
-    [toggleMenu],
+    [markPointerHandled, toggleMenu],
   );
 
   const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
@@ -193,7 +205,8 @@ const SlideOutAccountMenu: React.FC = () => {
         return;
       }
 
-      // Keyboard activation does not produce the pointerup handled above.
+      // Keyboard activation does not produce the pointerdown handled above.
+      setAnchor(event.currentTarget);
       toggleMenu();
     },
     [toggleMenu],
@@ -206,7 +219,7 @@ const SlideOutAccountMenu: React.FC = () => {
         icon={DotsThreeIcon}
         variant='ghost'
         size='sm'
-        onPointerUp={handlePointerUp}
+        onPointerDown={handlePointerDown}
         onClick={handleClick}
         aria-expanded={open}
         aria-haspopup='menu'
