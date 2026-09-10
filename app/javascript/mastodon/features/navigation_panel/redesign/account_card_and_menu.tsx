@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -55,6 +55,32 @@ export const NavigationAccountCardAndMenu: React.FC<{
   const { accountId } = useIdentity();
   const account = useAccount(accountId);
   const localCustomEmojis = useCustomEmojis();
+  const [slideOutOpen, setSlideOutOpen] = useState(false);
+  const slideOutRootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!inSlideOut || !slideOutOpen) return undefined;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!slideOutRootRef.current?.contains(event.target as Node)) {
+        setSlideOutOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSlideOutOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [inSlideOut, slideOutOpen]);
 
   if (!accountId || !account) {
     return null;
@@ -66,8 +92,8 @@ export const NavigationAccountCardAndMenu: React.FC<{
   };
   const displayNameEmojiVersion = `${Object.keys(localCustomEmojis).length}-${account.emojis.size}`;
 
-  return (
-    <div className={classes.root}>
+  const accountCard = (
+    <>
       <a
         className={classes.accountLink}
         href={account.url}
@@ -91,6 +117,34 @@ export const NavigationAccountCardAndMenu: React.FC<{
           </span>
         </span>
       </a>
+    </>
+  );
+
+  if (inSlideOut) {
+    return (
+      <div className={classes.root} ref={slideOutRootRef}>
+        {accountCard}
+        <IconButton
+          icon={DotsThreeIcon}
+          variant='ghost'
+          size='sm'
+          aria-expanded={slideOutOpen}
+          aria-haspopup='menu'
+          aria-label='Account settings'
+          onClick={() => setSlideOutOpen((value) => !value)}
+        />
+        {slideOutOpen && (
+          <div className={classes.slideOutMenu} role='menu'>
+            <AccountMenuItems />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={classes.root}>
+      {accountCard}
       <Menu type='navigation'>
         <MenuTrigger
           as={IconButton}
@@ -103,15 +157,7 @@ export const NavigationAccountCardAndMenu: React.FC<{
             defaultMessage='Account settings'
           />
         </MenuTrigger>
-        <MenuList
-          placement='top'
-          offset={8}
-          mobilePresentation={inSlideOut ? 'popover' : 'bottom-sheet'}
-          container={
-            inSlideOut && typeof document !== 'undefined' ? document.body : null
-          }
-          className={inSlideOut ? classes.slideOutMenu : undefined}
-        >
+        <MenuList placement='top' offset={8}>
           <AccountMenuItems />
         </MenuList>
       </Menu>
