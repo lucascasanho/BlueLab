@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -55,6 +55,29 @@ export const NavigationAccountCardAndMenu: React.FC<{
   const { accountId } = useIdentity();
   const account = useAccount(accountId);
   const localCustomEmojis = useCustomEmojis();
+  const [slideOutOpen, setSlideOutOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!inSlideOut || !slideOutOpen) return undefined;
+
+    const closeOnOutside = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setSlideOutOpen(false);
+      }
+    };
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSlideOutOpen(false);
+    };
+
+    document.addEventListener('pointerdown', closeOnOutside, true);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutside, true);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [inSlideOut, slideOutOpen]);
 
   if (!accountId || !account) {
     return null;
@@ -92,10 +115,47 @@ export const NavigationAccountCardAndMenu: React.FC<{
     </a>
   );
 
+  if (inSlideOut) {
+    return (
+      <div className={classes.root} ref={rootRef}>
+        {accountCard}
+        <IconButton
+          icon={DotsThreeIcon}
+          variant='ghost'
+          size='sm'
+          aria-expanded={slideOutOpen}
+          aria-haspopup='menu'
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            setSlideOutOpen((value) => !value);
+          }}
+        >
+          <FormattedMessage
+            id='tabs_bar.account_settings'
+            defaultMessage='Account settings'
+          />
+        </IconButton>
+        {slideOutOpen && (
+          <div
+            className={classes.slideOutMenu}
+            role='menu'
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <ul>
+              <AccountMenuItems context='mobile' />
+            </ul>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={classes.root}>
       {accountCard}
-      <Menu type='navigation' noFocus={inSlideOut}>
+      <Menu type='navigation'>
         <MenuTrigger
           as={IconButton}
           icon={DotsThreeIcon}
@@ -107,14 +167,8 @@ export const NavigationAccountCardAndMenu: React.FC<{
             defaultMessage='Account settings'
           />
         </MenuTrigger>
-        <MenuList
-          placement='top-end'
-          offset={8}
-          container={typeof document !== 'undefined' ? document.body : null}
-          mobilePresentation='popover'
-          className={inSlideOut ? classes.slideOutMenu : undefined}
-        >
-          <AccountMenuItems context={inSlideOut ? 'mobile' : 'default'} />
+        <MenuList placement='top-end' offset={8}>
+          <AccountMenuItems />
         </MenuList>
       </Menu>
     </div>
