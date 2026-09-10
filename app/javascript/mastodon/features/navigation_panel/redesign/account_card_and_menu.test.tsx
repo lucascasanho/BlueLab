@@ -1,4 +1,4 @@
-import { fireEvent, waitFor } from '@testing-library/react';
+import { act, fireEvent, waitFor } from '@testing-library/react';
 
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useAccount } from '@/mastodon/hooks/useAccount';
@@ -95,6 +95,34 @@ describe('<NavigationAccountCardAndMenu />', () => {
       screen.getByRole('link', { name: 'Administration' }).getAttribute('href'),
     ).toBe('/admin/dashboard');
     expect(screen.queryByRole('link', { name: 'Moderation' })).toBeNull();
+  });
+
+  it('opens the mobile drawer submenu from pointerdown even when no click follows', () => {
+    vi.mocked(useBreakpoint).mockReturnValue(true);
+    render(<NavigationAccountCardAndMenu inSlideOut />);
+    const trigger = screen.getByRole('button', { name: 'Account settings' });
+
+    fireEvent.pointerDown(trigger, { pointerType: 'touch', button: 0 });
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('slide-out-account-menu')).toBeInTheDocument();
+  });
+
+  it('keeps the submenu open when the synthesized click is delayed', () => {
+    vi.useFakeTimers();
+    vi.mocked(useBreakpoint).mockReturnValue(true);
+    render(<NavigationAccountCardAndMenu inSlideOut />);
+    const trigger = screen.getByRole('button', { name: 'Account settings' });
+
+    fireEvent.pointerDown(trigger, { pointerType: 'touch', button: 0 });
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    fireEvent.click(trigger);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('slide-out-account-menu')).toBeInTheDocument();
+    vi.useRealTimers();
   });
 
   it('uses a dedicated body-portal popover in the mobile drawer and isolates drawer gestures', async () => {
