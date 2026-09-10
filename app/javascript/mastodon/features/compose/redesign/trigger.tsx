@@ -119,130 +119,102 @@ export const ComposerBackdrop: React.FC<{ onMinimize: () => void }> = ({
 );
 
 export const ComposerResumeButton: React.FC<{
-  inline?: boolean;
   onResume: () => void;
-}> = ({ inline, onResume }) => (
+  inline?: boolean;
+}> = ({ onResume, inline }) => (
   <IconButton
     icon={PenNibIcon}
     variant='solid'
     color='accent'
     className={classNames(
       classes.button,
-      classes.buttonResume,
       inline && classes.buttonInline,
+      !inline && classes.blue2ResumeButton,
     )}
     size='lg'
-    data-blue2-compose-resume='true'
+    data-blue2-compose-resume
     data-blue2-compose-resume-inline={inline ? 'true' : undefined}
     onClick={onResume}
   >
-    <FormattedMessage
-      id='compose_form.show_composer'
-      defaultMessage='Show composer'
-    />
+    <FormattedMessage id='compose.expand' defaultMessage='Show composer' />
   </IconButton>
 );
 
-const getVisualViewportMetrics = (): VisualViewportMetrics => {
-  if (typeof window === 'undefined') return emptyVisualViewportMetrics;
-
-  const visualViewport = window.visualViewport;
-  if (!visualViewport) return emptyVisualViewportMetrics;
-
-  const layoutHeight = Math.max(
-    document.documentElement?.clientHeight ?? 0,
-    window.innerHeight,
-  );
-  const height = visualViewport.height;
-  const offsetTop = visualViewport.offsetTop;
-  const bottomInset = Math.max(
-    0,
-    layoutHeight - (visualViewport.height + visualViewport.offsetTop),
-  );
-
-  // A meaningful height reduction is a more stable keyboard signal than tiny
-  // browser chrome changes while scrolling on iOS/Android.
-  const keyboardOpen = layoutHeight - height > 160;
-
-  return {
-    height,
-    offsetTop,
-    bottomInset,
-    centerY: offsetTop + height / 2,
-    keyboardOpen,
-  };
-};
-
-const portalBlue2InlineOverlay = (
-  node: React.ReactNode,
-  enabled: boolean,
-): React.ReactNode => {
-  if (!enabled || typeof document === 'undefined') return node;
-  return createPortal(node, document.body);
-};
-
 export const ComposeRedesignButton: React.FC<{
+  /**
+   * Render the button in regular document flow instead of fixed positioning for mobile layout
+   */
   inline?: boolean;
 }> = ({ inline }) => {
-  const dispatch = useAppDispatch();
-  const { signedIn } = useIdentity();
   const displayState = useAppSelector((state) => state.composer.displayState);
   const origin = useAppSelector((state) => state.composer.origin);
   const editor = useAppSelector(selectComposerEditor);
-  const isBlue2 = useBlue2Theme();
-  const [viewport, setViewport] = useState<VisualViewportMetrics>(() =>
-    getVisualViewportMetrics(),
-  );
+  const { signedIn } = useIdentity();
   const composerRef = useRef<HTMLFormElement>(null);
-  const launcherOriginRef = useRef<{ x: number; y: number } | null>(null);
+  const launcherOriginRef = useRef<ReturnType<
+    typeof composerOriginFromElement
+  > | null>(null);
+  const isBlue2 = useBlue2Theme();
+  const portalBlue2InlineOverlay = (content: React.ReactNode) =>
+    isBlue2 && inline && typeof document !== 'undefined'
+      ? createPortal(content, document.body)
+      : content;
 
+  /*
+   * Keep VisualViewport metrics in React state instead of mutating the form from
+   * a layout effect. The redesigned form is lazy-loaded; an effect can run while
+   * Suspense is still showing its fallback and never see composerRef.current.
+   * State survives that delay, so the form receives the correct visible height
+   * as soon as it mounts and whenever the software keyboard changes it.
+   */
+  const [viewport, setViewport] = useState<VisualViewportMetrics>(
+    emptyVisualViewportMetrics,
+  );
   useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-
     const updateViewport = () => {
-      setViewport(getVisualViewportMetrics());
+      const visualViewport = window.visualViewport;
+      const height = visualViewport?.height ?? window.innerHeight;
+      const offsetTop = visualViewport?.offsetTop ?? 0;
+      const bottomInset = Math.max(0, window.innerHeight - offsetTop - height);
+
+      setViewport({
+        height,
+        offsetTop,
+        bottomInset,
+        centerY: offsetTop + height / 2,
+        keyboardOpen: window.innerHeight - height > 150,
+      });
     };
-    const visualViewport = window.visualViewport;
 
     updateViewport();
-    visualViewport?.addEventListener('resize', updateViewport);
-    visualViewport?.addEventListener('scroll', updateViewport);
+    window.visualViewport?.addEventListener('resize', updateViewport);
+    window.visualViewport?.addEventListener('scroll', updateViewport);
     window.addEventListener('resize', updateViewport);
 
     return () => {
-      visualViewport?.removeEventListener('resize', updateViewport);
-      visualViewport?.removeEventListener('scroll', updateViewport);
+      window.visualViewport?.removeEventListener('resize', updateViewport);
+      window.visualViewport?.removeEventListener('scroll', updateViewport);
       window.removeEventListener('resize', updateViewport);
     };
   }, []);
 
+  const dispatch = useAppDispatch();
   const handleBackdropClick = useCallback(() => {
     dispatch(minimizeComposerToggle());
   }, [dispatch]);
-
-  const captureLauncherOrigin = useCallback((element: HTMLElement) => {
-    launcherOriginRef.current = composerOriginFromElement(element);
-  }, []);
-
   const captureLauncherPointerOrigin: React.PointerEventHandler<HTMLButtonElement> =
-    useCallback(
-      (event) => {
-        captureLauncherOrigin(event.currentTarget);
-      },
-      [captureLauncherOrigin],
-    );
-
+    useCallback((event) => {
+      launcherOriginRef.current = composerOriginFromElement(
+        event.currentTarget,
+      );
+    }, []);
   const captureLauncherFocusOrigin: React.FocusEventHandler<HTMLButtonElement> =
-    useCallback(
-      (event) => {
-        if (!launcherOriginRef.current) {
-          captureLauncherOrigin(event.currentTarget);
-        }
-      },
-      [captureLauncherOrigin],
-    );
-
-  const handleMenuItemClick: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback((event) => {
+      launcherOriginRef.current = composerOriginFromElement(
+        event.currentTarget,
+      );
+    }, []);
+  const handleComposerOpen: React.MouseEventHandler<HTMLButtonElement> =
     useCallback(
       (event) => {
         const {
@@ -326,8 +298,6 @@ export const ComposeRedesignButton: React.FC<{
       );
     }
 
-    // This is a persistent composer card, not a menu. Opt it out of the native
-    // Popover API that MenuCard now enables by default via upstream #40448.
     return (
       <MenuCard
         popover={undefined}
@@ -365,7 +335,6 @@ export const ComposeRedesignButton: React.FC<{
           />
         </Suspense>
       </>,
-      isBlue2 && !!inline,
     );
   }
 
@@ -383,24 +352,26 @@ export const ComposeRedesignButton: React.FC<{
         onFocus={captureLauncherFocusOrigin}
       >
         <FormattedMessage
-          id='tabs_bar.publish'
+          id='compose.new'
           defaultMessage='Write a new post or messsage'
         />
       </MenuTrigger>
-      <MenuList placement='top-end' offset={4} maxWidth={180}>
-        <MenuItem
-          name='post'
-          icon={NewspaperIcon}
-          onClick={handleMenuItemClick}
-        >
-          <FormattedMessage id='compose_form.post' defaultMessage='Post' />
+
+      <MenuList maxWidth={180} placement='top-end'>
+        <MenuItem name='post' onClick={handleComposerOpen} icon={NewspaperIcon}>
+          <FormattedMessage id='compose.new.post' defaultMessage='Post' />
         </MenuItem>
+
         <MenuItem
           name='message'
+          onClick={handleComposerOpen}
           icon={ChatCircleIcon}
-          onClick={handleMenuItemClick}
         >
-          <FormattedMessage id='compose_form.message' defaultMessage='Message' />
+          <FormattedMessage
+            id='compose.new.message'
+            defaultMessage='Message'
+            description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
+          />
         </MenuItem>
       </MenuList>
     </Menu>
