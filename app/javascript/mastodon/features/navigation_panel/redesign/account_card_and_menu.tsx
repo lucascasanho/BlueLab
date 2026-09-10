@@ -115,6 +115,7 @@ export const NavigationAccountCardAndMenu: React.FC<{
           portal
           mobilePresentation='popover'
           placement='top-end'
+          strategy='fixed'
           offset={8}
           maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
           data-testid='account-menu'
@@ -162,6 +163,7 @@ const SlideOutAccountMenu: React.FC<{ accountCard: React.ReactNode }> = ({
           portal
           mobilePresentation='popover'
           placement='top-end'
+          strategy='fixed'
           offset={8}
           maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
           data-testid='slide-out-account-menu'
