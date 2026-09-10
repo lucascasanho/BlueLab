@@ -46,13 +46,15 @@ export const Blue2AccountMenu: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
   const [compactNavigation, setCompactNavigation] = useState(() =>
-    typeof window !== 'undefined'
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
       ? window.matchMedia('(width < 1180px)').matches
       : false,
   );
 
   useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return undefined;
+    }
 
     const mediaQuery = window.matchMedia('(width < 1180px)');
     const updateCompactNavigation = () => {
@@ -106,8 +108,10 @@ export const Blue2AccountMenu: React.FC = () => {
     id: 'tabs_bar.account_settings',
     defaultMessage: 'Account settings',
   });
+  const isRtl =
+    typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
   const menuPlacement = compactNavigation
-    ? document.documentElement.dir === 'rtl'
+    ? isRtl
       ? 'left-start'
       : 'right-start'
     : 'bottom-start';
