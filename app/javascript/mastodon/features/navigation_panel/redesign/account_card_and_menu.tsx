@@ -248,6 +248,7 @@ const SlideOutAccountMenu: React.FC = () => {
               data-testid='slide-out-account-menu'
               onPointerDown={stopDrawerGesture}
               onTouchStart={stopDrawerGesture}
+              onClick={stopDrawerGesture}
             >
               <Menu type='navigation' onClose={closeMenu}>
                 <ul>
