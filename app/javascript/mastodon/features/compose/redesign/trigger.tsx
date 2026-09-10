@@ -105,6 +105,12 @@ export const shouldHideBlue2GlobalTrigger = (
   displayState: 'hidden' | 'showing' | 'minimized',
 ) => isBlue2 && !inline && displayState !== 'showing';
 
+export const shouldUseDirectBlue2InlineLauncher = (
+  isBlue2: boolean,
+  inline: boolean | undefined,
+  displayState: 'hidden' | 'showing' | 'minimized',
+) => isBlue2 && !!inline && displayState === 'hidden';
+
 export const ComposerBackdrop: React.FC<{ onMinimize: () => void }> = ({
   onMinimize,
 }) => (
@@ -331,6 +337,27 @@ export const ComposeRedesignButton: React.FC<{
           />
         </Suspense>
       </>,
+    );
+  }
+
+  // The Blue 2 mobile FAB used to be a generic Menu trigger. Opening the
+  // composer from a Menu item kept the mobile menu lifecycle active while the
+  // editor focused and the VisualViewport changed, which is the one launch path
+  // that could leave the fixed composer attached to the bottom chrome/keyboard.
+  // Open a normal post directly, exactly like the working sidebar "Write" action.
+  if (shouldUseDirectBlue2InlineLauncher(isBlue2, inline, displayState)) {
+    return (
+      <IconButton
+        icon={PenNibIcon}
+        variant='solid'
+        color='accent'
+        className={classNames(classes.button, classes.buttonInline)}
+        size='lg'
+        data-blue2-compose-fab='true'
+        onClick={handleMastodonOpen}
+      >
+        <FormattedMessage id='tabs_bar.publish' defaultMessage='New Post' />
+      </IconButton>
     );
   }
 
