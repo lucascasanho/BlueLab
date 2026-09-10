@@ -94,7 +94,7 @@ describe('<RedesignNavigationPanel />', () => {
     vi.mocked(useCustomEmojis).mockReturnValue({});
   });
 
-  it('opens the real account submenu from the slide-out mobile panel', () => {
+  it('opens the desktop-style account submenu from the slide-out mobile panel', () => {
     render(<RedesignNavigationPanel mode='slide-out' />);
 
     expect(screen.getByText('Alice')).toBeInTheDocument();
@@ -107,13 +107,11 @@ describe('<RedesignNavigationPanel />', () => {
     expect(screen.getByTestId('slide-out-account-menu')).toBeInTheDocument();
     expect(
       screen
-        .getByRole('menuitem', { name: 'Scheduled publications' })
+        .getByRole('link', { name: 'Scheduled publications' })
         .getAttribute('href'),
     ).toBe('/scheduled');
-    expect(screen.queryByRole('menuitem', { name: 'Moderation' })).toBeNull();
-    expect(
-      screen.queryByRole('menuitem', { name: 'Administration' }),
-    ).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Moderation' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Administration' })).toBeNull();
 
     fireEvent.click(trigger);
     expect(screen.queryByTestId('slide-out-account-menu')).toBeNull();
@@ -127,12 +125,10 @@ describe('<RedesignNavigationPanel />', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
 
     expect(
-      screen.getByRole('menuitem', { name: 'Moderation' }).getAttribute('href'),
+      screen.getByRole('link', { name: 'Moderation' }).getAttribute('href'),
     ).toBe('/admin/reports');
     expect(
-      screen
-        .getByRole('menuitem', { name: 'Administration' })
-        .getAttribute('href'),
+      screen.getByRole('link', { name: 'Administration' }).getAttribute('href'),
     ).toBe('/admin/dashboard');
   });
 });
