@@ -73,6 +73,16 @@ describe('<Blue2AccountMenu />', () => {
     ).toBeInTheDocument();
   });
 
+  it('portals the submenu outside the navigation subtree', () => {
+    const { container } = render(<Blue2AccountMenu />);
+    openAccountMenu();
+
+    const menu = screen.getByRole('menu');
+
+    expect(document.body.contains(menu)).toBe(true);
+    expect(container.contains(menu)).toBe(false);
+  });
+
   it('hides moderation and administration from users without permissions', () => {
     render(<Blue2AccountMenu />);
     openAccountMenu();

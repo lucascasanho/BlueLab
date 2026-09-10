@@ -156,15 +156,13 @@
 
 .menu {
   box-sizing: border-box;
-  position: absolute;
-  z-index: 40;
-  top: 56px;
-  inset-inline-start: 0;
+  z-index: 1000;
   width: 216px;
-  max-width: 100%;
-  max-height: calc(100vh - 72px);
-  max-height: calc(100dvh - 72px);
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
   padding: 8px;
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   border: 1px solid var(--blue2-border-soft, #17232c);
@@ -253,11 +251,5 @@
     > span {
       display: none;
     }
-  }
-
-  .menu {
-    width: min(216px, calc(100vw - 92px));
-    inset-inline-start: 56px;
-    top: 0;
   }
 }
