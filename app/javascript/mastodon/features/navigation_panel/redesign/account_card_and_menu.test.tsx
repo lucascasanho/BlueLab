@@ -72,10 +72,8 @@ describe('<NavigationAccountCardAndMenu />', () => {
     render(<NavigationAccountCardAndMenu inSlideOut />);
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
 
-    expect(screen.queryByRole('menuitem', { name: 'Moderation' })).toBeNull();
-    expect(
-      screen.queryByRole('menuitem', { name: 'Administration' }),
-    ).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Moderation' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Administration' })).toBeNull();
   });
 
   it('reflects granular moderation and administration permissions independently', () => {
@@ -84,11 +82,9 @@ describe('<NavigationAccountCardAndMenu />', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
     expect(
-      screen.getByRole('menuitem', { name: 'Moderation' }).getAttribute('href'),
+      screen.getByRole('link', { name: 'Moderation' }).getAttribute('href'),
     ).toBe('/admin/reports');
-    expect(
-      screen.queryByRole('menuitem', { name: 'Administration' }),
-    ).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Administration' })).toBeNull();
     unmount();
 
     render(<NavigationAccountCardAndMenu inSlideOut />, {
@@ -96,14 +92,12 @@ describe('<NavigationAccountCardAndMenu />', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Account settings' }));
     expect(
-      screen
-        .getByRole('menuitem', { name: 'Administration' })
-        .getAttribute('href'),
+      screen.getByRole('link', { name: 'Administration' }).getAttribute('href'),
     ).toBe('/admin/dashboard');
-    expect(screen.queryByRole('menuitem', { name: 'Moderation' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Moderation' })).toBeNull();
   });
 
-  it('portals the drawer account menu above clipping ancestors and keeps drawer gestures isolated', async () => {
+  it('reuses the desktop navigation submenu in the mobile drawer and isolates drawer gestures', async () => {
     vi.mocked(useBreakpoint).mockReturnValue(true);
     const drawerTouchStart = vi.fn();
     render(
@@ -118,15 +112,17 @@ describe('<NavigationAccountCardAndMenu />', () => {
     fireEvent.click(trigger);
 
     const menu = screen.getByTestId('slide-out-account-menu');
-    expect(menu).toHaveAttribute('role', 'menu');
     expect(menu.parentElement).toBe(document.body);
     expect(screen.getByTestId('drawer-ancestor')).not.toContainElement(menu);
     expect(menu).toHaveAttribute('data-popover-placement');
+    expect(menu.querySelector(':scope > ul')).not.toBeNull();
     expect(
       screen
-        .getByRole('menuitem', { name: 'Scheduled publications' })
+        .getByRole('link', { name: 'Scheduled publications' })
         .getAttribute('href'),
     ).toBe('/scheduled');
+    expect(screen.queryByRole('link', { name: 'Profile' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Bookmarks' })).toBeNull();
     expect(document.querySelector('[role="dialog"]')).toBeNull();
 
     fireEvent.keyUp(document, { key: 'Escape' });
