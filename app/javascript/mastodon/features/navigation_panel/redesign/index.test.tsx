@@ -34,8 +34,15 @@ vi.mock('@/mastodon/store', () => ({
   ) => selector({ followedTags: { tags: [], stale: false } }),
 }));
 vi.mock('./account_card_and_menu', () => ({
-  NavigationAccountCardAndMenu: () => (
-    <div data-testid='navigation-account-card' />
+  NavigationAccountCardAndMenu: ({
+    inSlideOut,
+  }: {
+    inSlideOut?: boolean;
+  }) => (
+    <div
+      data-testid='navigation-account-card'
+      data-slide-out={inSlideOut ? 'true' : 'false'}
+    />
   ),
 }));
 vi.mock('./footer_links', () => ({
@@ -63,5 +70,9 @@ describe('<RedesignNavigationPanel />', () => {
     render(<RedesignNavigationPanel mode='slide-out' />);
 
     expect(screen.getByTestId('navigation-account-card')).toBeInTheDocument();
+    expect(screen.getByTestId('navigation-account-card')).toHaveAttribute(
+      'data-slide-out',
+      'true',
+    );
   });
 });
