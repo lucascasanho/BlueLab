@@ -1,6 +1,6 @@
-import { fireEvent } from '@testing-library/react';
-
 import { useLocation } from 'react-router';
+
+import { fireEvent } from '@testing-library/react';
 
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
