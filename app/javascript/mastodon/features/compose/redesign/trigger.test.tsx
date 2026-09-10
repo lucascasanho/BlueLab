@@ -70,7 +70,7 @@ describe('BlueLab composer trigger controls', () => {
     );
   });
 
-  test('reacts when Blue 2 is applied after the compose trigger mounts', async () => {
+  test('reacts when Blue 2 is applied after mount', async () => {
     delete document.body.dataset.theme;
     const { result } = renderHook(() => useBlue2Theme());
 
