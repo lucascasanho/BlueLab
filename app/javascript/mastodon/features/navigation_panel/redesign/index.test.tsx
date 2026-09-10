@@ -34,14 +34,10 @@ vi.mock('@/mastodon/store', () => ({
   ) => selector({ followedTags: { tags: [], stale: false } }),
 }));
 vi.mock('./account_card_and_menu', () => ({
-  NavigationAccountCardAndMenu: ({
-    inSlideOut,
-  }: {
-    inSlideOut?: boolean;
-  }) => (
+  NavigationAccountCardAndMenu: (props: { inSlideOut?: boolean }) => (
     <div
       data-testid='navigation-account-card'
-      data-slide-out={inSlideOut ? 'true' : 'false'}
+      data-slide-out={props.inSlideOut ? 'true' : 'false'}
     />
   ),
 }));
