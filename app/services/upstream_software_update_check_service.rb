@@ -29,6 +29,7 @@ class UpstreamSoftwareUpdateCheckService < BaseService
 
   def check_development_version!(head_sha)
     version = fetch_declared_version(head_sha)
+    return unless Gem::Version.new(version).prerelease?
     return unless newer_than_runtime?(version)
     return if version_already_recorded?(version)
 
