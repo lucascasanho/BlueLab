@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -24,6 +24,7 @@ import { VerifiedBadge } from '@/mastodon/components/display_name/verified_badge
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { Popover } from '@/mastodon/components/popover';
 import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
+import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import { useIdentity } from '@/mastodon/identity_context';
@@ -43,31 +44,9 @@ export const Blue2AccountMenu: React.FC = () => {
   const { accountId, permissions } = useIdentity();
   const account = useAccount(accountId);
   const localCustomEmojis = useCustomEmojis();
+  const compactNavigation = useBreakpoint('full');
   const [open, setOpen] = useState(false);
   const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
-  const [compactNavigation, setCompactNavigation] = useState(() =>
-    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-      ? window.matchMedia('(width < 1180px)').matches
-      : false,
-  );
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-      return undefined;
-    }
-
-    const mediaQuery = window.matchMedia('(width < 1180px)');
-    const updateCompactNavigation = () => {
-      setCompactNavigation(mediaQuery.matches);
-    };
-
-    updateCompactNavigation();
-    mediaQuery.addEventListener('change', updateCompactNavigation);
-
-    return () => {
-      mediaQuery.removeEventListener('change', updateCompactNavigation);
-    };
-  }, []);
 
   const toggleMenu = useCallback(() => {
     setOpen((value) => !value);
