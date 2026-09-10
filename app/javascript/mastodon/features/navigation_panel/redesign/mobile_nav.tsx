@@ -231,6 +231,7 @@ const SlideOutNavigation: React.FC = () => {
       filterTaps: true,
       bounds: isLtrDir ? { right: 0 } : { left: 0 },
       rubberband: true,
+      pointer: { touch: true },
     },
   );
 
