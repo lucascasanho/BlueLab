@@ -22,12 +22,17 @@ RSpec.describe UpstreamUpdateBatch do
     end
 
     it 'does not count an official version that is older than the running Mastodon version' do
-      Fabricate(:upstream_update_batch, commits: [{
-                  kind: described_class::VERSION_METADATA_KIND,
-                  version: '1.0.0',
-                  release_type: 'stable',
-                  url: 'https://github.com/mastodon/mastodon/releases/tag/v1.0.0',
-                }])
+      Fabricate(
+        :upstream_update_batch,
+        commits: [
+          {
+            kind: described_class::VERSION_METADATA_KIND,
+            version: '1.0.0',
+            release_type: 'stable',
+            url: 'https://github.com/mastodon/mastodon/releases/tag/v1.0.0',
+          },
+        ]
+      )
 
       expect(described_class).to_not be_pending
       expect(described_class.pending_count).to eq 0
@@ -36,13 +41,19 @@ RSpec.describe UpstreamUpdateBatch do
 
   describe 'version metadata' do
     it 'exposes the official version and release kind without treating metadata as commits' do
-      batch = Fabricate.build(:upstream_update_batch, channel: described_class::STABLE_RELEASE_CHANNEL, commits: [{
-                                kind: described_class::VERSION_METADATA_KIND,
-                                version: '99.0.0',
-                                release_type: 'stable',
-                                url: 'https://github.com/mastodon/mastodon/releases/tag/v99.0.0',
-                                published_at: '2026-09-10T12:00:00Z',
-                              }])
+      batch = Fabricate.build(
+        :upstream_update_batch,
+        channel: described_class::STABLE_RELEASE_CHANNEL,
+        commits: [
+          {
+            kind: described_class::VERSION_METADATA_KIND,
+            version: '99.0.0',
+            release_type: 'stable',
+            url: 'https://github.com/mastodon/mastodon/releases/tag/v99.0.0',
+            published_at: '2026-09-10T12:00:00Z',
+          },
+        ]
+      )
 
       expect(batch.version).to eq '99.0.0'
       expect(batch).to be_stable_release
@@ -53,11 +64,14 @@ RSpec.describe UpstreamUpdateBatch do
 
   describe '#impact_areas' do
     subject(:batch) do
-      Fabricate.build(:upstream_update_batch, files: [
-                        { filename: 'db/migrate/20260909000000_example.rb' },
-                        { filename: 'app/javascript/mastodon/example.tsx' },
-                        { filename: 'spec/models/example_spec.rb' },
-                      ])
+      Fabricate.build(
+        :upstream_update_batch,
+        files: [
+          { filename: 'db/migrate/20260909000000_example.rb' },
+          { filename: 'app/javascript/mastodon/example.tsx' },
+          { filename: 'spec/models/example_spec.rb' },
+        ]
+      )
     end
 
     it 'classifies historical changed files and flags migrations' do
