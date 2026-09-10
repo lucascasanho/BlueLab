@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type PointerEvent } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -55,6 +55,12 @@ export const NavigationAccountCardAndMenu: React.FC<{
   const { accountId } = useIdentity();
   const account = useAccount(accountId);
   const localCustomEmojis = useCustomEmojis();
+  const handleTriggerPointerDown = useCallback(
+    (event: PointerEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+    },
+    [],
+  );
 
   if (!accountId || !account) {
     return null;
@@ -101,9 +107,7 @@ export const NavigationAccountCardAndMenu: React.FC<{
           icon={DotsThreeIcon}
           variant='ghost'
           size='sm'
-          onPointerDown={
-            inSlideOut ? (event) => event.stopPropagation() : undefined
-          }
+          onPointerDown={inSlideOut ? handleTriggerPointerDown : undefined}
         >
           <FormattedMessage
             id='tabs_bar.account_settings'
