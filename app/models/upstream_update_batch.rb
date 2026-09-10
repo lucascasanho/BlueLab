@@ -35,11 +35,13 @@ class UpstreamUpdateBatch < ApplicationRecord
   end
 
   def self.pending?
-    check_enabled? && current_source.pending_review.exists?
+    check_enabled? && current_source.pending_review.any?(&:pending_version?)
   end
 
   def self.pending_count
-    check_enabled? ? current_source.pending_review.count : 0
+    return 0 unless check_enabled?
+
+    current_source.pending_review.count(&:pending_version?)
   end
 
   def self.current_source
@@ -75,6 +77,12 @@ class UpstreamUpdateBatch < ApplicationRecord
 
   def prerelease?
     release_type == 'prerelease'
+  end
+
+  def pending_version?
+    reviewed_at.nil? && version.present? && Gem::Version.new(version) > Mastodon::Version.gem_version
+  rescue ArgumentError
+    false
   end
 
   def large?
