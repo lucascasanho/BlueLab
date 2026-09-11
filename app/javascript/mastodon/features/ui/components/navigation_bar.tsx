@@ -5,9 +5,6 @@ import { useIntl, defineMessages, FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { NavLink, useRouteMatch } from 'react-router-dom';
 
-import { PenNibIcon } from '@phosphor-icons/react';
-
-import AddIcon from '@/material-icons/400-24px/add.svg?react';
 import HomeActiveIcon from '@/material-icons/400-24px/home-fill.svg?react';
 import HomeIcon from '@/material-icons/400-24px/home.svg?react';
 import MenuIcon from '@/material-icons/400-24px/menu.svg?react';
@@ -17,6 +14,7 @@ import SearchIcon from '@/material-icons/400-24px/search.svg?react';
 import { openModal } from 'mastodon/actions/modal';
 import { toggleNavigation } from 'mastodon/actions/navigation';
 import { fetchServer } from 'mastodon/actions/server';
+import { ComposeIcon } from 'mastodon/components/compose_icon';
 import { Icon } from 'mastodon/components/icon';
 import { IconWithBadge } from 'mastodon/components/icon_with_badge';
 import type { MastodonLocationDescriptor } from 'mastodon/components/router';
@@ -124,7 +122,7 @@ const ComposeButton = () => {
       aria-current={isActive ? 'page' : undefined}
       data-composer-editor={editor}
     >
-      <Icon id='' icon={editor === 'mastodon' ? AddIcon : PenNibIcon} />
+      <Icon id='' icon={ComposeIcon} />
     </button>
   );
 };
@@ -189,10 +187,7 @@ const LoginOrSignUp: React.FC = () => {
       <div className='ui__navigation-bar__sign-up'>
         {signupButton}
         <a href='/auth/sign_in' className='button button-secondary'>
-          <FormattedMessage
-            id='sign_in_banner.sign_in'
-            defaultMessage='Login'
-          />
+          <FormattedMessage id='sign_in_banner.sign_in' defaultMessage='Login' />
         </a>
       </div>
     );
