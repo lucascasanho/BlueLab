@@ -86,14 +86,9 @@ class MediaProxyController < ApplicationController
     result = MediaDownloadService.new(@media_attachment).call
 
     response.headers['Cache-Control'] = 'private, no-store'
-
-    if result.temporary?
-      send_file_headers!(type: result.content_type, disposition: 'attachment', filename: result.filename)
-      response.headers['Content-Length'] = File.size(result.path).to_s
-      self.response_body = MediaDownloadService::StreamingBody.new(result)
-    else
-      send_file(result.path, type: result.content_type, disposition: 'attachment', filename: result.filename)
-    end
+    send_file_headers!(type: result.content_type, disposition: 'attachment', filename: result.filename)
+    response.headers['Content-Length'] = File.size(result.path).to_s
+    self.response_body = MediaDownloadService::StreamingBody.new(result)
   end
 
   def requires_file_streaming?
