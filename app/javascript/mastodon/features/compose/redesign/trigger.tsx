@@ -15,14 +15,11 @@ import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 
-import {
-  ChatCircleIcon,
-  NewspaperIcon,
-  PenNibIcon,
-} from '@phosphor-icons/react';
+import { ChatCircleIcon, NewspaperIcon } from '@phosphor-icons/react';
 
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { CircularProgress } from '@/mastodon/components/circular_progress';
+import { ComposeIcon } from '@/mastodon/components/compose_icon';
 import {
   Menu,
   MenuTrigger,
@@ -39,7 +36,6 @@ import {
   selectComposerEditor,
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
-import AddIcon from '@/material-icons/400-24px/add.svg?react';
 
 import { ComposeFormHeader } from './header';
 import classes from './trigger.module.scss';
@@ -123,7 +119,7 @@ export const ComposerResumeButton: React.FC<{
   inline?: boolean;
 }> = ({ onResume, inline }) => (
   <IconButton
-    icon={PenNibIcon}
+    icon={ComposeIcon}
     variant='solid'
     color='accent'
     className={classNames(
@@ -271,7 +267,7 @@ export const ComposeRedesignButton: React.FC<{
   if (editor === 'mastodon' && !isBlue2) {
     return (
       <IconButton
-        icon={AddIcon}
+        icon={ComposeIcon}
         variant='solid'
         color='accent'
         className={classNames(
@@ -342,7 +338,7 @@ export const ComposeRedesignButton: React.FC<{
     <Menu>
       <MenuTrigger
         as={IconButton}
-        icon={PenNibIcon}
+        icon={ComposeIcon}
         variant='solid'
         color='accent'
         className={classNames(classes.button, inline && classes.buttonInline)}

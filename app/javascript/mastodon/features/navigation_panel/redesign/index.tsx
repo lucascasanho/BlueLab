@@ -3,7 +3,6 @@ import { useCallback, useEffect } from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import {
-  PenNibIcon,
   HouseIcon,
   MagnifyingGlassIcon,
   RssSimpleIcon,
@@ -16,6 +15,7 @@ import FediIcon from '@/images/icons/icon_fediverse.svg?react';
 import { fetchLists } from '@/mastodon/actions/lists';
 import { closeNavigation } from '@/mastodon/actions/navigation';
 import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
+import { ComposeIcon } from '@/mastodon/components/compose_icon';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 import { blue2Text } from '@/mastodon/features/blue2/locale';
 import { useScrollSensor } from '@/mastodon/hooks/useScrollSensor';
@@ -23,12 +23,10 @@ import { useIdentity } from '@/mastodon/identity_context';
 import {
   composerOriginFromElement,
   openPreferredComposer,
-  selectComposerEditor,
 } from '@/mastodon/reducers/slices/composer';
 import { getOrderedLists } from '@/mastodon/selectors/lists';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
-import AddIcon from '@/material-icons/400-24px/add.svg?react';
 
 import { NavigationAccountCardAndMenu } from './account_card_and_menu';
 import { NavigationFooterLinks } from './footer_links';
@@ -89,7 +87,6 @@ export const RedesignNavigationPanel: React.FC<{
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
   );
-  const composerEditor = useAppSelector(selectComposerEditor);
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
@@ -132,9 +129,7 @@ export const RedesignNavigationPanel: React.FC<{
               type='button'
               data-bluelab-compose={isBlue2 ? 'true' : undefined}
               onClick={openComposer}
-              iconComponent={
-                composerEditor === 'mastodon' ? AddIcon : PenNibIcon
-              }
+              iconComponent={ComposeIcon}
             >
               {isBlue2 ? (
                 blue2Text(intl.locale, 'write')
