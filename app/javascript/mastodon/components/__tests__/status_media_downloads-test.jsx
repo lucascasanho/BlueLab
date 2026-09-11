@@ -15,7 +15,17 @@ describe('status media downloads', () => {
       expect(getMediaDownloadKind(fromJS({ type: 'video', url: 'https://example.com/video.mp4' }))).toBe('video');
     });
 
-    it('uses the original remote URL to recognize a proxied static GIF', () => {
+    it('prefers the exact download kind reported by the server', () => {
+      const attachment = fromJS({
+        type: 'image',
+        download_type: 'gif',
+        url: 'https://example.com/media/without-extension',
+      });
+
+      expect(getMediaDownloadKind(attachment)).toBe('gif');
+    });
+
+    it('uses the original remote URL to recognize a proxied static GIF as a compatibility fallback', () => {
       const attachment = fromJS({
         type: 'image',
         url: '/media_proxy/42/original',
@@ -49,7 +59,7 @@ describe('status media downloads', () => {
       expect(buildMediaDownloadMenuItems(List(), 'pt-BR')).toEqual([]);
 
       const attachments = fromJS([
-        { id: '1', type: 'image', url: 'https://example.com/photo.png' },
+        { id: '1', type: 'image', download_type: 'photo', url: 'https://example.com/photo.png' },
         { id: '2', type: 'audio', url: 'https://example.com/audio.mp3' },
       ]);
       const items = buildMediaDownloadMenuItems(attachments, 'pt-BR');
