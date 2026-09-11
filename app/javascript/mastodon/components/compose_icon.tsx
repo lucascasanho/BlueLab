@@ -2,10 +2,10 @@ import type { FC, SVGProps } from 'react';
 
 import EditSquareIcon from '@/material-icons/400-24px/edit_square.svg?react';
 
-type ComposeIconProps = SVGProps<SVGSVGElement> & {
+interface ComposeIconProps extends SVGProps<SVGSVGElement> {
   size?: number | string;
   weight?: string;
-};
+}
 
 /**
  * Canonical compose icon used by BlueLab launchers.
@@ -16,13 +16,11 @@ type ComposeIconProps = SVGProps<SVGSVGElement> & {
  */
 export const ComposeIcon: FC<ComposeIconProps> = ({
   size = 24,
+  // NavigationLink sends Phosphor's active-state weight hint to every icon.
+  // This fixed Material glyph intentionally stays identical in every state.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   weight: _weight,
   ...props
 }) => (
-  <EditSquareIcon
-    {...props}
-    width={size}
-    height={size}
-    fill='currentColor'
-  />
+  <EditSquareIcon {...props} width={size} height={size} fill='currentColor' />
 );
