@@ -1,0 +1,91 @@
+@use 'blue-2-v15';
+
+/*
+ * BlueLab sixteenth refinement layer.
+ *
+ * Preferences/moderation/administration remain exclusive to Blue 2. This
+ * layer makes the desktop shell moderately wider, guarantees visible breathing
+ * room at the end of pages, and right-aligns bottom save actions consistently.
+ */
+body[data-theme='blue-2'].admin {
+  /*
+   * Keep a real visual gap after the final block. The explicit !important on
+   * the padding prevents downstream responsive shorthands from collapsing the
+   * bottom breathing room on settings pages.
+   */
+  .content {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .content > :last-child {
+    margin-bottom: 16px;
+  }
+
+  /* Bottom form actions: save belongs at the end of the row everywhere. */
+  .simple_form > .actions:last-child {
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  /*
+   * Instance customization keeps the destructive reset at the start and save
+   * at the end. On narrow widths flex-wrap can place them on separate lines
+   * without changing their visual order.
+   */
+  .simple_form > .actions:last-child:has(button[name='reset_all']) {
+    justify-content: space-between;
+  }
+
+  .simple_form
+    > .actions:last-child:has(button[name='reset_all'])
+    > .btn:not([name='reset_all']) {
+    margin-inline-start: auto;
+  }
+}
+
+@media (width >= 891px) {
+  body[data-theme='blue-2'].admin .admin-wrapper {
+    /*
+     * Use a deterministic two-column desktop shell instead of the upstream
+     * three-item flex balancing trick. 300px is the native navigation width;
+     * the whole shell tops out at 1280px, leaving up to 980px for content.
+     * This is intentionally much narrower than the previous 1600px attempt,
+     * but wide enough for server-setting tabs to stay on one line at normal
+     * desktop widths.
+     */
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+    justify-content: stretch;
+
+    > .sidebar-wrapper:not(.sidebar-wrapper--empty) {
+      width: auto !important;
+      min-width: 0;
+      flex: none !important;
+
+      .sidebar-wrapper__inner {
+        justify-content: stretch;
+      }
+
+      .sidebar {
+        width: 300px;
+      }
+    }
+
+    > .content-wrapper {
+      width: auto !important;
+      max-width: none !important;
+      min-width: 0;
+      flex: none !important;
+    }
+
+    > .sidebar-wrapper--empty {
+      display: none !important;
+    }
+  }
+}
