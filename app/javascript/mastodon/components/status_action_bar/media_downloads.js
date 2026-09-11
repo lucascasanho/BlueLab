@@ -21,6 +21,8 @@ const MEDIA_DOWNLOAD_LABELS = {
   },
 };
 
+const DOWNLOAD_KINDS = new Set(['photo', 'gif', 'video']);
+
 const languageForLocale = (locale) => {
   const language = locale?.toLowerCase().split(/[-_]/)[0];
 
@@ -40,6 +42,12 @@ const hasGifExtension = (url) => {
 };
 
 export const getMediaDownloadKind = (attachment) => {
+  const downloadType = attachment.get('download_type');
+
+  if (DOWNLOAD_KINDS.has(downloadType)) {
+    return downloadType;
+  }
+
   const type = attachment.get('type');
 
   if (type === 'gifv') {
