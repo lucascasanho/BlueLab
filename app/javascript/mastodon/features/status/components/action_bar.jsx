@@ -14,15 +14,16 @@ import ReplyAllIcon from '@/material-icons/400-24px/reply_all.svg?react';
 import StarIcon from '@/material-icons/400-24px/star-fill.svg?react';
 import StarBorderIcon from '@/material-icons/400-24px/star.svg?react';
 import { injectIntl } from '@/mastodon/components/intl';
+import { BoostButton } from '@/mastodon/components/status/boost_button';
+import { quoteItemState } from '@/mastodon/components/status/boost_button_utils';
+import { buildMediaDownloadMenuItems } from '@/mastodon/components/status_action_bar/media_downloads';
+import { selectStatusConditions } from '@/mastodon/selectors/statuses';
 import { identityContextPropShape, withIdentity } from 'mastodon/identity_context';
 import { PERMISSION_MANAGE_USERS, PERMISSION_MANAGE_FEDERATION } from 'mastodon/permissions';
 
 import { IconButton } from '../../../components/icon_button';
 import { Dropdown } from 'mastodon/components/dropdown_menu';
 import { me, quickBoosting } from '../../../initial_state';
-import { BoostButton } from '@/mastodon/components/status/boost_button';
-import { quoteItemState } from '@/mastodon/components/status/boost_button_utils';
-import { selectStatusConditions } from '@/mastodon/selectors/statuses';
 
 const messages = defineMessages({
   delete: { id: 'status.delete', defaultMessage: 'Delete' },
@@ -226,6 +227,13 @@ class ActionBar extends PureComponent {
     }
 
     menu.push({ text: intl.formatMessage(messages.copy), action: this.handleCopy });
+
+    const mediaDownloadItems = buildMediaDownloadMenuItems(status.get('media_attachments'), intl.locale);
+
+    if (mediaDownloadItems.length > 0) {
+      menu.push(null);
+      menu.push(...mediaDownloadItems);
+    }
 
     if (publicStatus && 'share' in navigator) {
       menu.push({ text: intl.formatMessage(messages.share), action: this.handleShare });

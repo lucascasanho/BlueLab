@@ -5,12 +5,23 @@ class REST::MediaAttachmentSerializer < ActiveModel::Serializer
 
   # Please update `app/javascript/mastodon/api_types/media_attachments.ts` when making changes to the attributes
 
-  attributes :id, :type, :url, :preview_url,
+  attributes :id, :type, :download_type, :url, :preview_url,
              :remote_url, :preview_remote_url, :text_url, :meta,
              :description, :blurhash
 
   def id
     object.id.to_s
+  end
+
+  def download_type
+    case object.type
+    when 'gifv'
+      'gif'
+    when 'video'
+      'video'
+    when 'image'
+      object.file_content_type == 'image/gif' ? 'gif' : 'photo'
+    end
   end
 
   def url

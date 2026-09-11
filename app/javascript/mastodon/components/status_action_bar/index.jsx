@@ -28,6 +28,7 @@ import { BoostButton } from '../status/boost_button';
 import { RemoveQuoteHint } from './remove_quote_hint';
 import { quoteItemState } from '../status/boost_button_utils';
 import { selectStatusConditions } from '@/mastodon/selectors/statuses';
+import { buildMediaDownloadMenuItems } from './media_downloads';
 
 
 const messages = defineMessages({
@@ -275,6 +276,13 @@ class StatusActionBar extends ImmutablePureComponent {
     }
 
     menu.push({ text: intl.formatMessage(messages.copy), action: this.handleCopy });
+
+    const mediaDownloadItems = buildMediaDownloadMenuItems(status.get('media_attachments'), intl.locale);
+
+    if (mediaDownloadItems.length > 0) {
+      menu.push(null);
+      menu.push(...mediaDownloadItems);
+    }
 
     if (this.props.onToggleFullAccountHandle) {
       menu.push({

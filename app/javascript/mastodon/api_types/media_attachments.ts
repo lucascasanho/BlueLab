@@ -7,9 +7,12 @@ export type MediaAttachmentType =
   | 'unknown'
   | 'audio';
 
+export type MediaAttachmentDownloadType = 'photo' | 'gif' | 'video';
+
 export interface BaseApiMediaAttachmentJSON {
   id: string;
   type: MediaAttachmentType;
+  download_type?: MediaAttachmentDownloadType | null;
   url: string;
   preview_url: string;
   remote_url?: string;
