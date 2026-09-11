@@ -6,6 +6,7 @@ import { NavLink } from 'react-router-dom';
 
 import { StackIcon } from '@phosphor-icons/react';
 
+import { ComposeIcon } from '@/mastodon/components/compose_icon';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
@@ -20,7 +21,6 @@ import { Blue2AccountMenu } from './account_menu';
 import {
   Blue2BellIcon,
   Blue2BookmarkIcon,
-  Blue2ComposeIcon,
   Blue2FeedIcon,
   Blue2ListIcon,
   Blue2MessageIcon,
@@ -173,7 +173,7 @@ export const Blue2Navigation: React.FC = () => {
           type='button'
           onClick={openComposer}
         >
-          <Blue2ComposeIcon size={19} />
+          <ComposeIcon size={19} />
           <span>{blue2Text(intl.locale, 'write')}</span>
         </button>
       )}
