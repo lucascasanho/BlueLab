@@ -1,3 +1,5 @@
+import { useLocation } from 'react-router';
+
 import { act, fireEvent, waitFor } from '@testing-library/react';
 
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
@@ -23,6 +25,11 @@ vi.mock('@/mastodon/store', async () => {
 
   return { ...store, useAppDispatch: () => vi.fn() };
 });
+
+const LocationProbe: React.FC = () => {
+  const location = useLocation();
+  return <output data-testid='location'>{location.pathname}</output>;
+};
 
 describe('<NavigationAccountCardAndMenu />', () => {
   const account = accountFactoryImmutable({
@@ -123,6 +130,33 @@ describe('<NavigationAccountCardAndMenu />', () => {
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByTestId('slide-out-account-menu')).toBeInTheDocument();
     vi.useRealTimers();
+  });
+
+  it('handles the first mobile drawer menu item click before any sidebar navigation', () => {
+    vi.mocked(useBreakpoint).mockReturnValue(true);
+    const documentClick = vi.fn();
+    document.addEventListener('click', documentClick);
+
+    try {
+      render(
+        <>
+          <NavigationAccountCardAndMenu inSlideOut />
+          <LocationProbe />
+        </>,
+      );
+      const trigger = screen.getByRole('button', { name: 'Account settings' });
+
+      fireEvent.pointerDown(trigger, { pointerType: 'touch', button: 0 });
+
+      const favorites = screen.getByRole('link', { name: 'Favorites' });
+      fireEvent.pointerDown(favorites, { pointerType: 'touch', button: 0 });
+      fireEvent.click(favorites);
+
+      expect(screen.getByTestId('location')).toHaveTextContent('/favourites');
+      expect(documentClick).not.toHaveBeenCalled();
+    } finally {
+      document.removeEventListener('click', documentClick);
+    }
   });
 
   it('uses a dedicated body-portal popover in the mobile drawer and isolates drawer gestures', async () => {

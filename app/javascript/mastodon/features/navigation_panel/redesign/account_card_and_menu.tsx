@@ -242,12 +242,16 @@ const SlideOutAccountMenu: React.FC = () => {
           offset={8}
         >
           {({ props: floatingProps }) => (
+            // The surface only contains interactive children; this click
+            // handler is a propagation boundary, not an extra interaction.
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
             <div
               {...floatingProps}
               className={classes.slideOutMenu}
               data-testid='slide-out-account-menu'
               onPointerDown={stopDrawerGesture}
               onTouchStart={stopDrawerGesture}
+              onClick={stopDrawerGesture}
             >
               <Menu type='navigation' onClose={closeMenu}>
                 <ul>
