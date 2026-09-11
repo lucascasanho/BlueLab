@@ -214,7 +214,12 @@ const SlideOutNavigation: React.FC = () => {
     {
       from: () => [x.get(), 0],
       axis: 'x',
-      filterTaps: true,
+      // Do not enable filterTaps on this container. @use-gesture explicitly
+      // filters child taps when that option is enabled, while this drawer is a
+      // navigation surface containing links, buttons and a portaled submenu.
+      // A zero-displacement tap already snaps back to x=0 in the handler above,
+      // so tap filtering is unnecessary and can consume the first activation.
+      filterTaps: false,
       bounds: isLtrDir ? { right: 0 } : { left: 0 },
       rubberband: true,
       pointer: { capture: false },
