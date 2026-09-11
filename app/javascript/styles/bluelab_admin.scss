@@ -17,41 +17,43 @@ $bluelab-admin-shell-max-width: 1680px;
 body.admin .admin-wrapper {
   .simple_form .actions .btn,
   .simple_form .stacked-actions .btn {
-    display: inline-flex;
-    width: auto;
-    max-width: 100%;
-    flex: 0 1 auto;
+    display: inline-flex !important;
+    width: fit-content !important;
+    max-width: 100% !important;
+    flex: 0 1 auto !important;
     align-self: flex-start;
     align-items: center;
     justify-content: center;
-    border-radius: 999px;
+    border-radius: 999px !important;
   }
 }
 
 @media screen and (min-width: $bluelab-admin-desktop-breakpoint) {
   body.admin .admin-wrapper {
+    box-sizing: border-box;
     width: 100%;
-    max-width: $bluelab-admin-shell-max-width;
+    max-width: $bluelab-admin-shell-max-width !important;
     margin-inline: auto;
+    justify-content: flex-start;
 
     > .sidebar-wrapper:not(.sidebar-wrapper--empty) {
-      width: $bluelab-admin-sidebar-width;
-      flex: 0 0 $bluelab-admin-sidebar-width;
+      width: $bluelab-admin-sidebar-width !important;
+      flex: 0 0 $bluelab-admin-sidebar-width !important;
 
       .sidebar {
-        width: $bluelab-admin-sidebar-width;
+        width: $bluelab-admin-sidebar-width !important;
       }
     }
 
     > .sidebar-wrapper--empty {
-      display: none;
+      display: none !important;
     }
 
     > .content-wrapper {
-      width: auto;
-      max-width: none;
+      width: auto !important;
+      max-width: none !important;
       min-width: 0;
-      flex: 1 1 0;
+      flex: 1 1 0 !important;
     }
   }
 }
