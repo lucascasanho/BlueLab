@@ -108,5 +108,16 @@ describe('status media downloads', () => {
       expect(items[0].text).toBe('Salvar foto');
       expect(items[0].action).toEqual(expect.any(Function));
     });
+
+    it('preserves GIF kind in the action path so iOS can use the retry flow', () => {
+      const attachments = fromJS([
+        { id: '3', type: 'gifv', download_type: 'gif', url: 'https://example.com/animated.mp4' },
+      ]);
+      const items = buildMediaDownloadMenuItems(attachments, 'pt-BR');
+
+      expect(items).toHaveLength(1);
+      expect(items[0].text).toBe('Salvar GIF');
+      expect(items[0].action).toEqual(expect.any(Function));
+    });
   });
 });
