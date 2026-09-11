@@ -12,6 +12,7 @@ class MediaProxyController < ApplicationController
   before_action :set_media_attachment
 
   rescue_from ActiveRecord::RecordInvalid, Mastodon::NotPermittedError, Mastodon::UnexpectedResponseError, with: :not_found
+  rescue_from MediaDownloadService::Error, with: :internal_server_error
   rescue_from(*Mastodon::HTTP_CONNECTION_ERRORS, with: :internal_server_error)
 
   def show
@@ -22,7 +23,9 @@ class MediaProxyController < ApplicationController
       end
     end
 
-    if requires_file_streaming?
+    if download_requested?
+      send_download
+    elsif requires_file_streaming?
       send_file(media_attachment_file.path, type: media_attachment_file.instance_read(:content_type), disposition: 'inline')
     else
       redirect_to media_attachment_file_path, allow_other_host: true
@@ -73,6 +76,18 @@ class MediaProxyController < ApplicationController
 
   def preview_requested?
     request.path.end_with?('/small')
+  end
+
+  def download_requested?
+    params[:download] == '1'
+  end
+
+  def send_download
+    result = MediaDownloadService.new(@media_attachment).call
+
+    response.headers['Cache-Control'] = 'private, no-store'
+    send_file(result.path, type: result.content_type, disposition: 'attachment', filename: result.filename)
+    self.response_body = Rack::BodyProxy.new(response_body) { result.cleanup }
   end
 
   def requires_file_streaming?
