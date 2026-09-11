@@ -1,59 +1,42 @@
 /*
- * BlueLab layout adjustments for Rails-rendered preferences, moderation and
- * administration pages. These rules are scoped to the admin shell and do not
- * affect Mastodon's main timeline columns.
+ * BlueLab desktop layout adjustments for Rails-rendered preferences,
+ * moderation and administration pages. Mobile keeps Mastodon's native
+ * admin layout unchanged.
  */
 
 $bluelab-admin-desktop-breakpoint: 891px;
 $bluelab-admin-sidebar-width: 340px;
-$bluelab-admin-shell-max-width: 1680px;
-
-/*
- * Mastodon's `.simple_form .btn` is full-width by default. In preferences,
- * keep action buttons content-sized on both desktop and mobile and give them
- * the same pill geometry used by the other BlueLab action buttons. Colors and
- * hover states continue to come from the instance/theme tokens.
- */
-body.admin .admin-wrapper {
-  .simple_form .actions .btn,
-  .simple_form .stacked-actions .btn {
-    display: inline-flex !important;
-    width: fit-content !important;
-    max-width: 100% !important;
-    flex: 0 1 auto !important;
-    align-self: flex-start;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px !important;
-  }
-}
+$bluelab-admin-content-max-width: 1400px;
 
 @media screen and (min-width: $bluelab-admin-desktop-breakpoint) {
-  body.admin .admin-wrapper {
-    box-sizing: border-box;
-    width: 100%;
-    max-width: $bluelab-admin-shell-max-width !important;
+  .admin-wrapper {
+    max-width: $bluelab-admin-sidebar-width + $bluelab-admin-content-max-width;
     margin-inline: auto;
-    justify-content: flex-start;
 
     > .sidebar-wrapper:not(.sidebar-wrapper--empty) {
-      width: $bluelab-admin-sidebar-width !important;
-      flex: 0 0 $bluelab-admin-sidebar-width !important;
+      width: $bluelab-admin-sidebar-width;
+      flex: 0 0 $bluelab-admin-sidebar-width;
 
       .sidebar {
-        width: $bluelab-admin-sidebar-width !important;
+        width: $bluelab-admin-sidebar-width;
       }
     }
 
     > .sidebar-wrapper--empty {
-      display: none !important;
+      display: none;
     }
 
     > .content-wrapper {
-      width: auto !important;
-      max-width: none !important;
+      width: auto;
+      max-width: $bluelab-admin-content-max-width;
       min-width: 0;
-      flex: 1 1 0 !important;
+      flex: 1 1 auto;
+    }
+
+    .simple_form .actions .btn {
+      width: auto;
+      max-width: 100%;
+      flex: 0 1 auto;
     }
   }
 }
