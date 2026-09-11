@@ -4,6 +4,7 @@ class MediaDownloadService
   class Error < StandardError; end
 
   GIF_FILTER = '[0:v]split[v0][v1];[v0]palettegen=stats_mode=diff[p];[v1][p]paletteuse=dither=sierra2_4a'
+  GIF_CACHE_TTL = 10.minutes
 
   Result = Struct.new(:path, :content_type, :filename, :temporary_files, keyword_init: true) do
     def temporary?
@@ -75,8 +76,19 @@ class MediaDownloadService
   end
 
   def build_gif
+    cache_path = gif_cache_path
+
+    if File.file?(cache_path) && File.mtime(cache_path) >= GIF_CACHE_TTL.ago
+      return Result.new(
+        path: cache_path,
+        content_type: 'image/gif',
+        filename: gif_filename,
+        temporary_files: []
+      )
+    end
+
     source_path, source_temporary_file = materialize_original
-    output = Tempfile.new(["media-download-#{media_attachment.id}-", '.gif'])
+    output = Tempfile.new(["media-download-#{media_attachment.id}-", '.gif'], gif_cache_directory)
     output.binmode
     output.close
 
@@ -87,12 +99,14 @@ class MediaDownloadService
     )
 
     command.run(source: source_path, filter: GIF_FILTER, destination: output.path)
+    File.rename(output.path, cache_path)
+    output.close!
 
     Result.new(
-      path: output.path,
+      path: cache_path,
       content_type: 'image/gif',
       filename: gif_filename,
-      temporary_files: [output]
+      temporary_files: []
     )
   rescue Terrapin::ExitStatusError => e
     output&.close!
@@ -102,6 +116,16 @@ class MediaDownloadService
     raise Error, "Could not run ffmpeg for media attachment #{media_attachment.id}: #{e.message}"
   ensure
     source_temporary_file&.close!
+  end
+
+  def gif_cache_directory
+    @gif_cache_directory ||= Rails.root.join('tmp', 'media-download-gif-cache').tap do |directory|
+      FileUtils.mkdir_p(directory)
+    end
+  end
+
+  def gif_cache_path
+    gif_cache_directory.join("#{media_attachment.id}.gif")
   end
 
   def materialize_original
