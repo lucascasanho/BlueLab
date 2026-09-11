@@ -187,7 +187,10 @@ const LoginOrSignUp: React.FC = () => {
       <div className='ui__navigation-bar__sign-up'>
         {signupButton}
         <a href='/auth/sign_in' className='button button-secondary'>
-          <FormattedMessage id='sign_in_banner.sign_in' defaultMessage='Login' />
+          <FormattedMessage
+            id='sign_in_banner.sign_in'
+            defaultMessage='Login'
+          />
         </a>
       </div>
     );
