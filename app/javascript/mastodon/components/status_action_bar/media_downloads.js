@@ -23,6 +23,7 @@ const MEDIA_DOWNLOAD_LABELS = {
 
 const DOWNLOAD_KINDS = new Set(['photo', 'gif', 'video']);
 const IOS_DEVICE_PATTERN = /iPad|iPhone|iPod/;
+const IOS_GIF_SHARE_RETRY_DELAY = 250;
 
 const MIME_EXTENSIONS = {
   'image/avif': '.avif',
@@ -93,6 +94,8 @@ const filenameFromContentDisposition = (contentDisposition) => {
   return plainMatch ? safeFilename(plainMatch[1].trim()) : null;
 };
 
+const wait = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+
 export const isIOSDevice = ({
   userAgent = navigator.userAgent,
   platform = navigator.platform,
@@ -152,11 +155,7 @@ export const triggerBrowserDownload = (attachmentId) => {
   link.remove();
 };
 
-export const shareMediaOnIOS = async (attachmentId) => {
-  if (!isIOSDevice() || typeof navigator.share !== 'function' || typeof File !== 'function') {
-    return false;
-  }
-
+const prepareShareFile = async (attachmentId) => {
   const response = await fetch(mediaDownloadUrl(attachmentId), {
     credentials: 'same-origin',
   });
@@ -167,9 +166,13 @@ export const shareMediaOnIOS = async (attachmentId) => {
 
   const blob = await response.blob();
   const filename = getMediaDownloadFilename(response, blob, attachmentId);
-  const file = new File([blob], filename, {
+
+  return new File([blob], filename, {
     type: normalizedContentType(response, blob) || 'application/octet-stream',
   });
+};
+
+const sharePreparedFile = async (file) => {
   const shareData = { files: [file] };
 
   if (typeof navigator.canShare === 'function' && !navigator.canShare(shareData)) {
@@ -181,9 +184,33 @@ export const shareMediaOnIOS = async (attachmentId) => {
   return true;
 };
 
-export const triggerMediaDownload = async (attachmentId) => {
+export const shareMediaOnIOS = async (attachmentId, kind) => {
+  if (!isIOSDevice() || typeof navigator.share !== 'function' || typeof File !== 'function') {
+    return false;
+  }
+
+  const file = await prepareShareFile(attachmentId);
+
   try {
-    if (await shareMediaOnIOS(attachmentId)) {
+    return await sharePreparedFile(file);
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      throw error;
+    }
+
+    if (kind !== 'gif') {
+      throw error;
+    }
+  }
+
+  await wait(IOS_GIF_SHARE_RETRY_DELAY);
+
+  return sharePreparedFile(file);
+};
+
+export const triggerMediaDownload = async (attachmentId, kind) => {
+  try {
+    if (await shareMediaOnIOS(attachmentId, kind)) {
       return;
     }
   } catch (error) {
@@ -209,7 +236,7 @@ export const buildMediaDownloadMenuItems = (attachments, locale) => {
 
     items.push({
       text: getMediaDownloadLabel(kind, locale),
-      action: () => triggerMediaDownload(attachment.get('id')),
+      action: () => triggerMediaDownload(attachment.get('id'), kind),
     });
 
     return items;
