@@ -2,11 +2,28 @@ import { fromJS, List } from 'immutable';
 
 import {
   buildMediaDownloadMenuItems,
+  getMediaDownloadFilename,
   getMediaDownloadKind,
   getMediaDownloadLabel,
+  isIOSDevice,
 } from '../status_action_bar/media_downloads';
 
 describe('status media downloads', () => {
+  describe('isIOSDevice', () => {
+    it('detects iPhone and iPad user agents', () => {
+      expect(isIOSDevice({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 27_0 like Mac OS X)', platform: 'iPhone', maxTouchPoints: 5 })).toBe(true);
+      expect(isIOSDevice({ userAgent: 'Mozilla/5.0 (iPad; CPU OS 27_0 like Mac OS X)', platform: 'iPad', maxTouchPoints: 5 })).toBe(true);
+    });
+
+    it('detects iPadOS when it reports a desktop Mac platform', () => {
+      expect(isIOSDevice({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15)', platform: 'MacIntel', maxTouchPoints: 5 })).toBe(true);
+    });
+
+    it('does not classify a regular desktop Mac as iOS', () => {
+      expect(isIOSDevice({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15)', platform: 'MacIntel', maxTouchPoints: 0 })).toBe(false);
+    });
+  });
+
   describe('getMediaDownloadKind', () => {
     it('distinguishes photos, GIFs and videos from actual media attachments', () => {
       expect(getMediaDownloadKind(fromJS({ type: 'image', url: 'https://example.com/photo.jpg' }))).toBe('photo');
@@ -51,6 +68,29 @@ describe('status media downloads', () => {
 
     it('falls back to English for other interface languages', () => {
       expect(getMediaDownloadLabel('video', 'de')).toBe('Download video');
+    });
+  });
+
+  describe('getMediaDownloadFilename', () => {
+    it('preserves the filename sent by the authenticated media endpoint', () => {
+      const response = {
+        headers: new Headers({
+          'Content-Disposition': "attachment; filename*=UTF-8''foto%20teste.png",
+          'Content-Type': 'image/png',
+        }),
+      };
+      const blob = new Blob(['image'], { type: 'image/png' });
+
+      expect(getMediaDownloadFilename(response, blob, '42')).toBe('foto teste.png');
+    });
+
+    it('uses the response MIME type to create a safe fallback filename', () => {
+      const response = {
+        headers: new Headers({ 'Content-Type': 'video/mp4' }),
+      };
+      const blob = new Blob(['video'], { type: 'video/mp4' });
+
+      expect(getMediaDownloadFilename(response, blob, '84')).toBe('media-84.mp4');
     });
   });
 

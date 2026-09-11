@@ -22,6 +22,20 @@ const MEDIA_DOWNLOAD_LABELS = {
 };
 
 const DOWNLOAD_KINDS = new Set(['photo', 'gif', 'video']);
+const IOS_DEVICE_PATTERN = /iPad|iPhone|iPod/;
+
+const MIME_EXTENSIONS = {
+  'image/avif': '.avif',
+  'image/gif': '.gif',
+  'image/heic': '.heic',
+  'image/heif': '.heif',
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+  'video/mp4': '.mp4',
+  'video/quicktime': '.mov',
+  'video/webm': '.webm',
+};
 
 const languageForLocale = (locale) => {
   const language = locale?.toLowerCase().split(/[-_]/)[0];
@@ -40,6 +54,50 @@ const hasGifExtension = (url) => {
     return false;
   }
 };
+
+const mediaDownloadUrl = (attachmentId) => `/media_proxy/${encodeURIComponent(attachmentId)}/original?download=1`;
+
+const normalizedContentType = (response, blob) => {
+  const contentType = blob.type || response.headers.get('Content-Type') || '';
+
+  return contentType.split(';', 1)[0].trim().toLowerCase();
+};
+
+const safeFilename = (filename) => filename.split(/[\\/]/).pop();
+
+const filenameFromContentDisposition = (contentDisposition) => {
+  if (!contentDisposition) {
+    return null;
+  }
+
+  const encodedMatch = contentDisposition.match(/filename\*\s*=\s*(?:UTF-8'')?([^;]+)/i);
+
+  if (encodedMatch) {
+    const encodedFilename = encodedMatch[1].trim().replace(/^"|"$/g, '');
+
+    try {
+      return safeFilename(decodeURIComponent(encodedFilename));
+    } catch {
+      return safeFilename(encodedFilename);
+    }
+  }
+
+  const quotedMatch = contentDisposition.match(/filename\s*=\s*"([^"]+)"/i);
+
+  if (quotedMatch) {
+    return safeFilename(quotedMatch[1]);
+  }
+
+  const plainMatch = contentDisposition.match(/filename\s*=\s*([^;]+)/i);
+
+  return plainMatch ? safeFilename(plainMatch[1].trim()) : null;
+};
+
+export const isIOSDevice = ({
+  userAgent = navigator.userAgent,
+  platform = navigator.platform,
+  maxTouchPoints = navigator.maxTouchPoints,
+} = {}) => IOS_DEVICE_PATTERN.test(userAgent) || (platform === 'MacIntel' && maxTouchPoints > 1);
 
 export const getMediaDownloadKind = (attachment) => {
   const downloadType = attachment.get('download_type');
@@ -71,15 +129,70 @@ export const getMediaDownloadKind = (attachment) => {
 
 export const getMediaDownloadLabel = (kind, locale) => MEDIA_DOWNLOAD_LABELS[languageForLocale(locale)][kind];
 
-export const triggerMediaDownload = (attachmentId) => {
+export const getMediaDownloadFilename = (response, blob, attachmentId) => {
+  const contentDispositionFilename = filenameFromContentDisposition(response.headers.get('Content-Disposition'));
+
+  if (contentDispositionFilename) {
+    return contentDispositionFilename;
+  }
+
+  const extension = MIME_EXTENSIONS[normalizedContentType(response, blob)] || '';
+
+  return `media-${attachmentId}${extension}`;
+};
+
+export const triggerBrowserDownload = (attachmentId) => {
   const link = document.createElement('a');
-  link.href = `/media_proxy/${encodeURIComponent(attachmentId)}/original?download=1`;
+  link.href = mediaDownloadUrl(attachmentId);
   link.download = '';
   link.hidden = true;
 
   document.body.appendChild(link);
   link.click();
   link.remove();
+};
+
+export const shareMediaOnIOS = async (attachmentId) => {
+  if (!isIOSDevice() || typeof navigator.share !== 'function' || typeof File !== 'function') {
+    return false;
+  }
+
+  const response = await fetch(mediaDownloadUrl(attachmentId), {
+    credentials: 'same-origin',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Could not fetch media attachment ${attachmentId} for sharing`);
+  }
+
+  const blob = await response.blob();
+  const filename = getMediaDownloadFilename(response, blob, attachmentId);
+  const file = new File([blob], filename, {
+    type: normalizedContentType(response, blob) || 'application/octet-stream',
+  });
+  const shareData = { files: [file] };
+
+  if (typeof navigator.canShare === 'function' && !navigator.canShare(shareData)) {
+    return false;
+  }
+
+  await navigator.share(shareData);
+
+  return true;
+};
+
+export const triggerMediaDownload = async (attachmentId) => {
+  try {
+    if (await shareMediaOnIOS(attachmentId)) {
+      return;
+    }
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      return;
+    }
+  }
+
+  triggerBrowserDownload(attachmentId);
 };
 
 export const buildMediaDownloadMenuItems = (attachments, locale) => {
