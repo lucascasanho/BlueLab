@@ -1,0 +1,42 @@
+/*
+ * BlueLab desktop layout adjustments for Rails-rendered preferences,
+ * moderation and administration pages. Mobile keeps Mastodon's native
+ * admin layout unchanged.
+ */
+
+$bluelab-admin-desktop-breakpoint: 891px;
+$bluelab-admin-sidebar-width: 340px;
+$bluelab-admin-content-max-width: 1400px;
+
+@media screen and (min-width: $bluelab-admin-desktop-breakpoint) {
+  .admin-wrapper {
+    max-width: $bluelab-admin-sidebar-width + $bluelab-admin-content-max-width;
+    margin-inline: auto;
+
+    > .sidebar-wrapper:not(.sidebar-wrapper--empty) {
+      width: $bluelab-admin-sidebar-width;
+      flex: 0 0 $bluelab-admin-sidebar-width;
+
+      .sidebar {
+        width: $bluelab-admin-sidebar-width;
+      }
+    }
+
+    > .sidebar-wrapper--empty {
+      display: none;
+    }
+
+    > .content-wrapper {
+      width: auto;
+      max-width: $bluelab-admin-content-max-width;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .simple_form .actions .btn {
+      width: auto;
+      max-width: 100%;
+      flex: 0 1 auto;
+    }
+  }
+}
