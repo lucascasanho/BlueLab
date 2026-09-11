@@ -1,0 +1,77 @@
+@use 'blue-2-v14';
+
+/*
+ * BlueLab fifteenth refinement layer.
+ *
+ * Keep the Rails preferences/moderation/administration shell exclusive to
+ * Blue 2 while giving the main content a little more room than Vanilla,
+ * preserving a compact page ending, and refining the destructive/default
+ * action order on instance customization.
+ */
+body[data-theme='blue-2'].admin {
+  /* Give the end of every preferences/admin page a visible breathing space. */
+  .content {
+    padding-bottom: calc(44px + env(safe-area-inset-bottom));
+  }
+
+  /*
+   * On the instance customization page, put the destructive reset action at
+   * the start and the normal save action at the far end of the same row.
+   */
+  .simple_form .actions:has(button[name='reset_all']) {
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .simple_form .actions:has(button[name='reset_all']) button[name='reset_all'] {
+    order: 1;
+  }
+
+  .simple_form
+    .actions:has(button[name='reset_all'])
+    > .btn:not([name='reset_all']) {
+    order: 2;
+    margin-inline-start: auto;
+  }
+}
+
+@media (width >= 891px) {
+  body[data-theme='blue-2'].admin .admin-wrapper {
+    /*
+     * Vanilla caps the main column at 840px. Blue 2 needs only a moderate
+     * increase: enough for the server-settings tab row to remain on one line
+     * on normal desktop widths without returning to the overly-wide v13 shell.
+     */
+    > .sidebar-wrapper:not(.sidebar-wrapper--empty) {
+      width: 300px;
+      flex: 0 0 300px;
+    }
+
+    > .sidebar-wrapper--empty {
+      display: none;
+    }
+
+    > .content-wrapper {
+      max-width: 1040px;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+  }
+}
+
+@media (width <= 600px) {
+  body[data-theme='blue-2'].admin
+    .simple_form
+    .actions:has(button[name='reset_all']) {
+    justify-content: flex-start;
+  }
+
+  body[data-theme='blue-2'].admin
+    .simple_form
+    .actions:has(button[name='reset_all'])
+    > .btn:not([name='reset_all']) {
+    margin-inline-start: 0;
+  }
+}
