@@ -1,0 +1,30 @@
+@use 'blue-2-v16';
+
+/*
+ * BlueLab seventeenth refinement layer.
+ *
+ * Keep standard select controls comfortable on wide preference/admin pages
+ * without letting them consume an entire content row. This remains scoped to
+ * Blue 2 only; Vanilla and Bird UI keep their existing select geometry.
+ */
+body[data-theme='blue-2'].admin {
+  /*
+   * Simple Form renders ordinary selects inside `.input.select` wrappers.
+   * Constrain the interactive control/wrapper rather than the whole field so
+   * labels and hints can still use the available content width.
+   *
+   * 560px is wide enough for long locale/time-zone/update-policy labels while
+   * remaining visually compact on the wider Blue 2 preferences shell. Inside
+   * two-column rows the parent column remains the effective upper bound.
+   */
+  .simple_form .input.select .label_input__wrapper,
+  .simple_form .input.select .select-wrapper {
+    width: min(100%, 560px);
+    max-width: 560px;
+  }
+
+  .simple_form .input.select select {
+    width: 100%;
+    max-width: 560px;
+  }
+}
