@@ -105,6 +105,8 @@ RSpec.describe MediaDownloadService do
 
     context 'with a gifv attachment' do
       let(:command) { instance_double(Terrapin::CommandLine) }
+      let(:cache_directory) { Rails.root.join('tmp', 'media-download-gif-cache') }
+      let(:cache_path) { cache_directory.join('84.gif') }
       let(:media_attachment) do
         instance_double(
           MediaAttachment,
@@ -119,11 +121,17 @@ RSpec.describe MediaDownloadService do
       end
 
       before do
+        FileUtils.mkdir_p(cache_directory)
+        FileUtils.rm_f(cache_path)
         allow(paperclip_file).to receive(:path).with(:original).and_return(source_file.path)
         allow(Terrapin::CommandLine).to receive(:new).and_return(command)
         allow(command).to receive(:run) do |arguments|
           File.binwrite(arguments.fetch(:destination), 'GIF89a')
         end
+      end
+
+      after do
+        FileUtils.rm_f(cache_path)
       end
 
       it 'creates a real GIF download instead of renaming the stored MP4' do
@@ -133,8 +141,15 @@ RSpec.describe MediaDownloadService do
         expect(result.filename).to eq('animated.gif')
         expect(File.binread(result.path, 6)).to eq('GIF89a')
         expect(command).to have_received(:run).with(hash_including(source: source_file.path, filter: described_class::GIF_FILTER))
-      ensure
-        result&.cleanup
+      end
+
+      it 'reuses a fresh cached GIF instead of invoking ffmpeg again' do
+        first_result = service.call
+        second_result = service.call
+
+        expect(first_result.path).to eq(cache_path)
+        expect(second_result.path).to eq(cache_path)
+        expect(command).to have_received(:run).once
       end
     end
 
