@@ -16,11 +16,12 @@ interface ComposeIconProps extends SVGProps<SVGSVGElement> {
  */
 export const ComposeIcon: FC<ComposeIconProps> = ({
   size = 24,
-  // NavigationLink sends Phosphor's active-state weight hint to every icon.
-  // This fixed Material glyph intentionally stays identical in every state.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  weight: _weight,
+  weight,
   ...props
-}) => (
-  <EditSquareIcon {...props} width={size} height={size} fill='currentColor' />
-);
+}) => {
+  void weight;
+
+  return (
+    <EditSquareIcon {...props} width={size} height={size} fill='currentColor' />
+  );
+};
