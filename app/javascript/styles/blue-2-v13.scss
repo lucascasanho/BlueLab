@@ -1,0 +1,62 @@
+@use 'blue-2-v12';
+
+/*
+ * BlueLab thirteenth refinement layer.
+ *
+ * Keep Rails-rendered preferences/moderation/administration layout changes
+ * exclusive to the Blue 2 theme. Vanilla and Bird UI continue to use the
+ * upstream administrative shell from application.scss.
+ */
+body[data-theme='blue-2'].admin {
+  /* Match BlueLab's existing pill buttons without overriding instance colors. */
+  .simple_form .actions .btn,
+  .simple_form .stacked-actions .btn {
+    display: inline-flex;
+    width: auto;
+    max-width: 100%;
+    flex: 0 1 auto;
+    align-self: flex-start;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+  }
+}
+
+@media (width >= 891px) {
+  body[data-theme='blue-2'].admin .admin-wrapper {
+    /*
+     * The upstream shell is flex-based and caps the content column at 840px.
+     * BlueLab uses a desktop-only two-column grid instead: a stable navigation
+     * rail plus a fluid content area that grows with the browser window.
+     */
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    width: 100%;
+    max-width: 1600px;
+    margin-inline: auto;
+
+    > .sidebar-wrapper:not(.sidebar-wrapper--empty) {
+      width: auto;
+      min-width: 0;
+      flex: none;
+
+      .sidebar-wrapper__inner {
+        justify-content: stretch;
+      }
+
+      .sidebar {
+        width: 100%;
+      }
+    }
+
+    > .content-wrapper {
+      width: auto;
+      max-width: none;
+      min-width: 0;
+    }
+
+    > .sidebar-wrapper--empty {
+      display: none;
+    }
+  }
+}
