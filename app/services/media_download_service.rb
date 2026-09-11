@@ -6,12 +6,42 @@ class MediaDownloadService
   GIF_FILTER = '[0:v]split[v0][v1];[v0]palettegen=stats_mode=diff[p];[v1][p]paletteuse=dither=sierra2_4a'
 
   Result = Struct.new(:path, :content_type, :filename, :temporary_files, keyword_init: true) do
+    def temporary?
+      temporary_files.present?
+    end
+
     def cleanup
       temporary_files&.each do |file|
         file.close!
       rescue Errno::ENOENT
         nil
       end
+    end
+  end
+
+  class StreamingBody
+    CHUNK_SIZE = 64 * 1024
+
+    def initialize(result)
+      @result = result
+      @closed = false
+    end
+
+    def each
+      File.open(@result.path, 'rb') do |file|
+        while (chunk = file.read(CHUNK_SIZE))
+          yield chunk
+        end
+      end
+    ensure
+      close
+    end
+
+    def close
+      return if @closed
+
+      @closed = true
+      @result.cleanup
     end
   end
 
