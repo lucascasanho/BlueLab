@@ -49,6 +49,60 @@ RSpec.describe MediaDownloadService do
       end
     end
 
+    context 'with a static GIF image attachment' do
+      let(:media_attachment) do
+        instance_double(
+          MediaAttachment,
+          id: 63,
+          file: paperclip_file,
+          file_file_name: 'static.gif',
+          file_content_type: 'image/gif',
+          image?: true,
+          gifv?: false,
+          video?: false
+        )
+      end
+
+      before do
+        allow(paperclip_file).to receive(:path).with(:original).and_return(source_file.path)
+      end
+
+      it 'keeps the GIF filename and MIME type unchanged' do
+        result = service.call
+
+        expect(result.path).to eq(source_file.path)
+        expect(result.content_type).to eq('image/gif')
+        expect(result.filename).to eq('static.gif')
+      end
+    end
+
+    context 'with a video attachment' do
+      let(:media_attachment) do
+        instance_double(
+          MediaAttachment,
+          id: 74,
+          file: paperclip_file,
+          file_file_name: 'clip.webm',
+          file_content_type: 'video/webm',
+          image?: false,
+          gifv?: false,
+          video?: true
+        )
+      end
+
+      before do
+        allow(paperclip_file).to receive(:path).with(:original).and_return(source_file.path)
+      end
+
+      it 'keeps the stored video filename and MIME type unchanged' do
+        result = service.call
+
+        expect(result.path).to eq(source_file.path)
+        expect(result.content_type).to eq('video/webm')
+        expect(result.filename).to eq('clip.webm')
+      end
+    end
+
     context 'with a gifv attachment' do
       let(:command) { instance_double(Terrapin::CommandLine) }
       let(:media_attachment) do
