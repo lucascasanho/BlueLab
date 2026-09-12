@@ -7,10 +7,6 @@ on:
       - 'stable-*'
   pull_request:
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -23,20 +19,5 @@ jobs:
       - name: Set up Javascript environment
         uses: ./.github/actions/setup-javascript
 
-      - name: Apply formatting
-        run: yarn format
-
-      - name: Publish formatter diff
-        if: github.event_name == 'pull_request'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if git diff --quiet; then
-            exit 0
-          fi
-          {
-            echo '```diff'
-            git diff -- . ':(exclude).github/workflows/format-check.yml'
-            echo '```'
-          } > /tmp/format-diff.md
-          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/format-diff.md
+      - name: Check formatting
+        run: yarn format:check
