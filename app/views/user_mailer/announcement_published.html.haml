@@ -13,9 +13,9 @@
             = prerender_custom_emojis(rendered_communication, @announcement.emojis)
 
             - @announcement.media_attachments.each do |media|
+              - media_url = full_asset_url(media.file.url(:original))
               %p
-                - media_url = full_asset_url(media.file.url(:original))
-                - if media.image? && media.file_content_type != 'image/gif'
+                - if media.image?
                   = link_to media_url do
                     = image_tag media_url, alt: media.description.presence || '', style: 'max-width: 100%; height: auto; border-radius: 8px;'
                 - else
@@ -23,4 +23,5 @@
                   - if preview_url.present?
                     = link_to media_url do
                       = image_tag preview_url, alt: media.description.presence || '', style: 'max-width: 100%; height: auto; border-radius: 8px;'
+                  %br
                   = link_to(media.description.presence || media.file_file_name || 'Abrir mídia', media_url)
