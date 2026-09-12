@@ -16,6 +16,15 @@ export type CustomEmojiTextPart =
 const isTokenBoundary = (character: string | undefined) =>
   !character || !WORD_CHARACTER_PATTERN.test(character);
 
+const isBlockElement = (element: HTMLElement) =>
+  element.tagName === 'DIV' || element.tagName === 'P';
+
+const isEmptyBlockElement = (element: HTMLElement) =>
+  isBlockElement(element) &&
+  element.childNodes.length === 1 &&
+  element.firstChild instanceof HTMLElement &&
+  element.firstChild.tagName === 'BR';
+
 export function customEmojiTextParts(
   text: string,
   customEmojis: ExtraCustomEmojiMap,
@@ -75,11 +84,14 @@ export function insertEmojiAtSelection(
   emoji: string,
   selectionStart: number,
   selectionEnd = selectionStart,
+  maxLength?: number,
 ) {
   const start = Math.max(0, Math.min(selectionStart, text.length));
   const end = Math.max(start, Math.min(selectionEnd, text.length));
   const withoutSelection = `${text.slice(0, start)}${text.slice(end)}`;
   const nextValue = insertEmojiAtPosition(withoutSelection, emoji, start);
+
+  if (maxLength !== undefined && nextValue.length > maxLength) return null;
 
   return {
     value: nextValue,
@@ -94,14 +106,30 @@ const nodeSerializedText = (node: Node): string => {
   const shortcode = node.dataset.emojiShortcode;
   if (shortcode) return shortcode;
   if (node.tagName === 'BR') return '\n';
+  if (isEmptyBlockElement(node)) return '\n';
 
   const content = Array.from(node.childNodes).map(nodeSerializedText).join('');
-  if (node.tagName === 'DIV' || node.tagName === 'P') return `\n${content}`;
+  if (isBlockElement(node)) return `\n${content}`;
   return content;
 };
 
-export const profileEmojiEditorText = (editor: HTMLElement) =>
-  Array.from(editor.childNodes).map(nodeSerializedText).join('');
+export const profileEmojiEditorText = (editor: HTMLElement) => {
+  const children = Array.from(editor.childNodes);
+  const firstChild = children[0];
+
+  if (
+    children.length === 1 &&
+    firstChild instanceof HTMLElement &&
+    firstChild.tagName === 'BR'
+  ) {
+    return '';
+  }
+
+  const text = children.map(nodeSerializedText).join('');
+  return firstChild instanceof HTMLElement && isBlockElement(firstChild)
+    ? text.slice(1)
+    : text;
+};
 
 const serializedOffsetTo = (
   editor: HTMLElement,
@@ -153,7 +181,10 @@ const pointAtSerializedOffset = (
     return { node: parent, offset: index + (after ? 1 : 0) };
   };
 
-  const visit = (node: Node): SerializedPoint | null => {
+  const visit = (
+    node: Node,
+    skipBlockPrefix = false,
+  ): SerializedPoint | null => {
     if (node.nodeType === Node.TEXT_NODE) {
       const length = node.textContent?.length ?? 0;
       if (remaining <= length) return { node, offset: remaining };
@@ -177,9 +208,13 @@ const pointAtSerializedOffset = (
       return null;
     }
 
-    if (node.tagName === 'DIV' || node.tagName === 'P') {
+    if (isBlockElement(node) && !skipBlockPrefix) {
       if (remaining === 0) return pointAround(node, false);
       remaining -= 1;
+    }
+
+    if (isEmptyBlockElement(node)) {
+      return remaining === 0 ? pointAround(node, true) : null;
     }
 
     for (const child of Array.from(node.childNodes)) {
@@ -190,8 +225,20 @@ const pointAtSerializedOffset = (
     return null;
   };
 
-  for (const child of Array.from(editor.childNodes)) {
-    const point = visit(child);
+  const children = Array.from(editor.childNodes);
+  const firstChild = children[0];
+  if (
+    children.length === 1 &&
+    firstChild instanceof HTMLElement &&
+    firstChild.tagName === 'BR'
+  ) {
+    return { node: editor, offset: 0 };
+  }
+
+  for (const [index, child] of children.entries()) {
+    const skipBlockPrefix =
+      index === 0 && child instanceof HTMLElement && isBlockElement(child);
+    const point = visit(child, skipBlockPrefix);
     if (point) return point;
   }
 
