@@ -9,4 +9,18 @@
         %tr
           %td.email-inner-card-td.email-prose
             %p= t('user_mailer.announcement_published.description', domain: site_hostname)
-            = linkify(@announcement.text)
+            - rendered_communication = AdvancedTextFormatter.new(@announcement.text, content_type: @announcement.content_type, local: true).to_s
+            = prerender_custom_emojis(rendered_communication, @announcement.emojis)
+
+            - @announcement.media_attachments.each do |media|
+              %p
+                - media_url = full_asset_url(media.file.url(:original))
+                - if media.image? && media.file_content_type != 'image/gif'
+                  = link_to media_url do
+                    = image_tag media_url, alt: media.description.presence || '', style: 'max-width: 100%; height: auto; border-radius: 8px;'
+                - else
+                  - preview_url = media.file.styles.key?(:small) ? full_asset_url(media.file.url(:small)) : nil
+                  - if preview_url.present?
+                    = link_to media_url do
+                      = image_tag preview_url, alt: media.description.presence || '', style: 'max-width: 100%; height: auto; border-radius: 8px;'
+                  = link_to(media.description.presence || media.file_file_name || 'Abrir mídia', media_url)
