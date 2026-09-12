@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import TrendingUpIcon from '@/material-icons/400-24px/trending_up.svg?react';
 
 import { Blue2AccountMenu } from './account_menu';
+import { Blue2Announcements } from './announcements';
 import {
   Blue2BellIcon,
   Blue2BookmarkIcon,
@@ -109,6 +110,11 @@ export const Blue2Navigation: React.FC = () => {
                 defaultMessage='Notifications'
               />
             </Item>
+            <Blue2Announcements
+              variant='navigation'
+              className={classes.item}
+              badgeClassName={classes.badge}
+            />
             <Item to='/conversations' icon={Blue2MessageIcon}>
               <FormattedMessage
                 id='tabs_bar.messages'

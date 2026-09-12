@@ -8,6 +8,7 @@ import { Link, useHistory, useLocation } from 'react-router-dom';
 import { HashIcon } from '@phosphor-icons/react';
 
 import { openNavigation } from '@/mastodon/actions/navigation';
+import { Blue2Announcements } from '@/mastodon/features/blue2/announcements';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
 import { blue2Text } from '@/mastodon/features/blue2/locale';
 import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
@@ -221,6 +222,7 @@ export const ColumnsAreaRedesign: React.FC<{
                 classes.blue2MobileUtilityBar,
                 mobileChromeClasses.topUtilityBar,
               )}
+              style={{ gridTemplateColumns: '88px 1fr 88px' }}
             >
               <button
                 type='button'
@@ -250,15 +252,25 @@ export const ColumnsAreaRedesign: React.FC<{
                 />
               </Link>
 
-              <button
-                type='button'
-                className={classes.blue2MobileUtilityButton}
-                onClick={handleOpenBlue2MobileRail}
-                aria-label={blue2Text(intl.locale, 'trendingFeeds')}
-                aria-expanded={isBlue2MobileRailOpen}
+              <div
+                style={{
+                  width: 88,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                }}
               >
-                <HashIcon size={28} />
-              </button>
+                <Blue2Announcements variant='mobile' />
+                <button
+                  type='button'
+                  className={classes.blue2MobileUtilityButton}
+                  onClick={handleOpenBlue2MobileRail}
+                  aria-label={blue2Text(intl.locale, 'trendingFeeds')}
+                  aria-expanded={isBlue2MobileRailOpen}
+                >
+                  <HashIcon size={28} />
+                </button>
+              </div>
             </header>
           )}
 
