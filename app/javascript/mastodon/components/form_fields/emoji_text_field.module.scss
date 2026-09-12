@@ -34,14 +34,23 @@
 
   [data-input] > input,
   [data-input] > textarea {
-    color: transparent;
-    caret-color: transparent;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    caret-color: transparent !important;
+    text-shadow: none !important;
     pointer-events: none;
+  }
+
+  [data-input] > input::placeholder,
+  [data-input] > textarea::placeholder {
+    color: var(--color-text-secondary) !important;
+    -webkit-text-fill-color: var(--color-text-secondary) !important;
   }
 
   [data-input] > input::selection,
   [data-input] > textarea::selection {
     color: transparent;
+    background: transparent;
   }
 
   [data-input]:has(.blue2Editor:focus) > input,
@@ -63,6 +72,7 @@
     font-size: 14px;
     line-height: 20px;
     color: var(--color-text-primary);
+    -webkit-text-fill-color: var(--color-text-primary);
     white-space: pre;
     cursor: text;
   }
@@ -98,6 +108,7 @@
   [data-input] > input:disabled ~ .blue2Editor,
   [data-input] > textarea:disabled ~ .blue2Editor {
     color: var(--color-text-disabled);
+    -webkit-text-fill-color: var(--color-text-disabled);
     cursor: not-allowed;
   }
 }
