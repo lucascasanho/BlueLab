@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 
 import type { List, Map } from 'immutable';
 
@@ -33,6 +33,47 @@ interface Blue2AnnouncementsProps {
   badgeClassName?: string;
 }
 
+interface AnnouncementsCopy {
+  trigger: string;
+  title: string;
+}
+
+const defaultAnnouncementsCopy: AnnouncementsCopy = {
+  trigger: 'Notices',
+  title: 'Espelunca notices',
+};
+
+const announcementsCopyByLocale: Record<string, AnnouncementsCopy> = {
+  'pt-br': {
+    trigger: 'Comunicados',
+    title: 'Comunicados da Espelunca',
+  },
+  pt: {
+    trigger: 'Comunicados',
+    title: 'Comunicados da Espelunca',
+  },
+  en: defaultAnnouncementsCopy,
+  es: {
+    trigger: 'Comunicados',
+    title: 'Comunicados de Espelunca',
+  },
+  fr: {
+    trigger: 'Communiqués',
+    title: 'Communiqués d’Espelunca',
+  },
+};
+
+const getAnnouncementsCopy = (locale: string): AnnouncementsCopy => {
+  const normalizedLocale = locale.toLowerCase();
+  const language = normalizedLocale.split('-')[0];
+
+  return (
+    announcementsCopyByLocale[normalizedLocale] ??
+    (language ? announcementsCopyByLocale[language] : undefined) ??
+    defaultAnnouncementsCopy
+  );
+};
+
 export const Blue2Announcements: React.FC<Blue2AnnouncementsProps> = ({
   variant,
   className,
@@ -52,6 +93,7 @@ export const Blue2Announcements: React.FC<Blue2AnnouncementsProps> = ({
     () => announcements.filter((announcement) => !announcement.read).length,
     [announcements],
   );
+  const copy = useMemo(() => getAnnouncementsCopy(intl.locale), [intl.locale]);
   const currentIndex = selectedAnnouncementId
     ? announcements.findIndex(
         (announcement) => announcement.id === selectedAnnouncementId,
@@ -128,11 +170,6 @@ export const Blue2Announcements: React.FC<Blue2AnnouncementsProps> = ({
     return null;
   }
 
-  const triggerLabel = intl.formatMessage({
-    id: 'announcement.announcement',
-    defaultMessage: 'Announcement',
-  });
-
   const modal =
     currentAnnouncement && typeof document !== 'undefined'
       ? createPortal(
@@ -154,12 +191,7 @@ export const Blue2Announcements: React.FC<Blue2AnnouncementsProps> = ({
                   <span className={classes.titleIcon} aria-hidden='true'>
                     <CampaignIcon width={22} height={22} fill='currentColor' />
                   </span>
-                  <h2 id='blue2-announcements-title'>
-                    <FormattedMessage
-                      id='announcement.announcement'
-                      defaultMessage='Announcement'
-                    />
-                  </h2>
+                  <h2 id='blue2-announcements-title'>{copy.title}</h2>
                 </div>
 
                 <button
@@ -234,7 +266,7 @@ export const Blue2Announcements: React.FC<Blue2AnnouncementsProps> = ({
         aria-haspopup='dialog'
         aria-expanded={open}
         aria-label={
-          unreadCount > 0 ? `${triggerLabel} (${unreadCount})` : triggerLabel
+          unreadCount > 0 ? `${copy.trigger} (${unreadCount})` : copy.trigger
         }
       >
         <CampaignIcon
@@ -243,7 +275,7 @@ export const Blue2Announcements: React.FC<Blue2AnnouncementsProps> = ({
           fill='currentColor'
         />
 
-        {variant === 'navigation' && <span>{triggerLabel}</span>}
+        {variant === 'navigation' && <span>{copy.trigger}</span>}
 
         {unreadCount > 0 &&
           (variant === 'navigation' ? (
