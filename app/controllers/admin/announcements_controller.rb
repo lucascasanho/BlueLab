@@ -105,9 +105,9 @@ class Admin::AnnouncementsController < Admin::BaseController
     end
 
     attachments = current_user.account.media_attachments
-                              .where(id: ids, status_id: nil, scheduled_status_id: nil)
-                              .where(announcement_id: [nil, announcement.id])
-                              .index_by(&:id)
+      .where(id: ids, status_id: nil, scheduled_status_id: nil)
+      .where(announcement_id: [nil, announcement.id])
+      .index_by(&:id)
 
     if attachments.size != ids.size
       announcement.errors.add(:media_attachments, I18n.t('admin.announcements.media_errors.invalid'))
