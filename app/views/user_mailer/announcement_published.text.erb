@@ -1,4 +1,4 @@
-<%= t('user_mailer.announcement_published.title') %>
+<%= t('user_mailer.announcement_published.title', domain: site_hostname) %>
 
 ===
 
@@ -7,8 +7,8 @@
 <%= @announcement.text %>
 <% if @announcement.media_attachments.any? %>
 
-<%= t('media_attachments.attachments', count: @announcement.media_attachments.size, default: 'Mídia') %>:
+<%= t('media_attachments.attachments', count: @announcement.media_attachments.size, default: 'Media') %>:
 <% @announcement.media_attachments.each do |media| %>
-- <%= media.description.presence || media.file_file_name || 'Mídia' %>: <%= full_asset_url(media.file.url(:original)) %>
+- <%= media.description.presence || t('media_attachments.attachments', count: 1, default: 'Media') %>: <%= full_asset_url(media.file.url(:original)) %>
 <% end %>
 <% end %>
