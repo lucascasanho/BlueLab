@@ -96,20 +96,50 @@ class Admin::AnnouncementsController < Admin::BaseController
     end.uniq
   end
 
-  def save_with_media(announcement)
-    return false unless announcement.save
+  def requested_media_attachments(announcement)
+    ids = requested_media_attachment_ids
 
-    attach_requested_media(announcement)
-    true
+    if ids.size > Announcement::MAX_MEDIA_ATTACHMENTS
+      announcement.errors.add(:media_attachments, I18n.t('admin.announcements.media_errors.too_many', count: Announcement::MAX_MEDIA_ATTACHMENTS))
+      return
+    end
+
+    attachments = current_user.account.media_attachments
+                              .where(id: ids, status_id: nil, scheduled_status_id: nil)
+                              .where(announcement_id: [nil, announcement.id])
+                              .index_by(&:id)
+
+    if attachments.size != ids.size
+      announcement.errors.add(:media_attachments, I18n.t('admin.announcements.media_errors.invalid'))
+      return
+    end
+
+    ids.filter_map { |id| attachments[id] }
   end
 
-  def attach_requested_media(announcement)
-    requested_ids = requested_media_attachment_ids
-    owned_media = current_user.account.media_attachments.where(id: requested_ids)
-    allowed_ids = owned_media.where(status_id: nil, scheduled_status_id: nil).where(announcement_id: [nil, announcement.id]).pluck(:id)
+  def save_with_media(announcement)
+    media_attachments = requested_media_attachments(announcement)
+    return false if media_attachments.nil?
 
-    announcement.media_attachments.where.not(id: allowed_ids).update_all(announcement_id: nil)
-    owned_media.where(id: allowed_ids).update_all(announcement_id: announcement.id)
+    saved = false
+
+    Announcement.transaction do
+      unless announcement.save
+        raise ActiveRecord::Rollback
+      end
+
+      sync_media_attachments(announcement, media_attachments)
+      saved = true
+    end
+
+    saved
+  end
+
+  def sync_media_attachments(announcement, media_attachments)
+    requested_ids = media_attachments.map(&:id)
+
+    announcement.media_attachments.where.not(id: requested_ids).update_all(announcement_id: nil)
+    current_user.account.media_attachments.where(id: requested_ids).update_all(announcement_id: announcement.id)
     announcement.media_attachments.reset
   end
 end
