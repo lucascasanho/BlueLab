@@ -15,6 +15,10 @@ import { insertEmojiAtPosition } from '@/mastodon/features/emoji/utils';
 import { CharacterCounter } from '../character_counter';
 import { EmojiPickerButton } from '../emoji/picker_button';
 
+import {
+  Blue2EmojiFieldWrapper,
+  isBlue2Theme,
+} from './blue2_emoji_field_wrapper';
 import classes from './emoji_text_field.module.scss';
 import type { CommonFieldWrapperProps, InputProps } from './form_field_wrapper';
 import { FormFieldWrapper } from './form_field_wrapper';
@@ -27,6 +31,7 @@ export type EmojiInputProps = {
   onChange?: (newValue: string) => void;
   counterMax?: number;
   recommended?: boolean;
+  blue2EmojiEditor?: boolean;
 } & Omit<CommonFieldWrapperProps, 'wrapperClassName'>;
 
 export const EmojiTextInputField: FC<
@@ -41,6 +46,7 @@ export const EmojiTextInputField: FC<
   counterMax = maxLength,
   recommended,
   disabled,
+  blue2EmojiEditor = false,
   ...otherProps
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -51,7 +57,9 @@ export const EmojiTextInputField: FC<
     status,
     counterMax,
     recommended,
+    maxLength,
     disabled,
+    blue2EmojiEditor,
     inputRef,
     value,
     onChange,
@@ -84,6 +92,7 @@ export const EmojiTextAreaField: FC<
   disabled,
   hint,
   status,
+  blue2EmojiEditor = false,
   ...otherProps
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -94,7 +103,9 @@ export const EmojiTextAreaField: FC<
     status,
     counterMax,
     recommended,
+    maxLength,
     disabled,
+    blue2EmojiEditor,
     inputRef: textareaRef,
     value,
     onChange,
@@ -115,15 +126,28 @@ export const EmojiTextAreaField: FC<
   );
 };
 
-const EmojiFieldWrapper: FC<
-  EmojiInputProps & {
-    disabled?: boolean;
-    children: (
-      inputProps: InputProps & { onChange: ChangeEventHandler },
-    ) => ReactNode;
-    inputRef: RefObject<HTMLTextAreaElement | HTMLInputElement | null>;
+export type EmojiInputElement = HTMLInputElement | HTMLTextAreaElement;
+
+export type EmojiFieldWrapperProps = EmojiInputProps & {
+  disabled?: boolean;
+  maxLength?: number;
+  children: (
+    inputProps: InputProps & {
+      onChange: ChangeEventHandler<EmojiInputElement>;
+    },
+  ) => ReactNode;
+  inputRef: RefObject<EmojiInputElement | null>;
+};
+
+const EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = (props) => {
+  if (props.blue2EmojiEditor && isBlue2Theme()) {
+    return <Blue2EmojiFieldWrapper {...props} />;
   }
-> = ({
+
+  return <DefaultEmojiFieldWrapper {...props} />;
+};
+
+const DefaultEmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   value,
   onChange,
   children,
@@ -131,6 +155,8 @@ const EmojiFieldWrapper: FC<
   inputRef,
   counterMax,
   recommended = false,
+  maxLength: _maxLength,
+  blue2EmojiEditor: _blue2EmojiEditor,
   ...otherProps
 }) => {
   const counterId = useId();
@@ -149,7 +175,7 @@ const EmojiFieldWrapper: FC<
   );
 
   const handleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
+    (event: ChangeEvent<EmojiInputElement>) => {
       onChange?.(event.target.value);
     },
     [onChange],
