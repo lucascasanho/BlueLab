@@ -27,6 +27,7 @@ import { CharacterCounter } from '../character_counter';
 import { EmojiPickerButton } from '../emoji/picker_button';
 
 import {
+  customEmojiDeletionRange,
   customEmojiTextParts,
   insertEmojiAtSelection,
   matchingCustomEmojiShortcodes,
@@ -73,6 +74,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   const pendingSelectionRef = useRef<{ start: number; end: number } | null>(
     null,
   );
+  const lastSelectionRef = useRef<{ start: number; end: number } | null>(null);
 
   const parts = useMemo(
     () => customEmojiTextParts(inputValue, customEmojis),
@@ -124,6 +126,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
 
     const selection = profileEmojiEditorSelection(editor);
     input.setSelectionRange(selection.start, selection.end);
+    lastSelectionRef.current = selection;
     return selection;
   }, [inputRef]);
 
@@ -133,16 +136,28 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     if (!editor || !input) return;
 
     const rawText = profileEmojiEditorText(editor);
-    const text =
-      maxLength === undefined ? rawText : rawText.slice(0, maxLength);
     const rawSelection = profileEmojiEditorSelection(editor);
+    const normalizeText = (text: string) =>
+      input instanceof HTMLInputElement ? text.replace(/[\r\n]/g, '') : text;
+    const normalizedText = normalizeText(rawText);
+    const text =
+      maxLength === undefined
+        ? normalizedText
+        : normalizedText.slice(0, maxLength);
     const selection = {
-      start: Math.min(rawSelection.start, text.length),
-      end: Math.min(rawSelection.end, text.length),
+      start: Math.min(
+        normalizeText(rawText.slice(0, rawSelection.start)).length,
+        text.length,
+      ),
+      end: Math.min(
+        normalizeText(rawText.slice(0, rawSelection.end)).length,
+        text.length,
+      ),
     };
     input.value = text;
     input.setSelectionRange(selection.start, selection.end);
     pendingSelectionRef.current = selection;
+    lastSelectionRef.current = selection;
     onChange?.(text);
     updateSuggestions(text, selection.end);
   }, [inputRef, maxLength, onChange, updateSuggestions]);
@@ -164,6 +179,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
         end: insertion.caretPosition,
       };
       pendingSelectionRef.current = selection;
+      lastSelectionRef.current = selection;
       if (inputRef.current) {
         inputRef.current.value = insertion.value;
         inputRef.current.setSelectionRange(selection.start, selection.end);
@@ -187,8 +203,12 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     (emoji: string) => {
       const input = inputRef.current;
       const currentValue = input?.value ?? inputValue;
-      const start = input?.selectionStart ?? currentValue.length;
-      const end = input?.selectionEnd ?? start;
+      const rememberedSelection = lastSelectionRef.current;
+      const start =
+        rememberedSelection?.start ??
+        input?.selectionStart ??
+        currentValue.length;
+      const end = rememberedSelection?.end ?? input?.selectionEnd ?? start;
       applyEmoji(emoji, start, end);
     },
     [applyEmoji, inputRef, inputValue],
@@ -222,6 +242,8 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
       if (event.target === input) {
         const start = input.selectionStart ?? input.value.length;
         const end = input.selectionEnd ?? start;
+        const selection = { start, end };
+        lastSelectionRef.current = selection;
         editor.focus({ preventScroll: true });
         setProfileEmojiEditorSelection(editor, start, end);
       } else if (event.target === editor) {
@@ -244,7 +266,8 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
 
   const handleKeyDown = useCallback(
     (event: ReactKeyboardEvent<HTMLDivElement>) => {
-      if (event.target !== editorRef.current || event.nativeEvent.isComposing) {
+      const editor = editorRef.current;
+      if (event.target !== editor || event.nativeEvent.isComposing) {
         return;
       }
 
@@ -276,6 +299,43 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
         }
       }
 
+      if (event.key === 'Backspace' || event.key === 'Delete') {
+        const selection = profileEmojiEditorSelection(editor);
+        if (selection.start === selection.end) {
+          const currentValue = inputRef.current?.value ?? inputValue;
+          const deletionRange = customEmojiDeletionRange(
+            currentValue,
+            customEmojis,
+            selection.start,
+            event.key === 'Backspace' ? 'backward' : 'forward',
+          );
+
+          if (deletionRange) {
+            event.preventDefault();
+            event.stopPropagation();
+            const nextValue =
+              currentValue.slice(0, deletionRange.start) +
+              currentValue.slice(deletionRange.end);
+            const nextSelection = {
+              start: deletionRange.start,
+              end: deletionRange.start,
+            };
+            pendingSelectionRef.current = nextSelection;
+            lastSelectionRef.current = nextSelection;
+            if (inputRef.current) {
+              inputRef.current.value = nextValue;
+              inputRef.current.setSelectionRange(
+                nextSelection.start,
+                nextSelection.end,
+              );
+            }
+            hideSuggestions();
+            onChange?.(nextValue);
+            return;
+          }
+        }
+      }
+
       if (
         event.key === 'Enter' &&
         inputRef.current instanceof HTMLInputElement
@@ -287,8 +347,12 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
       requestAnimationFrame(handleEditorSelection);
     },
     [
+      customEmojis,
       handleEditorSelection,
+      hideSuggestions,
       inputRef,
+      inputValue,
+      onChange,
       selectedSuggestion,
       selectSuggestion,
       suggestionCodes.length,
@@ -337,6 +401,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
             <>
               {children({ ...inputProps, onChange: handleSourceChange })}
               <div
+                key={inputValue}
                 ref={editorRef}
                 className={classes.blue2Editor}
                 contentEditable={!disabled}
@@ -365,7 +430,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
                       contentEditable={false}
                       className={classes.blue2EmojiToken}
                     >
-                      <Emoji code={part.shortcode} />
+                      <Emoji code={part.shortcode} showFallback={false} />
                     </span>
                   ) : (
                     <span key={`text-${index}`}>{part.text}</span>

@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest';
 import type { ExtraCustomEmojiMap } from '@/mastodon/features/emoji/types';
 
 import {
+  customEmojiDeletionRange,
   customEmojiTextParts,
   insertEmojiAtSelection,
   matchingCustomEmojiShortcodes,
@@ -103,6 +104,22 @@ describe('Blue 2 emoji profile fields', () => {
         caretPosition: 'hello :party: '.length,
       },
     );
+  });
+
+  test('finds an atomic custom emoji next to backspace and delete carets', () => {
+    const text = 'hello :party: world';
+    const start = 'hello '.length;
+    const end = start + ':party:'.length;
+
+    expect(
+      customEmojiDeletionRange(text, customEmojis, end, 'backward'),
+    ).toEqual({ start, end });
+    expect(
+      customEmojiDeletionRange(text, customEmojis, start, 'forward'),
+    ).toEqual({ start, end });
+    expect(
+      customEmojiDeletionRange(text, customEmojis, end + 1, 'backward'),
+    ).toBeNull();
   });
 
   test('serializes browser contenteditable line blocks without duplication', () => {

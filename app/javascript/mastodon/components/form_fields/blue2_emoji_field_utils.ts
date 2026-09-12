@@ -99,6 +99,34 @@ export function insertEmojiAtSelection(
   };
 }
 
+export function customEmojiDeletionRange(
+  text: string,
+  customEmojis: ExtraCustomEmojiMap,
+  caretPosition: number,
+  direction: 'backward' | 'forward',
+) {
+  let offset = 0;
+
+  for (const part of customEmojiTextParts(text, customEmojis)) {
+    const length =
+      part.type === 'emoji' ? part.shortcode.length : part.text.length;
+    const start = offset;
+    const end = start + length;
+
+    if (
+      part.type === 'emoji' &&
+      ((direction === 'backward' && caretPosition === end) ||
+        (direction === 'forward' && caretPosition === start))
+    ) {
+      return { start, end };
+    }
+
+    offset = end;
+  }
+
+  return null;
+}
+
 const nodeSerializedText = (node: Node): string => {
   if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? '';
   if (!(node instanceof HTMLElement)) return '';
