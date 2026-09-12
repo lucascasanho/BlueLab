@@ -1,0 +1,34 @@
+.media {
+  display: grid;
+  gap: 8px;
+  margin-block: 12px;
+}
+
+.mediaItem {
+  overflow: hidden;
+  border: 1px solid var(--blue2-border, rgba(255, 255, 255, 0.12));
+  border-radius: 12px;
+  background: var(--blue2-raised, rgba(0, 0, 0, 0.08));
+}
+
+.image,
+.video {
+  display: block;
+  width: 100%;
+  max-height: min(520px, 58vh);
+  object-fit: contain;
+  background: #000;
+}
+
+.audio {
+  display: block;
+  width: calc(100% - 24px);
+  margin: 12px;
+}
+
+.fallback {
+  display: block;
+  padding: 12px;
+  color: inherit;
+  text-decoration: underline;
+}
