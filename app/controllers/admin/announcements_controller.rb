@@ -124,9 +124,7 @@ class Admin::AnnouncementsController < Admin::BaseController
     saved = false
 
     Announcement.transaction do
-      unless announcement.save
-        raise ActiveRecord::Rollback
-      end
+      raise ActiveRecord::Rollback unless announcement.save
 
       sync_media_attachments(announcement, media_attachments)
       saved = true
