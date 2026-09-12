@@ -5,6 +5,7 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { dismissAnnouncement } from '@/mastodon/actions/announcements';
 import type { ApiAnnouncementJSON } from '@/mastodon/api_types/announcements';
+import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
 import { AnimateEmojiProvider } from '@/mastodon/components/emoji/context';
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { useAppDispatch } from '@/mastodon/store';
@@ -19,6 +20,60 @@ interface AnnouncementProps {
   announcement: IAnnouncement;
   active?: boolean;
 }
+
+const AnnouncementMedia: FC<{ attachment: ApiMediaAttachmentJSON }> = ({
+  attachment,
+}) => {
+  const label = attachment.description ?? '';
+
+  if (attachment.type === 'audio') {
+    return (
+      <audio
+        className='announcements__media-audio'
+        controls
+        preload='metadata'
+        src={attachment.url}
+      />
+    );
+  }
+
+  if (attachment.type === 'video' || attachment.type === 'gifv') {
+    return (
+      <video
+        className='announcements__media-video'
+        controls={attachment.type === 'video'}
+        autoPlay={attachment.type === 'gifv'}
+        loop={attachment.type === 'gifv'}
+        muted={attachment.type === 'gifv'}
+        playsInline
+        poster={attachment.preview_url || undefined}
+        preload='metadata'
+        aria-label={label || undefined}
+        src={attachment.url}
+      />
+    );
+  }
+
+  if (attachment.type === 'image') {
+    return (
+      <a
+        className='announcements__media-link'
+        href={attachment.url}
+        target='_blank'
+        rel='noopener noreferrer'
+      >
+        <img
+          className='announcements__media-image'
+          src={attachment.preview_url || attachment.url}
+          alt={label}
+          loading='lazy'
+        />
+      </a>
+    );
+  }
+
+  return null;
+};
 
 export const Announcement: FC<AnnouncementProps> = ({
   announcement,
@@ -65,6 +120,14 @@ export const Announcement: FC<AnnouncementProps> = ({
         htmlString={announcement.contentHtml}
         extraEmojis={announcement.emojis}
       />
+
+      {announcement.media_attachments.length > 0 && (
+        <div className='announcements__media'>
+          {announcement.media_attachments.map((attachment) => (
+            <AnnouncementMedia key={attachment.id} attachment={attachment} />
+          ))}
+        </div>
+      )}
 
       <ReactionsBar reactions={announcement.reactions} id={announcement.id} />
 
