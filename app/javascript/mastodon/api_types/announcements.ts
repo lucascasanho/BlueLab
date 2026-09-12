@@ -1,11 +1,13 @@
 // See app/serializers/rest/announcement_serializer.rb
 
 import type { ApiCustomEmojiJSON } from './custom_emoji';
+import type { ApiMediaAttachmentJSON } from './media_attachments';
 import type { ApiMentionJSON, ApiStatusJSON, ApiTagJSON } from './statuses';
 
 export interface ApiAnnouncementJSON {
   id: string;
   content: string;
+  content_type: 'text/plain' | 'text/markdown';
   starts_at: null | string;
   ends_at: null | string;
   all_day: boolean;
@@ -17,6 +19,7 @@ export interface ApiAnnouncementJSON {
   tags: ApiTagJSON[];
   emojis: ApiCustomEmojiJSON[];
   reactions: ApiAnnouncementReactionJSON[];
+  media_attachments: ApiMediaAttachmentJSON[];
 }
 
 export interface ApiAnnouncementReactionJSON {
