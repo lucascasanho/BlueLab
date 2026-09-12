@@ -1,4 +1,3 @@
-import { useCallback, useId, useRef } from 'react';
 import type {
   ChangeEvent,
   ChangeEventHandler,
@@ -7,6 +6,7 @@ import type {
   ReactNode,
   RefObject,
 } from 'react';
+import { useCallback, useId, useRef } from 'react';
 
 import type { Merge } from 'type-fest';
 
@@ -20,10 +20,7 @@ import {
   isBlue2Theme,
 } from './blue2_emoji_field_wrapper';
 import classes from './emoji_text_field.module.scss';
-import type {
-  CommonFieldWrapperProps,
-  InputProps,
-} from './form_field_wrapper';
+import type { CommonFieldWrapperProps, InputProps } from './form_field_wrapper';
 import { FormFieldWrapper } from './form_field_wrapper';
 import { TextArea } from './text_area_field';
 import type { TextAreaProps } from './text_area_field';
