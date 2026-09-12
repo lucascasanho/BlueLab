@@ -205,7 +205,9 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
       const currentValue = input?.value ?? inputValue;
       const rememberedSelection = lastSelectionRef.current;
       const start =
-        rememberedSelection?.start ?? input?.selectionStart ?? currentValue.length;
+        rememberedSelection?.start ??
+        input?.selectionStart ??
+        currentValue.length;
       const end = rememberedSelection?.end ?? input?.selectionEnd ?? start;
       applyEmoji(emoji, start, end);
     },
@@ -311,7 +313,9 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
           if (deletionRange) {
             event.preventDefault();
             event.stopPropagation();
-            const nextValue = `${currentValue.slice(0, deletionRange.start)}${currentValue.slice(deletionRange.end)}`;
+            const nextValue =
+              currentValue.slice(0, deletionRange.start) +
+              currentValue.slice(deletionRange.end);
             const nextSelection = {
               start: deletionRange.start,
               end: deletionRange.start,
