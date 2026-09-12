@@ -6,6 +6,7 @@
 #
 #  id                   :bigint(8)        not null, primary key
 #  all_day              :boolean          default(FALSE), not null
+#  content_type         :string           default("text/plain"), not null
 #  ends_at              :datetime
 #  notification_sent_at :datetime
 #  published            :boolean          default(FALSE), not null
@@ -19,6 +20,9 @@
 #
 
 class Announcement < ApplicationRecord
+  CONTENT_TYPES = %w(text/plain text/markdown).freeze
+  MAX_MEDIA_ATTACHMENTS = 4
+
   scope :unpublished, -> { where(published: false) }
   scope :published, -> { where(published: true) }
   scope :chronological, -> { order(coalesced_chronology_timestamps.asc) }
@@ -26,10 +30,13 @@ class Announcement < ApplicationRecord
 
   has_many :announcement_mutes, dependent: :destroy
   has_many :announcement_reactions, dependent: :destroy
+  has_many :media_attachments, dependent: :destroy, inverse_of: :announcement
 
   validates :text, presence: true
+  validates :content_type, inclusion: { in: CONTENT_TYPES }
   validates :starts_at, presence: true, if: :ends_at?
   validates :ends_at, presence: true, if: :starts_at?
+  validate :validate_media_attachment_count
 
   before_validation :set_published, on: :create
 
@@ -96,6 +103,12 @@ class Announcement < ApplicationRecord
   end
 
   private
+
+  def validate_media_attachment_count
+    return if media_attachments.size <= MAX_MEDIA_ATTACHMENTS
+
+    errors.add(:media_attachments, :too_long, count: MAX_MEDIA_ATTACHMENTS)
+  end
 
   def grouped_ordered_announcement_reactions
     announcement_reactions
