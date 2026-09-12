@@ -112,7 +112,7 @@ run env RAILS_ENV=production bundle exec rails db:migrate
 
 echo
 echo "===== DOMÍNIOS DE E-MAIL DESCARTÁVEIS ====="
-run env RAILS_ENV=production bundle exec tootctl email_domain_blocks sync_disposable
+run env RAILS_ENV=production bin/tootctl email_domain_blocks sync_disposable
 
 echo
 echo "===== ASSETS ====="

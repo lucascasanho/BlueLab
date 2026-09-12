@@ -186,7 +186,7 @@ run env RAILS_ENV=production bundle exec rails db:migrate
 
 if [[ "$TARGET" == "blue" ]]; then
   printf '\n===== DOMÍNIOS DE E-MAIL DESCARTÁVEIS =====\n'
-  run env RAILS_ENV=production bundle exec tootctl email_domain_blocks sync_disposable
+  run env RAILS_ENV=production bin/tootctl email_domain_blocks sync_disposable
 fi
 
 printf '\n===== ASSETS — REBUILD LIMPO =====\n'
