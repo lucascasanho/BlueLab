@@ -11,6 +11,8 @@ import {
 import { RichComposeEditor } from '@/mastodon/features/compose/redesign/rich_editor';
 import { store } from '@/mastodon/store';
 
+import './announcement_editor.scss';
+
 const COPY = {
   en: {
     plainText: 'Plain text',
