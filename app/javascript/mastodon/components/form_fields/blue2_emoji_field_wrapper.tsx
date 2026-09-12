@@ -19,7 +19,10 @@ import classNames from 'classnames';
 import { textAtCursorMatchesToken } from '@/mastodon/components/autosuggest/utils';
 import { AutosuggestEmoji } from '@/mastodon/components/autosuggest_emoji';
 import { Emoji } from '@/mastodon/components/emoji';
-import { LocalCustomEmojiProvider } from '@/mastodon/components/emoji/context';
+import {
+  AnimateEmojiProvider,
+  LocalCustomEmojiProvider,
+} from '@/mastodon/components/emoji/context';
 import { Popover } from '@/mastodon/components/popover';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 
@@ -400,7 +403,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
           {(inputProps) => (
             <>
               {children({ ...inputProps, onChange: handleSourceChange })}
-              <div
+              <AnimateEmojiProvider
                 key={inputValue}
                 ref={editorRef}
                 className={classes.blue2Editor}
@@ -436,7 +439,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
                     <span key={`text-${index}`}>{part.text}</span>
                   ),
                 )}
-              </div>
+              </AnimateEmojiProvider>
               <EmojiPickerButton onPick={handlePickEmoji} disabled={disabled} />
               {counterMax && (
                 <CharacterCounter
