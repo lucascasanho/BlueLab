@@ -13,6 +13,7 @@ class REST::AnnouncementSerializer < ActiveModel::Serializer
   has_many :tags, serializer: REST::StatusSerializer::TagSerializer
   has_many :emojis, serializer: REST::CustomEmojiSerializer
   has_many :reactions, serializer: REST::ReactionSerializer
+  has_many :media_attachments, serializer: REST::MediaAttachmentSerializer
 
   def current_user?
     !current_user.nil?
@@ -27,7 +28,7 @@ class REST::AnnouncementSerializer < ActiveModel::Serializer
   end
 
   def content
-    linkify(object.text)
+    html_aware_format(object.text, true, content_type: object.content_type)
   end
 
   def reactions
