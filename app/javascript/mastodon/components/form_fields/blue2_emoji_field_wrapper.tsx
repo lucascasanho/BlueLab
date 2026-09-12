@@ -1,3 +1,10 @@
+import type {
+  ChangeEvent,
+  FC,
+  KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent as ReactMouseEvent,
+  SyntheticEvent,
+} from 'react';
 import {
   useCallback,
   useId,
@@ -5,13 +12,6 @@ import {
   useMemo,
   useRef,
   useState,
-} from 'react';
-import type {
-  ChangeEvent,
-  FC,
-  KeyboardEvent as ReactKeyboardEvent,
-  MouseEvent as ReactMouseEvent,
-  SyntheticEvent,
 } from 'react';
 
 import classNames from 'classnames';
@@ -78,6 +78,12 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     () => customEmojiTextParts(inputValue, customEmojis),
     [customEmojis, inputValue],
   );
+  const inputLabel =
+    inputElement === null
+      ? undefined
+      : (Array.from(inputElement.labels).at(0)?.textContent?.trim() ??
+        inputElement.getAttribute('aria-label') ??
+        undefined);
 
   const hideSuggestions = useCallback(() => {
     setSuggestionCodes([]);
@@ -338,11 +344,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
                 aria-labelledby={
                   inputElement?.getAttribute('aria-labelledby') ?? undefined
                 }
-                aria-label={
-                  inputElement?.labels.item(0)?.textContent?.trim() ??
-                  inputElement?.getAttribute('aria-label') ??
-                  undefined
-                }
+                aria-label={inputLabel}
                 aria-required={inputProps.required}
                 spellCheck
                 onInput={handleEditorInput}
