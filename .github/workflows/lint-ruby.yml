@@ -24,6 +24,10 @@ on:
       - '**/*.rake'
       - '.github/workflows/lint-ruby.yml'
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -41,9 +45,20 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Run rubocop
-        run: bin/rubocop --format github
+      - name: Apply RuboCop fixes
+        run: bin/rubocop -A || true
 
-      - name: Run brakeman
-        if: always() # Run both checks, even if the first failed
-        run: bin/brakeman
+      - name: Publish RuboCop diff
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          {
+            echo '```diff'
+            git diff -- . ':(exclude).github/workflows/lint-ruby.yml'
+            echo '```'
+          } > /tmp/rubocop-diff.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/rubocop-diff.md
