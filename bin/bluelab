@@ -184,6 +184,11 @@ run yarn install --immutable
 printf '\n===== MIGRATIONS =====\n'
 run env RAILS_ENV=production bundle exec rails db:migrate
 
+if [[ "$TARGET" == "blue" ]]; then
+  printf '\n===== DOMÍNIOS DE E-MAIL DESCARTÁVEIS =====\n'
+  run env RAILS_ENV=production bundle exec tootctl email_domain_blocks sync_disposable
+fi
+
 printf '\n===== ASSETS — REBUILD LIMPO =====\n'
 echo "Removendo assets compilados antigos, incluindo os packs do Vite..."
 run env RAILS_ENV=production NODE_ENV=production bundle exec rails assets:clobber
