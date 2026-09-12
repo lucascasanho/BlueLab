@@ -1,0 +1,48 @@
+pt-BR:
+  admin:
+    action_logs:
+      action_types:
+        create_announcement: Criar comunicado
+        destroy_announcement: Excluir comunicado
+        update_announcement: Editar comunicado
+      actions:
+        create_announcement_html: "%{name} criou o novo comunicado %{target}"
+        destroy_announcement_html: "%{name} excluiu o comunicado %{target}"
+        update_announcement_html: "%{name} atualizou o comunicado %{target}"
+    announcements:
+      back: Voltar aos comunicados
+      destroyed_msg: Comunicado excluído!
+      edit:
+        title: Editar comunicado
+      empty: Sem comunicados.
+      live: Ativo
+      media_errors:
+        invalid: Uma ou mais mídias não são válidas para este comunicado.
+        too_many: Você pode anexar no máximo %{count} mídias a um comunicado.
+      new:
+        create: Criar comunicado
+        title: Novo comunicado
+      publish: Publicar
+      published_msg: Comunicado publicado!
+      scheduled_for: Agendado para %{time}
+      scheduled_msg: Comunicado agendado!
+      title: Comunicados
+      unpublish: Despublicar
+      unpublished_msg: Comunicado despublicado!
+      updated_msg: Comunicado atualizado!
+    roles:
+      permissions:
+        manage_announcements: Gerenciar comunicados
+        manage_announcements_description: Permite aos usuários gerenciar comunicados no servidor
+  announcement:
+    announcement: Comunicado
+  simple_form:
+    labels:
+      announcement:
+        text: Conteúdo do comunicado
+  user_mailer:
+    announcement_published:
+      description: 'A administração de %{domain} publicou um comunicado:'
+      open_media: Abrir mídia
+      subject: Comunicado de serviço
+      title: Comunicado de %{domain}
