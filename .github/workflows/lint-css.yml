@@ -24,6 +24,10 @@ on:
       - '**/*.scss'
       - '.github/workflows/lint-css.yml'
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -36,10 +40,20 @@ jobs:
       - name: Set up Javascript environment
         uses: ./.github/actions/setup-javascript
 
-      - name: Stylelint
+      - name: Apply Stylelint fixes
+        run: yarn fix:css
+
+      - name: Publish Stylelint diff
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if ! yarn lint:css --custom-formatter @csstools/stylelint-formatter-github; then
-            echo 'Stylelint failed; rerunning with the standard formatter for actionable file and line output.'
-            yarn stylelint "**/*.{css,scss}" --formatter string
-            exit 1
+          if git diff --quiet; then
+            exit 0
           fi
+          {
+            echo '```diff'
+            git diff -- . ':(exclude).github/workflows/lint-css.yml'
+            echo '```'
+          } > /tmp/stylelint-diff.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/stylelint-diff.md
