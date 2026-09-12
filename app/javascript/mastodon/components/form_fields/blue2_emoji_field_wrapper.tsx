@@ -150,7 +150,15 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   const applyEmoji = useCallback(
     (emoji: string, start: number, end: number) => {
       const currentValue = inputRef.current?.value ?? inputValue;
-      const insertion = insertEmojiAtSelection(currentValue, emoji, start, end);
+      const insertion = insertEmojiAtSelection(
+        currentValue,
+        emoji,
+        start,
+        end,
+        maxLength,
+      );
+      if (!insertion) return;
+
       const selection = {
         start: insertion.caretPosition,
         end: insertion.caretPosition,
@@ -163,7 +171,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
       hideSuggestions();
       onChange?.(insertion.value);
     },
-    [hideSuggestions, inputRef, inputValue, onChange],
+    [hideSuggestions, inputRef, inputValue, maxLength, onChange],
   );
 
   const selectSuggestion = useCallback(
