@@ -22,10 +22,6 @@ on:
       - '**/*.haml'
       - 'Gemfile*'
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -43,20 +39,6 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Apply haml-lint fixes
-        run: bin/haml-lint --auto-correct || true
-
-      - name: Publish haml-lint diff
-        if: github.event_name == 'pull_request'
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Run haml-lint
         run: |
-          if git diff --quiet; then
-            exit 0
-          fi
-          {
-            echo '```diff'
-            git diff -- . ':(exclude).github/workflows/lint-haml.yml'
-            echo '```'
-          } > /tmp/haml-diff.md
-          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/haml-diff.md
+          bin/haml-lint --reporter github
