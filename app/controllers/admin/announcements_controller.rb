@@ -22,7 +22,8 @@ class Admin::AnnouncementsController < Admin::BaseController
   def create
     authorize :announcement, :create?
 
-    @announcement = Announcement.new(resource_params)
+    @announcement = Announcement.new(resource_attributes)
+    assign_media_attachments
 
     if @announcement.save
       PublishScheduledAnnouncementWorker.perform_async(@announcement.id) if @announcement.published?
@@ -36,7 +37,10 @@ class Admin::AnnouncementsController < Admin::BaseController
   def update
     authorize :announcement, :update?
 
-    if @announcement.update(resource_params)
+    @announcement.assign_attributes(resource_attributes)
+    assign_media_attachments
+
+    if @announcement.save
       PublishScheduledAnnouncementWorker.perform_async(@announcement.id) if @announcement.published?
       log_action :update, @announcement
       redirect_to admin_announcements_path, notice: I18n.t('admin.announcements.updated_msg')
@@ -83,8 +87,22 @@ class Admin::AnnouncementsController < Admin::BaseController
     params.slice(*AnnouncementFilter::KEYS).permit(*AnnouncementFilter::KEYS)
   end
 
+  def resource_attributes
+    resource_params.except(:media_attachment_ids)
+  end
+
   def resource_params
-    params
-      .expect(announcement: [:text, :scheduled_at, :starts_at, :ends_at, :all_day])
+    @resource_params ||= params.expect(
+      announcement: [:text, :scheduled_at, :starts_at, :ends_at, :all_day, :markdown_enabled, media_attachment_ids: []]
+    )
+  end
+
+  def assign_media_attachments
+    requested_ids = Array(resource_params[:media_attachment_ids]).compact_blank
+    allowed_attachments = current_account.media_attachments
+                                         .where(id: requested_ids, status_id: nil, scheduled_status_id: nil)
+                                         .where(announcement_id: [nil, @announcement.id])
+
+    @announcement.media_attachments = allowed_attachments
   end
 end
