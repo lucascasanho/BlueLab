@@ -58,6 +58,7 @@ export const NameModal: FC<BaseConfirmationModalProps> = ({ onClose }) => {
       noFocusButton
     >
       <EmojiTextInputField
+        blue2EmojiEditor
         value={newName}
         onChange={setNewName}
         aria-labelledby={titleId}
