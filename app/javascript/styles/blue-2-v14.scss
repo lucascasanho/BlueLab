@@ -1,0 +1,34 @@
+@use 'blue-2-v12';
+
+body[data-theme='blue-2'].admin {
+  .simple_form .btn {
+    display: inline-flex !important;
+    width: auto !important;
+    max-width: 100% !important;
+    flex: 0 1 auto !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px !important;
+  }
+
+  .simple_form button[name^='reset['],
+  .simple_form button[name='reset_all'] {
+    background: var(--color-bg-error-base) !important;
+    color: var(--color-text-on-error-base) !important;
+    border-color: transparent !important;
+  }
+
+  .simple_form button[name^='reset[']:hover,
+  .simple_form button[name^='reset[']:focus,
+  .simple_form button[name^='reset[']:active,
+  .simple_form button[name='reset_all']:hover,
+  .simple_form button[name='reset_all']:focus,
+  .simple_form button[name='reset_all']:active {
+    background: var(--color-bg-error-base-hover) !important;
+    color: var(--color-text-on-error-base) !important;
+  }
+
+  .content {
+    padding-bottom: calc(32px + env(safe-area-inset-bottom));
+  }
+}
