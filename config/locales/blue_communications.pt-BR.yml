@@ -43,5 +43,6 @@ pt-BR:
   user_mailer:
     announcement_published:
       description: 'A administração de %{domain} publicou um comunicado:'
+      open_media: Abrir mídia
       subject: Comunicado de serviço
       title: Comunicado de %{domain}
