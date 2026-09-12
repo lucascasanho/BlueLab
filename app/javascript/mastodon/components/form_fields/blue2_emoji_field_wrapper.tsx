@@ -16,8 +16,8 @@ import {
 
 import classNames from 'classnames';
 
-import { AutosuggestEmoji } from '@/mastodon/components/autosuggest_emoji';
 import { textAtCursorMatchesToken } from '@/mastodon/components/autosuggest/utils';
+import { AutosuggestEmoji } from '@/mastodon/components/autosuggest_emoji';
 import { Emoji } from '@/mastodon/components/emoji';
 import { LocalCustomEmojiProvider } from '@/mastodon/components/emoji/context';
 import { Popover } from '@/mastodon/components/popover';
@@ -34,11 +34,11 @@ import {
   profileEmojiEditorText,
   setProfileEmojiEditorSelection,
 } from './blue2_emoji_field_utils';
-import classes from './emoji_text_field.module.scss';
 import type {
   EmojiFieldWrapperProps,
   EmojiInputElement,
 } from './emoji_text_field';
+import classes from './emoji_text_field.module.scss';
 import { FormFieldWrapper } from './form_field_wrapper';
 
 export const isBlue2Theme = () =>
@@ -81,7 +81,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   const inputLabel =
     inputElement === null
       ? undefined
-      : (Array.from(inputElement.labels).at(0)?.textContent?.trim() ??
+      : (Array.from(inputElement.labels).at(0)?.textContent.trim() ??
         inputElement.getAttribute('aria-label') ??
         undefined);
 
