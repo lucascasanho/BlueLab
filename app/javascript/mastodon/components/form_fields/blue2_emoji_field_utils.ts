@@ -4,6 +4,8 @@ import { insertEmojiAtPosition } from '@/mastodon/features/emoji/utils';
 const CUSTOM_EMOJI_PATTERN = /:([a-zA-Z0-9_+-]+):/g;
 const WORD_CHARACTER_PATTERN = /[\p{L}\p{N}_+-]/u;
 
+type SerializedPoint = { node: Node; offset: number };
+
 export type CustomEmojiTextPart =
   | { type: 'text'; text: string }
   | { type: 'emoji'; code: string; shortcode: string };
@@ -22,7 +24,7 @@ export function customEmojiTextParts(
     const code = match[1];
     const start = match.index;
 
-    if (!code || start === undefined || !customEmojis[code]) continue;
+    if (!code || !Object.hasOwn(customEmojis, code)) continue;
 
     const shortcode = match[0];
     const end = start + shortcode.length;
@@ -119,7 +121,10 @@ export function profileEmojiEditorSelection(editor: HTMLElement) {
   }
 
   const range = selection.getRangeAt(0);
-  if (!editor.contains(range.startContainer) || !editor.contains(range.endContainer)) {
+  if (
+    !editor.contains(range.startContainer) ||
+    !editor.contains(range.endContainer)
+  ) {
     return { start: text.length, end: text.length };
   }
 
@@ -129,64 +134,65 @@ export function profileEmojiEditorSelection(editor: HTMLElement) {
   };
 }
 
-const pointAtSerializedOffset = (editor: HTMLElement, targetOffset: number) => {
+const pointAtSerializedOffset = (
+  editor: HTMLElement,
+  targetOffset: number,
+): SerializedPoint => {
   let remaining = Math.max(0, targetOffset);
-  let point: { node: Node; offset: number } | null = null;
 
-  const pointAround = (element: HTMLElement, after: boolean) => {
+  const pointAround = (
+    element: HTMLElement,
+    after: boolean,
+  ): SerializedPoint | null => {
     const parent = element.parentNode;
     if (!parent) return null;
-    const index = Array.prototype.indexOf.call(parent.childNodes, element) as number;
+    const index = Array.from(parent.childNodes).indexOf(element);
     return { node: parent, offset: index + (after ? 1 : 0) };
   };
 
-  const visit = (node: Node) => {
-    if (point) return;
-
+  const visit = (node: Node): SerializedPoint | null => {
     if (node.nodeType === Node.TEXT_NODE) {
       const length = node.textContent?.length ?? 0;
-      if (remaining <= length) point = { node, offset: remaining };
-      else remaining -= length;
-      return;
+      if (remaining <= length) return { node, offset: remaining };
+      remaining -= length;
+      return null;
     }
 
-    if (!(node instanceof HTMLElement)) return;
+    if (!(node instanceof HTMLElement)) return null;
 
     const shortcode = node.dataset.emojiShortcode;
     if (shortcode) {
-      if (remaining === 0) point = pointAround(node, false);
-      else if (remaining <= shortcode.length) point = pointAround(node, true);
-      else remaining -= shortcode.length;
-      return;
+      if (remaining === 0) return pointAround(node, false);
+      if (remaining <= shortcode.length) return pointAround(node, true);
+      remaining -= shortcode.length;
+      return null;
     }
 
     if (node.tagName === 'BR') {
-      const around = pointAround(node, remaining === 1);
-      if (remaining <= 1 && around) point = around;
-      else remaining -= 1;
-      return;
+      if (remaining <= 1) return pointAround(node, remaining === 1);
+      remaining -= 1;
+      return null;
     }
 
     if (node.tagName === 'DIV' || node.tagName === 'P') {
-      if (remaining === 0) {
-        point = pointAround(node, false);
-        return;
-      }
+      if (remaining === 0) return pointAround(node, false);
       remaining -= 1;
     }
 
     for (const child of Array.from(node.childNodes)) {
-      visit(child);
-      if (point) return;
+      const point = visit(child);
+      if (point) return point;
     }
+
+    return null;
   };
 
   for (const child of Array.from(editor.childNodes)) {
-    visit(child);
-    if (point) break;
+    const point = visit(child);
+    if (point) return point;
   }
 
-  return point ?? { node: editor, offset: editor.childNodes.length };
+  return { node: editor, offset: editor.childNodes.length };
 };
 
 export function setProfileEmojiEditorSelection(
