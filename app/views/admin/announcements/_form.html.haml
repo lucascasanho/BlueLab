@@ -17,8 +17,16 @@
 
 .fields-group
   %label.form-label= t('simple_form.labels.announcement.text', default: 'Conteúdo')
-  - initial_media = form.object.media_attachments.map { |attachment| { id: attachment.id.to_s, type: attachment.type, url: attachment.file.url(:original), preview_url: attachment.file.styles.key?(:small) ? attachment.file.url(:small) : attachment.file.url(:original), description: attachment.description } }
-  %div{ data: { admin_component: 'announcement_editor', props: { initialText: form.object.text.to_s, initialContentType: form.object.content_type.presence || 'text/markdown', initialMedia: initial_media }.to_json } }
+  - initial_media = form.object.media_attachments.map do |attachment|
+    - { id: attachment.id.to_s,
+        type: attachment.type,
+        url: attachment.file.url(:original),
+        preview_url: attachment.file.styles.key?(:small) ? attachment.file.url(:small) : attachment.file.url(:original),
+        description: attachment.description }
+  - editor_props = { initialText: form.object.text.to_s,
+                     initialContentType: form.object.content_type.presence || 'text/markdown',
+                     initialMedia: initial_media }
+  %div{ data: { admin_component: 'announcement_editor', props: editor_props.to_json } }
 
 - unless form.object.published?
   .fields-group
