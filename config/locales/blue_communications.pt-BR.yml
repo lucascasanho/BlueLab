@@ -1,0 +1,26 @@
+pt-BR:
+  admin:
+    announcements:
+      back: Voltar aos comunicados
+      destroyed_msg: Comunicado excluído!
+      edit:
+        title: Editar comunicado
+      empty: Sem comunicados.
+      live: Ativo
+      new:
+        create: Criar comunicado
+        title: Novo comunicado
+      publish: Publicar
+      published_msg: Comunicado publicado!
+      scheduled_for: Agendado para %{time}
+      scheduled_msg: Comunicado agendado!
+      title: Comunicados
+      unpublish: Despublicar
+      unpublished_msg: Comunicado despublicado!
+      updated_msg: Comunicado atualizado!
+    roles:
+      permissions:
+        manage_announcements: Gerenciar comunicados
+        manage_announcements_description: Permite aos usuários gerenciar comunicados no servidor
+  announcement:
+    announcement: Comunicado
