@@ -12,7 +12,7 @@ class Admin::AnnouncementsController < Admin::BaseController
   def new
     authorize :announcement, :create?
 
-    @announcement = Announcement.new
+    @announcement = Announcement.new(content_type: 'text/markdown')
   end
 
   def edit
@@ -24,7 +24,7 @@ class Admin::AnnouncementsController < Admin::BaseController
 
     @announcement = Announcement.new(resource_params)
 
-    if @announcement.save
+    if save_with_media(@announcement)
       PublishScheduledAnnouncementWorker.perform_async(@announcement.id) if @announcement.published?
       log_action :create, @announcement
       redirect_to admin_announcements_path, notice: @announcement.published? ? I18n.t('admin.announcements.published_msg') : I18n.t('admin.announcements.scheduled_msg')
@@ -36,7 +36,9 @@ class Admin::AnnouncementsController < Admin::BaseController
   def update
     authorize :announcement, :update?
 
-    if @announcement.update(resource_params)
+    @announcement.assign_attributes(resource_params)
+
+    if save_with_media(@announcement)
       PublishScheduledAnnouncementWorker.perform_async(@announcement.id) if @announcement.published?
       log_action :update, @announcement
       redirect_to admin_announcements_path, notice: I18n.t('admin.announcements.updated_msg')
@@ -85,6 +87,29 @@ class Admin::AnnouncementsController < Admin::BaseController
 
   def resource_params
     params
-      .expect(announcement: [:text, :scheduled_at, :starts_at, :ends_at, :all_day])
+      .expect(announcement: [:text, :content_type, :scheduled_at, :starts_at, :ends_at, :all_day])
+  end
+
+  def requested_media_attachment_ids
+    Array(params.dig(:announcement, :media_attachment_ids)).filter_map do |id|
+      Integer(id, exception: false)
+    end.uniq
+  end
+
+  def save_with_media(announcement)
+    return false unless announcement.save
+
+    attach_requested_media(announcement)
+    true
+  end
+
+  def attach_requested_media(announcement)
+    requested_ids = requested_media_attachment_ids
+    owned_media = current_user.account.media_attachments.where(id: requested_ids)
+    allowed_ids = owned_media.where(status_id: nil, scheduled_status_id: nil).where(announcement_id: [nil, announcement.id]).pluck(:id)
+
+    announcement.media_attachments.where.not(id: allowed_ids).update_all(announcement_id: nil)
+    owned_media.where(id: allowed_ids).update_all(announcement_id: announcement.id)
+    announcement.media_attachments.reset
   end
 end
