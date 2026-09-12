@@ -152,12 +152,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   const applyEmoji = useCallback(
     (emoji: string, start: number, end: number) => {
       const currentValue = inputRef.current?.value ?? inputValue;
-      const insertion = insertEmojiAtSelection(
-        currentValue,
-        emoji,
-        start,
-        end,
-      );
+      const insertion = insertEmojiAtSelection(currentValue, emoji, start, end);
       const selection = {
         start: insertion.caretPosition,
         end: insertion.caretPosition,
@@ -325,7 +320,10 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     >
       <LocalCustomEmojiProvider>
         <FormFieldWrapper
-          className={classNames(classes.fieldWrapper, classes.blue2FieldWrapper)}
+          className={classNames(
+            classes.fieldWrapper,
+            classes.blue2FieldWrapper,
+          )}
           describedById={counterId}
           {...otherProps}
         >
@@ -368,10 +366,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
                   ),
                 )}
               </div>
-              <EmojiPickerButton
-                onPick={handlePickEmoji}
-                disabled={disabled}
-              />
+              <EmojiPickerButton onPick={handlePickEmoji} disabled={disabled} />
               {counterMax && (
                 <CharacterCounter
                   currentString={inputValue}
@@ -412,9 +407,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
                     )}
                     onMouseDown={handleSuggestionMouseDown}
                   >
-                    <AutosuggestEmoji
-                      emoji={{ id: shortcode, custom: true }}
-                    />
+                    <AutosuggestEmoji emoji={{ id: shortcode, custom: true }} />
                   </div>
                 ))}
               </div>
