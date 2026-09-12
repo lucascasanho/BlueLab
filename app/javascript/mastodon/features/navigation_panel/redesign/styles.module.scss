@@ -20,6 +20,9 @@
 
   &[data-mode='slide-out'] {
     --navigation-background-color: var(--color-bg-primary);
+
+    overflow: visible;
+    isolation: isolate;
   }
 }
 
@@ -31,16 +34,19 @@
 .footer {
   position: sticky;
   bottom: 0;
+  z-index: 2;
   margin-top: auto;
   padding: var(--space-xl);
   padding-top: var(--space-2xs);
   background-color: var(--navigation-background-color);
+  overflow: visible;
 
   &::before {
     @include mixins.scroll-gradient(bottom, var(--navigation-background-color));
 
     opacity: 0;
     transition: opacity ease 250ms;
+    pointer-events: none;
   }
 
   &[data-stuck='true']::before {
