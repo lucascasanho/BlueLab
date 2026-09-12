@@ -108,7 +108,8 @@ export function customEmojiDeletionRange(
   let offset = 0;
 
   for (const part of customEmojiTextParts(text, customEmojis)) {
-    const length = part.type === 'emoji' ? part.shortcode.length : part.text.length;
+    const length =
+      part.type === 'emoji' ? part.shortcode.length : part.text.length;
     const start = offset;
     const end = start + length;
 
