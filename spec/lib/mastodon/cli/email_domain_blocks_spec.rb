@@ -160,4 +160,35 @@ RSpec.describe Mastodon::CLI::EmailDomainBlocks do
       end
     end
   end
+
+  describe '#sync_disposable' do
+    subject { cli.invoke(:sync_disposable, [], {}) }
+
+    before do
+      allow(cli).to receive(:fetch_source).and_return(
+        "valid-disposable.example\ninvalid domain\n",
+        '["another-disposable.example", "valid-disposable.example"]',
+        "third-disposable.example\n",
+        "fourth-disposable.example\n"
+      )
+    end
+
+    it 'imports valid domains from all sources and leaves existing blocks unchanged' do
+      Fabricate(:email_domain_block, domain: 'valid-disposable.example', allow_with_approval: true)
+
+      expect { subject }
+        .to output_results('Processed 4 disposable e-mail domains; added 3 new blocks.')
+        .and change(EmailDomainBlock, :count).by(3)
+
+      expect(EmailDomainBlock.find_by(domain: 'valid-disposable.example')).to be_allow_with_approval
+      expect(EmailDomainBlock.where(domain: %w[another-disposable.example third-disposable.example fourth-disposable.example], allow_with_approval: false).count).to eq(3)
+    end
+
+    it 'fails when every source is unavailable' do
+      allow(cli).to receive(:fetch_source).and_raise(Net::OpenTimeout)
+
+      expect { subject }.to raise_error(Thor::Error, 'Could not fetch any disposable e-mail domain source')
+    end
+  end
+
 end

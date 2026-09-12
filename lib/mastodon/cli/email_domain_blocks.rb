@@ -1,10 +1,22 @@
 # frozen_string_literal: true
 
 require 'concurrent'
+require 'json'
+require 'net/http'
+require 'set'
 require_relative 'base'
 
 module Mastodon::CLI
   class EmailDomainBlocks < Base
+    DISPOSABLE_EMAIL_SOURCES = {
+      'eramitgupta/disposable-email' => 'https://raw.githubusercontent.com/eramitgupta/disposable-email/main/disposable_email.txt',
+      'email-check-app/disposable-email-providers' => 'https://raw.githubusercontent.com/email-check-app/disposable-email-providers/master/disposable-email-providers.json',
+      'disposable-email-domains/disposable-email-domains' => 'https://raw.githubusercontent.com/disposable-email-domains/disposable-email-domains/main/disposable_email_blocklist.conf',
+      'sefinek/temp-email-domains' => 'https://raw.githubusercontent.com/sefinek/temp-email-domains/main/blacklist.txt',
+    }.freeze
+
+    DOMAIN_PATTERN = /\A(?=.{1,253}\z)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}\z/i
+
     option :only_blocked, type: :boolean, default: false
     option :only_with_approval, type: :boolean, default: false
     desc 'list', 'List blocked e-mail domains'
@@ -126,7 +138,67 @@ module Mastodon::CLI
       say("Removed #{processed}, skipped #{skipped}, failed #{failed}", color(processed, failed))
     end
 
+    desc 'sync_disposable', 'Import disposable e-mail domains from the configured public sources'
+    long_desc <<-LONG_DESC
+      Downloads the disposable e-mail domain lists maintained by
+      eramitgupta/disposable-email, email-check-app/disposable-email-providers,
+      disposable-email-domains/disposable-email-domains, and
+      sefinek/temp-email-domains. New valid domains are added as blocked
+      domains. Existing blocks are preserved, including blocks created manually.
+    LONG_DESC
+    def sync_disposable
+      source_bodies = DISPOSABLE_EMAIL_SOURCES.filter_map do |name, url|
+        [name, fetch_source(url)]
+      rescue StandardError => e
+        say("Could not fetch #{name}: #{e.message}", :yellow)
+        nil
+      end
+
+      fail_with_message 'Could not fetch any disposable e-mail domain source' if source_bodies.empty?
+
+      domains = source_bodies.flat_map do |name, body|
+        parse_domains(body, name)
+      rescue JSON::ParserError => e
+        say("Could not parse #{name}: #{e.message}", :yellow)
+        []
+      end.to_set
+
+      fail_with_message 'The disposable e-mail domain sources contained no valid domains' if domains.empty?
+
+      now = Time.current
+      added = domains.each_slice(1_000).sum do |batch|
+        result = EmailDomainBlock.insert_all(
+          batch.map { |domain| { domain: domain, allow_with_approval: false, created_at: now, updated_at: now } },
+          unique_by: :index_email_domain_blocks_on_domain,
+          returning: %w[id]
+        )
+        result.rows.count
+      end
+
+      say("Processed #{domains.size} disposable e-mail domains; added #{added} new blocks.", :green)
+    end
+
     private
+
+    def fetch_source(url)
+      uri = URI(url)
+      response = Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: 10, read_timeout: 60) do |http|
+        http.get(uri.request_uri, { 'User-Agent' => 'BlueLab disposable-email sync' })
+      end
+
+      raise "HTTP #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+
+      response.body
+    end
+
+    def parse_domains(body, source_name)
+      entries = source_name == 'email-check-app/disposable-email-providers' ? JSON.parse(body) : body.lines
+
+      entries.filter_map do |entry|
+        domain = entry.to_s.strip.downcase.delete_suffix('.')
+        domain if DOMAIN_PATTERN.match?(domain)
+      end
+    end
 
     def color(processed, failed)
       if !processed.zero? && failed.zero?
