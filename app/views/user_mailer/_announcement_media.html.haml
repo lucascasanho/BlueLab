@@ -1,0 +1,21 @@
+- media = REST::MediaAttachmentSerializer.new(attachment).serializable_hash
+- media_url = media[:url]
+- preview_url = media[:preview_url]
+- alt_text = attachment.description.presence || ''
+
+%table.email-w-full{ cellspacing: 0, cellpadding: 0, border: 0, role: 'presentation', style: 'margin-top: 16px;' }
+  %tr
+    %td
+      - if attachment.image?
+        = link_to media_url, target: '_blank', rel: 'noopener noreferrer' do
+          = image_tag media_url, alt: alt_text, style: 'display:block;max-width:100%;height:auto;border-radius:8px;'
+      - elsif attachment.gifv? || attachment.video?
+        - if preview_url.present?
+          = link_to media_url, target: '_blank', rel: 'noopener noreferrer' do
+            = image_tag preview_url, alt: alt_text.presence || t('admin.announcements.composer.video'), style: 'display:block;max-width:100%;height:auto;border-radius:8px;'
+        %p{ style: 'margin:8px 0 0;' }
+          = link_to t('admin.announcements.composer.open_media'), media_url, target: '_blank', rel: 'noopener noreferrer'
+      - elsif attachment.audio?
+        %p{ style: 'margin:0;' }= t('admin.announcements.composer.audio')
+        %p{ style: 'margin:8px 0 0;' }
+          = link_to t('admin.announcements.composer.open_media'), media_url, target: '_blank', rel: 'noopener noreferrer'
