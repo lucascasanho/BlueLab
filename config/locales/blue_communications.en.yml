@@ -43,5 +43,6 @@ en:
   user_mailer:
     announcement_published:
       description: 'The administrators of %{domain} published a notice:'
+      open_media: Open media
       subject: Service notice
       title: Notice from %{domain}
