@@ -6,7 +6,9 @@ import {
   customEmojiTextParts,
   insertEmojiAtSelection,
   matchingCustomEmojiShortcodes,
+  profileEmojiEditorSelection,
   profileEmojiEditorText,
+  setProfileEmojiEditorSelection,
 } from './blue2_emoji_field_utils';
 
 const customEmojis: ExtraCustomEmojiMap = {
@@ -122,5 +124,45 @@ describe('Blue 2 emoji profile fields', () => {
       'Hi <span data-emoji-shortcode=":party:"></span><div>there</div>';
 
     expect(profileEmojiEditorText(editor)).toBe('Hi :party:\nthere');
+  });
+
+  test('round-trips the caret around a rendered custom emoji token', () => {
+    const editor = document.createElement('div');
+    editor.innerHTML =
+      '<span>hello </span><span data-emoji-shortcode=":party:"></span><span> world</span>';
+    document.body.append(editor);
+
+    const afterEmoji = 'hello :party:'.length;
+    setProfileEmojiEditorSelection(editor, afterEmoji);
+    expect(profileEmojiEditorSelection(editor)).toEqual({
+      start: afterEmoji,
+      end: afterEmoji,
+    });
+
+    const insideTrailingText = afterEmoji + 3;
+    setProfileEmojiEditorSelection(editor, insideTrailingText);
+    expect(profileEmojiEditorSelection(editor)).toEqual({
+      start: insideTrailingText,
+      end: insideTrailingText,
+    });
+
+    editor.remove();
+    window.getSelection()?.removeAllRanges();
+  });
+
+  test('round-trips the caret across browser block line breaks', () => {
+    const editor = document.createElement('div');
+    editor.innerHTML = '<div>one</div><div>two</div>';
+    document.body.append(editor);
+
+    const secondLineStart = 'one\n'.length;
+    setProfileEmojiEditorSelection(editor, secondLineStart);
+    expect(profileEmojiEditorSelection(editor)).toEqual({
+      start: secondLineStart,
+      end: secondLineStart,
+    });
+
+    editor.remove();
+    window.getSelection()?.removeAllRanges();
   });
 });
