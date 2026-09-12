@@ -19,8 +19,5 @@ jobs:
       - name: Set up Javascript environment
         uses: ./.github/actions/setup-javascript
 
-      - name: Diagnose Blue 2 formatting
-        run: |
-          yarn oxfmt app/javascript/mastodon/components/form_fields/blue2_emoji_field_wrapper.tsx
-          git diff -- app/javascript/mastodon/components/form_fields/blue2_emoji_field_wrapper.tsx
-          exit 1
+      - name: Check formatting
+        run: yarn format:check
