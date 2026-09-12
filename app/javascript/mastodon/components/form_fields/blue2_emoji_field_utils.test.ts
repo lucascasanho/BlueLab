@@ -6,6 +6,7 @@ import {
   customEmojiTextParts,
   insertEmojiAtSelection,
   matchingCustomEmojiShortcodes,
+  profileEmojiEditorText,
 } from './blue2_emoji_field_utils';
 
 const customEmojis: ExtraCustomEmojiMap = {
@@ -89,5 +90,37 @@ describe('Blue 2 emoji profile fields', () => {
       value: 'hello :party: ',
       caretPosition: 'hello :party: '.length,
     });
+  });
+
+  test('does not insert an emoji beyond the field maximum length', () => {
+    expect(insertEmojiAtSelection('12345', ':party:', 5, 5, 10)).toBeNull();
+
+    expect(insertEmojiAtSelection('hello world', ':party:', 6, 11, 20)).toEqual(
+      {
+        value: 'hello :party: ',
+        caretPosition: 'hello :party: '.length,
+      },
+    );
+  });
+
+  test('serializes browser contenteditable line blocks without duplication', () => {
+    const editor = document.createElement('div');
+
+    editor.innerHTML = 'hello<div><br></div>';
+    expect(profileEmojiEditorText(editor)).toBe('hello\n');
+
+    editor.innerHTML = '<div>one</div><div>two</div>';
+    expect(profileEmojiEditorText(editor)).toBe('one\ntwo');
+
+    editor.innerHTML = '<div>one</div><div><br></div><div>three</div>';
+    expect(profileEmojiEditorText(editor)).toBe('one\n\nthree');
+  });
+
+  test('serializes custom emoji tokens together with block line breaks', () => {
+    const editor = document.createElement('div');
+    editor.innerHTML =
+      'Hi <span data-emoji-shortcode=":party:"></span><div>there</div>';
+
+    expect(profileEmojiEditorText(editor)).toBe('Hi :party:\nthere');
   });
 });
