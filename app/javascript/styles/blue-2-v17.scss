@@ -1,0 +1,14 @@
+@use 'blue-2-v16';
+
+body[data-theme='blue-2'].admin {
+  .simple_form .input.select .label_input__wrapper,
+  .simple_form .input.select .select-wrapper {
+    width: min(100%, 560px);
+    max-width: 560px;
+  }
+
+  .simple_form .input.select select {
+    width: 100%;
+    max-width: 560px;
+  }
+}
