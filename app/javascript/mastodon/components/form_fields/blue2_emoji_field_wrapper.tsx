@@ -79,11 +79,9 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     [customEmojis, inputValue],
   );
   const inputLabel =
-    inputElement === null
-      ? undefined
-      : (Array.from(inputElement.labels).at(0)?.textContent.trim() ??
-        inputElement.getAttribute('aria-label') ??
-        undefined);
+    inputElement?.labels?.[0]?.textContent.trim() ??
+    inputElement?.getAttribute('aria-label') ??
+    undefined;
 
   const hideSuggestions = useCallback(() => {
     setSuggestionCodes([]);
