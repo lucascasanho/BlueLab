@@ -6,6 +6,7 @@
 #
 #  id                   :bigint(8)        not null, primary key
 #  all_day              :boolean          default(FALSE), not null
+#  content_type         :string           default("text/plain"), not null
 #  ends_at              :datetime
 #  notification_sent_at :datetime
 #  published            :boolean          default(FALSE), not null
@@ -19,6 +20,8 @@
 #
 
 class Announcement < ApplicationRecord
+  MAX_MEDIA_ATTACHMENTS = 4
+
   scope :unpublished, -> { where(published: false) }
   scope :published, -> { where(published: true) }
   scope :chronological, -> { order(coalesced_chronology_timestamps.asc) }
@@ -26,8 +29,10 @@ class Announcement < ApplicationRecord
 
   has_many :announcement_mutes, dependent: :destroy
   has_many :announcement_reactions, dependent: :destroy
+  has_many :media_attachments, -> { reorder(:id) }, dependent: :nullify, inverse_of: :announcement
 
   validates :text, presence: true
+  validates :content_type, inclusion: { in: %w(text/plain text/markdown) }
   validates :starts_at, presence: true, if: :ends_at?
   validates :ends_at, presence: true, if: :starts_at?
 

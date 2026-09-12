@@ -1,0 +1,11 @@
+# frozen_string_literal: true
+
+class AddRichContentToAnnouncements < ActiveRecord::Migration[8.0]
+  disable_ddl_transaction!
+
+  def change
+    add_column :announcements, :content_type, :string, default: 'text/plain', null: false
+    add_reference :media_attachments, :announcement, index: false
+    add_index :media_attachments, :announcement_id, algorithm: :concurrently
+  end
+end
