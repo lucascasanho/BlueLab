@@ -20,6 +20,8 @@
 #
 
 class Announcement < ApplicationRecord
+  MAX_MEDIA_ATTACHMENTS = 4
+
   scope :unpublished, -> { where(published: false) }
   scope :published, -> { where(published: true) }
   scope :chronological, -> { order(coalesced_chronology_timestamps.asc) }
