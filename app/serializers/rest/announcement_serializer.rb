@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 class REST::AnnouncementSerializer < ActiveModel::Serializer
-  include FormattingHelper
-
   attributes :id, :content, :starts_at, :ends_at, :all_day,
-             :published_at, :updated_at
+             :published_at, :updated_at, :markdown_enabled
 
   attribute :read, if: :current_user?
 
@@ -13,6 +11,7 @@ class REST::AnnouncementSerializer < ActiveModel::Serializer
   has_many :tags, serializer: REST::StatusSerializer::TagSerializer
   has_many :emojis, serializer: REST::CustomEmojiSerializer
   has_many :reactions, serializer: REST::ReactionSerializer
+  has_many :media_attachments, serializer: REST::MediaAttachmentSerializer
 
   def current_user?
     !current_user.nil?
@@ -27,7 +26,7 @@ class REST::AnnouncementSerializer < ActiveModel::Serializer
   end
 
   def content
-    linkify(object.text)
+    object.formatted_content
   end
 
   def reactions
