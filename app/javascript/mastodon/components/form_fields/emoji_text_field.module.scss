@@ -44,6 +44,11 @@
     color: transparent;
   }
 
+  [data-input]:has(.blue2Editor:focus) > input,
+  [data-input]:has(.blue2Editor:focus) > textarea {
+    outline-color: var(--color-border-brand);
+  }
+
   .blue2Editor {
     position: absolute;
     z-index: 1;
