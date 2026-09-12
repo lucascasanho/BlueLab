@@ -1,3 +1,7 @@
+- editor_media = form.object.media_attachments.map do |media|
+  - preview_url = media.audio? ? nil : full_asset_url(media.file.url(:small))
+  - { id: media.id.to_s, type: media.type, url: full_asset_url(media.file.url), preview_url: preview_url, description: media.description }
+
 .fields-group
   = form.input :starts_at,
                html5: true,
@@ -17,7 +21,25 @@
 
 .fields-group
   = form.input :text,
+               input_html: { rows: 10 },
                wrapper: :with_block_label
+  = form.hidden_field :content_type, value: form.object.content_type.presence || 'text/markdown', id: 'announcement_content_type'
+
+  .input.with_block_label
+    = label_tag :announcement_media_files, t('admin.announcements.media', default: 'Media')
+    = file_field_tag 'announcement[media_files][]',
+                     accept: 'image/*,video/*,audio/*,.gif',
+                     id: 'announcement_media_files',
+                     multiple: true
+    %span.hint= t('admin.announcements.media_hint', default: 'Attach up to 4 images, animated GIFs, videos, or audio files.')
+
+  = react_admin_component :communication_editor,
+                          content_type_id: 'announcement_content_type',
+                          custom_emojis: @announcement_editor_emojis,
+                          existing_media: editor_media,
+                          file_input_id: 'announcement_media_files',
+                          max_media: Announcement::MAX_MEDIA_ATTACHMENTS,
+                          textarea_id: 'announcement_text'
 
 - unless form.object.published?
   .fields-group
