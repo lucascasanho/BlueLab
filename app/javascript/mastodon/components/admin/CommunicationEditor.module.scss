@@ -1,0 +1,250 @@
+.root {
+  margin-top: 10px;
+  border: 1px solid var(--blue2-border, #3a3b43);
+  border-radius: 12px;
+  background: var(--blue2-bg, #191b22);
+  color: var(--blue2-text, #f5f5f7);
+  overflow: visible;
+}
+
+.hiddenFallback {
+  display: none !important;
+}
+
+.modeRow,
+.toolbar,
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+}
+
+.modeRow {
+  border-bottom: 1px solid var(--blue2-border, #3a3b43);
+}
+
+.modeButton,
+.activeMode,
+.toolbar button,
+.actionButton {
+  min-height: 34px;
+  border: 0;
+  border-radius: 8px;
+  padding: 7px 10px;
+  background: transparent;
+  color: var(--blue2-muted, #a7a9b3);
+  cursor: pointer;
+  font: inherit;
+}
+
+.modeButton:hover,
+.activeMode,
+.toolbar button:hover,
+.toolbar button:focus-visible,
+.actionButton:hover,
+.actionButton:focus-visible {
+  background: var(--blue2-hover, #2a2d36);
+  color: var(--blue2-text, #f5f5f7);
+  outline: none;
+}
+
+.activeMode {
+  color: var(--blue2-blue, #6364ff);
+  font-weight: 700;
+}
+
+.toolbar {
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--blue2-border, #3a3b43);
+}
+
+.toolbar button,
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.toolbar svg,
+.actionButton svg {
+  width: 19px;
+  height: 19px;
+}
+
+.editorShell {
+  position: relative;
+}
+
+.editor {
+  box-sizing: border-box;
+  min-height: 180px;
+  max-height: 520px;
+  padding: 14px;
+  overflow-y: auto;
+  color: var(--blue2-text, #f5f5f7);
+  font-size: 15px;
+  line-height: 1.55;
+  outline: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--blue2-muted, #8f919b);
+  pointer-events: none;
+}
+
+.editor img {
+  width: 1.25em;
+  height: 1.25em;
+  vertical-align: -0.25em;
+  object-fit: contain;
+}
+
+.editor blockquote {
+  margin-inline: 0;
+  padding-inline-start: 12px;
+  border-inline-start: 3px solid var(--blue2-blue, #6364ff);
+}
+
+.editor pre,
+.editor code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.editor pre {
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--blue2-search, #111318);
+  white-space: pre-wrap;
+}
+
+.actions {
+  border-top: 1px solid var(--blue2-border, #3a3b43);
+}
+
+.actionButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pickerAnchor {
+  position: relative;
+}
+
+.picker {
+  position: absolute;
+  z-index: 20;
+  inset-inline-start: 0;
+  inset-block-end: calc(100% + 8px);
+  box-shadow: 0 12px 36px rgb(0 0 0 / 35%);
+}
+
+.suggestions {
+  position: absolute;
+  z-index: 15;
+  inset-inline-start: 12px;
+  inset-block-end: 8px;
+  width: min(360px, calc(100% - 24px));
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--blue2-border, #3a3b43);
+  border-radius: 10px;
+  background: var(--blue2-surface-raised, #20232b);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 30%);
+}
+
+.suggestions button {
+  width: 100%;
+  border: 0;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--blue2-text, #f5f5f7);
+  text-align: start;
+  cursor: pointer;
+}
+
+.suggestions button:hover,
+.suggestions button:focus-visible {
+  background: var(--blue2-hover, #2a2d36);
+  outline: none;
+}
+
+.suggestions img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.mediaGrid {
+  padding: 0 10px 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.mediaCard {
+  min-width: 0;
+  border: 1px solid var(--blue2-border, #3a3b43);
+  border-radius: 10px;
+  padding: 8px;
+  background: var(--blue2-surface-raised, #20232b);
+}
+
+.mediaPreview {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  border-radius: 7px;
+  object-fit: contain;
+  background: #000;
+}
+
+.mediaCard label,
+.fileName {
+  margin-top: 7px;
+  display: block;
+  color: var(--blue2-muted, #a7a9b3);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.mediaCard label {
+  cursor: pointer;
+}
+
+.mediaCard input {
+  margin-inline-end: 6px;
+}
+
+.removed {
+  opacity: 0.5;
+}
+
+.error {
+  margin: 0 10px 10px;
+  color: #df405a;
+  font-size: 13px;
+}
+
+@media (width <= 600px) {
+  .picker {
+    position: fixed;
+    inset: auto 8px max(8px, env(safe-area-inset-bottom));
+  }
+
+  .picker :global(.emoji-mart) {
+    width: calc(100vw - 16px) !important;
+    max-height: 70dvh;
+  }
+
+  .actionButton span {
+    display: none;
+  }
+}
