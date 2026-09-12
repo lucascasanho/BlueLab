@@ -5,10 +5,12 @@ import { FormattedDate, FormattedMessage } from 'react-intl';
 
 import { dismissAnnouncement } from '@/mastodon/actions/announcements';
 import type { ApiAnnouncementJSON } from '@/mastodon/api_types/announcements';
+import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
 import { AnimateEmojiProvider } from '@/mastodon/components/emoji/context';
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { useAppDispatch } from '@/mastodon/store';
 
+import styles from './announcement_media.module.scss';
 import { ReactionsBar } from './reactions';
 
 export interface IAnnouncement extends ApiAnnouncementJSON {
@@ -66,10 +68,101 @@ export const Announcement: FC<AnnouncementProps> = ({
         extraEmojis={announcement.emojis}
       />
 
+      <MediaAttachments media={announcement.media_attachments} />
+
       <ReactionsBar reactions={announcement.reactions} id={announcement.id} />
 
       {!isVisuallyRead && <span className='announcements__unread' />}
     </AnimateEmojiProvider>
+  );
+};
+
+const MediaAttachments: FC<{ media: ApiMediaAttachmentJSON[] }> = ({ media }) => {
+  if (media.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className={styles.media}>
+      {media.map((attachment) => (
+        <div className={styles.mediaItem} key={attachment.id}>
+          <MediaAttachment attachment={attachment} />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const MediaAttachment: FC<{ attachment: ApiMediaAttachmentJSON }> = ({
+  attachment,
+}) => {
+  const label = attachment.description ?? '';
+
+  if (attachment.type === 'image') {
+    return (
+      <a href={attachment.url} target='_blank' rel='noopener noreferrer'>
+        <img
+          className={styles.image}
+          src={attachment.url}
+          alt={label}
+          loading='lazy'
+        />
+      </a>
+    );
+  }
+
+  if (attachment.type === 'gifv') {
+    return (
+      <video
+        className={styles.video}
+        src={attachment.url}
+        poster={attachment.preview_url}
+        aria-label={label || undefined}
+        autoPlay
+        loop
+        muted
+        playsInline
+        controls
+        preload='metadata'
+      />
+    );
+  }
+
+  if (attachment.type === 'video') {
+    return (
+      <video
+        className={styles.video}
+        src={attachment.url}
+        poster={attachment.preview_url}
+        aria-label={label || undefined}
+        controls
+        playsInline
+        preload='metadata'
+      />
+    );
+  }
+
+  if (attachment.type === 'audio') {
+    return (
+      <audio
+        className={styles.audio}
+        src={attachment.url}
+        aria-label={label || undefined}
+        controls
+        preload='metadata'
+      />
+    );
+  }
+
+  return (
+    <a
+      className={styles.fallback}
+      href={attachment.url}
+      target='_blank'
+      rel='noopener noreferrer'
+    >
+      {label || attachment.url}
+    </a>
   );
 };
 
