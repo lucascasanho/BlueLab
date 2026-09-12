@@ -279,6 +279,7 @@ export const EditFieldModal = forwardRef<
       />
 
       <EmojiTextInputField
+        blue2EmojiEditor
         name='value'
         value={newValue}
         onChange={setNewValue}
