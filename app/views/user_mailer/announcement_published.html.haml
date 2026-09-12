@@ -10,7 +10,7 @@
           %td.email-inner-card-td.email-prose
             %p= t('user_mailer.announcement_published.description', domain: site_hostname)
             - rendered_communication = AdvancedTextFormatter.new(@announcement.text, content_type: @announcement.content_type, local: true).to_s
-            = prerender_custom_emojis(rendered_communication, @announcement.emojis)
+            = prerender_custom_emojis(rendered_communication, @announcement.emojis, style: FormattingHelper::SYNDICATED_EMOJI_STYLES)
 
             - @announcement.media_attachments.each do |media|
               - media_url = full_asset_url(media.file.url(:original))
@@ -24,4 +24,4 @@
                     = link_to media_url do
                       = image_tag preview_url, alt: media.description.presence || '', style: 'max-width: 100%; height: auto; border-radius: 8px;'
                   %br
-                  = link_to(media.description.presence || media.file_file_name || 'Abrir mídia', media_url)
+                  = link_to(media.description.presence || t('user_mailer.announcement_published.open_media'), media_url)
