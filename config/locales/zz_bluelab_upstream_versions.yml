@@ -1,0 +1,49 @@
+---
+en:
+  admin:
+    software_updates:
+      upstream:
+        alert:
+          one: 1 official Mastodon version to review
+          other: "%{count} official Mastodon versions to review"
+        batch_meta: "%{source} · detected %{date}"
+        check_error: 'The latest official Mastodon version check failed:'
+        compatibility: "Installed version: %{installed}. Available official version: %{available}. This monitor only reports the release; it never merges or deploys upstream code."
+        description: "Only official Mastodon version changes from %{repository} are shown here. Ordinary commits are ignored. Pre-releases are detected from the version declared on the official development channel, while stable versions come from published GitHub Releases."
+        empty: No newer official Mastodon version has been detected.
+        mark_reviewed: Mark as reviewed
+        published_at: "published %{date}"
+        release_badge:
+          prerelease: Official pre-release
+          stable: Stable release
+        reviewed: Official Mastodon version marked as reviewed.
+        reviewed_badge: Reviewed
+        source:
+          prerelease: "Official %{channel} channel"
+          stable: Official GitHub Release
+        title: Official Mastodon versions
+        view_official: View official version
+pt-BR:
+  admin:
+    software_updates:
+      upstream:
+        alert:
+          one: 1 versão oficial do Mastodon para analisar
+          other: "%{count} versões oficiais do Mastodon para analisar"
+        batch_meta: "%{source} · detectado em %{date}"
+        check_error: 'A última consulta de versões oficiais do Mastodon falhou:'
+        compatibility: "Versão instalada: %{installed}. Versão oficial disponível: %{available}. Este monitor apenas informa o lançamento; ele nunca integra nem publica código do upstream."
+        description: "Aqui aparecem apenas mudanças oficiais de versão do Mastodon em %{repository}. Commits comuns são ignorados. Pré-lançamentos são detectados pela versão declarada no canal oficial de desenvolvimento, enquanto versões estáveis vêm de GitHub Releases publicados."
+        empty: Nenhuma versão oficial mais nova do Mastodon foi detectada.
+        mark_reviewed: Marcar como analisado
+        published_at: "publicado em %{date}"
+        release_badge:
+          prerelease: Pré-lançamento oficial
+          stable: Versão estável
+        reviewed: Versão oficial do Mastodon marcada como analisada.
+        reviewed_badge: Analisado
+        source:
+          prerelease: "Canal oficial %{channel}"
+          stable: GitHub Release oficial
+        title: Versões oficiais do Mastodon
+        view_official: Ver versão oficial
