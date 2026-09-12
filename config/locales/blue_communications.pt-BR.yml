@@ -1,5 +1,14 @@
 pt-BR:
   admin:
+    action_logs:
+      action_types:
+        create_announcement: Criar comunicado
+        destroy_announcement: Excluir comunicado
+        update_announcement: Editar comunicado
+      actions:
+        create_announcement_html: "%{name} criou o novo comunicado %{target}"
+        destroy_announcement_html: "%{name} excluiu o comunicado %{target}"
+        update_announcement_html: "%{name} atualizou o comunicado %{target}"
     announcements:
       back: Voltar aos comunicados
       destroyed_msg: Comunicado excluído!
@@ -7,6 +16,9 @@ pt-BR:
         title: Editar comunicado
       empty: Sem comunicados.
       live: Ativo
+      media_errors:
+        invalid: Uma ou mais mídias não são válidas para este comunicado.
+        too_many: Você pode anexar no máximo %{count} mídias a um comunicado.
       new:
         create: Criar comunicado
         title: Novo comunicado
@@ -24,3 +36,12 @@ pt-BR:
         manage_announcements_description: Permite aos usuários gerenciar comunicados no servidor
   announcement:
     announcement: Comunicado
+  simple_form:
+    labels:
+      announcement:
+        text: Conteúdo do comunicado
+  user_mailer:
+    announcement_published:
+      description: 'A administração de %{domain} publicou um comunicado:'
+      subject: Comunicado de serviço
+      title: Comunicado de %{domain}
