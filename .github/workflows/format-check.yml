@@ -8,7 +8,8 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
+  pull-requests: write
 
 jobs:
   lint:
@@ -18,8 +19,6 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          ref: ${{ github.head_ref }}
 
       - name: Set up Javascript environment
         uses: ./.github/actions/setup-javascript
@@ -27,13 +26,17 @@ jobs:
       - name: Apply formatting
         run: yarn format
 
-      - name: Commit formatting changes
+      - name: Publish formatter diff
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if git diff --quiet; then
             exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add --all
-          git commit -m "Apply formatter to communications changes"
-          git push origin HEAD:${{ github.head_ref }}
+          {
+            echo '```diff'
+            git diff -- . ':(exclude).github/workflows/format-check.yml'
+            echo '```'
+          } > /tmp/format-diff.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/format-diff.md
