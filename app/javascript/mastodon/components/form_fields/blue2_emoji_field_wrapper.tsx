@@ -1,10 +1,3 @@
-import type {
-  ChangeEvent,
-  FC,
-  KeyboardEvent as ReactKeyboardEvent,
-  MouseEvent as ReactMouseEvent,
-  SyntheticEvent,
-} from 'react';
 import {
   useCallback,
   useId,
@@ -12,6 +5,13 @@ import {
   useMemo,
   useRef,
   useState,
+} from 'react';
+import type {
+  ChangeEvent,
+  FC,
+  KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent as ReactMouseEvent,
+  SyntheticEvent,
 } from 'react';
 
 import classNames from 'classnames';
@@ -53,18 +53,26 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   counterMax,
   recommended = false,
   maxLength,
+  blue2EmojiEditor: _blue2EmojiEditor,
   ...otherProps
 }) => {
   const counterId = useId();
   const editorRef = useRef<HTMLDivElement>(null);
   const customEmojis = useCustomEmojis();
   const inputValue = value ?? '';
-  const [inputElement, setInputElement] = useState<EmojiInputElement | null>(null);
+  const [inputElement, setInputElement] = useState<EmojiInputElement | null>(
+    null,
+  );
   const [suggestionCodes, setSuggestionCodes] = useState<string[]>([]);
   const [suggestionsHidden, setSuggestionsHidden] = useState(true);
   const [selectedSuggestion, setSelectedSuggestion] = useState(0);
-  const [activeToken, setActiveToken] = useState<{ start: number; end: number } | null>(null);
-  const pendingSelectionRef = useRef<{ start: number; end: number } | null>(null);
+  const [activeToken, setActiveToken] = useState<{
+    start: number;
+    end: number;
+  } | null>(null);
+  const pendingSelectionRef = useRef<{ start: number; end: number } | null>(
+    null,
+  );
 
   const parts = useMemo(
     () => customEmojiTextParts(inputValue, customEmojis),
@@ -80,8 +88,12 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
 
   const updateSuggestions = useCallback(
     (text: string, caretPosition: number) => {
-      const [tokenStart, token] = textAtCursorMatchesToken(text, caretPosition, [':']);
-      if (tokenStart === null || token === null) {
+      const [tokenStart, token] = textAtCursorMatchesToken(
+        text,
+        caretPosition,
+        [':'],
+      );
+      if (tokenStart === null) {
         hideSuggestions();
         return;
       }
@@ -117,7 +129,8 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     if (!editor || !input) return;
 
     const rawText = profileEmojiEditorText(editor);
-    const text = maxLength ? rawText.slice(0, maxLength) : rawText;
+    const text =
+      maxLength === undefined ? rawText : rawText.slice(0, maxLength);
     const rawSelection = profileEmojiEditorSelection(editor);
     const selection = {
       start: Math.min(rawSelection.start, text.length),
@@ -133,7 +146,12 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   const applyEmoji = useCallback(
     (emoji: string, start: number, end: number) => {
       const currentValue = inputRef.current?.value ?? inputValue;
-      const insertion = insertEmojiAtSelection(currentValue, emoji, start, end);
+      const insertion = insertEmojiAtSelection(
+        currentValue,
+        emoji,
+        start,
+        end,
+      );
       const selection = {
         start: insertion.caretPosition,
         end: insertion.caretPosition,
@@ -219,7 +237,9 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
 
   const handleKeyDown = useCallback(
     (event: ReactKeyboardEvent<HTMLDivElement>) => {
-      if (event.target !== editorRef.current || event.nativeEvent.isComposing) return;
+      if (event.target !== editorRef.current || event.nativeEvent.isComposing) {
+        return;
+      }
 
       if (!suggestionsHidden && suggestionCodes.length > 0) {
         switch (event.key) {
@@ -231,7 +251,9 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
           case 'ArrowDown':
             event.preventDefault();
             event.stopPropagation();
-            setSelectedSuggestion((current) => Math.min(current + 1, suggestionCodes.length - 1));
+            setSelectedSuggestion((current) =>
+              Math.min(current + 1, suggestionCodes.length - 1),
+            );
             return;
           case 'ArrowUp':
             event.preventDefault();
@@ -247,7 +269,10 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
         }
       }
 
-      if (event.key === 'Enter' && inputRef.current instanceof HTMLInputElement) {
+      if (
+        event.key === 'Enter' &&
+        inputRef.current instanceof HTMLInputElement
+      ) {
         event.preventDefault();
         return;
       }
@@ -277,7 +302,11 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     const pendingSelection = pendingSelectionRef.current;
     if (!editor || !pendingSelection) return;
 
-    setProfileEmojiEditorSelection(editor, pendingSelection.start, pendingSelection.end);
+    setProfileEmojiEditorSelection(
+      editor,
+      pendingSelection.start,
+      pendingSelection.end,
+    );
     editor.focus({ preventScroll: true });
     pendingSelectionRef.current = null;
   }, [inputValue]);
@@ -303,14 +332,15 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
                 contentEditable={!disabled}
                 suppressContentEditableWarning
                 role='textbox'
+                tabIndex={disabled ? -1 : 0}
                 aria-multiline={inputElement instanceof HTMLTextAreaElement}
                 aria-describedby={inputProps['aria-describedby']}
                 aria-labelledby={
                   inputElement?.getAttribute('aria-labelledby') ?? undefined
                 }
                 aria-label={
-                  inputElement?.labels?.[0]?.textContent?.trim() ||
-                  inputElement?.getAttribute('aria-label') ||
+                  inputElement?.labels.item(0)?.textContent?.trim() ??
+                  inputElement?.getAttribute('aria-label') ??
                   undefined
                 }
                 aria-required={inputProps.required}
@@ -336,7 +366,10 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
                   ),
                 )}
               </div>
-              <EmojiPickerButton onPick={handlePickEmoji} disabled={disabled} />
+              <EmojiPickerButton
+                onPick={handlePickEmoji}
+                disabled={disabled}
+              />
               {counterMax && (
                 <CharacterCounter
                   currentString={inputValue}
@@ -351,7 +384,11 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
 
         <Popover
           matchReferenceWidth
-          isOpen={!suggestionsHidden && suggestionCodes.length > 0 && inputElement !== null}
+          isOpen={
+            !suggestionsHidden &&
+            suggestionCodes.length > 0 &&
+            inputElement !== null
+          }
           onClose={hideSuggestions}
           reference={inputElement}
         >
@@ -373,7 +410,9 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
                     )}
                     onMouseDown={handleSuggestionMouseDown}
                   >
-                    <AutosuggestEmoji emoji={{ id: shortcode, custom: true }} />
+                    <AutosuggestEmoji
+                      emoji={{ id: shortcode, custom: true }}
+                    />
                   </div>
                 ))}
               </div>
