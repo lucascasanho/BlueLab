@@ -16,7 +16,7 @@
                wrapper: :with_label
 
 .fields-group
-  %label.form-label= t('simple_form.labels.announcement.text', default: 'Conteúdo')
+  %label.form-label= t('simple_form.labels.announcement.text', default: 'Content')
   - initial_media = form.object.media_attachments.map do |attachment|
     - { id: attachment.id.to_s,
         type: attachment.type,
@@ -25,7 +25,8 @@
         description: attachment.description }
   - editor_props = { initialText: form.object.text.to_s,
                      initialContentType: form.object.content_type.presence || 'text/markdown',
-                     initialMedia: initial_media }
+                     initialMedia: initial_media,
+                     maxMediaAttachments: Announcement::MAX_MEDIA_ATTACHMENTS }
   %div{ data: { admin_component: 'announcement_editor', props: editor_props.to_json } }
 
 - unless form.object.published?
