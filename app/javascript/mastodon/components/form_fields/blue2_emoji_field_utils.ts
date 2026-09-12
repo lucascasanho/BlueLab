@@ -4,7 +4,10 @@ import { insertEmojiAtPosition } from '@/mastodon/features/emoji/utils';
 const CUSTOM_EMOJI_PATTERN = /:([a-zA-Z0-9_+-]+):/g;
 const WORD_CHARACTER_PATTERN = /[\p{L}\p{N}_+-]/u;
 
-type SerializedPoint = { node: Node; offset: number };
+interface SerializedPoint {
+  node: Node;
+  offset: number;
+}
 
 export type CustomEmojiTextPart =
   | { type: 'text'; text: string }
