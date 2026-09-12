@@ -77,7 +77,9 @@ export const Announcement: FC<AnnouncementProps> = ({
   );
 };
 
-const MediaAttachments: FC<{ media: ApiMediaAttachmentJSON[] }> = ({ media }) => {
+const MediaAttachments: FC<{ media: ApiMediaAttachmentJSON[] }> = ({
+  media,
+}) => {
   if (media.length === 0) {
     return null;
   }
