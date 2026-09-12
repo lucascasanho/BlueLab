@@ -6,9 +6,9 @@
 
 .mediaItem {
   overflow: hidden;
-  border: 1px solid var(--blue2-border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--blue2-border, rgba(255, 255, 255, 12%));
   border-radius: 12px;
-  background: var(--blue2-raised, rgba(0, 0, 0, 0.08));
+  background: var(--blue2-raised, rgba(0, 0, 0, 8%));
 }
 
 .image,
