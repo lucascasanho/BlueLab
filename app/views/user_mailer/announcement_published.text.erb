@@ -5,3 +5,10 @@
 <%= t('user_mailer.announcement_published.description', domain: site_hostname) %>
 
 <%= @announcement.text %>
+<% if @announcement.media_attachments.any? %>
+
+<% @announcement.media_attachments.each do |attachment| %>
+<% media = REST::MediaAttachmentSerializer.new(attachment).serializable_hash %>
+<%= attachment.description.presence || t('admin.announcements.composer.open_media') %>: <%= media[:url] %>
+<% end %>
+<% end %>
