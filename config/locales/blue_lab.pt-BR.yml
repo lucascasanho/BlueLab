@@ -1,0 +1,35 @@
+---
+pt-BR:
+  admin:
+    announcements:
+      destroyed_msg: Comunicado excluído com sucesso!
+      edit:
+        title: Editar comunicado
+      empty: Nenhum comunicado encontrado.
+      new:
+        create: Criar comunicado
+        title: Novo comunicado
+      preview:
+        disclaimer: Como os usuários não podem optar por não receber notificações por e-mail, elas devem se limitar a comunicados importantes, como notificações de violação de dados pessoais ou encerramento do servidor.
+        explanation_html: 'O e-mail será enviado para <strong>%{display_count} usuários</strong>. O seguinte conteúdo será incluído no e-mail:'
+        title: Pré-visualização da notificação do comunicado
+      published_msg: Comunicado publicado com sucesso!
+      scheduled_msg: Comunicado agendado para publicação!
+      title: Comunicados
+      unpublished_msg: Comunicado despublicado com sucesso!
+      updated_msg: Comunicado atualizado com sucesso!
+      composer:
+        text_label: Conteúdo do comunicado
+        markdown: Formatação Markdown
+        markdown_hint: Usa a mesma formatação Markdown disponível no composer BlueLab.
+        media: Adicionar mídia ou GIF
+        media_hint: Imagens, GIFs, vídeos e áudio usam o mesmo pipeline de mídia do composer.
+        drop_hint: Você também pode colar ou arrastar arquivos para esta área.
+        remove_media: Remover mídia
+        alt_text: Texto alternativo
+        save_alt_text: Salvar texto alternativo
+        uploading: Enviando mídia…
+        processing: Processando mídia…
+        upload_failed: Não foi possível enviar esta mídia.
+        media_limit: O limite de mídias deste comunicado foi atingido.
+        preview: Pré-visualizar
