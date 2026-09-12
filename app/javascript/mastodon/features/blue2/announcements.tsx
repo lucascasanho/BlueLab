@@ -10,6 +10,7 @@ import { CustomEmojiProvider } from '@/mastodon/components/emoji/context';
 import type { IAnnouncement } from '@/mastodon/features/home_timeline/components/announcements/announcement';
 import { Announcement } from '@/mastodon/features/home_timeline/components/announcements/announcement';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
+import { domain, title as instanceTitle } from '@/mastodon/initial_state';
 import {
   createAppSelector,
   useAppDispatch,
@@ -35,31 +36,37 @@ interface Blue2AnnouncementsProps {
 
 interface AnnouncementsCopy {
   trigger: string;
-  title: string;
+  title: (instanceName: string) => string;
 }
 
 const defaultAnnouncementsCopy: AnnouncementsCopy = {
   trigger: 'Notices',
-  title: 'Espelunca notices',
+  title: (instanceName) => `Notices from ${instanceName}`,
 };
+
+const frenchInstancePreposition = (instanceName: string) =>
+  /^[aeiouyàâäéèêëîïôöùûüÿœæ]/i.test(instanceName)
+    ? `d’${instanceName}`
+    : `de ${instanceName}`;
 
 const announcementsCopyByLocale: Record<string, AnnouncementsCopy> = {
   'pt-br': {
     trigger: 'Comunicados',
-    title: 'Comunicados da Espelunca',
+    title: (instanceName) => `Comunicados de ${instanceName}`,
   },
   pt: {
     trigger: 'Comunicados',
-    title: 'Comunicados da Espelunca',
+    title: (instanceName) => `Comunicados de ${instanceName}`,
   },
   en: defaultAnnouncementsCopy,
   es: {
     trigger: 'Comunicados',
-    title: 'Comunicados de Espelunca',
+    title: (instanceName) => `Comunicados de ${instanceName}`,
   },
   fr: {
     trigger: 'Communiqués',
-    title: 'Communiqués d’Espelunca',
+    title: (instanceName) =>
+      `Communiqués ${frenchInstancePreposition(instanceName)}`,
   },
 };
 
@@ -94,6 +101,8 @@ export const Blue2Announcements: React.FC<Blue2AnnouncementsProps> = ({
     [announcements],
   );
   const copy = useMemo(() => getAnnouncementsCopy(intl.locale), [intl.locale]);
+  const resolvedInstanceTitle = instanceTitle ?? domain ?? 'this server';
+  const modalTitle = copy.title(resolvedInstanceTitle);
   const currentIndex = selectedAnnouncementId
     ? announcements.findIndex(
         (announcement) => announcement.id === selectedAnnouncementId,
@@ -191,7 +200,7 @@ export const Blue2Announcements: React.FC<Blue2AnnouncementsProps> = ({
                   <span className={classes.titleIcon} aria-hidden='true'>
                     <CampaignIcon width={22} height={22} fill='currentColor' />
                   </span>
-                  <h2 id='blue2-announcements-title'>{copy.title}</h2>
+                  <h2 id='blue2-announcements-title'>{modalTitle}</h2>
                 </div>
 
                 <button
