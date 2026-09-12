@@ -7,6 +7,7 @@
 #  id                   :bigint(8)        not null, primary key
 #  all_day              :boolean          default(FALSE), not null
 #  ends_at              :datetime
+#  markdown_enabled     :boolean          default(FALSE), not null
 #  notification_sent_at :datetime
 #  published            :boolean          default(FALSE), not null
 #  published_at         :datetime
@@ -26,6 +27,7 @@ class Announcement < ApplicationRecord
 
   has_many :announcement_mutes, dependent: :destroy
   has_many :announcement_reactions, dependent: :destroy
+  has_many :media_attachments, dependent: :nullify
 
   validates :text, presence: true
   validates :starts_at, presence: true, if: :ends_at?
@@ -79,6 +81,14 @@ class Announcement < ApplicationRecord
 
   def emojis
     @emojis ||= CustomEmoji.from_text(text)
+  end
+
+  def formatted_content
+    if markdown_enabled?
+      AdvancedTextFormatter.new(text, content_type: 'text/markdown').to_s
+    else
+      Formatter.instance.format_announcement(self)
+    end
   end
 
   def reactions(account = nil)
