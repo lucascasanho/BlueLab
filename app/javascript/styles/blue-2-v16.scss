@@ -1,0 +1,65 @@
+@use 'blue-2-v15';
+
+body[data-theme='blue-2'].admin {
+  .content {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .content > :last-child {
+    margin-bottom: 16px;
+  }
+
+  .simple_form > .actions:last-child {
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .simple_form > .actions:last-child:has(button[name='reset_all']) {
+    justify-content: space-between;
+  }
+
+  .simple_form
+    > .actions:last-child:has(button[name='reset_all'])
+    > .btn:not([name='reset_all']) {
+    margin-inline-start: auto;
+  }
+}
+
+@media (width >= 891px) {
+  body[data-theme='blue-2'].admin .admin-wrapper {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+    justify-content: stretch;
+
+    > .sidebar-wrapper:not(.sidebar-wrapper--empty) {
+      width: auto !important;
+      min-width: 0;
+      flex: none !important;
+
+      .sidebar-wrapper__inner {
+        justify-content: stretch;
+      }
+
+      .sidebar {
+        width: 300px;
+      }
+    }
+
+    > .content-wrapper {
+      width: auto !important;
+      max-width: none !important;
+      min-width: 0;
+      flex: none !important;
+    }
+
+    > .sidebar-wrapper--empty {
+      display: none !important;
+    }
+  }
+}
