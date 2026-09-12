@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class REST::AnnouncementSerializer < ActiveModel::Serializer
-  include FormattingHelper
-
   attributes :id, :content, :content_type, :starts_at, :ends_at, :all_day,
              :published_at, :updated_at
 
@@ -28,13 +26,11 @@ class REST::AnnouncementSerializer < ActiveModel::Serializer
   end
 
   def content
-    html = AdvancedTextFormatter.new(
+    AdvancedTextFormatter.new(
       object.text,
       content_type: object.content_type,
       local: true
     ).to_s
-
-    prerender_custom_emojis(html, object.emojis)
   end
 
   def reactions
