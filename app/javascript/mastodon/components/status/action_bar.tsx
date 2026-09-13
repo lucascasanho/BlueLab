@@ -13,6 +13,7 @@ import {
   HeartIcon,
   QuotesIcon,
   ShareFatIcon,
+  StarIcon,
 } from '@phosphor-icons/react';
 
 import {
@@ -201,15 +202,18 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   }, [contextType, dispatch, statusId]);
 
   const intl = useIntl();
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const FavouriteIcon = isBlue2 ? StarIcon : HeartIcon;
 
   const favouriteIcon = useCallback(
     (props: React.SVGProps<SVGSVGElement>) =>
       status?.favourited ? (
-        <HeartIcon {...props} weight='fill' />
+        <FavouriteIcon {...props} weight='fill' />
       ) : (
-        <HeartIcon {...props} />
+        <FavouriteIcon {...props} />
       ),
-    [status?.favourited],
+    [FavouriteIcon, status?.favourited],
   );
   const bookmarkIcon = useCallback(
     (props: React.SVGProps<SVGSVGElement>) =>
@@ -260,6 +264,7 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
         leadingIcon={favouriteIcon}
         onClick={handleFavouriteClick}
         className={classes.actionsButtonGap}
+        data-favourite-action
       >
         {withCounters && status.favourites_count}
       </ToggleButton>
