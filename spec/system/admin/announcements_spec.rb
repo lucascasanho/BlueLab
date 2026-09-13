@@ -123,7 +123,8 @@ RSpec.describe 'Admin::Announcements' do
   end
 
   def sign_in_admin
-    user = admin_user
+    role = Fabricate(:user_role, permissions: UserRole::FLAGS.fetch(:manage_announcements))
+    user = Fabricate(:user, role: role)
     user.approve!
 
     visit new_user_session_path
