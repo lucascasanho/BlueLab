@@ -1,237 +1,315 @@
 #!/usr/bin/env bash
 
-# Atualizador unificado do BlueLab para os WSL Blue e Espelunca.
+# Atualizador seguro do BlueLab.
+# Blue usa o canal bluelab-teste; Espelunca usa somente bluelab.
+# Atualizações oficiais do Mastodon são verificadas sem alterar automaticamente
+# o código BlueLab. Em caso de conflito, o comando gera um resumo para auxílio.
 #
-# - Blue:      atualiza ~/blue e reinicia blue-web/sidekiq/streaming
-# - Espelunca: atualiza ~/espelunca e reinicia espelunca-web/sidekiq/streaming
-# - Busca todas as branches, tags e commits do remoto BlueLab.
-# - Blue usa BlueLab-Test por padrão para receber alterações ainda em validação.
-# - Espelunca usa BlueLab-Testing por padrão para receber apenas alterações promovidas.
-# - BLUELAB_BRANCH continua podendo sobrescrever explicitamente a branch.
-# - Preserva alterações locais em stash e histórico divergente em branch de backup.
+# Fontes:
+# - https://git-scm.com/docs/git-merge
+# - https://git-scm.com/docs/git-worktree
+# - https://github.com/mastodon/mastodon
 
 set -Eeuo pipefail
 
-REMOTE="${BLUELAB_REMOTE:-bluelab}"
-REMOTE_URL="${BLUELAB_REMOTE_URL:-https://github.com/lucascasanho/BlueLab.git}"
-INSTALL_DIR="${BLUELAB_INSTALL_DIR:-$HOME/.local/bin}"
-INSTALL_PATH="$INSTALL_DIR/bluelab"
+REMOTO="${BLUELAB_REMOTE:-bluelab}"
+URL_REMOTO="${BLUELAB_REMOTE_URL:-https://github.com/lucascasanho/BlueLab.git}"
+REMOTO_MASTODON="${BLUELAB_UPSTREAM_REMOTE:-mastodon-oficial}"
+URL_MASTODON="${BLUELAB_UPSTREAM_URL:-https://github.com/mastodon/mastodon.git}"
+CANAL_ESTAVEL="${BLUELAB_CANAL_ESTAVEL:-bluelab}"
+CANAL_TESTE="${BLUELAB_CANAL_TESTE:-bluelab-teste}"
+DIR_INSTALACAO="${BLUELAB_INSTALL_DIR:-$HOME/.local/bin}"
+COMANDO_INSTALADO="$DIR_INSTALACAO/bluelab"
+DIR_ESTADO="${BLUELAB_STATE_DIR:-$HOME/.local/state/bluelab}"
+ACAO="${1:-atualizar}"
 
-fail() {
-  echo
-  echo "ERRO: $*" >&2
-  echo "Nenhuma etapa posterior será executada." >&2
-  exit 1
+falhar() { echo; echo "ERRO: $*" >&2; exit 1; }
+executar() { "$@" || falhar "falhou: $*"; }
+
+cabecalho() {
+  printf '\n============================================================\n %s\n============================================================\n\n' "$1"
 }
 
-run() {
-  "$@" || fail "falhou: $*"
-}
-
-select_target() {
-  local requested="${BLUELAB_TARGET:-}"
-
-  case "$requested" in
-    blue)
-      TARGET="blue"
-      REPO="${BLUELAB_REPO:-$HOME/blue}"
-      SERVICES=(blue-web blue-sidekiq blue-streaming)
-      return
+selecionar_alvo() {
+  case "${BLUELAB_TARGET:-}" in
+    blue) ALVO=blue; REPO="${BLUELAB_REPO:-$HOME/blue}"; SERVICOS=(blue-web blue-sidekiq blue-streaming) ;;
+    espelunca) ALVO=espelunca; REPO="${BLUELAB_REPO:-$HOME/espelunca}"; SERVICOS=(espelunca-web espelunca-sidekiq espelunca-streaming) ;;
+    "")
+      if [[ "${USER:-}" == blue && -d "$HOME/blue/.git" ]]; then
+        ALVO=blue; REPO="${BLUELAB_REPO:-$HOME/blue}"; SERVICOS=(blue-web blue-sidekiq blue-streaming)
+      elif [[ "${USER:-}" == espelunca && -d "$HOME/espelunca/.git" ]]; then
+        ALVO=espelunca; REPO="${BLUELAB_REPO:-$HOME/espelunca}"; SERVICOS=(espelunca-web espelunca-sidekiq espelunca-streaming)
+      elif [[ -n "${BLUELAB_REPO:-}" ]]; then
+        REPO="$BLUELAB_REPO"
+        case "$(basename "$REPO")" in
+          blue) ALVO=blue; SERVICOS=(blue-web blue-sidekiq blue-streaming) ;;
+          espelunca) ALVO=espelunca; SERVICOS=(espelunca-web espelunca-sidekiq espelunca-streaming) ;;
+          *) falhar "defina BLUELAB_TARGET=blue ou espelunca" ;;
+        esac
+      else
+        falhar "não consegui identificar Blue ou Espelunca"
+      fi
       ;;
-    espelunca)
-      TARGET="espelunca"
-      REPO="${BLUELAB_REPO:-$HOME/espelunca}"
-      SERVICES=(espelunca-web espelunca-sidekiq espelunca-streaming)
-      return
-      ;;
-    "") ;;
-    *) fail "BLUELAB_TARGET deve ser 'blue' ou 'espelunca'" ;;
+    *) falhar "BLUELAB_TARGET deve ser blue ou espelunca" ;;
   esac
 
-  if [[ "${USER:-}" == "blue" && -d "$HOME/blue/.git" ]]; then
-    TARGET="blue"
-    REPO="${BLUELAB_REPO:-$HOME/blue}"
-    SERVICES=(blue-web blue-sidekiq blue-streaming)
-    return
+  if [[ -n "${BLUELAB_CANAL:-}" ]]; then
+    CANAL="$BLUELAB_CANAL"
+  elif [[ -n "${BLUELAB_BRANCH:-}" ]]; then
+    CANAL="$BLUELAB_BRANCH"
+  elif [[ "$ALVO" == blue ]]; then
+    CANAL="$CANAL_TESTE"
+  else
+    CANAL="$CANAL_ESTAVEL"
   fi
-
-  if [[ "${USER:-}" == "espelunca" && -d "$HOME/espelunca/.git" ]]; then
-    TARGET="espelunca"
-    REPO="${BLUELAB_REPO:-$HOME/espelunca}"
-    SERVICES=(espelunca-web espelunca-sidekiq espelunca-streaming)
-    return
-  fi
-
-  if [[ -n "${BLUELAB_REPO:-}" ]]; then
-    REPO="$BLUELAB_REPO"
-    case "$(basename "$REPO")" in
-      blue)
-        TARGET="blue"
-        SERVICES=(blue-web blue-sidekiq blue-streaming)
-        ;;
-      espelunca)
-        TARGET="espelunca"
-        SERVICES=(espelunca-web espelunca-sidekiq espelunca-streaming)
-        ;;
-      *) fail "não consegui inferir a instância de BLUELAB_REPO=$REPO; defina BLUELAB_TARGET" ;;
-    esac
-    return
-  fi
-
-  if [[ -d "$HOME/blue/.git" && ! -d "$HOME/espelunca/.git" ]]; then
-    TARGET="blue"
-    REPO="$HOME/blue"
-    SERVICES=(blue-web blue-sidekiq blue-streaming)
-    return
-  fi
-
-  if [[ -d "$HOME/espelunca/.git" && ! -d "$HOME/blue/.git" ]]; then
-    TARGET="espelunca"
-    REPO="$HOME/espelunca"
-    SERVICES=(espelunca-web espelunca-sidekiq espelunca-streaming)
-    return
-  fi
-
-  fail "não consegui identificar automaticamente Blue ou Espelunca"
 }
 
-select_target
+preparar_git() {
+  cd "$REPO" || falhar "não consegui entrar em $REPO"
+  git rev-parse --git-dir >/dev/null 2>&1 || falhar "$REPO não é um repositório Git"
+  git remote get-url "$REMOTO" >/dev/null 2>&1 || executar git remote add "$REMOTO" "$URL_REMOTO"
+  executar git fetch --prune --tags "$REMOTO" "+refs/heads/*:refs/remotes/$REMOTO/*"
+}
 
-if [[ -n "${BLUELAB_BRANCH:-}" ]]; then
-  BRANCH="$BLUELAB_BRANCH"
-elif [[ "$TARGET" == "blue" ]]; then
-  BRANCH="BlueLab-Test"
-else
-  BRANCH="BlueLab-Testing"
-fi
-
-printf '\n============================================================\n'
-printf ' BLUELAB — ATUALIZAÇÃO COMPLETA\n'
-printf '============================================================\n\n'
-printf 'Instância:    %s\n' "$TARGET"
-printf 'Repositório:  %s\n' "$REPO"
-printf 'Remote:       %s\n' "$REMOTE"
-printf 'Branch deploy:%s\n' " $BRANCH"
-
-cd "$REPO" || fail "não consegui entrar em $REPO"
-git rev-parse --git-dir >/dev/null 2>&1 || fail "$REPO não é um repositório Git"
-
-printf '\n===== PRESERVANDO ESTADO LOCAL =====\n'
-if [[ -n "$(git status --porcelain=v1)" ]]; then
-  STASH_LABEL="bluelab-auto-backup-${TARGET}-$(date +%Y%m%d-%H%M%S)"
-  git status --short
-  run git stash push --include-untracked -m "$STASH_LABEL"
-  echo "Alterações locais guardadas em git stash: $STASH_LABEL"
-else
-  echo "Working tree limpa."
-fi
-
-printf '\n===== CONFIGURANDO REMOTE =====\n'
-if git remote get-url "$REMOTE" >/dev/null 2>&1; then
-  echo "Usando remote existente: $REMOTE -> $(git remote get-url "$REMOTE")"
-else
-  echo "Criando remote $REMOTE -> $REMOTE_URL"
-  run git remote add "$REMOTE" "$REMOTE_URL"
-fi
-
-printf '\n===== BUSCANDO TODO O REPOSITÓRIO =====\n'
-run git fetch --prune --tags "$REMOTE" "+refs/heads/*:refs/remotes/$REMOTE/*"
-
-REMOTE_REF="refs/remotes/$REMOTE/$BRANCH"
-git show-ref --verify --quiet "$REMOTE_REF" || fail "branch remota $REMOTE/$BRANCH não encontrada"
-NEW_HEAD="$(git rev-parse "$REMOTE_REF")"
-OLD_HEAD="$(git rev-parse HEAD)"
-CURRENT_BRANCH="$(git branch --show-current)"
-
-printf 'HEAD local antes: %s\n' "$OLD_HEAD"
-printf 'HEAD remoto:      %s\n' "$NEW_HEAD"
-
-if [[ "$OLD_HEAD" != "$NEW_HEAD" && ( "$CURRENT_BRANCH" == "$BRANCH" || -z "$CURRENT_BRANCH" ) ]]; then
-  if ! git merge-base --is-ancestor "$OLD_HEAD" "$NEW_HEAD"; then
-    BACKUP_BRANCH="backup/bluelab-local-${TARGET}-$(date +%Y%m%d-%H%M%S)"
-    run git branch "$BACKUP_BRANCH" "$OLD_HEAD"
-    echo "Histórico local divergente preservado em: $BACKUP_BRANCH"
+preservar_local() {
+  if [[ -n "$(git status --porcelain=v1)" ]]; then
+    local nome="bluelab-reserva-local-${ALVO}-$(date +%Y%m%d-%H%M%S)"
+    git status --short
+    executar git stash push --include-untracked -m "$nome"
+    echo "Alterações locais preservadas no stash: $nome"
   fi
-fi
+}
 
-printf '\n===== ALINHANDO CÓDIGO AO MAIS RECENTE =====\n'
-if git show-ref --verify --quiet "refs/heads/$BRANCH"; then
-  run git switch "$BRANCH"
-else
-  run git switch --track -c "$BRANCH" "$REMOTE/$BRANCH"
-fi
+instalar_comando_atual() {
+  executar mkdir -p "$DIR_INSTALACAO"
+  executar install -m 0755 "$REPO/bin/bluelab" "$COMANDO_INSTALADO"
+}
 
-# O objetivo deste comando é implantar exatamente o estado consolidado do GitHub.
-# Qualquer estado local relevante já foi preservado acima.
-run git reset --hard "$NEW_HEAD"
-run git diff --check "$NEW_HEAD"
+capturar_configuracoes() {
+  local destino="$1"
+  local codigo="require 'json'; keys=%w[status_character_limit admin_status_character_limit hide_status_character_counter hide_admin_status_character_counter media_image_size_limit_mb media_video_size_limit_mb instance_accent_color instance_light_background_color instance_light_surface_color instance_light_text_color instance_dark_background_color instance_dark_surface_color instance_dark_text_color email_primary_color email_button_color email_link_color email_background_color email_surface_color email_text_color email_muted_color email_dark_background_color email_dark_surface_color email_dark_text_color email_dark_muted_color theme landing_page trends]; data=keys.to_h { |k| [k, Setting.public_send(k)] }; File.write(ENV.fetch('BLUELAB_ARQUIVO_CONFIG'), JSON.pretty_generate(data.sort.to_h)+\"\\n\")"
+  executar mkdir -p "$DIR_ESTADO"
+  BLUELAB_ARQUIVO_CONFIG="$destino" env RAILS_ENV=production bundle exec rails runner "$codigo" >/dev/null
+  [[ -s "$destino" ]] || falhar "não foi possível registrar limites/cores do painel"
+}
 
-printf '\n===== ATUALIZANDO O PRÓPRIO COMANDO =====\n'
-run mkdir -p "$INSTALL_DIR"
-run install -m 0755 "$REPO/bin/bluelab" "$INSTALL_PATH"
-echo "Comando instalado/atualizado em: $INSTALL_PATH"
-
-printf '\n===== RUBY =====\n'
-if ! bundle check; then
-  run bundle install
-else
-  echo "Dependências Ruby já satisfeitas."
-fi
-
-printf '\n===== JAVASCRIPT =====\n'
-run yarn install --immutable
-
-printf '\n===== MIGRATIONS =====\n'
-run env RAILS_ENV=production bundle exec rails db:migrate
-
-if [[ "$TARGET" == "blue" ]]; then
-  printf '\n===== DOMÍNIOS DE E-MAIL DESCARTÁVEIS =====\n'
-  run env RAILS_ENV=production bin/tootctl email_domain_blocks sync_disposable
-fi
-
-printf '\n===== ASSETS — REBUILD LIMPO =====\n'
-echo "Removendo assets compilados antigos, incluindo os packs do Vite..."
-run env RAILS_ENV=production NODE_ENV=production bundle exec rails assets:clobber
-
-echo "Limpando cache temporário do Rails antes da recompilação..."
-run env RAILS_ENV=production bundle exec rails tmp:cache:clear
-
-echo "Compilando assets novamente a partir do checkout atual..."
-run env RAILS_ENV=production NODE_ENV=production bundle exec rails assets:precompile
-
-VITE_MANIFEST="$REPO/public/packs/.vite/manifest.json"
-[[ -s "$VITE_MANIFEST" ]] || fail "manifesto do Vite não foi gerado em $VITE_MANIFEST"
-echo "Manifesto Vite regenerado: $VITE_MANIFEST"
-
-printf '\n===== REINICIANDO %s =====\n' "${TARGET^^}"
-for service in "${SERVICES[@]}"; do
-  systemctl cat "$service" >/dev/null 2>&1 || fail "serviço $service não existe neste WSL"
-done
-run sudo systemctl restart "${SERVICES[@]}"
-
-sleep 2
-
-printf '\n===== STATUS =====\n'
-FAILED=0
-for service in "${SERVICES[@]}"; do
-  state="$(systemctl is-active "$service" 2>/dev/null || true)"
-  printf '%-28s %s\n' "$service" "$state"
-  if [[ "$state" != "active" ]]; then
-    FAILED=1
+comparar_configuracoes() {
+  local antes="$1" depois="$2"
+  if ! cmp -s "$antes" "$depois"; then
+    echo "As configurações administrativas mudaram durante a atualização:" >&2
+    diff -u "$antes" "$depois" || true
+    falhar "limites, cores ou outra configuração protegida não foi preservada"
   fi
-done
+  echo "Limites e cores do painel: preservados."
+}
 
-if [[ "$FAILED" -ne 0 ]]; then
-  fail "um ou mais serviços não ficaram ativos"
-fi
+alinhar_codigo() {
+  git show-ref --verify --quiet "refs/remotes/$REMOTO/$CANAL" || falhar "canal $CANAL não encontrado"
+  local novo antigo
+  novo="$(git rev-parse "$REMOTO/$CANAL")"
+  antigo="$(git rev-parse HEAD)"
 
-printf '\n===== VERSÃO IMPLANTADA =====\n'
-git log -1 --format='commit:   %H%ndata:     %cd%nmensagem: %s' --date=iso
+  if [[ "$novo" != "$antigo" ]] && ! git merge-base --is-ancestor "$antigo" "$novo" 2>/dev/null; then
+    executar git branch "reserva/local-${ALVO}-$(date +%Y%m%d-%H%M%S)" "$antigo"
+  fi
 
-printf '\n===== REFS REMOTAS =====\n'
-printf 'Branches remotas: %s\n' "$(git for-each-ref --format='%(refname:short)' "refs/remotes/$REMOTE" | wc -l)"
-printf 'Tags locais:      %s\n' "$(git tag | wc -l)"
+  if git show-ref --verify --quiet "refs/heads/$CANAL"; then
+    executar git switch "$CANAL"
+  else
+    executar git switch --track -c "$CANAL" "$REMOTO/$CANAL"
+  fi
+  executar git reset --hard "$novo"
+  executar git diff --check "$novo"
+}
 
-printf '\n============================================================\n'
-printf ' BLUELAB ATUALIZADO — %s\n' "${TARGET^^}"
-printf '============================================================\n'
+atualizar_dependencias() {
+  bundle check || executar bundle install
+  executar yarn install --immutable
+  executar env RAILS_ENV=production bundle exec rails db:migrate
+  if [[ "$ALVO" == blue ]]; then
+    executar env RAILS_ENV=production bin/tootctl email_domain_blocks sync_disposable
+  fi
+}
+
+recompilar_assets() {
+  executar env RAILS_ENV=production NODE_ENV=production bundle exec rails assets:clobber
+  executar env RAILS_ENV=production bundle exec rails tmp:cache:clear
+  executar env RAILS_ENV=production NODE_ENV=production bundle exec rails assets:precompile
+  [[ -s "$REPO/public/packs/.vite/manifest.json" ]] || falhar "manifesto Vite não foi gerado"
+}
+
+reiniciar_servicos() {
+  local s estado
+  for s in "${SERVICOS[@]}"; do
+    systemctl cat "$s" >/dev/null 2>&1 || falhar "serviço $s não existe"
+  done
+  executar sudo systemctl restart "${SERVICOS[@]}"
+  sleep 2
+  for s in "${SERVICOS[@]}"; do
+    estado="$(systemctl is-active "$s" 2>/dev/null || true)"
+    printf '%-28s %s\n' "$s" "$estado"
+    [[ "$estado" == active ]] || falhar "$s não ficou ativo"
+  done
+  executar env RAILS_ENV=production bundle exec rails runner "abort 'Rails não iniciou' unless defined?(Setting); puts 'Rails: OK'"
+}
+
+versao_atual() {
+  ruby -e '
+    s=File.read(ARGV[0]); f=->(n){s[/def #{Regexp.escape(n)}\s*\n\s*([^\n]+)/,1]&.strip&.sub(/\A[\x27\x22]|[\x27\x22]\z/,"")};
+    a=[f["major"],f["minor"],f["patch"]]; abort "versão ilegível" if a.any?(&:nil?); v=a.join("."); p=f["default_prerelease"]; v+="-#{p}" if p && p!="nil"; puts v
+  ' "$REPO/lib/mastodon/version.rb"
+}
+
+maior_tag_oficial() {
+  git for-each-ref --format='%(refname:strip=4)' "refs/remotes/$REMOTO_MASTODON/tags" | ruby -rrubygems -e '
+    t=STDIN.each_line.map(&:strip).select{|x| x.match?(/\Av\d+\.\d+\.\d+(?:-(?:alpha|beta|rc)(?:[.-]?\d+(?:\.\d+)*)?)?\z/i)};
+    m=t.max_by{|x| Gem::Version.new(x.delete_prefix("v"))}; puts m if m
+  '
+}
+
+categoria() {
+  case "$1" in
+    db/migrate/*|db/schema.rb) echo "banco" ;;
+    app/javascript/*|app/assets/*|app/views/*) echo "interface" ;;
+    app/models/*|app/services/*|app/controllers/*|app/serializers/*|lib/*) echo "backend" ;;
+    config/*) echo "configuração" ;;
+    spec/*|test/*) echo "testes" ;;
+    Gemfile*|package.json|yarn.lock) echo "dependências" ;;
+    *) echo "outros" ;;
+  esac
+}
+
+verificar_mastodon() {
+  [[ "$ALVO" == blue ]] || return 0
+  cabecalho "VERIFICAÇÃO DO MASTODON OFICIAL"
+
+  if git remote get-url "$REMOTO_MASTODON" >/dev/null 2>&1; then
+    executar git remote set-url "$REMOTO_MASTODON" "$URL_MASTODON"
+  else
+    executar git remote add "$REMOTO_MASTODON" "$URL_MASTODON"
+  fi
+  executar git fetch --prune "$REMOTO_MASTODON" \
+    '+refs/heads/main:refs/remotes/'"$REMOTO_MASTODON"'/main' \
+    '+refs/tags/v*:refs/remotes/'"$REMOTO_MASTODON"'/tags/v*'
+
+  local atual tag recente
+  atual="$(versao_atual)"
+  tag="$(maior_tag_oficial)"
+  [[ -n "$tag" ]] || falhar "não encontrei versão oficial do Mastodon"
+  recente="${tag#v}"
+  echo "BlueLab baseado em: $atual"
+  echo "Mastodon oficial mais recente: $recente"
+
+  if ! ruby -rrubygems -e 'exit(Gem::Version.new(ARGV[0])>Gem::Version.new(ARGV[1]) ? 0 : 1)' "$recente" "$atual"; then
+    echo "Nenhuma versão oficial mais nova para analisar."
+    return 0
+  fi
+
+  local tmp codigo=0 relatorio
+  tmp="$(mktemp -d "${TMPDIR:-/tmp}/bluelab-upstream.XXXXXX")"
+  executar git worktree add --detach "$tmp" "$REMOTO/$CANAL_TESTE" >/dev/null
+  (cd "$tmp" && git -c user.name='BlueLab Atualizador' -c user.email='atualizador@localhost' merge --no-commit --no-ff "refs/remotes/$REMOTO_MASTODON/tags/$tag" >/dev/null 2>&1) || codigo=$?
+
+  if [[ "$codigo" -ne 0 ]]; then
+    mapfile -t conflitos < <(git -C "$tmp" diff --name-only --diff-filter=U)
+    relatorio="$DIR_ESTADO/conflitos-${tag#v}.txt"
+    executar mkdir -p "$DIR_ESTADO"
+    {
+      echo "Mastodon: $tag"
+      echo "BlueLab teste: $(git rev-parse "$REMOTO/$CANAL_TESTE")"
+      echo "Conflitos: ${#conflitos[@]}"
+      echo
+      for arq in "${conflitos[@]}"; do printf '[%s] %s\n' "$(categoria "$arq")" "$arq"; done
+      echo
+      echo "Pedido para IA: integre $tag ao BlueLab preservando tema, compose, navegação, limites, cores e configurações administrativas. Não substitua arquivos customizados inteiros por versões upstream. Resolva os conflitos abaixo:"
+      printf '%s\n' "${conflitos[@]}"
+    } >"$relatorio"
+    echo "Conflitos encontrados; nenhum canal foi alterado:"
+    for arq in "${conflitos[@]}"; do printf '  - %-13s %s\n' "$(categoria "$arq")" "$arq"; done
+    echo "Relatório para enviar à IA: $relatorio"
+    git -C "$tmp" merge --abort >/dev/null 2>&1 || true
+  else
+    echo "A simulação da atualização $tag não encontrou conflitos textuais."
+    echo "Ela não foi aplicada automaticamente; primeiro deve ser integrada ao canal de teste e validada."
+    git -C "$tmp" merge --abort >/dev/null 2>&1 || true
+  fi
+  git worktree remove --force "$tmp" >/dev/null 2>&1 || true
+}
+
+atualizar() {
+  cabecalho "BLUELAB — ATUALIZAÇÃO"
+  echo "Instância: $ALVO"
+  echo "Canal: $CANAL"
+  preparar_git
+  preservar_local
+
+  local antes="$DIR_ESTADO/configuracoes-antes-${ALVO}.json"
+  local depois="$DIR_ESTADO/configuracoes-depois-${ALVO}.json"
+  capturar_configuracoes "$antes"
+
+  alinhar_codigo
+  instalar_comando_atual
+  atualizar_dependencias
+  recompilar_assets
+  reiniciar_servicos
+
+  capturar_configuracoes "$depois"
+  comparar_configuracoes "$antes" "$depois"
+  executar mkdir -p "$DIR_ESTADO"
+  git rev-parse HEAD >"$DIR_ESTADO/ultimo-implantado-${ALVO}.sha"
+
+  git log -1 --format='commit: %H%ndata: %cd%nmensagem: %s' --date=iso
+  if [[ "$ALVO" == blue ]]; then
+    verificar_mastodon
+    echo "Depois de testar este SHA, use 'bluelab promover' para validar a promoção."
+  else
+    echo "A Espelunca consulta somente o canal $CANAL_ESTAVEL."
+  fi
+}
+
+promover() {
+  [[ "$ALVO" == blue ]] || falhar "promoção só pode ser validada no mastodon.blue"
+  preparar_git
+  local teste estavel local_head implantado
+  teste="$(git rev-parse "$REMOTO/$CANAL_TESTE")"
+  estavel="$(git rev-parse "$REMOTO/$CANAL_ESTAVEL")"
+  local_head="$(git rev-parse HEAD)"
+  implantado="$(cat "$DIR_ESTADO/ultimo-implantado-blue.sha" 2>/dev/null || true)"
+
+  [[ "$local_head" == "$teste" ]] || falhar "o Blue não está no HEAD atual de $CANAL_TESTE"
+  [[ "$implantado" == "$teste" ]] || falhar "$CANAL_TESTE mudou desde o último teste; atualize e teste novamente"
+  git merge-base --is-ancestor "$estavel" "$teste" || falhar "os canais divergiram; promoção automática não é segura"
+  [[ -z "$(git status --porcelain=v1)" ]] || falhar "há alterações locais"
+
+  executar mkdir -p "$DIR_ESTADO"
+  {
+    echo "SHA_TESTADO=$teste"
+    echo "SHA_ESTAVEL_ATUAL=$estavel"
+    echo "CANAL_ORIGEM=$CANAL_TESTE"
+    echo "CANAL_DESTINO=$CANAL_ESTAVEL"
+  } >"$DIR_ESTADO/promocao-pronta.txt"
+
+  echo "Promoção validada localmente."
+  echo "SHA testado: $teste"
+  echo "O conector do GitHub deve mover $CANAL_ESTAVEL exatamente para esse SHA, sem squash/rebase e sem incluir commits posteriores."
+  echo "Registro: $DIR_ESTADO/promocao-pronta.txt"
+}
+
+estado() {
+  preparar_git
+  printf '%-16s %s\n' "$CANAL_ESTAVEL" "$(git rev-parse "$REMOTO/$CANAL_ESTAVEL")"
+  printf '%-16s %s\n' "$CANAL_TESTE" "$(git rev-parse "$REMOTO/$CANAL_TESTE")"
+  printf '%-16s %s\n' local "$(git rev-parse HEAD)"
+}
+
+selecionar_alvo
+case "$ACAO" in
+  atualizar) atualizar ;;
+  promover) promover ;;
+  verificar-mastodon) preparar_git; verificar_mastodon ;;
+  estado) estado ;;
+  ajuda|-h|--help)
+    echo "bluelab | bluelab atualizar | bluelab promover | bluelab verificar-mastodon | bluelab estado"
+    ;;
+  *) falhar "ação desconhecida: $ACAO" ;;
+esac
