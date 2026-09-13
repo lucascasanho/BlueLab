@@ -564,6 +564,7 @@ export const RichComposeEditor: React.FC<{
   value?: string;
   contentType?: string;
   editorId?: string;
+  ariaLabel?: string;
   onChange?: (value: string) => void;
   onContentTypeChange?: (value: string) => void;
   onFiles?: (files: FileList) => void;
@@ -575,6 +576,7 @@ export const RichComposeEditor: React.FC<{
   value,
   contentType: contentTypeProp,
   editorId,
+  ariaLabel,
   onChange,
   onContentTypeChange,
   onFiles,
@@ -854,6 +856,7 @@ export const RichComposeEditor: React.FC<{
         contentEditable={isMarkdown ? true : 'plaintext-only'}
         suppressContentEditableWarning
         role='textbox'
+        aria-label={ariaLabel}
         aria-multiline='true'
         data-placeholder={intl.formatMessage(
           type === 'message'

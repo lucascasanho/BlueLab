@@ -29,7 +29,7 @@ class Admin::AnnouncementsController < Admin::BaseController
       log_action :create, @announcement
       redirect_to admin_announcements_path, notice: @announcement.published? ? I18n.t('admin.announcements.published_msg') : I18n.t('admin.announcements.scheduled_msg')
     else
-      render :new
+      render :new, status: 422
     end
   end
 
@@ -43,7 +43,7 @@ class Admin::AnnouncementsController < Admin::BaseController
       log_action :update, @announcement
       redirect_to admin_announcements_path, notice: I18n.t('admin.announcements.updated_msg')
     else
-      render :edit
+      render :edit, status: 422
     end
   end
 
@@ -107,6 +107,7 @@ class Admin::AnnouncementsController < Admin::BaseController
     attachments = current_user.account.media_attachments
       .where(id: ids, status_id: nil, scheduled_status_id: nil)
       .where(announcement_id: [nil, announcement.id])
+      .lock
       .index_by(&:id)
 
     if attachments.size != ids.size
@@ -118,12 +119,11 @@ class Admin::AnnouncementsController < Admin::BaseController
   end
 
   def save_with_media(announcement)
-    media_attachments = requested_media_attachments(announcement)
-    return false if media_attachments.nil?
-
     saved = false
 
     Announcement.transaction do
+      media_attachments = requested_media_attachments(announcement)
+      raise ActiveRecord::Rollback if media_attachments.nil?
       raise ActiveRecord::Rollback unless announcement.save
 
       sync_media_attachments(announcement, media_attachments)
@@ -137,7 +137,7 @@ class Admin::AnnouncementsController < Admin::BaseController
     requested_ids = media_attachments.map(&:id)
 
     announcement.media_attachments.where.not(id: requested_ids).update_all(announcement_id: nil)
-    current_user.account.media_attachments.where(id: requested_ids).update_all(announcement_id: announcement.id)
+    current_user.account.media_attachments.where(id: requested_ids, announcement_id: [nil, announcement.id]).update_all(announcement_id: announcement.id)
     announcement.media_attachments.reset
   end
 end

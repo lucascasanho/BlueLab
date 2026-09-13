@@ -242,5 +242,16 @@ RSpec.describe 'Media' do
         expect(MediaAttachment.where(id: media.id)).to exist
       end
     end
+
+    context 'when media is attached to an announcement' do
+      let(:media) { Fabricate(:media_attachment, account: user.account, announcement: Fabricate(:announcement)) }
+
+      it 'returns http unprocessable entity and keeps the media' do
+        media
+
+        expect { subject }.to_not change(MediaAttachment, :count)
+        expect(response).to have_http_status(422)
+      end
+    end
   end
 end

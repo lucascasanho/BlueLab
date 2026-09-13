@@ -9,8 +9,7 @@
         %tr
           %td.email-inner-card-td.email-prose
             %p= t('user_mailer.announcement_published.description', domain: site_hostname)
-            - rendered_communication = AdvancedTextFormatter.new(@announcement.text, content_type: @announcement.content_type, local: true).to_s
-            = prerender_custom_emojis(rendered_communication, @announcement.emojis, style: FormattingHelper::SYNDICATED_EMOJI_STYLES)
+            = EmojiFormatter.new(@announcement.formatted_text, @announcement.emojis, style: FormattingHelper::SYNDICATED_EMOJI_STYLES).to_s
 
             - @announcement.media_attachments.each do |media|
               - media_url = full_asset_url(media.file.url(:original))

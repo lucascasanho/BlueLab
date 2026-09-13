@@ -19,7 +19,7 @@ RSpec.describe 'Admin::Announcements' do
   end
 
   describe 'Creating announcements' do
-    it 'create a new announcement' do
+    it 'create a new announcement', :js do
       sign_in admin_user
       visit new_admin_announcement_path
 
@@ -34,7 +34,7 @@ RSpec.describe 'Admin::Announcements' do
   end
 
   describe 'Updating announcements' do
-    it 'updates an existing announcement' do
+    it 'updates an existing announcement', :js do
       announcement = Fabricate :announcement, text: 'Test Announcement'
       sign_in admin_user
       visit admin_announcements_path

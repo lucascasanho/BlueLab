@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Provider } from 'react-redux';
 
@@ -9,6 +9,7 @@ import {
   setSavedComposerSelectionOffset,
 } from '@/mastodon/features/compose/redesign/emoji_selection';
 import { RichComposeEditor } from '@/mastodon/features/compose/redesign/rich_editor';
+import { initializeEmoji } from '@/mastodon/features/emoji';
 import { store } from '@/mastodon/store';
 
 import './announcement_editor.scss';
@@ -163,6 +164,7 @@ const AnnouncementEditor = ({
   initialContentType = 'text/markdown',
   initialMedia = [],
   maxMediaAttachments = 4,
+  textLabel = 'Content',
 }) => {
   const copy = useMemo(getCopy, []);
   const [text, setText] = useState(initialText);
@@ -173,6 +175,10 @@ const AnnouncementEditor = ({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    void initializeEmoji();
+  }, []);
 
   const handleEmojiPick = useCallback(
     (emoji) => {
@@ -281,6 +287,7 @@ const AnnouncementEditor = ({
         <RichComposeEditor
           value={text}
           contentType={contentType}
+          ariaLabel={textLabel}
           onChange={setText}
           onContentTypeChange={setContentType}
           onFiles={handleFiles}

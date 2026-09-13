@@ -28,4 +28,13 @@ RSpec.describe REST::AnnouncementSerializer do
         )
     end
   end
+
+  it 'includes content type and media attachments' do
+    media_attachment = Fabricate(:media_attachment, announcement: announcement)
+
+    expect(subject).to include(
+      'content_type' => 'text/plain',
+      'media_attachments' => contain_exactly(include('id' => media_attachment.id.to_s))
+    )
+  end
 end

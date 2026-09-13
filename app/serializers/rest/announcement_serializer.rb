@@ -26,11 +26,7 @@ class REST::AnnouncementSerializer < ActiveModel::Serializer
   end
 
   def content
-    AdvancedTextFormatter.new(
-      object.text,
-      content_type: object.content_type,
-      local: true
-    ).to_s
+    object.formatted_text
   end
 
   def reactions

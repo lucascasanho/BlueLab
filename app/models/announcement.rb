@@ -52,6 +52,14 @@ class Announcement < ApplicationRecord
     text
   end
 
+  def formatted_text
+    if content_type == 'text/markdown'
+      AdvancedTextFormatter.new(text, content_type: content_type).to_s
+    else
+      TextFormatter.new(text).to_s
+    end
+  end
+
   def publish!
     update!(published: true, published_at: Time.now.utc, scheduled_at: nil)
   end

@@ -26,7 +26,8 @@
   - editor_props = { initialText: form.object.text.to_s,
                      initialContentType: form.object.content_type.presence || 'text/markdown',
                      initialMedia: initial_media,
-                     maxMediaAttachments: Announcement::MAX_MEDIA_ATTACHMENTS }
+                     maxMediaAttachments: Announcement::MAX_MEDIA_ATTACHMENTS,
+                     textLabel: t('simple_form.labels.announcement.text', default: 'Content') }
   %div{ data: { admin_component: 'announcement_editor', props: editor_props.to_json } }
 
 - unless form.object.published?
