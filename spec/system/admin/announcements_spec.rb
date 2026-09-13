@@ -4,7 +4,6 @@ require 'rails_helper'
 
 RSpec.describe 'Admin::Announcements' do
   include ActionView::RecordIdentifier
-  include ProfileStories
 
   describe 'Viewing announcements' do
     it 'can view a list of existing announcements' do
@@ -21,7 +20,7 @@ RSpec.describe 'Admin::Announcements' do
 
   describe 'Creating announcements' do
     it 'create a new announcement', :js do
-      as_a_logged_in_admin
+      sign_in_admin
       visit new_admin_announcement_path
 
       fill_in_editor 'Announcement text'
@@ -36,7 +35,7 @@ RSpec.describe 'Admin::Announcements' do
   describe 'Updating announcements' do
     it 'updates an existing announcement', :js do
       announcement = Fabricate :announcement, text: 'Test Announcement'
-      as_a_logged_in_admin
+      sign_in_admin
       visit admin_announcements_path
 
       within css_id(announcement) do
@@ -120,7 +119,17 @@ RSpec.describe 'Admin::Announcements' do
   end
 
   def fill_in_editor(text)
-    find(%([contenteditable][aria-label="#{text_label}"])).set(text)
+    find('[role="textbox"]', visible: :all).set(text)
+  end
+
+  def sign_in_admin
+    user = admin_user
+    user.approve!
+
+    visit new_user_session_path
+    fill_in 'user_email', with: user.email
+    fill_in 'user_password', with: '123456789'
+    click_on I18n.t('auth.login')
   end
 
   def admin_user
