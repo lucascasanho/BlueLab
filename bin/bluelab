@@ -153,11 +153,19 @@ reiniciar_servicos() {
   executar env RAILS_ENV=production bundle exec rails runner "abort 'Rails não iniciou' unless defined?(Setting); puts 'Rails: OK'"
 }
 
-versao_atual() {
+extrair_versao() {
   ruby -e '
-    s=File.read(ARGV[0]); f=->(n){s[/def #{Regexp.escape(n)}\s*\n\s*([^\n]+)/,1]&.strip&.sub(/\A[\x27\x22]|[\x27\x22]\z/,"")};
+    s=STDIN.read; f=->(n){s[/def #{Regexp.escape(n)}\s*\n\s*([^\n]+)/,1]&.strip&.sub(/\A[\x27\x22]|[\x27\x22]\z/,"")};
     a=[f["major"],f["minor"],f["patch"]]; abort "versão ilegível" if a.any?(&:nil?); v=a.join("."); p=f["default_prerelease"]; v+="-#{p}" if p && p!="nil"; puts v
-  ' "$REPO/lib/mastodon/version.rb"
+  '
+}
+
+versao_atual() {
+  extrair_versao <"$REPO/lib/mastodon/version.rb"
+}
+
+versao_main_oficial() {
+  git show "$REMOTO_MASTODON/main:lib/mastodon/version.rb" | extrair_versao
 }
 
 maior_tag_oficial() {
@@ -165,6 +173,10 @@ maior_tag_oficial() {
     t=STDIN.each_line.map(&:strip).select{|x| x.match?(/\Av\d+\.\d+\.\d+(?:-(?:alpha|beta|rc)(?:[.-]?\d+(?:\.\d+)*)?)?\z/i)};
     m=t.max_by{|x| Gem::Version.new(x.delete_prefix("v"))}; puts m if m
   '
+}
+
+versao_maior() {
+  ruby -rrubygems -e 'exit(Gem::Version.new(ARGV[0])>Gem::Version.new(ARGV[1]) ? 0 : 1)' "$1" "$2"
 }
 
 categoria() {
@@ -192,36 +204,57 @@ verificar_mastodon() {
     '+refs/heads/main:refs/remotes/'"$REMOTO_MASTODON"'/main' \
     '+refs/tags/v*:refs/remotes/'"$REMOTO_MASTODON"'/tags/v*'
 
-  local atual tag recente
+  local atual versao_main tag versao_tag candidato_ref candidato_versao candidato_origem
   atual="$(versao_atual)"
+  versao_main="$(versao_main_oficial)"
   tag="$(maior_tag_oficial)"
-  [[ -n "$tag" ]] || falhar "não encontrei versão oficial do Mastodon"
-  recente="${tag#v}"
-  echo "BlueLab baseado em: $atual"
-  echo "Mastodon oficial mais recente: $recente"
+  versao_tag="${tag#v}"
+  candidato_ref=""
+  candidato_versao=""
+  candidato_origem=""
 
-  if ! ruby -rrubygems -e 'exit(Gem::Version.new(ARGV[0])>Gem::Version.new(ARGV[1]) ? 0 : 1)' "$recente" "$atual"; then
-    echo "Nenhuma versão oficial mais nova para analisar."
+  echo "BlueLab baseado em: $atual"
+  echo "Versão declarada no main oficial: $versao_main"
+  [[ -n "$tag" ]] && echo "Maior tag oficial publicada: $versao_tag"
+
+  if versao_maior "$versao_main" "$atual"; then
+    candidato_ref="refs/remotes/$REMOTO_MASTODON/main"
+    candidato_versao="$versao_main"
+    candidato_origem="main oficial"
+  fi
+
+  if [[ -n "$tag" ]] && versao_maior "$versao_tag" "$atual"; then
+    if [[ -z "$candidato_versao" ]] || versao_maior "$versao_tag" "$candidato_versao"; then
+      candidato_ref="refs/remotes/$REMOTO_MASTODON/tags/$tag"
+      candidato_versao="$versao_tag"
+      candidato_origem="tag oficial $tag"
+    fi
+  fi
+
+  if [[ -z "$candidato_ref" ]]; then
+    echo "Nenhuma versão oficial mais nova para analisar. Commits comuns sem mudança de versão são ignorados."
     return 0
   fi
+
+  echo "Candidato encontrado: $candidato_versao ($candidato_origem)"
 
   local tmp codigo=0 relatorio
   tmp="$(mktemp -d "${TMPDIR:-/tmp}/bluelab-upstream.XXXXXX")"
   executar git worktree add --detach "$tmp" "$REMOTO/$CANAL_TESTE" >/dev/null
-  (cd "$tmp" && git -c user.name='BlueLab Atualizador' -c user.email='atualizador@localhost' merge --no-commit --no-ff "refs/remotes/$REMOTO_MASTODON/tags/$tag" >/dev/null 2>&1) || codigo=$?
+  (cd "$tmp" && git -c user.name='BlueLab Atualizador' -c user.email='atualizador@localhost' merge --no-commit --no-ff "$candidato_ref" >/dev/null 2>&1) || codigo=$?
 
   if [[ "$codigo" -ne 0 ]]; then
     mapfile -t conflitos < <(git -C "$tmp" diff --name-only --diff-filter=U)
-    relatorio="$DIR_ESTADO/conflitos-${tag#v}.txt"
+    relatorio="$DIR_ESTADO/conflitos-${candidato_versao}.txt"
     executar mkdir -p "$DIR_ESTADO"
     {
-      echo "Mastodon: $tag"
+      echo "Mastodon: $candidato_versao ($candidato_origem)"
       echo "BlueLab teste: $(git rev-parse "$REMOTO/$CANAL_TESTE")"
       echo "Conflitos: ${#conflitos[@]}"
       echo
       for arq in "${conflitos[@]}"; do printf '[%s] %s\n' "$(categoria "$arq")" "$arq"; done
       echo
-      echo "Pedido para IA: integre $tag ao BlueLab preservando tema, compose, navegação, limites, cores e configurações administrativas. Não substitua arquivos customizados inteiros por versões upstream. Resolva os conflitos abaixo:"
+      echo "Pedido para IA: integre a versão oficial $candidato_versao ($candidato_origem) ao BlueLab preservando tema, compose, navegação, limites, cores e configurações administrativas. Não substitua arquivos customizados inteiros por versões upstream. Resolva os conflitos abaixo:"
       printf '%s\n' "${conflitos[@]}"
     } >"$relatorio"
     echo "Conflitos encontrados; nenhum canal foi alterado:"
@@ -229,7 +262,7 @@ verificar_mastodon() {
     echo "Relatório para enviar à IA: $relatorio"
     git -C "$tmp" merge --abort >/dev/null 2>&1 || true
   else
-    echo "A simulação da atualização $tag não encontrou conflitos textuais."
+    echo "A simulação da atualização $candidato_versao não encontrou conflitos textuais."
     echo "Ela não foi aplicada automaticamente; primeiro deve ser integrada ao canal de teste e validada."
     git -C "$tmp" merge --abort >/dev/null 2>&1 || true
   fi
