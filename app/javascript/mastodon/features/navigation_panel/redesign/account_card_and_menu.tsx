@@ -15,6 +15,7 @@ import {
   ShieldStarIcon,
   SignOutIcon,
   CalendarDotsIcon,
+  StarIcon,
 } from '@phosphor-icons/react';
 
 import { openModal } from '@/mastodon/actions/modal';
@@ -284,6 +285,10 @@ export const AccountMenuItems: React.FC<{
   const isManager = canManageReports(permissions);
   const isAdmin = canViewAdminDashboard(permissions);
   const accountBasePath = `/@${account.acct}`;
+  const FavouriteIcon =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2'
+      ? StarIcon
+      : HeartIcon;
 
   return (
     <>
@@ -319,7 +324,7 @@ export const AccountMenuItems: React.FC<{
         />
       </MenuItemLink>
 
-      <MenuItemLink to='/favourites' icon={HeartIcon}>
+      <MenuItemLink to='/favourites' icon={FavouriteIcon}>
         <FormattedMessage
           id='navigation_bar.favourites'
           defaultMessage='Favorites'

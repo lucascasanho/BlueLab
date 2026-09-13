@@ -8,12 +8,12 @@ import {
   CalendarDotsIcon,
   GavelIcon,
   GearIcon,
-  HeartIcon,
   HouseIcon,
   ProhibitIcon,
   ShieldStarIcon,
   SignOutIcon,
   StackIcon,
+  StarIcon,
   UserIcon,
   UsersThreeIcon,
 } from '@phosphor-icons/react';
@@ -164,7 +164,7 @@ export const Blue2AccountMenu: React.FC = () => {
         onClick={closeMenu}
         role='menuitem'
       >
-        <HeartIcon />
+        <StarIcon />
         <FormattedMessage
           id='navigation_bar.favourites'
           defaultMessage='Favorites'
