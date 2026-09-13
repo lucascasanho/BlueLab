@@ -1,35 +1,46 @@
-# BlueLab customization invariants
+# Invariantes de customização do BlueLab
 
-BlueLab is a customized Mastodon distribution. Upstream Mastodon updates are inputs to BlueLab, not replacements for BlueLab behavior.
+O BlueLab é uma distribuição customizada do Mastodon. Atualizações do Mastodon oficial são entradas para o BlueLab, nunca substituições do comportamento do BlueLab.
 
-## Integration rule
+## Canais oficiais
 
-When synchronizing a new Mastodon upstream version:
+- `bluelab`: estado estável e único canal consumido pela Espelunca.
+- `bluelab-teste`: estado destinado ao mastodon.blue para validação antes de promoção.
 
-1. Start from the current `BlueLab` branch.
-2. Merge or port upstream changes into an isolated integration branch.
-3. Resolve conflicts by preserving BlueLab behavior unless the upstream change requires an adaptation for compatibility or safety.
-4. Never resolve conflicts by replacing customized BlueLab files wholesale with their upstream versions.
-5. Run the complete repository CI suite before integrating the update into `BlueLab`.
-6. Only after validation, merge the integration branch into `BlueLab` so every instance updating from this branch receives both the new Mastodon version and all BlueLab customizations.
+Os nomes antigos `BlueLab`, `BlueLab-Test` e `BlueLab-Testing` são apenas referências de transição e não devem receber novas implementações.
 
-## Protected BlueLab behavior
+## Regra de integração
 
-The following behavior must survive upstream updates:
+Ao sincronizar uma nova versão oficial do Mastodon:
 
-- The Bluesky-inspired BlueLab theme is the separate `blue-2` theme, currently entering through `styles/blue-2-v7.scss`; it must remain registered and selectable as **BlueLab**.
-- The complete BlueLab 2.0 experience is protected, not only its SCSS entrypoint. This includes the `features/blue2` navigation, account menu, compose launcher, icons, right rail, scroll-to-top behavior, BlueLab single-column/mobile layout integration, and the BlueLab messages/direct-timeline presentation.
-- When upstream replaces or renames a file used by BlueLab 2.0, port the BlueLab behavior to the new upstream component instead of restoring obsolete upstream files or dropping the customization.
-- `mastodon-bird-ui-auto` is a separate legacy Bird UI option and must never be renamed to BlueLab or used as a replacement for the `blue-2` theme.
-- Vanilla/default remains available alongside BlueLab and Bird UI.
-- Signed-out visitors use the BlueLab custom `/overview` homepage by default, except when Trends or Local Feed is explicitly configured as the landing page.
-- The BlueLab homepage keeps guest actions for account creation (when registrations are open), normal login, native passkey login, and the option to continue exploring without authentication.
-- The public About experience keeps the intended BlueLab surfaces and must not render duplicated borders between adjacent blocks or between section wrappers, titles, and bodies.
-- BlueLab compose redesign fixes, including mobile internal scrolling, media/ALT access, quote-card behavior, cursor/emoji behavior, safe-area handling, and prevention of background-column scrolling, must be preserved when compose files conflict.
-- Existing BlueLab branding, limits, instance customization controls, menu/theme palette adjustments, username-display behavior, passkey additions, and other committed BlueLab features must not be removed merely to match upstream.
+1. Partir do estado atual de `bluelab`.
+2. Integrar ou portar as mudanças upstream em um estado isolado.
+3. Resolver conflitos preservando o comportamento BlueLab, exceto quando uma adaptação for necessária por compatibilidade ou segurança.
+4. Nunca substituir arquivos customizados inteiros por versões upstream apenas para eliminar conflitos.
+5. Validar o resultado antes de colocá-lo em `bluelab-teste`.
+6. Testar esse SHA no mastodon.blue.
+7. Promover para `bluelab` exatamente o SHA testado, sem incluir commits posteriores.
 
-## Regression guards
+## Comportamentos protegidos
 
-Prefer executable regression tests for protected behavior. If an upstream update changes a guarded area, update the implementation and test together while preserving the intended BlueLab behavior.
+As seguintes características precisam sobreviver a atualizações upstream:
 
-A Mastodon version bump is not complete when an upstream snapshot is merely imported. It is complete only when the resulting `BlueLab` branch contains the upstream update plus the protected BlueLab behavior and passes validation.
+- Tema `blue-2`, registrado e exibido como **BlueLab**.
+- Experiência BlueLab 2.0 completa, incluindo navegação, menu de conta, acionador do compose, ícones, coluna lateral direita, comportamento de rolagem, layout de coluna única/mobile e apresentação de mensagens.
+- Quando o upstream renomear ou substituir um componente usado pelo BlueLab, o comportamento BlueLab deve ser portado para a nova estrutura em vez de ser descartado.
+- Homepage pública `/overview`, ações de cadastro quando permitido, login normal, login com passkey e opção de continuar navegando sem autenticação.
+- Ajustes do compose BlueLab, incluindo rolagem interna no mobile, mídia/ALT, citações, cursor/emojis, safe-area e bloqueio da rolagem da coluna de fundo.
+- Branding BlueLab, limites configuráveis, controles de customização da instância, paletas administrativas, comportamento de username, passkeys e demais recursos já incorporados.
+- Valores persistidos pelo painel administrativo para limites, cores claras/escuras, cores de e-mail e opções relacionadas não podem ser redefinidos por uma atualização.
+
+## Proteção contra regressões
+
+Sempre que possível, comportamentos protegidos devem possuir testes executáveis. Se uma atualização upstream tocar uma área protegida, implementação e teste devem ser adaptados juntos sem remover a intenção do BlueLab.
+
+Uma atualização do Mastodon não está concluída quando apenas o código upstream foi importado. Ela só está concluída quando o resultado mantém as customizações BlueLab, preserva as configurações administrativas e passa pela validação no mastodon.blue.
+
+## Fontes técnicas
+
+- Mastodon oficial: https://github.com/mastodon/mastodon
+- Git merge: https://git-scm.com/docs/git-merge
+- Git worktree: https://git-scm.com/docs/git-worktree
