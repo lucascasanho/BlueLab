@@ -19,12 +19,11 @@ RSpec.describe 'Admin::Announcements' do
   end
 
   describe 'Creating announcements' do
-    it 'create a new announcement' do
-      sign_in admin_user
+    it 'create a new announcement', :js do
+      sign_in_admin
       visit new_admin_announcement_path
 
-      fill_in text_label,
-              with: 'Announcement text'
+      fill_in_editor 'Announcement text'
 
       expect { submit_form }
         .to change(Announcement, :count).by(1)
@@ -34,17 +33,16 @@ RSpec.describe 'Admin::Announcements' do
   end
 
   describe 'Updating announcements' do
-    it 'updates an existing announcement' do
+    it 'updates an existing announcement', :js do
       announcement = Fabricate :announcement, text: 'Test Announcement'
-      sign_in admin_user
+      sign_in_admin
       visit admin_announcements_path
 
       within css_id(announcement) do
         click_on announcement.text
       end
 
-      fill_in text_label,
-              with: 'Announcement text'
+      fill_in_editor 'Announcement text'
       click_on submit_button
 
       expect(page)
@@ -118,6 +116,21 @@ RSpec.describe 'Admin::Announcements' do
 
   def text_label
     form_label('announcement.text')
+  end
+
+  def fill_in_editor(text)
+    find('[role="textbox"]', visible: :all).set(text)
+  end
+
+  def sign_in_admin
+    role = Fabricate(:user_role, permissions: UserRole::FLAGS.fetch(:manage_announcements))
+    user = Fabricate(:user, role: role)
+    user.approve!
+
+    visit new_user_session_path
+    fill_in 'user_email', with: user.email
+    fill_in 'user_password', with: '123456789'
+    click_on I18n.t('auth.login')
   end
 
   def admin_user

@@ -3,6 +3,21 @@
 require 'rails_helper'
 
 RSpec.describe Announcement do
+  describe '#formatted_text' do
+    it 'preserves native plain-text announcement formatting' do
+      announcement = Fabricate.build(:announcement, text: "Hello\nworld", content_type: 'text/plain')
+
+      expect(announcement.formatted_text).to eq('<p>Hello<br />world</p>')
+    end
+
+    it 'sanitizes rendered Markdown' do
+      announcement = Fabricate.build(:announcement, text: '**Hello** <script>alert(1)</script>', content_type: 'text/markdown')
+
+      expect(announcement.formatted_text).to include('<strong>Hello</strong>')
+      expect(announcement.formatted_text).to_not include('<script>')
+    end
+  end
+
   describe 'Scopes' do
     context 'with published and unpublished records' do
       let!(:published) { Fabricate(:announcement, published: true) }

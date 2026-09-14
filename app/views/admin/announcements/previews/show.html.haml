@@ -13,7 +13,7 @@
   = t('admin.announcements.preview.explanation_html', count: @user_count, display_count: number_with_delimiter(@user_count))
 
 .prose
-  = linkify(@announcement.text)
+  = prerender_custom_emojis(@announcement.formatted_text, @announcement.emojis)
 
 %hr.spacer/
 

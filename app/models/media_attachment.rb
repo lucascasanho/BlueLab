@@ -26,6 +26,7 @@
 #  created_at                       :datetime         not null
 #  updated_at                       :datetime         not null
 #  account_id                       :bigint(8)
+#  announcement_id                  :bigint(8)
 #  scheduled_status_id              :bigint(8)
 #  status_id                        :bigint(8)
 #
@@ -190,6 +191,7 @@ class MediaAttachment < ApplicationRecord
   belongs_to :account,          inverse_of: :media_attachments, optional: true
   belongs_to :status,           inverse_of: :media_attachments, optional: true
   belongs_to :scheduled_status, inverse_of: :media_attachments, optional: true
+  belongs_to :announcement,     inverse_of: :media_attachments, optional: true
 
   has_attached_file :file,
                     styles: ->(f) { file_styles f },
@@ -217,13 +219,13 @@ class MediaAttachment < ApplicationRecord
   validates :file, presence: true, if: :local?
   validates :thumbnail, absence: true, if: -> { local? && !audio_or_video? }
 
-  scope :attached, -> { where.not(status_id: nil).or(where.not(scheduled_status_id: nil)) }
+  scope :attached, -> { where.not(status_id: nil).or(where.not(scheduled_status_id: nil)).or(where.not(announcement_id: nil)) }
   scope :cached, -> { remote.where.not(file_file_name: nil) }
   scope :created_before, ->(value) { where(arel_table[:created_at].lt(value)) }
   scope :local, -> { where(remote_url: '') }
   scope :ordered, -> { order(id: :asc) }
   scope :remote, -> { where.not(remote_url: '') }
-  scope :unattached, -> { where(status_id: nil, scheduled_status_id: nil) }
+  scope :unattached, -> { where(status_id: nil, scheduled_status_id: nil, announcement_id: nil) }
   scope :updated_before, ->(value) { where(arel_table[:updated_at].lt(value)) }
   scope :without_local_interaction, lambda {
     where.not(Favourite.joins(:account).merge(Account.local).where(Favourite.arel_table[:status_id].eq(MediaAttachment.arel_table[:status_id])).select(1).arel.exists)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_09_130100) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_12_150002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -280,6 +280,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_130100) do
 
   create_table "announcements", force: :cascade do |t|
     t.boolean "all_day", default: false, null: false
+    t.string "content_type", default: "text/plain", null: false
     t.datetime "created_at", precision: nil, null: false
     t.datetime "ends_at", precision: nil
     t.datetime "notification_sent_at"
@@ -789,6 +790,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_130100) do
 
   create_table "media_attachments", id: :bigint, default: -> { "timestamp_id('media_attachments'::text)" }, force: :cascade do |t|
     t.bigint "account_id"
+    t.bigint "announcement_id"
     t.string "blurhash"
     t.datetime "created_at", precision: nil, null: false
     t.text "description"
@@ -812,6 +814,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_130100) do
     t.integer "type", default: 0, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["account_id", "status_id"], name: "index_media_attachments_on_account_id_and_status_id", order: { status_id: :desc }
+    t.index ["announcement_id"], name: "index_media_attachments_on_announcement_id"
     t.index ["scheduled_status_id"], name: "index_media_attachments_on_scheduled_status_id", where: "(scheduled_status_id IS NOT NULL)"
     t.index ["shortcode"], name: "index_media_attachments_on_shortcode", unique: true, opclass: :text_pattern_ops, where: "(shortcode IS NOT NULL)"
     t.index ["status_id"], name: "index_media_attachments_on_status_id"
@@ -1668,6 +1671,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_130100) do
   add_foreign_key "login_activities", "users", on_delete: :cascade
   add_foreign_key "markers", "users", on_delete: :cascade
   add_foreign_key "media_attachments", "accounts", name: "fk_96dd81e81b", on_delete: :nullify
+  add_foreign_key "media_attachments", "announcements", on_delete: :nullify
   add_foreign_key "media_attachments", "scheduled_statuses", on_delete: :nullify
   add_foreign_key "media_attachments", "statuses", on_delete: :nullify
   add_foreign_key "mentions", "accounts", name: "fk_970d43f9d1", on_delete: :cascade
