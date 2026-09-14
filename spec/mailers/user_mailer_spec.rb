@@ -386,6 +386,15 @@ RSpec.describe UserMailer do
         .to match(I18n.t('user_mailer.announcement_published.description', domain: local_domain_uri.host))
     end
 
+    it 'renders Markdown, custom emojis, and media fallbacks' do
+      Fabricate(:custom_emoji, shortcode: 'party')
+      announcement.update!(text: '**Hello** :party:', content_type: 'text/markdown')
+      media = Fabricate(:media_attachment, announcement: announcement, description: 'Release demo')
+
+      expect(mail.html_part.body.decoded).to include('<strong>Hello</strong>', 'alt=":party:"', 'Release demo')
+      expect(mail.text_part.body.decoded).to include('Release demo', media.file.url(:original))
+    end
+
     it_behaves_like 'optional bulk mailer settings'
   end
 end
