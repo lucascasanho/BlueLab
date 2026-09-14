@@ -58,7 +58,6 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   );
   const composerEditor = useAppSelector(selectComposerEditor);
   const useBlueLabComposer =
-    multiColumn &&
     composerEditor === 'bluelab' &&
     typeof document !== 'undefined' &&
     document.body.dataset.theme === 'blue-2';
@@ -211,11 +210,15 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
       />
 
       <div className='scrollable'>
-        <ComposeFormContainer
-          // This is fine on this single-purpose view
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus
-        />
+        {useBlueLabComposer ? (
+          <RedesignComposeForm autoFocus embedded />
+        ) : (
+          <ComposeFormContainer
+            // This is fine on this single-purpose view
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+          />
+        )}
       </div>
 
       <Helmet>
