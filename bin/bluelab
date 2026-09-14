@@ -154,9 +154,9 @@ reiniciar_servicos() {
 }
 
 extrair_versao() {
-  ruby -e '
-    s=STDIN.read; f=->(n){s[/def #{Regexp.escape(n)}\s*\n\s*([^\n]+)/,1]&.strip&.sub(/\A[\x27\x22]|[\x27\x22]\z/,"")};
-    a=[f["major"],f["minor"],f["patch"]]; abort "versão ilegível" if a.any?(&:nil?); v=a.join("."); p=f["default_prerelease"]; v+="-#{p}" if p && p!="nil"; puts v
+  ruby -rrubygems -e '
+    s=STDIN.read; f=->(n){s[/def #{Regexp.escape(n)}\s*\n\s*([^\n]+)/,1]&.strip&.gsub(/\A[\x27\x22]+|[\x27\x22]+\z/,"")};
+    a=[f["major"],f["minor"],f["patch"]]; abort "versão ilegível" if a.any?(&:nil?); v=a.join("."); p=f["default_prerelease"]; v+="-#{p}" if p && p!="nil"; Gem::Version.new(v); puts v
   '
 }
 
