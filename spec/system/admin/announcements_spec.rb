@@ -30,6 +30,23 @@ RSpec.describe 'Admin::Announcements' do
       expect(page)
         .to have_text(I18n.t('admin.announcements.published_msg'))
     end
+
+    it 'keeps the text editor mounted while using the emoji picker', :js do
+      sign_in_admin
+      visit new_admin_announcement_path
+
+      button = find('.communication-composer__actions button[aria-expanded]')
+      expect(button[:type]).to eq('button')
+      button.click
+
+      expect(page).to have_css('.emoji-mart')
+      expect(page).to have_css('[role="textbox"]', visible: :visible)
+
+      button.click
+
+      expect(page).to have_no_css('.emoji-mart')
+      expect(page).to have_css('[role="textbox"]', visible: :visible)
+    end
   end
 
   describe 'Updating announcements' do

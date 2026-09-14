@@ -20,9 +20,10 @@ const modeSelector = createAppSelector(
 );
 
 export function useEmojiAppState(): EmojiAppState {
-  const locale = useAppSelector((state) =>
-    toSupportedLocale(state.meta.get('locale') as string),
-  );
+  const locale = useAppSelector((state) => {
+    const stateLocale = state.meta.get('locale') as string | undefined;
+    return toSupportedLocale(stateLocale ?? document.documentElement.lang);
+  });
   const mode = useAppSelector(modeSelector);
 
   return {
