@@ -27,6 +27,15 @@ RSpec.describe PostStatusService do
     end.to raise_error(ActiveRecord::RecordInvalid)
   end
 
+  it 'rejects media attached to an announcement' do
+    account = Fabricate(:account)
+    media = Fabricate(:media_attachment, account: account, announcement: Fabricate(:announcement))
+
+    expect do
+      subject.call(account, text: 'Hello', media_ids: [media.id])
+    end.to raise_error(Mastodon::ValidationError)
+  end
+
   it 'creates a new response status' do
     in_reply_to_status = Fabricate(:status)
     account = Fabricate(:account)

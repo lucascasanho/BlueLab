@@ -111,6 +111,14 @@ RSpec.describe UpdateStatusService do
       status.media_attachments << detached_media_attachment
     end
 
+    it 'rejects media attached to an announcement' do
+      media = Fabricate(:media_attachment, account: status.account, announcement: Fabricate(:announcement))
+
+      expect do
+        subject.call(status, status.account_id, text: 'Foo', media_ids: [media.id])
+      end.to raise_error(Mastodon::ValidationError)
+    end
+
     it 'updates media attachments, handles attachments, saves history' do
       subject.call(status, status.account_id, text: 'Foo', media_ids: [attached_media_attachment.id.to_s])
 

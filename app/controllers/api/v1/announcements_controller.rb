@@ -18,7 +18,7 @@ class Api::V1::AnnouncementsController < Api::BaseController
   private
 
   def set_announcements
-    @announcements = Announcement.published.chronological
+    @announcements = Announcement.published.chronological.includes(:media_attachments)
   end
 
   def set_announcement
