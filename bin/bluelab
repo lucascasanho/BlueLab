@@ -294,16 +294,16 @@ atualizar() {
   git log -1 --format='commit: %H%ndata: %cd%nmensagem: %s' --date=iso
   if [[ "$ALVO" == blue ]]; then
     verificar_mastodon
-    echo "Depois de testar este SHA, use 'bluelab promover' para validar a promoção."
+    echo "Depois de testar este SHA, use 'bluelab promover' para promover o SHA testado ao canal estável."
   else
     echo "A Espelunca consulta somente o canal $CANAL_ESTAVEL."
   fi
 }
 
 promover() {
-  [[ "$ALVO" == blue ]] || falhar "promoção só pode ser validada no mastodon.blue"
+  [[ "$ALVO" == blue ]] || falhar "promoção só pode ser executada no mastodon.blue"
   preparar_git
-  local teste estavel local_head implantado
+  local teste estavel local_head implantado promovido
   teste="$(git rev-parse "$REMOTO/$CANAL_TESTE")"
   estavel="$(git rev-parse "$REMOTO/$CANAL_ESTAVEL")"
   local_head="$(git rev-parse HEAD)"
@@ -314,17 +314,28 @@ promover() {
   git merge-base --is-ancestor "$estavel" "$teste" || falhar "os canais divergiram; promoção automática não é segura"
   [[ -z "$(git status --porcelain=v1)" ]] || falhar "há alterações locais"
 
+  if [[ "$estavel" == "$teste" ]]; then
+    echo "Canal $CANAL_ESTAVEL já está no SHA testado: $teste"
+    return 0
+  fi
+
+  executar git push "$REMOTO" "$teste:refs/heads/$CANAL_ESTAVEL"
+  executar git fetch --prune "$REMOTO" "+refs/heads/$CANAL_ESTAVEL:refs/remotes/$REMOTO/$CANAL_ESTAVEL"
+  promovido="$(git rev-parse "$REMOTO/$CANAL_ESTAVEL")"
+  [[ "$promovido" == "$teste" ]] || falhar "o GitHub não confirmou $CANAL_ESTAVEL no SHA testado"
+
   executar mkdir -p "$DIR_ESTADO"
   {
     echo "SHA_TESTADO=$teste"
-    echo "SHA_ESTAVEL_ATUAL=$estavel"
+    echo "SHA_ESTAVEL_ANTERIOR=$estavel"
+    echo "SHA_PROMOVIDO=$promovido"
     echo "CANAL_ORIGEM=$CANAL_TESTE"
     echo "CANAL_DESTINO=$CANAL_ESTAVEL"
   } >"$DIR_ESTADO/promocao-pronta.txt"
 
-  echo "Promoção validada localmente."
-  echo "SHA testado: $teste"
-  echo "O conector do GitHub deve mover $CANAL_ESTAVEL exatamente para esse SHA, sem squash/rebase e sem incluir commits posteriores."
+  echo "Promoção concluída."
+  echo "$CANAL_ESTAVEL agora aponta exatamente para o SHA testado: $promovido"
+  echo "A Espelunca já pode executar 'bluelab' para receber esta versão."
   echo "Registro: $DIR_ESTADO/promocao-pronta.txt"
 }
 
