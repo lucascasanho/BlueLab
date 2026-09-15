@@ -1,0 +1,42 @@
+name: Format alpha.3 integration fixes
+
+on:
+  push:
+    branches:
+      - integration/20260915-mastodon-4.8.0-alpha.3-xours
+    paths:
+      - .github/workflows/format-alpha3-integration.yml
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout integration branch
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Javascript environment
+        uses: ./.github/actions/setup-javascript
+
+      - name: Format affected files
+        run: |
+          yarn format \
+            app/javascript/mastodon/features/custom_homepage/index.tsx \
+            app/javascript/mastodon/features/ui/components/columns_area/redesign.tsx
+          yarn oxfmt --check \
+            app/javascript/mastodon/features/custom_homepage/index.tsx \
+            app/javascript/mastodon/features/ui/components/columns_area/redesign.tsx
+
+      - name: Commit formatting
+        run: |
+          git config user.name "BlueLab Alpha3 Format"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            app/javascript/mastodon/features/custom_homepage/index.tsx \
+            app/javascript/mastodon/features/ui/components/columns_area/redesign.tsx
+          git commit --no-verify -m "Format alpha.3 integration fixes"
+          git push origin HEAD:integration/20260915-mastodon-4.8.0-alpha.3-xours
