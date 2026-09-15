@@ -256,7 +256,34 @@ export const CustomHomepage: React.FC = () => {
   }
 
   return (
-    <div className={classes.page}>
+    <div
+      className={classNames(
+        classes.page,
+        isRedesignEnabled() && classes.pageRedesign,
+      )}
+    >
+      {isRedesignEnabled() && (
+        <ColumnHeader
+          title={domain}
+          extraButtons={
+            !signedIn && (
+              <ColumnHeaderButton
+                as='a'
+                href={sso_redirect ?? '/auth/sign_in'}
+                data-method={sso_redirect ? 'post' : undefined}
+                showTextOnDesktop
+                icon={SignInIcon}
+                variant='solid'
+              >
+                <FormattedMessage
+                  id='sign_in_banner.sign_in'
+                  defaultMessage='Login'
+                />
+              </ColumnHeaderButton>
+            )
+          }
+        />
+      )}
       <ServerHeroImage
         alt={server.item?.thumbnail.description ?? ''}
         blurhash={server.item?.thumbnail.blurhash ?? ''}

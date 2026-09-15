@@ -60,11 +60,32 @@ export const selectComposeCharsCount = createAppSelector(
   },
 );
 
+export const selectComposeHasAttachments = createAppSelector(
+  [
+    (state) => !!state.compose.get('poll'),
+    (state) => state.compose.get('quoted_status_id') as string | null,
+    (state) =>
+      state.compose.get('media_attachments') as
+        | Immutable.List<unknown>
+        | undefined,
+    (state) => Number(state.compose.get('pending_media_attachments')),
+  ],
+  (hasPoll, quotedStatusId, attachments, pendingAttachments) => {
+    return {
+      hasPoll,
+      hasAttachments:
+        (attachments && attachments.size > 0) || pendingAttachments > 0,
+      quotedStatusId,
+    };
+  },
+);
+
 export const selectComposeCanSubmit = createAppSelector(
   [
     (state) => !!state.compose.get('is_submitting'),
     (state) => !!state.compose.get('is_uploading'),
     (state) => !!state.compose.get('is_changing_upload'),
+    selectComposeHasAttachments,
     selectComposeCharsCount,
     (state) =>
       (state.compose.get('media_attachments') as unknown as { size: number })
@@ -111,7 +132,7 @@ export const selectComposeMentions = createAppSelector(
   (accountsMap, text, localDomain) => {
     const accounts = new Set<string>();
     const potentialAccounts = text.matchAll(
-      /@(?<username>[a-zA-Z0-9_.-]+)(?<domain>@[a-zA-Z0-9_.-]+)?/g,
+      /(?<!:\/\/[^\s]+)@(?<username>[a-zA-Z0-9_.-]+)(?<domain>@[a-zA-Z0-9_.-]+)?/g,
     );
     for (const match of potentialAccounts) {
       const { username, domain } = match.groups ?? {};
@@ -188,26 +209,6 @@ export const selectFrequentlyUsedEmoji = createAppSelector(
     }
 
     return emojis;
-  },
-);
-
-export const selectComposeHasAttachments = createAppSelector(
-  [
-    (state) => !!state.compose.get('poll'),
-    (state) => state.compose.get('quoted_status_id') as string | null,
-    (state) =>
-      state.compose.get('media_attachments') as
-        | Immutable.List<unknown>
-        | undefined,
-    (state) => Number(state.compose.get('pending_media_attachments')),
-  ],
-  (hasPoll, quotedStatusId, attachments, pendingAttachments) => {
-    return {
-      hasPoll,
-      hasAttachments:
-        (attachments && attachments.size > 0) || pendingAttachments > 0,
-      quotedStatusId,
-    };
   },
 );
 

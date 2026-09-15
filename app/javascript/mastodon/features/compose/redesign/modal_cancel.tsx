@@ -10,8 +10,8 @@ import {
   ModalTitle,
 } from '@/mastodon/components/modal_shell/redesign';
 import {
-  focusComposerTextarea,
   openNewComposer,
+  requestComposerFocus,
   resetComposer,
   resumeComposer,
 } from '@/mastodon/reducers/slices/composer';
@@ -43,32 +43,62 @@ const ComposerModalCancelConfirm: React.FC<{ openNew?: ComposeNewPayload }> = ({
     }
   }, [dispatch, openNew]);
 
+  const isEditing = useAppSelector((state) => !!state.compose.get('id'));
+
   return (
     <ModalShell>
       <ModalTitle>
-        <FormattedMessage
-          id='compose.cancel_modal.title'
-          defaultMessage='Discard draft'
-        />
+        {isEditing ? (
+          <FormattedMessage
+            id='compose.cancel_modal.edit.title'
+            defaultMessage='Unsaved changes'
+          />
+        ) : (
+          <FormattedMessage
+            id='compose.cancel_modal.title'
+            defaultMessage='Discard draft'
+          />
+        )}
       </ModalTitle>
 
-      <FormattedMessage
-        id='compose.cancel_modal.body'
-        defaultMessage='You have a draft already in progress. What would you like to do?'
-      />
+      {isEditing ? (
+        <FormattedMessage
+          id='compose.cancel_modal.edit.body'
+          defaultMessage='You were editing a post. What would you like to do?'
+        />
+      ) : (
+        <FormattedMessage
+          id='compose.cancel_modal.body'
+          defaultMessage='You have a draft already in progress. What would you like to do?'
+        />
+      )}
 
       <ModalActions>
         <Button variant='solid' color='destructive' onClick={handleDelete}>
-          <FormattedMessage
-            id='compose.cancel_modal.delete'
-            defaultMessage='Delete draft'
-          />
+          {isEditing ? (
+            <FormattedMessage
+              id='compose.cancel_modal.edit.delete'
+              defaultMessage='Discard changes'
+            />
+          ) : (
+            <FormattedMessage
+              id='compose.cancel_modal.delete'
+              defaultMessage='Delete draft'
+            />
+          )}
         </Button>
         <Button variant='solid' onClick={handleContinue}>
-          <FormattedMessage
-            id='compose.cancel_modal.continue'
-            defaultMessage='Continue draft'
-          />
+          {isEditing ? (
+            <FormattedMessage
+              id='compose.cancel_modal.edit.continue'
+              defaultMessage='Continue editing'
+            />
+          ) : (
+            <FormattedMessage
+              id='compose.cancel_modal.continue'
+              defaultMessage='Continue draft'
+            />
+          )}
         </Button>
       </ModalActions>
     </ModalShell>

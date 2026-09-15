@@ -236,72 +236,73 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
     }
   }
 
-  return (
-    <Column
-      bindToDocument={!multiColumn}
-      label={intl.formatMessage(messages.title, { q })}
-    >
-      <ColumnHeader
-        icon={'search'}
-        iconComponent={SearchIcon}
-        title={intl.formatMessage(messages.title, { q })}
-        multiColumn={multiColumn}
-        scrollTopOnClick
-        appendContent={
-          <>
-            <div className='explore__search-header'>
-              <Search
-                singleColumn
-                initialValue={trimmedValue}
-                key={trimmedValue}
-              />
-            </div>
+  const extraStickyHeaderContent = (
+    <>
+      <div className='explore__search-header'>
+        <Search singleColumn initialValue={trimmedValue} key={trimmedValue} />
+      </div>
 
-            <div className='account__section-headline'>
-              <button
-                onClick={handleSelectAll}
-                className={mappedType === 'all' ? 'active' : undefined}
-                type='button'
-              >
-                <FormattedMessage
-                  id='search_results.all'
-                  defaultMessage='All'
-                />
-              </button>
-              <button
-                onClick={handleSelectAccounts}
-                className={mappedType === 'accounts' ? 'active' : undefined}
-                type='button'
-              >
-                <FormattedMessage
-                  id='search_results.accounts'
-                  defaultMessage='Profiles'
-                />
-              </button>
-              <button
-                onClick={handleSelectHashtags}
-                className={mappedType === 'hashtags' ? 'active' : undefined}
-                type='button'
-              >
-                <FormattedMessage
-                  id='search_results.hashtags'
-                  defaultMessage='Hashtags'
-                />
-              </button>
-              <button
-                onClick={handleSelectStatuses}
-                className={mappedType === 'statuses' ? 'active' : undefined}
-                type='button'
-              >
-                <FormattedMessage
-                  id='search_results.statuses'
-                  defaultMessage='Posts'
-                />
-              </button>
-            </div>
-          </>
-        }
-      />
+      <div className='account__section-headline'>
+        <button
+          onClick={handleSelectAll}
+          className={mappedType === 'all' ? 'active' : undefined}
+          type='button'
+        >
+          <FormattedMessage id='search_results.all' defaultMessage='All' />
+        </button>
+        <button
+          onClick={handleSelectAccounts}
+          className={mappedType === 'accounts' ? 'active' : undefined}
+          type='button'
+        >
+          <FormattedMessage
+            id='search_results.accounts'
+            defaultMessage='Profiles'
+          />
+        </button>
+        <button
+          onClick={handleSelectHashtags}
+          className={mappedType === 'hashtags' ? 'active' : undefined}
+          type='button'
+        >
+          <FormattedMessage
+            id='search_results.hashtags'
+            defaultMessage='Hashtags'
+          />
+        </button>
+        <button
+          onClick={handleSelectStatuses}
+          className={mappedType === 'statuses' ? 'active' : undefined}
+          type='button'
+        >
+          <FormattedMessage
+            id='search_results.statuses'
+            defaultMessage='Posts'
+          />
+        </button>
+      </div>
+    </>
+  );
+
+  const pageTitle = intl.formatMessage(messages.title, { q });
+
+  return (
+    <Column bindToDocument={!multiColumn} label={pageTitle}>
+      {isRedesignEnabled() ? (
+        <ColumnHeader
+          title={pageTitle}
+          extraStickyContent={extraStickyHeaderContent}
+        />
+      ) : (
+        <LegacyColumnHeader
+          icon={'search'}
+          iconComponent={SearchIcon}
+          title={pageTitle}
+          multiColumn={multiColumn}
+          scrollTopOnClick
+          appendContent={extraStickyHeaderContent}
+        />
+      )}
 
       <div className='explore__search-results' data-nosnippet>
         <ScrollableList
@@ -330,7 +331,7 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
       </div>
 
       <Helmet>
-        <title>{intl.formatMessage(messages.title, { q })}</title>
+        <title>{pageTitle}</title>
         <meta name='robots' content='noindex' />
       </Helmet>
     </Column>

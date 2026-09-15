@@ -110,6 +110,15 @@ const composerSlice = createSlice({
     setCloseOnSubmitSuccess(state, action: PayloadAction<boolean>) {
       state.closeOnSubmitSuccess = action.payload;
     },
+    requestFocus(
+      state,
+      action: PayloadAction<ComposerTextareaSelection | undefined>,
+    ) {
+      state.pendingFocus = { selection: action.payload ?? null };
+    },
+    clearPendingFocus(state) {
+      state.pendingFocus = null;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(COMPOSE_SUBMIT_SUCCESS, (state) => {
@@ -244,9 +253,12 @@ export const openNewComposer = createAppThunk(
         dispatch(directCompose(account));
       } else {
         dispatch(changeComposeVisibility('direct'));
+        dispatch(requestComposerFocus());
       }
     } else if (payload.type === 'reply') {
       dispatch(replyComposeById(payload.toStatusId));
+    } else {
+      dispatch(requestComposerFocus());
     }
     dispatch(composerSlice.actions.showComposer(payload.origin));
 

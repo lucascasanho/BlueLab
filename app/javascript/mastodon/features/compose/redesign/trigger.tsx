@@ -369,7 +369,7 @@ export const ComposeRedesignButton: React.FC<{
         <MenuItem
           name='message'
           onClick={handleComposerOpen}
-          icon={ChatCircleIcon}
+          icon={ChatCircleDotsIcon}
         >
           <FormattedMessage
             id='compose.new.message'

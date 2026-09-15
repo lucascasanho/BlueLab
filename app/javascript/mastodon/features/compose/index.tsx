@@ -20,7 +20,11 @@ import MenuIcon from '@/material-icons/400-24px/menu.svg?react';
 import NotificationsIcon from '@/material-icons/400-24px/notifications-fill.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 import SettingsIcon from '@/material-icons/400-24px/settings.svg?react';
-import { mountCompose, unmountCompose } from 'mastodon/actions/compose';
+import {
+  changeComposing,
+  mountCompose,
+  unmountCompose,
+} from 'mastodon/actions/compose';
 import { openModal } from 'mastodon/actions/modal';
 import { Icon } from 'mastodon/components/icon';
 import { mascot, reduceMotion } from 'mastodon/initial_state';
@@ -68,6 +72,10 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
     return () => {
       dispatch(unmountCompose());
     };
+  }, [dispatch]);
+
+  const handleFocus = useCallback(() => {
+    dispatch(changeComposing(true));
   }, [dispatch]);
 
   const handleLogoutClick = useCallback(
@@ -201,13 +209,20 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
       bindToDocument={!multiColumn}
       label={intl.formatMessage(navbarMessages.publish)}
     >
-      <ColumnHeader
-        icon='pencil'
-        iconComponent={EditIcon}
-        title={intl.formatMessage(navbarMessages.publish)}
-        multiColumn={multiColumn}
-        showBackButton
-      />
+      {isRedesignEnabled() ? (
+        <ColumnHeader
+          withBackButton
+          title={intl.formatMessage(navbarMessages.publish)}
+        />
+      ) : (
+        <LegacyColumnHeader
+          icon='pencil'
+          iconComponent={EditIcon}
+          title={intl.formatMessage(navbarMessages.publish)}
+          multiColumn={multiColumn}
+          showBackButton
+        />
+      )}
 
       <div className='scrollable'>
         {useBlueLabComposer ? (

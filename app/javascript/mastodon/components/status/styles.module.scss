@@ -39,33 +39,39 @@
 .content,
 .footer,
 .root :global(.status__prepend),
-.root :global(.content-warning) {
+.root :global(.content-warning),
+.translate,
+.contentReadMore {
   grid-column: var(--content-col);
 }
 
+.translate {
+  display: flex;
+  align-items: center;
+}
+
+.translateInfo {
+  @include mixins.type-label-md;
+
+  color: var(--color-text-secondary);
+  margin-inline-start: auto;
+}
+
 .content {
+  --mask-height: 80px;
+
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
 
   &.collapsed {
-    position: relative;
-    max-height: 15lh;
+    max-height: var(--max-height); // Set via JS.
     overflow-y: clip;
-
-    &::after {
-      content: '';
-      position: absolute;
-      inset-inline: 0;
-      inset-block-end: 0;
-      height: calc(var(--space-4xl) * 2);
-      background: linear-gradient(
-        to bottom,
-        transparent,
-        var(--color-bg-blend)
-      );
-      pointer-events: none;
-    }
+    mask-image: linear-gradient(
+      to bottom,
+      black calc(100% - var(--mask-height)),
+      transparent
+    );
   }
 }
 
@@ -96,10 +102,33 @@
 }
 
 .contentReadMore {
-  position: absolute;
-  inset-block-end: 0;
-  inset-inline-start: 0;
-  z-index: 1;
+  width: max-content;
+}
+
+.hashtagsWrapper,
+.hashtags {
+  display: flex;
+  gap: var(--space-2xs);
+  flex-wrap: nowrap;
+}
+
+.hashtagsWrapper {
+  padding: var(--space-2xs) 0;
+}
+
+.hashtags {
+  overflow: hidden;
+  position: relative;
+
+  > button {
+    flex-shrink: 0;
+  }
+}
+
+.hashtagsShowAll {
+  flex-wrap: wrap;
+  overflow: visible;
+  max-width: none !important;
 }
 
 .meta {
@@ -118,23 +147,4 @@
 
 .actionsButtonGap {
   margin-inline-end: auto;
-}
-
-.actionDescription {
-  @include mixins.type-label-sm;
-
-  display: block;
-  color: var(--color-text-tertiary);
-
-  [data-menu-item='true'][aria-disabled='true'] & {
-    color: inherit;
-  }
-}
-
-.actionDangerous {
-  color: var(--color-text-error);
-}
-
-.buttonAlign {
-  margin-inline-start: calc(-1 * var(--space-sm));
 }

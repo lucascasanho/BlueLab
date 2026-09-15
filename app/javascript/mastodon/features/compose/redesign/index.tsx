@@ -17,7 +17,7 @@ import {
 } from '@/mastodon/actions/compose';
 import { ToggleButton } from '@/mastodon/components/button/redesign';
 import { TextInputField } from '@/mastodon/components/form_fields/redesign';
-import { Icon } from '@/mastodon/components/icon';
+import { Icon, useIconWeight } from '@/mastodon/components/icon';
 import {
   focusComposerTextarea,
   submitComposer,
