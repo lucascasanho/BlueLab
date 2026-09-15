@@ -52,11 +52,29 @@ jobs:
               "app/javascript/mastodon/components/menu/styles.module.scss"
               "app/javascript/mastodon/components/status/action_bar.tsx"
               "app/javascript/mastodon/features/compose/index.tsx"
+              "app/javascript/mastodon/features/compose/redesign/footer.tsx"
+              "app/javascript/mastodon/features/compose/redesign/index.tsx"
+              "app/javascript/mastodon/features/compose/redesign/modal_cancel.tsx"
+              "app/javascript/mastodon/features/compose/redesign/selectors.ts"
+              "app/javascript/mastodon/features/compose/redesign/styles.module.scss"
+              "app/javascript/mastodon/features/compose/redesign/trigger.module.scss"
+              "app/javascript/mastodon/features/compose/redesign/trigger.tsx"
+              "app/javascript/mastodon/features/compose/redesign/visibility.tsx"
+              "app/javascript/mastodon/features/custom_homepage/index.tsx"
+              "app/javascript/mastodon/features/navigation_panel/redesign/account_card_and_menu.tsx"
+              "app/javascript/mastodon/features/navigation_panel/redesign/index.tsx"
+              "app/javascript/mastodon/features/search/index.tsx"
+              "app/javascript/mastodon/features/ui/components/columns_area/redesign.tsx"
+              "app/javascript/mastodon/features/ui/index.jsx"
+              "app/javascript/mastodon/locales/en.json"
+              "app/javascript/mastodon/reducers/slices/composer.ts"
+              "app/models/scheduled_status.rb"
             )
 
             printf '%s\n' "${expected_conflicts[@]}" | sort > /tmp/expected-conflicts
             printf '%s\n' "${conflicts[@]}" > /tmp/actual-conflicts
             unexpected="$(comm -23 /tmp/actual-conflicts /tmp/expected-conflicts || true)"
+            missing="$(comm -13 /tmp/actual-conflicts /tmp/expected-conflicts || true)"
 
             if [ -n "$unexpected" ]; then
               echo "Unexpected conflicts detected; refusing to publish integration:"
@@ -64,7 +82,12 @@ jobs:
               exit 1
             fi
 
-            echo "Expected conflicts detected. Preserving BlueLab versions for surgical follow-up:"
+            if [ -n "$missing" ]; then
+              echo "Previously audited conflicts no longer present (informational):"
+              printf '%s\n' "$missing"
+            fi
+
+            echo "Audited conflicts detected. Preserving BlueLab versions for surgical follow-up:"
             printf '%s\n' "${conflicts[@]}"
             for file in "${conflicts[@]}"; do
               git checkout --ours -- "$file"
