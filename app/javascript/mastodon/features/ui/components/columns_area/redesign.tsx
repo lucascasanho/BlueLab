@@ -382,7 +382,9 @@ export const ColumnsAreaRedesign: React.FC<{
   return (
     <main
       ref={ref}
-      className={classNames(multiColClasses.root, { unscrollable: isModalOpen })}
+      className={classNames(multiColClasses.root, {
+        unscrollable: isModalOpen,
+      })}
       tabIndex={isModalOpen ? undefined : 0}
     >
       <div className={multiColClasses.navigationWrapper}>

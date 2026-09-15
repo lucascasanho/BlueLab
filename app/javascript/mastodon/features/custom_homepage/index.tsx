@@ -17,7 +17,10 @@ import { SignInIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
 import api from '@/mastodon/api';
-import { ColumnHeader, ColumnHeaderButton } from '@/mastodon/components/column_header';
+import {
+  ColumnHeader,
+  ColumnHeaderButton,
+} from '@/mastodon/components/column_header';
 import { NavigationFocusTarget } from '@/mastodon/components/navigation_focus_target';
 import {
   customFavicon,
