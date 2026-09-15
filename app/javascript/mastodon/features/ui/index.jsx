@@ -74,7 +74,6 @@ import {
   Blocks,
   DomainBlocks,
   Mutes,
-  PinnedStatuses,
   Directory,
   OnboardingProfile,
   OnboardingFollows,
@@ -242,7 +241,6 @@ class SwitchingColumnsArea extends PureComponent {
 
             <WrappedRoute path='/bookmarks' component={BookmarkedStatuses} content={children} />
             <WrappedRoute path='/scheduled' component={ScheduledPublications} content={children} />
-            <WrappedRoute path='/pinned' component={PinnedStatuses} content={children} />
 
             <WrappedRoute path='/start/profile' exact component={OnboardingProfile} content={children} />
             <WrappedRoute path={['/start', '/start/follows']} exact component={OnboardingFollows} content={children} />
