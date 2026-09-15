@@ -9,8 +9,8 @@
 #  ordered_media_attachment_ids :bigint(8)        is an Array
 #  poll_options                 :string           is an Array
 #  sensitive                    :boolean
-#  spoiler_text                 :text             default(""), not null
-#  text                         :text             default(""), not null
+#  spoiler_text                 :text             default("") , not null
+#  text                         :text             default("") , not null
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  account_id                   :bigint(8)
@@ -27,7 +27,7 @@ class StatusEdit < ApplicationRecord
     delegate :id, :type, :url, :preview_url, :remote_url,
              :preview_remote_url, :text_url, :meta, :blurhash,
              :not_processed?, :needs_redownload?, :local?,
-             :file, :thumbnail, :thumbnail_remote_url,
+             :file, :file_content_type, :thumbnail, :thumbnail_remote_url,
              :shortcode, :video?, :audio?, :discarded?, :on_hold?, to: :media_attachment
   end
 
