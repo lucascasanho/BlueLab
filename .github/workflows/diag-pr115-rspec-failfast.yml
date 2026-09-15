@@ -88,14 +88,48 @@ jobs:
         run: |
           bin/rails db:setup
           bin/flatware fan bin/rails db:test:prepare
-      - name: Run RSpec until first failure
+      - name: Run RSpec until first failure and build tiny report
         shell: bash
         run: |
           set +e
           bin/flatware rspec --fail-fast > rspec-failfast.log 2>&1
           rc=$?
-          echo '===== Failure markers ====='
-          grep -n -E 'Failures:|Failed examples:|Failure/Error:|rspec ./spec/|examples?, [0-9]+ failures?' rspec-failfast.log | tail -n 120 || true
-          echo '===== Last 300 lines ====='
-          tail -n 300 rspec-failfast.log
-          exit "$rc"
+          {
+            echo '===== Failure markers ====='
+            grep -n -E 'Failures:|Failed examples:|Failure/Error:|rspec ./spec/|examples?, [0-9]+ failures?' rspec-failfast.log | tail -n 80 || true
+            echo '===== Failure block ====='
+            sed -n '/^Failures:/,/^Failed examples:/p' rspec-failfast.log | tail -n 120 || true
+            echo '===== Failed examples ====='
+            sed -n '/^Failed examples:/,$p' rspec-failfast.log | head -n 40 || true
+          } > failure-report.txt
+          head -c 12000 failure-report.txt > failure-report.trimmed.txt
+          mv failure-report.trimmed.txt failure-report.txt
+          echo "$rc" > rspec-exit-code.txt
+          exit 0
+      - name: Upload tiny failure report
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          path: |
+            failure-report.txt
+            rspec-exit-code.txt
+          name: diag-pr115-failure-report
+          retention-days: 1
+      - name: Preserve RSpec exit status
+        shell: bash
+        run: exit "$(cat rspec-exit-code.txt)"
+
+  report:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    needs: rspec-failfast
+    steps:
+      - name: Download tiny failure report
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          name: diag-pr115-failure-report
+          path: report
+      - name: Print tiny failure report
+        shell: bash
+        run: |
+          echo 'RSpec exit code:' "$(cat report/rspec-exit-code.txt)"
+          cat report/failure-report.txt
