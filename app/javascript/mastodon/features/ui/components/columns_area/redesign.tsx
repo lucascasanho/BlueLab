@@ -22,6 +22,7 @@ import { customFavicon, customInstanceLogo } from '@/mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import MenuIcon from '@/material-icons/400-24px/menu.svg?react';
 import { Footer } from 'mastodon/features/custom_homepage/components/footer';
+import { Header } from 'mastodon/features/custom_homepage/components/header';
 
 import { useBreakpoint } from '../../hooks/useBreakpoint';
 import { useColumnsContext } from '../../util/columns_context';
@@ -379,7 +380,11 @@ export const ColumnsAreaRedesign: React.FC<{
   }
 
   return (
-    <main ref={ref} className={multiColClasses.root}>
+    <main
+      ref={ref}
+      className={classNames(multiColClasses.root, { unscrollable: isModalOpen })}
+      tabIndex={isModalOpen ? undefined : 0}
+    >
       <div className={multiColClasses.navigationWrapper}>
         <RedesignNavigationPanel />
       </div>

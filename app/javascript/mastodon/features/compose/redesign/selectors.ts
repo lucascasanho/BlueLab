@@ -88,10 +88,6 @@ export const selectComposeCanSubmit = createAppSelector(
     selectComposeHasAttachments,
     selectComposeCharsCount,
     (state) =>
-      (state.compose.get('media_attachments') as unknown as { size: number })
-        .size,
-    (state) => !!state.compose.get('quoted_status_id'),
-    (state) =>
       state.compose.get('thread_items') as unknown as Immutable.List<
         Immutable.Map<string, unknown>
       >,
@@ -100,25 +96,25 @@ export const selectComposeCanSubmit = createAppSelector(
     isSubmitting,
     isUploading,
     isChangingUpload,
+    { hasAttachments, hasPoll, quotedStatusId },
     { text, current, max },
-    mediaCount,
-    hasQuote,
     threadItems,
   ) =>
     !isSubmitting &&
     !isUploading &&
     !isChangingUpload &&
     current <= max &&
-    (text.trim().length > 0 || mediaCount > 0 || hasQuote) &&
+    (text.trim().length > 0 || hasAttachments || hasPoll || !!quotedStatusId) &&
     threadItems.every((item) => {
       const itemText = item.get('text') as string;
       const spoilerText = item.get('spoiler_text') as string;
       const attachments = item.get(
         'media_attachments',
       ) as Immutable.List<unknown>;
-      const current = length(`${countableText(itemText)}${spoilerText}`);
+      const itemCurrent = length(`${countableText(itemText)}${spoilerText}`);
       return (
-        current <= max && (itemText.trim().length > 0 || attachments.size > 0)
+        itemCurrent <= max &&
+        (itemText.trim().length > 0 || attachments.size > 0)
       );
     }),
 );

@@ -140,8 +140,10 @@ export const Menu: React.FC<MenuProps> = ({
     if (shouldClose === false) return;
 
     setIsMenuOpen(false);
-    triggerElement?.focus({ preventScroll: true });
-  }, [triggerElement, onClose]);
+    if (listElement?.contains(document.activeElement)) {
+      triggerElement?.focus({ preventScroll: true });
+    }
+  }, [listElement, triggerElement, onClose]);
 
   const toggleMenu = isMenuOpen ? closeMenu : openMenu;
 

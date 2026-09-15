@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import classNames from 'classnames';
 import {
   Link,
   Route,
@@ -12,15 +13,20 @@ import {
 } from 'react-router-dom';
 
 import * as WebAuthnJSON from '@github/webauthn-json';
+import { SignInIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
 import api from '@/mastodon/api';
+import { ColumnHeader, ColumnHeaderButton } from '@/mastodon/components/column_header';
 import { NavigationFocusTarget } from '@/mastodon/components/navigation_focus_target';
 import {
   customFavicon,
   customInstanceLogo,
+  domain,
   registrationsOpen,
+  sso_redirect,
 } from '@/mastodon/initial_state';
+import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import { fetchServer } from 'mastodon/actions/server';
 import { ServerHeroImage } from 'mastodon/components/server_hero_image';
 import { TabLink, TabList } from 'mastodon/components/tab_list';

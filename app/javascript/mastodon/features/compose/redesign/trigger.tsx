@@ -15,7 +15,7 @@ import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 
-import { ChatCircleIcon, NewspaperIcon } from '@phosphor-icons/react';
+import { ChatCircleDotsIcon, NewspaperIcon } from '@phosphor-icons/react';
 
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { CircularProgress } from '@/mastodon/components/circular_progress';

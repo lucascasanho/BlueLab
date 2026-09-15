@@ -16,7 +16,7 @@ import {
   resumeComposer,
 } from '@/mastodon/reducers/slices/composer';
 import type { ComposeNewPayload } from '@/mastodon/reducers/slices/composer';
-import { useAppDispatch } from '@/mastodon/store';
+import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 const ComposerModalCancelConfirm: React.FC<{ openNew?: ComposeNewPayload }> = ({
   openNew,
@@ -39,7 +39,7 @@ const ComposerModalCancelConfirm: React.FC<{ openNew?: ComposeNewPayload }> = ({
     if (openNew) {
       dispatch(resumeComposer(openNew.origin));
     } else {
-      focusComposerTextarea(true);
+      dispatch(requestComposerFocus());
     }
   }, [dispatch, openNew]);
 

@@ -39,6 +39,16 @@ export function getComposerTextarea() {
   }
   return null;
 }
+
+export interface ComposerTextareaSelection {
+  start: number;
+  end: number;
+}
+
+interface PendingFocus {
+  selection: ComposerTextareaSelection | null;
+}
+
 /**
  * Focuses on the composer textarea.
  * @param defer Waits before focusing. Useful if the composer may not be focusable immediately.
@@ -76,12 +86,14 @@ interface ComposerState {
   displayState: DisplayState;
   origin: ComposerOrigin | null;
   closeOnSubmitSuccess: boolean;
+  pendingFocus: PendingFocus | null;
 }
 
 const initialState: ComposerState = {
   displayState: 'hidden',
   origin: null,
   closeOnSubmitSuccess: false,
+  pendingFocus: null,
 };
 
 const composerSlice = createSlice({
@@ -101,6 +113,7 @@ const composerSlice = createSlice({
       state.displayState = 'hidden';
       state.origin = null;
       state.closeOnSubmitSuccess = false;
+      state.pendingFocus = null;
     },
     showRestoredComposer(state) {
       state.displayState = 'minimized';
@@ -149,6 +162,10 @@ const composerSlice = createSlice({
 export const composer = composerSlice.reducer;
 
 export const showRestoredComposer = composerSlice.actions.showRestoredComposer;
+export const {
+  requestFocus: requestComposerFocus,
+  clearPendingFocus: clearComposerFocusRequest,
+} = composerSlice.actions;
 
 export const minimizeComposerToggle = createAppThunk(
   (_arg, { dispatch, getState }) => {

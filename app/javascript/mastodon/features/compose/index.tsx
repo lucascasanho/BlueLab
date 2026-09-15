@@ -10,8 +10,10 @@ import { Helmet } from '@unhead/react/helmet';
 
 import elephantUIPlane from '@/images/elephant_ui_plane.svg';
 import { Column } from '@/mastodon/components/column';
-import { ColumnHeader } from '@/mastodon/components/column/header';
+import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';
+import { ColumnHeader } from '@/mastodon/components/column_header';
 import { selectComposerEditor } from '@/mastodon/reducers/slices/composer';
+import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import EditIcon from '@/material-icons/400-24px/edit_square.svg?react';
 import PeopleIcon from '@/material-icons/400-24px/group.svg?react';
 import HomeIcon from '@/material-icons/400-24px/home-fill.svg?react';
@@ -179,7 +181,7 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
           role='region'
           aria-label={intl.formatMessage(navbarMessages.publish)}
         >
-          <div className='drawer__inner'>
+          <div className='drawer__inner' onFocus={handleFocus}>
             {useBlueLabComposer ? (
               <RedesignComposeForm
                 className='drawer__bluelab-compose'
@@ -226,7 +228,12 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
 
       <div className='scrollable'>
         {useBlueLabComposer ? (
-          <RedesignComposeForm autoFocus embedded />
+          <RedesignComposeForm
+            // This is a dedicated compose view.
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+            embedded
+          />
         ) : (
           <ComposeFormContainer
             // This is fine on this single-purpose view

@@ -59,7 +59,7 @@ import {
   ToggleButton,
   ToggleIconButton,
 } from '../button/redesign';
-import { iconWeight, useIconWeight } from '../icon';
+import { iconWeight } from '../icon';
 import {
   Menu,
   MenuItem,
@@ -365,7 +365,7 @@ const StatusReblogButton: React.FC<{
         {children}
       </MenuTrigger>
 
-      <MenuList placement='bottom' maxWidth={180}>
+      <MenuList placement='bottom' maxWidth={180} container={document.body}>
         <MenuItem
           onClick={onReblog}
           icon={ArrowsClockwiseIcon}
@@ -479,7 +479,7 @@ const StatusActionMenu: React.FC<{
         <FormattedMessage id='status.more' defaultMessage='More' />
       </MenuTrigger>
 
-      <MenuList placement='top-end'>
+      <MenuList placement='top-end' container={document.body}>
         {menu.map((item, index) => (
           <StatusActionItem key={index} item={item} />
         ))}

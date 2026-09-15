@@ -7,7 +7,7 @@ import {
   MagnifyingGlassIcon,
   RssSimpleIcon,
   BellIcon,
-  ChatCircleDotsIcon,
+  ChatCircleIcon,
   BookmarkSimpleIcon,
 } from '@phosphor-icons/react';
 
