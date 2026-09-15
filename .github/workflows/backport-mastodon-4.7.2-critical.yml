@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   backport:
-    if: github.event.head_commit.message == 'chore: stage Mastodon 4.7.2 critical backport'
+    if: "github.event.head_commit.message == 'chore: stage Mastodon 4.7.2 critical backport'"
     runs-on: ubuntu-latest
 
     steps:
