@@ -1,0 +1,85 @@
+name: Integrate pinned Mastodon alpha.3 into BlueLab test
+
+on:
+  push:
+    branches:
+      - integration/20260915-mastodon-4.8.0-alpha.3
+    paths:
+      - .github/workflows/integrate-mastodon-alpha3-test.yml
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout isolated integration branch
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Merge pinned Mastodon snapshot conservatively
+        shell: bash
+        env:
+          UPSTREAM_SHA: c9b78c464b99f6c0b6b28e2f6b174a9ef0faa55f
+          WORKFLOW_FILE: .github/workflows/integrate-mastodon-alpha3-test.yml
+        run: |
+          set -euo pipefail
+
+          git config user.name "BlueLab Upstream Integration"
+          git config user.email "actions@users.noreply.github.com"
+          git remote add mastodon-upstream https://github.com/mastodon/mastodon.git
+          git fetch --no-tags mastodon-upstream "$UPSTREAM_SHA"
+
+          set +e
+          git merge --no-ff --no-commit "$UPSTREAM_SHA"
+          merge_status=$?
+          set -e
+
+          if [ "$merge_status" -ne 0 ]; then
+            mapfile -t conflicts < <(git diff --name-only --diff-filter=U | sort)
+            if [ "${#conflicts[@]}" -eq 0 ]; then
+              echo "Merge failed without ordinary file conflicts."
+              git status --short
+              exit "$merge_status"
+            fi
+
+            expected_conflicts=(
+              "app/javascript/mastodon/actions/compose.js"
+              "app/javascript/mastodon/components/menu/card.tsx"
+              "app/javascript/mastodon/components/menu/index.tsx"
+              "app/javascript/mastodon/components/menu/styles.module.scss"
+              "app/javascript/mastodon/components/status/action_bar.tsx"
+              "app/javascript/mastodon/features/compose/index.tsx"
+            )
+
+            printf '%s\n' "${expected_conflicts[@]}" | sort > /tmp/expected-conflicts
+            printf '%s\n' "${conflicts[@]}" > /tmp/actual-conflicts
+            unexpected="$(comm -23 /tmp/actual-conflicts /tmp/expected-conflicts || true)"
+
+            if [ -n "$unexpected" ]; then
+              echo "Unexpected conflicts detected; refusing to publish integration:"
+              printf '%s\n' "$unexpected"
+              exit 1
+            fi
+
+            echo "Expected conflicts detected. Preserving BlueLab versions for surgical follow-up:"
+            printf '%s\n' "${conflicts[@]}"
+            for file in "${conflicts[@]}"; do
+              git checkout --ours -- "$file"
+              git add -- "$file"
+            done
+          fi
+
+          unresolved="$(git diff --name-only --diff-filter=U)"
+          if [ -n "$unresolved" ]; then
+            echo "Unresolved conflicts remain:"
+            printf '%s\n' "$unresolved"
+            exit 1
+          fi
+
+          git rm -f "$WORKFLOW_FILE"
+          git add -A
+          git commit -m "Merge pinned Mastodon 4.8.0-alpha.3 snapshot for BlueLab test"
+          git push origin HEAD:integration/20260915-mastodon-4.8.0-alpha.3
