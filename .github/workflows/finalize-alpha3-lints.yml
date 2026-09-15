@@ -8,24 +8,42 @@ on:
       - .github/workflows/finalize-alpha3-lints.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  diagnose-ruby:
+  fix-ruby:
     runs-on: ubuntu-latest
     env:
       BUNDLE_ONLY: development
     steps:
       - name: Checkout integration branch
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
 
-      - name: Diagnose Ruby lint paths
-        shell: bash
+      - name: Autocorrect only diagnosed Ruby style files
         run: |
-          bin/rubocop --format simple || true
-          bin/brakeman || true
+          bin/rubocop -A \
+            lib/mastodon/cli/email_domain_blocks.rb \
+            spec/lib/mastodon/cli/email_domain_blocks_spec.rb
+          bin/rubocop \
+            lib/mastodon/cli/email_domain_blocks.rb \
+            spec/lib/mastodon/cli/email_domain_blocks_spec.rb
+          git diff --check
+
+      - name: Commit validated Ruby style fixes
+        env:
+          HUSKY: '0'
+        run: |
+          git config user.name "BlueLab Alpha3 Finalizer"
+          git config user.email "actions@users.noreply.github.com"
+          git add \
+            lib/mastodon/cli/email_domain_blocks.rb \
+            spec/lib/mastodon/cli/email_domain_blocks_spec.rb
+          git commit -m "Fix Ruby lint compatibility after alpha.3 dependency update"
+          git push origin HEAD:integration/20260915-mastodon-4.8.0-alpha.3-xours
