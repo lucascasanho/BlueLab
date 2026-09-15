@@ -1,0 +1,101 @@
+name: Diagnose PR 115 RSpec Fail Fast
+
+on:
+  push:
+    branches:
+      - 'diag/pr115-rspec-failfast-20260915'
+
+env:
+  BUNDLE_CLEAN: true
+  BUNDLE_FROZEN: true
+
+jobs:
+  build-test-assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RAILS_ENV: test
+      BUNDLE_WITH: test
+      SECRET_KEY_BASE_DUMMY: 1
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: ./.github/actions/setup-ruby
+      - uses: ./.github/actions/setup-javascript
+        with:
+          onlyProduction: 'true'
+      - run: bin/rails assets:precompile
+      - run: tar --exclude={"*.br","*.gz"} -zcf artifacts.tar.gz public/assets public/packs*
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          path: ./artifacts.tar.gz
+          name: diag-pr115-failfast-assets
+          retention-days: 1
+
+  rspec-failfast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: build-test-assets
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10ms
+          --health-timeout 3s
+          --health-retries 50
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10ms
+          --health-timeout 3s
+          --health-retries 50
+        ports:
+          - 6379:6379
+    env:
+      DB_HOST: localhost
+      DB_USER: postgres
+      DB_PASS: postgres
+      COVERAGE: false
+      RAILS_ENV: test
+      ALLOW_NOPAM: true
+      PAM_ENABLED: true
+      PAM_DEFAULT_SERVICE: pam_test
+      PAM_CONTROLLED_SERVICE: pam_test_controlled
+      OIDC_ENABLED: true
+      OIDC_SCOPE: read
+      SAML_ENABLED: true
+      CAS_ENABLED: true
+      BUNDLE_WITH: 'pam_authentication test'
+      GITHUB_RSPEC: false
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          path: ./
+          name: diag-pr115-failfast-assets
+      - run: tar xvzf artifacts.tar.gz
+      - uses: ./.github/actions/setup-ruby
+        with:
+          ruby-version: '.ruby-version'
+          additional-system-dependencies: ffmpeg libpam-dev
+      - name: Load database schema
+        run: |
+          bin/rails db:setup
+          bin/flatware fan bin/rails db:test:prepare
+      - name: Run RSpec until first failure
+        shell: bash
+        run: |
+          set +e
+          bin/flatware rspec --fail-fast > rspec-failfast.log 2>&1
+          rc=$?
+          echo '===== Failure markers ====='
+          grep -n -E 'Failures:|Failed examples:|Failure/Error:|rspec ./spec/|examples?, [0-9]+ failures?' rspec-failfast.log | tail -n 120 || true
+          echo '===== Last 300 lines ====='
+          tail -n 300 rspec-failfast.log
+          exit "$rc"
