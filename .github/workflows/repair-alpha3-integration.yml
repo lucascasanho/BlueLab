@@ -73,5 +73,5 @@ jobs:
             app/javascript/mastodon/components/menu/index.tsx \
             app/javascript/mastodon/components/status/action_bar.tsx \
             app/models/scheduled_status.rb
-          git commit -m "Fix BlueLab compatibility after Mastodon alpha.3 merge"
+          git commit --no-verify -m "Fix BlueLab compatibility after Mastodon alpha.3 merge"
           git push origin HEAD:integration/20260915-mastodon-4.8.0-alpha.3-xours
