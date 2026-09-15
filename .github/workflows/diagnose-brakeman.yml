@@ -1,0 +1,48 @@
+name: One-shot Brakeman diagnostics
+
+on:
+  push:
+    branches:
+      - sync/20260915-mastodon-4.7.2-critical-fixes
+    paths:
+      - .github/workflows/diagnose-brakeman.yml
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    if: "github.event.head_commit.message == 'chore: diagnose Brakeman warnings'"
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_ONLY: development
+
+    steps:
+      - name: Checkout integration branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          fetch-depth: 0
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@6e5d382445ae5590b7449d8b3bc8cb1c2c27f617
+        with:
+          bundler-cache: true
+
+      - name: Print Brakeman warning fingerprints
+        shell: bash
+        run: |
+          set +e
+          bin/brakeman -f json -o /tmp/brakeman.json >/dev/null 2>&1
+          set -e
+          ruby -rjson -e 'JSON.parse(File.read("/tmp/brakeman.json")).fetch("warnings").each { |w| puts({ fingerprint: w["fingerprint"], warning_type: w["warning_type"], warning_code: w["warning_code"], message: w["message"], file: w["file"], line: w["line"], confidence: w["confidence"] }.to_json) }'
+
+      - name: Remove diagnostic workflow
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'BlueLab CI Diagnostics'
+          git config user.email 'ci-diagnostics@users.noreply.github.com'
+          git rm .github/workflows/diagnose-brakeman.yml
+          git commit -m 'chore: remove one-shot Brakeman diagnostics'
+          git push origin HEAD:refs/heads/sync/20260915-mastodon-4.7.2-critical-fixes
