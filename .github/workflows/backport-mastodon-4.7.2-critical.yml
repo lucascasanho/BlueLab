@@ -30,7 +30,9 @@ jobs:
           git config user.email 'upstream-sync@users.noreply.github.com'
 
           git remote add mastodon-official https://github.com/mastodon/mastodon.git
-          git fetch --no-tags mastodon-official refs/tags/v4.7.2:refs/tags/mastodon-v4.7.2
+          git fetch --no-tags mastodon-official \
+            refs/heads/main:refs/remotes/mastodon-official/main \
+            refs/tags/v4.7.2:refs/tags/mastodon-v4.7.2
 
           # Published v4.7.2 fixes not yet present in the BlueLab upstream ancestry.
           fixes=(
@@ -44,10 +46,15 @@ jobs:
           for sha in "${fixes[@]}"; do
             echo "Applying upstream fix $sha"
             if ! git cherry-pick "$sha"; then
-              echo "::error::Conflict while applying $sha; refusing to publish a partial backport."
-              git status --short
-              git cherry-pick --abort || true
-              exit 1
+              if git diff --quiet && git diff --cached --quiet; then
+                echo "Fix $sha is already represented in the target tree; skipping empty cherry-pick."
+                git cherry-pick --skip
+              else
+                echo "::error::Conflict while applying $sha; refusing to publish a partial backport."
+                git status --short
+                git cherry-pick --abort || true
+                exit 1
+              fi
             fi
           done
 
@@ -56,7 +63,11 @@ jobs:
           # so take this one file from the pinned published tag rather than from main.
           git show mastodon-v4.7.2:config/initializers/vips.rb > config/initializers/vips.rb
           git add config/initializers/vips.rb
-          git commit -m 'security: backport Mastodon 4.7.2 HEIF mitigation'
+          if git diff --cached --quiet; then
+            echo 'HEIF mitigation is already present.'
+          else
+            git commit -m 'security: backport Mastodon 4.7.2 HEIF mitigation'
+          fi
 
           # Lightweight validation before publishing anything from this one-shot job.
           git diff --check "${{ github.sha }}..HEAD"
