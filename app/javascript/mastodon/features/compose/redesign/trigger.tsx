@@ -1,8 +1,6 @@
 /* eslint-disable jsx-a11y/no-autofocus */
 import type React from 'react';
 import {
-  lazy,
-  Suspense,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -18,7 +16,6 @@ import classNames from 'classnames';
 import { ChatCircleIcon, NewspaperIcon } from '@phosphor-icons/react';
 
 import { IconButton } from '@/mastodon/components/button/redesign';
-import { CircularProgress } from '@/mastodon/components/circular_progress';
 import { ComposeIcon } from '@/mastodon/components/compose_icon';
 import {
   Menu,
@@ -38,13 +35,8 @@ import {
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { ComposeFormHeader } from './header';
+import { RedesignComposeForm } from './index';
 import classes from './trigger.module.scss';
-
-const ComposeLazyForm = lazy(() =>
-  import('./index').then(({ RedesignComposeForm }) => ({
-    default: RedesignComposeForm,
-  })),
-);
 
 interface VisualViewportMetrics {
   height: number | null;
@@ -158,10 +150,9 @@ export const ComposeRedesignButton: React.FC<{
 
   /*
    * Keep VisualViewport metrics in React state instead of mutating the form from
-   * a layout effect. The redesigned form is lazy-loaded; an effect can run while
-   * Suspense is still showing its fallback and never see composerRef.current.
-   * State survives that delay, so the form receives the correct visible height
-   * as soon as it mounts and whenever the software keyboard changes it.
+   * a layout effect. State keeps the metrics ready before the preloaded composer
+   * is mounted, so the form receives the correct visible height immediately and
+   * whenever the software keyboard changes it.
    */
   const [viewport, setViewport] = useState<VisualViewportMetrics>(
     emptyVisualViewportMetrics,
@@ -321,15 +312,13 @@ export const ComposeRedesignButton: React.FC<{
     return portalBlue2InlineOverlay(
       <>
         {isBlue2 && <ComposerBackdrop onMinimize={handleBackdropClick} />}
-        <Suspense fallback={<CircularProgress strokeWidth={2} size={50} />}>
-          <ComposeLazyForm
-            ref={composerRef}
-            autoFocus
-            className={classes.composer}
-            style={style}
-            data-keyboard-open={viewport.keyboardOpen ? 'true' : undefined}
-          />
-        </Suspense>
+        <RedesignComposeForm
+          ref={composerRef}
+          autoFocus
+          className={classes.composer}
+          style={style}
+          data-keyboard-open={viewport.keyboardOpen ? 'true' : undefined}
+        />
       </>,
     );
   }
