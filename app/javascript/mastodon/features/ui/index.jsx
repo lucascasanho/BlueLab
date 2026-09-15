@@ -23,6 +23,7 @@ import { PictureInPicture } from 'mastodon/features/picture_in_picture';
 import { identityContextPropShape, withIdentity } from 'mastodon/identity_context';
 import { layoutFromWindow, transientSingleColumn } from 'mastodon/is_mobile';
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
+import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import { checkAnnualReport } from '@/mastodon/reducers/slices/annual_report';
 import { openNewComposer, openPreferredComposer } from '@/mastodon/reducers/slices/composer';
 
@@ -73,6 +74,7 @@ import {
   Blocks,
   DomainBlocks,
   Mutes,
+  PinnedStatuses,
   Directory,
   OnboardingProfile,
   OnboardingFollows,
