@@ -1,0 +1,13 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "78b3324bce49a9e1e915716b3a59a76d6c22cb1701085fde3aead406799a71db",
+      "note": "Audited BlueLab upstream-update admin link. The href keeps the fixed https://github.com/ origin; stored base/head SHAs are validated as 40-64 hexadecimal characters and Rails escapes the generated href. Brakeman reports this as Weak confidence because the path is assembled from model data."
+    },
+    {
+      "fingerprint": "b7e5f4799a12da6fa33f8532c307bfdf99e4e856d92a3dd5c636275b1646c9de",
+      "note": "Audited BlueLab upstream-update admin link. The href keeps the fixed https://github.com/ origin; the compare SHAs are model-validated hexadecimal values and Rails escapes the generated href. Brakeman reports this as Weak confidence because the path is assembled from model data."
+    }
+  ],
+  "brakeman_version": "8.0.6"
+}
