@@ -11,18 +11,15 @@ import {
   ImageSquareIcon,
   ChartBarHorizontalIcon,
   WarningCircleIcon,
-  MarkdownLogoIcon,
   PlusIcon,
 } from '@phosphor-icons/react';
 import { length } from 'stringz';
 
 import {
   addPoll,
-  changeComposeContentType,
   uploadCompose,
   addComposeThreadItem,
   addComposeThreadMedia,
-  changeComposeThreadItem,
 } from '@/mastodon/actions/compose';
 import api from '@/mastodon/api';
 import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
@@ -74,9 +71,6 @@ export const ComposeFooter: React.FC<{
     (state) => !!state.compose.get('is_submitting'),
   );
   const canSubmit = useAppSelector(selectComposeCanSubmit);
-  const rootContentType = useAppSelector(
-    (state) => state.compose.get('content_type') as string,
-  );
   const activeThreadItem = useAppSelector((state) => {
     if (!activeThreadItemId) return null;
     return (
@@ -93,9 +87,6 @@ export const ComposeFooter: React.FC<{
       statusMaxCharacters ??
       500,
   );
-  const contentType = activeThreadItem
-    ? (activeThreadItem.get('content_type') as string)
-    : rootContentType;
   const activeText = activeThreadItem?.get('text');
   const activeSpoiler = activeThreadItem?.get('spoiler_text');
   const current = activeThreadItem
@@ -123,17 +114,6 @@ export const ComposeFooter: React.FC<{
   const handlePoll = useCallback(() => {
     dispatch(addPoll());
   }, [dispatch]);
-  const handleContentType = useCallback(() => {
-    const next =
-      contentType === 'text/markdown' ? 'text/plain' : 'text/markdown';
-    if (activeThreadItemId) {
-      dispatch(
-        changeComposeThreadItem(activeThreadItemId, 'content_type', next),
-      );
-    } else {
-      dispatch(changeComposeContentType(next));
-    }
-  }, [activeThreadItemId, contentType, dispatch]);
   const handleAddThreadItem = useCallback(() => {
     dispatch(addComposeThreadItem());
   }, [dispatch]);
@@ -146,20 +126,6 @@ export const ComposeFooter: React.FC<{
       />
 
       <ComposeEmojiButton onPick={onEmojiPick} />
-
-      <IconButton
-        as='button'
-        size='sm'
-        icon={MarkdownLogoIcon}
-        color={contentType === 'text/markdown' ? 'accent' : 'neutral'}
-        aria-pressed={contentType === 'text/markdown'}
-        onClick={handleContentType}
-      >
-        <FormattedMessage
-          id='compose_form.markdown'
-          defaultMessage='Markdown formatting'
-        />
-      </IconButton>
 
       <IconButton
         size='sm'
