@@ -23,7 +23,6 @@ jobs:
         shell: bash
         env:
           UPSTREAM_SHA: c9b78c464b99f6c0b6b28e2f6b174a9ef0faa55f
-          WORKFLOW_FILE: .github/workflows/integrate-mastodon-alpha3-test.yml
         run: |
           set -euo pipefail
 
@@ -74,17 +73,11 @@ jobs:
             printf '%s\n' "${expected_conflicts[@]}" | sort > /tmp/expected-conflicts
             printf '%s\n' "${conflicts[@]}" > /tmp/actual-conflicts
             unexpected="$(comm -23 /tmp/actual-conflicts /tmp/expected-conflicts || true)"
-            missing="$(comm -13 /tmp/actual-conflicts /tmp/expected-conflicts || true)"
 
             if [ -n "$unexpected" ]; then
               echo "Unexpected conflicts detected; refusing to publish integration:"
               printf '%s\n' "$unexpected"
               exit 1
-            fi
-
-            if [ -n "$missing" ]; then
-              echo "Previously audited conflicts no longer present (informational):"
-              printf '%s\n' "$missing"
             fi
 
             echo "Audited conflicts detected. Preserving BlueLab versions for surgical follow-up:"
@@ -102,7 +95,10 @@ jobs:
             exit 1
           fi
 
-          git rm -f "$WORKFLOW_FILE"
+          # BlueLab owns its CI workflows. They are deployment/maintenance
+          # infrastructure rather than runtime Mastodon code, and the Actions
+          # token is intentionally not allowed to rewrite them.
+          git checkout HEAD -- .github/workflows
           git add -A
           git commit -m "Merge pinned Mastodon 4.8.0-alpha.3 snapshot for BlueLab test"
           git push origin HEAD:integration/20260915-mastodon-4.8.0-alpha.3
