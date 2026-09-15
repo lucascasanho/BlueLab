@@ -3,7 +3,6 @@
 require 'concurrent'
 require 'json'
 require 'net/http'
-require 'set'
 require_relative 'base'
 
 module Mastodon::CLI
@@ -149,7 +148,7 @@ module Mastodon::CLI
     def sync_disposable
       source_bodies = DISPOSABLE_EMAIL_SOURCES.filter_map do |name, url|
         [name, fetch_source(url)]
-      rescue StandardError => e
+      rescue => e
         say("Could not fetch #{name}: #{e.message}", :yellow)
         nil
       end
@@ -170,7 +169,7 @@ module Mastodon::CLI
         result = EmailDomainBlock.insert_all(
           batch.map { |domain| { domain: domain, allow_with_approval: false, created_at: now, updated_at: now } },
           unique_by: :index_email_domain_blocks_on_domain,
-          returning: %w[id]
+          returning: %w(id)
         )
         result.rows.count
       end

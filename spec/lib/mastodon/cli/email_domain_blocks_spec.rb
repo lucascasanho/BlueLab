@@ -181,7 +181,7 @@ RSpec.describe Mastodon::CLI::EmailDomainBlocks do
         .and change(EmailDomainBlock, :count).by(3)
 
       expect(EmailDomainBlock.find_by(domain: 'valid-disposable.example')).to be_allow_with_approval
-      expect(EmailDomainBlock.where(domain: %w[another-disposable.example third-disposable.example fourth-disposable.example], allow_with_approval: false).count).to eq(3)
+      expect(EmailDomainBlock.where(domain: %w(another-disposable.example third-disposable.example fourth-disposable.example), allow_with_approval: false).count).to eq(3)
     end
 
     it 'fails when every source is unavailable' do
@@ -190,5 +190,4 @@ RSpec.describe Mastodon::CLI::EmailDomainBlocks do
       expect { subject }.to raise_error(Thor::Error, 'Could not fetch any disposable e-mail domain source')
     end
   end
-
 end
