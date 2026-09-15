@@ -1,0 +1,396 @@
+from pathlib import Path
+
+
+def replace(path: str, old: str, new: str, count: int = 1) -> None:
+    p = Path(path)
+    text = p.read_text()
+    actual = text.count(old)
+    if actual < count:
+        raise SystemExit(
+            f"{path}: expected at least {count} occurrence(s), found {actual}: {old[:120]!r}"
+        )
+    p.write_text(text.replace(old, new, count))
+
+
+# compose.js: alpha.3 focus protocol + media validation, while keeping
+# BlueLab Markdown/content_type, scheduling, threads and resumable upload.
+path = "app/javascript/mastodon/actions/compose.js"
+replace(
+    path,
+    "import { insertStatusIntoAccountTimelines } from './timelines_typed';\n",
+    "import { insertStatusIntoAccountTimelines } from './timelines_typed';\n"
+    "import { requestComposerFocus } from '../reducers/slices/composer';\n"
+    "import { isRedesignEnabled } from '../utils/environment';\n",
+)
+replace(
+    path,
+    "    ensureComposeIsVisible(getState, dispatch);\n  };\n}\n\nexport function replyComposeById",
+    "    ensureComposeIsVisible(getState, dispatch);\n\n"
+    "    if (isRedesignEnabled()) {\n"
+    "      const text = getState().getIn(['compose', 'text'], '');\n"
+    "      dispatch(requestComposerFocus({ start: text.search(/\\s/) + 1, end: text.length }));\n"
+    "    }\n"
+    "  };\n}\n\nexport function replyComposeById",
+)
+replace(
+    path,
+    "  ensureComposeIsVisible(getState, dispatch);\n};\n\nexport function mentionCompose",
+    "  ensureComposeIsVisible(getState, dispatch);\n\n"
+    "  if (isRedesignEnabled()) {\n"
+    "    const position = caretStart ? 0 : getState().getIn(['compose', 'text'], '').length;\n"
+    "    dispatch(requestComposerFocus({ start: position, end: position }));\n"
+    "  }\n"
+    "};\n\nexport function mentionCompose",
+)
+replace(
+    path,
+    "    ensureComposeIsVisible(getState, dispatch);\n  };\n}\n\nexport function mentionComposeById",
+    "    ensureComposeIsVisible(getState, dispatch);\n\n"
+    "    if (isRedesignEnabled()) {\n"
+    "      const position = getState().getIn(['compose', 'text'], '').length;\n"
+    "      dispatch(requestComposerFocus({ start: position, end: position }));\n"
+    "    }\n"
+    "  };\n}\n\nexport function mentionComposeById",
+)
+replace(
+    path,
+    "    ensureComposeIsVisible(getState, dispatch);\n  };\n}\n\nexport function submitCompose",
+    "    ensureComposeIsVisible(getState, dispatch);\n\n"
+    "    if (isRedesignEnabled()) {\n"
+    "      const position = getState().getIn(['compose', 'text'], '').length;\n"
+    "      dispatch(requestComposerFocus({ start: position, end: position }));\n"
+    "    }\n"
+    "  };\n}\n\nexport function submitCompose",
+)
+replace(
+    path,
+    "    const media = getState().getIn(['compose', 'media_attachments']);\n"
+    "    const pending = getState().getIn(['compose', 'pending_media_attachments']);\n"
+    "    if (files.length + media.size + pending > uploadLimit) {\n"
+    "      dispatch(showAlert({ message: messages.uploadErrorLimit }));\n"
+    "      return;\n"
+    "    }\n\n"
+    "    for (const [i, file] of Array.from(files).entries()) {\n",
+    "    const media = getState().getIn(['compose', 'media_attachments']);\n"
+    "    const pending = getState().getIn(['compose', 'pending_media_attachments']);\n"
+    "    const serverConfiguration = getState().getIn(['server', 'server', 'item', 'configuration']);\n"
+    "    const maxMediaAttachments = serverConfiguration?.statuses.max_media_attachments ?? 4;\n"
+    "    const videoSizeLimit = serverConfiguration?.media_attachments.video_size_limit;\n"
+    "    const imageSizeLimit = serverConfiguration?.media_attachments.image_size_limit;\n"
+    "    const filesArray = Array.from(files);\n\n"
+    "    if (\n"
+    "      files.length + media.size + pending > maxMediaAttachments ||\n"
+    "      filesArray.some(\n"
+    "        (file) =>\n"
+    "          (file.type.startsWith('video/') && videoSizeLimit && file.size > videoSizeLimit) ||\n"
+    "          (file.type.startsWith('image/') && imageSizeLimit && file.size > imageSizeLimit),\n"
+    "      )\n"
+    "    ) {\n"
+    "      dispatch(showAlert({ message: messages.uploadErrorLimit }));\n"
+    "      return;\n"
+    "    }\n\n"
+    "    for (const [i, file] of filesArray.entries()) {\n",
+)
+
+# Composer state: merge BlueLab origin/editor/draft behavior with alpha.3's
+# deferred focus request consumed by the lazy textarea.
+path = "app/javascript/mastodon/reducers/slices/composer.ts"
+replace(
+    path,
+    "export function getComposerTextarea() {\n"
+    "  const textarea = document.getElementById(COMPOSER_TEXTAREA_ID);\n"
+    "  if (textarea instanceof HTMLTextAreaElement) {\n"
+    "    return textarea;\n"
+    "  }\n"
+    "  return null;\n"
+    "}\n"
+    "/**\n",
+    "export function getComposerTextarea() {\n"
+    "  const textarea = document.getElementById(COMPOSER_TEXTAREA_ID);\n"
+    "  if (textarea instanceof HTMLTextAreaElement) {\n"
+    "    return textarea;\n"
+    "  }\n"
+    "  return null;\n"
+    "}\n\n"
+    "export interface ComposerTextareaSelection {\n"
+    "  start: number;\n"
+    "  end: number;\n"
+    "}\n\n"
+    "interface PendingFocus {\n"
+    "  selection: ComposerTextareaSelection | null;\n"
+    "}\n\n"
+    "/**\n",
+)
+replace(
+    path,
+    "interface ComposerState {\n"
+    "  displayState: DisplayState;\n"
+    "  origin: ComposerOrigin | null;\n"
+    "  closeOnSubmitSuccess: boolean;\n"
+    "}\n\n"
+    "const initialState: ComposerState = {\n"
+    "  displayState: 'hidden',\n"
+    "  origin: null,\n"
+    "  closeOnSubmitSuccess: false,\n"
+    "};",
+    "interface ComposerState {\n"
+    "  displayState: DisplayState;\n"
+    "  origin: ComposerOrigin | null;\n"
+    "  closeOnSubmitSuccess: boolean;\n"
+    "  pendingFocus: PendingFocus | null;\n"
+    "}\n\n"
+    "const initialState: ComposerState = {\n"
+    "  displayState: 'hidden',\n"
+    "  origin: null,\n"
+    "  closeOnSubmitSuccess: false,\n"
+    "  pendingFocus: null,\n"
+    "};",
+)
+replace(
+    path,
+    "    hideComposer(state) {\n"
+    "      state.displayState = 'hidden';\n"
+    "      state.origin = null;\n"
+    "      state.closeOnSubmitSuccess = false;\n"
+    "    },",
+    "    hideComposer(state) {\n"
+    "      state.displayState = 'hidden';\n"
+    "      state.origin = null;\n"
+    "      state.closeOnSubmitSuccess = false;\n"
+    "      state.pendingFocus = null;\n"
+    "    },",
+)
+replace(
+    path,
+    "export const showRestoredComposer = composerSlice.actions.showRestoredComposer;\n",
+    "export const showRestoredComposer = composerSlice.actions.showRestoredComposer;\n"
+    "export const {\n"
+    "  requestFocus: requestComposerFocus,\n"
+    "  clearPendingFocus: clearComposerFocusRequest,\n"
+    "} = composerSlice.actions;\n",
+)
+
+# /publish: preserve editor selection and add the new redesign header path.
+path = "app/javascript/mastodon/features/compose/index.tsx"
+replace(
+    path,
+    "import { ColumnHeader } from '@/mastodon/components/column/header';\n"
+    "import { selectComposerEditor } from '@/mastodon/reducers/slices/composer';\n",
+    "import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';\n"
+    "import { ColumnHeader } from '@/mastodon/components/column_header';\n"
+    "import { selectComposerEditor } from '@/mastodon/reducers/slices/composer';\n"
+    "import { isRedesignEnabled } from '@/mastodon/utils/environment';\n",
+)
+replace(
+    path,
+    "          <div className='drawer__inner'>\n",
+    "          <div className='drawer__inner' onFocus={handleFocus}>\n",
+)
+
+# Draft cancel: keep BlueLab resume-origin behavior, use alpha.3 focus request.
+path = "app/javascript/mastodon/features/compose/redesign/modal_cancel.tsx"
+replace(
+    path,
+    "import { useAppDispatch } from '@/mastodon/store';",
+    "import { useAppDispatch, useAppSelector } from '@/mastodon/store';",
+)
+replace(
+    path,
+    "    } else {\n      focusComposerTextarea(true);\n    }",
+    "    } else {\n      dispatch(requestComposerFocus());\n    }",
+)
+
+# Submit selector: keep thread validation/BlueLab max-char handling and add
+# alpha.3 poll/pending-attachment/quote awareness.
+path = "app/javascript/mastodon/features/compose/redesign/selectors.ts"
+old = """export const selectComposeCanSubmit = createAppSelector(
+  [
+    (state) => !!state.compose.get('is_submitting'),
+    (state) => !!state.compose.get('is_uploading'),
+    (state) => !!state.compose.get('is_changing_upload'),
+    selectComposeHasAttachments,
+    selectComposeCharsCount,
+    (state) =>
+      (state.compose.get('media_attachments') as unknown as { size: number })
+        .size,
+    (state) => !!state.compose.get('quoted_status_id'),
+    (state) =>
+      state.compose.get('thread_items') as unknown as Immutable.List<
+        Immutable.Map<string, unknown>
+      >,
+  ],
+  (
+    isSubmitting,
+    isUploading,
+    isChangingUpload,
+    { text, current, max },
+    mediaCount,
+    hasQuote,
+    threadItems,
+  ) =>
+    !isSubmitting &&
+    !isUploading &&
+    !isChangingUpload &&
+    current <= max &&
+    (text.trim().length > 0 || mediaCount > 0 || hasQuote) &&
+    threadItems.every((item) => {
+      const itemText = item.get('text') as string;
+      const spoilerText = item.get('spoiler_text') as string;
+      const attachments = item.get(
+        'media_attachments',
+      ) as Immutable.List<unknown>;
+      const current = length(`${countableText(itemText)}${spoilerText}`);
+      return (
+        current <= max && (itemText.trim().length > 0 || attachments.size > 0)
+      );
+    }),
+);
+"""
+new = """export const selectComposeCanSubmit = createAppSelector(
+  [
+    (state) => !!state.compose.get('is_submitting'),
+    (state) => !!state.compose.get('is_uploading'),
+    (state) => !!state.compose.get('is_changing_upload'),
+    selectComposeHasAttachments,
+    selectComposeCharsCount,
+    (state) =>
+      state.compose.get('thread_items') as unknown as Immutable.List<
+        Immutable.Map<string, unknown>
+      >,
+  ],
+  (
+    isSubmitting,
+    isUploading,
+    isChangingUpload,
+    { hasAttachments, hasPoll, quotedStatusId },
+    { text, current, max },
+    threadItems,
+  ) =>
+    !isSubmitting &&
+    !isUploading &&
+    !isChangingUpload &&
+    current <= max &&
+    (text.trim().length > 0 || hasAttachments || hasPoll || !!quotedStatusId) &&
+    threadItems.every((item) => {
+      const itemText = item.get('text') as string;
+      const spoilerText = item.get('spoiler_text') as string;
+      const attachments = item.get(
+        'media_attachments',
+      ) as Immutable.List<unknown>;
+      const itemCurrent = length(`${countableText(itemText)}${spoilerText}`);
+      return (
+        itemCurrent <= max &&
+        (itemText.trim().length > 0 || attachments.size > 0)
+      );
+    }),
+);
+"""
+replace(path, old, new)
+
+# Composer launcher: message menu item uses alpha.3 dotted-chat glyph.
+path = "app/javascript/mastodon/features/compose/redesign/trigger.tsx"
+replace(
+    path,
+    "import { ChatCircleIcon, NewspaperIcon } from '@phosphor-icons/react';",
+    "import { ChatCircleDotsIcon, NewspaperIcon } from '@phosphor-icons/react';",
+)
+
+# Homepage: add imports required by alpha.3 redesign header without disturbing
+# BlueLab passkey/welcome modal and guest actions.
+path = "app/javascript/mastodon/features/custom_homepage/index.tsx"
+replace(
+    path,
+    "import { FormattedMessage, useIntl } from 'react-intl';\n\n",
+    "import { FormattedMessage, useIntl } from 'react-intl';\n\n"
+    "import classNames from 'classnames';\n",
+)
+replace(
+    path,
+    "import * as WebAuthnJSON from '@github/webauthn-json';\n"
+    "import { Helmet } from '@unhead/react/helmet';",
+    "import * as WebAuthnJSON from '@github/webauthn-json';\n"
+    "import { SignInIcon } from '@phosphor-icons/react';\n"
+    "import { Helmet } from '@unhead/react/helmet';",
+)
+replace(
+    path,
+    "import api from '@/mastodon/api';\n"
+    "import { NavigationFocusTarget }",
+    "import api from '@/mastodon/api';\n"
+    "import { ColumnHeader, ColumnHeaderButton } from '@/mastodon/components/column_header';\n"
+    "import { NavigationFocusTarget }",
+)
+replace(
+    path,
+    "  customFavicon,\n"
+    "  customInstanceLogo,\n"
+    "  registrationsOpen,\n"
+    "} from '@/mastodon/initial_state';",
+    "  customFavicon,\n"
+    "  customInstanceLogo,\n"
+    "  domain,\n"
+    "  registrationsOpen,\n"
+    "  sso_redirect,\n"
+    "} from '@/mastodon/initial_state';",
+)
+replace(
+    path,
+    "import { fetchServer } from 'mastodon/actions/server';",
+    "import { isRedesignEnabled } from '@/mastodon/utils/environment';\n"
+    "import { fetchServer } from 'mastodon/actions/server';",
+)
+
+# Navigation: preserve BlueLab message icon used before upstream merge.
+path = "app/javascript/mastodon/features/navigation_panel/redesign/index.tsx"
+replace(path, "  ChatCircleDotsIcon,", "  ChatCircleIcon,")
+
+# Search: alpha.3 new header plus legacy fallback.
+path = "app/javascript/mastodon/features/search/index.tsx"
+replace(
+    path,
+    "import { ColumnHeader } from '@/mastodon/components/column/header';",
+    "import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';\n"
+    "import { ColumnHeader } from '@/mastodon/components/column_header';\n"
+    "import { isRedesignEnabled } from '@/mastodon/utils/environment';",
+)
+
+# BlueLab minimal shell keeps its custom homepage Header.
+path = "app/javascript/mastodon/features/ui/components/columns_area/redesign.tsx"
+replace(
+    path,
+    "import { Footer } from 'mastodon/features/custom_homepage/components/footer';",
+    "import { Footer } from 'mastodon/features/custom_homepage/components/footer';\n"
+    "import { Header } from 'mastodon/features/custom_homepage/components/header';",
+)
+
+# Menu focus: alpha.3 conditional restoration + BlueLab portal/mobile behavior.
+path = "app/javascript/mastodon/components/menu/index.tsx"
+replace(
+    path,
+    "    setIsMenuOpen(false);\n"
+    "    triggerElement?.focus({ preventScroll: true });\n"
+    "  }, [triggerElement, onClose]);",
+    "    setIsMenuOpen(false);\n"
+    "    if (listElement?.contains(document.activeElement)) {\n"
+    "      triggerElement?.focus({ preventScroll: true });\n"
+    "    }\n"
+    "  }, [listElement, triggerElement, onClose]);",
+)
+
+# Preserve BlueLab document-body fallback for action menus.
+path = "app/javascript/mastodon/components/status/action_bar.tsx"
+replace(
+    path,
+    "      <MenuList placement='bottom' maxWidth={180}>\n",
+    "      <MenuList placement='bottom' maxWidth={180} container={document.body}>\n",
+)
+replace(
+    path,
+    "      <MenuList placement='top-end'>\n",
+    "      <MenuList placement='top-end' container={document.body}>\n",
+)
+
+# Ruby model: only alpha.3 interpolation-name change; preserve BlueLab threads.
+path = "app/models/scheduled_status.rb"
+replace(path, "limit: TOTAL_LIMIT", "count: TOTAL_LIMIT")
+replace(path, "limit: DAILY_LIMIT", "count: DAILY_LIMIT")
