@@ -30,6 +30,7 @@ As seguintes características precisam sobreviver a atualizações upstream:
 - Quando o upstream renomear ou substituir um componente usado pelo BlueLab, o comportamento BlueLab deve ser portado para a nova estrutura em vez de ser descartado.
 - Homepage pública `/overview`, ações de cadastro quando permitido, login normal, login com passkey e opção de continuar navegando sem autenticação.
 - Ajustes do compose BlueLab, incluindo rolagem interna no mobile, mídia/ALT, citações, cursor/emojis, safe-area e bloqueio da rolagem da coluna de fundo.
+- Comunicados administrativos com editor BlueLab, texto simples ou Markdown, emojis personalizados, anexos de mídia e renderização compatível nos e-mails HTML e em texto simples.
 - Branding BlueLab, limites configuráveis, controles de customização da instância, paletas administrativas, comportamento de username, passkeys e demais recursos já incorporados.
 - Valores persistidos pelo painel administrativo para limites, cores claras/escuras, cores de e-mail e opções relacionadas não podem ser redefinidos por uma atualização.
 
