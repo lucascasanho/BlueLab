@@ -102,6 +102,7 @@ export const RedesignComposeForm: React.FC<
 
   const intl = useIntl();
   const titleId = useId();
+  const sensitiveIcon = useIconWeight(PepperIcon, sensitive && 'fill');
 
   const handleWheelCapture: React.WheelEventHandler<HTMLFormElement> =
     useCallback((event) => {
@@ -183,7 +184,7 @@ export const RedesignComposeForm: React.FC<
             size='sm'
             active={sensitive}
             onClick={onSensitiveChange}
-            leadingIcon={PepperIcon}
+            leadingIcon={sensitiveIcon}
           >
             <FormattedMessage
               id='compose.sensitive'

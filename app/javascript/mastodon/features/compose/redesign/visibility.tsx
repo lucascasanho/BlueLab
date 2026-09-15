@@ -57,6 +57,7 @@ export const ComposeVisibility: React.FC<{
   activeThreadItemId?: string | null;
 }> = ({ className, activeThreadItemId = null }) => {
   const privacy = useThreadPrivacy(activeThreadItemId);
+  const isEditing = useAppSelector((state) => !!state.compose.get('id'));
 
   return (
     <div className={className}>
@@ -66,7 +67,12 @@ export const ComposeVisibility: React.FC<{
         description='Before button that indicates who a post is for (Public, Followers, mentioned people)'
       />
       <Menu>
-        <MenuTrigger size='sm' trailingIcon={CaretIcon}>
+        <MenuTrigger
+          as={Button}
+          size='sm'
+          trailingIcon={CaretIcon}
+          disabled={isEditing}
+        >
           <ComposeVisibilityButtonText
             privacy={privacy}
             activeThreadItemId={activeThreadItemId}
@@ -187,14 +193,13 @@ const ComposeVisibilityMenu: React.FC<{
           break;
         case 'others':
           if (checked) {
-            newQuotePolicy =
-              defaultQuotePolicy !== 'nobody' ? defaultQuotePolicy : 'public';
+            newQuotePolicy = lastQuotePolicy;
           }
           break;
       }
       dispatch(setComposeQuotePolicy(newQuotePolicy));
     },
-    [activeThreadItemId, defaultQuotePolicy, dispatch],
+    [activeThreadItemId, dispatch, lastQuotePolicy],
   );
 
   const handleSwitchToMessage: React.MouseEventHandler<HTMLButtonElement> =
