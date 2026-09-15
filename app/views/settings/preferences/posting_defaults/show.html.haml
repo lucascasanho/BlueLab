@@ -41,18 +41,6 @@
                  hint: false,
                  include_blank: false,
                  label_method: ->(locale) { locale.nil? ? I18n.t('statuses.default_language') : native_locale_name(locale) },
-                 label: I18n.t('simple_form.labels.defaults.setting_default_language'),
-                 required: false,
-                 wrapper: :with_label
-
-    .fields-group
-      = ff.input :default_content_type,
-                 collection: user_settings_collection('default_content_type'),
-                 selected: current_user.setting_default_content_type,
-                 hint: false,
-                 include_blank: false,
-                 label_method: ->(content_type) { content_type == 'text/markdown' ? I18n.t('posting_defaults.content_types.markdown') : I18n.t('posting_defaults.content_types.plain') },
-                 label: I18n.t('posting_defaults.content_type'),
                  required: false,
                  wrapper: :with_label
 
