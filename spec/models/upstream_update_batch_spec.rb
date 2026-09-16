@@ -7,7 +7,7 @@ RSpec.describe UpstreamUpdateBatch do
     it 'does not expose legacy per-commit batches as software update alerts' do
       Fabricate(:upstream_update_batch, total_commits: 3)
 
-      expect(described_class).not_to be_pending
+      expect(described_class).to_not be_pending
       expect(described_class.pending_count).to eq 0
     end
   end
