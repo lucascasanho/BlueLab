@@ -31,6 +31,7 @@ import { EmojiPickerButton } from '../emoji/picker_button';
 
 import {
   customEmojiDeletionRange,
+  customEmojiEditorRenderKey,
   customEmojiTextParts,
   insertEmojiAtSelection,
   matchingCustomEmojiShortcodes,
@@ -82,6 +83,10 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   const parts = useMemo(
     () => customEmojiTextParts(inputValue, customEmojis),
     [customEmojis, inputValue],
+  );
+  const editorRenderKey = useMemo(
+    () => customEmojiEditorRenderKey(parts),
+    [parts],
   );
   const inputLabel =
     inputElement?.labels?.[0]?.textContent.trim() ??
@@ -404,7 +409,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
             <>
               {children({ ...inputProps, onChange: handleSourceChange })}
               <AnimateEmojiProvider
-                key={inputValue}
+                key={editorRenderKey}
                 ref={editorRef}
                 className={classes.blue2Editor}
                 contentEditable={!disabled}
