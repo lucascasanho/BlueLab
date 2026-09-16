@@ -24,6 +24,8 @@ import { Scrollable, ItemList } from './components';
 
 const MOUSE_IDLE_DELAY = 300;
 const TOP_THRESHOLD = 100;
+const BLUE2_SCROLL_SETTLE_DELAY = 180;
+const PULL_REFRESH_ACTIVATION_DISTANCE = 20;
 const PULL_REFRESH_THRESHOLD = 72;
 const PULL_REFRESH_MAX_DISTANCE = 112;
 const PULL_REFRESH_FALLBACK_DELAY = 12000;
@@ -105,10 +107,12 @@ class ScrollableList extends PureComponent {
   intersectionObserverWrapper = new IntersectionObserverWrapper();
   pullOrigin = null;
   pullTracking = false;
+  pullActive = false;
   pullDistance = 0;
   pullSawLoading = false;
   pullRefreshFallbackTimer = null;
   pullResetTimer = null;
+  lastUserScrollAt = 0;
   mounted = false;
 
   handleScroll = throttle(() => {
@@ -117,6 +121,10 @@ class ScrollableList extends PureComponent {
       const scrollHeight = this.getScrollHeight();
       const clientHeight = this.getClientHeight();
       const offset = scrollHeight - scrollTop - clientHeight;
+
+      if (!this.lastScrollWasSynthetic) {
+        this.lastUserScrollAt = Date.now();
+      }
 
       if (scrollTop > 0 && offset < 400 && this.props.onLoadMore && this.props.hasMore && !this.props.isLoading) {
         this.props.onLoadMore();
@@ -235,6 +243,15 @@ class ScrollableList extends PureComponent {
     this.setScrollTop(newScrollTop);
   };
 
+  isBlueLabTheme = () => {
+    return typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  };
+
+  isBlueLabUserScrollActive = () => {
+    return this.isBlueLabTheme() &&
+      Date.now() - this.lastUserScrollAt < BLUE2_SCROLL_SETTLE_DELAY;
+  };
+
   getVisualScrollAnchor = () => {
     const viewportTop = this.props.bindToDocument ? 0 : this.node.getBoundingClientRect().top;
     const items = this.node.querySelectorAll('.item-list > article[data-id]');
@@ -255,15 +272,25 @@ class ScrollableList extends PureComponent {
       Children.count(prevProps.children) < Children.count(this.props.children) &&
       this.getFirstChildKey(prevProps) !== this.getFirstChildKey(this.props);
     const pendingChanged = (prevProps.numPending > 0) !== (this.props.numPending > 0);
+    const shouldPreservePosition = pendingChanged || someItemInserted &&
+      (this.getScrollTop() >= TOP_THRESHOLD || this.props.preventScroll);
 
-    if (pendingChanged || someItemInserted && (this.getScrollTop() >= TOP_THRESHOLD || this.props.preventScroll)) {
-      return {
-        anchor: this.getVisualScrollAnchor(),
-        bottom: this.getScrollHeight() - this.getScrollTop(),
-      };
-    } else {
+    if (!shouldPreservePosition) {
       return null;
     }
+
+    // While the user is actively scrolling BlueLab, avoid forcing a synchronous
+    // geometry read + scrollTop write. Native browser scroll anchoring keeps the
+    // viewport stable without interrupting wheel/touch momentum. The explicit
+    // visual anchor remains in place once scrolling has settled.
+    if (this.isBlueLabUserScrollActive() && !this.props.preventScroll) {
+      return null;
+    }
+
+    return {
+      anchor: this.getVisualScrollAnchor(),
+      bottom: this.getScrollHeight() - this.getScrollTop(),
+    };
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
@@ -364,16 +391,13 @@ class ScrollableList extends PureComponent {
   };
 
   isBlueLabPullToRefreshEnabled = () => {
-    return Boolean(
-      this.props.onRefresh &&
-      typeof document !== 'undefined' &&
-      document.body.dataset.theme === 'blue-2',
-    );
+    return Boolean(this.props.onRefresh && this.isBlueLabTheme());
   };
 
   resetPullGesture = () => {
     this.pullOrigin = null;
     this.pullTracking = false;
+    this.pullActive = false;
     this.pullDistance = 0;
 
     if (this.mounted && this.state.pullDistance !== 0) {
@@ -409,6 +433,7 @@ class ScrollableList extends PureComponent {
     const touch = event.touches[0];
     this.pullOrigin = { x: touch.clientX, y: touch.clientY };
     this.pullTracking = true;
+    this.pullActive = false;
     this.pullDistance = 0;
   };
 
@@ -426,12 +451,24 @@ class ScrollableList extends PureComponent {
     const deltaX = touch.clientX - this.pullOrigin.x;
     const deltaY = touch.clientY - this.pullOrigin.y;
 
-    if (deltaY <= 0 || Math.abs(deltaX) > Math.abs(deltaY) * 0.8) {
+    if (deltaY <= 0) {
       this.resetPullGesture();
       return;
     }
 
-    if (deltaY < 8) return;
+    if (!this.pullActive) {
+      if (deltaY < PULL_REFRESH_ACTIVATION_DISTANCE) return;
+
+      if (Math.abs(deltaX) > Math.abs(deltaY) * 0.8) {
+        this.resetPullGesture();
+        return;
+      }
+
+      this.pullActive = true;
+    } else if (Math.abs(deltaX) > Math.abs(deltaY) * 0.8) {
+      this.resetPullGesture();
+      return;
+    }
 
     if (event.cancelable) {
       event.preventDefault();
@@ -448,9 +485,11 @@ class ScrollableList extends PureComponent {
   handlePullEnd = () => {
     if (!this.pullTracking) return;
 
-    const shouldRefresh = this.pullDistance >= PULL_REFRESH_THRESHOLD;
+    const shouldRefresh = this.pullActive &&
+      this.pullDistance >= PULL_REFRESH_THRESHOLD;
     this.pullOrigin = null;
     this.pullTracking = false;
+    this.pullActive = false;
 
     if (!shouldRefresh) {
       this.resetPullGesture();
