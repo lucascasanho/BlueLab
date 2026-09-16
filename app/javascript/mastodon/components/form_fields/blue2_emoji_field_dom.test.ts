@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'vitest';
 
-import { clearEmptyProfileEmojiEditorPlaceholder } from './blue2_emoji_field_dom';
+import {
+  clearEmptyProfileEmojiEditorPlaceholder,
+} from './blue2_emoji_field_dom';
 
 describe('Blue 2 profile editor placeholder cleanup', () => {
   test('clears browser-only placeholder DOM while the source value is empty', () => {
