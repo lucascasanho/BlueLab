@@ -116,10 +116,12 @@ const InnerTimeline: FC<{ account: Account; multiColumn: boolean }> = ({
     usePinnedStatusIds({ accountId, tagged, forceEmptyState });
 
   const isLoading = !!timeline?.isLoading || isPinnedLoading;
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   return (
     <Column bindToDocument={!multiColumn}>
-      {isRedesignEnabled() ? (
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
           withBackButton
           title={<DisplayNameSimple account={account} />}

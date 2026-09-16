@@ -15,7 +15,7 @@ import VisibilityIcon from '@/material-icons/400-24px/visibility.svg?react';
 import VisibilityOffIcon from '@/material-icons/400-24px/visibility_off.svg?react';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';
-import { ColumnHeader, ColumnSettingsMenu } from '@/mastodon/components/column_header';
+import { ColumnHeader, ColumnHeaderButton, ColumnSettingsMenu } from '@/mastodon/components/column_header';
 import { DisplayNameSimple } from '@/mastodon/components/display_name/simple';
 import { Hotkeys }  from 'mastodon/components/hotkeys';
 import { Icon }  from 'mastodon/components/icon';
@@ -592,10 +592,38 @@ class Status extends ImmutablePureComponent {
         }}
       />
     );
+    const isBlue2 =
+      typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+    const blue2PageTitle = status.get('visibility') === 'direct' ? (
+      <FormattedMessage
+        id='status.direct_indicator'
+        defaultMessage='Private mention'
+      />
+    ) : (
+      <FormattedMessage id='compose.new.post' defaultMessage='Post' />
+    );
+    const toggleAllLabel = intl.formatMessage(
+      status.get('hidden') ? messages.revealAll : messages.hideAll,
+    );
 
     return (
       <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.detailedStatus)}>
-        {isRedesignEnabled() ? (
+        {isBlue2 ? (
+          <ColumnHeader
+            withBackButton
+            title={blue2PageTitle}
+            extraButtons={
+              <ColumnHeaderButton
+                icon={status.get('hidden') ? VisibilityIcon : VisibilityOffIcon}
+                onClick={this.handleToggleAll}
+                title={toggleAllLabel}
+                aria-label={toggleAllLabel}
+              >
+                {toggleAllLabel}
+              </ColumnHeaderButton>
+            }
+          />
+        ) : isRedesignEnabled() ? (
           <ColumnHeader
             withBackButton
             title={pageTitle}
@@ -617,7 +645,7 @@ class Status extends ImmutablePureComponent {
             showBackButton
             multiColumn={multiColumn}
             extraButton={(
-              <button type='button' className='column-header__button' title={intl.formatMessage(status.get('hidden') ? messages.revealAll : messages.hideAll)} aria-label={intl.formatMessage(status.get('hidden') ? messages.revealAll : messages.hideAll)} onClick={this.handleToggleAll}><Icon id={status.get('hidden') ? 'eye' : 'eye-slash'} icon={status.get('hidden') ? VisibilityIcon : VisibilityOffIcon} /></button>
+              <button type='button' className='column-header__button' title={toggleAllLabel} aria-label={toggleAllLabel} onClick={this.handleToggleAll}><Icon id={status.get('hidden') ? 'eye' : 'eye-slash'} icon={status.get('hidden') ? VisibilityIcon : VisibilityOffIcon} /></button>
             )}
           />
         )}

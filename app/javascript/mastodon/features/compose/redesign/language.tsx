@@ -48,6 +48,8 @@ export const LanguageButton: React.FC<{
     return (item?.get('language') as string | undefined) ?? null;
   });
   const langCode = threadLangCode ?? rootLangCode;
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   return (
     <Menu>
@@ -59,6 +61,9 @@ export const LanguageButton: React.FC<{
         placement='bottom-end'
         className={classes.languageMenu}
         maxWidth={280}
+        portal={isBlue2}
+        mobilePresentation={isBlue2 ? 'popover' : 'bottom-sheet'}
+        strategy={isBlue2 ? 'fixed' : undefined}
       >
         <LanguageDropdown activeThreadItemId={activeThreadItemId} />
       </MenuList>

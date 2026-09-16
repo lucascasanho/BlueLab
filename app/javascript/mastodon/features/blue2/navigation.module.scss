@@ -81,6 +81,10 @@
 .itemActive {
   color: var(--blue2-text, #f7f7f8) !important;
   font-weight: 650;
+
+  svg {
+    color: var(--blue2-blue, #0085ff);
+  }
 }
 
 .badge {

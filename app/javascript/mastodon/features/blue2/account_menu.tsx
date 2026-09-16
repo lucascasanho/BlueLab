@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { NavLink, useHistory } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 import {
   CalendarDotsIcon,
@@ -39,7 +39,6 @@ import classes from './account_menu.module.scss';
 
 export const Blue2AccountMenu: React.FC = () => {
   const intl = useIntl();
-  const history = useHistory();
   const dispatch = useAppDispatch();
   const { accountId, permissions } = useIdentity();
   const account = useAccount(accountId);
@@ -62,11 +61,6 @@ export const Blue2AccountMenu: React.FC = () => {
     },
     [],
   );
-
-  const goHome = useCallback(() => {
-    setOpen(false);
-    history.push('/home');
-  }, [history]);
 
   const confirmLogout = useCallback(() => {
     setOpen(false);
@@ -281,16 +275,17 @@ export const Blue2AccountMenu: React.FC = () => {
         <MoreHorizIcon className={classes.moreIcon} />
       </button>
 
-      <button
-        type='button'
+      <NavLink
+        exact
+        to='/home'
         className={classes.homeButton}
-        onClick={goHome}
+        activeClassName={classes.homeButtonActive}
         aria-label={homeLabel}
         title={homeLabel}
       >
         <HouseIcon size={27} />
         <span>{homeLabel}</span>
-      </button>
+      </NavLink>
 
       {open && anchor && (
         <Popover

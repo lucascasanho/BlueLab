@@ -8,17 +8,11 @@ SimpleNavigation::Configuration.run do |navigation|
 
     n.item :software_updates,
            safe_join(
-             if SoftwareUpdate.urgent_pending?
-               [material_symbol('report'), t('admin.critical_update_pending')]
-             elsif UpstreamUpdateBatch.pending?
-               [material_symbol('system_update_alt'), t('admin.software_updates.upstream.alert', count: UpstreamUpdateBatch.pending_count)]
-             else
-               [material_symbol('system_update_alt'), t('admin.update_available')]
-             end
+             SoftwareUpdate.urgent_pending? ? [material_symbol('report'), t('admin.critical_update_pending')] : [material_symbol('system_update_alt'), t('admin.update_available')]
            ),
            admin_software_updates_path,
            html: { class: SoftwareUpdate.urgent_pending? || SoftwareDeprecation.current&.unsupported? ? 'warning' : nil },
-           if: -> { current_user.can?(:view_devops) && (SoftwareUpdate.pending? || UpstreamUpdateBatch.pending?) }
+           if: -> { Rails.configuration.x.mastodon.software_update_url.present? && current_user.can?(:view_devops) && SoftwareUpdate.pending? }
 
     n.item :profile, safe_join([material_symbol('person'), t('settings.profile')]), settings_profile_path, if: -> { current_user.functional? && !self_destruct }, highlights_on: %r{/settings/profile|/settings/featured_tags|/settings/verification}
     n.item :privacy, safe_join([material_symbol('globe'), t('privacy.title')]), settings_privacy_path, if: -> { current_user.functional? && !self_destruct }, highlights_on: %r{/settings/privacy}
@@ -82,7 +76,7 @@ SimpleNavigation::Configuration.run do |navigation|
       s.item :instance_customization, safe_join([material_symbol('edit'), t('admin.settings.instance_customization.title')]), admin_settings_instance_customization_path, if: -> { current_user.can?(:manage_settings) }
       s.item :terms_of_service, safe_join([material_symbol('description'), t('admin.terms_of_service.title')]), admin_terms_of_service_index_path, highlights_on: %r{/admin/terms_of_service}, if: -> { current_user.can?(:manage_rules) }
       s.item :rules, safe_join([material_symbol('gavel'), t('admin.rules.title')]), admin_rules_path, highlights_on: %r{/admin/rules}, if: -> { current_user.can?(:manage_rules) }
-      s.item :warning_presets, safe_join([material_symbol('warning'), t('admin.warning_presets.title')]), admin_warning_presets_path, highlights_on: %r{/admin/warning_presets}, if: -> { current_user.can?(:manage_settings) }
+      s.item :warning_presets, safe_join([material_symbol('warning'), t('admin.warning_presets.title')]), admin_warning_presets_path, if: -> { current_user.can?(:manage_settings) }
       s.item :roles, safe_join([material_symbol('contact_mail'), t('admin.roles.title')]), admin_roles_path, highlights_on: %r{/admin/roles}, if: -> { current_user.can?(:manage_roles) }
       s.item :announcements, safe_join([material_symbol('campaign'), t('admin.announcements.title')]), admin_announcements_path, highlights_on: %r{/admin/announcements}, if: -> { current_user.can?(:manage_announcements) }
       s.item :email_subscriptions, safe_join([material_symbol('mail'), t('admin.email_subscriptions.index.title')]), admin_email_subscriptions_path, highlights_on: %r{/admin/email_subscriptions}, if: -> { current_user.can?(:manage_settings) }

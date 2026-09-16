@@ -51,6 +51,9 @@ export const Collections: React.FC<{
   const accountId = useAccountId();
   const account = useAccount(accountId);
   const { path } = useRouteMatch();
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const useRedesignHeader = isRedesignEnabled() || isBlue2;
 
   const isOwnCollectionsPage = accountId === me;
 
@@ -71,8 +74,8 @@ export const Collections: React.FC<{
 
   return (
     <Column bindToDocument={!multiColumn} label={pageTitle}>
-      {isRedesignEnabled() ? (
-        <ColumnHeader title={pageTitle} />
+      {useRedesignHeader ? (
+        <ColumnHeader title={pageTitle} withBackButton={isBlue2} />
       ) : (
         <LegacyColumnHeader showBackButton multiColumn={multiColumn} />
       )}
@@ -81,10 +84,10 @@ export const Collections: React.FC<{
         <header
           className={classNames(
             classes.header,
-            isRedesignEnabled() && classes.headerRedesign,
+            useRedesignHeader && classes.headerRedesign,
           )}
         >
-          {!isRedesignEnabled() && (
+          {!useRedesignHeader && (
             <NavigationFocusTarget as='h1' className={classes.heading}>
               {pageTitleHtml}
             </NavigationFocusTarget>
