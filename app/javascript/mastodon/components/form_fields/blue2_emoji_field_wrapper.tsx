@@ -19,6 +19,7 @@ import classNames from 'classnames';
 import { textAtCursorMatchesToken } from '@/mastodon/components/autosuggest/utils';
 import { AutosuggestEmoji } from '@/mastodon/components/autosuggest_emoji';
 import { LocalCustomEmojiProvider } from '@/mastodon/components/emoji/context';
+import { Popover } from '@/mastodon/components/popover';
 import type { ExtraCustomEmojiMap } from '@/mastodon/features/emoji/types';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import { autoPlayGif } from '@/mastodon/initial_state';
@@ -37,7 +38,6 @@ import {
   setProfileEmojiEditorSelection,
 } from './blue2_emoji_field_utils';
 import type {
-  CustomEmojiTextPart,
   EmojiFieldWrapperProps,
   EmojiInputElement,
 } from './emoji_text_field';
@@ -54,7 +54,7 @@ const escapeAttribute = (value: string) =>
   escapeHtml(value).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
 const buildEditorHtml = (
-  parts: CustomEmojiTextPart[],
+  parts: ReturnType<typeof customEmojiTextParts>,
   customEmojis: ExtraCustomEmojiMap,
 ) =>
   parts
