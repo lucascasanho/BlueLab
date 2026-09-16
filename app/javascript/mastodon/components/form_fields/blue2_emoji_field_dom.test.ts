@@ -1,28 +1,23 @@
 import { describe, expect, test } from 'vitest';
 
-import {
-  clearEmptyProfileEmojiEditorPlaceholder,
-} from './blue2_emoji_field_dom';
+import { clearEmptyProfileEmojiEditorPlaceholder } from './blue2_emoji_field_dom';
 
 describe('Blue 2 profile editor placeholder cleanup', () => {
-  test(
-    'clears browser-only placeholder DOM while the source value is empty',
-    () => {
-      const editor = document.createElement('div');
+  test('clears browser-only placeholder DOM while the source value is empty', () => {
+    const editor = document.createElement('div');
 
-      editor.innerHTML = '<br>';
-      expect(clearEmptyProfileEmojiEditorPlaceholder(editor, '')).toBe(true);
-      expect(editor.childNodes).toHaveLength(0);
+    editor.innerHTML = '<br>';
+    expect(clearEmptyProfileEmojiEditorPlaceholder(editor, '')).toBe(true);
+    expect(editor.childNodes).toHaveLength(0);
 
-      editor.innerHTML = '<div><br></div>';
-      expect(clearEmptyProfileEmojiEditorPlaceholder(editor, '')).toBe(true);
-      expect(editor.childNodes).toHaveLength(0);
+    editor.innerHTML = '<div><br></div>';
+    expect(clearEmptyProfileEmojiEditorPlaceholder(editor, '')).toBe(true);
+    expect(editor.childNodes).toHaveLength(0);
 
-      editor.innerHTML = '&nbsp;';
-      expect(clearEmptyProfileEmojiEditorPlaceholder(editor, '')).toBe(true);
-      expect(editor.childNodes).toHaveLength(0);
-    },
-  );
+    editor.innerHTML = '&nbsp;';
+    expect(clearEmptyProfileEmojiEditorPlaceholder(editor, '')).toBe(true);
+    expect(editor.childNodes).toHaveLength(0);
+  });
 
   test('preserves real user text and ordinary spaces', () => {
     const editor = document.createElement('div');
@@ -40,9 +35,9 @@ describe('Blue 2 profile editor placeholder cleanup', () => {
     const editor = document.createElement('div');
     editor.innerHTML = '<br>';
 
-    expect(
-      clearEmptyProfileEmojiEditorPlaceholder(editor, 'hello'),
-    ).toBe(false);
+    expect(clearEmptyProfileEmojiEditorPlaceholder(editor, 'hello')).toBe(
+      false,
+    );
     expect(editor.innerHTML).toBe('<br>');
   });
 });
