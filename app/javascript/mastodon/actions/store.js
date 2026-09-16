@@ -12,9 +12,17 @@ const convertState = rawState =>
     isIndexed(v) ? v.toList() : v.toMap());
 
 export function hydrateStore(rawState) {
-  return dispatch => {
-    const state = convertState(rawState);
+  const state = convertState({
+    ...rawState,
+    compose: rawState.compose
+      ? {
+          ...rawState.compose,
+          default_content_type: 'text/markdown',
+        }
+      : rawState.compose,
+  });
 
+  return dispatch => {
     dispatch({
       type: STORE_HYDRATE,
       state,
