@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 
-import { PlusIcon } from '@phosphor-icons/react';
+import { ChatCircleDotsIcon, PlusIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
 import { Column } from '@/mastodon/components/column';
@@ -13,7 +13,6 @@ import {
   ColumnSettingsMenu,
 } from '@/mastodon/components/column_header';
 import { MultiColumnMenuItems } from '@/mastodon/components/column_header/multicolumn_settings';
-import { Blue2MessageIcon } from '@/mastodon/features/blue2/icons';
 import { blue2Text } from '@/mastodon/features/blue2/locale';
 import {
   composerOriginFromElement,
@@ -118,7 +117,7 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
               className={blue2Classes.headerButton}
               onClick={handleNewConversation}
             >
-              <Blue2MessageIcon size={19} />
+              <ChatCircleDotsIcon size={19} />
               <span>{blue2Text(intl.locale, 'newConversation')}</span>
             </button>
           </header>
@@ -147,7 +146,7 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
                 scrollKey={`direct_timeline-${columnId}`}
                 emptyMessage={
                   <div className={blue2Classes.emptyInbox}>
-                    <Blue2MessageIcon size={58} />
+                    <ChatCircleDotsIcon size={58} />
                     <strong>{blue2Text(intl.locale, 'sayHello')}</strong>
                     <span>{blue2Text(intl.locale, 'inboxEmpty')}</span>
                   </div>
