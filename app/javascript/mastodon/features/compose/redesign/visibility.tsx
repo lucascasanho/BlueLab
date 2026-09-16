@@ -36,6 +36,9 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { selectComposeMentions, selectComposePrivacy } from './selectors';
 
+const isBlue2ThemeActive = () =>
+  typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+
 const useThreadPrivacy = (activeThreadItemId: string | null) => {
   const rootPrivacy = useAppSelector(selectComposePrivacy);
   const threadPrivacy = useAppSelector((state) => {
@@ -142,6 +145,7 @@ const ComposeVisibilityMenu: React.FC<{
   const defaultQuotePolicy = useAppSelector(
     (state) => state.compose.get('default_quote_policy') as ApiQuotePolicy,
   );
+  const useBlue2Popover = isBlue2ThemeActive();
 
   // Track the last public quote policy, so the picker remembers what was last used before quoting was disabled.
   const [lastQuotePolicy, setLastQuotePolicy] = useState(
@@ -208,7 +212,14 @@ const ComposeVisibilityMenu: React.FC<{
     }, [applyPrivacy]);
 
   return (
-    <MenuList placement='bottom-start' offset={4} maxWidth={280}>
+    <MenuList
+      placement='bottom-start'
+      offset={4}
+      maxWidth={280}
+      portal={useBlue2Popover}
+      mobilePresentation={useBlue2Popover ? 'popover' : undefined}
+      strategy={useBlue2Popover ? 'fixed' : undefined}
+    >
       <MenuItemGroup
         label={
           <FormattedMessage
@@ -339,6 +350,7 @@ const ComposeDirectMenu: React.FC<{
   const defaultPrivacy = useAppSelector(
     (state) => state.compose.get('default_privacy') as StatusVisibility,
   );
+  const useBlue2Popover = isBlue2ThemeActive();
   const handleSwitchToPost: React.MouseEventHandler<HTMLButtonElement> =
     useCallback(() => {
       if (activeThreadItemId) {
@@ -359,7 +371,14 @@ const ComposeDirectMenu: React.FC<{
   const isReply = useAppSelector((state) => !!state.compose.get('in_reply_to'));
 
   return (
-    <MenuList placement='bottom-start' offset={4} maxWidth={280}>
+    <MenuList
+      placement='bottom-start'
+      offset={4}
+      maxWidth={280}
+      portal={useBlue2Popover}
+      mobilePresentation={useBlue2Popover ? 'popover' : undefined}
+      strategy={useBlue2Popover ? 'fixed' : undefined}
+    >
       <MenuItemGroup
         label={
           <FormattedMessage
