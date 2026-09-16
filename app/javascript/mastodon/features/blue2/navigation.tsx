@@ -43,6 +43,8 @@ interface ItemProps {
   isActive?: React.ComponentProps<typeof NavLink>['isActive'];
 }
 
+const neverActive: NonNullable<ItemProps['isActive']> = () => false;
+
 const Item: React.FC<ItemProps> = ({
   to,
   icon: Icon,
@@ -138,7 +140,7 @@ export const Blue2Navigation: React.FC = () => {
           to='/explore'
           icon={TrendingUpIcon}
           iconClassName={classes.trendingIcon}
-          isActive={() => false}
+          isActive={neverActive}
         >
           {blue2Text(intl.locale, 'trendingFeeds')}
         </Item>
