@@ -162,7 +162,7 @@ RSpec.describe Mastodon::CLI::EmailDomainBlocks do
   end
 
   describe '#sync_disposable' do
-    subject { cli.invoke(:sync_disposable, [], {}) }
+    subject { cli.sync_disposable }
 
     before do
       allow(cli).to receive(:fetch_source).and_return(
