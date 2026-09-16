@@ -19,8 +19,5 @@ jobs:
       - name: Set up Javascript environment
         uses: ./.github/actions/setup-javascript
 
-      - name: Show formatter diff
-        run: |
-          yarn format app/javascript/mastodon/features/compose/redesign/rich_editor.tsx
-          git diff -- app/javascript/mastodon/features/compose/redesign/rich_editor.tsx
-          exit 1
+      - name: Check formatting
+        run: yarn format:check
