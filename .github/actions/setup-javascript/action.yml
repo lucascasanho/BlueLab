@@ -36,15 +36,6 @@ runs:
       run: yarn install --immutable
       if: inputs.onlyProduction == 'false'
 
-    - name: Show Blue2 formatter diff
-      shell: bash
-      if: inputs.onlyProduction == 'false'
-      run: |
-        file='app/javascript/mastodon/components/form_fields/blue2_emoji_field_dom.test.ts'
-        yarn oxfmt
-        git diff -- "$file"
-        git reset --hard HEAD
-
     - name: Install all production yarn packages
       shell: bash
       run: yarn workspaces focus --production
