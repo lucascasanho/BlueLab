@@ -27,6 +27,7 @@ import { autoPlayGif } from '@/mastodon/initial_state';
 import { CharacterCounter } from '../character_counter';
 import { EmojiPickerButton } from '../emoji/picker_button';
 
+import { clearEmptyProfileEmojiEditorPlaceholder } from './blue2_emoji_field_dom';
 import {
   customEmojiDeletionRange,
   customEmojiEditorRenderKey,
@@ -283,6 +284,24 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     [onChange],
   );
 
+  const resetEmptyEditorPlaceholder = useCallback(
+    (editor: HTMLDivElement) => {
+      if (!clearEmptyProfileEmojiEditorPlaceholder(editor, inputValue)) return;
+
+      const selection = { start: 0, end: 0 };
+      lastSelectionRef.current = selection;
+      setProfileEmojiEditorSelection(editor, 0);
+    },
+    [inputValue],
+  );
+
+  const handleEditorBeforeInput = useCallback(
+    (event: SyntheticEvent<HTMLDivElement>) => {
+      resetEmptyEditorPlaceholder(event.currentTarget);
+    },
+    [resetEmptyEditorPlaceholder],
+  );
+
   const handleEditorInput = useCallback(() => {
     syncFromEditor();
   }, [syncFromEditor]);
@@ -309,10 +328,11 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
         editor.focus({ preventScroll: true });
         setProfileEmojiEditorSelection(editor, start, end);
       } else if (event.target === editor) {
+        resetEmptyEditorPlaceholder(editor);
         handleEditorSelection();
       }
     },
-    [handleEditorSelection, inputRef],
+    [handleEditorSelection, inputRef, resetEmptyEditorPlaceholder],
   );
 
   const handleBlurCapture = useCallback(
@@ -508,6 +528,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
                 aria-label={inputLabel}
                 aria-required={inputProps.required}
                 spellCheck
+                onBeforeInput={handleEditorBeforeInput}
                 onInput={handleEditorInput}
                 onClick={handleEditorSelection}
                 onMouseUp={handleEditorSelection}
