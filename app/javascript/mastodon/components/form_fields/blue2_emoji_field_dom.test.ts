@@ -35,7 +35,9 @@ describe('Blue 2 profile editor placeholder cleanup', () => {
     const editor = document.createElement('div');
     editor.innerHTML = '<br>';
 
-    expect(clearEmptyProfileEmojiEditorPlaceholder(editor, 'hello')).toBe(false);
+    expect(
+      clearEmptyProfileEmojiEditorPlaceholder(editor, 'hello'),
+    ).toBe(false);
     expect(editor.innerHTML).toBe('<br>');
   });
 });
