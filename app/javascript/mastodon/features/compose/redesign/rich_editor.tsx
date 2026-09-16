@@ -663,9 +663,7 @@ export const RichComposeEditor: React.FC<{
     if (
       editor &&
       (contentTypeChanged ||
-        (!isLocalUpdate &&
-          !liveDomMatchesText &&
-          (textChanged || !wasFocused)))
+        (!isLocalUpdate && !liveDomMatchesText && (textChanged || !wasFocused)))
     ) {
       editor.innerHTML = isMarkdown
         ? markdownToHtml(text, customEmojis)
