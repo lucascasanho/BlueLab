@@ -64,12 +64,11 @@ const buildEditorHtml = (
       const emoji = customEmojis[part.code];
       if (!emoji) return escapeHtml(part.shortcode);
 
-      const animatedUrl = emoji.url ?? emoji.static_url;
-      const staticUrl = emoji.static_url ?? emoji.url;
-      if (!animatedUrl || !staticUrl) return escapeHtml(part.shortcode);
+      const animatedUrl = emoji.url || emoji.static_url;
+      const staticUrl = emoji.static_url || emoji.url;
       const src = autoPlayGif ? animatedUrl : staticUrl;
 
-      return `<span data-emoji-shortcode="${escapeAttribute(part.shortcode)}" contenteditable="false" class="${escapeAttribute(classes.blue2EmojiToken)}"><img src="${escapeAttribute(src)}" data-blue2-emoji-animated-url="${escapeAttribute(animatedUrl)}" data-blue2-emoji-static-url="${escapeAttribute(staticUrl)}" alt="${escapeAttribute(part.shortcode)}" class="emojione custom-emoji" loading="lazy" draggable="false" /></span>`;
+      return `<span data-emoji-shortcode="${escapeAttribute(part.shortcode)}" contenteditable="false" class="${escapeAttribute(classes.blue2EmojiToken ?? '')}"><img src="${escapeAttribute(src)}" data-blue2-emoji-animated-url="${escapeAttribute(animatedUrl)}" data-blue2-emoji-static-url="${escapeAttribute(staticUrl)}" alt="${escapeAttribute(part.shortcode)}" class="emojione custom-emoji" loading="lazy" draggable="false" /></span>`;
     })
     .join('');
 
