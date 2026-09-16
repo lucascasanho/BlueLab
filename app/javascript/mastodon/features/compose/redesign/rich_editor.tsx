@@ -299,7 +299,8 @@ export const editorSerializedValueMatches = (
   element: HTMLElement,
   value: string,
   isMarkdown: boolean,
-) => (isMarkdown ? editorText(element) : editorPlainText(element)) === value;
+) =>
+  (isMarkdown ? editorText(element) : editorPlainText(element)) === value;
 
 const selectionNodeLength = (node: Node): number => {
   if (node.nodeType === Node.TEXT_NODE) {
