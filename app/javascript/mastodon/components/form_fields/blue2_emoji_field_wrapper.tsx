@@ -18,13 +18,10 @@ import classNames from 'classnames';
 
 import { textAtCursorMatchesToken } from '@/mastodon/components/autosuggest/utils';
 import { AutosuggestEmoji } from '@/mastodon/components/autosuggest_emoji';
-import { Emoji } from '@/mastodon/components/emoji';
-import {
-  AnimateEmojiProvider,
-  LocalCustomEmojiProvider,
-} from '@/mastodon/components/emoji/context';
-import { Popover } from '@/mastodon/components/popover';
+import { LocalCustomEmojiProvider } from '@/mastodon/components/emoji/context';
+import type { ExtraCustomEmojiMap } from '@/mastodon/features/emoji/types';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
+import { autoPlayGif } from '@/mastodon/initial_state';
 
 import { CharacterCounter } from '../character_counter';
 import { EmojiPickerButton } from '../emoji/picker_button';
@@ -40,6 +37,7 @@ import {
   setProfileEmojiEditorSelection,
 } from './blue2_emoji_field_utils';
 import type {
+  CustomEmojiTextPart,
   EmojiFieldWrapperProps,
   EmojiInputElement,
 } from './emoji_text_field';
@@ -48,6 +46,44 @@ import { FormFieldWrapper } from './form_field_wrapper';
 
 export const isBlue2Theme = () =>
   typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+
+const escapeHtml = (value: string) =>
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const escapeAttribute = (value: string) =>
+  escapeHtml(value).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+const buildEditorHtml = (
+  parts: CustomEmojiTextPart[],
+  customEmojis: ExtraCustomEmojiMap,
+) =>
+  parts
+    .map((part) => {
+      if (part.type === 'text') return escapeHtml(part.text);
+
+      const emoji = customEmojis[part.code];
+      if (!emoji) return escapeHtml(part.shortcode);
+
+      const animatedUrl = emoji.url || emoji.static_url;
+      const staticUrl = emoji.static_url || emoji.url;
+      const src = autoPlayGif ? animatedUrl : staticUrl;
+
+      return `<span data-emoji-shortcode="${escapeAttribute(part.shortcode)}" contenteditable="false" class="${escapeAttribute(classes.blue2EmojiToken)}"><img src="${escapeAttribute(src)}" data-blue2-emoji-animated-url="${escapeAttribute(animatedUrl)}" data-blue2-emoji-static-url="${escapeAttribute(staticUrl)}" alt="${escapeAttribute(part.shortcode)}" class="emojione custom-emoji" loading="lazy" draggable="false" /></span>`;
+    })
+    .join('');
+
+const setEditorEmojiAnimation = (editor: HTMLElement, animate: boolean) => {
+  editor
+    .querySelectorAll<HTMLImageElement>(
+      'img[data-blue2-emoji-animated-url][data-blue2-emoji-static-url]',
+    )
+    .forEach((image) => {
+      const src = animate
+        ? image.dataset.blue2EmojiAnimatedUrl
+        : image.dataset.blue2EmojiStaticUrl;
+      if (src && image.getAttribute('src') !== src) image.src = src;
+    });
+};
 
 export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   value,
@@ -78,7 +114,10 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   const pendingSelectionRef = useRef<{ start: number; end: number } | null>(
     null,
   );
+  const pendingRenderValueRef = useRef<string | null>(null);
   const lastSelectionRef = useRef<{ start: number; end: number } | null>(null);
+  const editorHtmlRef = useRef('');
+  const editorHtmlKeyRef = useRef<string | null>(null);
 
   const parts = useMemo(
     () => customEmojiTextParts(inputValue, customEmojis),
@@ -88,6 +127,12 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     () => customEmojiEditorRenderKey(parts),
     [parts],
   );
+
+  if (editorHtmlKeyRef.current !== editorRenderKey) {
+    editorHtmlRef.current = buildEditorHtml(parts, customEmojis);
+    editorHtmlKeyRef.current = editorRenderKey;
+  }
+
   const inputLabel =
     inputElement?.labels?.[0]?.textContent.trim() ??
     inputElement?.getAttribute('aria-label') ??
@@ -165,10 +210,15 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     const nextRenderKey = customEmojiEditorRenderKey(
       customEmojiTextParts(text, customEmojis),
     );
+    const needsCanonicalRender =
+      nextRenderKey !== editorRenderKey || text !== rawText;
+
     input.value = text;
     input.setSelectionRange(selection.start, selection.end);
-    pendingSelectionRef.current =
-      nextRenderKey === editorRenderKey ? null : selection;
+    if (needsCanonicalRender) {
+      pendingSelectionRef.current = selection;
+      pendingRenderValueRef.current = text;
+    }
     lastSelectionRef.current = selection;
     onChange?.(text);
     updateSuggestions(text, selection.end);
@@ -198,6 +248,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
         end: insertion.caretPosition,
       };
       pendingSelectionRef.current = selection;
+      pendingRenderValueRef.current = insertion.value;
       lastSelectionRef.current = selection;
       if (inputRef.current) {
         inputRef.current.value = insertion.value;
@@ -283,6 +334,18 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     [inputRef],
   );
 
+  const handleEditorMouseEnter = useCallback(() => {
+    if (!autoPlayGif && editorRef.current) {
+      setEditorEmojiAnimation(editorRef.current, true);
+    }
+  }, []);
+
+  const handleEditorMouseLeave = useCallback(() => {
+    if (!autoPlayGif && editorRef.current) {
+      setEditorEmojiAnimation(editorRef.current, false);
+    }
+  }, []);
+
   const handleKeyDown = useCallback(
     (event: ReactKeyboardEvent<HTMLDivElement>) => {
       const editor = editorRef.current;
@@ -340,6 +403,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
               end: deletionRange.start,
             };
             pendingSelectionRef.current = nextSelection;
+            pendingRenderValueRef.current = nextValue;
             lastSelectionRef.current = nextSelection;
             if (inputRef.current) {
               inputRef.current.value = nextValue;
@@ -389,17 +453,34 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
 
   useLayoutEffect(() => {
     const editor = editorRef.current;
-    const pendingSelection = pendingSelectionRef.current;
-    if (!editor || !pendingSelection) return;
+    if (!editor) return;
 
-    setProfileEmojiEditorSelection(
-      editor,
-      pendingSelection.start,
-      pendingSelection.end,
-    );
-    editor.focus({ preventScroll: true });
-    pendingSelectionRef.current = null;
-  }, [inputValue]);
+    const pendingSelection = pendingSelectionRef.current;
+    const pendingReady =
+      pendingSelection !== null && pendingRenderValueRef.current === inputValue;
+    const liveValue = profileEmojiEditorText(editor);
+    const isFocused = document.activeElement === editor;
+
+    if (liveValue !== inputValue && (!isFocused || pendingReady)) {
+      editor.innerHTML = buildEditorHtml(
+        customEmojiTextParts(inputValue, customEmojis),
+        customEmojis,
+      );
+    }
+
+    setEditorEmojiAnimation(editor, autoPlayGif ?? false);
+
+    if (pendingReady && pendingSelection) {
+      setProfileEmojiEditorSelection(
+        editor,
+        pendingSelection.start,
+        pendingSelection.end,
+      );
+      editor.focus({ preventScroll: true });
+      pendingSelectionRef.current = null;
+      pendingRenderValueRef.current = null;
+    }
+  }, [customEmojis, inputValue]);
 
   return (
     <div
@@ -419,8 +500,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
           {(inputProps) => (
             <>
               {children({ ...inputProps, onChange: handleSourceChange })}
-              <AnimateEmojiProvider
-                key={editorRenderKey}
+              <div
                 ref={editorRef}
                 className={classes.blue2Editor}
                 contentEditable={!disabled}
@@ -435,27 +515,15 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
                 aria-label={inputLabel}
                 aria-required={inputProps.required}
                 spellCheck
+                dangerouslySetInnerHTML={{ __html: editorHtmlRef.current }}
                 onInput={handleEditorInput}
                 onClick={handleEditorSelection}
                 onMouseUp={handleEditorSelection}
                 onKeyUp={handleEditorSelection}
                 onKeyDown={handleKeyDown}
-              >
-                {parts.map((part, index) =>
-                  part.type === 'emoji' ? (
-                    <span
-                      key={`emoji-${part.code}-${index}`}
-                      data-emoji-shortcode={part.shortcode}
-                      contentEditable={false}
-                      className={classes.blue2EmojiToken}
-                    >
-                      <Emoji code={part.shortcode} showFallback={false} />
-                    </span>
-                  ) : (
-                    <span key={`text-${index}`}>{part.text}</span>
-                  ),
-                )}
-              </AnimateEmojiProvider>
+                onMouseEnter={handleEditorMouseEnter}
+                onMouseLeave={handleEditorMouseLeave}
+              />
               <EmojiPickerButton onPick={handlePickEmoji} disabled={disabled} />
               {counterMax && (
                 <CharacterCounter
