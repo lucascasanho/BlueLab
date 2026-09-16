@@ -450,8 +450,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
       if (
         (event.key === 'Backspace' &&
           deleteAdjacentCustomEmoji(editor, 'backward')) ||
-        (event.key === 'Delete' &&
-          deleteAdjacentCustomEmoji(editor, 'forward'))
+        (event.key === 'Delete' && deleteAdjacentCustomEmoji(editor, 'forward'))
       ) {
         event.preventDefault();
         event.stopPropagation();
