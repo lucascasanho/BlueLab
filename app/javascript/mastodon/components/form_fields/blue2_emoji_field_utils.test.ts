@@ -4,6 +4,7 @@ import type { ExtraCustomEmojiMap } from '@/mastodon/features/emoji/types';
 
 import {
   customEmojiDeletionRange,
+  customEmojiEditorRenderKey,
   customEmojiTextParts,
   insertEmojiAtSelection,
   matchingCustomEmojiShortcodes,
@@ -41,6 +42,25 @@ describe('Blue 2 emoji profile fields', () => {
     expect(customEmojiTextParts('Hello :missing:!', customEmojis)).toEqual([
       { type: 'text', text: 'Hello :missing:!' },
     ]);
+  });
+
+  test('keeps the editor render key stable for ordinary text edits', () => {
+    const original = customEmojiEditorRenderKey(
+      customEmojiTextParts('Hello world', customEmojis),
+    );
+    const afterBackspace = customEmojiEditorRenderKey(
+      customEmojiTextParts('Hello worl', customEmojis),
+    );
+    const withEmoji = customEmojiEditorRenderKey(
+      customEmojiTextParts('Hello :party: world', customEmojis),
+    );
+    const sameEmojiDifferentText = customEmojiEditorRenderKey(
+      customEmojiTextParts('Changed :party: text', customEmojis),
+    );
+
+    expect(afterBackspace).toBe(original);
+    expect(withEmoji).not.toBe(original);
+    expect(sameEmojiDifferentText).toBe(withEmoji);
   });
 
   test('does not render shortcodes embedded in words', () => {
