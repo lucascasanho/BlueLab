@@ -31,6 +31,7 @@ import mobileChromeClasses from './blue2_mobile_chrome.module.scss';
 import searchPortalClasses from './blue2_search_portal.module.scss';
 import { MultiColumnContent } from './multi_column_content';
 import classes from './redesign.module.scss';
+import multiColClasses from './redesign_multicol.module.scss';
 
 const TabsBarPortal: React.FC<React.ComponentProps<'div'>> = (props) => {
   const { setTabsBarElement } = useColumnsContext();
@@ -176,7 +177,8 @@ export const ColumnsAreaRedesign: React.FC<{
 
   if (minimalShell) {
     return (
-      <div className={classes.root}>
+      <div ref={ref} className={classNames(classes.root, classes.rootMinimal)}>
+        {isMobile && <RedesignMobileNavigation />}
         <div className={classes.main}>
           <Header />
 
@@ -360,7 +362,7 @@ export const ColumnsAreaRedesign: React.FC<{
 
   if (singleColumn) {
     return (
-      <div className={classes.root}>
+      <div ref={ref} className={classes.root}>
         <div className={classes.navigationWrapper}>
           <RedesignNavigationPanel />
         </div>
@@ -379,10 +381,16 @@ export const ColumnsAreaRedesign: React.FC<{
 
   return (
     <main
-      className={classNames('columns-area', { unscrollable: isModalOpen })}
       ref={ref}
+      className={classNames(multiColClasses.root, {
+        unscrollable: isModalOpen,
+      })}
       tabIndex={isModalOpen ? undefined : 0}
     >
+      <div className={multiColClasses.navigationWrapper}>
+        <RedesignNavigationPanel />
+      </div>
+      <ComposeRedesignButton />
       <MultiColumnContent>{children}</MultiColumnContent>
     </main>
   );

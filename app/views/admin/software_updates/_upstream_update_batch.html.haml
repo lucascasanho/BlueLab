@@ -5,7 +5,7 @@
   .upstream-update__header
     %div
       %h3
-        = link_to upstream_update_batch.head_sha.first(12), upstream_update_batch.compare_url, target: '_blank', rel: 'noopener noreferrer'
+        %a{ href: upstream_update_batch.compare_url, target: '_blank', rel: 'noopener noreferrer' }= upstream_update_batch.head_sha.first(12)
         - if upstream_update_batch.large?
           %span.upstream-update__badge= t('admin.software_updates.upstream.large_update')
       .upstream-update__meta
@@ -44,7 +44,7 @@
       - upstream_update_batch.commits.each_with_index do |commit, index|
         %li
           .upstream-update__commit-heading
-            = link_to commit['sha'].first(12), upstream_update_batch.commit_url(commit['sha']), target: '_blank', rel: 'noopener noreferrer'
+            %a{ href: upstream_update_batch.commit_url(commit['sha']), target: '_blank', rel: 'noopener noreferrer' }= commit['sha'].first(12)
             %span= commit['author']
             - if commit['committed_at'].present?
               %time{ datetime: commit['committed_at'] }= l(Time.zone.parse(commit['committed_at']), format: :long)

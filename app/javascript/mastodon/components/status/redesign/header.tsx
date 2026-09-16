@@ -1,5 +1,7 @@
 import { useId } from 'react';
 
+import { FormattedMessage } from 'react-intl';
+
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 
@@ -15,7 +17,10 @@ import { statusLink } from '../utils';
 import classes from './styles.module.scss';
 
 interface StatusRedesignHeaderProps {
-  status: Pick<AccountStatusShape, 'id' | 'account' | 'created_at'>;
+  status: Pick<
+    AccountStatusShape,
+    'id' | 'account' | 'created_at' | 'visibility'
+  >;
   children?: React.ReactNode;
   className?: string;
   showFullAccountHandle?: boolean;
@@ -42,6 +47,26 @@ export const StatusRedesignHeader: React.FC<StatusRedesignHeaderProps> = ({
     'data-hover-card-reference': 'status',
   };
 
+  let displayName = (
+    <Link
+      {...accountLinkProps}
+      className={classes.headerNameLink}
+      aria-describedby={handleId}
+    >
+      <DisplayName account={account} variant='noDomain' />
+    </Link>
+  );
+  if (status.visibility === 'private') {
+    displayName = (
+      <FormattedMessage
+        id='status.header.to_followers'
+        defaultMessage='{displayName} to Followers'
+        tagName='span'
+        values={{ displayName }}
+      />
+    );
+  }
+
   return (
     <header className={classNames(className, classes.header)}>
       <Link
@@ -55,13 +80,7 @@ export const StatusRedesignHeader: React.FC<StatusRedesignHeaderProps> = ({
 
       <div>
         <p className={classes.headerName}>
-          <Link
-            {...accountLinkProps}
-            className={classes.headerNameLink}
-            aria-describedby={handleId}
-          >
-            <DisplayName account={account} variant='noDomain' />
-          </Link>
+          {displayName}
           &bull;
           <Link
             to={{

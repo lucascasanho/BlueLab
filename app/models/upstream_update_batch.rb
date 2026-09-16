@@ -66,10 +66,11 @@ class UpstreamUpdateBatch < ApplicationRecord
   end
 
   def compare_url
-    "https://github.com/#{repository}/compare/#{base_sha}...#{head_sha}"
+    "https://github.com/#{OFFICIAL_REPOSITORY}/compare/#{base_sha}...#{head_sha}"
   end
 
   def commit_url(sha)
-    "https://github.com/#{repository}/commit/#{sha}"
+    safe_sha = sha.to_s.match?(/\A[0-9a-f]{40,64}\z/) ? sha.to_s : head_sha
+    "https://github.com/#{OFFICIAL_REPOSITORY}/commit/#{safe_sha}"
   end
 end

@@ -304,6 +304,7 @@ export const Notifications: React.FC<{
               )}
             </>
           }
+          extraStickyContent={filterBar}
         />
       ) : (
         <LegacyColumnHeader
@@ -322,7 +323,7 @@ export const Notifications: React.FC<{
         </LegacyColumnHeader>
       )}
 
-      {filterBar}
+      {!isRedesignEnabled() && filterBar}
 
       {scrollContainer}
 

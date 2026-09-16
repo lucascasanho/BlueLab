@@ -17,7 +17,7 @@ import {
 } from '@/mastodon/actions/compose';
 import { ToggleButton } from '@/mastodon/components/button/redesign';
 import { TextInputField } from '@/mastodon/components/form_fields/redesign';
-import { Icon } from '@/mastodon/components/icon';
+import { Icon, useIconWeight } from '@/mastodon/components/icon';
 import {
   focusComposerTextarea,
   submitComposer,
@@ -102,6 +102,7 @@ export const RedesignComposeForm: React.FC<
 
   const intl = useIntl();
   const titleId = useId();
+  const sensitiveIcon = useIconWeight(PepperIcon, sensitive && 'fill');
 
   const handleWheelCapture: React.WheelEventHandler<HTMLFormElement> =
     useCallback((event) => {
@@ -183,7 +184,7 @@ export const RedesignComposeForm: React.FC<
             size='sm'
             active={sensitive}
             onClick={onSensitiveChange}
-            leadingIcon={PepperIcon}
+            leadingIcon={sensitiveIcon}
           >
             <FormattedMessage
               id='compose.sensitive'

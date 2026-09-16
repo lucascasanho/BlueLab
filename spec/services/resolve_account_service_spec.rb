@@ -197,6 +197,10 @@ RSpec.describe ResolveAccountService do
     let!(:duplicate) { Fabricate(:account, username: 'foo', domain: 'old.example.com', uri: 'https://ap.example.com/users/foo') }
     let!(:status)    { Fabricate(:status, account: duplicate, text: 'foo') }
 
+    before do
+      stub_request(:get, 'https://ap.example.com/api/v2/instance').to_return(status: 404)
+    end
+
     it 'returns new remote account and merges accounts', :inline_jobs do
       account = subject.call('foo@ap.example.com')
 

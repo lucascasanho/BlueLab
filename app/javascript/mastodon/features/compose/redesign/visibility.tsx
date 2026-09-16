@@ -1,12 +1,11 @@
-import type React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import {
-  ChatCircleIcon,
+  ChatCircleDotsIcon,
   MagnifyingGlassIcon,
   NewspaperIcon,
   QuotesIcon,
@@ -20,7 +19,7 @@ import {
 import { openModal } from '@/mastodon/actions/modal';
 import type { ApiQuotePolicy } from '@/mastodon/api_types/quotes';
 import type { StatusVisibility } from '@/mastodon/api_types/statuses';
-import { CaretIcon } from '@/mastodon/components/button/redesign';
+import { Button, CaretIcon } from '@/mastodon/components/button/redesign';
 import { DisplayNameSimple } from '@/mastodon/components/display_name/simple';
 import {
   Menu,
@@ -58,6 +57,7 @@ export const ComposeVisibility: React.FC<{
   activeThreadItemId?: string | null;
 }> = ({ className, activeThreadItemId = null }) => {
   const privacy = useThreadPrivacy(activeThreadItemId);
+  const isEditing = useAppSelector((state) => !!state.compose.get('id'));
 
   return (
     <div className={className}>
@@ -67,7 +67,12 @@ export const ComposeVisibility: React.FC<{
         description='Before button that indicates who a post is for (Public, Followers, mentioned people)'
       />
       <Menu>
-        <MenuTrigger size='sm' trailingIcon={CaretIcon}>
+        <MenuTrigger
+          as={Button}
+          size='sm'
+          trailingIcon={CaretIcon}
+          disabled={isEditing}
+        >
           <ComposeVisibilityButtonText
             privacy={privacy}
             activeThreadItemId={activeThreadItemId}
@@ -137,6 +142,11 @@ const ComposeVisibilityMenu: React.FC<{
   const defaultQuotePolicy = useAppSelector(
     (state) => state.compose.get('default_quote_policy') as ApiQuotePolicy,
   );
+
+  // Track the last public quote policy, so the picker remembers what was last used before quoting was disabled.
+  const [lastQuotePolicy, setLastQuotePolicy] = useState(
+    defaultQuotePolicy !== 'nobody' ? defaultQuotePolicy : 'public',
+  );
   const quotePolicy = currentQuotePolicy ?? defaultQuotePolicy;
 
   const isReply = useAppSelector((state) => !!state.compose.get('in_reply_to'));
@@ -175,20 +185,21 @@ const ComposeVisibilityMenu: React.FC<{
       switch (value) {
         case 'public':
           newQuotePolicy = 'public';
+          setLastQuotePolicy(newQuotePolicy);
           break;
         case 'followers':
           newQuotePolicy = 'followers';
+          setLastQuotePolicy(newQuotePolicy);
           break;
         case 'others':
           if (checked) {
-            newQuotePolicy =
-              defaultQuotePolicy !== 'nobody' ? defaultQuotePolicy : 'public';
+            newQuotePolicy = lastQuotePolicy;
           }
           break;
       }
       dispatch(setComposeQuotePolicy(newQuotePolicy));
     },
-    [activeThreadItemId, defaultQuotePolicy, dispatch],
+    [activeThreadItemId, dispatch, lastQuotePolicy],
   );
 
   const handleSwitchToMessage: React.MouseEventHandler<HTMLButtonElement> =
@@ -303,7 +314,7 @@ const ComposeVisibilityMenu: React.FC<{
 
       <MenuItemDivider />
 
-      <MenuItem icon={ChatCircleIcon} onClick={handleSwitchToMessage}>
+      <MenuItem icon={ChatCircleDotsIcon} onClick={handleSwitchToMessage}>
         {isReply ? (
           <FormattedMessage
             id='compose.post.to_private_reply'
