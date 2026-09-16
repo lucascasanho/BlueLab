@@ -40,6 +40,7 @@ interface ItemProps {
   badge?: number;
   iconClassName?: string;
   className?: string;
+  isActive?: React.ComponentProps<typeof NavLink>['isActive'];
 }
 
 const Item: React.FC<ItemProps> = ({
@@ -50,12 +51,14 @@ const Item: React.FC<ItemProps> = ({
   badge,
   iconClassName,
   className,
+  isActive,
 }) => (
   <NavLink
     to={to}
     exact={exact}
     className={className ? `${classes.item} ${className}` : classes.item}
     activeClassName={classes.itemActive}
+    isActive={isActive}
   >
     <Icon size={27} className={iconClassName} />
     <span>{children}</span>
@@ -135,6 +138,7 @@ export const Blue2Navigation: React.FC = () => {
           to='/explore'
           icon={TrendingUpIcon}
           iconClassName={classes.trendingIcon}
+          isActive={() => false}
         >
           {blue2Text(intl.locale, 'trendingFeeds')}
         </Item>
@@ -156,7 +160,7 @@ export const Blue2Navigation: React.FC = () => {
                 defaultMessage='Collections'
               />
             </Item>
-            <Item to={profilePath} icon={Blue2ProfileIcon}>
+            <Item to={profilePath} icon={Blue2ProfileIcon} exact>
               {blue2Text(intl.locale, 'profile')}
             </Item>
 
