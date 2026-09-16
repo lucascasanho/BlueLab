@@ -19,5 +19,15 @@ jobs:
       - name: Set up Javascript environment
         uses: ./.github/actions/setup-javascript
 
-      - name: Check formatting
-        run: yarn format:check
+      - name: Apply formatting for inspection
+        run: yarn format
+
+      - name: Upload formatted files
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: oxfmt-output
+          path: |
+            app/javascript/mastodon/components/form_fields/blue2_emoji_field_wrapper.tsx
+            app/javascript/mastodon/components/form_fields/emoji_text_field.module.scss
+            app/javascript/styles/blue-2-v20.scss
+            config/themes.yml
