@@ -19,7 +19,6 @@ import {
   Blue2EmojiFieldWrapper,
   isBlue2Theme,
 } from './blue2_emoji_field_wrapper';
-export type { CustomEmojiTextPart } from './blue2_emoji_field_utils';
 import classes from './emoji_text_field.module.scss';
 import type { CommonFieldWrapperProps, InputProps } from './form_field_wrapper';
 import { FormFieldWrapper } from './form_field_wrapper';
