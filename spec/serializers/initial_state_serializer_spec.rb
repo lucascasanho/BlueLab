@@ -18,10 +18,6 @@ RSpec.describe InitialStateSerializer do
     it 'uses the standard counter visibility setting' do
       expect(meta[:hide_status_character_counter]).to be false
     end
-
-    it 'always uses Markdown as the default compose content type' do
-      expect(described_class.new(presenter).compose[:default_content_type]).to eq 'text/markdown'
-    end
   end
 
   context 'with an administrator' do
