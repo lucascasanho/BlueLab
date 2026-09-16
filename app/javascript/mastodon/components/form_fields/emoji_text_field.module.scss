@@ -71,6 +71,8 @@
 
   [data-input]:has(> textarea) .blue2Editor {
     overflow-y: auto;
+    padding-block-end: 19px;
+    scroll-padding-block-end: 10px;
     white-space: pre-wrap;
     overflow-wrap: break-word;
   }
