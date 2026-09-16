@@ -130,12 +130,13 @@
   align-items: center;
   gap: 12px;
   background: transparent;
-  color: var(--blue2-text, #f7f7f8);
+  color: var(--blue2-text, #f7f7f8) !important;
   font: inherit;
   font-size: 18px;
   line-height: 1.2;
   font-weight: 400;
   text-align: start;
+  text-decoration: none;
   cursor: pointer;
 
   svg {
@@ -149,8 +150,17 @@
   &:hover,
   &:focus-visible {
     background: var(--blue2-hover, #111820);
-    color: var(--blue2-text, #f7f7f8);
+    color: var(--blue2-text, #f7f7f8) !important;
+    text-decoration: none;
     outline: none;
+  }
+}
+
+.homeButtonActive {
+  font-weight: 650;
+
+  svg {
+    color: var(--blue2-blue, #0085ff);
   }
 }
 

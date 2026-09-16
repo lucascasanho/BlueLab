@@ -32,12 +32,15 @@ class UpstreamUpdateBatch < ApplicationRecord
     Rails.configuration.x.mastodon.upstream_commit_check_enabled
   end
 
+  # The per-commit upstream alert UI is intentionally retired. Keep the model
+  # readable for existing database rows, but never expose those rows as pending
+  # software-update notifications again.
   def self.pending?
-    check_enabled? && current_source.pending_review.exists?
+    false
   end
 
   def self.pending_count
-    check_enabled? ? current_source.pending_review.sum(:total_commits) : 0
+    0
   end
 
   def self.current_source

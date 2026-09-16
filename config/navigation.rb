@@ -8,17 +8,11 @@ SimpleNavigation::Configuration.run do |navigation|
 
     n.item :software_updates,
            safe_join(
-             if SoftwareUpdate.urgent_pending?
-               [material_symbol('report'), t('admin.critical_update_pending')]
-             elsif UpstreamUpdateBatch.pending?
-               [material_symbol('system_update_alt'), t('admin.software_updates.upstream.alert', count: UpstreamUpdateBatch.pending_count)]
-             else
-               [material_symbol('system_update_alt'), t('admin.update_available')]
-             end
+             SoftwareUpdate.urgent_pending? ? [material_symbol('report'), t('admin.critical_update_pending')] : [material_symbol('system_update_alt'), t('admin.update_available')]
            ),
            admin_software_updates_path,
            html: { class: SoftwareUpdate.urgent_pending? || SoftwareDeprecation.current&.unsupported? ? 'warning' : nil },
-           if: -> { current_user.can?(:view_devops) && (SoftwareUpdate.pending? || UpstreamUpdateBatch.pending?) }
+           if: -> { Rails.configuration.x.mastodon.software_update_url.present? && current_user.can?(:view_devops) && SoftwareUpdate.pending? }
 
     n.item :profile, safe_join([material_symbol('person'), t('settings.profile')]), settings_profile_path, if: -> { current_user.functional? && !self_destruct }, highlights_on: %r{/settings/profile|/settings/featured_tags|/settings/verification}
     n.item :privacy, safe_join([material_symbol('globe'), t('privacy.title')]), settings_privacy_path, if: -> { current_user.functional? && !self_destruct }, highlights_on: %r{/settings/privacy}
@@ -32,7 +26,7 @@ SimpleNavigation::Configuration.run do |navigation|
 
     n.item :relationships, safe_join([material_symbol('groups'), t('settings.relationships')]), relationships_path, if: -> { current_user.functional? && !self_destruct } do |s|
       s.item :current, safe_join([material_symbol('groups'), t('settings.relationships')]), relationships_path
-      s.item :severed_relationships, safe_join([material_symbol('link_off'), t('settings.severed_relationships')]), severed_relationships_path
+      s.item :severed_relationships, safe_join([material_symbol('link_off'), t('settings.severed_relationships')]), settings_severed_relationships_path
     end
 
     n.item :filters, safe_join([material_symbol('filter_alt'), t('filters.index.title')]), filters_path, highlights_on: %r{/filters}, if: -> { current_user.functional? && !self_destruct }
