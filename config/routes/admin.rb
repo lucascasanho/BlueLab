@@ -226,9 +226,7 @@ namespace :admin do
     end
   end
 
-  resources :software_updates, only: [:index] do
-    post :review_upstream, on: :collection
-  end
+  resources :software_updates, only: [:index]
 
   resources :username_blocks, except: [:show, :destroy], concerns: :batch
 end
