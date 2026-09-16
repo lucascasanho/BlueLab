@@ -3,6 +3,7 @@ import { afterEach, vi } from 'vitest';
 import {
   captureComposerSelectionOffset,
   editorPlainText,
+  editorSerializedValueMatches,
   editorText,
   getEditorSelectionOffset,
   getSavedComposerSelectionOffset,
@@ -132,6 +133,20 @@ describe('BlueLab rich editor conversion', () => {
     expect(editorText(editor)).toBe(
       '**bold***italic*_underline_\n> quote\n\n- first\n- second\n\n1. one\n2. two',
     );
+  });
+
+  test('recognizes browser-edited DOM that already matches the synchronized value', () => {
+    const editor = document.createElement('div');
+    editor.innerHTML = '<strong>hello</strong>';
+
+    expect(editorSerializedValueMatches(editor, '**hello**', true)).toBe(true);
+
+    const textNode = editor.querySelector('strong')?.firstChild;
+    if (!textNode) throw new Error('Expected formatted editor text node');
+    textNode.textContent = 'hell';
+
+    expect(editorSerializedValueMatches(editor, '**hell**', true)).toBe(true);
+    expect(editorSerializedValueMatches(editor, '**hello**', true)).toBe(false);
   });
 
   test('preserves browser-created paragraph and line containers', () => {
