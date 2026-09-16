@@ -162,13 +162,24 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
         text.length,
       ),
     };
+    const nextRenderKey = customEmojiEditorRenderKey(
+      customEmojiTextParts(text, customEmojis),
+    );
     input.value = text;
     input.setSelectionRange(selection.start, selection.end);
-    pendingSelectionRef.current = selection;
+    pendingSelectionRef.current =
+      nextRenderKey === editorRenderKey ? null : selection;
     lastSelectionRef.current = selection;
     onChange?.(text);
     updateSuggestions(text, selection.end);
-  }, [inputRef, maxLength, onChange, updateSuggestions]);
+  }, [
+    customEmojis,
+    editorRenderKey,
+    inputRef,
+    maxLength,
+    onChange,
+    updateSuggestions,
+  ]);
 
   const applyEmoji = useCallback(
     (emoji: string, start: number, end: number) => {
