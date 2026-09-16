@@ -26,7 +26,7 @@ SimpleNavigation::Configuration.run do |navigation|
 
     n.item :relationships, safe_join([material_symbol('groups'), t('settings.relationships')]), relationships_path, if: -> { current_user.functional? && !self_destruct } do |s|
       s.item :current, safe_join([material_symbol('groups'), t('settings.relationships')]), relationships_path
-      s.item :severed_relationships, safe_join([material_symbol('link_off'), t('settings.severed_relationships')]), relationships_path
+      s.item :severed_relationships, safe_join([material_symbol('link_off'), t('settings.severed_relationships')]), settings_severed_relationships_path
     end
 
     n.item :filters, safe_join([material_symbol('filter_alt'), t('filters.index.title')]), filters_path, highlights_on: %r{/filters}, if: -> { current_user.functional? && !self_destruct }
