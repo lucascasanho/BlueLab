@@ -58,6 +58,11 @@ export function customEmojiTextParts(
   return parts;
 }
 
+export const customEmojiEditorRenderKey = (parts: CustomEmojiTextPart[]) =>
+  parts
+    .flatMap((part) => (part.type === 'emoji' ? [part.shortcode] : []))
+    .join('\u0000');
+
 export function matchingCustomEmojiShortcodes(
   customEmojis: ExtraCustomEmojiMap,
   token: string,
