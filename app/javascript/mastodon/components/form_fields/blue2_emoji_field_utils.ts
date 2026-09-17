@@ -118,9 +118,7 @@ export function customEmojiDeletionRange(
     direction === 'backward' &&
     normalizedCaretPosition === text.length &&
     text.endsWith(' ');
-  const backwardSeparatorStart = hasTrailingEmojiSeparator
-    ? text.length - 1
-    : null;
+  const backwardSeparatorStart = hasTrailingEmojiSeparator ? text.length - 1 : null;
   let offset = 0;
 
   for (const part of customEmojiTextParts(text, customEmojis)) {
