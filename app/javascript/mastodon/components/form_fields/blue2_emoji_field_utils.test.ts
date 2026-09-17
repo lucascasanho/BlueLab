@@ -156,13 +156,13 @@ describe('Blue 2 emoji profile fields', () => {
     ).toEqual({ start: 0, end: text.length });
   });
 
-  test('keeps mobile held backspace moving across the picker separator', () => {
+  test('removes a custom emoji with its picker separator on mobile backspace', () => {
     const text = ':party: ';
     const staleRenderedCaret = ':party: :party_parrot:'.length;
 
     expect(
       customEmojiDeletionRange(text, customEmojis, text.length, 'backward'),
-    ).toBeNull();
+    ).toEqual({ start: 0, end: text.length });
     expect(
       customEmojiDeletionRange(
         text,
