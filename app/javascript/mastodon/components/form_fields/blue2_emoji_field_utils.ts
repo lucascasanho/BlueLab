@@ -166,7 +166,7 @@ const isBrowserOnlyEmptyEditor = (editor: HTMLElement) => {
   const children = Array.from(editor.childNodes);
   if (children.length === 0) return true;
 
-  const text = editor.textContent ?? '';
+  const text = editor.textContent;
   if (
     text !== '' &&
     BROWSER_PLACEHOLDER_TEXT.test(text) &&
