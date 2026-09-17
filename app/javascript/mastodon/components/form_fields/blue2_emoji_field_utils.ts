@@ -110,6 +110,10 @@ export function customEmojiDeletionRange(
   caretPosition: number,
   direction: 'backward' | 'forward',
 ) {
+  const normalizedCaretPosition = Math.max(
+    0,
+    Math.min(caretPosition, text.length),
+  );
   let offset = 0;
 
   for (const part of customEmojiTextParts(text, customEmojis)) {
@@ -120,8 +124,8 @@ export function customEmojiDeletionRange(
 
     if (
       part.type === 'emoji' &&
-      ((direction === 'backward' && caretPosition === end) ||
-        (direction === 'forward' && caretPosition === start))
+      ((direction === 'backward' && normalizedCaretPosition === end) ||
+        (direction === 'forward' && normalizedCaretPosition === start))
     ) {
       return { start, end };
     }
