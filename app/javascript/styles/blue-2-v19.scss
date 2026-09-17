@@ -1,0 +1,48 @@
+@use 'blue-2-v18';
+
+/*
+ * BlueLab nineteenth refinement layer.
+ *
+ * Keep Mastodon's corner snackbar behavior intact and only align its visual
+ * surface with BlueLab. Accent states use the administrator-defined instance
+ * palette through the existing runtime theme tokens.
+ */
+body[data-theme='blue-2'] {
+  .notification-bar {
+    color: var(--blue2-text);
+    background: var(--blue2-surface);
+    border: 1px solid var(--blue2-border-soft);
+    border-radius: var(--radius-lg);
+  }
+
+  .notification-bar__title {
+    color: var(--blue2-text);
+  }
+
+  .notification-bar__action {
+    color: var(--color-text-brand);
+    border-radius: 999px;
+  }
+
+  .notification-bar__action:hover,
+  .notification-bar__action:active,
+  .notification-bar__action:focus-visible {
+    color: var(--color-text-brand);
+    background: var(--color-bg-brand-softest);
+  }
+
+  .notification-bar__action:focus-visible {
+    outline: 2px solid var(--color-border-brand);
+    outline-offset: 2px;
+  }
+
+  .notification-bar__dismiss-button {
+    color: var(--blue2-muted);
+  }
+
+  .notification-bar__dismiss-button:hover,
+  .notification-bar__dismiss-button:active,
+  .notification-bar__dismiss-button:focus-visible {
+    color: var(--color-text-brand);
+  }
+}
