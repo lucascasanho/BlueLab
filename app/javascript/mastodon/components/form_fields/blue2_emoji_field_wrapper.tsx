@@ -316,9 +316,24 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
         start: deletionRange.start,
         end: deletionRange.start,
       };
-      pendingSelectionRef.current = nextSelection;
-      pendingRenderValueRef.current = nextValue;
+
+      // Keep the visible editor in lockstep with the hidden source value.
+      // Mobile keyboards can emit the next repeated beforeinput before React
+      // commits onChange, so waiting for useLayoutEffect leaves a stale DOM.
+      editor.innerHTML = buildEditorHtml(
+        customEmojiTextParts(nextValue, customEmojis),
+        customEmojis,
+      );
+      setEditorEmojiAnimation(editor, Boolean(autoPlayGif));
+      setProfileEmojiEditorSelection(
+        editor,
+        nextSelection.start,
+        nextSelection.end,
+      );
+      pendingSelectionRef.current = null;
+      pendingRenderValueRef.current = null;
       lastSelectionRef.current = nextSelection;
+
       if (inputRef.current) {
         inputRef.current.value = nextValue;
         inputRef.current.setSelectionRange(
