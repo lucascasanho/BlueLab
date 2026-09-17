@@ -114,12 +114,15 @@ export function customEmojiDeletionRange(
     0,
     Math.min(caretPosition, text.length),
   );
-  const backwardSeparatorStart =
+  let backwardSeparatorStart: number | null = null;
+  if (
     direction === 'backward' &&
+    normalizedCaretPosition === text.length &&
     normalizedCaretPosition > 0 &&
     text[normalizedCaretPosition - 1] === ' '
-      ? normalizedCaretPosition - 1
-      : null;
+  ) {
+    backwardSeparatorStart = normalizedCaretPosition - 1;
+  }
   let offset = 0;
 
   for (const part of customEmojiTextParts(text, customEmojis)) {
