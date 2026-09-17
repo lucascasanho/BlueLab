@@ -175,7 +175,7 @@ export const markdownToHtml = (
       index -= 1;
       output.push(`<ol>${items.join('')}</ol>`);
     } else {
-      output.push(inlineMarkdownToHtml(line, customEmojis) || '<br />');
+      output.push(inlineMarkdownToHtml(line, customEmojis));
     }
   }
 
@@ -294,6 +294,12 @@ export const editorPlainText = (element: HTMLElement) =>
     .map(nodeToPlainText)
     .join('')
     .replace(/^\n+|\n+$/g, '');
+
+export const editorSerializedValueMatches = (
+  element: HTMLElement,
+  value: string,
+  isMarkdown: boolean,
+) => (isMarkdown ? editorText(element) : editorPlainText(element)) === value;
 
 const selectionNodeLength = (node: Node): number => {
   if (node.nodeType === Node.TEXT_NODE) {
@@ -650,9 +656,14 @@ export const RichComposeEditor: React.FC<{
     const textChanged = text !== renderedTextRef.current;
     const contentTypeChanged = contentType !== renderedContentTypeRef.current;
     const wasFocused = document.activeElement === editor;
+    const liveDomMatchesText =
+      !!editor &&
+      wasFocused &&
+      editorSerializedValueMatches(editor, text, isMarkdown);
     if (
       editor &&
-      (contentTypeChanged || (!isLocalUpdate && (textChanged || !wasFocused)))
+      (contentTypeChanged ||
+        (!isLocalUpdate && !liveDomMatchesText && (textChanged || !wasFocused)))
     ) {
       editor.innerHTML = isMarkdown
         ? markdownToHtml(text, customEmojis)

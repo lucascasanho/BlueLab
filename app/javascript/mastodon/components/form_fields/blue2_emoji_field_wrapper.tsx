@@ -295,11 +295,80 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     [inputValue],
   );
 
+  const deleteAdjacentCustomEmoji = useCallback(
+    (editor: HTMLDivElement, direction: 'backward' | 'forward') => {
+      const selection = profileEmojiEditorSelection(editor);
+      if (selection.start !== selection.end) return false;
+
+      const currentValue = inputRef.current?.value ?? inputValue;
+      const deletionRange = customEmojiDeletionRange(
+        currentValue,
+        customEmojis,
+        selection.start,
+        direction,
+      );
+      if (!deletionRange) return false;
+
+      const nextValue =
+        currentValue.slice(0, deletionRange.start) +
+        currentValue.slice(deletionRange.end);
+      const nextSelection = {
+        start: deletionRange.start,
+        end: deletionRange.start,
+      };
+
+      // Keep the visible editor in lockstep with the hidden source value.
+      // Mobile keyboards can emit the next repeated beforeinput before React
+      // commits onChange, so waiting for useLayoutEffect leaves a stale DOM.
+      editor.innerHTML = buildEditorHtml(
+        customEmojiTextParts(nextValue, customEmojis),
+        customEmojis,
+      );
+      setEditorEmojiAnimation(editor, Boolean(autoPlayGif));
+      setProfileEmojiEditorSelection(
+        editor,
+        nextSelection.start,
+        nextSelection.end,
+      );
+      pendingSelectionRef.current = null;
+      pendingRenderValueRef.current = null;
+      lastSelectionRef.current = nextSelection;
+
+      if (inputRef.current) {
+        inputRef.current.value = nextValue;
+        inputRef.current.setSelectionRange(
+          nextSelection.start,
+          nextSelection.end,
+        );
+      }
+      hideSuggestions();
+      onChange?.(nextValue);
+      return true;
+    },
+    [customEmojis, hideSuggestions, inputRef, inputValue, onChange],
+  );
+
   const handleEditorBeforeInput = useCallback(
     (event: SyntheticEvent<HTMLDivElement>) => {
-      resetEmptyEditorPlaceholder(event.currentTarget);
+      const editor = event.currentTarget;
+      resetEmptyEditorPlaceholder(editor);
+
+      const inputEvent = event.nativeEvent as InputEvent;
+      if (inputEvent.isComposing) return;
+
+      const direction =
+        inputEvent.inputType === 'deleteContentBackward'
+          ? 'backward'
+          : inputEvent.inputType === 'deleteContentForward'
+            ? 'forward'
+            : null;
+
+      if (direction && deleteAdjacentCustomEmoji(editor, direction)) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
     },
-    [resetEmptyEditorPlaceholder],
+    [deleteAdjacentCustomEmoji, resetEmptyEditorPlaceholder],
   );
 
   const handleEditorInput = useCallback(() => {
@@ -393,42 +462,14 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
         }
       }
 
-      if (event.key === 'Backspace' || event.key === 'Delete') {
-        const selection = profileEmojiEditorSelection(editor);
-        if (selection.start === selection.end) {
-          const currentValue = inputRef.current?.value ?? inputValue;
-          const deletionRange = customEmojiDeletionRange(
-            currentValue,
-            customEmojis,
-            selection.start,
-            event.key === 'Backspace' ? 'backward' : 'forward',
-          );
-
-          if (deletionRange) {
-            event.preventDefault();
-            event.stopPropagation();
-            const nextValue =
-              currentValue.slice(0, deletionRange.start) +
-              currentValue.slice(deletionRange.end);
-            const nextSelection = {
-              start: deletionRange.start,
-              end: deletionRange.start,
-            };
-            pendingSelectionRef.current = nextSelection;
-            pendingRenderValueRef.current = nextValue;
-            lastSelectionRef.current = nextSelection;
-            if (inputRef.current) {
-              inputRef.current.value = nextValue;
-              inputRef.current.setSelectionRange(
-                nextSelection.start,
-                nextSelection.end,
-              );
-            }
-            hideSuggestions();
-            onChange?.(nextValue);
-            return;
-          }
-        }
+      if (
+        (event.key === 'Backspace' &&
+          deleteAdjacentCustomEmoji(editor, 'backward')) ||
+        (event.key === 'Delete' && deleteAdjacentCustomEmoji(editor, 'forward'))
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
       }
 
       if (
@@ -442,12 +483,9 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
       requestAnimationFrame(handleEditorSelection);
     },
     [
-      customEmojis,
+      deleteAdjacentCustomEmoji,
       handleEditorSelection,
-      hideSuggestions,
       inputRef,
-      inputValue,
-      onChange,
       selectedSuggestion,
       selectSuggestion,
       suggestionCodes.length,
@@ -484,12 +522,13 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     setEditorEmojiAnimation(editor, Boolean(autoPlayGif));
 
     if (pendingSelection !== null && pendingValueMatches) {
-      setProfileEmojiEditorSelection(
-        editor,
-        pendingSelection.start,
-        pendingSelection.end,
-      );
-      editor.focus({ preventScroll: true });
+      if (isFocused) {
+        setProfileEmojiEditorSelection(
+          editor,
+          pendingSelection.start,
+          pendingSelection.end,
+        );
+      }
       pendingSelectionRef.current = null;
       pendingRenderValueRef.current = null;
     }
