@@ -3,6 +3,7 @@ import { insertEmojiAtPosition } from '@/mastodon/features/emoji/utils';
 
 const CUSTOM_EMOJI_PATTERN = /:([a-zA-Z0-9_+-]+):/g;
 const WORD_CHARACTER_PATTERN = /[\p{L}\p{N}_+-]/u;
+const BROWSER_PLACEHOLDER_TEXT = /^[\u00a0\u200b\ufeff]+$/u;
 
 interface SerializedPoint {
   node: Node;
@@ -110,6 +111,16 @@ export function customEmojiDeletionRange(
   caretPosition: number,
   direction: 'backward' | 'forward',
 ) {
+  const normalizedCaretPosition = Math.max(
+    0,
+    Math.min(caretPosition, text.length),
+  );
+  const backwardSeparatorStart =
+    direction === 'backward' &&
+    normalizedCaretPosition === text.length &&
+    text.endsWith(' ')
+      ? text.length - 1
+      : null;
   let offset = 0;
 
   for (const part of customEmojiTextParts(text, customEmojis)) {
@@ -118,12 +129,17 @@ export function customEmojiDeletionRange(
     const start = offset;
     const end = start + length;
 
-    if (
-      part.type === 'emoji' &&
-      ((direction === 'backward' && caretPosition === end) ||
-        (direction === 'forward' && caretPosition === start))
-    ) {
-      return { start, end };
+    if (part.type === 'emoji') {
+      if (
+        (direction === 'backward' && normalizedCaretPosition === end) ||
+        (direction === 'forward' && normalizedCaretPosition === start)
+      ) {
+        return { start, end };
+      }
+
+      if (backwardSeparatorStart !== null && backwardSeparatorStart === end) {
+        return { start, end: normalizedCaretPosition };
+      }
     }
 
     offset = end;
@@ -146,18 +162,33 @@ const nodeSerializedText = (node: Node): string => {
   return content;
 };
 
-export const profileEmojiEditorText = (editor: HTMLElement) => {
+const isBrowserOnlyEmptyEditor = (editor: HTMLElement) => {
   const children = Array.from(editor.childNodes);
-  const firstChild = children[0];
+  if (children.length === 0) return true;
 
+  const text = editor.textContent;
   if (
-    children.length === 1 &&
-    firstChild instanceof HTMLElement &&
-    firstChild.tagName === 'BR'
+    text !== '' &&
+    BROWSER_PLACEHOLDER_TEXT.test(text) &&
+    !editor.querySelector('[data-emoji-shortcode]')
   ) {
-    return '';
+    return true;
   }
 
+  if (children.length !== 1) return false;
+
+  const onlyChild = children[0];
+  return (
+    onlyChild instanceof HTMLElement &&
+    (onlyChild.tagName === 'BR' || isEmptyBlockElement(onlyChild))
+  );
+};
+
+export const profileEmojiEditorText = (editor: HTMLElement) => {
+  if (isBrowserOnlyEmptyEditor(editor)) return '';
+
+  const children = Array.from(editor.childNodes);
+  const firstChild = children[0];
   const text = children.map(nodeSerializedText).join('');
   return firstChild instanceof HTMLElement && isBlockElement(firstChild)
     ? text.slice(1)

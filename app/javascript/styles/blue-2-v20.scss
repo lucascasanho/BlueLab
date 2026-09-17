@@ -1,0 +1,15 @@
+@use 'blue-2-v18';
+
+/*
+ * BlueLab twentieth refinement layer.
+ *
+ * Keep the final line of the redesigned composer fully inside its scrollable
+ * editing surface. The extra trailing half-line only affects the BlueLab
+ * contenteditable composer and does not change its outer geometry.
+ */
+body[data-theme='blue-2'] {
+  [data-compose-scroll-zone='editor'][contenteditable] {
+    padding-block-end: calc(var(--space-xs) + 0.5lh);
+    scroll-padding-block-end: 0.5lh;
+  }
+}
