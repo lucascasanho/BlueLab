@@ -156,6 +156,23 @@ describe('Blue 2 emoji profile fields', () => {
     ).toEqual({ start: 0, end: text.length });
   });
 
+  test('keeps mobile held backspace moving across the picker separator', () => {
+    const text = ':party: ';
+    const staleRenderedCaret = ':party: :party_parrot:'.length;
+
+    expect(
+      customEmojiDeletionRange(text, customEmojis, text.length, 'backward'),
+    ).toBeNull();
+    expect(
+      customEmojiDeletionRange(
+        text,
+        customEmojis,
+        staleRenderedCaret,
+        'backward',
+      ),
+    ).toEqual({ start: 0, end: text.length });
+  });
+
   test('serializes browser contenteditable line blocks without duplication', () => {
     const editor = document.createElement('div');
 
