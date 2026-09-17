@@ -114,9 +114,9 @@ export function customEmojiDeletionRange(
     0,
     Math.min(caretPosition, text.length),
   );
-  const staleBackwardSeparatorStart =
+  const terminalBackwardSeparatorStart =
     direction === 'backward' &&
-    caretPosition > text.length &&
+    normalizedCaretPosition === text.length &&
     normalizedCaretPosition > 0 &&
     text[normalizedCaretPosition - 1] === ' '
       ? normalizedCaretPosition - 1
@@ -138,8 +138,8 @@ export function customEmojiDeletionRange(
       }
 
       if (
-        staleBackwardSeparatorStart !== null &&
-        staleBackwardSeparatorStart === end
+        terminalBackwardSeparatorStart !== null &&
+        terminalBackwardSeparatorStart === end
       ) {
         return { start, end: normalizedCaretPosition };
       }
