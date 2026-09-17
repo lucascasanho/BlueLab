@@ -175,7 +175,7 @@ export const markdownToHtml = (
       index -= 1;
       output.push(`<ol>${items.join('')}</ol>`);
     } else {
-      output.push(inlineMarkdownToHtml(line, customEmojis) || '<br />');
+      output.push(inlineMarkdownToHtml(line, customEmojis));
     }
   }
 
