@@ -156,13 +156,40 @@ describe('Blue 2 emoji profile fields', () => {
     ).toEqual({ start: 0, end: text.length });
   });
 
+  test('deletes a final picker separator together with its custom emoji', () => {
+    const text = ':party: :party_parrot: ';
+    const finalEmojiStart = ':party: '.length;
+
+    expect(
+      customEmojiDeletionRange(text, customEmojis, text.length, 'backward'),
+    ).toEqual({ start: finalEmojiStart, end: text.length });
+
+    const firstEmoji = ':party: ';
+    expect(
+      customEmojiDeletionRange(
+        firstEmoji,
+        customEmojis,
+        firstEmoji.length,
+        'backward',
+      ),
+    ).toEqual({ start: 0, end: firstEmoji.length });
+  });
+
+  test('does not consume multiple ordinary trailing spaces with an emoji', () => {
+    const text = ':party:  ';
+
+    expect(
+      customEmojiDeletionRange(text, customEmojis, text.length, 'backward'),
+    ).toBeNull();
+  });
+
   test('keeps mobile held backspace moving across the picker separator', () => {
     const text = ':party: ';
     const staleRenderedCaret = ':party: :party_parrot:'.length;
 
     expect(
       customEmojiDeletionRange(text, customEmojis, text.length, 'backward'),
-    ).toBeNull();
+    ).toEqual({ start: 0, end: text.length });
     expect(
       customEmojiDeletionRange(
         text,
@@ -171,6 +198,22 @@ describe('Blue 2 emoji profile fields', () => {
         'backward',
       ),
     ).toEqual({ start: 0, end: text.length });
+  });
+
+  test('normalizes a browser-only empty editor to an empty string', () => {
+    const editor = document.createElement('div');
+
+    editor.innerHTML = '<br>';
+    expect(profileEmojiEditorText(editor)).toBe('');
+
+    editor.innerHTML = '<div><br></div>';
+    expect(profileEmojiEditorText(editor)).toBe('');
+
+    editor.innerHTML = '<p><br></p>';
+    expect(profileEmojiEditorText(editor)).toBe('');
+
+    editor.textContent = '\u200b';
+    expect(profileEmojiEditorText(editor)).toBe('');
   });
 
   test('serializes browser contenteditable line blocks without duplication', () => {
