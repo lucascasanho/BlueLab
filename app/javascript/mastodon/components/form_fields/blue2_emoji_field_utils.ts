@@ -114,6 +114,13 @@ export function customEmojiDeletionRange(
     0,
     Math.min(caretPosition, text.length),
   );
+  const staleBackwardSeparatorStart =
+    direction === 'backward' &&
+    caretPosition > text.length &&
+    normalizedCaretPosition > 0 &&
+    text[normalizedCaretPosition - 1] === ' '
+      ? normalizedCaretPosition - 1
+      : null;
   let offset = 0;
 
   for (const part of customEmojiTextParts(text, customEmojis)) {
@@ -122,12 +129,20 @@ export function customEmojiDeletionRange(
     const start = offset;
     const end = start + length;
 
-    if (
-      part.type === 'emoji' &&
-      ((direction === 'backward' && normalizedCaretPosition === end) ||
-        (direction === 'forward' && normalizedCaretPosition === start))
-    ) {
-      return { start, end };
+    if (part.type === 'emoji') {
+      if (
+        (direction === 'backward' && normalizedCaretPosition === end) ||
+        (direction === 'forward' && normalizedCaretPosition === start)
+      ) {
+        return { start, end };
+      }
+
+      if (
+        staleBackwardSeparatorStart !== null &&
+        staleBackwardSeparatorStart === end
+      ) {
+        return { start, end: normalizedCaretPosition };
+      }
     }
 
     offset = end;
