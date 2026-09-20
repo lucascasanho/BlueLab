@@ -7,30 +7,32 @@ transacional, validada por manifesto, sem promoção ou acesso à Espelunca.
 
 ## Fase atual
 
-Fases 0–2: inventário em complemento para cobrir os domínios sub-representados na
-primeira passagem (homepage, retenção, PWA e operação). Nenhuma migração pode
-começar antes deste complemento ser validado e commitado.
+Fases 0–2 concluídas e documentadas. A primeira fronteira B de baixo risco foi
+confirmada e registrada; este checkpoint ainda não move código.
 
 ## Último checkpoint concluído
 
 Proteção inicial verificada em 2026-09-20: branch `bluelab-teste`, HEAD
 `8300c26ed840eec984932a55a2a027392b98e96c`, árvore limpa; branch local de recuperação
 `backup/bluelab-before-update-system-20260920` criada no mesmo SHA. O upstream foi
-buscado sem alterar a árvore de trabalho. Inventário e mapa foram consolidados no
-commit `9efd38d7e8`.
+buscado sem alterar a árvore de trabalho. O complemento do inventário foi consolidado
+em `31ae6ac1b8`; sua validação confirmou 21 domínios e os nove caminhos de teste
+declarados nas cinco novas entradas.
 
 ## Último commit criado
 
-`9efd38d7e8 bluelab-update: inventory existing customizations`.
+`31ae6ac1b8 bluelab-update: complete customization inventory scope`.
 
 ## Arquivos já migrados
 
-Nenhum. Esta etapa não move nem refatora código.
+Nenhum por este checkpoint. A árvore de trabalho contém alterações locais em Blue2
+que permanecem deliberadamente fora deste registro e não foram incluídas nele.
 
 ## Arquivos pendentes
 
-Nenhum código está pendente de migração nesta fase. Falta validar e registrar as
-entradas complementares antes de encerrar a auditoria documental.
+Nenhum código está pendente de migração neste checkpoint. A próxima unidade pode
+migrar exclusivamente o catálogo `blue2Text` segundo a fronteira registrada; os
+demais módulos de shell continuam pendentes de análise própria.
 
 ## Problemas encontrados
 
@@ -57,6 +59,12 @@ entradas complementares antes de encerrar a auditoria documental.
   domínios e identificou quatro domínios sub-representados para complemento.
 - YAML do manifesto carregado por Ruby/Psych e todos os caminhos de testes declarados
   foram confirmados no checkout.
+- Validação complementar: as cinco entradas novas (`public-homepage-and-onboarding`,
+  `content-retention`, `account-role-verification`, `pwa-and-client-assets` e
+  `deployment-and-maintenance`) totalizam nove caminhos de teste existentes.
+- Leitura da entrada `blue2-shell-navigation`: o catálogo `blue2Text` tem seis
+  consumidores, contrato síncrono tipado e nenhuma dependência de estado, rota ou
+  ação; foi registrado como a primeira fronteira B de baixo risco.
 - `git diff --check`: passou.
 
 ## Testes pendentes
@@ -66,9 +74,11 @@ definida junto ao primeiro domínio escolhido para isolamento.
 
 ## Próximo passo exato
 
-Validar as novas entradas do manifesto contra caminhos de teste reais, atualizar a
-contagem e criar checkpoint documental para concluir fases 0–2. Só então analisar
-`blue2-shell-navigation` para selecionar um integration point B.
+Em uma unidade separada, migrar somente o catálogo puro `blue2Text` para
+`app/javascript/bluelab/i18n/blue2.ts`, preservar seu contrato e atualizar todos os
+seis consumidores identificados. Antes de qualquer commit funcional, adicionar o
+teste unitário de fallback/normalização de locale e executar esse teste, os testes
+existentes de `blue2-shell-navigation`, typecheck e `git diff --check`.
 
 ## Comandos para continuar
 
@@ -78,10 +88,12 @@ git status --short --branch
 sed -n '1,240p' docs/bluelab-update-system/PROGRESS.md
 git diff -- docs/bluelab-update-system bluelab/manifest.yml CODEX_PROGRESS.md
 rg -n "blue2|BlueLab" app/javascript/mastodon/features/{blue2,ui,navigation_panel}
+sed -n '1,220p' docs/bluelab-update-system/INTEGRATION_POINTS.md
 ```
 
 ## Estado da árvore Git
 
-Após o commit de registro deste checkpoint, a árvore deve estar limpa e
-`bluelab-teste` deve ficar dois commits à frente de `bluelab/bluelab-teste`. Confirmar
-o estado real com `git status` antes de agir.
+O checkpoint documental não inclui as alterações locais atuais em Blue2. Elas devem
+ser preservadas e separadas desta auditoria; confirmar o estado real com `git status`
+antes de agir. No momento da validação, `bluelab-teste` estava três commits à frente
+de `bluelab/bluelab-teste`.

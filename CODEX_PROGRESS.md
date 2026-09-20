@@ -22,10 +22,15 @@
   `docs/bluelab-update-system/PROGRESS.md` para o checkpoint operacional atual.
 - Próximo passo: analisar a fronteira do domínio `blue2-shell-navigation` e escolher
   um único integration point B de baixo risco antes de iniciar qualquer migração.
-- Revisão da auditoria detectou que homepage/onboarding, retenção, PWA e tooling de
-  operação estavam sub-representados no primeiro catálogo; o complemento documental
-  está pronto para checkpoint e eleva o manifesto para 21 domínios, sem mudança de
-  comportamento.
+- Revisão da auditoria incorporou homepage/onboarding, retenção, PWA, operação e
+  verificação por papel ao catálogo. O checkpoint confirmou 21 domínios e nove
+  caminhos de teste existentes nas cinco entradas novas, sem mudança de comportamento.
+- A fronteira B escolhida é o catálogo puro `blue2Text(locale, key)`: o contrato é
+  síncrono e tipado, sem estado, rota, ação, markup ou estilos. A decisão e os seis
+  consumidores estão registrados em `docs/bluelab-update-system/INTEGRATION_POINTS.md`.
+- Próximo passo do sistema de atualização: em unidade separada, migrar somente esse
+  catálogo, cobrir fallback/normalização de locale e validar os consumidores; as
+  alterações locais não commitadas em Blue2 permanecem fora deste checkpoint.
 
 ## Estado
 

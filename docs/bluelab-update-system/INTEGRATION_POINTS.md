@@ -39,6 +39,23 @@ drivers nunca têm autoridade para aceitá-los automaticamente.
 
 ## Próxima redução de acoplamento
 
-O primeiro candidato será selecionado depois de validar esta lista contra cada
-entrada do manifesto. Prioridade provável: integration points frontend do tema e
-navegação (B), antes de qualquer alteração em C/D.
+### Decisão registrada: catálogo de rótulos do shell Blue2
+
+O primeiro integration point **B** de baixo risco é o catálogo puro
+`blue2Text(locale, key)`. Ele concentra as mensagens específicas do shell Blue2 e
+é consumido por componentes de navegação e de UI, mas não lê estado, não despacha
+ações, não altera rotas e não contém markup ou estilos.
+
+| Item                     | Decisão                                                                                                                                                                                                    |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Proprietário BlueLab     | `app/javascript/bluelab/i18n/blue2.ts`                                                                                                                                                                     |
+| Contrato de integração   | export estático `blue2Text(locale, key)` e o tipo `Blue2TextKey`                                                                                                                                           |
+| Consumidores a preservar | `features/blue2/navigation.tsx`, `right_rail.tsx`, `features/ui/components/columns_area/redesign.tsx`, `features/navigation_panel/redesign/{header,index}.tsx` e `features/direct_timeline/index.tsx`      |
+| Fora de escopo           | componentes, SCSS, navegação, composer, timelines, reducers e ações                                                                                                                                        |
+| Evidência                | os testes existentes de menu Blue2 e painel de navegação cobrem os consumidores; a fronteira nova requer teste unitário do fallback de locale e dos rótulos em `app/javascript/bluelab/i18n/blue2.test.ts` |
+
+Esta é uma fronteira B porque o Mastodon depende apenas de uma função síncrona e
+tipada, enquanto o conteúdo BlueLab pode evoluir no seu próprio diretório. A
+extração não deve modificar os textos, a estratégia de fallback nem o comportamento
+dos consumidores. Qualquer próxima extração do shell (componentes, barras móveis ou
+painéis) continua fora desta decisão e deve passar por uma nova análise.
