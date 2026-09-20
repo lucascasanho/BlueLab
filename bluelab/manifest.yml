@@ -1,0 +1,357 @@
+version: 1
+inventory:
+  compared_from: c9b78c464b99f6c0b6b28e2f6b174a9ef0faa55f
+  compared_to: 8300c26ed840eec984932a55a2a027392b98e96c
+  method: 'git diff --name-status <merge-base>...bluelab-teste plus targeted code and test review'
+  raw_difference:
+    paths: 789
+    added: 379
+    modified: 410
+  caveat: 'A path difference is evidence, not proof of intentional BlueLab behavior.'
+customizations:
+  - id: bluelab-theme
+    name: BlueLab theme and visual tokens
+    category: [THEME, UI, CONFIG, LOCALE]
+    description: Registered BlueLab presentation, palette-aware shell, public/auth/admin appearance.
+    files:
+      [
+        app/javascript/styles/blue-2.scss,
+        app/javascript/styles/mastodon-bird-ui/,
+        app/helpers/theme_helper.rb,
+        app/models/concerns/user/has_settings.rb,
+      ]
+    integration_points: [theme registry, stylesheet entrypoints, initial state]
+    risk: high
+    criticality: high
+    surface: frontend
+    isolation: B
+    tests:
+      [
+        spec/lib/themes_spec.rb,
+        spec/helpers/theme_helper_spec.rb,
+        spec/mailers/user_mailer_bluelab_theme_spec.rb,
+      ]
+    missing_tests: [end-to-end palette switching]
+  - id: blue2-shell-navigation
+    name: BlueLab 2 shell and navigation
+    category: [UI, NAVIGATION, REACT_COMPONENT, STATE]
+    description: Account menu, navigation, right rail, mobile chrome, compose launcher and timeline shell.
+    files:
+      [
+        app/javascript/mastodon/features/blue2/,
+        app/javascript/mastodon/features/ui/,
+        app/javascript/mastodon/features/navigation_panel/,
+      ]
+    integration_points: [UI root, columns area, navigation panel]
+    risk: high
+    criticality: high
+    surface: frontend
+    isolation: B
+    tests:
+      [
+        app/javascript/mastodon/features/blue2/account_menu.test.tsx,
+        app/javascript/mastodon/features/navigation_panel/redesign/index.test.tsx,
+      ]
+    missing_tests: [full shell navigation preservation]
+  - id: rich-composer
+    name: Rich BlueLab composer
+    category: [COMPOSER, REACT_COMPONENT, STATE]
+    description: Redesigned composer with rich editor, formatting, draft persistence, mobile behavior and shortcuts.
+    files:
+      [
+        app/javascript/mastodon/features/compose/redesign/,
+        app/javascript/mastodon/reducers/slices/composer.ts,
+        app/javascript/mastodon/actions/compose_draft.ts,
+      ]
+    integration_points: [compose reducer, compose submission, hotkeys]
+    risk: very_high
+    criticality: critical
+    surface: frontend
+    isolation: C
+    tests:
+      [
+        app/javascript/mastodon/features/compose/redesign/draft_persistence.test.ts,
+        app/javascript/mastodon/features/compose/redesign/rich_editor.test.ts,
+        app/javascript/mastodon/reducers/slices/composer.test.ts,
+      ]
+    missing_tests: [full post lifecycle against upstream compose]
+  - id: markdown-and-emoji
+    name: Markdown and custom emoji editing
+    category: [COMPOSER, PROFILE, REACT_COMPONENT, SERVICE]
+    description: Markdown formatting/rendering and custom emoji insertion/deletion in compose and profile fields.
+    files:
+      [
+        app/lib/advanced_text_formatter.rb,
+        app/javascript/mastodon/features/compose/redesign/rich_editor.tsx,
+        app/javascript/mastodon/components/form_fields/blue2_emoji_field_wrapper.tsx,
+      ]
+    integration_points: [text formatter, rich editor, account edit fields]
+    risk: high
+    criticality: high
+    surface: frontend_backend
+    isolation: B
+    tests:
+      [
+        spec/lib/advanced_text_formatter_spec.rb,
+        app/javascript/mastodon/components/form_fields/blue2_emoji_field_dom.test.ts,
+      ]
+    missing_tests: [sanitization compatibility matrix]
+  - id: profile-customization
+    name: Profile presentation and editing
+    category: [PROFILE, UI, API, RAILS_CONTROLLER]
+    description: Profile header, verified badges, rich fields, mobile editor behavior and account identity display.
+    files:
+      [
+        app/javascript/mastodon/components/account_header/,
+        app/javascript/mastodon/components/display_name/,
+        app/javascript/mastodon/features/account_edit/,
+      ]
+    integration_points:
+      [account serializer/state, account header, settings forms]
+    risk: high
+    criticality: high
+    surface: frontend_backend
+    isolation: B
+    tests:
+      [
+        app/javascript/mastodon/components/__tests__/display_name-test.tsx,
+        spec/serializers/initial_state_serializer_spec.rb,
+      ]
+    missing_tests: [profile edit end-to-end]
+  - id: username-changes
+    name: Username changes and reservations
+    category: [PROFILE, API, RAILS_CONTROLLER, RAILS_MODEL, SERVICE, DATABASE]
+    description: Controlled username changes with reservations and validation.
+    files:
+      [
+        app/controllers/settings/username_changes_controller.rb,
+        app/models/account_username_reservation.rb,
+        app/services/account_username_change_service.rb,
+        db/migrate/20260828160000_create_account_username_reservations.rb,
+      ]
+    integration_points: [account model, settings routes, validation]
+    risk: very_high
+    criticality: critical
+    surface: backend_database
+    isolation: D
+    tests:
+      [
+        spec/models/account_username_reservation_spec.rb,
+        spec/services/account_username_change_service_spec.rb,
+      ]
+    missing_tests: [upstream account validation reconciliation]
+  - id: passkeys
+    name: Passkey authentication
+    category: [AUTH, PASSKEY, SECURITY, DATABASE]
+    description: WebAuthn credential storage and session/settings flows.
+    files:
+      [
+        app/controllers/auth/sessions/security_key_options_controller.rb,
+        app/controllers/settings/passkeys_controller.rb,
+        app/models/webauthn_credential.rb,
+        config/initializers/webauthn.rb,
+        db/migrate/20260827223000_add_passkey_to_webauthn_credentials.rb,
+      ]
+    integration_points: [sessions, settings, WebAuthn initializer]
+    risk: critical
+    criticality: critical
+    surface: backend_database
+    isolation: D
+    tests:
+      [
+        spec/controllers/auth/sessions_controller_passkey_spec.rb,
+        spec/controllers/settings/passkeys_controller_spec.rb,
+      ]
+    missing_tests: [upstream WebAuthn security regression suite]
+  - id: registration-protection
+    name: Registration abuse protection
+    category: [AUTH, SECURITY, API, CONFIG]
+    description: Registration intent, API closing, rate limits, approval handling and abuse checks.
+    files:
+      [
+        app/controllers/auth/registrations_controller.rb,
+        app/controllers/api/v1/accounts_controller.rb,
+        app/lib/registration_protection.rb,
+        config/initializers/rack_attack.rb,
+      ]
+    integration_points:
+      [registration controller, public accounts API, Rack Attack]
+    risk: critical
+    criticality: critical
+    surface: backend
+    isolation: D
+    tests:
+      [
+        spec/controllers/auth/registrations_controller_spec.rb,
+        spec/requests/api/v1/accounts_spec.rb,
+        spec/lib/registration_protection_spec.rb,
+        spec/config/initializers/rack/attack_spec.rb,
+      ]
+    missing_tests: [upstream authentication change reconciliation]
+  - id: resumable-uploads
+    name: Resumable media uploads
+    category: [UPLOAD, API, SERVICE, RAILS_MODEL, DATABASE]
+    description: Blue-specific resumable upload API, parts, validation and finalization.
+    files:
+      [
+        app/controllers/api/v1/blue/resumable_media_uploads_controller.rb,
+        app/services/resumable_media_uploads/,
+        app/models/resumable_media_upload.rb,
+        db/migrate/20260831230000_create_resumable_media_uploads.rb,
+      ]
+    integration_points: [routes, media attachment, upload validation]
+    risk: very_high
+    criticality: critical
+    surface: backend_database
+    isolation: B
+    tests:
+      [
+        spec/requests/api/v1/blue/resumable_media_uploads_spec.rb,
+        spec/services/resumable_media_uploads/finalizer_spec.rb,
+      ]
+    missing_tests: [upstream media validation compatibility]
+  - id: scheduled-threads
+    name: Scheduled publication threads
+    category: [API, SERVICE, RAILS_MODEL, DATABASE]
+    description: Grouped scheduled statuses and publication services.
+    files:
+      [
+        app/controllers/api/v1/scheduled_threads_controller.rb,
+        app/services/create_scheduled_thread_service.rb,
+        app/models/scheduled_thread.rb,
+        db/migrate/20260909120000_create_scheduled_threads.rb,
+      ]
+    integration_points: [scheduled statuses, post status service, API routes]
+    risk: very_high
+    criticality: high
+    surface: backend_database
+    isolation: B
+    tests:
+      [
+        spec/requests/api/v1/scheduled_threads_spec.rb,
+        spec/workers/publish_scheduled_thread_worker_spec.rb,
+      ]
+    missing_tests: [create/update service coverage, migration upgrade path]
+  - id: quotes-and-media-downloads
+    name: Quotes and media download behavior
+    category: [UI, API, SERVICE, UPLOAD]
+    description: Status quote presentation and validated media download path.
+    files:
+      [
+        app/javascript/mastodon/features/status/,
+        app/javascript/mastodon/components/status_action_bar/media_downloads.js,
+        app/services/media_download_service.rb,
+      ]
+    integration_points:
+      [status components, status serializer/API, media service]
+    risk: high
+    criticality: high
+    surface: frontend_backend
+    isolation: C
+    tests:
+      [
+        app/javascript/mastodon/components/__tests__/status_media_downloads-test.jsx,
+        spec/services/media_download_service_spec.rb,
+      ]
+    missing_tests: [quote and download end-to-end]
+  - id: instance-customization
+    name: Administrative branding and limits
+    category: [CONFIG, RAILS_CONTROLLER, RAILS_MODEL, UI, LOCALE]
+    description: Instance palette, mail colors, status limits and customization administration.
+    files:
+      [
+        app/controllers/admin/settings/instance_customization_controller.rb,
+        app/models/form/instance_customization.rb,
+        app/javascript/styles/bluelab_admin.scss,
+        config/locales/bluelab.en.yml,
+        config/locales/bluelab.pt-BR.yml,
+      ]
+    integration_points:
+      [settings model, admin routes, initial state, theme tokens]
+    risk: high
+    criticality: critical
+    surface: frontend_backend
+    isolation: B
+    tests:
+      [
+        spec/requests/admin/settings/instance_customization_spec.rb,
+        spec/models/form/instance_customization_spec.rb,
+      ]
+    missing_tests: [persisted palette across upstream update]
+  - id: announcements
+    name: Rich administrative announcements
+    category: [UI, RAILS_CONTROLLER, RAILS_MODEL, DATABASE]
+    description: Rich announcements and media associations.
+    files:
+      [
+        app/controllers/admin/announcements_controller.rb,
+        app/models/announcement.rb,
+        app/javascript/mastodon/components/admin/announcement_editor.jsx,
+        db/migrate/20260912150000_add_rich_content_to_announcements.rb,
+      ]
+    integration_points: [admin announcement controller/model, media attachment]
+    risk: high
+    criticality: medium
+    surface: frontend_backend_database
+    isolation: B
+    tests:
+      [
+        spec/models/announcement_spec.rb,
+        spec/requests/admin/announcements_spec.rb,
+      ]
+    missing_tests: [announcement media upgrade path]
+  - id: remote-instance-verification
+    name: Remote instance verification
+    category: [PROFILE, SERVICE, RAILS_MODEL, DATABASE]
+    description: Verification metadata for remote accounts/instances.
+    files:
+      [
+        app/lib/instance_verification.rb,
+        app/services/fetch_remote_instance_verification_service.rb,
+        db/migrate/20260908135000_add_remote_instance_verification_to_accounts.rb,
+      ]
+    integration_points: [ActivityPub processing, account model, profile display]
+    risk: high
+    criticality: high
+    surface: backend_database
+    isolation: B
+    tests:
+      [
+        spec/lib/instance_verification_spec.rb,
+        spec/services/fetch_remote_instance_verification_service_spec.rb,
+      ]
+    missing_tests: [federation compatibility suite]
+  - id: upstream-update-checks
+    name: Upstream update checks and batches
+    category: [SERVICE, RAILS_MODEL, DATABASE, BUILD]
+    description: Stored checks and translation of upstream software update information.
+    files:
+      [
+        app/models/upstream_update_check.rb,
+        app/models/upstream_update_batch.rb,
+        app/services/upstream_software_update_check_service.rb,
+        db/migrate/20260909130000_create_upstream_update_checks.rb,
+      ]
+    integration_points: [admin/status scheduling, updater command]
+    risk: high
+    criticality: high
+    surface: backend_database
+    isolation: B
+    tests:
+      [
+        spec/services/upstream_software_update_check_service_spec.rb,
+        spec/services/translate_upstream_update_batch_service_spec.rb,
+      ]
+    missing_tests: [transactional worktree pipeline]
+  - id: status-page
+    name: Blue status page and Cloudflare infrastructure
+    category: [OTHER, BUILD, CONFIG]
+    description: Separate status dashboard and origin fallback worker.
+    files: [status-page/, infrastructure/cloudflare/origin-fallback/]
+    integration_points: [external status endpoints only]
+    risk: medium
+    criticality: medium
+    surface: separate_service
+    isolation: A
+    tests: [status-page/test/, infrastructure/cloudflare/origin-fallback/test/]
+    missing_tests: [Mastodon update impact contract]

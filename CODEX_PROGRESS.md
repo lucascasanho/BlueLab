@@ -4,6 +4,24 @@
 > `AGENTS.md`, a documentação permanente, o Git nem a verificação do estado real do sistema.
 > Nunca registrar segredos aqui.
 
+## Tarefa atual — sistema de atualização BlueLab (2026-09-20)
+
+- Objetivo: iniciar a refatoração estrutural para atualizações Mastodon seguras e
+  retomáveis. Nesta unidade estão autorizadas somente as fases 0–2: proteção,
+  inventário e mapa de acoplamento; não alterar Espelunca nem promover `bluelab`.
+- Estado inicial confirmado: `bluelab-teste` em
+  `8300c26ed840eec984932a55a2a027392b98e96c`, árvore limpa. Referência local de
+  recuperação criada: `backup/bluelab-before-update-system-20260920` no mesmo SHA.
+- Upstream conferido após fetch: merge-base com `upstream/main` em
+  `c9b78c464b99f6c0b6b28e2f6b174a9ef0faa55f`; há 789 caminhos divergentes (379
+  adicionados, 410 modificados) e 1.188 commits no lado BlueLab.
+- Documentação e inventário em preparação em
+  `docs/bluelab-update-system/` e `bluelab/manifest.yml`. Nenhum código funcional
+  foi movido ou alterado. Consultar obrigatoriamente
+  `docs/bluelab-update-system/PROGRESS.md` para o checkpoint operacional atual.
+- Próximo passo desta unidade: validar os documentos/YAML, executar `git diff
+--check` e criar o commit documental das fases 0–2 em `bluelab-teste`.
+
 ## Estado
 
 - Status: escudo de cadastro em implementação no BlueLab-Test
