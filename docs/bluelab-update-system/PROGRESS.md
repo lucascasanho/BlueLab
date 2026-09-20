@@ -7,20 +7,20 @@ transacional, validada por manifesto, sem promoção ou acesso à Espelunca.
 
 ## Fase atual
 
-Fases 0–2: inventário funcional e mapa de acoplamento concluídos, aguardando o
-checkpoint Git documental.
+Fases 0–2 concluídas e documentadas. A próxima unidade ainda não pode mover código:
+deve primeiro confirmar o primeiro integration point B de baixo risco.
 
 ## Último checkpoint concluído
 
 Proteção inicial verificada em 2026-09-20: branch `bluelab-teste`, HEAD
 `8300c26ed840eec984932a55a2a027392b98e96c`, árvore limpa; branch local de recuperação
 `backup/bluelab-before-update-system-20260920` criada no mesmo SHA. O upstream foi
-buscado sem alterar a árvore de trabalho.
+buscado sem alterar a árvore de trabalho. Inventário e mapa foram consolidados no
+commit `9efd38d7e8`.
 
 ## Último commit criado
 
-Ainda nenhum nesta iniciativa. O próximo commit será somente o checkpoint documental
-das fases 0–2, após validar manifesto e documentação.
+`9efd38d7e8 bluelab-update: inventory existing customizations`.
 
 ## Arquivos já migrados
 
@@ -64,9 +64,10 @@ definida junto ao primeiro domínio escolhido para isolamento.
 
 ## Próximo passo exato
 
-Fazer o commit `bluelab-update: inventory existing customizations` contendo somente
-o manifesto, documentação e checkpoint das fases 0–2. Depois, inspecionar a entrada
-`blue2-shell-navigation` para escolher o primeiro integration point B de baixo risco.
+Ler os módulos e testes da entrada `blue2-shell-navigation`, identificar um único
+integration point B de baixo risco e registrar a decisão antes de mover qualquer
+arquivo. Começar por `app/javascript/mastodon/features/blue2/` e seus consumidores
+em `features/ui/` e `features/navigation_panel/`.
 
 ## Comandos para continuar
 
@@ -75,9 +76,11 @@ cd /home/blue/blue
 git status --short --branch
 sed -n '1,240p' docs/bluelab-update-system/PROGRESS.md
 git diff -- docs/bluelab-update-system bluelab/manifest.yml CODEX_PROGRESS.md
+rg -n "blue2|BlueLab" app/javascript/mastodon/features/{blue2,ui,navigation_panel}
 ```
 
 ## Estado da árvore Git
 
-Confirmar com `git status` antes de agir: a documentação desta iniciativa está
-intencionalmente não commitada até a conclusão do checkpoint documental.
+Após o commit de registro deste checkpoint, a árvore deve estar limpa e
+`bluelab-teste` deve ficar dois commits à frente de `bluelab/bluelab-teste`. Confirmar
+o estado real com `git status` antes de agir.

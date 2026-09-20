@@ -15,12 +15,13 @@
 - Upstream conferido após fetch: merge-base com `upstream/main` em
   `c9b78c464b99f6c0b6b28e2f6b174a9ef0faa55f`; há 789 caminhos divergentes (379
   adicionados, 410 modificados) e 1.188 commits no lado BlueLab.
-- Documentação e inventário em preparação em
+- Documentação e inventário consolidados no commit
+  `9efd38d7e8 bluelab-update: inventory existing customizations`, em
   `docs/bluelab-update-system/` e `bluelab/manifest.yml`. Nenhum código funcional
   foi movido ou alterado. Consultar obrigatoriamente
   `docs/bluelab-update-system/PROGRESS.md` para o checkpoint operacional atual.
-- Próximo passo desta unidade: validar os documentos/YAML, executar `git diff
---check` e criar o commit documental das fases 0–2 em `bluelab-teste`.
+- Próximo passo: analisar a fronteira do domínio `blue2-shell-navigation` e escolher
+  um único integration point B de baixo risco antes de iniciar qualquer migração.
 
 ## Estado
 
