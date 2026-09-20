@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+# Starts Puma under systemd and reports readiness only after Rails is accepting
+# requests. This prevents a Type=simple service from appearing healthy while
+# nginx still receives connection-refused errors from its upstream.
+
+set -Eeuo pipefail
+
+port="${MASTODON_READINESS_PORT:-${PORT:?PORT must be set}}"
+path="${MASTODON_READINESS_PATH:-/health}"
+timeout_seconds="${MASTODON_READINESS_TIMEOUT_SECONDS:-300}"
+url="http://127.0.0.1:${port}${path}"
+
+log() {
+  printf '%s mastodon-systemd-puma: %s\n' "$(date --iso-8601=seconds)" "$*"
+}
+
+notify() {
+  systemd-notify "$@" 2>/dev/null || true
+}
+
+bundle exec puma -C config/puma.rb &
+puma_pid=$!
+
+stop_puma() {
+  if kill -0 "$puma_pid" 2>/dev/null; then
+    kill -TERM "$puma_pid" 2>/dev/null || true
+  fi
+  wait "$puma_pid" || true
+}
+
+trap 'stop_puma; exit 0' TERM INT
+trap 'kill -USR1 "$puma_pid" 2>/dev/null || true' USR1
+
+deadline=$((SECONDS + timeout_seconds))
+while ! curl --fail --silent --show-error --max-time 2 "$url" >/dev/null 2>&1; do
+  if ! kill -0 "$puma_pid" 2>/dev/null; then
+    wait "$puma_pid"
+    exit $?
+  fi
+
+  if (( SECONDS >= deadline )); then
+    log "Rails did not become ready at ${url} within ${timeout_seconds}s"
+    notify --status="Rails readiness timed out"
+    stop_puma
+    exit 1
+  fi
+
+  sleep 1
+done
+
+log "Rails is ready at ${url}"
+notify --ready --status="Rails ready at ${url}"
+
+wait "$puma_pid"

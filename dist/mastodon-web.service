@@ -3,16 +3,19 @@ Description=mastodon-web
 After=network.target
 
 [Service]
-Type=simple
+Type=notify
 User=mastodon
 WorkingDirectory=/home/mastodon/live
 Environment="RAILS_ENV=production"
 Environment="PORT=3000"
+Environment="MASTODON_READINESS_PORT=3000"
 Environment="LD_PRELOAD=libjemalloc.so"
-ExecStart=/home/mastodon/.rbenv/shims/bundle exec puma -C config/puma.rb
+ExecStart=/home/mastodon/live/bin/mastodon-systemd-puma
 ExecReload=/bin/kill -SIGUSR1 $MAINPID
-TimeoutSec=15
+NotifyAccess=main
+TimeoutStartSec=5min
 Restart=always
+RestartSec=10
 # Proc filesystem
 ProcSubset=pid
 ProtectProc=invisible
