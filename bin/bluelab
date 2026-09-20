@@ -143,6 +143,7 @@ reiniciar_servicos() {
   for s in "${SERVICOS[@]}"; do
     systemctl cat "$s" >/dev/null 2>&1 || falhar "serviço $s não existe"
   done
+  executar "$REPO/bin/mastodon-install-systemd-readiness" "$ALVO"
   executar sudo systemctl restart "${SERVICOS[@]}"
   sleep 2
   for s in "${SERVICOS[@]}"; do

@@ -120,6 +120,7 @@ run env RAILS_ENV=production NODE_ENV=production bundle exec rails assets:precom
 
 echo
 echo "===== REINICIANDO BLUE ====="
+run "$REPO/bin/mastodon-install-systemd-readiness" blue
 run sudo systemctl restart "${SERVICES[@]}"
 
 sleep 2

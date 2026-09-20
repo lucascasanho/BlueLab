@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+# Installs a minimal systemd override that uses mastodon-systemd-puma as the
+# web service entrypoint. The application code remains in the repository; only
+# this generated override belongs in /etc/systemd/system.
+
+set -Eeuo pipefail
+
+target="${1:?use: mastodon-install-systemd-readiness blue|espelunca}"
+
+case "$target" in
+  blue)
+    service="blue-web.service"
+    app_dir="${BLUE_REPO:-$HOME/blue}"
+    port="3000"
+    ;;
+  espelunca)
+    service="espelunca-web.service"
+    app_dir="${ESPELUNCA_REPO:-$HOME/espelunca}"
+    port="3001"
+    ;;
+  *)
+    printf 'target inválido: %s\n' "$target" >&2
+    exit 2
+    ;;
+esac
+
+wrapper="$app_dir/bin/mastodon-systemd-puma"
+[[ -x "$wrapper" ]] || {
+  printf 'wrapper ausente ou não executável: %s\n' "$wrapper" >&2
+  exit 1
+}
+
+tmp_file="$(mktemp)"
+trap 'rm -f "$tmp_file"' EXIT
+
+cat >"$tmp_file" <<EOF
+[Service]
+Type=notify
+NotifyAccess=all
+TimeoutStartSec=5min
+RestartSec=10
+Environment="MASTODON_READINESS_PORT=${port}"
+ExecStart=
+ExecStart=${wrapper}
+EOF
+
+sudo install -d -o root -g root -m 0755 "/etc/systemd/system/${service}.d"
+sudo install -o root -g root -m 0644 "$tmp_file" "/etc/systemd/system/${service}.d/10-mastodon-readiness.conf"
+sudo systemctl daemon-reload
+printf 'Override de prontidão instalado para %s.\n' "$service"
