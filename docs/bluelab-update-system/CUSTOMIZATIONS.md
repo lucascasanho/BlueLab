@@ -12,18 +12,26 @@ serem declarados automaticamente como produto BlueLab.
 
 ## Domínios encontrados
 
-| Domínio                | Classes                          | Evidência principal                              | Situação de isolamento              |
-| ---------------------- | -------------------------------- | ------------------------------------------------ | ----------------------------------- |
-| Tema e shell BlueLab 2 | THEME, UI, NAVIGATION            | `styles/blue-2.scss`, `features/blue2/`, layouts | parcialmente isolado                |
-| Composer rico          | COMPOSER, REACT_COMPONENT, STATE | `features/compose/redesign/`, reducer/actions    | misto; alto hotspot                 |
-| Markdown e emojis      | COMPOSER, PROFILE                | formatter Ruby e editor de campos                | misto                               |
-| Perfil e identidade    | PROFILE, API, RAILS\_\*          | campos, badges, username, verificação            | misto/sensível                      |
-| Mídia                  | UPLOAD, API, SERVICE, DATABASE   | API Blue de upload retomável e serviços          | bem separado, integrações restantes |
-| Agendamento/threads    | API, SERVICE, DATABASE           | threads e status agendados                       | backend próprio com integrações     |
-| Administração/branding | CONFIG, RAILS_CONTROLLER, UI     | personalização, cores, limites e anúncios        | misto                               |
-| Autenticação/cadastro  | AUTH, PASSKEY, SECURITY          | passkeys e proteção de cadastro                  | sensível; não automatizar merge     |
-| Atualização upstream   | SERVICE, DATABASE, BUILD         | checks/batches e `bin/bluelab`                   | existente, ainda não transacional   |
-| Status/infrastructure  | OTHER, BUILD                     | `status-page/`, Cloudflare                       | separado do core Mastodon           |
+| Domínio                | Classes                           | Evidência principal                              | Situação de isolamento              |
+| ---------------------- | --------------------------------- | ------------------------------------------------ | ----------------------------------- |
+| Tema e shell BlueLab 2 | THEME, UI, NAVIGATION             | `styles/blue-2.scss`, `features/blue2/`, layouts | parcialmente isolado                |
+| Composer rico          | COMPOSER, REACT_COMPONENT, STATE  | `features/compose/redesign/`, reducer/actions    | misto; alto hotspot                 |
+| Markdown e emojis      | COMPOSER, PROFILE                 | formatter Ruby e editor de campos                | misto                               |
+| Perfil e identidade    | PROFILE, API, RAILS\_\*           | campos, badges, username, verificação            | misto/sensível                      |
+| Mídia                  | UPLOAD, API, SERVICE, DATABASE    | API Blue de upload retomável e serviços          | bem separado, integrações restantes |
+| Agendamento/threads    | API, SERVICE, DATABASE            | threads e status agendados                       | backend próprio com integrações     |
+| Administração/branding | CONFIG, RAILS_CONTROLLER, UI      | personalização, cores, limites e anúncios        | misto                               |
+| Autenticação/cadastro  | AUTH, PASSKEY, SECURITY           | passkeys e proteção de cadastro                  | sensível; não automatizar merge     |
+| Atualização upstream   | SERVICE, DATABASE, BUILD          | checks/batches e `bin/bluelab`                   | existente, ainda não transacional   |
+| Status/infrastructure  | OTHER, BUILD                      | `status-page/`, Cloudflare                       | separado do core Mastodon           |
+| Homepage e onboarding  | UI, NAVIGATION, AUTH              | homepage, rotas públicas e shells auth           | integração pequena/mista            |
+| Retenção de conteúdo   | RAILS_CONTROLLER, SERVICE, CONFIG | settings e scheduler                             | acoplado a lifecycle upstream       |
+| PWA e ativos cliente   | UI, BUILD                         | install prompt, service worker e screenshots     | parcialmente isolado                |
+| Operação/deploy        | BUILD, CONFIG, SECURITY           | `bin/`, workflows e manutenção                   | sensível; pipeline não transacional |
 
 As entradas do manifesto são o inventário operacional atual. Itens sem teste são
 lacunas explícitas, não garantias implícitas.
+
+O inventário distingue `MIGRATION` de `DATABASE`: a primeira identifica histórico
+imutável de evolução do schema, e a segunda o domínio persistido que exige
+reconciliação compatível. Ambos são sensíveis e não recebem resolução cega.

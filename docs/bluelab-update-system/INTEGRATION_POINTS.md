@@ -22,6 +22,10 @@
 | Username/verificação remota | models, services, controllers, migrations               | C/D    | API e banco; preservar validações upstream e migrar só com testes                      |
 | Agendamento em threads      | controllers, services, models, migrations               | B/D    | domínio próprio, mas toca publicação e schema                                          |
 | Branding/admin              | settings, serializers, views, locais                    | B/C    | separar adaptadores de configuração e manter compatibilidade de settings               |
+| Homepage/onboarding         | controllers públicos, auth layouts e UI client          | B/C    | preservar rotas, acesso anônimo e login; testar transição público→sessão               |
+| Retenção de conteúdo        | admin settings e schedulers                             | C/D    | lifecycle e dados; revisar semanticamente mudanças upstream correlatas                 |
+| PWA/service worker          | entrypoint, caching e mobile UI                         | B      | manter módulo cliente; validar cache sem esconder correção upstream                    |
+| Ferramentas de deploy       | `bin/`, workflows, CLI e nginx                          | C/D    | pipeline sensível; será substituído por worktree transacional                          |
 | Status page/Cloudflare      | `status-page/`, `infrastructure/`                       | A      | produto adjacente, sem merge driver Mastodon                                           |
 | Atualizador existente       | `bin/bluelab`                                           | C/D    | faz deploy e usa `reset --hard`; será redesenhado apenas na fase 6, após inventário    |
 

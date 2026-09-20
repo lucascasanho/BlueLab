@@ -120,7 +120,16 @@ customizations:
     missing_tests: [profile edit end-to-end]
   - id: username-changes
     name: Username changes and reservations
-    category: [PROFILE, API, RAILS_CONTROLLER, RAILS_MODEL, SERVICE, DATABASE]
+    category:
+      [
+        PROFILE,
+        API,
+        RAILS_CONTROLLER,
+        RAILS_MODEL,
+        SERVICE,
+        DATABASE,
+        MIGRATION,
+      ]
     description: Controlled username changes with reservations and validation.
     files:
       [
@@ -142,7 +151,7 @@ customizations:
     missing_tests: [upstream account validation reconciliation]
   - id: passkeys
     name: Passkey authentication
-    category: [AUTH, PASSKEY, SECURITY, DATABASE]
+    category: [AUTH, PASSKEY, SECURITY, DATABASE, MIGRATION]
     description: WebAuthn credential storage and session/settings flows.
     files:
       [
@@ -190,7 +199,7 @@ customizations:
     missing_tests: [upstream authentication change reconciliation]
   - id: resumable-uploads
     name: Resumable media uploads
-    category: [UPLOAD, API, SERVICE, RAILS_MODEL, DATABASE]
+    category: [UPLOAD, API, SERVICE, RAILS_MODEL, DATABASE, MIGRATION]
     description: Blue-specific resumable upload API, parts, validation and finalization.
     files:
       [
@@ -212,7 +221,7 @@ customizations:
     missing_tests: [upstream media validation compatibility]
   - id: scheduled-threads
     name: Scheduled publication threads
-    category: [API, SERVICE, RAILS_MODEL, DATABASE]
+    category: [API, SERVICE, RAILS_MODEL, DATABASE, MIGRATION]
     description: Grouped scheduled statuses and publication services.
     files:
       [
@@ -280,7 +289,7 @@ customizations:
     missing_tests: [persisted palette across upstream update]
   - id: announcements
     name: Rich administrative announcements
-    category: [UI, RAILS_CONTROLLER, RAILS_MODEL, DATABASE]
+    category: [UI, RAILS_CONTROLLER, RAILS_MODEL, DATABASE, MIGRATION]
     description: Rich announcements and media associations.
     files:
       [
@@ -302,7 +311,7 @@ customizations:
     missing_tests: [announcement media upgrade path]
   - id: remote-instance-verification
     name: Remote instance verification
-    category: [PROFILE, SERVICE, RAILS_MODEL, DATABASE]
+    category: [PROFILE, SERVICE, RAILS_MODEL, DATABASE, MIGRATION]
     description: Verification metadata for remote accounts/instances.
     files:
       [
@@ -323,7 +332,7 @@ customizations:
     missing_tests: [federation compatibility suite]
   - id: upstream-update-checks
     name: Upstream update checks and batches
-    category: [SERVICE, RAILS_MODEL, DATABASE, BUILD]
+    category: [SERVICE, RAILS_MODEL, DATABASE, MIGRATION, BUILD]
     description: Stored checks and translation of upstream software update information.
     files:
       [
@@ -355,3 +364,114 @@ customizations:
     isolation: A
     tests: [status-page/test/, infrastructure/cloudflare/origin-fallback/test/]
     missing_tests: [Mastodon update impact contract]
+  - id: public-homepage-and-onboarding
+    name: Public homepage and authenticated onboarding
+    category: [UI, NAVIGATION, AUTH, LOCALE]
+    description: BlueLab public overview, landing content, authentication shell branding and onboarding paths.
+    files:
+      [
+        app/javascript/mastodon/features/custom_homepage/,
+        app/controllers/accounts_controller.rb,
+        app/views/auth/,
+        app/views/layouts/auth.html.haml,
+      ]
+    integration_points: [public routes, auth layouts, client UI root]
+    risk: high
+    criticality: high
+    surface: frontend_backend
+    isolation: B
+    tests:
+      [
+        spec/system/home_spec.rb,
+        spec/controllers/auth/sessions_controller_overview_redirect_spec.rb,
+      ]
+    missing_tests: [public to authenticated navigation contract]
+  - id: content-retention
+    name: Administrative content retention
+    category: [RAILS_CONTROLLER, RAILS_MODEL, SERVICE, CONFIG, DATABASE]
+    description: Configurable retention settings and cleanup scheduling for BlueLab-managed content.
+    files:
+      [
+        app/controllers/admin/settings/content_retention_controller.rb,
+        app/workers/scheduler/user_cleanup_scheduler.rb,
+        config/settings.yml,
+      ]
+    integration_points: [admin settings, scheduler, user cleanup]
+    risk: high
+    criticality: high
+    surface: backend
+    isolation: C
+    tests:
+      [
+        spec/requests/admin/settings/content_retention_spec.rb,
+        spec/workers/scheduler/user_cleanup_scheduler_spec.rb,
+      ]
+    missing_tests: [retention upgrade and rollback behavior]
+  - id: account-role-verification
+    name: Account role verification presentation
+    category: [PROFILE, RAILS_MODEL, SERVICE, DATABASE, MIGRATION, UI]
+    description: Role-derived verification metadata and profile badge presentation.
+    files:
+      [
+        app/models/account.rb,
+        app/models/user_role.rb,
+        app/services/activitypub/process_account_service.rb,
+        app/javascript/mastodon/components/display_name/verified_badge.tsx,
+        db/migrate/20260905212000_add_verified_by_role_since_to_accounts.rb,
+      ]
+    integration_points:
+      [account association, federation processing, display-name component]
+    risk: high
+    criticality: high
+    surface: frontend_backend_database
+    isolation: C
+    tests:
+      [
+        spec/models/account_spec.rb,
+        app/javascript/mastodon/components/__tests__/display_name-test.tsx,
+      ]
+    missing_tests:
+      [role change propagation and upstream account serializer compatibility]
+  - id: pwa-and-client-assets
+    name: PWA installation and client asset behavior
+    category: [UI, BUILD, CONFIG, OTHER]
+    description: PWA install prompt, navigation caching and Blue instance screenshots/assets.
+    files:
+      [
+        app/javascript/mastodon/pwa_install.ts,
+        app/javascript/mastodon/service_worker/,
+        public/pwa-screenshots/,
+        app/javascript/mastodon/features/ui/util/mobile_chrome.ts,
+      ]
+    integration_points: [PWA entrypoint, service worker, mobile UI]
+    risk: medium
+    criticality: medium
+    surface: frontend
+    isolation: B
+    tests:
+      [
+        app/javascript/mastodon/service_worker/caching_navigation.test.ts,
+        app/javascript/mastodon/features/ui/util/mobile_chrome.test.ts,
+      ]
+    missing_tests: [browser install and offline smoke test]
+  - id: deployment-and-maintenance
+    name: BlueLab deployment and maintenance tooling
+    category: [BUILD, CONFIG, SECURITY, OTHER]
+    description: Blue test-channel update helpers, nginx documentation and maintenance integrations.
+    files:
+      [
+        bin/blue-atualizar,
+        bin/blue-reiniciar,
+        bin/bluelab,
+        ops/nginx/,
+        .github/workflows/,
+        lib/mastodon/cli/email_domain_blocks.rb,
+      ]
+    integration_points: [Git channels, system services, Mastodon CLI]
+    risk: critical
+    criticality: critical
+    surface: operations
+    isolation: C
+    tests: [spec/lib/mastodon/cli/email_domain_blocks_spec.rb]
+    missing_tests:
+      [transactional updater dry-run, failure abort, channel promotion contract]

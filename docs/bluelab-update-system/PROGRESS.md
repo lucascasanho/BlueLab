@@ -7,8 +7,9 @@ transacional, validada por manifesto, sem promoção ou acesso à Espelunca.
 
 ## Fase atual
 
-Fases 0–2 concluídas e documentadas. A próxima unidade ainda não pode mover código:
-deve primeiro confirmar o primeiro integration point B de baixo risco.
+Fases 0–2: inventário em complemento para cobrir os domínios sub-representados na
+primeira passagem (homepage, retenção, PWA e operação). Nenhuma migração pode
+começar antes deste complemento ser validado e commitado.
 
 ## Último checkpoint concluído
 
@@ -28,8 +29,8 @@ Nenhum. Esta etapa não move nem refatora código.
 
 ## Arquivos pendentes
 
-Nenhum código está pendente de migração nesta fase. As migrações funcionais só podem
-começar após a revisão do checkpoint documental.
+Nenhum código está pendente de migração nesta fase. Falta validar e registrar as
+entradas complementares antes de encerrar a auditoria documental.
 
 ## Problemas encontrados
 
@@ -52,7 +53,8 @@ começar após a revisão do checkpoint documental.
 - `git status --short --branch` inicial: limpo.
 - `git fetch upstream --tags --prune`: concluído.
 - `git merge-base HEAD upstream/main`: `c9b78c464b99f6c0b6b28e2f6b174a9ef0faa55f`.
-- Inventário de diff: 789 caminhos (379 A, 410 M); 16 domínios de produto registrados.
+- Inventário de diff: 789 caminhos (379 A, 410 M); a primeira passagem registrou 16
+  domínios e identificou quatro domínios sub-representados para complemento.
 - YAML do manifesto carregado por Ruby/Psych e todos os caminhos de testes declarados
   foram confirmados no checkout.
 - `git diff --check`: passou.
@@ -64,10 +66,9 @@ definida junto ao primeiro domínio escolhido para isolamento.
 
 ## Próximo passo exato
 
-Ler os módulos e testes da entrada `blue2-shell-navigation`, identificar um único
-integration point B de baixo risco e registrar a decisão antes de mover qualquer
-arquivo. Começar por `app/javascript/mastodon/features/blue2/` e seus consumidores
-em `features/ui/` e `features/navigation_panel/`.
+Validar as novas entradas do manifesto contra caminhos de teste reais, atualizar a
+contagem e criar checkpoint documental para concluir fases 0–2. Só então analisar
+`blue2-shell-navigation` para selecionar um integration point B.
 
 ## Comandos para continuar
 

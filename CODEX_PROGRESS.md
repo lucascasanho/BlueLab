@@ -22,6 +22,10 @@
   `docs/bluelab-update-system/PROGRESS.md` para o checkpoint operacional atual.
 - Próximo passo: analisar a fronteira do domínio `blue2-shell-navigation` e escolher
   um único integration point B de baixo risco antes de iniciar qualquer migração.
+- Revisão da auditoria detectou que homepage/onboarding, retenção, PWA e tooling de
+  operação estavam sub-representados no primeiro catálogo; o complemento documental
+  está pronto para checkpoint e eleva o manifesto para 21 domínios, sem mudança de
+  comportamento.
 
 ## Estado
 
