@@ -12,7 +12,7 @@ Environment="MASTODON_READINESS_PORT=3000"
 Environment="LD_PRELOAD=libjemalloc.so"
 ExecStart=/home/mastodon/live/bin/mastodon-systemd-puma
 ExecReload=/bin/kill -SIGUSR1 $MAINPID
-NotifyAccess=main
+NotifyAccess=all
 TimeoutStartSec=5min
 Restart=always
 RestartSec=10

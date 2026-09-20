@@ -9,6 +9,7 @@ set -Eeuo pipefail
 port="${MASTODON_READINESS_PORT:-${PORT:?PORT must be set}}"
 path="${MASTODON_READINESS_PATH:-/health}"
 timeout_seconds="${MASTODON_READINESS_TIMEOUT_SECONDS:-300}"
+bundle_executable="${MASTODON_BUNDLE_EXECUTABLE:-$HOME/.rbenv/shims/bundle}"
 url="http://127.0.0.1:${port}${path}"
 
 log() {
@@ -19,7 +20,7 @@ notify() {
   systemd-notify "$@" 2>/dev/null || true
 }
 
-bundle exec puma -C config/puma.rb &
+"$bundle_executable" exec puma -C config/puma.rb &
 puma_pid=$!
 
 stop_puma() {
