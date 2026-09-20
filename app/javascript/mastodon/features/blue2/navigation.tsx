@@ -6,6 +6,7 @@ import { NavLink } from 'react-router-dom';
 
 import { StackIcon } from '@phosphor-icons/react';
 
+import { blue2Text } from '@/bluelab/i18n/blue2';
 import { ComposeIcon } from '@/mastodon/components/compose_icon';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
@@ -29,7 +30,6 @@ import {
   Blue2SearchIcon,
   Blue2SettingsIcon,
 } from './icons';
-import { blue2Text } from './locale';
 import classes from './navigation.module.scss';
 
 interface ItemProps {

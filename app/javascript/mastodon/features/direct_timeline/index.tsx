@@ -13,7 +13,8 @@ import {
   ColumnSettingsMenu,
 } from '@/mastodon/components/column_header';
 import { MultiColumnMenuItems } from '@/mastodon/components/column_header/multicolumn_settings';
-import { blue2Text } from '@/mastodon/features/blue2/locale';
+// BLUELAB_INTEGRATION: BlueLab-owned labels for the optional BlueLab theme.
+import { blue2Text } from '@/bluelab/i18n/blue2';
 import {
   composerOriginFromElement,
   openNewComposer,

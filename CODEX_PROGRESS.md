@@ -25,12 +25,13 @@
 - Revisão da auditoria incorporou homepage/onboarding, retenção, PWA, operação e
   verificação por papel ao catálogo. O checkpoint confirmou 21 domínios e nove
   caminhos de teste existentes nas cinco entradas novas, sem mudança de comportamento.
-- A fronteira B escolhida é o catálogo puro `blue2Text(locale, key)`: o contrato é
-  síncrono e tipado, sem estado, rota, ação, markup ou estilos. A decisão e os seis
-  consumidores estão registrados em `docs/bluelab-update-system/INTEGRATION_POINTS.md`.
-- Próximo passo do sistema de atualização: em unidade separada, migrar somente esse
-  catálogo, cobrir fallback/normalização de locale e validar os consumidores; as
-  alterações locais não commitadas em Blue2 permanecem fora deste checkpoint.
+- A primeira fronteira B, o catálogo puro `blue2Text(locale, key)`, foi migrada para
+  `app/javascript/bluelab/i18n/blue2.ts` com os seis consumidores preservados e teste
+  de normalização/fallback. Testes focados, lint, typecheck e `git diff --check`
+  passaram.
+- Próximo passo do sistema de atualização: publicar somente este lote em
+  `BlueLab-Test`, testar o shell Blue2 no Blue via `blue-atualizar` e manter
+  `BlueLab` inalterada até aprovação explícita.
 
 ## Estado
 

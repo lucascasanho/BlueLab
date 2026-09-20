@@ -8,7 +8,7 @@ transacional, validada por manifesto, sem promoção ou acesso à Espelunca.
 ## Fase atual
 
 Fases 0–2 concluídas e documentadas. A primeira fronteira B de baixo risco foi
-confirmada e registrada; este checkpoint ainda não move código.
+migrada e validada sem alterar o comportamento dos consumidores.
 
 ## Último checkpoint concluído
 
@@ -25,14 +25,18 @@ declarados nas cinco novas entradas.
 
 ## Arquivos já migrados
 
-Nenhum por este checkpoint. A árvore de trabalho contém alterações locais em Blue2
-que permanecem deliberadamente fora deste registro e não foram incluídas nele.
+- `app/javascript/mastodon/features/blue2/locale.ts` foi movido sem alterações de
+  conteúdo para `app/javascript/bluelab/i18n/blue2.ts`.
+- Os seis consumidores passaram a importar o contrato BlueLab: navegação e right
+  rail Blue2, columns area, cabeçalho e painel de navegação, e direct timeline.
+- `app/javascript/bluelab/i18n/blue2.test.ts` cobre normalização de locale regional
+  e fallback para inglês.
 
 ## Arquivos pendentes
 
-Nenhum código está pendente de migração neste checkpoint. A próxima unidade pode
-migrar exclusivamente o catálogo `blue2Text` segundo a fronteira registrada; os
-demais módulos de shell continuam pendentes de análise própria.
+O catálogo `blue2Text` não tem pendências. Os demais módulos de shell continuam
+pendentes de análise própria; nenhum deles está autorizado a migrar por extensão
+deste checkpoint.
 
 ## Problemas encontrados
 
@@ -65,20 +69,28 @@ demais módulos de shell continuam pendentes de análise própria.
 - Leitura da entrada `blue2-shell-navigation`: o catálogo `blue2Text` tem seis
   consumidores, contrato síncrono tipado e nenhuma dependência de estado, rota ou
   ação; foi registrado como a primeira fronteira B de baixo risco.
+- `yarn test:js run app/javascript/bluelab/i18n/blue2.test.ts --reporter=verbose`:
+  2 testes passaram.
+- `yarn test:js run` dos testes existentes de account menu e navigation panel:
+  9 testes passaram.
+- `yarn typecheck` e ESLint restrito aos oito arquivos TypeScript alterados: passaram.
 - `git diff --check`: passou.
+
+O hook local também executou `yarn i18n:extract`, que apontou diferenças já
+existentes em `app/javascript/mastodon/locales/en.json` (chaves sem relação com este
+catálogo). A árvore foi restaurada pelo hook e esse arquivo não integra o lote.
 
 ## Testes pendentes
 
-Não há mudança funcional a testar nesta unidade. A primeira validação funcional será
-definida junto ao primeiro domínio escolhido para isolamento.
+Permanece pendente uma validação visual/manual do shell Blue2 no canal de testes.
+Ela deve confirmar rótulos em um locale regional e em um locale sem tradução,
+navegação, right rail, painel e direct timeline.
 
 ## Próximo passo exato
 
-Em uma unidade separada, migrar somente o catálogo puro `blue2Text` para
-`app/javascript/bluelab/i18n/blue2.ts`, preservar seu contrato e atualizar todos os
-seis consumidores identificados. Antes de qualquer commit funcional, adicionar o
-teste unitário de fallback/normalização de locale e executar esse teste, os testes
-existentes de `blue2-shell-navigation`, typecheck e `git diff --check`.
+No Blue, executar `blue-atualizar` e validar manualmente o shell Blue2. Enquanto o
+lote estiver em teste, `BlueLab` deve permanecer inalterada. Após aprovação explícita
+do usuário, promover o mesmo commit por fast-forward para `BlueLab`.
 
 ## Comandos para continuar
 
@@ -93,7 +105,6 @@ sed -n '1,220p' docs/bluelab-update-system/INTEGRATION_POINTS.md
 
 ## Estado da árvore Git
 
-O checkpoint documental não inclui as alterações locais atuais em Blue2. Elas devem
-ser preservadas e separadas desta auditoria; confirmar o estado real com `git status`
-antes de agir. No momento da validação, `bluelab-teste` estava três commits à frente
-de `bluelab/bluelab-teste`.
+O checkpoint funcional deve conter somente a migração do catálogo e seus testes.
+Confirmar o estado real com `git status` antes de agir e não incluir extrações
+adicionais do shell no mesmo lote.

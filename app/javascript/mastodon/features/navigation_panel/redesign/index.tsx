@@ -18,7 +18,8 @@ import { closeNavigation } from '@/mastodon/actions/navigation';
 import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
 import { ComposeIcon } from '@/mastodon/components/compose_icon';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
-import { blue2Text } from '@/mastodon/features/blue2/locale';
+// BLUELAB_INTEGRATION: BlueLab-owned labels for the optional BlueLab theme.
+import { blue2Text } from '@/bluelab/i18n/blue2';
 import { useScrollSensor } from '@/mastodon/hooks/useScrollSensor';
 import { useIdentity } from '@/mastodon/identity_context';
 import {

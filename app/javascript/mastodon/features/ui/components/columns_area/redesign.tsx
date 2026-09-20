@@ -7,10 +7,11 @@ import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import { HashIcon } from '@phosphor-icons/react';
 
+// BLUELAB_INTEGRATION: optional BlueLab shell widgets and localized labels.
+import { blue2Text } from '@/bluelab/i18n/blue2';
 import { openNavigation } from '@/mastodon/actions/navigation';
 import { Blue2Announcements } from '@/mastodon/features/blue2/announcements';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
-import { blue2Text } from '@/mastodon/features/blue2/locale';
 import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
