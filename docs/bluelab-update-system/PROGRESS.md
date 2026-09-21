@@ -21,6 +21,12 @@ descartáveis foram sincronizados sem novos bloqueios, assets foram recompilados
 serviços foram reiniciados. `blue-web`, `blue-sidekiq` e `blue-streaming` ficaram
 ativos; o healthcheck local `http://127.0.0.1:3000/health` respondeu `OK`.
 
+Na verificação posterior do mesmo dia, os três serviços continuavam ativos; os
+healthchecks local e público do Blue responderam `OK`/HTTP 200. O atualizador da
+página de status foi executado sem migrations pendentes e a página pública
+`https://status.mastodon.blue` respondeu HTTP 200. Essa verificação não promoveu
+`BlueLab` nem acessou a Espelunca.
+
 A proteção inicial permanece rastreável no SHA
 `8300c26ed840eec984932a55a2a027392b98e96c`, com a referência local
 `backup/bluelab-before-update-system-20260920`. O complemento do inventário foi
