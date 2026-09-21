@@ -152,9 +152,11 @@ de `BlueLab` e correspondia exatamente ao candidato aprovado. Em 2026-09-20,
 passaram a apontar para `2dc5b74`; não houve force-push, reconstrução por cherry-pick
 ou acesso à Espelunca.
 
-O próximo passo seguro é definir o plano de execução transacional em worktree e seu
-relatório, usando o validador do manifesto como pré-condição, sem substituir
-`bin/bluelab` nesta etapa.
+O plano de execução transacional em worktree e seu relatório foi definido em
+`TRANSACTION_PLAN.md`, com worktree temporário, gates de risco, resultado estruturado
+e proibição de alterar a árvore ativa. O próximo passo seguro é implementar o
+protótipo somente de simulação contra repositórios Git temporários; `bin/bluelab`
+continua inalterado nesta etapa.
 
 ## Regra de encerramento de etapas
 
