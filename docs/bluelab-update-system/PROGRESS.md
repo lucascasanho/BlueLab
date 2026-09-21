@@ -206,6 +206,29 @@ um banco isolado; todos falharam antes da carga dos exemplos com
 infraestrutura de teste, não uma falha de asserção do candidato. A validação no Blue
 deve observar migrations, boot e healthcheck antes de qualquer aprovação.
 
+### Candidato aplicado no Blue — 2026-09-21
+
+O candidato funcional `511f1045a195571bfba41c6f4cdf2007bc786261` foi publicado em
+`bluelab/BlueLab-Test` e aplicado no mastodon.blue por `blue-atualizar`. A primeira
+execução avançou o checkout, mas parou antes de migrations, assets e restart porque
+`vendor/bundle/ruby/4.0.0` continha extensões compiladas para Ruby 4.0.6. A árvore de
+361 MB foi preservada em `/tmp/blue-vendor-bundle-ruby-4.0.0-pre511f1045` e `bundle
+install` recompilou as 342 gems para Ruby 4.0.7. A reaplicação idempotente concluiu
+dependências Ruby/JavaScript, migrations sem pendências, sincronização de 200.683
+domínios descartáveis (21 novos), precompilação Vite e restart.
+
+Durante a reinstalação, o processo web anterior em memória respondeu uma vez HTTP 500
+em `/api/v2/instance` porque ainda referenciava a árvore de gems preservada. Após o
+restart final, iniciado às 10:21:31, o Puma declarou prontidão às 10:21:32. Os serviços
+`blue-web`, `blue-sidekiq` e `blue-streaming` estão ativos; `/health` local e público
+responderam `OK`, e `/api/v2/instance` local e público responderam com sucesso. Não há
+erros novos no journal após a prontidão. Os avisos de peer dependencies do Yarn e de
+configuração futura do Vite não bloquearam a instalação nem o build.
+
+`BlueLab` continua em `2dc5b74f572566acfed291ab7602a06be9c802d9`; não houve promoção
+para estável nem acesso à Espelunca. **Próximo passo:** confirmação manual do usuário
+no mastodon.blue para este candidato antes de qualquer promoção.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
