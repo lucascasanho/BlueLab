@@ -1,5 +1,6 @@
 import { FormattedMessage } from 'react-intl';
 
+import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 
 import { domain, termsOfServiceEnabled } from '@/mastodon/initial_state';
@@ -9,7 +10,8 @@ import classes from './footer_links.module.scss';
 export const NavigationFooterLinks: React.FC<{
   siteName?: string;
   multiColumn?: boolean;
-}> = ({ siteName = domain, multiColumn }) => {
+  variant?: 'default' | 'blue2';
+}> = ({ siteName = domain, multiColumn, variant = 'default' }) => {
   const multiColumnLinkAttrs = multiColumn
     ? {
         target: '_blank',
@@ -17,7 +19,12 @@ export const NavigationFooterLinks: React.FC<{
     : undefined;
 
   return (
-    <div className={classes.root}>
+    <div
+      className={classNames(
+        classes.root,
+        variant === 'blue2' && classes.rootBlue2,
+      )}
+    >
       <h2 className={classes.heading}>{siteName}</h2>
       <ul className={classes.list}>
         <li>

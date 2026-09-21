@@ -20,7 +20,7 @@ const GettingStarted: React.FC = () => {
         <div className='bluelab-advanced-footer-spacer' aria-hidden='true' />
       )}
 
-      <NavigationFooterLinks multiColumn />
+      <NavigationFooterLinks multiColumn variant='blue2' />
 
       <Helmet>
         <title>
