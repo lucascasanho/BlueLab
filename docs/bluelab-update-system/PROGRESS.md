@@ -229,6 +229,35 @@ configuração futura do Vite não bloquearam a instalação nem o build.
 para estável nem acesso à Espelunca. **Próximo passo:** confirmação manual do usuário
 no mastodon.blue para este candidato antes de qualquer promoção.
 
+### Correção de compatibilidade visual pós-upstream — 2026-09-21
+
+Após o teste manual do candidato upstream, foi relatado que o compositor no desktop
+perdera a aparência esperada e que os atalhos do menu inferior no mobile apareciam na
+lateral, sem cartão/borda. A causa do menu foi objetiva: a adaptação BlueLab preservou
+os links próprios, mas deixou de aplicar `floatingCard` ao `ul`; essa é a classe que
+define o cartão inferior no CSS upstream. O componente agora combina `floatingCard` e
+`list`, sem substituir o comportamento BlueLab dos links.
+
+O compositor e outras superfícies BlueLab ainda usam os nomes semânticos de espaços e
+raios anteriores à migração upstream para tokens numéricos. Como esses nomes deixaram
+de existir, declarações CSS com `var(...)` ficavam inválidas. O módulo global
+`app/javascript/bluelab/styles/_legacy_tokens.scss` restaura aliases explícitos para
+os tokens atuais, permitindo a migração gradual dos módulos BlueLab sem uma regressão
+visual ampla.
+
+O lote funcional foi publicado em `BlueLab-Test` no SHA
+`404d9fb20eac9d20971ed153186e7c99ac385d29` e aplicado no mastodon.blue por
+`blue-atualizar`. `git diff --check`, `yarn typecheck`, ESLint focal, Stylelint focal e
+`yarn build:production` passaram. O deploy idempotente concluiu dependências,
+migrations, assets e restart; `blue-web`, `blue-sidekiq` e `blue-streaming` estão
+ativos, enquanto `/health` e `/api/v2/instance` responderam com sucesso tanto local
+quanto publicamente.
+
+`BlueLab` e a Espelunca permanecem inalterados. **Próximo passo:** validar no
+mastodon.blue o compositor em desktop e a barra inferior em viewport mobile (após
+atualização forçada do navegador). Promover somente se o usuário aprovar
+explicitamente este SHA funcional.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
