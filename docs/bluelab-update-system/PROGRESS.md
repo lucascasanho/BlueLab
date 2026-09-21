@@ -401,6 +401,24 @@ publicamente. `BlueLab` e Espelunca seguem inalterados.
 avançado, confirmar que aparece a logo da instância em vez da logo Mastodon.
 Promover somente após confirmação explícita deste SHA.
 
+### Rodapé retrátil igual ao estável — 2026-09-21
+
+Uma comparação adicional com a versão estável mostrou que o rodapé retrátil também
+deveria manter três atalhos (notificações, mensagens e itens salvos) acima do card e
+usar o resumo compacto de perfil em vez do `Lockup` upstream. O candidato
+`c113266b93353e2704fad4bfdb5e0880f70eccff` restaura esses três atalhos e substitui,
+somente no `slide-out`, o resumo pelo link compacto estável: avatar de 32 px junto à
+borda interna, nome/handle e menu na mesma linha.
+
+TypeScript, ESLint, os 10 testes focalizados de sidebar/card e build de produção
+passaram. O SHA foi publicado em `BlueLab-Test` e aplicado por `blue-atualizar`;
+`blue-web`, `blue-sidekiq` e `blue-streaming` estão ativos, enquanto `/health` e
+`/api/v2/instance` responderam local e publicamente. `BlueLab` e Espelunca seguem
+inalterados.
+
+**Próximo passo:** validar que os três atalhos e o card no rodapé da sidebar retrátil
+correspondem à versão estável. Promover somente após confirmação explícita deste SHA.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
