@@ -419,6 +419,34 @@ inalterados.
 **Próximo passo:** validar que os três atalhos e o card no rodapé da sidebar retrátil
 correspondem à versão estável. Promover somente após confirmação explícita deste SHA.
 
+### Modo avançado restrito ao desktop — 2026-09-21
+
+O pedido final foi impedir que a preferência de modo avançado transforme celulares ou
+tablets em uma versão comprimida do desktop. O candidato
+`189198fd9a1063781e8d7522693bb84e809347d9` torna o limite completo do BlueLab
+(1174 px) o limiar para o modo avançado, exclusivamente quando o tema é `blue-2`.
+Até esse limite a aplicação usa uma única coluna e converte URLs `/deck` para a rota
+normal correspondente; assim, uma preferência avançada já salva não mantém colunas,
+trilhos ou compositor de desktop no dispositivo compacto.
+
+No mesmo intervalo, a área Blue2 passa a usar a navegação móvel já existente,
+inclusive gaveta e barra de ações, em vez de exibir a faixa avançada, a coluna direita
+ou o botão de publicação do desktop. Acima de 1174 px o modo avançado e sua faixa
+compacta permanecem inalterados. Outros temas não são afetados.
+
+`git diff --check`, `yarn tsc --noEmit` e `yarn build:production` passaram. O ESLint
+focal não encontrou erro no TypeScript; a configuração atual informa que o arquivo
+JSX legado não possui configuração correspondente. O SHA foi publicado em
+`BlueLab-Test` e aplicado por `blue-atualizar`; `blue-web`, `blue-sidekiq` e
+`blue-streaming` ficaram ativos, enquanto `/health` e `/api/v2/instance` responderam
+local e publicamente. `BlueLab` continua em
+`2dc5b74f572566acfed291ab7602a06be9c802d9` e a Espelunca não foi acessada.
+
+**Próximo passo:** no Blue, com o modo avançado ativo, testar um celular e um tablet
+(inclusive abrindo uma URL `/deck`): ambos devem abrir a interface móvel normal, com
+gaveta e sem colunas avançadas. Em desktop acima de 1174 px, confirmar que a faixa
+avançada continua disponível. Promover somente após confirmação explícita deste SHA.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
