@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
+import classNames from 'classnames';
 import { useLocation } from 'react-router';
 
 import {
@@ -41,7 +42,7 @@ export const RedesignMobileNavigation: React.FC = () => {
   return (
     <>
       <nav className={classes.root}>
-        <ul className={classes.list}>
+        <ul className={classNames(classes.floatingCard, classes.list)}>
           <MobileNavLink to='/home' iconComponent={HouseIcon}>
             <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
           </MobileNavLink>

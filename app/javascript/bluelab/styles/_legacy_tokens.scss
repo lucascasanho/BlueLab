@@ -1,0 +1,21 @@
+// BlueLab surfaces still use the semantic spacing and radius names that
+// preceded Mastodon's numeric token migration. Keep those names as aliases so
+// custom modules can be migrated incrementally without invalid CSS values.
+@mixin apply {
+  --space-3xs: var(--space-half);
+  --space-2xs: var(--space-1);
+  --space-xs: var(--space-2);
+  --space-sm: var(--space-3);
+  --space-md: var(--space-4);
+  --space-lg: var(--space-5);
+  --space-xl: var(--space-6);
+  --space-2xl: var(--space-7);
+  --space-3xl: var(--space-8);
+  --space-4xl: calc(var(--space-8) + var(--space-1));
+  --space-5xl: var(--space-10);
+  --radius-xs: var(--radius-2);
+  --radius-sm: var(--radius-3);
+  --radius-md: var(--radius-4);
+  --radius-lg: var(--radius-5);
+  --radius-xl: calc(var(--radius-5) + var(--radius-3));
+}

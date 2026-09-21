@@ -7,6 +7,7 @@
 
 @use 'mastodon/reset';
 @use 'mastodon/tokens';
+@use '../bluelab/styles/legacy_tokens';
 @use 'mastodon/basics';
 @use 'mastodon/branding';
 @use 'mastodon/containers';
@@ -24,3 +25,7 @@
 @use 'mastodon/dashboard';
 @use 'mastodon/rtl';
 @use 'mastodon/rich_text';
+
+html {
+  @include legacy_tokens.apply;
+}
