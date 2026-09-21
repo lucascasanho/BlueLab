@@ -121,6 +121,15 @@ No momento desta conferência, `bluelab/BlueLab` está em
 (`2` commits somente no estável e `286` somente no teste). Portanto, a promoção por
 fast-forward não é segura e deve ser diagnosticada, não forçada, caso seja solicitada.
 
+## Regra de encerramento de etapas
+
+Toda etapa funcional deste sistema deve ser publicada em `BlueLab-Test`, aplicada no
+mastodon.blue por `blue-atualizar` e verificada antes de ser considerada concluída. O
+checkpoint posterior deve registrar o SHA funcional aplicado, serviços, healthcheck,
+validações específicas e qualquer aviso ou falha. Um commit posterior que contenha
+somente o registro não exige novo deploy; ele documenta o deploy já verificado do SHA
+funcional. Essa rotina não promove `BlueLab` e não acessa a Espelunca.
+
 ## Comandos para continuar
 
 ```bash

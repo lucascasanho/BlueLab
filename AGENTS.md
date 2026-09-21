@@ -45,6 +45,20 @@ trabalho, conferir o arquivo contra `git status`, refs remotas e log; se houver
 diferença, corrigir o registro antes de avançar. O checkpoint não deve alegar que uma
 validação manual ou uma promoção ocorreu sem evidência correspondente.
 
+Ao encerrar cada etapa funcional desse sistema, seguir obrigatoriamente esta ordem:
+
+1. validar, fazer commit e publicar o lote em `BlueLab-Test`;
+2. aplicar o SHA publicado no mastodon.blue com `blue-atualizar`;
+3. verificar checkout, serviços e healthcheck, além das validações específicas da
+   etapa;
+4. registrar o resultado no `PROGRESS.md` e publicar esse checkpoint no mesmo canal.
+
+O checkpoint deve identificar o SHA funcional efetivamente aplicado no Blue, mesmo
+quando o commit posterior contém somente documentação. Uma falha de deploy ou de
+validação também deve ser registrada, e bloqueia o encerramento da etapa. Esta rotina
+não autoriza promoção de `BlueLab` nem qualquer operação na Espelunca: ambas continuam
+dependendo da aprovação explícita do usuário e das verificações de promoção abaixo.
+
 ## Regra de segurança de promoção
 
 Antes de mover `BlueLab`, confirmar que:
