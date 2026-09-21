@@ -447,6 +447,29 @@ local e publicamente. `BlueLab` continua em
 gaveta e sem colunas avançadas. Em desktop acima de 1174 px, confirmar que a faixa
 avançada continua disponível. Promover somente após confirmação explícita deste SHA.
 
+### Host do Compose no modo avançado — 2026-09-21
+
+Foi identificado que o botão de Compose integrado à faixa avançada já despachava
+`openNewComposer`, mas a remoção da coluna de compositor havia deixado o host do
+diálogo (`ComposeRedesignButton`) desmontado nesse layout. Por isso o estado mudava
+sem que houvesse um componente para renderizar o formulário.
+
+O candidato `202ecd3c38991cae1d1cd2f5c2b29c338bc0dbdb` monta esse host somente no
+layout avançado. Ele não cria outro botão, coluna ou elemento visível enquanto o
+compositor está fechado; a faixa continua sendo o único launcher. Ao clicar nela, o
+host compartilhado agora apresenta o diálogo BlueLab e preserva origem, minimizar e
+fechamento já usados pelos demais layouts.
+
+`git diff --check`, `yarn tsc --noEmit`, o teste focal da navegação retrátil (2
+testes) e `yarn build:production` passaram. O SHA foi publicado em `BlueLab-Test` e
+aplicado por `blue-atualizar`; `blue-web`, `blue-sidekiq` e `blue-streaming` ficaram
+ativos, e `/health` e `/api/v2/instance` responderam local e publicamente. `BlueLab`
+continua em `2dc5b74f572566acfed291ab7602a06be9c802d9`; a Espelunca não foi acessada.
+
+**Próximo passo:** no Blue, em desktop com modo avançado, clicar no Compose da faixa
+lateral, confirmar abertura do diálogo, digitar algo e testar minimizar/fechar.
+Promover somente após confirmação explícita deste SHA.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
