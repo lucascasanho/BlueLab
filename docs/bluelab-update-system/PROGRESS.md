@@ -139,9 +139,15 @@ de domínios, assets e restart concluíram. `blue-web`, `blue-sidekiq` e
 (`ae79d976`), tornando possível uma promoção por fast-forward após a confirmação
 manual do candidato reconciliado. `BlueLab` continua inalterada até essa aprovação.
 
-O próximo passo seguro é confirmar rapidamente a disponibilidade do Blue no candidato
-`ae79d976`. Após aprovação explícita, buscar as refs mais uma vez e promover esse
-mesmo commit por fast-forward para `BlueLab`.
+Após confirmação manual explícita, a pré-verificação confirmou que
+`BlueLab-Test` no commit `2dc5b74f572566acfed291ab7602a06be9c802d9` era descendente
+de `BlueLab` e correspondia exatamente ao candidato aprovado. Em 2026-09-20,
+`BlueLab` foi promovida por fast-forward para esse mesmo SHA. As duas branches remotas
+passaram a apontar para `2dc5b74`; não houve force-push, reconstrução por cherry-pick
+ou acesso à Espelunca.
+
+O próximo passo seguro é abrir a próxima etapa técnica definida na arquitetura do
+sistema de atualização, começando por sua análise e escopo antes de migrar código.
 
 ## Regra de encerramento de etapas
 
