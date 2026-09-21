@@ -59,6 +59,7 @@ export const NavigationAccountCardAndMenu: React.FC<{
   if (inSlideOut) {
     return (
       <div
+        className={classes.root}
         data-in-slide-out='true'
         onPointerDown={stopDrawerGesture}
         onTouchStart={stopDrawerGesture}

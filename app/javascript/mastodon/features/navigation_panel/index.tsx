@@ -44,6 +44,8 @@ import {
   remoteLiveFeedAccess,
   trendsEnabled,
   me,
+  customFavicon,
+  customInstanceLogo,
 } from 'mastodon/initial_state';
 import { transientSingleColumn } from 'mastodon/is_mobile';
 import { canViewFeed } from 'mastodon/permissions';
@@ -224,6 +226,9 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
   const location = useLocation();
   const showSearch = useBreakpoint('full') && !multiColumn;
   const account = useAccount(me);
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const instanceLogo = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
   const composerEditor = useAppSelector(selectComposerEditor);
   const dispatch = useAppDispatch();
   const handleOpenComposer = useCallback(
@@ -265,7 +270,17 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
           className='column-link column-link--logo'
           id={getNavigationSkipLinkId()}
         >
-          <WordmarkLogo />
+          {isBlue2 ? (
+            <img
+              src={instanceLogo}
+              alt=''
+              width={32}
+              height={32}
+              style={{ objectFit: 'contain' }}
+            />
+          ) : (
+            <WordmarkLogo />
+          )}
         </Link>
       </div>
 
