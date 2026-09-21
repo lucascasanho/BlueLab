@@ -142,7 +142,7 @@ export const Blue2Navigation: React.FC<{
           <CaretRightIcon size={24} />
         </button>
       )}
-      {signedIn && <Blue2AccountMenu />}
+      {signedIn && <Blue2AccountMenu compact={compact && !expanded} />}
 
       <div className={classes.items}>
         <Item to='/explore' icon={Blue2SearchIcon}>

@@ -42,3 +42,9 @@
     width: 264px;
   }
 }
+
+@media (max-width: ($mobile-menu-breakpoint - 1)) {
+  .root {
+    padding-inline: 0;
+  }
+}

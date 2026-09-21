@@ -422,16 +422,18 @@ export const ColumnsAreaRedesign: React.FC<{
       })}
       tabIndex={isModalOpen ? undefined : 0}
     >
-      <aside
-        className={multiColClasses.navigationRail}
-        data-expanded={isBlue2AdvancedNavigationExpanded}
-      >
-        <Blue2Navigation
-          compact
-          expanded={isBlue2AdvancedNavigationExpanded}
-          onToggleExpanded={handleToggleBlue2AdvancedNavigation}
-        />
-      </aside>
+      {!isMobile && (
+        <aside
+          className={multiColClasses.navigationRail}
+          data-expanded={isBlue2AdvancedNavigationExpanded}
+        >
+          <Blue2Navigation
+            compact
+            expanded={isBlue2AdvancedNavigationExpanded}
+            onToggleExpanded={handleToggleBlue2AdvancedNavigation}
+          />
+        </aside>
+      )}
       <MultiColumnContent>{children}</MultiColumnContent>
     </main>
   );
