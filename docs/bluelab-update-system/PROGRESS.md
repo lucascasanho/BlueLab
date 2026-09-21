@@ -118,6 +118,12 @@ install --immutable`, migrations, sincronização de domínios, precompilação 
   `NEEDS_SEMANTIC_REVIEW` sem tocar a árvore ativa. O relatório revelou que conflitos
   ainda não eram associados a domínios; a correção adiciona essa classificação e um
   teste específico de conflito antes da repetição da simulação.
+- A correção foi publicada em `BlueLab-Test` no SHA `cd59fccfc2` e aplicada no Blue;
+  serviços ativos e healthcheck `OK`. A repetição contra `upstream/main`
+  (`398b542652`) voltou `NEEDS_SEMANTIC_REVIEW` com 19 conflitos e relatório em
+  `$BLUELAB_STATE_DIR/transactions/`. Os caminhos foram classificados entre
+  `rich-composer`, `blue2-shell-navigation`, `quotes-and-media-downloads` e
+  `UNCLASSIFIED`; não houve merge, mudança de branch, serviço, banco ou Espelunca.
 
 O hook local também executou `yarn i18n:extract`, que apontou diferenças já
 existentes em `app/javascript/mastodon/locales/en.json` (chaves sem relação com este
@@ -164,8 +170,9 @@ O plano de execução transacional em worktree e seu relatório foi definido em
 e proibição de alterar a árvore ativa. O protótipo
 `bin/bluelab-transaction-plan` foi implementado e testado apenas contra repositórios
 Git temporários; `bin/bluelab` continua inalterado. O próximo passo seguro é executar
-a simulação contra a ref upstream real e revisar seu relatório, sem integrar ou
-implantar qualquer atualização upstream.
+a análise dos caminhos `UNCLASSIFIED` e a revisão semântica dos domínios em conflito.
+Não integrar ou implantar qualquer atualização upstream antes de registrar essa
+decisão por domínio.
 
 ## Regra de encerramento de etapas
 
