@@ -7,9 +7,8 @@ transacional, validada por manifesto, sem promoção ou acesso à Espelunca.
 
 ## Fase atual
 
-Fases 0–2 concluídas e documentadas. A primeira fronteira B de baixo risco foi
-migrada, teve validação automatizada e foi aplicada no Blue. A validação visual/manual
-do shell Blue2 ainda está pendente; `BlueLab` não foi promovida.
+Fases 0–2 concluídas, validadas e promovidas. A fase seguinte iniciou a validação
+executável do manifesto, sem alterar a rotina de atualização ativa.
 
 ## Último checkpoint concluído
 
@@ -105,6 +104,9 @@ install --immutable`, migrations, sincronização de domínios, precompilação 
   interromperam a instalação.
 - Após o restart, os três serviços ficaram ativos. O journal registrou o Puma pronto
   em `http://127.0.0.1:3000/health`; a consulta HTTP ao healthcheck retornou `OK`.
+- `ruby bin/bluelab-manifest-validate`: passou para o manifesto com 21 domínios.
+- `ruby test/bluelab_manifest_validator_test.rb`: 3 testes e 6 asserções passaram;
+  cobre manifesto válido, ID duplicado e caminho fora do repositório.
 
 O hook local também executou `yarn i18n:extract`, que apontou diferenças já
 existentes em `app/javascript/mastodon/locales/en.json` (chaves sem relação com este
@@ -146,8 +148,9 @@ de `BlueLab` e correspondia exatamente ao candidato aprovado. Em 2026-09-20,
 passaram a apontar para `2dc5b74`; não houve force-push, reconstrução por cherry-pick
 ou acesso à Espelunca.
 
-O próximo passo seguro é abrir a próxima etapa técnica definida na arquitetura do
-sistema de atualização, começando por sua análise e escopo antes de migrar código.
+O próximo passo seguro é publicar e aplicar no Blue o validador do manifesto. Depois
+do checkpoint de deploy, definir o plano de execução transacional em worktree e seu
+relatório, sem substituir `bin/bluelab` nesta etapa.
 
 ## Regra de encerramento de etapas
 
