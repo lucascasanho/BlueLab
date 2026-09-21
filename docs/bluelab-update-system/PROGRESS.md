@@ -310,6 +310,24 @@ publicamente. `BlueLab` e Espelunca seguem inalterados.
 botão de publicação sem coluna própria e os rótulos no idioma da interface. Só
 promover após aprovação explícita deste SHA.
 
+### Faixa compacta do modo avançado — 2026-09-21
+
+Em vez de um botão de menu flutuante, o candidato
+`33d38bbffa9eb92337a2cce348e3d9f102b9c85b` mantém uma faixa lateral esquerda de
+76 px no modo avançado. Ela mostra os ícones de navegação e o Compose BlueLab sem
+rótulos; seu primeiro controle expande e recolhe a própria faixa para o menu completo.
+O Compose pertence a essa faixa, portanto não há botão flutuante nem coluna de
+compositor. A expansão continua funcionando também nas larguras intermediárias.
+
+TypeScript, ESLint focal, Stylelint, 14 testes focalizados e build de produção
+passaram. O SHA foi publicado em `BlueLab-Test` e aplicado por `blue-atualizar`;
+`blue-web`, `blue-sidekiq` e `blue-streaming` estão ativos, e `/health` e
+`/api/v2/instance` responderam local e publicamente. `BlueLab` e Espelunca
+permanecem inalterados.
+
+**Próximo passo:** validar no Blue a faixa compacta, sua expansão/recolhimento e o
+botão de Compose integrado. Promover somente após confirmação explícita deste SHA.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
