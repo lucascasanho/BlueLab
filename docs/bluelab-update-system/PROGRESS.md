@@ -189,6 +189,23 @@ publicar o commit de merge em `BlueLab-Test`, executar `blue-atualizar`, validar
 Blue e registrar o SHA realmente aplicado. Não promover `BlueLab` e não executar
 `espelunca-atualizar` nesta etapa.
 
+### Gate Ruby reaberto — 2026-09-21
+
+Ruby 4.0.7 foi provisionado com `rbenv` em
+`/home/blue/.rbenv/versions/4.0.7`. Para obter a definição, o checkout limpo do
+plugin `ruby-build` foi atualizado por fast-forward de `13b73fe9` para `01800b05`;
+nenhuma configuração do repositório BlueLab foi alterada por essa atualização. No
+worktree do candidato, `ruby --version` confirmou `ruby 4.0.7` e `bundle install`
+concluiu as 154 dependências do Gemfile (342 gems).
+
+`bundle exec rubocop --force-exclusion` passou nos 13 arquivos Ruby alterados pelo
+merge. Os três specs Rails diretamente afetados não executaram exemplos porque este
+host não tem PostgreSQL de teste disponível e também não possui Docker para levantar
+um banco isolado; todos falharam antes da carga dos exemplos com
+`ActiveRecord::ConnectionNotEstablished` para o socket local. Esse é um limite de
+infraestrutura de teste, não uma falha de asserção do candidato. A validação no Blue
+deve observar migrations, boot e healthcheck antes de qualquer aprovação.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
