@@ -7,7 +7,6 @@ import { NavLink } from 'react-router-dom';
 import { StackIcon } from '@phosphor-icons/react';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
-import { ComposeIcon } from '@/mastodon/components/compose_icon';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
@@ -23,6 +22,7 @@ import { Blue2Announcements } from './announcements';
 import {
   Blue2BellIcon,
   Blue2BookmarkIcon,
+  Blue2ComposeIcon,
   Blue2FeedIcon,
   Blue2ListIcon,
   Blue2MessageIcon,
@@ -68,7 +68,9 @@ const Item: React.FC<ItemProps> = ({
   </NavLink>
 );
 
-export const Blue2Navigation: React.FC = () => {
+export const Blue2Navigation: React.FC<{ onCompose?: () => void }> = ({
+  onCompose,
+}) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const { accountId, signedIn } = useIdentity();
@@ -85,8 +87,9 @@ export const Blue2Navigation: React.FC = () => {
           origin: composerOriginFromElement(event.currentTarget),
         }),
       );
+      onCompose?.();
     },
-    [dispatch],
+    [dispatch, onCompose],
   );
 
   const profilePath = account?.acct ? `/@${account.acct}` : '/home';
@@ -185,7 +188,7 @@ export const Blue2Navigation: React.FC = () => {
           type='button'
           onClick={openComposer}
         >
-          <ComposeIcon size={19} />
+          <Blue2ComposeIcon size={19} />
           <span>{blue2Text(intl.locale, 'write')}</span>
         </button>
       )}

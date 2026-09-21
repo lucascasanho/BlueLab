@@ -30,6 +30,8 @@ import { getOrderedLists } from '@/mastodon/selectors/lists';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
+import { Blue2ComposeIcon } from '../../blue2/icons';
+
 import { NavigationAccountCardAndMenu } from './account_card_and_menu';
 import { NavigationFooterLinks } from './footer_links';
 import { NavigationHeader } from './header';
@@ -101,6 +103,8 @@ export const RedesignNavigationPanel: React.FC<{
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
   );
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   const openComposer = useCallback(() => {
     dispatch(closeNavigation());
@@ -137,7 +141,7 @@ export const RedesignNavigationPanel: React.FC<{
               withSpaceAfter
               as='button'
               onClick={openComposer}
-              iconComponent={PenNibIcon}
+              iconComponent={isBlue2 ? Blue2ComposeIcon : PenNibIcon}
             >
               <FormattedMessage
                 id='tabs_bar.publish'
@@ -284,20 +288,24 @@ export const RedesignNavigationPanel: React.FC<{
                 <NavigationAccountCardAndMenu />
               </>
             )}
-            <NavigationFooterLinks
-              multiColumn={multiColumn}
-              siteName={siteName}
-            />
+            {!multiColumn && (
+              <NavigationFooterLinks
+                multiColumn={multiColumn}
+                siteName={siteName}
+              />
+            )}
           </footer>
         </>
       )}
       {!signedIn && (
         <footer className={classes.footer} data-stuck={!isScrolledToBottom}>
           {disabledAccountId ? <DisabledAccountBanner /> : <LoggedOutInfo />}
-          <NavigationFooterLinks
-            multiColumn={multiColumn}
-            siteName={siteName}
-          />
+          {!multiColumn && (
+            <NavigationFooterLinks
+              multiColumn={multiColumn}
+              siteName={siteName}
+            />
+          )}
         </footer>
       )}
       {bottomSensor}

@@ -284,7 +284,8 @@
   display: none;
 }
 
-.blue2MobileRailBackdrop {
+.blue2MobileRailBackdrop,
+.blue2MobileNavigationBackdrop {
   position: absolute;
   inset: 0;
   border: 0;
@@ -425,6 +426,49 @@
       .blue2MobileRailDrawer {
         transform: translateX(0);
       }
+    }
+  }
+
+  .blue2MobileNavigationOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 240;
+    display: block;
+    pointer-events: none;
+    opacity: 0;
+    background: rgb(0 0 0 / 48%);
+    transition: opacity 180ms ease;
+
+    &[data-is-open='true'] {
+      pointer-events: auto;
+      opacity: 1;
+
+      .blue2MobileNavigationDrawer {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  .blue2MobileNavigationDrawer {
+    position: absolute;
+    z-index: 1;
+    inset-block: 0;
+    inset-inline-start: 0;
+    box-sizing: border-box;
+    width: min(280px, calc(100vw - 48px));
+    max-width: 100%;
+    overflow: hidden;
+    background: var(--blue2-bg, #000);
+    border-inline-end: 1px solid var(--blue2-border-soft, #17232c);
+    box-shadow: 14px 0 34px rgb(0 0 0 / 24%);
+    transform: translateX(-100%);
+    transition: transform 200ms ease;
+
+    > * {
+      position: static !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: 100dvh;
     }
   }
 

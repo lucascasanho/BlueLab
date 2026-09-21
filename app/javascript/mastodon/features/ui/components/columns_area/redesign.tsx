@@ -9,7 +9,6 @@ import { HashIcon } from '@phosphor-icons/react';
 
 // BLUELAB_INTEGRATION: optional BlueLab shell widgets and localized labels.
 import { blue2Text } from '@/bluelab/i18n/blue2';
-import { openNavigation } from '@/mastodon/actions/navigation';
 import { Blue2Announcements } from '@/mastodon/features/blue2/announcements';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
 import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
@@ -20,7 +19,7 @@ import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/re
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
 import { ComposePanel } from '@/mastodon/features/ui/components/compose_panel';
 import { customFavicon, customInstanceLogo } from '@/mastodon/initial_state';
-import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import { useAppSelector } from '@/mastodon/store';
 import MenuIcon from '@/material-icons/400-24px/menu.svg?react';
 import { Footer } from 'mastodon/features/custom_homepage/components/footer';
 import { Header } from 'mastodon/features/custom_homepage/components/header';
@@ -56,12 +55,13 @@ export const ColumnsAreaRedesign: React.FC<{
   ref?: React.Ref<HTMLDivElement>;
 }> = ({ children, minimalShell, singleColumn, ref }) => {
   const intl = useIntl();
-  const dispatch = useAppDispatch();
   const history = useHistory();
   const location = useLocation();
   const swipeOrigin = useRef<{ x: number; y: number } | null>(null);
   const railSwipeOrigin = useRef<{ x: number; y: number } | null>(null);
   const [isBlue2MobileRailOpen, setIsBlue2MobileRailOpen] = useState(false);
+  const [isBlue2MobileNavigationOpen, setIsBlue2MobileNavigationOpen] =
+    useState(false);
   const isModalOpen = useAppSelector(
     (state) => !state.modal.get('stack').isEmpty(),
   );
@@ -80,6 +80,7 @@ export const ColumnsAreaRedesign: React.FC<{
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       setIsBlue2MobileRailOpen(false);
+      setIsBlue2MobileNavigationOpen(false);
     });
 
     return () => {
@@ -88,8 +89,12 @@ export const ColumnsAreaRedesign: React.FC<{
   }, [location.pathname]);
 
   const handleOpenBlue2Navigation = useCallback(() => {
-    dispatch(openNavigation());
-  }, [dispatch]);
+    setIsBlue2MobileNavigationOpen(true);
+  }, []);
+
+  const handleCloseBlue2Navigation = useCallback(() => {
+    setIsBlue2MobileNavigationOpen(false);
+  }, []);
 
   const handleOpenBlue2MobileRail = useCallback(() => {
     setIsBlue2MobileRailOpen(true);
@@ -334,6 +339,26 @@ export const ColumnsAreaRedesign: React.FC<{
 
         {isMobile && (
           <div
+            className={classes.blue2MobileNavigationOverlay}
+            data-is-open={isBlue2MobileNavigationOpen}
+          >
+            <button
+              type='button'
+              className={classes.blue2MobileNavigationBackdrop}
+              onClick={handleCloseBlue2Navigation}
+              aria-label={intl.formatMessage({
+                id: 'bundle_modal_error.close',
+                defaultMessage: 'Close',
+              })}
+            />
+            <aside className={classes.blue2MobileNavigationDrawer}>
+              <Blue2Navigation onCompose={handleCloseBlue2Navigation} />
+            </aside>
+          </div>
+        )}
+
+        {isMobile && (
+          <div
             className={classes.blue2MobileRailOverlay}
             data-is-open={isBlue2MobileRailOpen}
           >
@@ -389,7 +414,7 @@ export const ColumnsAreaRedesign: React.FC<{
       tabIndex={isModalOpen ? undefined : 0}
     >
       <div className={multiColClasses.navigationWrapper}>
-        <RedesignNavigationPanel />
+        <RedesignNavigationPanel multiColumn />
       </div>
       <ComposeRedesignButton />
       <MultiColumnContent>{children}</MultiColumnContent>
