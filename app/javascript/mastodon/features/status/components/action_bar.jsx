@@ -14,7 +14,7 @@ import ReplyAllIcon from '@/material-icons/400-24px/reply_all.svg?react';
 import StarIcon from '@/material-icons/400-24px/star-fill.svg?react';
 import StarBorderIcon from '@/material-icons/400-24px/star.svg?react';
 import { injectIntl } from '@/mastodon/components/intl';
-import { BoostButton } from '@/mastodon/components/status/boost_button';
+import { BoostButton } from '@/mastodon/components/status/legacy/boost_button';
 import { quoteItemState } from '@/mastodon/components/status/boost_button_utils';
 import { buildMediaDownloadMenuItems } from '@/mastodon/components/status_action_bar/media_downloads';
 import { selectStatusConditions } from '@/mastodon/selectors/statuses';

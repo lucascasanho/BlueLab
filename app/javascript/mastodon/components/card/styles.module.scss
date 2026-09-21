@@ -37,7 +37,7 @@ a.root {
 }
 
 .title {
-  @include mixins.type-label-md;
+  @include mixins.type-meta;
 
   align-items: center;
   color: var(--color-text-secondary);
@@ -81,7 +81,7 @@ a.root {
 }
 
 .body {
-  @include mixins.type-label-lg;
+  @include mixins.type-label;
 
   overflow-wrap: anywhere;
   flex-grow: 1;
