@@ -9,7 +9,7 @@
   flex: 1 1 auto;
   justify-content: flex-start;
   gap: var(--multi-column-gap);
-  padding-inline-end: var(--multi-column-gap);
+  padding-inline: calc(76px + var(--multi-column-gap)) var(--multi-column-gap);
   overflow-x: auto;
 }
 
@@ -27,79 +27,18 @@
   }
 }
 
-.navigationTrigger {
+.navigationRail {
   position: fixed;
   z-index: 102;
-  inset-block-start: var(--space-4);
-  inset-inline-start: var(--space-4);
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  border: 1px solid var(--blue2-border-soft, #17232c);
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  background: var(--blue2-bg, #000);
-  color: var(--blue2-text, #f7f7f8);
-  cursor: pointer;
-
-  &:hover,
-  &:focus-visible {
-    background: var(--blue2-hover, #111820);
-    outline: none;
-  }
-}
-
-.navigationOverlay {
-  position: fixed;
-  z-index: 101;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0;
-  background: rgb(0 0 0 / 48%);
-  transition: opacity 180ms ease;
-
-  &[data-is-open='true'] {
-    pointer-events: auto;
-    opacity: 1;
-
-    .navigationDrawer {
-      transform: translateX(0);
-    }
-  }
-}
-
-.navigationBackdrop {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-.navigationDrawer {
-  position: absolute;
   inset-block: 0;
   inset-inline-start: 0;
-  width: min(320px, calc(100vw - 48px));
+  width: 76px;
   overflow: hidden;
   background: var(--blue2-bg, #000);
   border-inline-end: 1px solid var(--blue2-border-soft, #17232c);
-  box-shadow: 14px 0 34px rgb(0 0 0 / 24%);
-  transform: translateX(-100%);
-  transition: transform 200ms ease;
+  transition: width 200ms ease;
 
-  > * {
-    height: 100%;
+  &[data-expanded='true'] {
+    width: 264px;
   }
-}
-
-.composeButton {
-  position: fixed;
-  z-index: 100;
-  inset-inline-end: var(--space-4);
-  bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
 }

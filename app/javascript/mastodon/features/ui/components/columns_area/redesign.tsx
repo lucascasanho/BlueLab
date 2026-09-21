@@ -11,10 +11,7 @@ import { HashIcon } from '@phosphor-icons/react';
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import { Blue2Announcements } from '@/mastodon/features/blue2/announcements';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
-import {
-  Blue2ComposeButton,
-  Blue2Navigation,
-} from '@/mastodon/features/blue2/navigation';
+import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
@@ -65,8 +62,10 @@ export const ColumnsAreaRedesign: React.FC<{
   const [isBlue2MobileRailOpen, setIsBlue2MobileRailOpen] = useState(false);
   const [isBlue2MobileNavigationOpen, setIsBlue2MobileNavigationOpen] =
     useState(false);
-  const [isBlue2AdvancedNavigationOpen, setIsBlue2AdvancedNavigationOpen] =
-    useState(false);
+  const [
+    isBlue2AdvancedNavigationExpanded,
+    setIsBlue2AdvancedNavigationExpanded,
+  ] = useState(false);
   const isModalOpen = useAppSelector(
     (state) => !state.modal.get('stack').isEmpty(),
   );
@@ -86,7 +85,7 @@ export const ColumnsAreaRedesign: React.FC<{
     const frame = requestAnimationFrame(() => {
       setIsBlue2MobileRailOpen(false);
       setIsBlue2MobileNavigationOpen(false);
-      setIsBlue2AdvancedNavigationOpen(false);
+      setIsBlue2AdvancedNavigationExpanded(false);
     });
 
     return () => {
@@ -102,12 +101,8 @@ export const ColumnsAreaRedesign: React.FC<{
     setIsBlue2MobileNavigationOpen(false);
   }, []);
 
-  const handleOpenBlue2AdvancedNavigation = useCallback(() => {
-    setIsBlue2AdvancedNavigationOpen(true);
-  }, []);
-
-  const handleCloseBlue2AdvancedNavigation = useCallback(() => {
-    setIsBlue2AdvancedNavigationOpen(false);
+  const handleToggleBlue2AdvancedNavigation = useCallback(() => {
+    setIsBlue2AdvancedNavigationExpanded((expanded) => !expanded);
   }, []);
 
   const handleOpenBlue2MobileRail = useCallback(() => {
@@ -427,36 +422,16 @@ export const ColumnsAreaRedesign: React.FC<{
       })}
       tabIndex={isModalOpen ? undefined : 0}
     >
-      <button
-        type='button'
-        className={multiColClasses.navigationTrigger}
-        onClick={handleOpenBlue2AdvancedNavigation}
-        aria-label={intl.formatMessage({
-          id: 'navigation_bar.menu',
-          defaultMessage: 'Menu',
-        })}
-        aria-expanded={isBlue2AdvancedNavigationOpen}
+      <aside
+        className={multiColClasses.navigationRail}
+        data-expanded={isBlue2AdvancedNavigationExpanded}
       >
-        <MenuIcon width={28} height={28} fill='currentColor' />
-      </button>
-      <div
-        className={multiColClasses.navigationOverlay}
-        data-is-open={isBlue2AdvancedNavigationOpen}
-      >
-        <button
-          type='button'
-          className={multiColClasses.navigationBackdrop}
-          onClick={handleCloseBlue2AdvancedNavigation}
-          aria-label={intl.formatMessage({
-            id: 'bundle_modal_error.close',
-            defaultMessage: 'Close',
-          })}
+        <Blue2Navigation
+          compact
+          expanded={isBlue2AdvancedNavigationExpanded}
+          onToggleExpanded={handleToggleBlue2AdvancedNavigation}
         />
-        <aside className={multiColClasses.navigationDrawer}>
-          <RedesignNavigationPanel multiColumn />
-        </aside>
-      </div>
-      <Blue2ComposeButton className={multiColClasses.composeButton} />
+      </aside>
       <MultiColumnContent>{children}</MultiColumnContent>
     </main>
   );

@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 
-import { StackIcon } from '@phosphor-icons/react';
+import { CaretRightIcon, StackIcon } from '@phosphor-icons/react';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import { useAccount } from '@/mastodon/hooks/useAccount';
@@ -104,9 +104,12 @@ const Item: React.FC<ItemProps> = ({
   </NavLink>
 );
 
-export const Blue2Navigation: React.FC<{ onCompose?: () => void }> = ({
-  onCompose,
-}) => {
+export const Blue2Navigation: React.FC<{
+  onCompose?: () => void;
+  compact?: boolean;
+  expanded?: boolean;
+  onToggleExpanded?: () => void;
+}> = ({ onCompose, compact, expanded, onToggleExpanded }) => {
   const intl = useIntl();
   const { accountId, signedIn } = useIdentity();
   const account = useAccount(accountId);
@@ -120,7 +123,25 @@ export const Blue2Navigation: React.FC<{ onCompose?: () => void }> = ({
     : '/home';
 
   return (
-    <nav className={classes.root} aria-label='BLUE 2.0'>
+    <nav
+      className={classNames(
+        classes.root,
+        compact && classes.rootCompact,
+        expanded && classes.rootExpanded,
+      )}
+      aria-label='BLUE 2.0'
+    >
+      {compact && (
+        <button
+          type='button'
+          className={classes.expandButton}
+          onClick={onToggleExpanded}
+          aria-label={expanded ? 'Collapse menu' : 'Expand menu'}
+          aria-expanded={expanded}
+        >
+          <CaretRightIcon size={24} />
+        </button>
+      )}
       {signedIn && <Blue2AccountMenu />}
 
       <div className={classes.items}>
