@@ -129,6 +129,12 @@ install --immutable`, migrations, sincronização de domínios, precompilação 
   ao domínio de status e mídia. `app/javascript/mastodon/locales/en.json` permanece
   `UNCLASSIFIED`, pois agrega mensagens de vários domínios e não deve receber
   classificação automática.
+- O mapeamento foi publicado no SHA `bc7f7b03b8` e aplicado no Blue; serviços ativos
+  e healthcheck `OK`. A simulação repetida contra o mesmo `upstream/main` manteve
+  `NEEDS_SEMANTIC_REVIEW` e 19 conflitos, agora distribuídos em 7 do shell, 6 de
+  status/mídia, 5 do composer rico e somente 1 `UNCLASSIFIED` (`locales/en.json`).
+  Nenhum conflito foi resolvido, integrado, publicado como upstream ou enviado à
+  Espelunca.
 
 O hook local também executou `yarn i18n:extract`, que apontou diferenças já
 existentes em `app/javascript/mastodon/locales/en.json` (chaves sem relação com este
