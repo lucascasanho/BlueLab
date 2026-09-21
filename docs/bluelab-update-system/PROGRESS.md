@@ -107,6 +107,10 @@ install --immutable`, migrations, sincronização de domínios, precompilação 
 - `ruby bin/bluelab-manifest-validate`: passou para o manifesto com 21 domínios.
 - `ruby test/bluelab_manifest_validator_test.rb`: 3 testes e 6 asserções passaram;
   cobre manifesto válido, ID duplicado e caminho fora do repositório.
+- O validador foi publicado em `BlueLab-Test` no SHA
+  `4f6b4bd99e` e aplicado no Blue por `blue-atualizar`. Dependências, migrations,
+  sincronização de domínios, assets e restart concluíram; `blue-web`,
+  `blue-sidekiq` e `blue-streaming` ficaram ativos e o healthcheck retornou `OK`.
 
 O hook local também executou `yarn i18n:extract`, que apontou diferenças já
 existentes em `app/javascript/mastodon/locales/en.json` (chaves sem relação com este
@@ -148,9 +152,9 @@ de `BlueLab` e correspondia exatamente ao candidato aprovado. Em 2026-09-20,
 passaram a apontar para `2dc5b74`; não houve force-push, reconstrução por cherry-pick
 ou acesso à Espelunca.
 
-O próximo passo seguro é publicar e aplicar no Blue o validador do manifesto. Depois
-do checkpoint de deploy, definir o plano de execução transacional em worktree e seu
-relatório, sem substituir `bin/bluelab` nesta etapa.
+O próximo passo seguro é definir o plano de execução transacional em worktree e seu
+relatório, usando o validador do manifesto como pré-condição, sem substituir
+`bin/bluelab` nesta etapa.
 
 ## Regra de encerramento de etapas
 
