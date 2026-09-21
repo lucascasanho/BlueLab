@@ -122,6 +122,18 @@ Validar manualmente o shell Blue2 no Blue. Enquanto o lote estiver em teste, `Bl
 deve permanecer inalterada. Após aprovação explícita do usuário, comparar novamente
 as refs e promover somente por fast-forward o commit exato aprovado.
 
+Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
+para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
+`BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
+do estável são `f9ae9dfc41` e `e1e2672`, ambos ligados à ponte final do atualizador da
+Espelunca e com alterações em `bin/bluelab`; o canal de testes tem 289 commits
+exclusivos. Não usar force-push, reset ou cherry-pick para contornar a divergência.
+
+O próximo passo seguro para uma promoção futura é avaliar e, se autorizado, integrar
+não destrutivamente os dois commits estáveis em `BlueLab-Test`, aplicar esse novo lote
+no Blue por `blue-atualizar` e validá-lo novamente. A aprovação de `f4cfc66` não
+aprova automaticamente essa composição nova.
+
 No momento desta conferência, `bluelab/BlueLab` está em
 `e1e2672fc34b08e5d1bf92f2528f81f70cc22657` e diverge de `bluelab/BlueLab-Test`
 (`2` commits somente no estável e `286` somente no teste). Portanto, a promoção por
