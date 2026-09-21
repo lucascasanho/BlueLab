@@ -32,9 +32,20 @@ class BlueLabTransactionPlannerTest < Minitest::Test
     end
   end
 
+  def test_conflict_is_classified_by_manifest_domain
+    with_repository('README.md', conflict: true) do |repo, state_dir|
+      result = planner(repo, state_dir).run
+
+      assert_equal 'NEEDS_SEMANTIC_REVIEW', result.status
+      report = JSON.parse(File.read(result.report_path))
+      assert_equal ['README.md'], report.fetch('conflicts')
+      assert_equal 'sample-domain', report.fetch('domains').first.fetch('id')
+    end
+  end
+
   private
 
-  def with_repository(changed_path)
+  def with_repository(changed_path, conflict: false)
     Dir.mktmpdir('bluelab-transaction-test-') do |directory|
       repo = File.join(directory, 'repo')
       state_dir = File.join(directory, 'state')
@@ -51,6 +62,11 @@ class BlueLabTransactionPlannerTest < Minitest::Test
       execute('git', '-C', repo, 'add', changed_path)
       execute('git', '-C', repo, 'commit', '-m', 'candidate')
       execute('git', '-C', repo, 'switch', 'main')
+      if conflict
+        File.write(File.join(repo, changed_path), "test branch\n")
+        execute('git', '-C', repo, 'add', changed_path)
+        execute('git', '-C', repo, 'commit', '-m', 'test branch change')
+      end
       yield repo, state_dir
     end
   end

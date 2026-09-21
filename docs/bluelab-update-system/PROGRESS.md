@@ -111,8 +111,13 @@ install --immutable`, migrations, sincronização de domínios, precompilação 
   `4f6b4bd99e` e aplicado no Blue por `blue-atualizar`. Dependências, migrations,
   sincronização de domínios, assets e restart concluíram; `blue-web`,
   `blue-sidekiq` e `blue-streaming` ficaram ativos e o healthcheck retornou `OK`.
-- `ruby test/bluelab_transaction_planner_test.rb`: 2 testes e 8 asserções passaram;
-  confirma que a simulação preserva o checkout ativo e bloqueia caminhos sem domínio.
+- `ruby test/bluelab_transaction_planner_test.rb`: 3 testes e 11 asserções passaram;
+  confirma que a simulação preserva o checkout ativo, bloqueia caminhos sem domínio e
+  classifica conflitos pelo manifesto.
+- A primeira simulação real contra `upstream/main` encontrou 19 conflitos e retornou
+  `NEEDS_SEMANTIC_REVIEW` sem tocar a árvore ativa. O relatório revelou que conflitos
+  ainda não eram associados a domínios; a correção adiciona essa classificação e um
+  teste específico de conflito antes da repetição da simulação.
 
 O hook local também executou `yarn i18n:extract`, que apontou diferenças já
 existentes em `app/javascript/mastodon/locales/en.json` (chaves sem relação com este

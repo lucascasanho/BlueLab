@@ -45,6 +45,7 @@ module BlueLab
 
         if !merge.success? || !conflicts.empty?
           run_git(worktree, 'merge', '--abort', allow_failure: true)
+          domains = classify(manifest, conflicts)
           return write_result(
             'NEEDS_SEMANTIC_REVIEW',
             started_at,
@@ -53,6 +54,7 @@ module BlueLab
             manifest:,
             conflicts:,
             changed_paths: conflicts,
+            domains:,
             errors: ['merge textual exige revisão humana']
           )
         end
