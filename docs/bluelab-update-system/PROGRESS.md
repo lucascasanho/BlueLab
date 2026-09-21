@@ -112,15 +112,12 @@ catálogo). A árvore foi restaurada pelo hook e esse arquivo não integra o lot
 
 ## Testes pendentes
 
-Permanece pendente uma validação visual/manual do shell Blue2 no canal de testes no
-SHA `f4cfc66`. Ela deve confirmar rótulos em um locale regional e em um locale sem
-tradução, navegação, right rail, painel e direct timeline.
+Permanece pendente uma confirmação manual curta do candidato reconciliado
+`ae79d9768aa076a9aa91a0d98c8654332e724b0b` no Blue. A árvore desse commit é idêntica
+à do candidato antes da reconciliação, já aprovado visualmente; a confirmação deve
+garantir que o Blue continua disponível após a implantação do novo SHA.
 
 ## Próximo passo exato
-
-Validar manualmente o shell Blue2 no Blue. Enquanto o lote estiver em teste, `BlueLab`
-deve permanecer inalterada. Após aprovação explícita do usuário, comparar novamente
-as refs e promover somente por fast-forward o commit exato aprovado.
 
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
@@ -129,15 +126,22 @@ do estável são `f9ae9dfc41` e `e1e2672`, ambos ligados à ponte final do atual
 Espelunca e com alterações em `bin/bluelab`; o canal de testes tem 289 commits
 exclusivos. Não usar force-push, reset ou cherry-pick para contornar a divergência.
 
-O próximo passo seguro para uma promoção futura é avaliar e, se autorizado, integrar
-não destrutivamente os dois commits estáveis em `BlueLab-Test`, aplicar esse novo lote
-no Blue por `blue-atualizar` e validá-lo novamente. A aprovação de `f4cfc66` não
-aprova automaticamente essa composição nova.
+Com autorização explícita, esses commits foram integrados sem conflitos no merge
+`ae79d976`. A árvore resultante é exatamente igual à árvore de `BlueLab-Test` antes do
+merge; a reconciliação adiciona somente a ancestralidade necessária, sem remover ou
+alterar conteúdo funcional. O commit foi publicado e aplicado no Blue por
+`blue-atualizar`: bundle check, `yarn install --immutable`, migrations, sincronização
+de domínios, assets e restart concluíram. `blue-web`, `blue-sidekiq` e
+`blue-streaming` ficaram ativos; Puma informou prontidão e o healthcheck respondeu
+`OK`.
 
-No momento desta conferência, `bluelab/BlueLab` está em
-`e1e2672fc34b08e5d1bf92f2528f81f70cc22657` e diverge de `bluelab/BlueLab-Test`
-(`2` commits somente no estável e `286` somente no teste). Portanto, a promoção por
-fast-forward não é segura e deve ser diagnosticada, não forçada, caso seja solicitada.
+`bluelab/BlueLab` (`e1e2672`) agora é ancestral de `bluelab/BlueLab-Test`
+(`ae79d976`), tornando possível uma promoção por fast-forward após a confirmação
+manual do candidato reconciliado. `BlueLab` continua inalterada até essa aprovação.
+
+O próximo passo seguro é confirmar rapidamente a disponibilidade do Blue no candidato
+`ae79d976`. Após aprovação explícita, buscar as refs mais uma vez e promover esse
+mesmo commit por fast-forward para `BlueLab`.
 
 ## Regra de encerramento de etapas
 
