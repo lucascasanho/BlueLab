@@ -41,6 +41,7 @@ customizations:
         app/javascript/mastodon/features/blue2/,
         app/javascript/mastodon/features/ui/,
         app/javascript/mastodon/features/navigation_panel/,
+        app/javascript/mastodon/components/menu/,
       ]
     integration_points: [UI root, columns area, navigation panel]
     risk: high
@@ -62,6 +63,7 @@ customizations:
         app/javascript/mastodon/features/compose/redesign/,
         app/javascript/mastodon/reducers/slices/composer.ts,
         app/javascript/mastodon/actions/compose_draft.ts,
+        app/javascript/mastodon/containers/mastodon.jsx,
       ]
     integration_points: [compose reducer, compose submission, hotkeys]
     risk: very_high
@@ -248,6 +250,8 @@ customizations:
     files:
       [
         app/javascript/mastodon/features/status/,
+        app/javascript/mastodon/components/status/,
+        app/javascript/mastodon/components/card/,
         app/javascript/mastodon/components/status_action_bar/media_downloads.js,
         app/services/media_download_service.rb,
       ]

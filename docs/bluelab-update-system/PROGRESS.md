@@ -124,6 +124,11 @@ install --immutable`, migrations, sincronização de domínios, precompilação 
   `$BLUELAB_STATE_DIR/transactions/`. Os caminhos foram classificados entre
   `rich-composer`, `blue2-shell-navigation`, `quotes-and-media-downloads` e
   `UNCLASSIFIED`; não houve merge, mudança de branch, serviço, banco ou Espelunca.
+- A revisão histórica dos conflitos associou `components/menu/` ao shell Blue2,
+  `containers/mastodon.jsx` ao composer rico e `components/status/`/`components/card/`
+  ao domínio de status e mídia. `app/javascript/mastodon/locales/en.json` permanece
+  `UNCLASSIFIED`, pois agrega mensagens de vários domínios e não deve receber
+  classificação automática.
 
 O hook local também executou `yarn i18n:extract`, que apontou diferenças já
 existentes em `app/javascript/mastodon/locales/en.json` (chaves sem relação com este
