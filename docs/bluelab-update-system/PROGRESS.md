@@ -258,6 +258,33 @@ mastodon.blue o compositor em desktop e a barra inferior em viewport mobile (ap�
 atualização forçada do navegador). Promover somente se o usuário aprovar
 explicitamente este SHA funcional.
 
+### Navegação móvel e rodapé do modo avançado — 2026-09-21
+
+O lote `f53028a480a32fae967dcbb5944643ee117759ed` substitui os ícones genéricos
+de Compose pelos adaptadores Blue2 no lançador, no botão de navegação e no acionador
+global usado pelo modo avançado. Em viewport mobile, o menu esquerdo Blue2 agora é
+uma gaveta sobreposta e recolhível: não reserva coluna e seu Compose é somente o
+botão que abre o compositor; tocar nele fecha a gaveta. A gaveta direita de tendências
+permanece independente.
+
+No modo de múltiplas colunas, o rodapé de links deixa de ser renderizado na navegação
+fixa à esquerda. A coluna final “Getting started” passa a renderizar esse mesmo
+`NavigationFooterLinks`, removendo o rodapé Mastodon duplicado e mantendo apenas o
+rodapé BlueLab no local solicitado.
+
+O commit foi publicado em `BlueLab-Test` e aplicado no mastodon.blue com
+`blue-atualizar`. TypeScript, ESLint focal, Stylelint, `yarn build:production`, os 6
+testes de `compose/redesign/trigger` e os 8 de `account_card_and_menu` passaram.
+O teste legado `navigation_panel/redesign/index.test.tsx` continua falhando também
+no `HEAD` anterior: ele solicita menu de conta em `mode='slide-out'`, embora o
+componente de base não o renderize nesse modo; não foi alterado neste lote. Após o
+deploy, `blue-web`, `blue-sidekiq` e `blue-streaming` estavam ativos, e `/health` e
+`/api/v2/instance` responderam local e publicamente.
+
+`BlueLab` e Espelunca continuam inalterados. **Próximo passo:** validação manual no
+Blue do ícone de Compose, da gaveta móvel esquerda e do rodapé único no modo avançado;
+promover somente após confirmação explícita deste candidato.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
