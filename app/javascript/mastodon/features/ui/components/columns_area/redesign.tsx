@@ -70,11 +70,14 @@ export const ColumnsAreaRedesign: React.FC<{
     (state) => !state.modal.get('stack').isEmpty(),
   );
   const isMobile = useBreakpoint('openable');
+  const isCompactViewport = useBreakpoint('full');
   const useMastodonComposer = useAppSelector(
     (state) => state.compose.get('composer_editor') === 'mastodon',
   );
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const isBlue2MobileLayout =
+    isMobile || (isBlue2 && singleColumn && isCompactViewport);
   const isBlue2Home = isBlue2 && location.pathname === '/home';
   const isBlue2Global = isBlue2 && location.pathname === '/public';
   const isBlue2Search = isBlue2 && location.pathname === '/search';
@@ -188,7 +191,7 @@ export const ColumnsAreaRedesign: React.FC<{
   if (minimalShell) {
     return (
       <div ref={ref} className={classNames(classes.root, classes.rootMinimal)}>
-        {isMobile && <RedesignMobileNavigation />}
+        {isBlue2MobileLayout && <RedesignMobileNavigation />}
         <div className={classes.main}>
           <Header />
 
@@ -205,13 +208,13 @@ export const ColumnsAreaRedesign: React.FC<{
   if (singleColumn && isBlue2) {
     return (
       <div className={classNames(classes.root, classes.blue2Root)}>
-        {!isMobile && (
+        {!isBlue2MobileLayout && (
           <div className={classes.blue2NavigationWrapper}>
             <Blue2Navigation />
           </div>
         )}
 
-        {isMobile ? (
+        {isBlue2MobileLayout ? (
           <div className={mobileChromeClasses.mobileNavigation}>
             <RedesignMobileNavigation />
           </div>
@@ -228,7 +231,7 @@ export const ColumnsAreaRedesign: React.FC<{
           onTouchStart={handleSwipeStart}
           onTouchEnd={handleSwipeEnd}
         >
-          {isMobile && (
+          {isBlue2MobileLayout && (
             <header
               className={classNames(
                 classes.blue2MobileUtilityBar,
@@ -290,8 +293,10 @@ export const ColumnsAreaRedesign: React.FC<{
             <div
               className={classNames(
                 classes.blue2Portal,
-                isMobile && isBlue2Search && searchPortalClasses.searchPortal,
-                isMobile && mobileChromeClasses.portal,
+                isBlue2MobileLayout &&
+                  isBlue2Search &&
+                  searchPortalClasses.searchPortal,
+                isBlue2MobileLayout && mobileChromeClasses.portal,
               )}
             >
               <TabsBarPortal />
@@ -303,7 +308,7 @@ export const ColumnsAreaRedesign: React.FC<{
               <header
                 className={classNames(
                   classes.blue2Topbar,
-                  isMobile && mobileChromeClasses.feedTopBar,
+                  isBlue2MobileLayout && mobileChromeClasses.feedTopBar,
                 )}
               >
                 <img src={blue2Brand} alt='' className={classes.blue2Brand} />
@@ -328,20 +333,20 @@ export const ColumnsAreaRedesign: React.FC<{
                   {blue2Text(intl.locale, 'global')}
                 </Link>
               </header>
-              {isBlue2Home && !isMobile && <Blue2ComposeLauncher />}
+              {isBlue2Home && !isBlue2MobileLayout && <Blue2ComposeLauncher />}
             </>
           )}
 
           <div className='columns-area columns-area--mobile'>{children}</div>
         </main>
 
-        {!isMobile && (
+        {!isBlue2MobileLayout && (
           <div className={classes.blue2RightRail}>
             <Blue2RightRail />
           </div>
         )}
 
-        {isMobile && (
+        {isBlue2MobileLayout && (
           <div
             className={classes.blue2MobileRailOverlay}
             data-is-open={isBlue2MobileRailOpen}
