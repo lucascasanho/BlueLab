@@ -365,6 +365,23 @@ inalterados.
 **Próximo passo:** validar a sidebar mobile original e o rodapé BlueLab no modo
 avançado. Promover somente após confirmação explícita deste SHA.
 
+### Card de perfil na sidebar retrátil — 2026-09-21
+
+Ao comparar a sidebar retrátil com `BlueLab` estável, foi identificado que o upstream
+passou a ocultar `NavigationAccountCardAndMenu` em `mode='slide-out'`. O candidato
+`6ef038ace9e848c21b04353ebd76b71497b0a537` restaura esse componente somente nesse
+rodapé, incluindo foto, identificação e menu de conta, sem modificar os demais itens
+da sidebar ou o modo avançado.
+
+TypeScript, ESLint, o teste da sidebar retrátil, o teste do card de conta e build de
+produção passaram. O SHA foi publicado em `BlueLab-Test` e aplicado por
+`blue-atualizar`; `blue-web`, `blue-sidekiq` e `blue-streaming` estão ativos, e
+`/health` e `/api/v2/instance` responderam local e publicamente. `BlueLab` e
+Espelunca seguem inalterados.
+
+**Próximo passo:** confirmar manualmente que o card de perfil voltou ao rodapé da
+sidebar retrátil. Promover somente após confirmação explícita deste SHA.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
