@@ -346,6 +346,25 @@ responderam local e publicamente. `BlueLab` e Espelunca permanecem inalterados.
 avançado desktop, confirmar que a faixa recolhida mostra somente ícones sem texto
 cortado. Promover somente após confirmação explícita deste SHA.
 
+### Restauração exata da sidebar mobile e rodapé BlueLab — 2026-09-21
+
+Foi confirmado que a nova gaveta Blue2 havia substituído indevidamente a sidebar
+mobile original. O candidato `2506ad919a80e3ef962f97d6cf249fec7f6b1cc8` restaura
+o acionamento original por `openNavigation` e remove apenas a gaveta móvel criada
+durante esta sequência; a faixa compacta continua limitada ao modo avançado desktop.
+Nenhum comportamento dos demais modos deve ser alterado por este lote.
+
+O rodapé BlueLab na última coluna continua sendo o único rodapé do modo avançado,
+mas agora usa superfície, borda, tipografia e links do tema Blue2, removendo a
+aparência de HTML legado. TypeScript, ESLint focal, Stylelint, 14 testes focalizados
+e build de produção passaram. O SHA foi aplicado por `blue-atualizar`; os serviços
+`blue-web`, `blue-sidekiq` e `blue-streaming` estão ativos e `/health` e
+`/api/v2/instance` responderam local e publicamente. `BlueLab` e Espelunca seguem
+inalterados.
+
+**Próximo passo:** validar a sidebar mobile original e o rodapé BlueLab no modo
+avançado. Promover somente após confirmação explícita deste SHA.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
