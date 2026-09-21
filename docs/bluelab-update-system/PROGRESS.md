@@ -328,6 +328,24 @@ permanecem inalterados.
 **Próximo passo:** validar no Blue a faixa compacta, sua expansão/recolhimento e o
 botão de Compose integrado. Promover somente após confirmação explícita deste SHA.
 
+### Separação entre faixa avançada e sidebar mobile — 2026-09-21
+
+O relato seguinte indicou que a faixa nova estava afetando a versão mobile e que o
+menu compacto ainda deixava textos do perfil/Home cortados. O candidato
+`0a10f624ce149501ef52ea488656b972605dffb6` limita a faixa compacta ao breakpoint
+não-mobile e restaura o espaço original das telas menores. O menu de conta recebeu
+modo compacto próprio: nome, handle e rótulo Home não são renderizados visualmente até
+a faixa ser expandida, evitando conteúdo truncado.
+
+TypeScript, ESLint focal, Stylelint e build de produção passaram. O candidato foi
+publicado em `BlueLab-Test` e aplicado por `blue-atualizar`; `blue-web`,
+`blue-sidekiq` e `blue-streaming` estão ativos e `/health` e `/api/v2/instance`
+responderam local e publicamente. `BlueLab` e Espelunca permanecem inalterados.
+
+**Próximo passo:** testar a sidebar mobile preexistente em tela pequena e, no modo
+avançado desktop, confirmar que a faixa recolhida mostra somente ícones sem texto
+cortado. Promover somente após confirmação explícita deste SHA.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
