@@ -8,20 +8,34 @@ transacional, validada por manifesto, sem promoção ou acesso à Espelunca.
 ## Fase atual
 
 Fases 0–2 concluídas e documentadas. A primeira fronteira B de baixo risco foi
-migrada e validada sem alterar o comportamento dos consumidores.
+migrada, teve validação automatizada e foi aplicada no Blue. A validação visual/manual
+do shell Blue2 ainda está pendente; `BlueLab` não foi promovida.
 
 ## Último checkpoint concluído
 
-Proteção inicial verificada em 2026-09-20: branch `bluelab-teste`, HEAD
-`8300c26ed840eec984932a55a2a027392b98e96c`, árvore limpa; branch local de recuperação
-`backup/bluelab-before-update-system-20260920` criada no mesmo SHA. O upstream foi
-buscado sem alterar a árvore de trabalho. O complemento do inventário foi consolidado
-em `31ae6ac1b8`; sua validação confirmou 21 domínios e os nove caminhos de teste
-declarados nas cinco novas entradas.
+Em 2026-09-20, o canal remoto `bluelab/BlueLab-Test` foi confirmado em
+`f4cfc66ab3b697ea1ac10df0b0a9e6ae65577b87`, com checkout limpo no Blue. O comando
+`blue-atualizar` foi executado de forma idempotente nesse SHA: dependências Ruby e
+JavaScript foram verificadas, migrations executadas sem pendências, os domínios
+descartáveis foram sincronizados sem novos bloqueios, assets foram recompilados e os
+serviços foram reiniciados. `blue-web`, `blue-sidekiq` e `blue-streaming` ficaram
+ativos; o healthcheck local `http://127.0.0.1:3000/health` respondeu `OK`.
+
+A proteção inicial permanece rastreável no SHA
+`8300c26ed840eec984932a55a2a027392b98e96c`, com a referência local
+`backup/bluelab-before-update-system-20260920`. O complemento do inventário foi
+consolidado em `31ae6ac1b8`; sua validação confirmou 21 domínios e os nove caminhos de
+teste declarados nas cinco novas entradas.
 
 ## Último commit criado
 
-`31ae6ac1b8 bluelab-update: complete customization inventory scope`.
+O último commit funcional do lote é `f4cfc66ab3 Install web readiness override during
+updates`. Desde o checkpoint anterior, o lote contém:
+
+- `238ccff760 bluelab-update: isolate Blue2 shell labels`;
+- `c960306a39 Add Puma systemd readiness reporting`;
+- `fcb6aded72 Fix systemd Puma readiness wrapper`;
+- `f4cfc66ab3 Install web readiness override during updates`.
 
 ## Arquivos já migrados
 
@@ -31,6 +45,10 @@ declarados nas cinco novas entradas.
   rail Blue2, columns area, cabeçalho e painel de navegação, e direct timeline.
 - `app/javascript/bluelab/i18n/blue2.test.ts` cobre normalização de locale regional
   e fallback para inglês.
+- `bin/mastodon-systemd-puma`, `dist/mastodon-web.service` e
+  `bin/mastodon-install-systemd-readiness` passaram a reportar e aguardar a prontidão
+  do Puma para o systemd; `blue-atualizar` e `bluelab` instalam essa proteção antes do
+  restart do web.
 
 ## Arquivos pendentes
 
@@ -75,6 +93,12 @@ deste checkpoint.
   9 testes passaram.
 - `yarn typecheck` e ESLint restrito aos oito arquivos TypeScript alterados: passaram.
 - `git diff --check`: passou.
+- Em 2026-09-20, `blue-atualizar` no SHA `f4cfc66` completou bundle check, `yarn
+install --immutable`, migrations, sincronização de domínios, precompilação de
+  assets e restart. Os avisos de peer dependencies do Yarn já eram conhecidos e não
+  interromperam a instalação.
+- Após o restart, os três serviços ficaram ativos. O journal registrou o Puma pronto
+  em `http://127.0.0.1:3000/health`; a consulta HTTP ao healthcheck retornou `OK`.
 
 O hook local também executou `yarn i18n:extract`, que apontou diferenças já
 existentes em `app/javascript/mastodon/locales/en.json` (chaves sem relação com este
@@ -82,15 +106,20 @@ catálogo). A árvore foi restaurada pelo hook e esse arquivo não integra o lot
 
 ## Testes pendentes
 
-Permanece pendente uma validação visual/manual do shell Blue2 no canal de testes.
-Ela deve confirmar rótulos em um locale regional e em um locale sem tradução,
-navegação, right rail, painel e direct timeline.
+Permanece pendente uma validação visual/manual do shell Blue2 no canal de testes no
+SHA `f4cfc66`. Ela deve confirmar rótulos em um locale regional e em um locale sem
+tradução, navegação, right rail, painel e direct timeline.
 
 ## Próximo passo exato
 
-No Blue, executar `blue-atualizar` e validar manualmente o shell Blue2. Enquanto o
-lote estiver em teste, `BlueLab` deve permanecer inalterada. Após aprovação explícita
-do usuário, promover o mesmo commit por fast-forward para `BlueLab`.
+Validar manualmente o shell Blue2 no Blue. Enquanto o lote estiver em teste, `BlueLab`
+deve permanecer inalterada. Após aprovação explícita do usuário, comparar novamente
+as refs e promover somente por fast-forward o commit exato aprovado.
+
+No momento desta conferência, `bluelab/BlueLab` está em
+`e1e2672fc34b08e5d1bf92f2528f81f70cc22657` e diverge de `bluelab/BlueLab-Test`
+(`2` commits somente no estável e `286` somente no teste). Portanto, a promoção por
+fast-forward não é segura e deve ser diagnosticada, não forçada, caso seja solicitada.
 
 ## Comandos para continuar
 
@@ -105,6 +134,7 @@ sed -n '1,220p' docs/bluelab-update-system/INTEGRATION_POINTS.md
 
 ## Estado da árvore Git
 
-O checkpoint funcional deve conter somente a migração do catálogo e seus testes.
-Confirmar o estado real com `git status` antes de agir e não incluir extrações
-adicionais do shell no mesmo lote.
+O checkpoint funcional contém a migração do catálogo, sua validação automatizada e a
+proteção de prontidão de deploy. Confirmar o estado real com `git status`, refs
+remotas e `git log` antes de agir; não incluir extrações adicionais do shell no mesmo
+lote sem nova análise própria.
