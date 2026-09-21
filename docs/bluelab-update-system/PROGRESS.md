@@ -285,6 +285,31 @@ deploy, `blue-web`, `blue-sidekiq` e `blue-streaming` estavam ativos, e `/health
 Blue do ícone de Compose, da gaveta móvel esquerda e do rodapé único no modo avançado;
 promover somente após confirmação explícita deste candidato.
 
+### Gaveta e Compose sem colunas no modo avançado — 2026-09-21
+
+O teste manual do lote anterior mostrou que a navegação do modo avançado ainda ficava
+fixa como uma coluna e que o Compose legado ainda podia ocupar uma coluna quando o
+flag upstream de redesign estivesse desligado. O candidato funcional
+`c15ff1f71048b947ee8b85749ca54dcbe2789a8a` substitui a navegação fixa por uma gaveta
+esquerda aberta pelo botão de menu e fechada pelo backdrop ou ao navegar. O layout não
+reserva mais largura para ela.
+
+O Compose BlueLab agora é um botão fixo independente, com as mesmas classes visuais
+de pílula da versão estável. A coluna `COMPOSE` é suprimida explicitamente no tema
+Blue2, inclusive quando o flag de redesign do upstream não estiver ativo. Também foi
+restaurado o atributo `data-bluelab-compose` e os rótulos BlueLab do botão e das áreas
+de feeds personalizados, preservando a aparência estável e o idioma selecionado.
+
+`yarn typecheck`, ESLint focal, Stylelint focal, os 14 testes focalizados de Compose e
+menu de conta, e `yarn build:production` passaram. O lote foi publicado em
+`BlueLab-Test`, aplicado por `blue-atualizar`; `blue-web`, `blue-sidekiq` e
+`blue-streaming` ficaram ativos, e `/health` e `/api/v2/instance` responderam local e
+publicamente. `BlueLab` e Espelunca seguem inalterados.
+
+**Próximo passo:** testar no Blue o botão de menu e sua gaveta no modo avançado, o
+botão de publicação sem coluna própria e os rótulos no idioma da interface. Só
+promover após aprovação explícita deste SHA.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
