@@ -149,6 +149,46 @@ garantir que o Blue continua disponível após a implantação do novo SHA.
 
 ## Próximo passo exato
 
+### Integração upstream em preparação — 2026-09-21
+
+Com autorização explícita para resolver a revisão semântica, `upstream/main`
+(`398b542652bed28de11736b0949083d71847a7ce`) foi integrado somente em um worktree
+temporário e no commit de merge local
+`075bd395632e814058a9652354e7dba323b18117`. Esse commit ainda **não** foi publicado
+em `BlueLab-Test`, não foi aplicado no mastodon.blue e não alterou `BlueLab` nem a
+Espelunca.
+
+As 19 colisões foram resolvidas preservando os contratos BlueLab do compositor,
+downloads de mídia, shell Blue2 e menu de conta, enquanto a arquitetura upstream de
+status e navegação foi adotada onde os módulos foram movidos. A adaptação do menu no
+drawer preserva abertura por toque, isolamento de gestos, portal para o `body`, Escape
+e os itens BlueLab "Scheduled publications" e "Favorites". A migração upstream do
+action bar legado reutiliza o mesmo helper de downloads BlueLab; os mixins CSS antigos
+foram mapeados para a tipografia atual do upstream e o `BoostButton` passou ao caminho
+legado movido.
+
+Validações executadas no worktree integrado:
+
+- `git diff --check`: passou;
+- `yarn typecheck`: passou;
+- `yarn test:js app/javascript/mastodon/features/navigation_panel/redesign/account_card_and_menu.test.tsx`:
+  8 testes passaram;
+- ESLint focal dos adaptadores: passou;
+- `yarn build:production`: passou.
+
+O hook de pre-commit não pôde executar a bateria Ruby porque o candidato upstream
+passou a declarar Ruby `4.0.7` e essa versão não está instalada no host (`rbenv:
+version '4.0.7' is not installed`). O hook restaurou a árvore antes do commit; o merge
+foi gravado sem o hook após as verificações JavaScript acima. Isso não substitui a
+validação Ruby nem autoriza deploy.
+
+**Próximo passo seguro:** provisionar Ruby 4.0.7 no ambiente do Blue, confirmar
+`ruby --version`, `bundle exec ruby --version` e a instalação de dependências do
+candidato; então executar os testes Ruby relevantes. Somente se esses gates passarem,
+publicar o commit de merge em `BlueLab-Test`, executar `blue-atualizar`, validar o
+Blue e registrar o SHA realmente aplicado. Não promover `BlueLab` e não executar
+`espelunca-atualizar` nesta etapa.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
