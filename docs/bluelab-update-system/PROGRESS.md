@@ -7,8 +7,10 @@ transacional, validada por manifesto, sem promoção ou acesso à Espelunca.
 
 ## Fase atual
 
-Fases 0–2 concluídas, validadas e promovidas. A fase seguinte iniciou a validação
-executável do manifesto, sem alterar a rotina de atualização ativa.
+Fases 0–2 concluídas. A integração upstream, as correções visuais subsequentes e o
+lote de navegação/Compose foram validados no Blue e promovidos para `BlueLab` em
+2026-09-21. A próxima etapa de atualização deve começar por uma nova comparação
+transacional com o upstream atual, e não pela repetição de candidatos já aprovados.
 
 ## Último checkpoint concluído
 
@@ -142,12 +144,12 @@ catálogo). A árvore foi restaurada pelo hook e esse arquivo não integra o lot
 
 ## Testes pendentes
 
-Permanece pendente uma confirmação manual curta do candidato reconciliado
-`ae79d9768aa076a9aa91a0d98c8654332e724b0b` no Blue. A árvore desse commit é idêntica
-à do candidato antes da reconciliação, já aprovado visualmente; a confirmação deve
-garantir que o Blue continua disponível após a implantação do novo SHA.
+Não há confirmação manual pendente para os lotes já promovidos. Antes de iniciar uma
+nova atualização upstream, refazer a comparação de ancestrais e a simulação
+transacional contra a ponta atual do upstream; só criar um novo candidato se houver
+mudança real a integrar.
 
-## Próximo passo exato
+## Histórico da integração upstream concluída
 
 ### Integração upstream em preparação — 2026-09-21
 
@@ -469,6 +471,23 @@ continua em `2dc5b74f572566acfed291ab7602a06be9c802d9`; a Espelunca não foi ace
 **Próximo passo:** no Blue, em desktop com modo avançado, clicar no Compose da faixa
 lateral, confirmar abertura do diálogo, digitar algo e testar minimizar/fechar.
 Promover somente após confirmação explícita deste SHA.
+
+### Promoção do lote aprovado — 2026-09-21
+
+Após a confirmação manual de que o Compose avançado funcionou, a promoção verificou
+que `BlueLab` (`2dc5b74f572566acfed291ab7602a06be9c802d9`) era ancestral de
+`BlueLab-Test` (`d6f1c3ffad50c9ab9b8c896e18f912012602c13b`). O remoto `BlueLab` foi
+avançado por fast-forward para esse mesmo SHA, sem force-push, reset, cherry-pick ou
+acesso à Espelunca. O SHA promovido contém integralmente o host do Compose
+`202ecd3c`, o layout móvel para dispositivos compactos `189198fd` e os ajustes de
+sidebar/rodapé já validados no Blue.
+
+`BlueLab` e `BlueLab-Test` apontavam para `d6f1c3ffad` imediatamente após a promoção.
+Este checkpoint posterior é documental e não requer novo deploy. A Espelunca pode
+receber o lote aprovado com `espelunca-atualizar`, quando o operador decidir fazê-lo.
+
+**Próximo passo:** verificar por Git se `upstream/main` contém commits que ainda não
+sejam ancestrais de `BlueLab`; somente então preparar uma nova transação em worktree.
 
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
