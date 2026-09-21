@@ -111,6 +111,8 @@ install --immutable`, migrations, sincronização de domínios, precompilação 
   `4f6b4bd99e` e aplicado no Blue por `blue-atualizar`. Dependências, migrations,
   sincronização de domínios, assets e restart concluíram; `blue-web`,
   `blue-sidekiq` e `blue-streaming` ficaram ativos e o healthcheck retornou `OK`.
+- `ruby test/bluelab_transaction_planner_test.rb`: 2 testes e 8 asserções passaram;
+  confirma que a simulação preserva o checkout ativo e bloqueia caminhos sem domínio.
 
 O hook local também executou `yarn i18n:extract`, que apontou diferenças já
 existentes em `app/javascript/mastodon/locales/en.json` (chaves sem relação com este
@@ -154,9 +156,11 @@ ou acesso à Espelunca.
 
 O plano de execução transacional em worktree e seu relatório foi definido em
 `TRANSACTION_PLAN.md`, com worktree temporário, gates de risco, resultado estruturado
-e proibição de alterar a árvore ativa. O próximo passo seguro é implementar o
-protótipo somente de simulação contra repositórios Git temporários; `bin/bluelab`
-continua inalterado nesta etapa.
+e proibição de alterar a árvore ativa. O protótipo
+`bin/bluelab-transaction-plan` foi implementado e testado apenas contra repositórios
+Git temporários; `bin/bluelab` continua inalterado. O próximo passo seguro é executar
+a simulação contra a ref upstream real e revisar seu relatório, sem integrar ou
+implantar qualquer atualização upstream.
 
 ## Regra de encerramento de etapas
 

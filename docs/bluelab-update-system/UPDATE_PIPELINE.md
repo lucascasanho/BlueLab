@@ -14,5 +14,7 @@ caminhos fora do repositório.
 Estado: a validação do manifesto está pronta. A próxima etapa é definir o plano de
 execução transacional em worktree e seu relatório, ainda sem substituir a interface
 de atualização existente. O contrato foi registrado em
-`docs/bluelab-update-system/TRANSACTION_PLAN.md`; o próximo incremento é um comando
-novo, somente de simulação, testado contra repositórios temporários locais.
+`docs/bluelab-update-system/TRANSACTION_PLAN.md`. O protótipo somente de simulação é
+`bin/bluelab-transaction-plan`; ele gera um relatório JSON e não altera o checkout
+ativo, refs remotas, serviços ou banco. O próximo incremento é executá-lo contra a
+ref upstream real e revisar o relatório, sem integrar automaticamente a atualização.
