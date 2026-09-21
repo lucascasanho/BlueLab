@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 
 import { StackIcon } from '@phosphor-icons/react';
@@ -43,6 +44,41 @@ interface ItemProps {
   isActive?: React.ComponentProps<typeof NavLink>['isActive'];
 }
 
+export const Blue2ComposeButton: React.FC<{
+  onCompose?: () => void;
+  className?: string;
+}> = ({ onCompose, className }) => {
+  const dispatch = useAppDispatch();
+  const intl = useIntl();
+  const { signedIn } = useIdentity();
+
+  const openComposer = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      dispatch(
+        openNewComposer({
+          type: 'post',
+          origin: composerOriginFromElement(event.currentTarget),
+        }),
+      );
+      onCompose?.();
+    },
+    [dispatch, onCompose],
+  );
+
+  if (!signedIn) return null;
+
+  return (
+    <button
+      className={classNames(classes.composeButton, className)}
+      type='button'
+      onClick={openComposer}
+    >
+      <Blue2ComposeIcon size={19} />
+      <span>{blue2Text(intl.locale, 'write')}</span>
+    </button>
+  );
+};
+
 const neverActive: NonNullable<ItemProps['isActive']> = () => false;
 
 const Item: React.FC<ItemProps> = ({
@@ -71,25 +107,11 @@ const Item: React.FC<ItemProps> = ({
 export const Blue2Navigation: React.FC<{ onCompose?: () => void }> = ({
   onCompose,
 }) => {
-  const dispatch = useAppDispatch();
   const intl = useIntl();
   const { accountId, signedIn } = useIdentity();
   const account = useAccount(accountId);
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
-  );
-
-  const openComposer = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      dispatch(
-        openNewComposer({
-          type: 'post',
-          origin: composerOriginFromElement(event.currentTarget),
-        }),
-      );
-      onCompose?.();
-    },
-    [dispatch, onCompose],
   );
 
   const profilePath = account?.acct ? `/@${account.acct}` : '/home';
@@ -182,16 +204,7 @@ export const Blue2Navigation: React.FC<{ onCompose?: () => void }> = ({
         )}
       </div>
 
-      {signedIn && (
-        <button
-          className={classes.composeButton}
-          type='button'
-          onClick={openComposer}
-        >
-          <Blue2ComposeIcon size={19} />
-          <span>{blue2Text(intl.locale, 'write')}</span>
-        </button>
-      )}
+      <Blue2ComposeButton onCompose={onCompose} />
     </nav>
   );
 };

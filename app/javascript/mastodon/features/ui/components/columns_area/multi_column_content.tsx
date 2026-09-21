@@ -64,6 +64,8 @@ const renderLoading = (columnId: string) => {
 export const MultiColumnContent: React.FC<{
   children: React.ReactElement | React.ReactElement[];
 }> = ({ children }) => {
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const columns = useAppSelector(
     (state) => state.settings.get('columns') as List<Record<Column>>,
   );
@@ -77,7 +79,9 @@ export const MultiColumnContent: React.FC<{
         const uuid = column.get('uuid');
         const id = column.get('id');
 
-        if (isRedesignEnabled() && id === 'COMPOSE') {
+        // BlueLab owns compose through the fixed Blue2 button. Do not retain a
+        // legacy Compose column when an upstream preference flag is disabled.
+        if ((isRedesignEnabled() || isBlue2) && id === 'COMPOSE') {
           return null;
         }
 

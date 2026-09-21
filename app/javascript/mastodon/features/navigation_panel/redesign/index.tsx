@@ -15,6 +15,7 @@ import {
   PlusIcon,
 } from '@phosphor-icons/react';
 
+import { blue2Text } from '@/bluelab/i18n/blue2';
 import FediIcon from '@/images/icons/icon_fediverse.svg?react';
 import { fetchLists } from '@/mastodon/actions/lists';
 import { closeNavigation } from '@/mastodon/actions/navigation';
@@ -140,13 +141,18 @@ export const RedesignNavigationPanel: React.FC<{
             <NavigationLink
               withSpaceAfter
               as='button'
+              data-bluelab-compose={isBlue2 ? 'true' : undefined}
               onClick={openComposer}
               iconComponent={isBlue2 ? Blue2ComposeIcon : PenNibIcon}
             >
-              <FormattedMessage
-                id='tabs_bar.publish'
-                defaultMessage='New Post'
-              />
+              {isBlue2 ? (
+                blue2Text(intl.locale, 'write')
+              ) : (
+                <FormattedMessage
+                  id='tabs_bar.publish'
+                  defaultMessage='New Post'
+                />
+              )}
             </NavigationLink>
             <NavigationLink to='/home' iconComponent={HouseIcon}>
               <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
@@ -169,30 +175,46 @@ export const RedesignNavigationPanel: React.FC<{
               iconComponent={FediIcon}
               isActive={isFediverseFeedsLinkActive}
             >
-              <FormattedMessage
-                id='tabs_bar.fediverse_feeds'
-                defaultMessage='Fediverse Feeds'
-              />
+              {isBlue2 ? (
+                blue2Text(intl.locale, 'fediverseFeeds')
+              ) : (
+                <FormattedMessage
+                  id='tabs_bar.fediverse_feeds'
+                  defaultMessage='Fediverse Feeds'
+                />
+              )}
             </NavigationLink>
             <ListSection
               id='custom-feeds'
               title={
-                <FormattedMessage
-                  id='tabs_bar.custom_feeds'
-                  defaultMessage='Custom Feeds'
-                />
+                isBlue2 ? (
+                  blue2Text(intl.locale, 'customFeeds')
+                ) : (
+                  <FormattedMessage
+                    id='tabs_bar.custom_feeds'
+                    defaultMessage='Custom Feeds'
+                  />
+                )
               }
               emptyMessage={
                 <>
-                  <FormattedMessage
-                    id='tabs_bar.custom_feeds_empty'
-                    defaultMessage='You have no custom feeds yet.'
-                  />{' '}
-                  <Link to='/lists/new'>
+                  {isBlue2 ? (
+                    blue2Text(intl.locale, 'customFeedsEmpty')
+                  ) : (
                     <FormattedMessage
-                      id='tabs_bar.create_custom_feed'
-                      defaultMessage='Create Feed'
+                      id='tabs_bar.custom_feeds_empty'
+                      defaultMessage='You have no custom feeds yet.'
                     />
+                  )}{' '}
+                  <Link to='/lists/new'>
+                    {isBlue2 ? (
+                      blue2Text(intl.locale, 'createFeed')
+                    ) : (
+                      <FormattedMessage
+                        id='tabs_bar.create_custom_feed'
+                        defaultMessage='Create Feed'
+                      />
+                    )}
                   </Link>
                 </>
               }
@@ -204,10 +226,14 @@ export const RedesignNavigationPanel: React.FC<{
                     to='/lists/new'
                     iconComponent={PlusIcon}
                   >
-                    <FormattedMessage
-                      id='tabs_bar.create_custom_feed'
-                      defaultMessage='Create Feed'
-                    />
+                    {isBlue2 ? (
+                      blue2Text(intl.locale, 'createFeed')
+                    ) : (
+                      <FormattedMessage
+                        id='tabs_bar.create_custom_feed'
+                        defaultMessage='Create Feed'
+                      />
+                    )}
                   </NavigationLink>
                   {customFeeds.map((feed) => (
                     <NavigationLink
