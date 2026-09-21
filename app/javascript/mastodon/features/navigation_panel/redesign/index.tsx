@@ -314,6 +314,9 @@ export const RedesignNavigationPanel: React.FC<{
                 <NavigationAccountCardAndMenu />
               </>
             )}
+            {mode === 'slide-out' && (
+              <NavigationAccountCardAndMenu inSlideOut />
+            )}
             {!multiColumn && (
               <NavigationFooterLinks
                 multiColumn={multiColumn}
