@@ -64,7 +64,7 @@ export const NavigationAccountCardAndMenu: React.FC<{
         onPointerDown={stopDrawerGesture}
         onTouchStart={stopDrawerGesture}
       >
-        <AccountSummary />
+        <SlideOutAccountSummary />
         <SlideOutAccountMenu />
       </div>
     );
@@ -98,6 +98,31 @@ export const NavigationAccountCardAndMenu: React.FC<{
         </MenuList>
       </Menu>
     </div>
+  );
+};
+
+const SlideOutAccountSummary: React.FC = () => {
+  const { accountId } = useIdentity();
+  const account = useAccount(accountId);
+
+  if (!accountId || !account) {
+    return null;
+  }
+
+  return (
+    <a
+      className={classes.accountLink}
+      href={account.url}
+      data-hover-card-account={accountId}
+    >
+      <Avatar account={account} size={32} />
+      <span className={classes.accountText}>
+        <span className='display-name'>
+          <DisplayName variant='simple' account={account} />{' '}
+          <span className='display-name__account'>@{account.username}</span>
+        </span>
+      </span>
+    </a>
   );
 };
 
