@@ -382,6 +382,25 @@ Espelunca seguem inalterados.
 **Próximo passo:** confirmar manualmente que o card de perfil voltou ao rodapé da
 sidebar retrátil. Promover somente após confirmação explícita deste SHA.
 
+### Geometria do card e marca da instância em tablet — 2026-09-21
+
+O card de perfil retornado no lote anterior ainda não possuía o wrapper estável; sem
+ele, a borda não era aplicada e o botão de reticências caía para outra linha. O
+candidato `992cc9f4ea21aa77050184d133cdafbf6d6b659d` aplica novamente a classe do
+card ao caminho `slide-out`, restaurando flex, borda e alinhamento horizontal.
+
+No tablet, a sidebar legada ativada pelo modo avançado ainda renderizava
+`WordmarkLogo`. Para o tema Blue2 esse ponto agora usa somente
+`customInstanceLogo`, `customFavicon` ou `/favicon.ico` da instância; a marca padrão
+do Mastodon permanece reservada aos outros temas. Tipos, lint, os 10 testes de
+sidebar/card e build de produção passaram. O SHA foi aplicado por `blue-atualizar`;
+os três serviços estão ativos, e `/health` e `/api/v2/instance` responderam local e
+publicamente. `BlueLab` e Espelunca seguem inalterados.
+
+**Próximo passo:** validar no mobile a borda/alinhamento do card e, no tablet em modo
+avançado, confirmar que aparece a logo da instância em vez da logo Mastodon.
+Promover somente após confirmação explícita deste SHA.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
