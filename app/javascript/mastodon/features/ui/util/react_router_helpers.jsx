@@ -11,14 +11,10 @@ import { ColumnLoading } from '../components/column_loading';
 import { forceSingleColumn, hasMultiColumnPath } from '@/mastodon/initial_state';
 
 // Small wrapper to pass multiColumn to the route components
-export const WrappedSwitch = ({ multiColumn, forceCompactLayout, children }) => {
+export const WrappedSwitch = ({ multiColumn, children }) => {
   const  location = useLocation();
 
-  // On compact BlueLab viewports, keep the real /deck URL visible to the
-  // redirect below so the mobile UI can leave the advanced interface entirely.
-  // Otherwise the normal deckless route normalization would consume /deck/*
-  // before the compact-layout redirect gets a chance to run.
-  const decklessLocation = !forceCompactLayout && !forceSingleColumn && hasMultiColumnPath && location.pathname.startsWith('/deck')
+  const decklessLocation = !forceSingleColumn && hasMultiColumnPath && location.pathname.startsWith('/deck')
     ? {...location, pathname: location.pathname.slice(5)}
     : location;
 
@@ -32,7 +28,6 @@ export const WrappedSwitch = ({ multiColumn, forceCompactLayout, children }) => 
 
 WrappedSwitch.propTypes = {
   multiColumn: PropTypes.bool,
-  forceCompactLayout: PropTypes.bool,
   children: PropTypes.node,
 };
 
