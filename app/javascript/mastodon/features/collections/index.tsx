@@ -45,10 +45,13 @@ const messages = defineMessages({
 
 export const Collections: React.FC<{
   multiColumn?: boolean;
-}> = ({ multiColumn }) => {
+  accountId?: string;
+  featuringYou?: boolean;
+}> = ({ multiColumn, accountId: columnAccountId, featuringYou = false }) => {
   const intl = useIntl();
   const me = useCurrentAccountId();
-  const accountId = useAccountId();
+  const routeAccountId = useAccountId();
+  const accountId = columnAccountId ?? routeAccountId;
   const account = useAccount(accountId);
   const { path } = useRouteMatch();
   const isBlue2 =
@@ -108,14 +111,22 @@ export const Collections: React.FC<{
             )}
           </TabList>
         </header>
-        <Switch>
-          <Route exact path={path} component={CollectionsCreatedByAccount} />
-          <Route
-            exact
-            path={`${path}/featuring-you`}
-            component={CollectionsFeaturingYou}
-          />
-        </Switch>
+        {columnAccountId ? (
+          featuringYou ? (
+            <CollectionsFeaturingYou accountId={columnAccountId} />
+          ) : (
+            <CollectionsCreatedByAccount accountId={columnAccountId} />
+          )
+        ) : (
+          <Switch>
+            <Route exact path={path} component={CollectionsCreatedByAccount} />
+            <Route
+              exact
+              path={`${path}/featuring-you`}
+              component={CollectionsFeaturingYou}
+            />
+          </Switch>
+        )}
       </Scrollable>
 
       <Helmet>
