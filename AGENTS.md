@@ -5,65 +5,158 @@ Estas regras são obrigatórias para alterações feitas por assistentes, Codex 
 ## Alvos e branches
 
 - **Blue / mastodon.blue** é o alvo padrão de desenvolvimento e testes.
-- **`BlueLab-Test`** é o canal cumulativo de testes do Blue.
-- **`BlueLab`** é o canal estável consumido pela Espelunca através de `espelunca-atualizar`.
-- A Espelunca não deve receber código ainda não aprovado em teste no Blue.
+- **`BlueLab-Test`** é o canal oficial cumulativo de testes do Blue.
+- **`BlueLab`** é o canal oficial estável consumido pela Espelunca.
+- As branches legadas **`bluelab`** e **`bluelab-teste`** não fazem parte do pipeline oficial e não devem ser usadas em novos procedimentos.
 
-## Fluxo obrigatório
+## Comando operacional único
 
-1. Todo novo ajuste solicitado deve ser implementado e publicado primeiro em **`BlueLab-Test`**.
-2. Alterações de testes devem ser cumulativas: código novo não deve ficar apenas em branches temporárias. Se uma branch temporária for necessária para resolver um conflito ou preparar um patch, o resultado final deve entrar em `BlueLab-Test` antes de o usuário receber o comando de atualização do Blue.
-3. O Blue deve conseguir receber todo o lote novo com um comando simples de atualização (`blue-atualizar`). O canal de teste pode conter frontend, backend, migrations, dependências, assets, configurações e demais alterações necessárias ao recurso solicitado.
-4. Enquanto o usuário estiver testando ou informar que algo ainda não funciona, **`BlueLab` deve permanecer inalterada**. As correções seguintes continuam somente em `BlueLab-Test`.
-5. Quando o usuário confirmar explicitamente que o teste funcionou — por exemplo, “funcionou”, “está certo”, “pode mandar para a Espelunca” ou equivalente — o assistente deve, na mesma interação, comparar `BlueLab` com `BlueLab-Test` e promover **todo o conjunto aprovado** para `BlueLab` por fast-forward quando isso for seguro.
-6. A promoção para `BlueLab` deve apontar para o mesmo commit exato que foi testado no Blue. Não omitir commits do lote aprovado e não reconstruir a alteração com cherry-picks diferentes, salvo pedido explícito do usuário.
-7. Após a promoção, a Espelunca deve conseguir receber o lote apenas executando `espelunca-atualizar`.
-8. Se houver divergência entre `BlueLab` e `BlueLab-Test`, conflito inesperado ou impossibilidade de fast-forward, parar a promoção e diagnosticar. **Nunca** usar force-push, `reset --hard` ou outra operação destrutiva como atalho.
-9. Por padrão, uma alteração aprovada no Blue é destinada também à Espelunca. Só manter uma alteração exclusivamente no Blue quando o usuário disser explicitamente que ela é “Blue-only”, “só para o Blue” ou equivalente.
-10. Não modificar diretamente a instalação/working tree da Espelunca a menos que o usuário peça explicitamente. A promoção normal acontece somente pelo GitHub e depois pelo comando `espelunca-atualizar` executado pelo usuário.
+O comando operacional de atualização é sempre:
 
-## Regras para comandos entregues ao usuário
+```bash
+bluelab
+```
 
-- Preferir comandos curtos e repetíveis em vez de sequências diferentes a cada ajuste.
-- Para o Blue, o fluxo normal deve ser `blue-atualizar`.
-- Para a Espelunca, depois de uma aprovação e promoção, o fluxo normal deve continuar sendo `espelunca-atualizar`.
-- Não pedir que o usuário faça cherry-pick manual de commits que já podem ser publicados no canal correto pelo GitHub.
-- Não exigir que o usuário troque de branch a cada ajuste; `BlueLab-Test` é o canal persistente de teste.
+Não usar nem recomendar `blue-atualizar` ou `espelunca-atualizar` para o fluxo normal.
 
-## Continuidade do sistema de atualização BlueLab
+O comando `bluelab` detecta automaticamente se está no Blue ou na Espelunca:
 
-Para qualquer trabalho em `docs/bluelab-update-system/`, `bluelab/manifest.yml`,
-`bin/blue-atualizar`, `bin/bluelab` ou nos mecanismos de prontidão/deploy do BlueLab,
-`docs/bluelab-update-system/PROGRESS.md` é o registro operacional permanente e deve
-ser atualizado no mesmo lote de mudanças. Não deixar esse registro para uma tarefa
-posterior.
+- No **Blue**, usa `BlueLab-Test`.
+- Na **Espelunca**, usa `BlueLab`.
 
-Cada checkpoint deve registrar, de forma verificável: SHA e branch reais, mudanças
-concluídas, validações e deploys executados, avisos/falhas relevantes, estado de
-`BlueLab` versus `BlueLab-Test` e o único próximo passo seguro. Antes de retomar esse
-trabalho, conferir o arquivo contra `git status`, refs remotas e log; se houver
-diferença, corrigir o registro antes de avançar. O checkpoint não deve alegar que uma
-validação manual ou uma promoção ocorreu sem evidência correspondente.
+Os comandos auxiliares também são invocados pelo mesmo programa:
 
-Ao encerrar cada etapa funcional desse sistema, seguir obrigatoriamente esta ordem:
+```bash
+bluelab estado
+bluelab promover
+bluelab verificar-mastodon
+```
 
-1. validar, fazer commit e publicar o lote em `BlueLab-Test`;
-2. aplicar o SHA publicado no mastodon.blue com `blue-atualizar`;
-3. verificar checkout, serviços e healthcheck, além das validações específicas da
-   etapa;
-4. registrar o resultado no `PROGRESS.md` e publicar esse checkpoint no mesmo canal.
+## Fluxo oficial
 
-O checkpoint deve identificar o SHA funcional efetivamente aplicado no Blue, mesmo
-quando o commit posterior contém somente documentação. Uma falha de deploy ou de
-validação também deve ser registrada, e bloqueia o encerramento da etapa. Esta rotina
-não autoriza promoção de `BlueLab` nem qualquer operação na Espelunca: ambas continuam
-dependendo da aprovação explícita do usuário e das verificações de promoção abaixo.
+```
+BlueLab-Test
+    ↓
+mastodon.blue
+    ↓
+testes e validação
+    ↓
+bluelab promover
+    ↓
+BlueLab
+    ↓
+Espelunca
+```
 
-## Regra de segurança de promoção
+Todo código de aplicação destinado à produção deve ser testado primeiro no Blue.
 
-Antes de mover `BlueLab`, confirmar que:
+Enquanto uma alteração estiver sendo testada ou ainda não estiver aprovada, `BlueLab` deve permanecer inalterada.
 
-- `BlueLab-Test` contém o lote que o usuário acabou de testar;
-- `BlueLab` é ancestral de `BlueLab-Test` ou existe uma estratégia não destrutiva claramente validada;
-- a promoção não inclui alterações explicitamente rejeitadas pelo usuário;
-- o commit promovido é exatamente o commit aprovado no Blue.
+Quando o usuário confirmar explicitamente que o lote foi aprovado para produção, `bluelab promover` deve promover o mesmo SHA efetivamente testado no Blue para `BlueLab`.
+
+A promoção deve continuar protegida contra:
+- checkout local diferente de `BlueLab-Test`;
+- SHA não registrado como implantado/testado;
+- divergência entre os canais;
+- alterações locais não preservadas.
+
+Nunca usar force-push, reset destrutivo ou cherry-pick manual para contornar essas proteções.
+
+## Mastodon oficial
+
+O repositório upstream oficial é:
+
+`https://github.com/mastodon/mastodon`
+
+Somente o **Blue** verifica automaticamente se existe candidato upstream mais novo.
+
+No Blue, `bluelab` pode:
+1. consultar `mastodon/mastodon`;
+2. detectar uma versão upstream mais nova;
+3. simular a integração e detectar conflitos;
+4. gerar informações para a reconciliação.
+
+Essa verificação não significa aplicação automática do upstream.
+
+A **Espelunca não deve consultar nem integrar diretamente o upstream**. Ela recebe somente a versão promovida para `BlueLab`.
+
+## Atualização da Espelunca
+
+Na Espelunca, o único fluxo normal é:
+
+```bash
+bluelab
+```
+
+Esse comando consulta exclusivamente:
+
+```
+BlueLab
+```
+
+A Espelunca nunca deve atualizar diretamente de `BlueLab-Test` ou de `mastodon/mastodon`.
+
+## Segurança de atualização
+
+O `bluelab` deve atualizar o checkout antes de executar Bundler/Rails.
+
+A ordem esperada é:
+
+1. identificar a instância e o canal;
+2. buscar o remoto;
+3. preservar alterações locais quando aplicável;
+4. alinhar o checkout ao SHA do canal;
+5. instalar/atualizar a cópia atual do comando `bluelab`;
+6. garantir a versão de Ruby definida em `.ruby-version`;
+7. executar Bundler, dependências, migrations e assets;
+8. reiniciar os serviços;
+9. validar serviços e Rails;
+10. registrar o SHA implantado;
+11. no Blue, executar a verificação upstream.
+
+Nunca executar `bundle`, `rails` ou qualquer etapa dependente de Ruby antes de alinhar o checkout e preparar o runtime exigido por `.ruby-version`.
+
+## Preservação de customizações
+
+Atualizações upstream devem preservar as customizações do BlueLab.
+
+Não substituir arquivos customizados inteiros por versões upstream apenas para eliminar conflitos.
+
+Autenticação, autorização, passkeys, uploads, schema, migrations, navegação, compose, limites, cores e funcionalidades BlueLab são zonas de reconciliação semântica.
+
+## Continuidade do sistema de atualização
+
+Para alterações em:
+
+- `bin/bluelab`;
+- `bluelab/manifest.yml`;
+- `docs/bluelab-update-system/`;
+- mecanismos de prontidão/deploy;
+- qualquer parte do pipeline de atualização;
+
+consultar e atualizar o `docs/bluelab-update-system/PROGRESS.md` no mesmo lote.
+
+Cada checkpoint deve registrar SHA e branch reais, alterações, validações, deploys, falhas relevantes e o único próximo passo seguro.
+
+## Regra de promoção
+
+Antes de promover `BlueLab-Test` para `BlueLab`:
+
+- confirmar que o usuário aprovou o lote;
+- confirmar que o Blue está exatamente no SHA testado;
+- confirmar que esse SHA foi registrado como implantado/testado;
+- confirmar que `BlueLab` é ancestral de `BlueLab-Test`;
+- confirmar que não há alterações locais que invalidem o teste.
+
+A promoção deve apontar para o mesmo commit exato testado no Blue.
+
+## Regra para agentes
+
+Quando um agente precisar explicar ou executar uma atualização, use `bluelab`.
+
+Nunca reintroduza `blue-atualizar`, `espelunca-atualizar`, `bluelab-teste` ou `bluelab` como nomes de canais.
+
+Os únicos nomes canônicos de canal são:
+
+- `BlueLab-Test` = teste;
+- `BlueLab` = estável/produção.
