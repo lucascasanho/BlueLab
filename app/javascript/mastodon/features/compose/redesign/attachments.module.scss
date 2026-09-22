@@ -49,16 +49,10 @@
   }
 }
 
-.mediaMenuButton {
-  position: absolute;
-  top: var(--space-xs);
-  inset-inline-end: var(--space-xs);
-  z-index: 1;
-}
-
 .mediaEditButton {
   position: absolute;
   inset: 0;
+  z-index: 0;
   appearance: none;
   border: 0;
   border-radius: inherit;
@@ -69,6 +63,13 @@
     outline: var(--outline-focus-default);
     outline-offset: -2px;
   }
+}
+
+.mediaMenuButton {
+  position: absolute;
+  top: var(--space-xs);
+  inset-inline-end: var(--space-xs);
+  z-index: 3;
 }
 
 .mediaAlt {
