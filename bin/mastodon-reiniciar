@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+# Restarts a Mastodon installation in dependency order and waits until its
+# local HTTP endpoints are genuinely ready.  This is deliberately separate
+# from the update commands: it is a safe recovery command for a running host.
+
+set -Eeuo pipefail
+
+target="${1:-}"
+
+case "$target" in
+  blue)
+    database_units=(postgresql@17-main.service redis-server.service)
+    application_units=(blue-web.service blue-sidekiq.service blue-streaming.service)
+    edge_units=(nginx.service cloudflared.service)
+    rails_health_url="http://127.0.0.1:3000/health"
+    nginx_health_url="http://127.0.0.1/health"
+    streaming_health_url="http://127.0.0.1:4000/api/v1/streaming/health"
+    ;;
+  espelunca)
+    database_units=(postgresql.service redis-server@espelunca.service)
+    application_units=(espelunca-web.service espelunca-sidekiq.service espelunca-streaming.service)
+    edge_units=(nginx.service cloudflared-espelunca.service)
+    rails_health_url="http://127.0.0.1:3001/health"
+    nginx_health_url="http://127.0.0.1/health"
+    streaming_health_url="http://127.0.0.1:4001/api/v1/streaming/health"
+    ;;
+  *)
+    printf 'Uso: %s blue|espelunca\n' "${0##*/}" >&2
+    exit 2
+    ;;
+esac
+
+wait_for_http() {
+  local name="$1"
+  local url="$2"
+  local deadline=$((SECONDS + 300))
+
+  until curl --fail --silent --show-error --max-time 2 "$url" >/dev/null; do
+    if (( SECONDS >= deadline )); then
+      printf 'FALHA: %s não respondeu em até 300 segundos: %s\n' "$name" "$url" >&2
+      return 1
+    fi
+
+    sleep 1
+  done
+
+  printf 'OK: %s respondeu\n' "$name"
+}
+
+restart_group() {
+  local group="$1"
+  shift
+
+  printf '===== %s =====\n' "$group"
+  sudo systemctl restart "$@"
+
+  local unit
+  for unit in "$@"; do
+    if ! sudo systemctl is-active --quiet "$unit"; then
+      printf 'FALHA: %s não ficou ativo\n' "$unit" >&2
+      return 1
+    fi
+    printf 'OK: %s ativo\n' "$unit"
+  done
+}
+
+restart_group 'DEPENDÊNCIAS' "${database_units[@]}"
+restart_group 'APLICAÇÃO' "${application_units[@]}"
+
+# Puma and streaming must be listening before nginx and the Cloudflare tunnel
+# are exposed again, otherwise the tunnel turns a normal cold start into 502s.
+wait_for_http 'Rails' "$rails_health_url"
+wait_for_http 'streaming' "$streaming_health_url"
+
+restart_group 'BORDA' "${edge_units[@]}"
+wait_for_http 'nginx' "$nginx_health_url"
+
+printf 'Sucesso: %s reiniciado e saudável.\n' "$target"
