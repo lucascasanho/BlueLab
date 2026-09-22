@@ -95,12 +95,24 @@ import { CustomHomepage } from 'mastodon/features/custom_homepage';
 
 // Dummy import, to make sure that <Status /> ends up in the application bundle.
 // Without this it ends up in ~8 very commonly used bundles.
-import '../../components/status';
+import '../../components/status/legacy/status';
 import { getNavigationSkipLinkId, SkipLinks } from './components/skip_links';
 
 const messages = defineMessages({
   beforeUnload: { id: 'ui.beforeunload', defaultMessage: 'Your draft will be lost if you leave Mastodon.' },
 });
+
+// BlueLab's advanced interface needs the full desktop breakpoint. Below it,
+// keep the regular single-column experience instead of squeezing its rails
+// into phone and tablet viewports.
+const BLUE2_COMPACT_LAYOUT_BREAKPOINT = 1174;
+
+const isBlue2CompactViewport = () => (
+  typeof document !== 'undefined' &&
+  typeof window !== 'undefined' &&
+  document.body.dataset.theme === 'blue-2' &&
+  window.innerWidth <= BLUE2_COMPACT_LAYOUT_BREAKPOINT
+);
 
 const mapStateToProps = state => ({
   layout: state.getIn(['meta', 'layout']),
@@ -125,6 +137,7 @@ class SwitchingColumnsArea extends PureComponent {
     singleColumn: PropTypes.bool,
     layout: PropTypes.string.isRequired,
     forceOnboarding: PropTypes.bool,
+    forceCompactLayout: PropTypes.bool,
     minimalShell: PropTypes.bool,
   };
 
@@ -163,7 +176,7 @@ class SwitchingColumnsArea extends PureComponent {
   };
 
   render () {
-    const { children, singleColumn, forceOnboarding, minimalShell } = this.props;
+    const { children, singleColumn, forceOnboarding, forceCompactLayout, minimalShell } = this.props;
     const { signedIn } = this.props.identity;
     const pathName = this.props.location.pathname;
 
@@ -206,8 +219,8 @@ class SwitchingColumnsArea extends PureComponent {
           <WrappedSwitch>
             <Redirect from='/' to={redirectWithoutFocusing(rootRedirect)} exact />
 
-            {(forceSingleColumn || transientSingleColumn) ? <Redirect from='/deck' to={redirectWithoutFocusing('/home')} exact /> : null}
-            {(forceSingleColumn || transientSingleColumn) && pathName.startsWith('/deck/') ? <Redirect from={pathName} to={{...this.props.location, pathname: pathName.slice(5)}} /> : null}
+            {(forceSingleColumn || transientSingleColumn || forceCompactLayout) ? <Redirect from='/deck' to={redirectWithoutFocusing('/home')} exact /> : null}
+            {(forceSingleColumn || transientSingleColumn || forceCompactLayout) && pathName.startsWith('/deck/') ? <Redirect from={pathName} to={{...this.props.location, pathname: pathName.slice(5)}} /> : null}
             {/* Redirect old bookmarks (without /deck) with home-like routes to the advanced interface */}
             {!singleColumn && pathName === '/home' ? <Redirect from='/home' to={redirectWithoutFocusing(defaultHomepage)} exact /> : null}
             {(pathName === '/getting-started' || isRedesignEnabled())
@@ -310,6 +323,7 @@ class UI extends PureComponent {
   state = {
     draggingOver: false,
     mobileChromeHidden: false,
+    blue2CompactViewport: isBlue2CompactViewport(),
   };
 
   mobileChromeAnimationFrame = null;
@@ -495,6 +509,11 @@ class UI extends PureComponent {
 
   handleResize = () => {
     const layout = layoutFromWindow();
+    const blue2CompactViewport = isBlue2CompactViewport();
+
+    if (blue2CompactViewport !== this.state.blue2CompactViewport) {
+      this.setState({ blue2CompactViewport });
+    }
 
     if (window.innerWidth !== this.mobileChromeViewportWidth) {
       this.mobileChromeViewportWidth = window.innerWidth;
@@ -744,6 +763,8 @@ class UI extends PureComponent {
   render () {
     const { draggingOver, mobileChromeHidden } = this.state;
     const { children, isComposing, location, layout, firstLaunch, newAccount } = this.props;
+    const forceCompactLayout = isBlue2CompactViewport();
+    const singleColumn = layout === 'mobile' || layout === 'single-column' || forceCompactLayout;
 
     const handlers = {
       help: this.handleHotkeyToggleHelp,
@@ -781,7 +802,7 @@ class UI extends PureComponent {
         <div className={classNames('ui', { 'is-composing': isComposing, 'ui--mobile-chrome-hidden': mobileChromeHidden })} ref={this.setRef}>
           {!minimalShell && (
             <SkipLinks
-              multiColumn={layout === 'multi-column'}
+              multiColumn={!singleColumn}
               onFocusGettingStartedColumn={this.handleHotkeyGoToStart}
             />
           )}
@@ -789,16 +810,17 @@ class UI extends PureComponent {
           <SwitchingColumnsArea
             identity={this.props.identity}
             location={location}
-            singleColumn={layout === 'mobile' || layout === 'single-column'}
+            singleColumn={singleColumn}
             layout={layout}
             forceOnboarding={firstLaunch && newAccount}
+            forceCompactLayout={forceCompactLayout}
             minimalShell={minimalShell}
           >
             {children}
           </SwitchingColumnsArea>
 
           {!minimalShell && <NavigationBar />}
-          {layout !== 'mobile' && <PictureInPicture />}
+          {!singleColumn && <PictureInPicture />}
           <AlertsController />
           {!disableHoverCards && <HoverCardController />}
           <HashtagMenuController />

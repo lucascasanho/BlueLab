@@ -164,6 +164,29 @@
   }
 }
 
+.rootCompact {
+  width: 52px;
+
+  &:hover .accountButton,
+  &:focus-within .accountButton,
+  .accountButton[aria-expanded='true'] {
+    width: 52px;
+    padding: 5px;
+  }
+
+  .identity,
+  .moreIcon,
+  .homeButton > span {
+    display: none;
+  }
+
+  .homeButton {
+    width: 52px;
+    justify-content: center;
+    padding: 0;
+  }
+}
+
 .menu {
   box-sizing: border-box;
   z-index: 1000;

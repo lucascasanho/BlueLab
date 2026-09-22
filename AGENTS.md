@@ -30,6 +30,35 @@ Estas regras são obrigatórias para alterações feitas por assistentes, Codex 
 - Não pedir que o usuário faça cherry-pick manual de commits que já podem ser publicados no canal correto pelo GitHub.
 - Não exigir que o usuário troque de branch a cada ajuste; `BlueLab-Test` é o canal persistente de teste.
 
+## Continuidade do sistema de atualização BlueLab
+
+Para qualquer trabalho em `docs/bluelab-update-system/`, `bluelab/manifest.yml`,
+`bin/blue-atualizar`, `bin/bluelab` ou nos mecanismos de prontidão/deploy do BlueLab,
+`docs/bluelab-update-system/PROGRESS.md` é o registro operacional permanente e deve
+ser atualizado no mesmo lote de mudanças. Não deixar esse registro para uma tarefa
+posterior.
+
+Cada checkpoint deve registrar, de forma verificável: SHA e branch reais, mudanças
+concluídas, validações e deploys executados, avisos/falhas relevantes, estado de
+`BlueLab` versus `BlueLab-Test` e o único próximo passo seguro. Antes de retomar esse
+trabalho, conferir o arquivo contra `git status`, refs remotas e log; se houver
+diferença, corrigir o registro antes de avançar. O checkpoint não deve alegar que uma
+validação manual ou uma promoção ocorreu sem evidência correspondente.
+
+Ao encerrar cada etapa funcional desse sistema, seguir obrigatoriamente esta ordem:
+
+1. validar, fazer commit e publicar o lote em `BlueLab-Test`;
+2. aplicar o SHA publicado no mastodon.blue com `blue-atualizar`;
+3. verificar checkout, serviços e healthcheck, além das validações específicas da
+   etapa;
+4. registrar o resultado no `PROGRESS.md` e publicar esse checkpoint no mesmo canal.
+
+O checkpoint deve identificar o SHA funcional efetivamente aplicado no Blue, mesmo
+quando o commit posterior contém somente documentação. Uma falha de deploy ou de
+validação também deve ser registrada, e bloqueia o encerramento da etapa. Esta rotina
+não autoriza promoção de `BlueLab` nem qualquer operação na Espelunca: ambas continuam
+dependendo da aprovação explícita do usuário e das verificações de promoção abaixo.
+
 ## Regra de segurança de promoção
 
 Antes de mover `BlueLab`, confirmar que:

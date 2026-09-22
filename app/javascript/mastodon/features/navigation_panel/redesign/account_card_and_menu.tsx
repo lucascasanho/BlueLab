@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -8,14 +8,14 @@ import {
   GearIcon,
   StackIcon,
   HeartIcon,
+  StarIcon,
+  CalendarDotsIcon,
   BookmarkSimpleIcon,
   UsersThreeIcon,
   ProhibitIcon,
   GavelIcon,
   ShieldStarIcon,
   SignOutIcon,
-  CalendarDotsIcon,
-  StarIcon,
 } from '@phosphor-icons/react';
 
 import { openModal } from '@/mastodon/actions/modal';
@@ -23,13 +23,7 @@ import { Avatar } from '@/mastodon/components/avatar';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { DisplayName } from '@/mastodon/components/display_name';
 import { useAccountHandle } from '@/mastodon/components/display_name/default';
-import { AccountLock } from '@/mastodon/components/display_name/lock';
-import { VerifiedBadge } from '@/mastodon/components/display_name/verified_badge';
-import { EmojiHTML } from '@/mastodon/components/emoji/html';
-import {
-  ListItemContent,
-  ListItemWrapper,
-} from '@/mastodon/components/list_item';
+import { LockupContent, LockupWrapper } from '@/mastodon/components/lockup';
 import {
   Menu,
   MenuItem,
@@ -39,9 +33,7 @@ import {
   MenuTrigger,
 } from '@/mastodon/components/menu';
 import { Popover } from '@/mastodon/components/popover';
-import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
 import { useAccount } from '@/mastodon/hooks/useAccount';
-import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
   canManageReports,
@@ -59,20 +51,65 @@ export const NavigationAccountCardAndMenu: React.FC<{
   inSlideOut?: boolean;
 }> = ({ inSlideOut = false }) => {
   const { accountId } = useIdentity();
+
+  if (!accountId) {
+    return null;
+  }
+
+  if (inSlideOut) {
+    return (
+      <div
+        className={classes.root}
+        data-in-slide-out='true'
+        onPointerDown={stopDrawerGesture}
+        onTouchStart={stopDrawerGesture}
+      >
+        <SlideOutAccountSummary />
+        <SlideOutAccountMenu />
+      </div>
+    );
+  }
+
+  return (
+    <div className={classes.root}>
+      <AccountSummary />
+      <Menu type='navigation'>
+        <MenuTrigger
+          as={IconButton}
+          icon={DotsThreeIcon}
+          variant='ghost'
+          size='sm'
+        >
+          <FormattedMessage
+            id='tabs_bar.account_settings'
+            defaultMessage='Account settings'
+          />
+        </MenuTrigger>
+        <MenuList
+          portal
+          mobilePresentation='popover'
+          placement='top-end'
+          strategy='fixed'
+          offset={8}
+          maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
+          data-testid='account-menu'
+        >
+          <AccountMenuItems />
+        </MenuList>
+      </Menu>
+    </div>
+  );
+};
+
+const SlideOutAccountSummary: React.FC = () => {
+  const { accountId } = useIdentity();
   const account = useAccount(accountId);
-  const localCustomEmojis = useCustomEmojis();
 
   if (!accountId || !account) {
     return null;
   }
 
-  const displayNameEmojis = {
-    ...localCustomEmojis,
-    ...(cleanExtraEmojis(account.emojis) ?? {}),
-  };
-  const displayNameEmojiVersion = `${Object.keys(localCustomEmojis).length}-${account.emojis.size}`;
-
-  const accountCard = (
+  return (
     <a
       className={classes.accountLink}
       href={account.url}
@@ -81,68 +118,32 @@ export const NavigationAccountCardAndMenu: React.FC<{
       <Avatar account={account} size={32} />
       <span className={classes.accountText}>
         <span className='display-name'>
-          <bdi className='display-name__name'>
-            <EmojiHTML
-              key={`${account.id}-${displayNameEmojiVersion}`}
-              className='display-name__html'
-              htmlString={account.display_name_html}
-              as='strong'
-              extraEmojis={displayNameEmojis}
-            />
-            <VerifiedBadge account={account} />
-            {account.locked && <AccountLock />}
-          </bdi>{' '}
+          <DisplayName variant='simple' account={account} />{' '}
           <span className='display-name__account'>@{account.username}</span>
         </span>
       </span>
     </a>
   );
+};
+
+const AccountSummary: React.FC = () => {
+  const { accountId } = useIdentity();
+  const account = useAccount(accountId);
+  const handle = useAccountHandle(account);
 
   return (
-    <div
-      className={classes.root}
-      data-in-slide-out={inSlideOut ? 'true' : undefined}
-      onPointerDown={inSlideOut ? stopDrawerGesture : undefined}
-      onTouchStart={inSlideOut ? stopDrawerGesture : undefined}
-    >
-      {accountCard}
-      {inSlideOut ? (
-        <SlideOutAccountMenu />
-      ) : (
-        <Menu type='navigation'>
-          <MenuTrigger
-            as={IconButton}
-            icon={DotsThreeIcon}
-            variant='ghost'
-            size='sm'
-          >
-            <FormattedMessage
-              id='tabs_bar.account_settings'
-              defaultMessage='Account settings'
-            />
-          </MenuTrigger>
-          <MenuList
-            portal
-            mobilePresentation='popover'
-            placement='top-end'
-            strategy='fixed'
-            offset={8}
-            maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
-            data-testid='account-menu'
-          >
-            <AccountMenuItems />
-          </MenuList>
-        </Menu>
-      )}
-    </div>
+    <LockupWrapper icon={<Avatar account={account} size={32} />}>
+      <LockupContent subtitle={handle}>
+        <DisplayName variant='simple' account={account} />
+      </LockupContent>
+    </LockupWrapper>
   );
 };
 
 /**
- * The true mobile navigation lives inside a transformed, gesture-driven drawer.
+ * The mobile navigation lives inside a transformed, gesture-driven drawer.
  * Open on pointerdown so a later gesture cancellation cannot swallow the
- * activation. Browsers synthesize a click after touch/pointer activation, so
- * ignore that follow-up click for a short window instead of toggling twice.
+ * activation; ignore the synthetic click that often follows a touch event.
  */
 const SlideOutAccountMenu: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -161,6 +162,23 @@ const SlideOutAccountMenu: React.FC = () => {
     anchor?.focus({ preventScroll: true });
   }, [anchor]);
 
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeMenu();
+      }
+    };
+
+    document.addEventListener('keyup', handleKeyUp);
+    return () => {
+      document.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [closeMenu, open]);
+
   const markPointerHandled = useCallback(() => {
     pointerHandledRef.current = true;
 
@@ -168,8 +186,6 @@ const SlideOutAccountMenu: React.FC = () => {
       clearTimeout(pointerResetTimerRef.current);
     }
 
-    // A synthetic click may be queued after timers while the initial page is
-    // busy. Keep the guard alive long enough to cover delayed mobile clicks.
     pointerResetTimerRef.current = setTimeout(() => {
       pointerHandledRef.current = false;
       pointerResetTimerRef.current = null;
@@ -186,8 +202,6 @@ const SlideOutAccountMenu: React.FC = () => {
         return;
       }
 
-      // Do not depend on the ref callback having completed during hydration.
-      // The event target is the actual DOM button and is safe as the anchor.
       setAnchor(event.currentTarget);
       markPointerHandled();
       toggleMenu();
@@ -208,7 +222,6 @@ const SlideOutAccountMenu: React.FC = () => {
         return;
       }
 
-      // Keyboard activation does not produce the pointerdown handled above.
       setAnchor(event.currentTarget);
       toggleMenu();
     },
@@ -243,8 +256,6 @@ const SlideOutAccountMenu: React.FC = () => {
           offset={8}
         >
           {({ props: floatingProps }) => (
-            // The surface only contains interactive children; this click
-            // handler is a propagation boundary, not an extra interaction.
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
             <div
               {...floatingProps}
@@ -278,13 +289,14 @@ export const AccountMenuItems: React.FC<{
     dispatch(openModal({ modalType: 'CONFIRM_LOG_OUT', modalProps: {} }));
   }, [dispatch]);
 
-  if (!accountId || !account) {
+  if (!accountId) {
     return null;
   }
 
   const isManager = canManageReports(permissions);
   const isAdmin = canViewAdminDashboard(permissions);
-  const accountBasePath = `/@${account.acct}`;
+
+  const accountBasePath = `/@${account?.acct}`;
   const FavouriteIcon =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2'
       ? StarIcon
@@ -401,15 +413,15 @@ const ProfileMenuItem: React.FC = () => {
   const accountBasePath = `/@${account?.acct}`;
 
   return (
-    <MenuItemLink to={accountBasePath}>
-      <ListItemWrapper
+    <MenuItemLink to={accountBasePath} exact>
+      <LockupWrapper
         icon={<Avatar account={account} size={40} />}
         className={classes.profileMenuItem}
       >
-        <ListItemContent subtitle={handle}>
+        <LockupContent subtitle={handle}>
           <DisplayName variant='simple' account={account} />
-        </ListItemContent>
-      </ListItemWrapper>
+        </LockupContent>
+      </LockupWrapper>
     </MenuItemLink>
   );
 };

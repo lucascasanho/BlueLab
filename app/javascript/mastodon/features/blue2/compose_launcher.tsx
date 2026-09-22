@@ -3,7 +3,6 @@ import { useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { AvatarById } from '@/mastodon/components/avatar';
-import { ComposeIcon } from '@/mastodon/components/compose_icon';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
   composerOriginFromElement,
@@ -12,6 +11,7 @@ import {
 import { useAppDispatch } from '@/mastodon/store';
 
 import classes from './compose_launcher.module.scss';
+import { Blue2ComposeIcon } from './icons';
 
 export const Blue2ComposeLauncher: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -38,7 +38,7 @@ export const Blue2ComposeLauncher: React.FC = () => {
           defaultMessage='What is on your mind?'
         />
       </span>
-      <ComposeIcon size={22} />
+      <Blue2ComposeIcon size={22} />
     </button>
   );
 };

@@ -5,7 +5,7 @@ import { Helmet } from '@unhead/react/helmet';
 import { Column } from '@/mastodon/components/column';
 
 import { NavigationPanel } from '../navigation_panel';
-import { LinkFooter } from '../ui/components/link_footer';
+import { NavigationFooterLinks } from '../navigation_panel/redesign/footer_links';
 
 const GettingStarted: React.FC = () => {
   const intl = useIntl();
@@ -20,7 +20,7 @@ const GettingStarted: React.FC = () => {
         <div className='bluelab-advanced-footer-spacer' aria-hidden='true' />
       )}
 
-      <LinkFooter context='multi-column' />
+      <NavigationFooterLinks multiColumn variant='blue2' />
 
       <Helmet>
         <title>

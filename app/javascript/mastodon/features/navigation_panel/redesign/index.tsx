@@ -2,39 +2,42 @@ import { useCallback, useEffect } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { Link } from 'react-router-dom';
+
 import {
+  PenNibIcon,
   HouseIcon,
   MagnifyingGlassIcon,
   RssSimpleIcon,
   BellIcon,
   ChatCircleDotsIcon,
-  ChatCircleIcon,
   BookmarkSimpleIcon,
+  PlusIcon,
 } from '@phosphor-icons/react';
 
+import { blue2Text } from '@/bluelab/i18n/blue2';
 import FediIcon from '@/images/icons/icon_fediverse.svg?react';
 import { fetchLists } from '@/mastodon/actions/lists';
 import { closeNavigation } from '@/mastodon/actions/navigation';
 import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
-import { ComposeIcon } from '@/mastodon/components/compose_icon';
+import { Callout } from '@/mastodon/components/callout/redesign';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
-// BLUELAB_INTEGRATION: BlueLab-owned labels for the optional BlueLab theme.
-import { blue2Text } from '@/bluelab/i18n/blue2';
 import { useScrollSensor } from '@/mastodon/hooks/useScrollSensor';
 import { useIdentity } from '@/mastodon/identity_context';
-import {
-  composerOriginFromElement,
-  openPreferredComposer,
-} from '@/mastodon/reducers/slices/composer';
+import { disabledAccountId } from '@/mastodon/initial_state';
+import { transientSingleColumn } from '@/mastodon/is_mobile';
+import { openNewComposer } from '@/mastodon/reducers/slices/composer';
 import { getOrderedLists } from '@/mastodon/selectors/lists';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+
+import { Blue2ComposeIcon } from '../../blue2/icons';
 
 import { NavigationAccountCardAndMenu } from './account_card_and_menu';
 import { NavigationFooterLinks } from './footer_links';
 import { NavigationHeader } from './header';
 import { ListSection } from './list_section';
-import { LoggedOutInfo } from './logged_out_info';
+import { DisabledAccountBanner, LoggedOutInfo } from './logged_out_info';
 import { NavigationLink } from './navigation_link';
 import classes from './styles.module.scss';
 
@@ -58,7 +61,9 @@ function useCustomFeeds() {
     }
   }, [dispatch, signedIn]);
 
-  return { customFeeds };
+  return {
+    customFeeds,
+  };
 }
 
 function useFollowedHashtags() {
@@ -75,6 +80,13 @@ function useFollowedHashtags() {
   return { followedHashtags: tags };
 }
 
+const isFediverseFeedsLinkActive = (
+  match: unknown,
+  { pathname }: { pathname: string },
+) => {
+  return !!match || pathname.startsWith('/public');
+};
+
 const MAX_HASHTAG_COUNT = 5;
 
 export const RedesignNavigationPanel: React.FC<{
@@ -84,7 +96,8 @@ export const RedesignNavigationPanel: React.FC<{
    * menu items are hidden and the design is tweaked slightly
    */
   mode?: 'static' | 'slide-out';
-}> = ({ siteName, mode = 'static' }) => {
+  multiColumn?: boolean;
+}> = ({ siteName, mode = 'static', multiColumn }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const { signedIn } = useIdentity();
@@ -94,27 +107,24 @@ export const RedesignNavigationPanel: React.FC<{
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
-  const openComposer = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      dispatch(closeNavigation());
-      dispatch(
-        openPreferredComposer({
-          origin: composerOriginFromElement(event.currentTarget),
-        }),
-      );
-    },
-    [dispatch],
-  );
+  const openComposer = useCallback(() => {
+    dispatch(closeNavigation());
+    dispatch(openNewComposer({ type: 'post' }));
+  }, [dispatch]);
 
   const { customFeeds } = useCustomFeeds();
   const { followedHashtags } = useFollowedHashtags();
 
   const { sensor: topSensor, isInViewport: isScrolledToTop } = useScrollSensor({
     placement: 'top',
+    // Only show overlay fade after a bit of scrolling, as the nav header has
+    // a bit of bottom spacing where the fade isn't needed yet
     tolerance: 36,
   });
   const { sensor: bottomSensor, isInViewport: isScrolledToBottom } =
-    useScrollSensor({ placement: 'bottom' });
+    useScrollSensor({
+      placement: 'bottom',
+    });
 
   return (
     <nav
@@ -126,14 +136,14 @@ export const RedesignNavigationPanel: React.FC<{
       <NavigationHeader siteName={siteName} isStuck={!isScrolledToTop} />
       {signedIn && (
         <>
+          {transientSingleColumn && <TransientSingleColumnCallout />}
           <ul className={classes.list}>
             <NavigationLink
               withSpaceAfter
               as='button'
-              type='button'
               data-bluelab-compose={isBlue2 ? 'true' : undefined}
               onClick={openComposer}
-              iconComponent={ComposeIcon}
+              iconComponent={isBlue2 ? Blue2ComposeIcon : PenNibIcon}
             >
               {isBlue2 ? (
                 blue2Text(intl.locale, 'write')
@@ -163,6 +173,7 @@ export const RedesignNavigationPanel: React.FC<{
               withSpaceAfter
               to='/public/local'
               iconComponent={FediIcon}
+              isActive={isFediverseFeedsLinkActive}
             >
               {isBlue2 ? (
                 blue2Text(intl.locale, 'fediverseFeeds')
@@ -185,37 +196,56 @@ export const RedesignNavigationPanel: React.FC<{
                   />
                 )
               }
-              action={{
-                label: isBlue2 ? (
-                  blue2Text(intl.locale, 'createFeed')
-                ) : (
-                  <FormattedMessage
-                    id='tabs_bar.create_custom_feed'
-                    defaultMessage='Create'
-                  />
-                ),
-                link: '/lists/new',
-              }}
               emptyMessage={
-                isBlue2 ? (
-                  blue2Text(intl.locale, 'customFeedsEmpty')
-                ) : (
-                  <FormattedMessage
-                    id='tabs_bar.custom_feeds_empty'
-                    defaultMessage='You have no custom feeds yet.'
-                  />
-                )
+                <>
+                  {isBlue2 ? (
+                    blue2Text(intl.locale, 'customFeedsEmpty')
+                  ) : (
+                    <FormattedMessage
+                      id='tabs_bar.custom_feeds_empty'
+                      defaultMessage='You have no custom feeds yet.'
+                    />
+                  )}{' '}
+                  <Link to='/lists/new'>
+                    {isBlue2 ? (
+                      blue2Text(intl.locale, 'createFeed')
+                    ) : (
+                      <FormattedMessage
+                        id='tabs_bar.create_custom_feed'
+                        defaultMessage='Create Feed'
+                      />
+                    )}
+                  </Link>
+                </>
               }
             >
-              {customFeeds.map((feed) => (
-                <NavigationLink
-                  key={feed.id}
-                  to={`/lists/${feed.id}`}
-                  iconComponent={RssSimpleIcon}
-                >
-                  {feed.title}
-                </NavigationLink>
-              ))}
+              {customFeeds.length > 0 && (
+                <>
+                  <NavigationLink
+                    key='new'
+                    to='/lists/new'
+                    iconComponent={PlusIcon}
+                  >
+                    {isBlue2 ? (
+                      blue2Text(intl.locale, 'createFeed')
+                    ) : (
+                      <FormattedMessage
+                        id='tabs_bar.create_custom_feed'
+                        defaultMessage='Create Feed'
+                      />
+                    )}
+                  </NavigationLink>
+                  {customFeeds.map((feed) => (
+                    <NavigationLink
+                      key={feed.id}
+                      to={`/lists/${feed.id}`}
+                      iconComponent={RssSimpleIcon}
+                    >
+                      {feed.title}
+                    </NavigationLink>
+                  ))}
+                </>
+              )}
             </ListSection>
 
             {followedHashtags.length > 0 && (
@@ -245,53 +275,121 @@ export const RedesignNavigationPanel: React.FC<{
             )}
           </ul>
           <footer className={classes.footer} data-stuck={!isScrolledToBottom}>
-            {/* BlueLab intentionally keeps these shortcuts and the account
-                card in the slide-out navigation. Upstream #40428 hides this
-                block on mobile, but the BlueLab drawer remains an account-menu
-                entry point. */}
-            <ul className={classes.footerNav}>
-              <NavigationLink
-                stacked
-                to='/notifications'
-                iconComponent={BellIcon}
-                badgeCount={notificationsCount}
-              >
-                <FormattedMessage
-                  id='tabs_bar.notifications'
-                  defaultMessage='Notifications'
-                />
-              </NavigationLink>
-              <NavigationLink
-                stacked
-                to='/conversations'
-                iconComponent={isBlue2 ? ChatCircleDotsIcon : ChatCircleIcon}
-              >
-                <FormattedMessage
-                  id='tabs_bar.messages'
-                  defaultMessage='Messages'
-                  description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
-                />
-              </NavigationLink>
-              <NavigationLink
-                stacked
-                to='/bookmarks'
-                iconComponent={BookmarkSimpleIcon}
-              >
-                <FormattedMessage id='tabs_bar.saved' defaultMessage='Saved' />
-              </NavigationLink>
-            </ul>
-            <NavigationAccountCardAndMenu inSlideOut={mode === 'slide-out'} />
-            <NavigationFooterLinks siteName={siteName} />
+            {mode !== 'slide-out' && (
+              <>
+                <ul className={classes.footerNav}>
+                  <NavigationLink
+                    stacked
+                    to='/notifications'
+                    iconComponent={BellIcon}
+                    badgeCount={notificationsCount}
+                  >
+                    <FormattedMessage
+                      id='tabs_bar.notifications'
+                      defaultMessage='Notifications'
+                    />
+                  </NavigationLink>
+                  <NavigationLink
+                    stacked
+                    to='/conversations'
+                    iconComponent={ChatCircleDotsIcon}
+                  >
+                    <FormattedMessage
+                      id='tabs_bar.messages'
+                      defaultMessage='Messages'
+                      description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
+                    />
+                  </NavigationLink>
+                  <NavigationLink
+                    stacked
+                    to='/bookmarks'
+                    iconComponent={BookmarkSimpleIcon}
+                  >
+                    <FormattedMessage
+                      id='tabs_bar.saved'
+                      defaultMessage='Saved'
+                    />
+                  </NavigationLink>
+                </ul>
+                <NavigationAccountCardAndMenu />
+              </>
+            )}
+            {mode === 'slide-out' && (
+              <>
+                <ul className={classes.footerNav}>
+                  <NavigationLink
+                    stacked
+                    to='/notifications'
+                    iconComponent={BellIcon}
+                    badgeCount={notificationsCount}
+                  >
+                    <FormattedMessage
+                      id='tabs_bar.notifications'
+                      defaultMessage='Notifications'
+                    />
+                  </NavigationLink>
+                  <NavigationLink
+                    stacked
+                    to='/conversations'
+                    iconComponent={ChatCircleDotsIcon}
+                  >
+                    <FormattedMessage
+                      id='tabs_bar.messages'
+                      defaultMessage='Messages'
+                      description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
+                    />
+                  </NavigationLink>
+                  <NavigationLink
+                    stacked
+                    to='/bookmarks'
+                    iconComponent={BookmarkSimpleIcon}
+                  >
+                    <FormattedMessage
+                      id='tabs_bar.saved'
+                      defaultMessage='Saved'
+                    />
+                  </NavigationLink>
+                </ul>
+                <NavigationAccountCardAndMenu inSlideOut />
+              </>
+            )}
+            {!multiColumn && (
+              <NavigationFooterLinks
+                multiColumn={multiColumn}
+                siteName={siteName}
+              />
+            )}
           </footer>
         </>
       )}
       {!signedIn && (
         <footer className={classes.footer} data-stuck={!isScrolledToBottom}>
-          <LoggedOutInfo />
-          <NavigationFooterLinks siteName={siteName} />
+          {disabledAccountId ? <DisabledAccountBanner /> : <LoggedOutInfo />}
+          {!multiColumn && (
+            <NavigationFooterLinks
+              multiColumn={multiColumn}
+              siteName={siteName}
+            />
+          )}
         </footer>
       )}
       {bottomSensor}
     </nav>
   );
 };
+
+const TransientSingleColumnCallout: React.FC = () => (
+  <Callout className={classes.callout}>
+    <FormattedMessage
+      id='navigation_bar.opened_in_single_column_layout'
+      defaultMessage='Posts, profiles, and other pages are opened in the single-column layout by default.'
+    />
+    <br />
+    <a href={`/deck${location.pathname}`}>
+      <FormattedMessage
+        id='navigation_bar.advanced_interface'
+        defaultMessage='Open in advanced web interface'
+      />
+    </a>
+  </Callout>
+);

@@ -2,12 +2,12 @@ import { useCallback } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 
-import { StackIcon } from '@phosphor-icons/react';
+import { CaretRightIcon, StackIcon } from '@phosphor-icons/react';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
-import { ComposeIcon } from '@/mastodon/components/compose_icon';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
@@ -23,6 +23,7 @@ import { Blue2Announcements } from './announcements';
 import {
   Blue2BellIcon,
   Blue2BookmarkIcon,
+  Blue2ComposeIcon,
   Blue2FeedIcon,
   Blue2ListIcon,
   Blue2MessageIcon,
@@ -42,6 +43,41 @@ interface ItemProps {
   className?: string;
   isActive?: React.ComponentProps<typeof NavLink>['isActive'];
 }
+
+export const Blue2ComposeButton: React.FC<{
+  onCompose?: () => void;
+  className?: string;
+}> = ({ onCompose, className }) => {
+  const dispatch = useAppDispatch();
+  const intl = useIntl();
+  const { signedIn } = useIdentity();
+
+  const openComposer = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      dispatch(
+        openNewComposer({
+          type: 'post',
+          origin: composerOriginFromElement(event.currentTarget),
+        }),
+      );
+      onCompose?.();
+    },
+    [dispatch, onCompose],
+  );
+
+  if (!signedIn) return null;
+
+  return (
+    <button
+      className={classNames(classes.composeButton, className)}
+      type='button'
+      onClick={openComposer}
+    >
+      <Blue2ComposeIcon size={19} />
+      <span>{blue2Text(intl.locale, 'write')}</span>
+    </button>
+  );
+};
 
 const neverActive: NonNullable<ItemProps['isActive']> = () => false;
 
@@ -68,25 +104,17 @@ const Item: React.FC<ItemProps> = ({
   </NavLink>
 );
 
-export const Blue2Navigation: React.FC = () => {
-  const dispatch = useAppDispatch();
+export const Blue2Navigation: React.FC<{
+  onCompose?: () => void;
+  compact?: boolean;
+  expanded?: boolean;
+  onToggleExpanded?: () => void;
+}> = ({ onCompose, compact, expanded, onToggleExpanded }) => {
   const intl = useIntl();
   const { accountId, signedIn } = useIdentity();
   const account = useAccount(accountId);
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
-  );
-
-  const openComposer = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      dispatch(
-        openNewComposer({
-          type: 'post',
-          origin: composerOriginFromElement(event.currentTarget),
-        }),
-      );
-    },
-    [dispatch],
   );
 
   const profilePath = account?.acct ? `/@${account.acct}` : '/home';
@@ -95,8 +123,26 @@ export const Blue2Navigation: React.FC = () => {
     : '/home';
 
   return (
-    <nav className={classes.root} aria-label='BLUE 2.0'>
-      {signedIn && <Blue2AccountMenu />}
+    <nav
+      className={classNames(
+        classes.root,
+        compact && classes.rootCompact,
+        expanded && classes.rootExpanded,
+      )}
+      aria-label='BLUE 2.0'
+    >
+      {compact && (
+        <button
+          type='button'
+          className={classes.expandButton}
+          onClick={onToggleExpanded}
+          aria-label={expanded ? 'Collapse menu' : 'Expand menu'}
+          aria-expanded={expanded}
+        >
+          <CaretRightIcon size={24} />
+        </button>
+      )}
+      {signedIn && <Blue2AccountMenu compact={compact && !expanded} />}
 
       <div className={classes.items}>
         <Item to='/explore' icon={Blue2SearchIcon}>
@@ -179,16 +225,7 @@ export const Blue2Navigation: React.FC = () => {
         )}
       </div>
 
-      {signedIn && (
-        <button
-          className={classes.composeButton}
-          type='button'
-          onClick={openComposer}
-        >
-          <ComposeIcon size={19} />
-          <span>{blue2Text(intl.locale, 'write')}</span>
-        </button>
-      )}
+      <Blue2ComposeButton onCompose={onCompose} />
     </nav>
   );
 };

@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative '../lib/bluelab/manifest_validator'
+
+root = File.expand_path('..', __dir__)
+path = ENV.fetch('BLUELAB_MANIFEST', File.join(root, 'bluelab/manifest.yml'))
+result = BlueLab::ManifestValidator.new(path: path, root: root).validate
+
+if result.valid?
+  puts "Manifesto BlueLab válido: #{path}"
+  exit 0
+end
+
+warn "Manifesto BlueLab inválido: #{path}"
+result.errors.each { |error| warn "- #{error}" }
+exit 1

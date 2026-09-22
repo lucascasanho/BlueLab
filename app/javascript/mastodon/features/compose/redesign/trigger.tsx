@@ -24,6 +24,7 @@ import {
   MenuItem,
 } from '@/mastodon/components/menu';
 import { MenuCard } from '@/mastodon/components/menu/card';
+import { Blue2ComposeIcon } from '@/mastodon/features/blue2/icons';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
   composerOriginFromElement,
@@ -111,7 +112,7 @@ export const ComposerResumeButton: React.FC<{
   inline?: boolean;
 }> = ({ onResume, inline }) => (
   <IconButton
-    icon={ComposeIcon}
+    icon={Blue2ComposeIcon}
     variant='solid'
     color='accent'
     className={classNames(
@@ -327,7 +328,7 @@ export const ComposeRedesignButton: React.FC<{
     <Menu>
       <MenuTrigger
         as={IconButton}
-        icon={ComposeIcon}
+        icon={isBlue2 ? Blue2ComposeIcon : ComposeIcon}
         variant='solid'
         color='accent'
         className={classNames(classes.button, inline && classes.buttonInline)}

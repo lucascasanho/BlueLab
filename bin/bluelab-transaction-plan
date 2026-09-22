@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'optparse'
+require_relative '../lib/bluelab/transaction_planner'
+
+options = {
+  repo: Dir.pwd,
+  state_dir: ENV.fetch('BLUELAB_STATE_DIR', File.expand_path('~/.local/state/bluelab')),
+  test_ref: 'HEAD',
+}
+
+OptionParser.new do |parser|
+  parser.banner = 'Uso: bluelab-transaction-plan --upstream-ref REF [opções]'
+  parser.on('--upstream-ref REF', 'Ref upstream a simular') { |value| options[:upstream_ref] = value }
+  parser.on('--repo DIR', 'Checkout BlueLab (padrão: diretório atual)') { |value| options[:repo] = value }
+  parser.on('--test-ref REF', 'Ref de teste (padrão: HEAD)') { |value| options[:test_ref] = value }
+  parser.on('--state-dir DIR', 'Diretório externo de relatórios') { |value| options[:state_dir] = value }
+  parser.on('--manifest PATH', 'Manifesto a validar') { |value| options[:manifest_path] = value }
+end.parse!
+
+abort 'ERRO: --upstream-ref é obrigatório' unless options[:upstream_ref]
+
+result = BlueLab::TransactionPlanner.new(**options).run
+puts "Status: #{result.status}"
+puts "Relatório: #{result.report_path}"
+result.errors.each { |error| warn "- #{error}" }
+exit(result.ready? ? 0 : 1)

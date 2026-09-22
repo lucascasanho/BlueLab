@@ -1,17 +1,12 @@
-import type React from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useId, useMemo } from 'react';
 
 import classNames from 'classnames';
 
 import type { Merge } from 'type-fest';
 
-import { selectStatusFilters } from '@/mastodon/selectors/filters';
 import { selectExpandedStatus } from '@/mastodon/selectors/statuses';
 import { createAppSelector, useAppSelector } from '@/mastodon/store';
 
-import { ContentWarning } from '../content_warning';
-import { FilterWarning } from '../filter_warning';
-import { computeHashtagBarForStatus } from '../hashtag_bar';
 import { Hotkeys } from '../hotkeys';
 import { Poll } from '../poll';
 
@@ -19,18 +14,20 @@ import { StatusActionBar } from './action_bar';
 import { StatusAttachments } from './attachments';
 import { StatusContent } from './content';
 import { StatusHashtagBar } from './hashtag_bar';
+import { StatusRedesignHeader } from './header';
 import type { StatusHandlers } from './hooks';
 import {
   StatusContext,
   useStatusHandlers,
   useTextForScreenReader,
 } from './hooks';
+import { computeHashtagBarForStatus } from './legacy/hashtag_bar';
 import { StatusMeta } from './meta';
 import { StatusPrepend } from './prepend';
-import { StatusRedesignHeader } from './redesign/header';
 import classes from './styles.module.scss';
 import { TranslateButton } from './translate';
 import type { StatusContainerProps, StatusContextType } from './types';
+import { StatusWarning } from './warning';
 
 type StatusRedesignProps = Merge<
   Omit<StatusContainerProps, 'account'>,
@@ -79,18 +76,11 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
   showThread,
   headerContents,
   variant = contextToVariant(contextType),
+  nextId,
 }) => {
-  const [showFullAccountHandle, setShowFullAccountHandle] = useState(false);
-  const handleToggleFullAccountHandle = useCallback(() => {
-    setShowFullAccountHandle((value) => !value);
-  }, []);
-
   // Select data from store
   const { status, parent } = useAppSelector((state) =>
     selectStatusReblog(state, id),
-  );
-  const matchedFilters = useAppSelector((state) =>
-    selectStatusFilters(state, { contextType, statusId: parent?.id ?? id }),
   );
   const statusId = status?.id;
 
@@ -105,25 +95,28 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
       status ? computeHashtagBarForStatus(status) : {},
     [status],
   );
+  const contentWrapperId = useId();
+
+  const isNextReplyingToMe = useAppSelector(
+    (state) => state.statuses.getIn([nextId, 'in_reply_to_id']) === statusId,
+  );
 
   // Handlers
   const {
+    isFiltered,
     showDespiteFilter,
-    onExpandedToggle,
     onFilterToggle,
     onTranslate,
     ...handlers
-  } = useStatusHandlers({ status, contextType, onOpen });
+  } = useStatusHandlers({
+    status,
+    contextType,
+    onOpen,
+  });
 
   if (!status) {
     return null; // loading state
   }
-
-  const actualStatus = parent ?? status;
-
-  const expanded =
-    (matchedFilters.length === 0 || showDespiteFilter) &&
-    (!status.hidden || !status.spoiler_text);
 
   const hotkeysProps = {
     handlers: {
@@ -135,20 +128,19 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
     'data-id': id,
   };
 
+  const isHidden =
+    (!showDespiteFilter && isFiltered) ||
+    (!!status.spoiler_text && status.hidden);
+
   if (hidden) {
     return (
       <StatusHotkeys {...hotkeysProps}>
         <span>{status.account.display_name || status.account.username}</span>
         {status.spoiler_text && <span>{status.spoiler_text}</span>}
-        {expanded && <span>{status.content}</span>}
+        {!isHidden && <span>{status.content}</span>}
       </StatusHotkeys>
     );
   }
-
-  const showFooter =
-    (expanded && hashtagsInBar.length > 0) ||
-    variant === 'page' ||
-    (showActions && !isQuotedPost);
 
   return (
     <StatusContext.Provider value={{ id, contextType }}>
@@ -159,46 +151,46 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
           variant === 'thread' && classes.variantThread,
           variant === 'page' && classes.variantPage,
           isQuotedPost && classes.isQuote,
+          status.visibility === 'direct' && classes.isMessage,
+          variant === 'thread' &&
+            isNextReplyingToMe &&
+            !showThread &&
+            classes.connectNextReply,
         )}
         data-featured={featured ? 'true' : null}
         aria-label={screenReaderText}
         data-nosnippet={status.account.noindex || undefined}
+        data-connect-next={nextId ? isNextReplyingToMe : undefined}
       >
         {!skipPrepend && (
           <StatusPrepend
-            status={actualStatus}
-            isReblog={!!parent}
+            status={status}
+            reblogId={parent?.id}
             showThread={showThread}
           />
         )}
 
-        <StatusRedesignHeader
-          status={status}
-          className={classes.header}
-          showFullAccountHandle={showFullAccountHandle}
-        >
+        <StatusRedesignHeader status={status} className={classes.header}>
           {headerContents}
         </StatusRedesignHeader>
 
-        {matchedFilters.length > 0 && (
-          <FilterWarning
-            title={matchedFilters.map((filter) => filter.title).join(', ')}
-            expanded={showDespiteFilter}
-            onClick={onFilterToggle}
-          />
-        )}
-
-        {(matchedFilters.length === 0 || showDespiteFilter) && (
-          <ContentWarning
-            statusId={status.id}
-            expanded={expanded}
-            onClick={onExpandedToggle}
-          />
-        )}
-
         <TranslateButton status={status} onTranslate={onTranslate} />
 
-        {expanded && (
+        <StatusWarning
+          statusId={status.id}
+          dismissedFilter={showDespiteFilter}
+          onFilterToggle={onFilterToggle}
+          wrapperId={contentWrapperId}
+        />
+
+        <div
+          className={classNames(
+            classes.contentWrapper,
+            isHidden && classes.isFiltered,
+          )}
+          id={contentWrapperId}
+          inert={isHidden}
+        >
           <StatusContent
             status={status}
             statusContent={statusContent}
@@ -219,30 +211,25 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
 
             {children}
           </StatusContent>
-        )}
 
-        {showFooter && (
+          <StatusHashtagBar
+            hashtags={hashtagsInBar}
+            accountId={status.account.id}
+          />
+        </div>
+
+        {(variant === 'page' || (showActions && !isQuotedPost)) && (
           <footer className={classes.footer}>
-            {expanded && hashtagsInBar.length > 0 && (
-              <StatusHashtagBar
-                hashtags={hashtagsInBar}
-                accountId={status.account.id}
-              />
-            )}
-
-            {variant === 'page' && (
-              <StatusMeta status={status} className={classes.meta} />
-            )}
-
             {showActions && !isQuotedPost && (
               <StatusActionBar
                 statusId={status.id}
                 withDismiss={withDismiss}
                 withCounters={withCounters}
-                showFullAccountHandle={showFullAccountHandle}
-                onToggleFullAccountHandle={handleToggleFullAccountHandle}
+                onlyResponses={variant === 'page'}
               />
             )}
+
+            {variant === 'page' && <StatusMeta status={status} />}
           </footer>
         )}
       </StatusHotkeys>
@@ -256,6 +243,7 @@ interface StatusHotkeysProps {
   children: React.ReactNode;
   handlers: Omit<
     StatusHandlers,
+    | 'isFiltered'
     | 'showDespiteFilter'
     | 'onOpenClick'
     | 'onHeaderClick'
