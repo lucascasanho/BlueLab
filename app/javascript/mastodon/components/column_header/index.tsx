@@ -5,13 +5,15 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { useLocation } from 'react-router';
 
-import { ArrowLeftIcon, ListIcon } from '@phosphor-icons/react';
+import { ArrowLeftIcon, DotsThreeIcon, ListIcon } from '@phosphor-icons/react';
 import type { DistributedOmit } from 'type-fest';
 
+import { Menu, MenuItem, MenuItemDivider, MenuList, MenuTrigger } from '@/mastodon/components/menu';
 import { openNavigation } from '@/mastodon/actions/navigation';
 import { getColumnSkipLinkId } from '@/mastodon/features/ui/components/skip_links';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useAppDispatch } from '@/mastodon/store';
+import { useBlue2ColumnPinning } from '@/mastodon/features/ui/util/blue2_column_pinning';
 import { hasReactChildren } from '@/mastodon/utils/has_react_children';
 
 import type { IconButtonProps } from '../button/redesign';
@@ -52,6 +54,62 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     withBackButton === true ||
     (withBackButton === 'auto' && location.state?.fromMastodon);
   const hasExtraStickyContent = hasReactChildren(extraStickyContent);
+  const blue2ColumnPinning = useBlue2ColumnPinning();
+  const showBlue2ColumnSettings =
+    blue2ColumnPinning.canPin && !hasReactChildren(extraButtons);
+
+  const history = useAppHistory();
+
+  const blue2ColumnSettings = showBlue2ColumnSettings ? (
+    <Menu>
+      <MenuTrigger as={ColumnHeaderButton} icon={DotsThreeIcon}>
+        {blue2ColumnPinning.pinned ? (
+          <FormattedMessage
+            id='column_header.unpin'
+            defaultMessage='Unpin'
+          />
+        ) : (
+          <FormattedMessage
+            id='column_header.pin'
+            defaultMessage='Pin'
+          />
+        )}
+      </MenuTrigger>
+      <MenuList placement='bottom-end' strategy='fixed'>
+        <MenuItem
+          onClick={() => {
+            if (!blue2ColumnPinning.pinned) {
+              history.replace('/');
+            }
+            blue2ColumnPinning.onPin();
+          }}
+        >
+          {blue2ColumnPinning.pinned ? (
+            <FormattedMessage id='column_header.unpin' defaultMessage='Unpin' />
+          ) : (
+            <FormattedMessage id='column_header.pin' defaultMessage='Pin' />
+          )}
+        </MenuItem>
+        {blue2ColumnPinning.pinned && <MenuItemDivider />}
+        {blue2ColumnPinning.pinned && (
+          <>
+            <MenuItem onClick={() => blue2ColumnPinning.onMove(-1)}>
+              <FormattedMessage
+                id='column_header.moveLeft_settings'
+                defaultMessage='Move column to the left'
+              />
+            </MenuItem>
+            <MenuItem onClick={() => blue2ColumnPinning.onMove(1)}>
+              <FormattedMessage
+                id='column_header.moveRight_settings'
+                defaultMessage='Move column to the right'
+              />
+            </MenuItem>
+          </>
+        )}
+      </MenuList>
+    </Menu>
+  ) : null;
 
   return (
     <header
@@ -82,8 +140,11 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
             )}
           </button>
         </NavigationFocusTarget>
-        {hasReactChildren(extraButtons) && (
-          <div className={classes.rightButtons}>{extraButtons}</div>
+        {(hasReactChildren(extraButtons) || showBlue2ColumnSettings) && (
+          <div className={classes.rightButtons}>
+            {extraButtons}
+            {blue2ColumnSettings}
+          </div>
         )}
       </div>
       {hasExtraStickyContent && (

@@ -8,6 +8,7 @@ import { Helmet } from '@unhead/react/helmet';
 import { connect } from 'react-redux';
 
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
+import { blue2Text } from '@/bluelab/i18n/blue2';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';
 import { DismissableBanner } from 'mastodon/components/dismissable_banner';
@@ -137,7 +138,13 @@ class PublicTimeline extends PureComponent {
       />
     );
 
-    const title = intl.formatMessage(isRedesignEnabled() ? messages.title_redesign : messages.title)
+    const isBlue2 =
+      typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+    const title = isBlue2
+      ? blue2Text(intl.locale, 'global')
+      : intl.formatMessage(
+        isRedesignEnabled() ? messages.title_redesign : messages.title,
+      );
 
     return (
       <Column bindToDocument={!multiColumn} label={title}>

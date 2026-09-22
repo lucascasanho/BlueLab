@@ -31,6 +31,7 @@ import { uploadCompose, resetCompose, changeComposeSpoilerness } from '../../act
 import { clearHeight } from '../../actions/height_cache';
 import { fetchServer, fetchServerTranslationLanguages } from '../../actions/server';
 import { expandHomeTimeline } from '../../actions/timelines';
+import { addColumn, removeColumn } from '../../actions/columns';
 import { initialState, forceSingleColumn, me, owner, singleUserMode, trendsEnabled, landingPage, localLiveFeedAccess, disableHoverCards, domain } from '../../initial_state';
 
 import BundleColumnError from './components/bundle_column_error';
@@ -127,6 +128,7 @@ const mapStateToProps = state => ({
   newAccount: !state.getIn(['accounts', me, 'note']) && !state.getIn(['accounts', me, 'bot']) && state.getIn(['accounts', me, 'following_count'], 0) === 0 && state.getIn(['accounts', me, 'statuses_count'], 0) === 0,
   username: state.getIn(['accounts', me, 'username']),
   composerEditor: state.getIn(['compose', 'composer_editor']) === 'mastodon' ? 'mastodon' : 'bluelab',
+  columns: state.getIn(['settings', 'columns']),
 });
 
 class SwitchingColumnsArea extends PureComponent {
@@ -317,6 +319,7 @@ class UI extends PureComponent {
     newAccount: PropTypes.bool,
     username: PropTypes.string,
     composerEditor: PropTypes.oneOf(['bluelab', 'mastodon']).isRequired,
+    columns: PropTypes.object,
     ...WithRouterPropTypes,
   };
 
@@ -325,6 +328,8 @@ class UI extends PureComponent {
     mobileChromeHidden: false,
     blue2CompactViewport: isBlue2CompactViewport(),
   };
+
+  blue2DefaultColumnsApplied = false;
 
   mobileChromeAnimationFrame = null;
   mobileChromeScrollState = createMobileChromeScrollState();
@@ -508,6 +513,7 @@ class UI extends PureComponent {
   });
 
   handleResize = () => {
+    this.ensureBlue2DefaultColumns();
     const layout = layoutFromWindow();
     const blue2CompactViewport = isBlue2CompactViewport();
 
@@ -532,7 +538,36 @@ class UI extends PureComponent {
     location.href = 'https://joinmastodon.org/sponsors#donate'
   }
 
+  ensureBlue2DefaultColumns = () => {
+    if (
+      this.blue2DefaultColumnsApplied ||
+      forceSingleColumn ||
+      isBlue2CompactViewport() ||
+      this.props.columns?.size !== 3 ||
+      typeof document === 'undefined' ||
+      document.body.dataset.theme !== 'blue-2'
+    ) {
+      return;
+    }
+
+    const columns = this.props.columns;
+    const ids = columns.map((column) => column.get('id')).toArray();
+
+    if (
+      ids[0] === 'COMPOSE' &&
+      ids[1] === 'HOME' &&
+      ids[2] === 'NOTIFICATIONS'
+    ) {
+      this.props.dispatch(removeColumn(columns.getIn([0, 'uuid'])));
+      this.props.dispatch(addColumn('PUBLIC', {}));
+    }
+
+    this.blue2DefaultColumnsApplied = true;
+  };
+
   componentDidMount () {
+    this.ensureBlue2DefaultColumns();
+
     const { signedIn } = this.props.identity;
     this.mobileChromeViewportWidth = window.innerWidth;
 

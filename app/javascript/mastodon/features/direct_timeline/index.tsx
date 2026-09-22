@@ -15,6 +15,7 @@ import {
 import { MultiColumnMenuItems } from '@/mastodon/components/column_header/multicolumn_settings';
 // BLUELAB_INTEGRATION: BlueLab-owned labels for the optional BlueLab theme.
 import { blue2Text } from '@/bluelab/i18n/blue2';
+import { useBlue2ColumnPinning } from '@/mastodon/features/ui/util/blue2_column_pinning';
 import {
   composerOriginFromElement,
   openNewComposer,
@@ -53,6 +54,7 @@ interface ColumnBase {
 const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const blue2ColumnPinning = useBlue2ColumnPinning();
   const pinned = !!columnId;
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
@@ -121,6 +123,26 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
               <ChatCircleDotsIcon size={19} />
               <span>{blue2Text(intl.locale, 'newConversation')}</span>
             </button>
+            {blue2ColumnPinning.canPin && (
+              <button
+                type='button'
+                className={blue2Classes.headerButton}
+                onClick={blue2ColumnPinning.onPin}
+              >
+                <span>
+                  <FormattedMessage
+                    id={
+                      blue2ColumnPinning.pinned
+                        ? 'column_header.unpin'
+                        : 'column_header.pin'
+                    }
+                    defaultMessage={
+                      blue2ColumnPinning.pinned ? 'Unpin' : 'Pin'
+                    }
+                  />
+                </span>
+              </button>
+            )}
           </header>
 
           <div className={blue2Classes.notice}>
