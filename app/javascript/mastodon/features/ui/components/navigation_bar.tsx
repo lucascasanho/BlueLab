@@ -207,15 +207,15 @@ export const NavigationBar: React.FC = () => {
     typeof document !== 'undefined' &&
     document.body.dataset.theme === 'blue-2' &&
     typeof window !== 'undefined' &&
-    window.matchMedia('(max-width: 759px)').matches;
+    window.matchMedia('(max-width: 1174px)').matches;
 
   const handleClick = useCallback(() => {
     dispatch(toggleNavigation());
   }, [dispatch]);
 
-  // BlueLab mobile renders its own navigation shell. Keeping the legacy
-  // navigation mounted underneath it creates a second bottom bar and duplicate
-  // focus targets, so suppress it only for signed-in BlueLab users on phones.
+  // BlueLab compact viewports render their own mobile navigation shell.
+  // The advanced-interface preference must not restore the legacy navigation
+  // underneath it on tablets either.
   if (isBlue2Mobile) {
     return null;
   }
