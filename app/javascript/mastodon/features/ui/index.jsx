@@ -319,6 +319,7 @@ class UI extends PureComponent {
     newAccount: PropTypes.bool,
     username: PropTypes.string,
     composerEditor: PropTypes.oneOf(['bluelab', 'mastodon']).isRequired,
+    columns: PropTypes.object,
     ...WithRouterPropTypes,
   };
 
@@ -512,6 +513,7 @@ class UI extends PureComponent {
   });
 
   handleResize = () => {
+    this.ensureBlue2DefaultColumns();
     const layout = layoutFromWindow();
     const blue2CompactViewport = isBlue2CompactViewport();
 
