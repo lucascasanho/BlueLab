@@ -103,6 +103,9 @@ export const MultiColumnContent: React.FC<{
           ? column.get('params')?.toJS()
           : null;
         const other = params?.other ?? {};
+        const columnAccountId =
+          typeof params?.accountId === 'string' ? params.accountId : undefined;
+        const featuringYou = params?.featuringYou === true;
         const uuid = column.get('uuid');
         const id = column.get('id');
 
@@ -126,11 +129,11 @@ export const MultiColumnContent: React.FC<{
                   params={params}
                   multiColumn
                   {...other}
-                  {...(id === 'ACCOUNT' ? { accountId: params?.accountId } : {})}
+                  {...(id === 'ACCOUNT' ? { accountId: columnAccountId } : {})}
                   {...(id === 'COLLECTIONS'
                     ? {
-                        accountId: params?.accountId,
-                        featuringYou: params?.featuringYou,
+                        accountId: columnAccountId,
+                        featuringYou,
                       }
                     : {})}
                 />
