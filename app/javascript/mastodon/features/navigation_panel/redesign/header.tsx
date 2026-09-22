@@ -14,6 +14,8 @@ import {
   title,
 } from '@/mastodon/initial_state';
 
+import { getNavigationSkipLinkId } from '../../ui/components/skip_links';
+
 import classes from './header.module.scss';
 
 export const NavigationHeader: React.FC<{
@@ -27,7 +29,11 @@ export const NavigationHeader: React.FC<{
 
   return (
     <header className={classes.root} data-stuck={isStuck}>
-      <Link to='/' className={classes.siteNameLink}>
+      <Link
+        to='/'
+        className={classes.siteNameLink}
+        id={getNavigationSkipLinkId()}
+      >
         {isBlue2 ? (
           <img src={blue2Brand} alt='' className={classes.appIcon} />
         ) : customInstanceLogo ? (

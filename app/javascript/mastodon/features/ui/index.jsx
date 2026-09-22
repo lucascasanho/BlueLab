@@ -214,7 +214,7 @@ class SwitchingColumnsArea extends PureComponent {
     });
 
     return (
-      <ColumnsContextProvider multiColumn={!singleColumn}>
+      <ColumnsContextProvider multiColumn={layout === 'multi-column'}>
         <ColumnsArea ref={this.setRef} singleColumn={singleColumn} domain={domain} minimalShell={minimalShell}>
           <WrappedSwitch>
             <Redirect from='/' to={redirectWithoutFocusing(rootRedirect)} exact />
