@@ -615,6 +615,29 @@ API. A ref `BlueLab` dos dois remotos configurados para o fluxo aponta para
 **Próximo passo:** executar `espelunca-atualizar`, manter o log gerado como evidência
 e só encerrar após serviços, migrations e healthchecks local e público aprovados.
 
+### Bloqueio verificado para atualização da Espelunca — 2026-09-21
+
+No ambiente de trabalho atual, a etapa seguinte não pôde ser iniciada: a resolução de
+`espelunca-atualizar` falhou, `/usr/local/bin/espelunca-atualizar` não existe, não há
+checkout em `/home/espelunca` e não há unidades `espelunca-*` listadas pelo systemd.
+Portanto, a afirmação da auditoria anterior de que esse executável havia sido revisado
+não é reproduzível neste host; nenhum backup, cutover, migration, restart ou acesso à
+Espelunca foi executado nesta retomada.
+
+A verificação Git deste host foi concluída com a árvore Blue limpa antes deste
+checkpoint, `bluelab/BlueLab` em
+`9ee27d068951353bff5f68e177bf24487eec2bcb` e
+`bluelab/BlueLab-Test` em
+`d71da1143fdf9d44c63944d7f87e700a04d13500`; `BlueLab` é ancestral de
+`BlueLab-Test`. O fetch de `upstream` confirmou `upstream/main` em
+`3b43a085d076044abbbb69d928d704d3c9213b1c`. Esta correção documental será publicada
+em `BlueLab-Test`; não requer deploy no Blue, pois não muda código executável.
+
+**Único próximo passo seguro:** disponibilizar a sessão/host da Espelunca que contém
+o executável `espelunca-atualizar` e seu checkout. Nela, executar somente esse comando
+e registrar o log, SHA final, migrations, serviços e healthchecks local e público
+antes de declarar a atualização concluída.
+
 ## Regra de encerramento de etapas
 
 Toda etapa funcional deste sistema deve ser publicada em `BlueLab-Test`, aplicada no
