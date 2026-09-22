@@ -1,0 +1,33 @@
+@use 'blue-2-v20';
+
+/*
+ * BlueLab twenty-first refinement layer.
+ *
+ * Restore a visible, minimal divider around embedded post/link content.
+ * The earlier inset-stroke treatment in v6 was intentionally softened, but it
+ * became too subtle on Blue 2. Keep the border thin and use the theme's
+ * border token so dark and light modes stay consistent.
+ */
+body[data-theme='blue-2'] {
+  .status__quote,
+  .status-card,
+  .account-card,
+  .quote-status {
+    box-sizing: border-box;
+    border: 1px solid var(--blue2-border) !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    background-clip: padding-box;
+  }
+
+  .status__quote {
+    overflow: hidden !important;
+  }
+
+  .status__quote > .status,
+  .status__quote .status--is-quote {
+    border: 0 !important;
+    box-shadow: none !important;
+    border-radius: inherit;
+  }
+}
