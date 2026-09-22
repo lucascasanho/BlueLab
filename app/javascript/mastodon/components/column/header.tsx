@@ -21,6 +21,7 @@ import { NavigationFocusTarget } from '../navigation_focus_target';
 import { useAppHistory } from '../router';
 
 import { useColumn, useColumnIndexContext } from './context';
+import { useColumnsContext } from 'mastodon/features/ui/util/columns_context';
 import { useBlue2ColumnPinning } from 'mastodon/features/ui/util/blue2_column_pinning';
 
 export const messages = defineMessages({
@@ -117,6 +118,8 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   const { signedIn } = useIdentity();
   const history = useAppHistory();
   const blue2ColumnPinning = useBlue2ColumnPinning();
+  const { multiColumn: contextMultiColumn } = useColumnsContext();
+  const effectiveMultiColumn = multiColumn ?? contextMultiColumn;
   const effectivePinned =
     pinned ?? (blue2ColumnPinning.canPin ? blue2ColumnPinning.pinned : false);
   const effectiveOnPin =
@@ -190,7 +193,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     );
   }
 
-  if (multiColumn && effectivePinned) {
+  if (effectiveMultiColumn && effectivePinned) {
     pinButton = (
       <button
         className='text-btn column-header__setting-btn'
@@ -224,7 +227,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
         </button>
       </div>
     );
-  } else if (multiColumn && effectiveOnPin) {
+  } else if (effectiveMultiColumn && effectiveOnPin) {
     pinButton = (
       <button
         className='text-btn column-header__setting-btn'
@@ -239,14 +242,14 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
 
   if (
     !effectivePinned &&
-    ((multiColumn && history.location.state?.fromMastodon) || showBackButton)
+    ((effectiveMultiColumn && history.location.state?.fromMastodon) || showBackButton)
   ) {
     backButton = <BackButton hasTitle={!!title} />;
   }
 
   const collapsedContent = [extraContent];
 
-  if (multiColumn) {
+  if (effectiveMultiColumn) {
     collapsedContent.push(
       <div key='buttons' className='column-header__advanced-buttons'>
         {pinButton}
@@ -255,7 +258,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     );
   }
 
-  if (signedIn && (children || (multiColumn && effectiveOnPin))) {
+  if (signedIn && (children || (effectiveMultiColumn && effectiveOnPin))) {
     collapseButton = (
       <button
         className={collapsibleButtonClassName}
