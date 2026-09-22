@@ -125,6 +125,9 @@ class HomeTimeline extends PureComponent {
     const { intl, hasUnread, columnId, multiColumn, hasAnnouncements, unreadAnnouncements, showAnnouncements, matchesBreakpoint } = this.props;
     const pinned = !!columnId;
     const { signedIn } = this.props.identity;
+    const isBlue2 =
+      typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+    const title = intl.formatMessage(isBlue2 ? messages.following : messages.title);
     const banners = [
       <CriticalUpdateBanner key='critical-update-banner' />,
       <AnnualReportTimeline key='annual-report' />
@@ -147,7 +150,7 @@ class HomeTimeline extends PureComponent {
     }
 
     return (
-      <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.title)}>
+      <Column bindToDocument={!multiColumn} label={title}>
         {isRedesignEnabled() ? (
           <ColumnHeader
             title={intl.formatMessage(messages.following)}
@@ -171,7 +174,7 @@ class HomeTimeline extends PureComponent {
             icon='home'
             iconComponent={matchesBreakpoint ? SymbolLogo : HomeIcon}
             active={hasUnread}
-            title={intl.formatMessage(messages.title)}
+            title={title}
             onPin={this.handlePin}
             onMove={this.handleMove}
             pinned={pinned}
@@ -198,7 +201,7 @@ class HomeTimeline extends PureComponent {
         ) : <NotSignedInIndicator />}
 
         <Helmet>
-          <title>{intl.formatMessage(messages.title)}</title>
+          <title>{title}</title>
           <meta name='robots' content='noindex' />
         </Helmet>
       </Column>
