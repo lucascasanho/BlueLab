@@ -36,10 +36,12 @@ module Admin
 
     def edit
       @custom_emoji = local_custom_emoji
+      return if performed?
     end
 
     def update
       @custom_emoji = local_custom_emoji
+      return if performed?
 
       if @custom_emoji.update(shortcode_params)
         log_action :update, @custom_emoji
@@ -72,7 +74,6 @@ module Admin
       return custom_emoji if custom_emoji.local?
 
       redirect_to admin_custom_emojis_path, alert: I18n.t('admin.custom_emojis.remote_edit_not_permitted')
-      return
     end
 
     def shortcode_params
