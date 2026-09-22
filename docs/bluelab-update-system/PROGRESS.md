@@ -597,6 +597,24 @@ estavam ativos e os healthchecks local e público de `mastodon.blue` retornaram 
 **Próximo passo:** na Espelunca, executar somente `espelunca-atualizar` para receber
 o lote estável aprovado e então verificar os serviços e os healthchecks.
 
+### Auditoria antes da atualização da Espelunca — 2026-09-21
+
+Antes de retomar, `git status` do checkout Blue estava limpo e o fetch confirmou
+`bluelab/BlueLab` em `9ee27d068951353bff5f68e177bf24487eec2bcb`. O
+`BlueLab-Test` está em `d71da1143fdf9d44c63944d7f87e700a04d13500`, descendente do
+estável somente pelo commit documental `d71da1143f`; o lote funcional promovido e
+testado permanece exatamente `9ee27d0689`. Isso atualiza o estado corrente sem
+alterar a evidência da promoção registrada acima.
+
+Na Espelunca, a árvore `bluelab` estava limpa em `370cb25af6`. O executável
+`/usr/local/bin/espelunca-atualizar` foi revisado: ele busca a branch estável
+`BlueLab`, cria backup PostgreSQL, faz o cutover e verifica migrations, serviços e
+API. A ref `BlueLab` dos dois remotos configurados para o fluxo aponta para
+`9ee27d0689`; portanto não há divergência de origem que bloqueie o próximo passo.
+
+**Próximo passo:** executar `espelunca-atualizar`, manter o log gerado como evidência
+e só encerrar após serviços, migrations e healthchecks local e público aprovados.
+
 ## Regra de encerramento de etapas
 
 Toda etapa funcional deste sistema deve ser publicada em `BlueLab-Test`, aplicada no
