@@ -21,7 +21,6 @@ import { NavigationFocusTarget } from '../navigation_focus_target';
 import { useAppHistory } from '../router';
 
 import { useColumn, useColumnIndexContext } from './context';
-import { useColumnsContext } from 'mastodon/features/ui/util/columns_context';
 import { useBlue2ColumnPinning } from 'mastodon/features/ui/util/blue2_column_pinning';
 
 export const messages = defineMessages({
@@ -118,8 +117,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   const { signedIn } = useIdentity();
   const history = useAppHistory();
   const blue2ColumnPinning = useBlue2ColumnPinning();
-  const { multiColumn: contextMultiColumn } = useColumnsContext();
-  const blue2EffectiveMultiColumn = blue2ColumnPinning.active || multiColumn || contextMultiColumn;
+  const blue2EffectiveMultiColumn = blue2ColumnPinning.active ? true : multiColumn;
   const effectivePinned =
     pinned ?? (blue2ColumnPinning.canPin ? blue2ColumnPinning.pinned : false);
   const effectiveOnPin =
