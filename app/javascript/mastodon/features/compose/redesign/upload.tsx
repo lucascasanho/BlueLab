@@ -121,7 +121,14 @@ const ComposeUploadMenu: React.FC<{
   }, [dispatch, id]);
 
   return (
-    <MenuList portal placement='bottom-end' offset={4} maxWidth={170}>
+    <MenuList
+      portal
+      mobilePresentation='popover'
+      placement='top-end'
+      strategy='fixed'
+      offset={8}
+      maxWidth={170}
+    >
       <MenuItem onClick={onEdit}>
         {attachment.description ? (
           <FormattedMessage
