@@ -25,6 +25,14 @@
   @media (width > $mobile-menu-breakpoint) {
     display: none;
   }
+
+  // Blue2 deliberately treats tablet widths as compact/mobile. Keep the
+  // redesigned navigation visible there without changing other themes.
+  @media (width > $mobile-menu-breakpoint) and (width <= 1174px) {
+    :global(body[data-theme='blue-2']) & {
+      display: flex;
+    }
+  }
 }
 
 .floatingCard {
