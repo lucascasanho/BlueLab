@@ -21,6 +21,7 @@ import { NavigationFocusTarget } from '../navigation_focus_target';
 import { useAppHistory } from '../router';
 
 import { useColumn, useColumnIndexContext } from './context';
+import { useBlue2ColumnPinning } from 'mastodon/features/ui/util/blue2_column_pinning';
 
 export const messages = defineMessages({
   show: { id: 'column_header.show_settings', defaultMessage: 'Show settings' },
@@ -115,6 +116,13 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   const intl = useIntl();
   const { signedIn } = useIdentity();
   const history = useAppHistory();
+  const blue2ColumnPinning = useBlue2ColumnPinning();
+  const effectivePinned =
+    pinned ?? (blue2ColumnPinning.canPin ? blue2ColumnPinning.pinned : false);
+  const effectiveOnPin =
+    onPin ?? (blue2ColumnPinning.canPin ? blue2ColumnPinning.onPin : undefined);
+  const effectiveOnMove =
+    onMove ?? (blue2ColumnPinning.canPin ? blue2ColumnPinning.onMove : undefined);
   const [collapsed, setCollapsed] = useState(true);
   const [animating, setAnimating] = useState(false);
 
@@ -136,24 +144,24 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   }, [onClick, scrollTop, scrollTopOnClick]);
 
   const handleMoveLeft = useCallback(() => {
-    onMove?.(-1);
-  }, [onMove]);
+    effectiveOnMove?.(-1);
+  }, [effectiveOnMove]);
 
   const handleMoveRight = useCallback(() => {
-    onMove?.(1);
-  }, [onMove]);
+    effectiveOnMove?.(1);
+  }, [effectiveOnMove]);
 
   const handleTransitionEnd = useCallback(() => {
     setAnimating(false);
   }, [setAnimating]);
 
   const handlePin = useCallback(() => {
-    if (!pinned) {
+    if (!effectivePinned) {
       history.replace('/');
     }
 
-    onPin?.();
-  }, [history, pinned, onPin]);
+    effectiveOnPin?.();
+  }, [effectiveOnPin, effectivePinned, history]);
 
   const wrapperClassName = classNames('column-header__wrapper', className, {
     active,
@@ -182,7 +190,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     );
   }
 
-  if (multiColumn && pinned) {
+  if (multiColumn && effectivePinned) {
     pinButton = (
       <button
         className='text-btn column-header__setting-btn'
@@ -216,7 +224,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
         </button>
       </div>
     );
-  } else if (multiColumn && onPin) {
+  } else if (multiColumn && effectiveOnPin) {
     pinButton = (
       <button
         className='text-btn column-header__setting-btn'
@@ -230,7 +238,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   }
 
   if (
-    !pinned &&
+    !effectivePinned &&
     ((multiColumn && history.location.state?.fromMastodon) || showBackButton)
   ) {
     backButton = <BackButton hasTitle={!!title} />;
@@ -247,7 +255,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     );
   }
 
-  if (signedIn && (children || (multiColumn && onPin))) {
+  if (signedIn && (children || (multiColumn && effectiveOnPin))) {
     collapseButton = (
       <button
         className={collapsibleButtonClassName}
