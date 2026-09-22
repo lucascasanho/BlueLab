@@ -216,7 +216,7 @@ class SwitchingColumnsArea extends PureComponent {
     return (
       <ColumnsContextProvider multiColumn={!singleColumn}>
         <ColumnsArea ref={this.setRef} singleColumn={singleColumn} domain={domain} minimalShell={minimalShell}>
-          <WrappedSwitch>
+          <WrappedSwitch forceCompactLayout={forceCompactLayout}>
             <Redirect from='/' to={redirectWithoutFocusing(rootRedirect)} exact />
 
             {(forceSingleColumn || transientSingleColumn || forceCompactLayout) ? <Redirect from='/deck' to={redirectWithoutFocusing('/home')} exact /> : null}
