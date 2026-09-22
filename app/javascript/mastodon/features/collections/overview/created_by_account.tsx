@@ -75,9 +75,12 @@ export function useCollectionsCreatedBy(accountId: string | null | undefined) {
   );
 }
 
-export const CollectionsCreatedByAccount: React.FC = () => {
+export const CollectionsCreatedByAccount: React.FC<{ accountId?: string }> = ({
+  accountId: columnAccountId,
+}) => {
   const me = useCurrentAccountId();
-  const accountId = useAccountId();
+  const routeAccountId = useAccountId();
+  const accountId = columnAccountId ?? routeAccountId;
   const account = useAccount(accountId);
 
   const { collections, status } = useCollectionsCreatedBy(accountId);
