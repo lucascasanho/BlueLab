@@ -78,9 +78,15 @@ export const ColumnsAreaRedesign: React.FC<{
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const isBlue2MobileLayout =
     isMobile || (isBlue2 && singleColumn && isCompactViewport);
-  const isBlue2Home = isBlue2 && location.pathname === '/home';
-  const isBlue2Global = isBlue2 && location.pathname === '/public';
-  const isBlue2Search = isBlue2 && location.pathname === '/search';
+  // The advanced interface uses /deck/* URLs. On Blue2 mobile/tablet, keep
+  // the URL intact but interpret that route as its standard mobile equivalent.
+  const blue2Pathname =
+    isBlue2 && isBlue2MobileLayout && location.pathname.startsWith('/deck')
+      ? location.pathname.slice(5) || '/home'
+      : location.pathname;
+  const isBlue2Home = isBlue2 && blue2Pathname === '/home';
+  const isBlue2Global = isBlue2 && blue2Pathname === '/public';
+  const isBlue2Search = isBlue2 && blue2Pathname === '/search';
   const isBlue2FeedPage = isBlue2Home || isBlue2Global;
   const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
 
