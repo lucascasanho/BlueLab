@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Atualizador seguro do BlueLab.
-# Blue usa o canal bluelab-teste; Espelunca usa somente bluelab.
+# Fluxo canônico: BlueLab-Test no Blue e BlueLab na Espelunca.
 # Atualizações oficiais do Mastodon são verificadas sem alterar automaticamente
 # o código BlueLab. Em caso de conflito, o comando gera um resumo para auxílio.
 #
@@ -16,8 +16,8 @@ REMOTO="${BLUELAB_REMOTE:-bluelab}"
 URL_REMOTO="${BLUELAB_REMOTE_URL:-https://github.com/lucascasanho/BlueLab.git}"
 REMOTO_MASTODON="${BLUELAB_UPSTREAM_REMOTE:-mastodon-oficial}"
 URL_MASTODON="${BLUELAB_UPSTREAM_URL:-https://github.com/mastodon/mastodon.git}"
-CANAL_ESTAVEL="${BLUELAB_CANAL_ESTAVEL:-bluelab}"
-CANAL_TESTE="${BLUELAB_CANAL_TESTE:-bluelab-teste}"
+CANAL_ESTAVEL="${BLUELAB_CANAL_ESTAVEL:-BlueLab}"
+CANAL_TESTE="${BLUELAB_CANAL_TESTE:-BlueLab-Test}"
 DIR_INSTALACAO="${BLUELAB_INSTALL_DIR:-$HOME/.local/bin}"
 COMANDO_INSTALADO="$DIR_INSTALACAO/bluelab"
 DIR_ESTADO="${BLUELAB_STATE_DIR:-$HOME/.local/state/bluelab}"
