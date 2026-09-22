@@ -811,3 +811,28 @@ normais.
 **Único próximo passo seguro:** aplicar o bootstrap não destrutivo do comando
 instalado na Espelunca e executar `bluelab` novamente. Não executar Bundler,
 Rails ou migrations manualmente antes disso.
+
+
+### Correção da instalação automática do Ruby — 2026-09-22
+
+A versão `4.0.7` continua sendo a versão exigida pelo `.ruby-version` do BlueLab
+e pelo `.ruby-version` atual do Mastodon oficial. A falha observada na Espelunca
+não era uma versão Ruby incorreta: o plugin `ruby-build` local estava antigo e
+não possuía a definição `4.0.7`.
+
+O `bin/bluelab` agora verifica se a versão exigida aparece em
+`rbenv install --list-all`. Quando não aparece, ele atualiza o plugin existente
+por fast-forward ou instala o plugin oficial `rbenv/ruby-build` caso esteja
+ausente, sem substituir alterações locais do plugin. Depois tenta instalar a
+versão Ruby exigida normalmente.
+
+Correção publicada no SHA
+`6b996bdf6325eb2fb8cfdd9dc0d8c9ffc2a51c88`, em `BlueLab` e `BlueLab-Test`.
+
+**Estado de validação:** a correção ainda precisa ser exercitada na Espelunca. A
+execução anterior parou antes do Bundler porque `ruby-build` não conhecia
+`4.0.7`.
+
+**Único próximo passo seguro:** executar `bluelab` novamente na Espelunca. O
+comando deve primeiro atualizar sua própria cópia, depois atualizar/instalar
+`ruby-build`, instalar Ruby `4.0.7` e prosseguir com o deploy.
