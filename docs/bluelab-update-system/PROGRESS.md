@@ -581,6 +581,22 @@ código, em conformidade com o canal de aprovação.
 reboot/login do Windows. Após confirmação explícita, promover por fast-forward o
 lote aprovado de `BlueLab-Test` e só então aplicar `espelunca-atualizar`.
 
+### Promoção da recuperação WSL — 2026-09-21
+
+Após confirmação explícita, a promoção comparou `bluelab/BlueLab`
+(`d6f1c3ffad50c9ab9b8c896e18f912012602c13b`) com
+`bluelab/BlueLab-Test` (`9ee27d068951353bff5f68e177bf24487eec2bcb`). O estável era
+ancestral do candidato, o SHA testado no mastodon.blue era exatamente
+`9ee27d0689`, e nenhum item do lote havia sido rejeitado. O remoto foi avançado por
+fast-forward para esse mesmo SHA; não houve force-push, reset ou cherry-pick.
+
+Depois da promoção, ambas as refs remotas apontavam para
+`9ee27d068951353bff5f68e177bf24487eec2bcb`. Antes do push, todos os serviços do Blue
+estavam ativos e os healthchecks local e público de `mastodon.blue` retornaram HTTP 200. A Espelunca não foi acessada nem alterada.
+
+**Próximo passo:** na Espelunca, executar somente `espelunca-atualizar` para receber
+o lote estável aprovado e então verificar os serviços e os healthchecks.
+
 ## Regra de encerramento de etapas
 
 Toda etapa funcional deste sistema deve ser publicada em `BlueLab-Test`, aplicada no
