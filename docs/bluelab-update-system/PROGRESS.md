@@ -752,3 +752,36 @@ O checkpoint funcional contém a migração do catálogo, sua validação automa
 proteção de prontidão de deploy. Confirmar o estado real com `git status`, refs
 remotas e `git log` antes de agir; não incluir extrações adicionais do shell no mesmo
 lote sem nova análise própria.
+
+
+### Correção do bootstrap do comando `bluelab` — 2026-09-22
+
+O pipeline canônico passou a usar exclusivamente `BlueLab-Test` no Blue e
+`BlueLab` na Espelunca. Os dois canais estão atualmente alinhados no mesmo
+histórico.
+
+Foi corrigida a ordem de execução do `bin/bluelab`: o checkout agora é
+primeiro alinhado ao SHA do canal e somente depois são executados Bundler/Rails,
+migrations e assets. Isso evita que a configuração de uma versão antiga de Ruby
+seja carregada antes de o código novo chegar ao checkout.
+
+Também foi adicionada uma preparação de runtime que lê `.ruby-version` e, quando
+rbenv está disponível, instala automaticamente a versão Ruby exigida caso ela não
+esteja instalada. A versão atualmente declarada pelo repositório é `4.0.7`.
+
+A correção foi publicada no SHA `c6132ba313b4d65b06b31dde52ce80f95ca43fd5`
+e a documentação operacional foi atualizada em
+`33a8f0aec31c86889c99c85fa6cf017c71f059bb`. `BlueLab-Test` foi avançada por
+fast-forward para o mesmo SHA de `BlueLab` após a correção de documentação.
+
+A falha observada anteriormente na Espelunca ocorreu antes de migrations/assets:
+o checkout alcançou `BlueLab`, mas o processo parou ao resolver
+`.ruby-version` porque Ruby `4.0.7` não estava instalada no rbenv.
+
+**Estado de validação:** esta correção de bootstrap ainda precisa ser exercitada
+na Espelunca. Nenhuma alegação de deploy completo deve ser feita antes de a próxima
+execução de `bluelab` concluir dependências, migrations, assets, restart e
+validações.
+
+**Único próximo passo seguro:** executar `bluelab` na Espelunca novamente e
+registrar se o runtime Ruby foi preparado e se o deploy completo terminou.
