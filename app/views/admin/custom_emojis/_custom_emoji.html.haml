@@ -33,3 +33,6 @@
           = t('admin.custom_emojis.listed')
         - else
           = t('admin.custom_emojis.unlisted')
+        &bull;
+        = link_to admin_edit_custom_emoji_path(custom_emoji), class: 'table-action-link', title: t('admin.custom_emojis.edit') do
+          = safe_join([material_symbol('edit'), t('admin.custom_emojis.edit')])
