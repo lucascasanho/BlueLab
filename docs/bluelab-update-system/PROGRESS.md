@@ -885,3 +885,28 @@ Correção publicada em `e18a6dda0ca03d9c973d921cbfd349fdfab6e5aa`, com
 **Único próximo passo seguro:** executar `bluelab` na Espelunca novamente. O
 comando deve chegar efetivamente à etapa `bundle install` antes de qualquer
 comando Rails.
+
+
+### Redução do paralelismo do Bundler — 2026-09-22
+
+O log da Espelunca confirmou uma falha dentro do instalador paralelo do Bundler:
+`bundle install --jobs 16 --retry 3` terminou com
+`LoadError: ... libjemalloc.so.2: cannot allocate memory in static TLS block`
+durante o carregamento de `date_core.so`.
+
+Para evitar que o deploy mantenha 16 workers por padrão em um ambiente com esse
+problema, o `bin/bluelab` agora usa:
+
+`BLUELAB_BUNDLE_JOBS` com padrão `1`.
+
+O operador pode aumentar esse valor explicitamente quando houver motivo e recursos
+para isso, mas o comportamento padrão do atualizador passou a ser conservador.
+
+Correção publicada em `ce658edcfcc12981e410f8c7d0f84b6c2cb4c24d` e
+`BlueLab-Test` foi avançada para o mesmo SHA.
+
+**Estado de validação:** ainda não validado na Espelunca.
+
+**Único próximo passo seguro:** executar `bluelab` na Espelunca e confirmar se
+`bundle install --jobs 1` conclui a instalação das gems. Não aumentar o número de
+workers antes de confirmar que o bundle está saudável.
