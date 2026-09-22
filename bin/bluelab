@@ -130,7 +130,7 @@ garantir_ruby() {
 
   if command -v rbenv >/dev/null 2>&1; then
     if ! rbenv versions --bare 2>/dev/null | grep -Fxq "$versao"; then
-      command -v ruby-build >/dev/null 2>&1 || falhar "a versão Ruby $versao é exigida por $REPO/.ruby-version, mas ruby-build não está disponível no rbenv"
+      rbenv commands 2>/dev/null | grep -Fxq "install" || falhar "a versão Ruby $versao é exigida por $REPO/.ruby-version, mas o plugin ruby-build não está disponível no rbenv"
       echo "Ruby $versao não está instalada. Instalando automaticamente via rbenv..."
       executar rbenv install -s "$versao"
     fi
