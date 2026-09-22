@@ -489,6 +489,25 @@ receber o lote aprovado com `espelunca-atualizar`, quando o operador decidir faz
 **Próximo passo:** verificar por Git se `upstream/main` contém commits que ainda não
 sejam ancestrais de `BlueLab`; somente então preparar uma nova transação em worktree.
 
+### Nova simulação upstream — 2026-09-21
+
+Após `git fetch upstream --tags --prune`, a ponta `upstream/main` avançou de
+`398b542652` para `3b43a085d076044abbbb69d928d704d3c9213b1c`, com 18 commits ainda
+fora de `BlueLab`. A simulação `bin/bluelab-transaction-plan` foi executada contra o
+SHA estável promovido `d6f1c3ffad` e retornou `NEEDS_SEMANTIC_REVIEW`; o relatório
+imutável está em
+`/home/blue/.local/state/bluelab/transactions/20260921T202919Z-b4257bf7-650b-4aa8-b607-62c3ddd7220b.json`.
+
+Ela encontrou quatro colisões: `status/action_bar.tsx` (domínio C
+`quotes-and-media-downloads`), `navigation_panel/redesign/header.tsx` e `ui/index.jsx`
+(domínio B `blue2-shell-navigation`) e `locales/en.json` (`UNCLASSIFIED`). Um
+worktree temporário foi criado somente para revisão semântica; o checkout ativo, os
+serviços, `BlueLab` e a Espelunca não foram alterados.
+
+**Próximo passo:** reconciliar esses quatro arquivos no worktree, preservando os
+contratos BlueLab e as correções upstream, e executar os gates antes de publicar um
+novo candidato em `BlueLab-Test`.
+
 Em 2026-09-20, a validação manual do shell Blue2 no Blue foi aprovada explicitamente
 para o SHA funcional `f4cfc66`. A promoção foi então reavaliada, mas não executada:
 `BlueLab` (`e1e2672`) não é ancestral de `BlueLab-Test`. Os dois commits exclusivos
