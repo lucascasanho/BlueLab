@@ -12,9 +12,7 @@ import { forceSingleColumn } from '@/mastodon/initial_state';
 import { isBlue2MobileViewport } from '@/mastodon/is_mobile';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
-import {
-  useColumnIndexContext,
-} from '../components/column/context';
+import { useColumnIndexContext } from '@/mastodon/components/column/context';
 import { useColumnsContext } from './columns_context';
 
 export interface Blue2ColumnDefinition {
