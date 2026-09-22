@@ -9,6 +9,7 @@ import type { PolymorphicProps } from '@/types/polymorphic';
 import { BottomSheet } from '../bottom_sheet';
 import { Popover } from '../popover';
 import type { PopoverProps } from '../popover';
+import { Portal } from '../popover/portal';
 
 import classes from './styles.module.scss';
 
@@ -111,11 +112,13 @@ export const PopoverMenuCard = <As extends React.ElementType>({
   // BlueLab's account card deliberately keeps an anchored popover on mobile;
   // other Mastodon menus retain the upstream bottom-sheet presentation.
   if (isMobile && isOpen && mobilePresentation === 'bottom-sheet') {
-    return (
+    const sheet = (
       <BottomSheet {...props} onClose={onClose}>
         {children}
       </BottomSheet>
     );
+
+    return container === null ? sheet : <Portal container={container}>{sheet}</Portal>;
   }
 
   return (

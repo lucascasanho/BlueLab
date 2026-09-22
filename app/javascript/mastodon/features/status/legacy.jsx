@@ -536,7 +536,7 @@ class Status extends ImmutablePureComponent {
     const { isLoading, status, ancestorsIds, descendantsIds, refresh, intl, domain, multiColumn, pictureInPicture } = this.props;
     const { fullscreen } = this.state;
 
-    if (isLoading) {
+    if (isLoading || typeof status === 'undefined') {
       return (
         <Column>
           <LoadingIndicator />
