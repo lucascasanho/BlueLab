@@ -858,3 +858,30 @@ confirmados na Espelunca após essa correção.
 
 **Único próximo passo seguro:** executar `bluelab` na Espelunca novamente e deixar
 a etapa `bundle install` concluir antes de avaliar migrations, assets e restart.
+
+
+### Correção da ordem das dependências Ruby/JS — 2026-09-22
+
+A tentativa de deploy na Espelunca confirmou que a implementação anterior ainda
+carregava Rails em `capturar_configuracoes` antes de executar `bundle install`.
+Consequentemente, as gems ausentes continuavam causando `Bundler::GemNotFound`
+e a etapa de instalação nunca era alcançada.
+
+O `bin/bluelab` foi reorganizado em duas etapas:
+- `instalar_dependencias`: executa primeiro `bundle install`, `bundle check`
+  e `yarn install --immutable`;
+- `aplicar_migrations`: executa migrations somente depois de o bundle estar
+  disponível.
+
+A captura das configurações protegidas ocorre agora depois da instalação das gems
+e antes de migrations/assets, preservando a finalidade do checkpoint sem carregar
+Rails prematuramente.
+
+Correção publicada em `e18a6dda0ca03d9c973d921cbfd349fdfab6e5aa`, com
+`BlueLab` e `BlueLab-Test` alinhadas no mesmo SHA.
+
+**Estado de validação:** ainda não validado em deploy completo na Espelunca.
+
+**Único próximo passo seguro:** executar `bluelab` na Espelunca novamente. O
+comando deve chegar efetivamente à etapa `bundle install` antes de qualquer
+comando Rails.
