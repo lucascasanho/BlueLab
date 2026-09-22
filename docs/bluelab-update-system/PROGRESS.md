@@ -710,6 +710,22 @@ local e público retornaram `OK`. `BlueLab` permanece em
 abre sem `ReferenceError`; então repetir os testes de status, ações e navegação antes
 de qualquer promoção.
 
+### Promoção do hotfix e integração upstream — 2026-09-21
+
+Após a confirmação manual explícita de que o Blue voltou a abrir sem o
+`ReferenceError`, a promoção verificou `bluelab/BlueLab` em
+`9ee27d068951353bff5f68e177bf24487eec2bcb`, ancestral do SHA funcional testado
+`eab4ffe6dbd99085b04a55038de5409056e78020`. O remoto `BlueLab` foi avançado por
+fast-forward para esse mesmo SHA, sem force-push, reset ou cherry-pick. O checkpoint
+documental posterior continua em `BlueLab-Test` e é descendente do SHA promovido.
+
+Nenhuma operação foi feita na Espelunca. Quando o operador decidir atualizá-la, o
+único comando normal continua sendo `espelunca-atualizar`; esta promoção não autoriza
+nem executa esse comando.
+
+**Único próximo passo seguro:** manter o Blue em observação e realizar, no momento
+escolhido pelo operador, a atualização normal da Espelunca a partir de `BlueLab`.
+
 ## Regra de encerramento de etapas
 
 Toda etapa funcional deste sistema deve ser publicada em `BlueLab-Test`, aplicada no
