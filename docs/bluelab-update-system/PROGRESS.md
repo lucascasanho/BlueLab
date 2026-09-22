@@ -836,3 +836,25 @@ execução anterior parou antes do Bundler porque `ruby-build` não conhecia
 **Único próximo passo seguro:** executar `bluelab` novamente na Espelunca. O
 comando deve primeiro atualizar sua própria cópia, depois atualizar/instalar
 `ruby-build`, instalar Ruby `4.0.7` e prosseguir com o deploy.
+
+
+### Correção da instalação das gems no deploy — 2026-09-22
+
+A Espelunca alcançou o SHA do canal corretamente e preparou Ruby `4.0.7`, mas
+o deploy parou ao executar Rails porque o bundle local não continha as gems
+exigidas pelo `Gemfile.lock`: `aws-sdk-core-3.257.0`, `aws-sdk-s3-1.232.1`,
+`tzinfo-data-1.2026.4` e `aws-partitions-1.1287.0`.
+
+O `bin/bluelab` foi ajustado para executar `bundle install` explicitamente antes
+de `bundle check`, em vez de depender apenas do resultado de `bundle check`.
+Assim, após troca de Ruby ou de SHA, as dependências declaradas no lockfile são
+reconciliadas antes de qualquer comando Rails.
+
+A correção foi publicada em `4e28795c0cb87d95dab30e23125975dad2e5da4f` e
+`BlueLab-Test` foi avançada para o mesmo SHA.
+
+**Estado de validação:** a instalação das gems e o deploy completo ainda não foram
+confirmados na Espelunca após essa correção.
+
+**Único próximo passo seguro:** executar `bluelab` na Espelunca novamente e deixar
+a etapa `bundle install` concluir antes de avaliar migrations, assets e restart.
