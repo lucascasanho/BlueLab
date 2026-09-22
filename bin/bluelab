@@ -192,12 +192,14 @@ garantir_ruby() {
   echo "Ruby selecionado: $ruby_real"
 }
 
-atualizar_dependencias() {
-  # Instala/atualiza explicitamente as gems do Gemfile.lock a cada deploy.
-  # Isso evita confiar em um bundle check incorreto após troca de Ruby ou de SHA.
+instalar_dependencias() {
+  # Instala/atualiza as gems antes de qualquer comando Rails.
   executar bundle install --jobs "$(nproc)" --retry 3
   executar bundle check
   executar yarn install --immutable
+}
+
+aplicar_migrations() {
   executar env RAILS_ENV=production bundle exec rails db:migrate
   if [[ "$ALVO" == blue ]]; then
     executar env RAILS_ENV=production bin/tootctl email_domain_blocks sync_disposable
@@ -350,18 +352,20 @@ atualizar() {
   preparar_git
   preservar_local
 
-  # Primeiro alinhar o checkout com o canal correto. Só depois disso podem ser
-  # executados Bundler/Rails, pois o próprio commit novo pode exigir outra versão
-  # de Ruby definida em .ruby-version.
+  # Alinhar o checkout antes de qualquer runtime dependente do código.
   alinhar_codigo
   instalar_comando_atual
   garantir_ruby
 
   local antes="$DIR_ESTADO/configuracoes-antes-${ALVO}.json"
   local depois="$DIR_ESTADO/configuracoes-depois-${ALVO}.json"
+
+  # Primeiro garantir gems/JS. Só então o Rails pode ser carregado para
+  # registrar as configurações protegidas antes de migrations/assets.
+  instalar_dependencias
   capturar_configuracoes "$antes"
 
-  atualizar_dependencias
+  aplicar_migrations
   recompilar_assets
   reiniciar_servicos
 
