@@ -544,6 +544,43 @@ a análise dos caminhos `UNCLASSIFIED` e a revisão semântica dos domínios em 
 Não integrar ou implantar qualquer atualização upstream antes de registrar essa
 decisão por domínio.
 
+### Recuperação pós-reboot WSL — 2026-09-21
+
+O diagnóstico do boot de `blue` e `espelunca` encontrou o aviso do host WSL
+`WaitForBootProcess: /sbin/init failed to start within 10000ms`. O systemd continuava
+o boot depois desse prazo, enquanto o Cloudflare Tunnel já aceitava tráfego e o Puma
+ainda carregava; esse intervalo produzia `502`. A execução manual de
+`assets:precompile` não era uma correção de assets: apenas mantinha a distribuição
+aberta até o Rails ficar pronto.
+
+No Windows local foi instalado o lançador de login silencioso
+`C:\Users\lusca\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\BlueLab-start-wsl.vbs`.
+Ele inicia as distribuições `blue` e `espelunca` sem abrir console; a presença e a
+execução foram verificadas com ambas em estado `Running`. A tentativa de criar uma
+tarefa no Agendador foi recusada pelo Windows com `Acesso negado`, portanto o
+lançador no Startup é o mecanismo efetivamente instalado.
+
+O candidato funcional `3736075485ee6d07109910be998891fa530b9edc` foi publicado em
+`bluelab/BlueLab-Test` e aplicado no mastodon.blue por `blue-atualizar`. Ele cria
+`bin/mastodon-reiniciar`, que reinicia banco e Redis antes da aplicação, aguarda
+Rails e streaming localmente, e só então reinicia nginx e o tunnel. Os wrappers
+`blue-reiniciar` e `espelunca-reiniciar` selecionam os nomes, portas e tunnel próprios
+de cada instalação; isso corrige o antigo script copiado na Espelunca que tentava
+reiniciar unidades `blue-*`.
+
+`bash -n` e `git diff --check` passaram antes da publicação. No Blue, o deploy
+executou bundle, Yarn, migrations, sincronização de domínios, assets e restart;
+`blue-reiniciar` foi então executado de verdade. PostgreSQL, Redis, web, Sidekiq,
+streaming, nginx e cloudflared ficaram `active`; Rails, streaming e nginx locais
+retornaram HTTP 200. Durante a reconexão intencional do tunnel houve um `530`
+transitório por aproximadamente 15 segundos; `https://mastodon.blue/health` retornou
+HTTP 200 em seguida. `BlueLab` permanece em `d6f1c3ffad`; a Espelunca não recebeu
+código, em conformidade com o canal de aprovação.
+
+**Próximo passo:** testar no Blue o comando `blue-reiniciar` e, de preferência, um
+reboot/login do Windows. Após confirmação explícita, promover por fast-forward o
+lote aprovado de `BlueLab-Test` e só então aplicar `espelunca-atualizar`.
+
 ## Regra de encerramento de etapas
 
 Toda etapa funcional deste sistema deve ser publicada em `BlueLab-Test`, aplicada no
