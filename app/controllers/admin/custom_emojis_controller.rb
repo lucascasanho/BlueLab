@@ -34,6 +34,21 @@ module Admin
       end
     end
 
+    def edit
+      @custom_emoji = local_custom_emoji
+    end
+
+    def update
+      @custom_emoji = local_custom_emoji
+
+      if @custom_emoji.update(shortcode_params)
+        log_action :update, @custom_emoji
+        redirect_to admin_custom_emojis_path(local: '1'), notice: I18n.t('admin.custom_emojis.updated_msg')
+      else
+        render :edit
+      end
+    end
+
     def batch
       authorize :custom_emoji, :index?
 
@@ -48,6 +63,21 @@ module Admin
     end
 
     private
+
+    def local_custom_emoji
+      custom_emoji = CustomEmoji.find(params[:id])
+
+      authorize custom_emoji, :update?
+
+      return custom_emoji if custom_emoji.local?
+
+      redirect_to admin_custom_emojis_path, alert: I18n.t('admin.custom_emojis.remote_edit_not_permitted')
+      return
+    end
+
+    def shortcode_params
+      params.expect(custom_emoji: [:shortcode])
+    end
 
     def resource_params
       params
