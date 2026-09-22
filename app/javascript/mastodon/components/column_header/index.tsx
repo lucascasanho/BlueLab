@@ -8,8 +8,7 @@ import { useLocation } from 'react-router';
 import { ArrowLeftIcon, DotsThreeIcon, ListIcon } from '@phosphor-icons/react';
 import type { DistributedOmit } from 'type-fest';
 
-import { MenuItem, MenuItemDivider } from '@/mastodon/components/menu';
-import { Menu, MenuList, MenuTrigger } from '@/mastodon/components/menu';
+import { Menu, MenuItem, MenuItemDivider, MenuList, MenuTrigger } from '@/mastodon/components/menu';
 import { openNavigation } from '@/mastodon/actions/navigation';
 import { getColumnSkipLinkId } from '@/mastodon/features/ui/components/skip_links';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
