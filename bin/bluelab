@@ -22,6 +22,7 @@ DIR_INSTALACAO="${BLUELAB_INSTALL_DIR:-$HOME/.local/bin}"
 COMANDO_INSTALADO="$DIR_INSTALACAO/bluelab"
 DIR_ESTADO="${BLUELAB_STATE_DIR:-$HOME/.local/state/bluelab}"
 ACAO="${1:-atualizar}"
+ARGS=( "$@" )
 
 falhar() { echo; echo "ERRO: $*" >&2; exit 1; }
 executar() { "$@" || falhar "falhou: $*"; }
@@ -69,6 +70,28 @@ preparar_git() {
   git rev-parse --git-dir >/dev/null 2>&1 || falhar "$REPO não é um repositório Git"
   git remote get-url "$REMOTO" >/dev/null 2>&1 || executar git remote add "$REMOTO" "$URL_REMOTO"
   executar git fetch --prune --tags "$REMOTO" "+refs/heads/*:refs/remotes/$REMOTO/*"
+  autoatualizar_comando
+}
+
+autoatualizar_comando() {
+  local tmp
+  git show "$REMOTO/$CANAL:bin/bluelab" >/dev/null 2>&1 || return 0
+
+  tmp="$(mktemp "${TMPDIR:-/tmp}/bluelab-command.XXXXXX")"
+  if ! git show "$REMOTO/$CANAL:bin/bluelab" >"$tmp"; then
+    rm -f "$tmp"
+    falhar "não consegui ler o comando bluelab do canal $CANAL"
+  fi
+
+  if [[ ! -f "$COMANDO_INSTALADO" ]] || ! cmp -s "$tmp" "$COMANDO_INSTALADO"; then
+    executar mkdir -p "$DIR_INSTALACAO"
+    executar install -m 0755 "$tmp" "$COMANDO_INSTALADO"
+    rm -f "$tmp"
+    echo "Comando bluelab local atualizado a partir de $REMOTO/$CANAL."
+    exec "$COMANDO_INSTALADO" "${ARGS[@]}"
+  fi
+
+  rm -f "$tmp"
 }
 
 preservar_local() {
