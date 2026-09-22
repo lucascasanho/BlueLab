@@ -193,7 +193,10 @@ garantir_ruby() {
 }
 
 atualizar_dependencias() {
-  bundle check || executar bundle install
+  # Instala/atualiza explicitamente as gems do Gemfile.lock a cada deploy.
+  # Isso evita confiar em um bundle check incorreto após troca de Ruby ou de SHA.
+  executar bundle install --jobs "$(nproc)" --retry 3
+  executar bundle check
   executar yarn install --immutable
   executar env RAILS_ENV=production bundle exec rails db:migrate
   if [[ "$ALVO" == blue ]]; then
