@@ -24,6 +24,13 @@ DIR_ESTADO="${BLUELAB_STATE_DIR:-$HOME/.local/state/bluelab}"
 ACAO="${1:-atualizar}"
 ARGS=( "$@" )
 
+# O ambiente de manutenção pode pré-carregar jemalloc, que nesta máquina
+# entra em conflito com extensões nativas do Ruby por falta de TLS estático.
+# A aplicação em systemd mantém sua configuração própria; esta alteração
+# vale apenas para os comandos executados por este atualizador.
+export GLIBC_TUNABLES="${BLUELAB_GLIBC_TUNABLES:-glibc.rtld.optional_static_tls=16384}"
+unset LD_PRELOAD
+
 falhar() { echo; echo "ERRO: $*" >&2; exit 1; }
 executar() { "$@" || falhar "falhou: $*"; }
 
