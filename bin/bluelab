@@ -122,6 +122,28 @@ alinhar_codigo() {
   executar git diff --check "$novo"
 }
 
+garantir_ruby() {
+  local versao
+
+  versao="$(cat "$REPO/.ruby-version" 2>/dev/null || true)"
+  [[ -n "$versao" ]] || return 0
+
+  if command -v rbenv >/dev/null 2>&1; then
+    if ! rbenv versions --bare 2>/dev/null | grep -Fxq "$versao"; then
+      command -v ruby-build >/dev/null 2>&1 || falhar "a versão Ruby $versao é exigida por $REPO/.ruby-version, mas ruby-build não está disponível no rbenv"
+      echo "Ruby $versao não está instalada. Instalando automaticamente via rbenv..."
+      executar rbenv install -s "$versao"
+    fi
+    executar rbenv rehash
+  else
+    falhar "rbenv não está disponível e o repositório exige Ruby $versao"
+  fi
+
+  local ruby_real
+  ruby_real="$(ruby -v 2>/dev/null || true)"
+  echo "Ruby selecionado: $ruby_real"
+}
+
 atualizar_dependencias() {
   bundle check || executar bundle install
   executar yarn install --immutable
@@ -277,12 +299,17 @@ atualizar() {
   preparar_git
   preservar_local
 
+  # Primeiro alinhar o checkout com o canal correto. Só depois disso podem ser
+  # executados Bundler/Rails, pois o próprio commit novo pode exigir outra versão
+  # de Ruby definida em .ruby-version.
+  alinhar_codigo
+  instalar_comando_atual
+  garantir_ruby
+
   local antes="$DIR_ESTADO/configuracoes-antes-${ALVO}.json"
   local depois="$DIR_ESTADO/configuracoes-depois-${ALVO}.json"
   capturar_configuracoes "$antes"
 
-  alinhar_codigo
-  instalar_comando_atual
   atualizar_dependencias
   recompilar_assets
   reiniciar_servicos
@@ -300,7 +327,6 @@ atualizar() {
     echo "A Espelunca consulta somente o canal $CANAL_ESTAVEL."
   fi
 }
-
 promover() {
   [[ "$ALVO" == blue ]] || falhar "promoção só pode ser executada no mastodon.blue"
   preparar_git
