@@ -633,10 +633,20 @@ checkpoint, `bluelab/BlueLab` em
 `3b43a085d076044abbbb69d928d704d3c9213b1c`. Esta correção documental será publicada
 em `BlueLab-Test`; não requer deploy no Blue, pois não muda código executável.
 
-**Único próximo passo seguro:** disponibilizar a sessão/host da Espelunca que contém
-o executável `espelunca-atualizar` e seu checkout. Nela, executar somente esse comando
-e registrar o log, SHA final, migrations, serviços e healthchecks local e público
-antes de declarar a atualização concluída.
+### Correção de escopo da Espelunca — 2026-09-21
+
+A conclusão operacional acima foi corrigida por orientação explícita: a Espelunca é a
+instância de produção e não deve ser acessada, atualizada, validada ou usada como
+condição de continuidade enquanto o usuário não solicitar expressamente a atualização
+de produção. A ausência do executável e do checkout neste host não é bloqueio; é
+compatível com a separação obrigatória entre teste e produção. Nenhuma operação na
+Espelunca foi nem será iniciada por esta etapa.
+
+**Único próximo passo seguro:** continuar qualquer desenvolvimento, integração
+upstream, publicação de candidato e validação somente em `BlueLab-Test` e no
+mastodon.blue por `blue-atualizar`. `BlueLab` e a Espelunca permanecem inalterados
+até aprovação explícita do usuário para promover o SHA testado e, separadamente,
+executar `espelunca-atualizar`.
 
 ## Regra de encerramento de etapas
 
