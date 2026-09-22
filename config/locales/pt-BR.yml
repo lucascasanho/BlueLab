@@ -395,6 +395,8 @@ pt-BR:
       enabled: Ativado
       enabled_msg: Emoji ativado
       image_hint: PNG ou GIF até %{size}
+      edit: Editar
+      edit_title: Editar emoji personalizado
       list: Listar
       listed: Listado
       new:
@@ -410,6 +412,8 @@ pt-BR:
       unlisted: Não listado
       update_failed_msg: Não foi possível atualizar esse emoji
       updated_msg: Emoji atualizado!
+      update_shortcode: Salvar alterações
+      remote_edit_not_permitted: Emojis remotos não podem ser renomeados localmente
       upload: Enviar
     dashboard:
       active_users: usuários ativos
