@@ -17,7 +17,17 @@ import {
   FavouritedStatuses,
   BookmarkedStatuses,
   ListTimeline,
+  Lists,
   Directory,
+  Explore,
+  Search,
+  AccountTimeline,
+  Collections,
+  FollowedTags,
+  Blocks,
+  DomainBlocks,
+  Mutes,
+  FollowRequests,
 } from '../../util/async-components';
 import Bundle from '../bundle';
 import { BundleColumnError } from '../bundle_column_error';
@@ -36,13 +46,30 @@ const componentMap = {
   FAVOURITES: FavouritedStatuses,
   BOOKMARKS: BookmarkedStatuses,
   LIST: ListTimeline,
+  LISTS: Lists,
   DIRECTORY: Directory,
+  EXPLORE: Explore,
+  SEARCH: Search,
+  ACCOUNT: AccountTimeline,
+  COLLECTIONS: Collections,
+  FOLLOWED_TAGS: FollowedTags,
+  BLOCKS: Blocks,
+  DOMAIN_BLOCKS: DomainBlocks,
+  MUTES: Mutes,
+  FOLLOW_REQUESTS: FollowRequests,
 } as const;
 
 interface Column {
   uuid: string;
   id: keyof typeof componentMap;
-  params?: null | Record<{ other?: unknown }>;
+  params?: null | Record<{
+    other?: unknown;
+    id?: unknown;
+    accountId?: unknown;
+    featuringYou?: unknown;
+    order?: unknown;
+    local?: unknown;
+  }>;
 }
 
 type FetchedComponent = React.FC<{
@@ -99,6 +126,13 @@ export const MultiColumnContent: React.FC<{
                   params={params}
                   multiColumn
                   {...other}
+                  {...(id === 'ACCOUNT' ? { accountId: params?.accountId } : {})}
+                  {...(id === 'COLLECTIONS'
+                    ? {
+                        accountId: params?.accountId,
+                        featuringYou: params?.featuringYou,
+                      }
+                    : {})}
                 />
               )}
             </Bundle>
