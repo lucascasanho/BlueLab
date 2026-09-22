@@ -119,7 +119,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   const history = useAppHistory();
   const blue2ColumnPinning = useBlue2ColumnPinning();
   const { multiColumn: contextMultiColumn } = useColumnsContext();
-  const effectiveMultiColumn = multiColumn ?? contextMultiColumn;
+  const blue2EffectiveMultiColumn = blue2ColumnPinning.active || multiColumn || contextMultiColumn;
   const effectivePinned =
     pinned ?? (blue2ColumnPinning.canPin ? blue2ColumnPinning.pinned : false);
   const effectiveOnPin =
@@ -193,7 +193,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     );
   }
 
-  if (effectiveMultiColumn && effectivePinned) {
+  if (blue2EffectiveMultiColumn && effectivePinned) {
     pinButton = (
       <button
         className='text-btn column-header__setting-btn'
@@ -227,7 +227,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
         </button>
       </div>
     );
-  } else if (effectiveMultiColumn && effectiveOnPin) {
+  } else if (blue2EffectiveMultiColumn && effectiveOnPin) {
     pinButton = (
       <button
         className='text-btn column-header__setting-btn'
@@ -242,14 +242,14 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
 
   if (
     !effectivePinned &&
-    ((effectiveMultiColumn && history.location.state?.fromMastodon) || showBackButton)
+    ((multiColumn && history.location.state?.fromMastodon) || showBackButton)
   ) {
     backButton = <BackButton hasTitle={!!title} />;
   }
 
   const collapsedContent = [extraContent];
 
-  if (effectiveMultiColumn) {
+  if (blue2EffectiveMultiColumn) {
     collapsedContent.push(
       <div key='buttons' className='column-header__advanced-buttons'>
         {pinButton}
@@ -258,7 +258,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     );
   }
 
-  if (signedIn && (children || (effectiveMultiColumn && effectiveOnPin))) {
+  if (signedIn && (children || (blue2EffectiveMultiColumn && effectiveOnPin))) {
     collapseButton = (
       <button
         className={collapsibleButtonClassName}
