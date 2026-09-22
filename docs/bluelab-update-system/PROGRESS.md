@@ -648,6 +648,28 @@ mastodon.blue por `blue-atualizar`. `BlueLab` e a Espelunca permanecem inalterad
 até aprovação explícita do usuário para promover o SHA testado e, separadamente,
 executar `espelunca-atualizar`.
 
+### Simulação upstream revalidada no canal de teste — 2026-09-22
+
+Com a árvore ativa limpa em `112d01cd583292a011c22c79378809443bdbb4cc`, o fetch
+confirmou `upstream/main` em
+`3b43a085d076044abbbb69d928d704d3c9213b1c`. A simulação isolada por
+`bin/bluelab-transaction-plan` retornou `NEEDS_SEMANTIC_REVIEW`; o relatório é
+`/home/blue/.local/state/bluelab/transactions/20260922T022137Z-659ce4f8-c4f1-4c3e-9312-5ffcd75f06aa.json`.
+
+As quatro colisões são `status/action_bar.tsx` (C,
+`quotes-and-media-downloads`), `navigation_panel/redesign/header.tsx` e
+`ui/index.jsx` (B, `blue2-shell-navigation`) e `locales/en.json` (não
+classificado). Um worktree descartável foi aberto exclusivamente para essa revisão;
+nenhum commit funcional, deploy no Blue, mudança de `BlueLab` ou operação na
+Espelunca ocorreu.
+
+**Único próximo passo seguro:** concluir no worktree a reconciliação semântica,
+preservando os contratos BlueLab de marca/navegação e downloads de mídia enquanto se
+adota a refatoração upstream do status. Depois executar gates JS/Ruby relevantes;
+somente se passarem, publicar o candidato em `BlueLab-Test`, aplicá-lo no
+mastodon.blue por `blue-atualizar` e registrar o SHA funcional e os testes manuais
+solicitados ao usuário.
+
 ## Regra de encerramento de etapas
 
 Toda etapa funcional deste sistema deve ser publicada em `BlueLab-Test`, aplicada no
