@@ -414,8 +414,6 @@ en:
       enabled: Enabled
       enabled_msg: Successfully enabled that emoji
       image_hint: PNG or GIF up to %{size}
-      edit: Edit
-      edit_title: Edit custom emoji
       list: List
       listed: Listed
       new:
@@ -431,8 +429,6 @@ en:
       unlisted: Unlisted
       update_failed_msg: Could not update that emoji
       updated_msg: Emoji successfully updated!
-      update_shortcode: Save changes
-      remote_edit_not_permitted: Remote emojis cannot be renamed locally
       upload: Upload
     dashboard:
       active_users: active users
