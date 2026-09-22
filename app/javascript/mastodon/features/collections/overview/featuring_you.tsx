@@ -32,8 +32,11 @@ function useCollectionsFeaturing(accountId: string | null | undefined) {
   );
 }
 
-export const CollectionsFeaturingYou: React.FC = () => {
-  const accountId = useAccountId();
+export const CollectionsFeaturingYou: React.FC<{ accountId?: string }> = ({
+  accountId: columnAccountId,
+}) => {
+  const routeAccountId = useAccountId();
+  const accountId = columnAccountId ?? routeAccountId;
   const account = useAccount(accountId);
 
   const { collections, status } = useCollectionsFeaturing(accountId);
