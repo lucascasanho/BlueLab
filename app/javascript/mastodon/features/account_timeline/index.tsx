@@ -47,8 +47,12 @@ import classes from './styles.module.scss';
 
 const emptyList = ImmutableList<string>();
 
-const AccountTimeline: FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
-  const accountId = useAccountId();
+const AccountTimeline: FC<{
+  multiColumn: boolean;
+  accountId?: string;
+}> = ({ multiColumn, accountId: columnAccountId }) => {
+  const routeAccountId = useAccountId();
+  const accountId = columnAccountId ?? routeAccountId;
   const accountContext = useAccountContextValue(accountId);
   const account = useAccount(accountId);
 
