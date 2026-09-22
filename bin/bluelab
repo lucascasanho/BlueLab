@@ -194,7 +194,7 @@ garantir_ruby() {
 
 instalar_dependencias() {
   # Instala/atualiza as gems antes de qualquer comando Rails.
-  executar bundle install --jobs "$(nproc)" --retry 3
+  executar bundle install --jobs "${BLUELAB_BUNDLE_JOBS:-1}" --retry 3
   executar bundle check
   executar yarn install --immutable
 }
