@@ -194,7 +194,7 @@ namespace :admin do
     end
   end
 
-  resources :custom_emojis, only: [:index, :new, :create], concerns: :batch
+  resources :custom_emojis, only: [:index, :new, :create, :edit, :update], concerns: :batch
 
   resources :ip_blocks, only: [:index, :new, :create], concerns: :batch
 
