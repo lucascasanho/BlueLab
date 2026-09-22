@@ -785,3 +785,29 @@ validações.
 
 **Único próximo passo seguro:** executar `bluelab` na Espelunca novamente e
 registrar se o runtime Ruby foi preparado e se o deploy completo terminou.
+
+
+### Bootstrap de autoatualização do comando — 2026-09-22
+
+A primeira correção de runtime não podia ser alcançada pela cópia antiga de
+`~/.local/bin/bluelab` instalada na Espelunca: essa cópia ainda executava
+`capturar_configuracoes` antes de alinhar o checkout e, por isso, parava ao
+resolver `.ruby-version` com Ruby `4.0.7` ausente.
+
+O `bin/bluelab` foi reforçado para, imediatamente após o `git fetch` e antes de
+qualquer Bundler/Rails, comparar a cópia instalada com `bin/bluelab` do canal
+canônico e substituir/reativar o próprio comando quando necessário. Isso torna o
+atualizador capaz de se recuperar de versões antigas do comando sem executar Ruby
+antes da sincronização do código.
+
+O SHA atual do pipeline é `09ffc98b50e79cdba37cc8cf802caac845c4adf1`, publicado
+em `BlueLab` e `BlueLab-Test`.
+
+**Observação operacional:** a instalação antiga que já falhou na Espelunca ainda
+precisa de um bootstrap único, pois ela não contém a lógica de autoatualização.
+Depois desse bootstrap, `bluelab` volta a ser suficiente para as atualizações
+normais.
+
+**Único próximo passo seguro:** aplicar o bootstrap não destrutivo do comando
+instalado na Espelunca e executar `bluelab` novamente. Não executar Bundler,
+Rails ou migrations manualmente antes disso.
