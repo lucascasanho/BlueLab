@@ -73,7 +73,7 @@ module Admin
 
       return custom_emoji if custom_emoji.local?
 
-      redirect_to admin_custom_emojis_path, alert: I18n.t('admin.custom_emojis.remote_edit_not_permitted')
+      redirect_to admin_custom_emojis_path, alert: I18n.t('admin.custom_emojis.not_permitted')
     end
 
     def shortcode_params
