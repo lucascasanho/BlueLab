@@ -670,6 +670,28 @@ somente se passarem, publicar o candidato em `BlueLab-Test`, aplicá-lo no
 mastodon.blue por `blue-atualizar` e registrar o SHA funcional e os testes manuais
 solicitados ao usuário.
 
+### Candidato upstream aplicado no Blue — 2026-09-22
+
+O merge de `upstream/main` (`3b43a085d076044abbbb69d928d704d3c9213b1c`) foi
+reconciliado no candidato `24ec2ad6b5bd99c1bd49970b3b099d80df08bb60` e publicado
+em `bluelab/BlueLab-Test`. A reconciliação adota a nova arquitetura upstream de
+status e preserva a estrela de favoritos Blue2, a marca de instância/navegação Blue2,
+o layout compacto e as mensagens BlueLab ainda consumidas. `git diff --check`,
+TypeScript, ESLint focal, RuboCop focal e o build de produção passaram; o extrator
+i18n ficou idempotente. Os avisos preexistentes de mensagens duplicadas continuaram
+sem alteração automática do catálogo.
+
+`blue-atualizar` aplicou exatamente `24ec2ad6b5` no mastodon.blue. Dependências,
+migrations, assets e restart concluíram; após o restart, `blue-web`,
+`blue-sidekiq` e `blue-streaming` estão `active`. `/health` local e público
+retornaram `OK`, e `/api/v2/instance` local e público responderam com sucesso.
+`BlueLab` continua em `9ee27d068951353bff5f68e177bf24487eec2bcb`; nenhuma operação
+foi feita na Espelunca.
+
+**Único próximo passo seguro:** testar manualmente no mastodon.blue o redesign de
+status, a barra de ações e a navegação Blue2. Não promover `BlueLab` até confirmação
+explícita do usuário para este SHA.
+
 ## Regra de encerramento de etapas
 
 Toda etapa funcional deste sistema deve ser publicada em `BlueLab-Test`, aplicada no
