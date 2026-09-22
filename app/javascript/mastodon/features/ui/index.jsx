@@ -764,7 +764,12 @@ class UI extends PureComponent {
     const { draggingOver, mobileChromeHidden } = this.state;
     const { children, isComposing, location, layout, firstLaunch, newAccount } = this.props;
     const forceCompactLayout = isBlue2CompactViewport();
-    const singleColumn = layout === 'mobile' || layout === 'single-column' || forceCompactLayout;
+    // Blue2 compact viewports are a separate mobile UI state. Do not let the
+    // user's advanced-interface preference leak its multi-column layout state
+    // into mobile/tablet rendering.
+    const effectiveLayout = forceCompactLayout ? 'mobile' : layout;
+    const singleColumn =
+      effectiveLayout === 'mobile' || effectiveLayout === 'single-column';
 
     const handlers = {
       help: this.handleHotkeyToggleHelp,
@@ -802,7 +807,7 @@ class UI extends PureComponent {
         <div className={classNames('ui', { 'is-composing': isComposing, 'ui--mobile-chrome-hidden': mobileChromeHidden })} ref={this.setRef}>
           {!minimalShell && (
             <SkipLinks
-              multiColumn={!singleColumn}
+              multiColumn={effectiveLayout === 'multi-column'}
               onFocusGettingStartedColumn={this.handleHotkeyGoToStart}
             />
           )}
@@ -811,7 +816,7 @@ class UI extends PureComponent {
             identity={this.props.identity}
             location={location}
             singleColumn={singleColumn}
-            layout={layout}
+            layout={effectiveLayout}
             forceOnboarding={firstLaunch && newAccount}
             forceCompactLayout={forceCompactLayout}
             minimalShell={minimalShell}
@@ -820,7 +825,7 @@ class UI extends PureComponent {
           </SwitchingColumnsArea>
 
           {!minimalShell && <NavigationBar />}
-          {!singleColumn && <PictureInPicture />}
+          {effectiveLayout !== 'mobile' && <PictureInPicture />}
           <AlertsController />
           {!disableHoverCards && <HoverCardController />}
           <HashtagMenuController />
