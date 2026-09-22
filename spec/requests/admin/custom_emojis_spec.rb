@@ -13,7 +13,8 @@ RSpec.describe 'Admin Custom Emojis' do
         .to have_http_status(400)
     end
   end
-describe 'GET /admin/custom_emojis/:id/edit' do
+
+  describe 'GET /admin/custom_emojis/:id/edit' do
     before { sign_in Fabricate(:admin_user) }
 
     it 'renders the shortcode editor for a local emoji' do
