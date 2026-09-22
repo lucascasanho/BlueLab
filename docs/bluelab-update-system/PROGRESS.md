@@ -692,6 +692,24 @@ foi feita na Espelunca.
 status, a barra de ações e a navegação Blue2. Não promover `BlueLab` até confirmação
 explícita do usuário para este SHA.
 
+### Hotfix de contexto de colunas aplicado no Blue — 2026-09-21
+
+O candidato upstream introduziu uma referência a `layout` no componente legado que
+fornece o contexto de colunas, mas esse escopo expõe apenas `singleColumn`. O erro
+manual reportado no mastodon.blue (`ReferenceError: layout is not defined`) foi
+corrigido em `eab4ffe6dbd99085b04a55038de5409056e78020`, restaurando
+`multiColumn={!singleColumn}` nesse ponto. TypeScript e build de produção passaram;
+o lint focal apenas informa que o JSX legado não possui configuração correspondente.
+
+O SHA foi publicado em `bluelab/BlueLab-Test` e aplicado por `blue-atualizar`. Os
+serviços `blue-web`, `blue-sidekiq` e `blue-streaming` estão ativos; healthchecks
+local e público retornaram `OK`. `BlueLab` permanece em
+`9ee27d068951353bff5f68e177bf24487eec2bcb` e a Espelunca não foi acessada.
+
+**Único próximo passo seguro:** recarregar o mastodon.blue e confirmar que a interface
+abre sem `ReferenceError`; então repetir os testes de status, ações e navegação antes
+de qualquer promoção.
+
 ## Regra de encerramento de etapas
 
 Toda etapa funcional deste sistema deve ser publicada em `BlueLab-Test`, aplicada no
