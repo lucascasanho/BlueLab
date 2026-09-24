@@ -158,8 +158,7 @@ html.no-reduce-motion
  * favourite animation is present in every Bird UI action-bar context too.
  */
 html.no-reduce-motion {
-  .status__action-bar .favourite-spin,
-  .detailed-status__action-bar .favourite-spin {
+  .favourite-spin {
     &.activate > .icon {
       animation: spring-rotate-in 1s linear;
       transform-origin: 50% 52%;
