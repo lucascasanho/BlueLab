@@ -8,6 +8,8 @@ import type { LinkProps } from 'react-router-dom';
 
 import { CaretDownIcon } from '@phosphor-icons/react';
 
+import { usePrevious } from '@/mastodon/hooks/usePrevious';
+
 import { CircularProgress } from '../circular_progress';
 import type { IconProp } from '../icon';
 import { Icon } from '../icon';
@@ -170,19 +172,25 @@ const LoadingIcon: React.FC = () => (
   />
 );
 
-export const ToggleButton: React.FC<ButtonProps & { active?: boolean }> = ({
-  active,
-  className,
-  ...props
-}) => (
-  <Button
-    aria-pressed={active}
-    {...props}
-    // Toggle buttons always have neutral until pressed.
-    color='neutral'
-    className={classNames(className, classes.toggle)}
-  />
-);
+export const ToggleButton: React.FC<
+  ButtonProps & { active?: boolean; animate?: boolean }
+> = ({ active, animate = false, className, ...props }) => {
+  const previousActive = usePrevious(active) ?? active;
+  const shouldAnimate = animate && active !== previousActive;
+
+  return (
+    <Button
+      aria-pressed={active}
+      {...props}
+      // Toggle buttons always have neutral until pressed.
+      color='neutral'
+      className={classNames(className, classes.toggle, {
+        activate: shouldAnimate && active,
+        deactivate: shouldAnimate && !active,
+      })}
+    />
+  );
+};
 
 export const ToggleIconButton: React.FC<
   IconButtonProps & { active?: boolean }
