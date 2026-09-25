@@ -302,7 +302,7 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
 
       {showSearch && <Search singleColumn />}
 
-      {!multiColumn && <ProfileCard />}
+      {!multiColumn && !isBirdUi && <ProfileCard />}
 
       {banner && <div className='navigation-panel__banner'>{banner}</div>}
 
