@@ -59,8 +59,8 @@ module User::HasSettings
     settings['noindex']
   end
 
-  def setting_theme
-    settings['theme']
+  def setting_bluelab_theme
+    settings['bluelab_theme']
   end
 
   def setting_color_scheme
