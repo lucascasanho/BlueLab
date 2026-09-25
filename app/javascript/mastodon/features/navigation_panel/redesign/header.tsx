@@ -25,7 +25,11 @@ export const NavigationHeader: React.FC<{
   const intl = useIntl();
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const isFireBird =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'firebird';
   const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
+  const fireBirdBrand =
+    customInstanceLogo ?? customAppIcon ?? customFavicon ?? '/favicon.ico';
 
   return (
     <header className={classes.root} data-stuck={isStuck}>
@@ -36,6 +40,8 @@ export const NavigationHeader: React.FC<{
       >
         {isBlue2 ? (
           <img src={blue2Brand} alt='' className={classes.appIcon} />
+        ) : isFireBird ? (
+          <img src={fireBirdBrand} alt='' className={classes.appIcon} />
         ) : customInstanceLogo ? (
           <img src={customInstanceLogo} alt='' className={classes.appIcon} />
         ) : customAppIcon ? (
@@ -47,19 +53,21 @@ export const NavigationHeader: React.FC<{
           <span className={classes.serverName}>
             {siteName ?? title ?? domain}
           </span>
-          <span className={classes.poweredBy}>
-            {isBlue2 ? (
-              <>{blue2Text(intl.locale, 'basedOnMastodon')}</>
-            ) : (
-              <FormattedMessage
-                id='navigation_bar.powered_by_mastodon'
-                defaultMessage='powered by {logo}Mastodon'
-                values={{
-                  logo: <IconLogo role='presentation' />,
-                }}
-              />
-            )}
-          </span>
+          {!isFireBird && (
+            <span className={classes.poweredBy}>
+              {isBlue2 ? (
+                <>{blue2Text(intl.locale, 'basedOnMastodon')}</>
+              ) : (
+                <FormattedMessage
+                  id='navigation_bar.powered_by_mastodon'
+                  defaultMessage='powered by {logo}Mastodon'
+                  values={{
+                    logo: <IconLogo role='presentation' />,
+                  }}
+                />
+              )}
+            </span>
+          )}
         </span>
       </Link>
     </header>
