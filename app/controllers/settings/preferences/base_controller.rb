@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Settings::Preferences::BaseController < Settings::BaseController
-  PERMITTED_USER_SETTINGS = UserSettings.keys.excluding(:theme).freeze
+  PERMITTED_USER_SETTINGS = UserSettings.keys.freeze
 
   def show; end
 
@@ -24,9 +24,8 @@ class Settings::Preferences::BaseController < Settings::BaseController
   def after_preferences_update; end
 
   def user_params
-    # BlueLab themes are instance-wide and may only be changed through the
-    # authorized admin settings endpoint. Do not retain the legacy per-user
-    # theme parameter as an alternate write path.
+    # Theme is a per-user setting. The appearance controller validates it
+    # against the small set of themes exposed to users.
     params.expect(user: [:locale, :time_zone, chosen_languages: [], settings_attributes: PERMITTED_USER_SETTINGS])
   end
 end
