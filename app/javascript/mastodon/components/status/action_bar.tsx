@@ -164,10 +164,7 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
         leadingIcon={favouriteIcon}
         leadingIconWrapperClassName='favourite-animation-target'
         onClick={handleFavouriteClick}
-        className={classNames(
-          'favourite-spin',
-          !onlyResponses && classes.actionsButtonGap,
-        )}
+        className={!onlyResponses ? classes.actionsButtonGap : undefined}
       >
         {withCounters && status.favourites_count}
       </ToggleButton>
