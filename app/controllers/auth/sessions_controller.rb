@@ -29,6 +29,15 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def create
+    # Devise normally stops an already-authenticated browser from entering
+    # another account. During account switching, clear only Warden's current
+    # user so the password strategy authenticates the requested account.
+    # The previous SessionActivation remains valid for switching back.
+    if truthy_param?(:account_switcher)
+      session[:account_switcher] = true
+      warden.logout(:user) if warden.authenticated?(:user)
+    end
+
     super do |resource|
       # We only need to call this if this hasn't already been
       # called from one of the two-factor or sign-in token
