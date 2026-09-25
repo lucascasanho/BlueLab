@@ -131,3 +131,19 @@
     color: var(--color-yellow) !important;
   }
 }
+
+// The redesigned feed action bar is rendered outside the legacy
+// .layout-single-column/.layout-multiple-columns wrappers. Keep this selector
+// unscoped so the active native star is colored when Bird UI is in use.
+button.star-icon[aria-pressed='true'] {
+  --fg: var(--color-yellow) !important;
+  color: var(--color-yellow) !important;
+
+  .favourite-animation-target,
+  .favourite-animation-target > .icon,
+  .favourite-animation-target > .icon path {
+    color: var(--color-yellow) !important;
+    fill: var(--color-yellow) !important;
+    stroke: var(--color-yellow) !important;
+  }
+}
