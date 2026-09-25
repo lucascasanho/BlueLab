@@ -370,6 +370,19 @@
     padding-bottom: 0;
   }
 
+  // The compose launcher is a shared BlueLab component. Keep its
+  // background tied to the instance accent when Bird UI is active.
+  .navigation-panel > .bird-ui-compose-button {
+    background-color: var(--color-bg-brand-base);
+    color: var(--color-text-on-brand-base);
+  }
+
+  .navigation-panel > .bird-ui-compose-button:hover,
+  .navigation-panel > .bird-ui-compose-button:focus-visible {
+    background-color: var(--color-bg-brand-base-hover);
+    color: var(--color-text-on-brand-base);
+  }
+
   .navigation-panel > .bird-ui-compose-button {
     order: 3;
     align-self: flex-start;
