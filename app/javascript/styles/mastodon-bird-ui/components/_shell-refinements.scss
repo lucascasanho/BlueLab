@@ -32,23 +32,36 @@ body[data-theme='mastodon-bird-ui-auto'] {
   // Advanced Bird UI owns the navigation footer. Hide legacy footer mounts
   // inside the Bird UI navigation panel and any multi-column LinkFooter.
   &.layout-multiple-columns {
-    .navigation-panel--bird-ui > footer:not([data-bird-ui-footer='true']) {
+    // Advanced Bird UI owns the footer. Do not allow legacy footer mounts from
+    // the multiple-column shell to appear alongside it.
+    footer:not([data-bird-ui-footer='true']) {
       display: none !important;
     }
 
-    footer[data-context='multi-column'] {
-      display: none !important;
+    // The profile card is part of the Bird UI navigation shell. Contain every
+    // layer of the widget so long names, borders, and focus/hover states cannot
+    // escape the navigation column.
+    .navigation-panel--bird-ui {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow-x: hidden;
     }
 
-    // The account card is a Bird UI-only navigation element. Contain the
-    // expanding account button so the hover/focus state cannot escape the
-    // navigation column.
     .navigation-panel--bird-ui > .bird-ui-profile-slot {
       box-sizing: border-box;
       width: 100%;
       max-width: 100%;
       min-width: 0;
       overflow: hidden;
+    }
+
+    .navigation-panel--bird-ui > .bird-ui-profile-slot > * {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
     }
 
     .navigation-panel--bird-ui > .bird-ui-profile-slot button {
