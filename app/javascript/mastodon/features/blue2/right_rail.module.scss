@@ -22,6 +22,12 @@
   flex: 0 0 auto;
 }
 
+.rightRailComposeButton {
+  width: 100%;
+  margin: 0 0 10px;
+  min-height: 44px;
+}
+
 .searchHost {
   position: relative;
   z-index: 20;
@@ -353,4 +359,19 @@
   .root {
     width: 270px;
   }
+}
+
+:global(body[data-theme='mastodon-bird-ui-auto']) .root {
+  --blue2-bg: var(--color-bg-primary);
+  --blue2-surface: var(--color-bg-secondary);
+  --blue2-surface-raised: var(--color-bg-primary);
+  --blue2-search: var(--color-bg-secondary);
+  --blue2-hover: var(--color-bg-tertiary);
+  --blue2-border: var(--color-border-primary);
+  --blue2-border-soft: var(--color-border-primary);
+  --blue2-text: var(--color-text-primary);
+  --blue2-muted: var(--color-text-secondary);
+  --blue2-muted-2: var(--color-text-secondary);
+  --blue2-blue: var(--color-accent);
+  --blue2-blue-hover: var(--color-accent-dark);
 }
