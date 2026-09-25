@@ -28,6 +28,7 @@ import {
 import { shouldShowCharacterCounter } from '../components/character_counter';
 
 import type { OnEmojiPick } from './emoji';
+import { ComposeGifButton } from './gif_picker';
 import { ComposeEmojiButton } from './emoji';
 import {
   selectComposeAttachments,
@@ -69,6 +70,8 @@ export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
   return (
     <footer className={classes.footer} data-bluelab-compose-footer>
       <ComposeUploadButton disabled={hasQuote} />
+
+      <ComposeGifButton disabled={hasQuote} />
 
       <ComposeEmojiButton onPick={onEmojiPick} />
 
