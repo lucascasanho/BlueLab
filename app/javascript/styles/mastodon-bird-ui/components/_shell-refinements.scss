@@ -31,6 +31,15 @@ body[data-theme='mastodon-bird-ui-auto'] {
 
   // Single-column desktop/tablet panels keep a little more separation from
   // the page edge while remaining visually lighter than the base theme.
+  &.layout-multiple-columns {
+    // The legacy shell may also mount LinkFooter in the advanced interface.
+    // Bird UI has its own footer in the navigation panel, so keep only that
+    // footer and avoid rendering two footer link groups.
+    footer[data-context='multi-column'] {
+      display: none !important;
+    }
+  }
+
   &.layout-single-column {
     @media screen and (width >= 760px) {
       .column > .scrollable,
