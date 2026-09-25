@@ -10,16 +10,27 @@
   font-size: 12px;
   line-height: 1.35;
 
-  a {
+  a,
+  button {
     color: inherit !important;
     text-decoration: none;
+  }
 
-    &:hover,
-    &:focus-visible {
-      color: var(--blue2-text, var(--color-text-primary, #fff)) !important;
-      text-decoration: underline;
-      outline: none;
-    }
+  a:hover,
+  a:focus-visible,
+  button:hover,
+  button:focus-visible {
+    color: var(--blue2-text, var(--color-text-primary, #fff)) !important;
+    text-decoration: underline;
+    outline: none;
+  }
+
+  button {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
   }
 
   span {
