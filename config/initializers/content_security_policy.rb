@@ -30,7 +30,7 @@ Rails.application.config.content_security_policy do |p|
   p.child_src  :self, :blob, assets_host
   p.worker_src :self, :blob, assets_host
 
-  p.connect_src :self, :data, :blob, *media_hosts, 'https://api.klipy.com', Rails.configuration.x.streaming_api_base_url
+  p.connect_src :self, :data, :blob, *media_hosts, 'https://api.klipy.com', 'https://static.klipy.com', 'https://static1.klipy.com', 'https://static2.klipy.com', Rails.configuration.x.streaming_api_base_url
   p.script_src  :self, assets_host, "'wasm-unsafe-eval'"
   p.frame_src   :self, :https
   p.style_src   :self, assets_host
