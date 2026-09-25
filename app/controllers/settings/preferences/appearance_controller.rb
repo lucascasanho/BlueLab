@@ -12,12 +12,12 @@ class Settings::Preferences::AppearanceController < Settings::Preferences::BaseC
   private
 
   def user_theme
-    params.dig(:user, :settings_attributes, :theme).to_s
+    params.dig(:user, :settings_attributes, :bluelab_theme).to_s
   end
 
   def theme_submitted?
     settings = params.dig(:user, :settings_attributes)
-    settings.respond_to?(:key?) && (settings.key?(:theme) || settings.key?('theme'))
+    settings.respond_to?(:key?) && (settings.key?(:bluelab_theme) || settings.key?('bluelab_theme'))
   end
 
   def after_update_redirect_path
