@@ -50,6 +50,11 @@ body[data-theme='firebird'] {
   --color-bg-brand-base: var(--firebird-blue);
   --color-bg-brand-base-hover: var(--firebird-blue-hover);
   --color-bg-brand-soft: var(--firebird-blue-soft);
+  --color-bg-blend: var(--firebird-bg);
+  --color-bg-highlight: var(--firebird-surface-soft);
+  --color-bg-inverted: var(--firebird-text);
+  --color-text-inverted: var(--firebird-bg);
+  --color-shadow: var(--firebird-shadow);
   --color-bg-brand-softest: rgb(29 155 240 / 5%);
   --color-border-brand: var(--firebird-blue);
   --color-brand-mastodon: var(--firebird-blue);
