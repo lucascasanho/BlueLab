@@ -23,6 +23,11 @@ class Auth::SessionsController < Devise::SessionsController
     p.form_action(false)
   end
 
+  def new
+    session[:account_switcher] = truthy_param?(:account_switcher)
+    super
+  end
+
   def create
     super do |resource|
       # We only need to call this if this hasn't already been
@@ -137,7 +142,7 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def require_no_authentication
-    return if account_switcher_flow?
+    return if truthy_param?(:account_switcher)
 
     super
 
@@ -192,7 +197,7 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def account_switcher_flow?
-    truthy_param?(:account_switcher)
+    truthy_param?(:account_switcher) || session[:account_switcher] == true
   end
 
   def restart_session
@@ -231,6 +236,7 @@ class Auth::SessionsController < Devise::SessionsController
 
     user.update_sign_in!(new_sign_in: true)
     sign_in(user)
+    session.delete(:account_switcher)
     flash.delete(:notice)
 
     user.login_activities.create(
