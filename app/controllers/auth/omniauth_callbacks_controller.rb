@@ -28,6 +28,8 @@ class Auth::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   end
 
   def after_sign_in_path_for(resource)
+    return root_path if session.delete(:account_switcher)
+
     if resource.email_present?
       stored_location_for(resource) || root_path
     else

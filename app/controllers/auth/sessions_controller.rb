@@ -23,6 +23,11 @@ class Auth::SessionsController < Devise::SessionsController
     p.form_action(false)
   end
 
+  def new
+    session[:account_switcher] = truthy_param?(:account_switcher)
+    super
+  end
+
   def create
     super do |resource|
       # We only need to call this if this hasn't already been
@@ -125,6 +130,8 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def after_sign_in_path_for(resource)
+    return root_path if account_switcher_flow?
+
     last_url = stored_location_for(:user)
 
     if home_paths(resource).include?(last_url)
@@ -135,6 +142,8 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def require_no_authentication
+    return if truthy_param?(:account_switcher)
+
     super
 
     # Delete flash message that isn't entirely useful and may be confusing in
@@ -187,6 +196,10 @@ class Auth::SessionsController < Devise::SessionsController
     truthy_param?(:continue)
   end
 
+  def account_switcher_flow?
+    truthy_param?(:account_switcher) || session[:account_switcher] == true
+  end
+
   def restart_session
     clear_attempt_from_session
     redirect_to new_user_session_path, alert: I18n.t('devise.failure.timeout')
@@ -223,6 +236,7 @@ class Auth::SessionsController < Devise::SessionsController
 
     user.update_sign_in!(new_sign_in: true)
     sign_in(user)
+    session.delete(:account_switcher)
     flash.delete(:notice)
 
     user.login_activities.create(

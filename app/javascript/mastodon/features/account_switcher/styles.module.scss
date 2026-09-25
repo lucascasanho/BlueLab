@@ -1,0 +1,238 @@
+.root {
+  position: fixed;
+  z-index: 1100;
+  inset-block-start: max(8px, env(safe-area-inset-top));
+  inset-inline-end: 12px;
+  pointer-events: none;
+}
+
+.trigger {
+  width: 44px;
+  height: 44px;
+  padding: 2px;
+  border: 1px solid var(--color-border-primary);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  box-shadow: var(--dropdown-shadow, 0 4px 16px rgb(0 0 0 / 18%));
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.trigger:hover,
+.trigger:focus-visible,
+.trigger[aria-expanded='true'] {
+  border-color: var(--color-border-primary);
+  background: var(--color-bg-primary);
+  outline: 2px solid var(--color-border-primary);
+  outline-offset: 1px;
+}
+
+.panel {
+  box-sizing: border-box;
+  width: min(340px, calc(100vw - 16px));
+  max-height: min(620px, calc(100dvh - 16px));
+  padding: 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  box-shadow: var(--dropdown-shadow, 0 14px 40px rgb(0 0 0 / 28%));
+  pointer-events: auto;
+}
+
+.header {
+  min-height: 32px;
+  padding: 2px 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.count {
+  min-width: 22px;
+  min-height: 20px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.accounts {
+  display: grid;
+  gap: 2px;
+}
+
+.accountRow {
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.accountButton {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 56px;
+  flex: 1 1 auto;
+  padding: 7px;
+  border: 0;
+  border-radius: var(--radius-sm, 8px);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: transparent;
+  color: var(--color-text-primary);
+  text-align: start;
+  cursor: pointer;
+}
+
+.accountButton:hover:not(:disabled),
+.accountButton:focus-visible:not(:disabled) {
+  background: var(--color-bg-secondary);
+  outline: none;
+}
+
+.accountButton[aria-current='page'] {
+  background: var(--color-bg-secondary);
+}
+
+.accountButton:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.avatar {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  object-fit: cover;
+  background: var(--color-bg-secondary);
+}
+
+.accountText {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.accountText strong,
+.accountText > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accountText strong {
+  color: var(--color-text-primary);
+  font-size: 14px;
+}
+
+.accountText > span {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.current {
+  flex: 0 0 auto;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.removeButton {
+  flex: 0 0 32px;
+  width: 32px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm, 8px);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.removeButton:hover,
+.removeButton:focus-visible {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+.divider {
+  height: 1px;
+  margin: 8px 2px;
+  background: var(--color-border-primary);
+}
+
+.action {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm, 8px);
+  display: flex;
+  align-items: center;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.action:hover,
+.action:focus-visible {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+.error {
+  margin: 8px 4px 4px;
+  color: var(--color-text-primary);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+@media (width <= 759px) {
+  .root {
+    inset-inline-end: 8px;
+  }
+
+  .trigger {
+    width: 42px;
+    height: 42px;
+  }
+
+  .panel {
+    width: min(340px, calc(100vw - 16px));
+    max-height: calc(100dvh - 16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger,
+  .accountButton,
+  .removeButton,
+  .action {
+    transition: none;
+  }
+}
