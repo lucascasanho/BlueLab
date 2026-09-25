@@ -21,7 +21,7 @@ RSpec.describe UserSettings do
         expect(subject[:'web.trends']).to be false
       end
 
-      it 'has no BlueLab theme preference by default' do
+      it 'defaults the BlueLab theme preference to BlueLab' do
         expect(subject[:bluelab_theme]).to eq 'blue-2'
       end
 
