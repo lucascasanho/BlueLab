@@ -39,6 +39,25 @@ body[data-theme='mastodon-bird-ui-auto'] {
     footer[data-context='multi-column'] {
       display: none !important;
     }
+
+    // The account card is a Bird UI-only navigation element. Contain the
+    // expanding account button so the hover/focus state cannot escape the
+    // navigation column.
+    .navigation-panel--bird-ui > .bird-ui-profile-slot {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .navigation-panel--bird-ui > .bird-ui-profile-slot button {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
+    }
   }
 
   &.layout-single-column {
