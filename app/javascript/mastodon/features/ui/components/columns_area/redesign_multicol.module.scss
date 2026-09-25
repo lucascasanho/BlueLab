@@ -59,16 +59,20 @@
   }
 }
 
+.blue2MultiColumnRoot {
+  min-width: 0;
+}
+
 // BlueLab tablet rail stays in the horizontal layout flow instead of sitting
 // above the columns. This prevents the fixed 76px rail from covering content
 // while the multi-column area is horizontally scrolled.
 @media (min-width: $mobile-menu-breakpoint) and (max-width: ($no-gap-breakpoint - 1)) {
-  .blue2Root {
+  .blue2MultiColumnRoot {
     padding-inline-start: 0;
     scroll-padding-inline-start: 76px;
   }
 
-  .blue2Root .navigationRail {
+  .blue2MultiColumnRoot .navigationRail {
     position: sticky;
     inset-inline-start: 0;
     inset-block-start: 0;
@@ -79,7 +83,7 @@
     align-self: flex-start;
   }
 
-  .blue2Root .navigationRail[data-expanded='true'] {
+  .blue2MultiColumnRoot .navigationRail[data-expanded='true'] {
     flex-basis: 76px;
     width: 76px;
     min-width: 76px;
