@@ -15,6 +15,7 @@ import {
 import { dismissComposer, resetComposer } from '@/mastodon/reducers/slices/composer';
 import { directCompose, resetCompose } from '@/mastodon/actions/compose';
 import { RedesignComposeForm } from '@/mastodon/features/compose/redesign';
+import { Avatar } from '@/mastodon/components/avatar';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
 import AttachmentList from '@/mastodon/components/attachment_list';
@@ -128,6 +129,18 @@ export const MessageConversation: React.FC = () => {
   );
 
   const displayAccount = status.get('account');
+  const statusText = typeof status.get('text') === 'string' ? status.get('text') as string : '';
+  const mentions = status.get('mentions') as Immutable.List<Immutable.Map<string, unknown>>;
+  const showSenderName = mentions.size > 1 || mentions.some((mention) => {
+    const acct = mention.get('acct');
+    const username = mention.get('username');
+    const trimmedText = statusText.trimStart();
+
+    return (
+      (typeof acct === 'string' && !trimmedText.startsWith(`@${acct}`)) ||
+      (typeof username === 'string' && !trimmedText.startsWith(`@${username}`))
+    );
+  });
 
   return (
     <Column label={intl.formatMessage(messages.title)}>
@@ -158,20 +171,13 @@ export const MessageConversation: React.FC = () => {
             data-own-message={isMine ? 'true' : 'false'}
           >
             <div className={classes.messageMeta}>
-              <AvatarComposite
-                accounts={
-                  isMine
-                    ? accounts.filter((account) => account?.get('id') === me)
-                    : participantAccounts
-                }
-                size={36}
-              />
-              <div>
+              <Avatar account={displayAccount} size={20} />
+              {showSenderName && (
                 <strong>
                   <DisplayNameSimple account={displayAccount} />
                 </strong>
-                <RelativeTimestamp timestamp={status.get('created_at')} />
-              </div>
+              )}
+              <RelativeTimestamp timestamp={status.get('created_at')} />
             </div>
 
             <div className={classes.messageBody}>
