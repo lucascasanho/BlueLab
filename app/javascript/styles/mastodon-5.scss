@@ -1,0 +1,190 @@
+@use 'application';
+
+body[data-theme='mastodon-5'] {
+  --m5-bg: var(--color-bg-primary);
+  --m5-surface: var(--color-bg-elevated);
+  --m5-border: var(--color-border-primary);
+  --m5-text: var(--color-text-primary);
+  --m5-muted: var(--color-text-secondary);
+  --m5-hover: var(--color-bg-brand-softest);
+
+  min-width: 0;
+  margin: 0;
+  background: var(--m5-bg);
+  color: var(--m5-text);
+
+  .ui {
+    min-height: 100dvh;
+    background: var(--m5-bg);
+  }
+
+  .ui__navigation-bar,
+  .navigation-panel,
+  .compose-panel,
+  .columns-area__panels__pane__compositional {
+    display: none !important;
+  }
+
+  .columns-area,
+  .columns-area--mobile,
+  .column,
+  .scrollable,
+  .item-list {
+    background: var(--m5-bg);
+  }
+
+  .column {
+    border: 0;
+    box-shadow: none;
+  }
+
+  .column-header,
+  .column-header__wrapper,
+  .tabs-bar {
+    background: var(--m5-bg);
+    color: var(--m5-text);
+    border-color: var(--m5-border);
+    box-shadow: none;
+  }
+
+  .column-header__button,
+  .column-header__back-button,
+  .column-header__collapsible-inner {
+    color: var(--m5-text);
+  }
+
+  .status,
+  .notification,
+  .notification-group,
+  .account,
+  .conversation {
+    background: var(--m5-bg);
+    color: var(--m5-text);
+    border-color: var(--m5-border);
+  }
+
+  .status {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--m5-border);
+  }
+
+  .status:hover,
+  .notification:hover,
+  .notification-group:hover {
+    background: var(--m5-hover);
+  }
+
+  .status__content,
+  .status__content p {
+    color: var(--m5-text);
+    font-size: 15.5px;
+    line-height: 1.4;
+  }
+
+  .status__content a {
+    color: var(--color-text-brand);
+  }
+
+  .display-name__html,
+  .status__display-name strong,
+  .account__display-name strong {
+    color: var(--m5-text);
+  }
+
+  .status__relative-time,
+  .display-name__account,
+  .account__display-name span {
+    color: var(--m5-muted);
+  }
+
+  .button {
+    border-radius: 10px;
+  }
+
+  .form-container,
+  .hero-widget,
+  .box-widget {
+    background: var(--m5-surface);
+    color: var(--m5-text);
+    border-color: var(--m5-border);
+  }
+
+  input,
+  textarea,
+  select,
+  .search__input,
+  .setting-text {
+    background: var(--m5-surface);
+    color: var(--m5-text);
+    border-color: var(--m5-border);
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--color-border-brand);
+    box-shadow: 0 0 0 1px var(--color-border-brand);
+  }
+
+  .dropdown-menu,
+  .dropdown-menu__container,
+  .modal-root__modal,
+  .confirmation-modal,
+  .boost-modal,
+  .report-dialog-modal,
+  .privacy-dropdown__dropdown {
+    background: var(--m5-surface);
+    color: var(--m5-text);
+    border-color: var(--m5-border);
+    box-shadow: 0 16px 40px rgb(0 0 0 / 30%);
+  }
+
+  [data-bluelab-composer] {
+    background: var(--m5-surface);
+    color: var(--m5-text);
+    border: 1px solid var(--m5-border);
+    border-radius: 16px;
+  }
+
+  [data-bluelab-composer] input,
+  [data-bluelab-composer] textarea {
+    background: var(--m5-bg);
+  }
+
+  .media-gallery,
+  .video-player,
+  .status-card,
+  .quote-status {
+    border-color: var(--m5-border);
+    border-radius: 12px;
+  }
+
+  .account__header,
+  .account__header__bar,
+  .account__header__tabs,
+  .account__header__extra,
+  .account__header__bio .account__header__fields {
+    background: var(--m5-bg);
+    color: var(--m5-text);
+    border-color: var(--m5-border);
+  }
+
+  * {
+    scrollbar-color: var(--m5-border) transparent;
+    scrollbar-width: thin;
+  }
+}
+
+@media (width <= 759px) {
+  body[data-theme='mastodon-5'] {
+    .status__content,
+    .status__content p {
+      font-size: 15px;
+    }
+
+    [data-bluelab-composer] {
+      border-radius: 14px;
+    }
+  }
+}
