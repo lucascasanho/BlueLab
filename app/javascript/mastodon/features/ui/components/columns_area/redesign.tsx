@@ -407,7 +407,7 @@ export const ColumnsAreaRedesign: React.FC<{
       ref={ref}
       className={classNames(
         multiColClasses.root,
-        isBlue2 && multiColClasses.blue2Root,
+        isBlue2 && multiColClasses.blue2MultiColumnRoot,
         {
           unscrollable: isModalOpen,
         },
