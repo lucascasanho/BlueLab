@@ -2,27 +2,25 @@
 
 class Settings::Preferences::AppearanceController < Settings::Preferences::BaseController
   def update
-    return forbidden if instance_theme_submitted? && !current_user.can?(:manage_settings)
-    return bad_request if instance_theme_submitted? && Themes.instance.names.exclude?(instance_theme)
+    if theme_submitted? && Themes::USER_SELECTABLE_NAMES.exclude?(user_theme)
+      return bad_request
+    end
 
     super
   end
 
   private
 
-  def after_preferences_update
-    Setting.theme = instance_theme if instance_theme_submitted?
+  def user_theme
+    params.dig(:user, :settings_attributes, :theme).to_s
+  end
+
+  def theme_submitted?
+    settings = params.dig(:user, :settings_attributes)
+    settings.respond_to?(:key?) && (settings.key?(:theme) || settings.key?('theme'))
   end
 
   def after_update_redirect_path
     settings_preferences_appearance_path
-  end
-
-  def instance_theme
-    params[:instance_theme]
-  end
-
-  def instance_theme_submitted?
-    params.key?(:instance_theme)
   end
 end
