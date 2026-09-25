@@ -217,12 +217,26 @@ export const Conversation: React.FC<{
         className={classNames('conversation focusable muted', { unread })}
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
+        role='button'
+        onClick={(event) => {
+          if (
+            (event.target as HTMLElement).closest(
+              '.status__action-bar, button, [role="menuitem"]',
+            )
+          ) {
+            return;
+          }
+
+          handleClick();
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            handleClick();
+          }
+        }}
       >
-        <div
-          className='conversation__avatar'
-          onClick={handleClick}
-          role='presentation'
-        >
+        <div className='conversation__avatar' role='presentation'>
           <AvatarComposite accounts={accounts} size={48} />
         </div>
 
@@ -245,7 +259,6 @@ export const Conversation: React.FC<{
           <StatusContent
             // @ts-expect-error StatusContent isn't typed yet
             status={lastStatus}
-            onClick={handleClick}
             expanded={!lastStatus.get('hidden')}
             onExpandedToggle={handleShowMore}
             collapsible
