@@ -146,6 +146,12 @@ export const Blue2Navigation: React.FC<{
       {signedIn && <Blue2AccountMenu compact={compact && !expanded} />}
 
       <div className={classes.items}>
+        {compact && (
+          <Item to='/home' icon={HouseIcon} exact>
+            <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
+          </Item>
+        )}
+
         <Item to='/explore' icon={Blue2SearchIcon}>
           <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
         </Item>
