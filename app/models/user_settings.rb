@@ -9,7 +9,8 @@ class UserSettings
 
   setting :always_send_emails, default: false
   setting :aggregate_reblogs, default: true
-  setting :theme, default: -> { ::Setting.theme }
+  # BlueLab user theme is independent from the instance-wide Mastodon theme setting.
+  setting :bluelab_theme, default: nil, in: %w(blue-2 mastodon-bird-ui-auto mastodon-5)
   setting :noindex, default: -> { ::Setting.noindex }
   setting :show_application, default: true
   setting :default_language, default: nil
