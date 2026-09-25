@@ -260,6 +260,20 @@ body[data-theme='mastodon-5'] {
   display: block;
 }
 
+/* Dark mode: use softer separation instead of high-contrast rules. */
+html:not([data-color-scheme='light']) body[data-theme='mastodon-5'] {
+  --m5-border: color-mix(
+    in srgb,
+    var(--m5-bg) 85%,
+    var(--color-text-primary) 15%
+  );
+
+  .status {
+    border-bottom-width: 0.5px;
+  }
+}
+
+
 @media (width <= 759px) {
   body[data-theme='mastodon-5'] {
     .status__content,
