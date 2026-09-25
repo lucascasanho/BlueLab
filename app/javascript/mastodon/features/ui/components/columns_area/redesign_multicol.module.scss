@@ -58,3 +58,37 @@
     padding-inline: 0;
   }
 }
+
+
+/* FireBird advanced interface: TweetDeck-era column deck. */
+:global(body[data-theme='firebird']) .root {
+  --multi-column-navigation-width: 278px;
+  --multi-column-gap: 0;
+
+  padding-inline: calc(278px) 0;
+  gap: 0;
+  background: var(--firebird-surface-soft, #f7f9f9);
+  scroll-padding-inline-start: 278px;
+}
+
+:global(body[data-theme='firebird']) .navigationRail {
+  width: 278px;
+  background: var(--firebird-bg, #fff);
+  border-inline-end: 1px solid var(--firebird-border, #eff3f4);
+  transition: none;
+}
+
+:global(body[data-theme='firebird']) .navigationRail[ data-expanded='true' ] {
+  width: 278px;
+}
+
+@media (max-width: 1174px) {
+  :global(body[data-theme='firebird']) .root {
+    padding-inline: 0;
+  }
+
+  :global(body[data-theme='firebird']) .navigationRail {
+    display: none;
+  }
+}
+
