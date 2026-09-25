@@ -889,7 +889,7 @@ export const RichComposeEditor: React.FC<{
         aria-label={ariaLabel}
         aria-multiline='true'
         data-placeholder={intl.formatMessage(
-          type === 'message'
+          isMessageComposeType(type)
             ? messages.messagePlaceholder
             : messages.postPlaceholder,
         )}
