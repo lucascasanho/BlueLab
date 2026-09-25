@@ -13,7 +13,6 @@ import {
   DotsThreeIcon,
   QuotesIcon,
   ShareFatIcon,
-  StarIcon,
 } from '@phosphor-icons/react';
 
 import { statusInteraction } from '@/mastodon/actions/interactions';
@@ -109,10 +108,6 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   }, [contextType, dispatch, statusId]);
 
   const intl = useIntl();
-  const favouriteIcon = useIconWeight(
-    StarIcon,
-    status?.favourited && 'fill',
-  );
   const bookmarkIcon = useIconWeight(
     BookmarkSimpleIcon,
     status?.bookmarked && 'fill',
