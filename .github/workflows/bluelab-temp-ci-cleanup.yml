@@ -1,0 +1,39 @@
+name: BlueLab temporary CI cleanup
+
+on:
+  push:
+    branches:
+      - 'chatgpt/20260925-bluelab-ci-fixes'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Set up Javascript environment
+        uses: ./.github/actions/setup-javascript
+
+      - name: Apply formatter and automatic ESLint fixes
+        run: |
+          yarn format
+          yarn fix:js
+
+      - name: Commit fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No automatic fixes were produced."
+            exit 0
+          fi
+          git commit -m "chore: fix CI formatting and automatic lint issues"
+          git push
