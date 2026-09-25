@@ -71,8 +71,6 @@ export const ColumnsAreaRedesign: React.FC<{
   );
   const isMobile = useBreakpoint('openable');
   const isCompactViewport = useBreakpoint('full');
-  const shouldExpandBlue2AdvancedNavigation =
-    isBlue2AdvancedNavigationExpanded && !isCompactViewport;
   const useMastodonComposer = useAppSelector(
     (state) => state.compose.get('composer_editor') === 'mastodon',
   );
@@ -405,26 +403,22 @@ export const ColumnsAreaRedesign: React.FC<{
   return (
     <main
       ref={ref}
-      className={classNames(
-        multiColClasses.root,
-        isBlue2 && multiColClasses.blue2MultiColumnRoot,
-        {
-          unscrollable: isModalOpen,
-        },
-      )}
+      className={classNames(multiColClasses.root, {
+        unscrollable: isModalOpen,
+      })}
       tabIndex={isModalOpen ? undefined : 0}
     >
       {!isMobile && (
-        <div
-          className={multiColClasses.navigationWrapper}
-          data-expanded={shouldExpandBlue2AdvancedNavigation}
+        <aside
+          className={multiColClasses.navigationRail}
+          data-expanded={isBlue2AdvancedNavigationExpanded}
         >
           <Blue2Navigation
             compact
-            expanded={shouldExpandBlue2AdvancedNavigation}
+            expanded={isBlue2AdvancedNavigationExpanded}
             onToggleExpanded={handleToggleBlue2AdvancedNavigation}
           />
-        </div>
+        </aside>
       )}
       <MultiColumnContent>{children}</MultiColumnContent>
       {/* The Blue2 rail owns the launcher, while this hidden-until-open mount
