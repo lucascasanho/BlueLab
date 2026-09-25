@@ -107,22 +107,17 @@ interface AccountSwitcherState {
   removeAccount: (event: React.MouseEvent, accountId: string) => void;
 }
 
-export const useAccountSwitcher = (): AccountSwitcherState => {
+const useCurrentAccountSession = () => {
   const { signedIn, accountId } = useIdentity();
   const account = useAccount(accountId);
   const accessToken = getAccessToken();
-
-  const [storedAccounts, setStoredAccounts] =
-    useState<StoredAccount[]>(readStoredAccounts);
-  const [switchingId, setSwitchingId] = useState<string | null>(null);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!signedIn || !account || !accountId || !accessToken) {
       return;
     }
 
-    const next = upsertStoredAccount({
+    upsertStoredAccount({
       id: accountId,
       acct: account.acct,
       username: account.username,
@@ -132,9 +127,23 @@ export const useAccountSwitcher = (): AccountSwitcherState => {
       token: accessToken,
       lastUsedAt: Date.now(),
     });
-
-    setStoredAccounts(next);
   }, [accessToken, account, accountId, signedIn]);
+
+  return { signedIn, accountId };
+};
+
+export const AccountSwitcherSync: React.FC = () => {
+  useCurrentAccountSession();
+  return null;
+};
+
+export const useAccountSwitcher = (): AccountSwitcherState => {
+  const { signedIn, accountId } = useCurrentAccountSession();
+
+  const [storedAccounts, setStoredAccounts] =
+    useState<StoredAccount[]>(readStoredAccounts);
+  const [switchingId, setSwitchingId] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
   const switchAccount = useCallback(
     async (target: StoredAccount) => {
