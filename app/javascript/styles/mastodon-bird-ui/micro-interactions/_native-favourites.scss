@@ -37,8 +37,9 @@
     color: var(--color-dim);
   }
 
-  // The redesigned action bar uses a 32px button with an 18px glyph. Keep
-  // the hover circle proportional and center the native Phosphor star inside it.
+  // The redesigned timeline action uses the same 18px star artwork and
+  // yellow active asset as the working detailed-post action bar. Keep the
+  // native animation target as the element that rotates.
   .status__action-bar button.star-icon {
     box-sizing: border-box;
     min-width: 32px !important;
@@ -63,8 +64,22 @@
     min-width: 18px;
     min-height: 18px;
     margin: 0 !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 18px 18px !important;
+    background-image: var(--icon-star-detailed-status-action-bar) !important;
   }
 
+  .status__action-bar button.star-icon[aria-pressed='true']
+    .favourite-animation-target {
+    background-image: var(
+      --icon-star-detailed-status-action-bar-active
+    ) !important;
+  }
+
+  // The Phosphor SVG stays in the DOM for accessibility/animation structure,
+  // but the visual is supplied by the same asset used by the working detail
+  // page star, avoiding Bird UI's legacy dim-color override.
   .status__action-bar button.star-icon .favourite-animation-target > .icon {
     box-sizing: border-box;
     display: block !important;
@@ -73,33 +88,16 @@
     min-width: 18px !important;
     min-height: 18px !important;
     margin: 0 !important;
+    opacity: 0 !important;
     background-image: none !important;
-    color: inherit;
-    fill: currentColor !important;
-    stroke: currentColor !important;
-  }
-
-  .status__action-bar button.star-icon .favourite-animation-target > .icon path {
-    display: block !important;
-    fill: currentColor !important;
-    stroke: currentColor !important;
-  }
-
-  // Active favourites must use the standard Bird UI yellow, regardless of the
-  // neutral toggle button's own active foreground token.
-  .status__action-bar button.star-icon[aria-pressed='true'],
-  .status__action-bar button.star-icon[aria-pressed='true'] .favourite-animation-target,
-  .status__action-bar button.star-icon[aria-pressed='true'] .favourite-animation-target > .icon,
-  .status__action-bar button.star-icon[aria-pressed='true'] .favourite-animation-target > .icon path {
-    --fg: var(--color-yellow) !important;
-    color: var(--color-yellow) !important;
-    fill: var(--color-yellow) !important;
-    stroke: var(--color-yellow) !important;
   }
 }
 
-// Every Bird UI favourite control becomes yellow when active.
-body[data-theme='mastodon-bird-ui-auto'] {
+// The detailed-post action already has the correct yellow star. Keep legacy
+// Bird UI controls on the same semantic color without relying on a theme-name
+// data attribute.
+.layout-single-column,
+.layout-multiple-columns {
   button.star-icon[aria-pressed='true'],
   button.star-icon.active,
   .icon-button.star-icon.active {
@@ -109,10 +107,6 @@ body[data-theme='mastodon-bird-ui-auto'] {
 
   .status__action-bar button.star-icon[aria-pressed='true']
     .favourite-animation-target,
-  .status__action-bar button.star-icon[aria-pressed='true']
-    .favourite-animation-target > svg,
-  .status__action-bar button.star-icon[aria-pressed='true']
-    .favourite-animation-target > .icon,
   .detailed-status__action-bar .icon-button.star-icon.active,
   .detailed-status__action-bar .icon-button.star-icon.active .icon,
   .detailed-status__action-bar .icon-button.star-icon.active .icon-star {
