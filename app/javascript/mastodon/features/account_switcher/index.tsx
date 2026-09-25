@@ -6,7 +6,10 @@ import api from '@/mastodon/api';
 import { MenuItemGroup } from '@/mastodon/components/menu';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
-import { getAccessToken, registrationsOpen } from '@/mastodon/initial_state';
+import {
+  getAccountSwitcherToken,
+  registrationsOpen,
+} from '@/mastodon/initial_state';
 
 import classes from './styles.module.scss';
 
@@ -110,10 +113,10 @@ interface AccountSwitcherState {
 const useCurrentAccountSession = () => {
   const { signedIn, accountId } = useIdentity();
   const account = useAccount(accountId);
-  const accessToken = getAccessToken();
+  const accountSwitcherToken = getAccountSwitcherToken();
 
   useEffect(() => {
-    if (!signedIn || !account || !accountId || !accessToken) {
+    if (!signedIn || !account || !accountId || !accountSwitcherToken) {
       return;
     }
 
@@ -124,10 +127,10 @@ const useCurrentAccountSession = () => {
       displayName: account.display_name.trim() || account.username,
       avatar: account.avatar,
       url: account.url ?? '',
-      token: accessToken,
+      token: accountSwitcherToken,
       lastUsedAt: Date.now(),
     });
-  }, [accessToken, account, accountId, signedIn]);
+  }, [account, accountId, accountSwitcherToken, signedIn]);
 
   return { signedIn, accountId };
 };
