@@ -415,8 +415,8 @@ export const ColumnsAreaRedesign: React.FC<{
       tabIndex={isModalOpen ? undefined : 0}
     >
       {!isMobile && (
-        <aside
-          className={multiColClasses.navigationRail}
+        <div
+          className={multiColClasses.navigationWrapper}
           data-expanded={shouldExpandBlue2AdvancedNavigation}
         >
           <Blue2Navigation
@@ -424,11 +424,9 @@ export const ColumnsAreaRedesign: React.FC<{
             expanded={shouldExpandBlue2AdvancedNavigation}
             onToggleExpanded={handleToggleBlue2AdvancedNavigation}
           />
-        </aside>
+        </div>
       )}
-      <div className={multiColClasses.multiColumnContent}>
-        <MultiColumnContent>{children}</MultiColumnContent>
-      </div>
+      <MultiColumnContent>{children}</MultiColumnContent>
       {/* The Blue2 rail owns the launcher, while this hidden-until-open mount
           owns the shared compose dialog. */}
       <ComposeRedesignButton />
