@@ -86,6 +86,15 @@
   opacity: 1;
 }
 
+.avatar {
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  object-fit: cover;
+  background: var(--color-bg-secondary, var(--blue2-hover, rgb(127 127 127 / 12%)));
+}
+
 .accountText {
   min-width: 0;
   flex: 1 1 auto;
