@@ -49,3 +49,28 @@
     color: var(--color-yellow) !important;
   }
 }
+
+// Status favourite stars use the same artwork as the working detailed-status
+// control. The legacy timeline uses .status__action-bar, so these rules must
+// live in the Bird UI stylesheet that is actually loaded for that theme.
+.layout-single-column,
+.layout-multiple-columns {
+  .status__action-bar .icon-button.star-icon .icon-star,
+  .detailed-status__action-bar .icon-button.star-icon .icon-star {
+    --size-icon: 20px;
+    background-image: var(--icon-star-detailed-status-action-bar);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: var(--size-icon) var(--size-icon);
+    display: block;
+  }
+
+  .status__action-bar button.icon-button.star-icon.active .icon-star,
+  .detailed-status__action-bar button.icon-button.star-icon.active .icon-star,
+  .status__action-bar button.icon-button.star-icon.active:not(.activated) .icon-star,
+  .detailed-status__action-bar button.icon-button.star-icon.active:not(.activated) .icon-star {
+    background-image: var(
+      --icon-star-detailed-status-action-bar-active
+    ) !important;
+  }
+}
