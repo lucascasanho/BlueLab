@@ -362,3 +362,61 @@
     display: none;
   }
 }
+
+
+:global(body[data-theme='firebird']) .root {
+  width: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 18px 12px 24px;
+  background: var(--firebird-bg, #fff);
+  color: var(--firebird-text, #0f1419);
+}
+
+:global(body[data-theme='firebird']) .searchHost {
+  :global(.search__input),
+  :global(.search__input:focus),
+  :global(.search__input:active) {
+    border-color: var(--firebird-border-strong, #cfd9de);
+    border-radius: 999px;
+    background: var(--firebird-surface-soft, #f7f9f9);
+    color: var(--firebird-text, #0f1419);
+    -webkit-text-fill-color: var(--firebird-text, #0f1419);
+  }
+
+  :global(.search.active .search__input),
+  :global(.search__input:focus-visible) {
+    border-color: var(--firebird-blue, #1d9bf0);
+    box-shadow: 0 0 0 1px var(--firebird-blue, #1d9bf0);
+    background: var(--firebird-bg, #fff);
+  }
+}
+
+:global(body[data-theme='firebird']) .card {
+  border-color: var(--firebird-border, #eff3f4);
+  border-radius: 16px;
+  background: var(--firebird-surface-soft, #f7f9f9);
+  color: var(--firebird-text, #0f1419);
+}
+
+:global(body[data-theme='firebird']) .cardHeader {
+  color: var(--firebird-text, #0f1419);
+}
+
+:global(body[data-theme='firebird']) .moreButton:hover,
+:global(body[data-theme='firebird']) .moreButton:focus-visible {
+  background: var(--firebird-blue-soft, rgb(29 155 240 / 10%));
+  color: var(--firebird-blue, #1d9bf0);
+}
+
+:global(body[data-theme='firebird']) .trendList li {
+  color: var(--firebird-muted, #536471);
+}
+
+:global(body[data-theme='firebird']) .trendList a {
+  color: var(--firebird-text, #0f1419) !important;
+}
+
+:global(body[data-theme='firebird']) .footer {
+  color: var(--firebird-muted, #536471);
+}
