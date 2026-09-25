@@ -3,11 +3,11 @@
 class CreateBugReports < ActiveRecord::Migration[8.0]
   def change
     create_table :bug_reports do |t|
-      t.references :account, null: false, foreign_key: true
+      t.references :account, null: false, foreign_key: { on_delete: :cascade }
       t.text :description, null: false
       t.integer :status, null: false, default: 0
-      t.references :assigned_account, foreign_key: { to_table: :accounts }
-      t.references :resolved_by_account, foreign_key: { to_table: :accounts }
+      t.references :assigned_account, foreign_key: { to_table: :accounts, on_delete: :nullify }
+      t.references :resolved_by_account, foreign_key: { to_table: :accounts, on_delete: :nullify }
       t.datetime :resolved_at
 
       t.string :browser
@@ -27,6 +27,6 @@ class CreateBugReports < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_reference :media_attachments, :bug_report, foreign_key: true, index: true
+    add_reference :media_attachments, :bug_report, foreign_key: { on_delete: :cascade }, index: true
   end
 end
