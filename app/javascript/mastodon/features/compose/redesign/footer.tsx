@@ -38,6 +38,7 @@ import { shouldShowCharacterCounter } from '../components/character_counter';
 import { countableText } from '../util/counter';
 
 import type { OnEmojiPick } from './emoji';
+import { ComposeGifButton } from './gif_picker';
 import { ComposeEmojiButton } from './emoji';
 import { ComposeSchedule } from './schedule';
 import {
@@ -124,6 +125,8 @@ export const ComposeFooter: React.FC<{
         activeThreadItemId={activeThreadItemId}
         disabled={!activeThreadItemId && hasQuote}
       />
+
+      <ComposeGifButton disabled={!activeThreadItemId && hasQuote} />
 
       <ComposeEmojiButton onPick={onEmojiPick} />
 
