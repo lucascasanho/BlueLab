@@ -1,24 +1,24 @@
 import { useEffect } from 'react';
 
-import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { useParams } from 'react-router-dom';
 
 import { ChatCircleDotsIcon, ReplyIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
+import { markConversationRead } from '@/mastodon/actions/conversations';
+import { openNewComposer } from '@/mastodon/reducers/slices/composer';
 import { Button } from '@/mastodon/components/button/redesign';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
-import StatusContent from '@/mastodon/components/status/legacy/content';
 import AttachmentList from '@/mastodon/components/attachment_list';
 import AvatarComposite from '@/mastodon/components/avatar_composite';
+import StatusContent from '@/mastodon/components/status/legacy/content';
 import { DisplayNameSimple } from '@/mastodon/components/display_name/simple';
 import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
 import { me } from '@/mastodon/initial_state';
 import { makeGetStatus } from '@/mastodon/selectors';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
-import { openNewComposer } from '@/mastodon/reducers/slices/composer';
-import { markConversationRead } from '@/mastodon/actions/conversations';
 
 import classes from './message_conversation.module.scss';
 
@@ -45,18 +45,19 @@ export const MessageConversation: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const conversation = useAppSelector((state) =>
-    (state.conversations.get('items') as Immutable.List<Immutable.Map<string, unknown>>).find(
-      (item) => item.get('id') === id,
-    ),
+    (state.conversations.get('items') as Immutable.List<
+      Immutable.Map<string, unknown>
+    >).find((item) => item.get('id') === id),
   );
 
-  const lastStatusId = conversation?.get('last_status') as string | null | undefined;
-  const accountIds =
-    (conversation?.get('accounts') as Immutable.List<string> | undefined) ??
-    (globalThis as { Immutable?: { List: new () => unknown } }).Immutable;
+  const lastStatusId = conversation?.get('last_status') as
+    | string
+    | null
+    | undefined;
+
   const status = useAppSelector((state) =>
     lastStatusId
-      ? // @ts-expect-error legacy selector typing
+      ? // @ts-expect-error Legacy selector is not typed yet.
         getStatus(state, { id: lastStatusId })
       : undefined,
   );
@@ -65,7 +66,17 @@ export const MessageConversation: React.FC = () => {
     const ids = conversation?.get('accounts') as
       | Immutable.List<string>
       | undefined;
+
     return ids ? ids.map((accountId) => state.accounts.get(accountId)) : [];
+  });
+
+  const recipient = useAppSelector((state) => {
+    const ids = conversation?.get('accounts') as
+      | Immutable.List<string>
+      | undefined;
+    const recipientId = ids?.find((accountId) => accountId !== me);
+
+    return recipientId ? state.accounts.get(recipientId) : undefined;
   });
 
   useEffect(() => {
@@ -86,10 +97,7 @@ export const MessageConversation: React.FC = () => {
     );
   }
 
-  const recipient = accounts.find(
-    (account) => account && account.get('id') !== me,
-  );
-  const isMine = status.get('account') === me;
+  const isMine = status.getIn(['account', 'id']) === me;
 
   const handleReply = () => {
     if (!recipient) return;
@@ -102,10 +110,12 @@ export const MessageConversation: React.FC = () => {
     );
   };
 
-  const names = accounts
-    .filter(Boolean)
-    .map((account) => account?.get('id') === me ? null : account)
-    .filter(Boolean);
+  const participantAccounts = accounts.filter(
+    (account): account is NonNullable<typeof account> =>
+      account !== undefined && account !== null && account.get('id') !== me,
+  );
+
+  const displayAccount = status.get('account');
 
   return (
     <Column label={intl.formatMessage(messages.title)}>
@@ -115,13 +125,13 @@ export const MessageConversation: React.FC = () => {
           <div className={classes.headerTitle}>
             <ChatCircleDotsIcon size={18} />
             <span>
-              {names.length === 1 && names[0] ? (
-                <DisplayNameSimple account={names[0]} />
+              {participantAccounts.size === 1 && participantAccounts.first() ? (
+                <DisplayNameSimple account={participantAccounts.first()} />
               ) : (
                 <FormattedMessage
                   id='messages.conversation.participants'
                   defaultMessage='{count, plural, one {Message} other {Conversation}}'
-                  values={{ count: names.length }}
+                  values={{ count: participantAccounts.size }}
                 />
               )}
             </span>
@@ -140,13 +150,13 @@ export const MessageConversation: React.FC = () => {
                 accounts={
                   isMine
                     ? accounts.filter((account) => account?.get('id') === me)
-                    : accounts.filter((account) => account?.get('id') !== me)
+                    : participantAccounts
                 }
                 size={36}
               />
               <div>
                 <strong>
-                  <DisplayNameSimple account={status.get('account')} />
+                  <DisplayNameSimple account={displayAccount} />
                 </strong>
                 <RelativeTimestamp timestamp={status.get('created_at')} />
               </div>
@@ -154,7 +164,7 @@ export const MessageConversation: React.FC = () => {
 
             <div className={classes.messageBody}>
               <StatusContent
-                // @ts-expect-error legacy StatusContent typing
+                // @ts-expect-error Legacy StatusContent typing.
                 status={status}
                 expanded
               />
@@ -172,10 +182,10 @@ export const MessageConversation: React.FC = () => {
         <Button
           variant='solid'
           color='accent'
-          icon={ReplyIcon}
           onClick={handleReply}
           disabled={!recipient}
         >
+          <ReplyIcon size={18} />
           {intl.formatMessage(messages.reply)}
         </Button>
       </div>
