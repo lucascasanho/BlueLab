@@ -2,17 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { Link, NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import { Search } from '@/mastodon/features/compose/components/search';
 import { useIdentity } from '@/mastodon/identity_context';
-import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
-import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 
 import { Blue2AccountMenu } from './account_menu';
-import { Blue2HomeIcon } from './icons';
 import { Blue2ComposeButton } from './navigation';
 import classes from './right_rail.module.scss';
 
@@ -78,6 +75,10 @@ export const Blue2RightRail: React.FC<{ showProfileCard?: boolean }> = ({
 
   return (
     <aside className={classes.root}>
+      <div className={classes.searchHost}>
+        <Search singleColumn />
+      </div>
+
       {showProfileCard && signedIn && (
         <>
           <Blue2AccountMenu className={classes.rightRailProfile} />
@@ -86,50 +87,6 @@ export const Blue2RightRail: React.FC<{ showProfileCard?: boolean }> = ({
       )}
 
       <div className={classes.content}>
-        <div className={classes.searchHost}>
-          <Search singleColumn />
-        </div>
-
-        <nav className={classes.feeds} aria-label='Timelines'>
-          {signedIn && (
-            <NavLink
-              className={classes.feedShortcut}
-              activeClassName={classes.feedShortcutActive}
-              exact
-              to='/home'
-            >
-              <span className={classes.feedIcon}>
-                <Blue2HomeIcon size={18} />
-              </span>
-              <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
-            </NavLink>
-          )}
-
-          <NavLink
-            className={classes.feedShortcut}
-            activeClassName={classes.feedShortcutActive}
-            exact
-            to='/public/local'
-          >
-            <span className={classes.feedIcon}>
-              <GroupsIcon />
-            </span>
-            <span>{blue2Text(intl.locale, 'federation')}</span>
-          </NavLink>
-
-          <NavLink
-            className={classes.feedShortcut}
-            activeClassName={classes.feedShortcutActive}
-            exact
-            to='/public'
-          >
-            <span className={classes.feedIcon}>
-              <PublicIcon />
-            </span>
-            <span>{blue2Text(intl.locale, 'global')}</span>
-          </NavLink>
-        </nav>
-
         {!trendsHidden && (
           <section className={classes.card}>
             <div className={classes.cardHeader}>
