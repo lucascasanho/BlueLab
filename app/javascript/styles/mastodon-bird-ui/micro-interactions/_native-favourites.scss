@@ -57,12 +57,14 @@
 .layout-multiple-columns {
   .status__action-bar .icon-button.star-icon .icon-star,
   .detailed-status__action-bar .icon-button.star-icon .icon-star {
-    --size-icon: 20px;
+    --size-icon: 18px;
     background-image: var(--icon-star-detailed-status-action-bar);
     background-position: center;
     background-repeat: no-repeat;
-    background-size: var(--size-icon) var(--size-icon);
+    background-size: 18px 18px;
     display: block;
+    opacity: 1;
+    filter: none;
   }
 
   .status__action-bar button.icon-button.star-icon.active .icon-star,
@@ -72,5 +74,8 @@
     background-image: var(
       --icon-star-detailed-status-action-bar-active
     ) !important;
+    background-size: 18px 18px;
+    opacity: 1;
+    filter: saturate(1.08) brightness(1.05);
   }
 }
