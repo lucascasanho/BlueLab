@@ -2,11 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import api from '@/mastodon/api';
 import { MenuItemGroup } from '@/mastodon/components/menu';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
 import { getAccessToken, registrationsOpen } from '@/mastodon/initial_state';
-import api from '@/mastodon/api';
 
 import classes from './styles.module.scss';
 
@@ -82,7 +82,9 @@ export const upsertStoredAccount = (
 };
 
 export const removeStoredAccount = (accountId: string): StoredAccount[] => {
-  const next = readStoredAccounts().filter((account) => account.id !== accountId);
+  const next = readStoredAccounts().filter(
+    (account) => account.id !== accountId,
+  );
   writeStoredAccounts(next);
   return next;
 };
@@ -331,7 +333,10 @@ export const AccountSwitcherMenuSection: React.FC<{
 
   if (variant === 'navigation') {
     return (
-      <MenuItemGroup label={sectionLabel}>
+      <MenuItemGroup
+        label={sectionLabel}
+        className={classes.navigationSection}
+      >
         <AccountList variant='navigation' state={state} />
         {error && (
           <li className={classes.navigationError} role='alert'>
