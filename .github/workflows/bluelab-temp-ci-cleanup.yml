@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'chatgpt/20260925-bluelab-ci-fixes'
+  pull_request:
 
 permissions:
   contents: write
