@@ -105,7 +105,7 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
 
         {isBirdUi && (
           <aside className='bird-ui-right-rail'>
-            <Blue2RightRail />
+            <Blue2RightRail variant='birdUi' />
           </aside>
         )}
 
