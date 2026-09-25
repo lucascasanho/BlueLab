@@ -1569,10 +1569,9 @@ pt-BR:
     sign_in:
       preamble_html: Entre com suas credenciais de domínios ( <strong>%{domain}</strong> ) . Se sua conta estiver hospedada em um servidor diferente, você não deve conseguir acessar este conteúdo.
       title: Entrar em %{domain}
-    another_account:
-      title: "Entrar em outra conta"
-      notice: "Sua conta atual continuará disponível no seletor de contas."
-
+      another_account:
+        title: "Entrar em outra conta"
+        notice: "Sua conta atual continuará disponível no seletor de contas."
     sign_up:
       manual_review: Inscrições no %{domain} passam pela revisão manual dos nossos moderadores. Para nos ajudar a processar o seu cadastro, escreva um pouco sobre você e por que você quer uma conta no %{domain}.
       preamble: Com uma conta neste servidor Mastodon, você poderá seguir qualquer outra pessoa no fediverso, independentemente de onde a conta dela esteja hospedada.
