@@ -1505,6 +1505,8 @@ en:
     discovery: Discovery
     instance_theme: Site theme
     instance_theme_hint: Administrative setting applied to everyone on this server. Only roles with permission to manage settings can change it.
+    theme: Theme
+    theme_hint: Choose the theme used for your account.
     localization:
       body: Mastodon is translated by volunteers.
       guide_link: https://crowdin.com/project/mastodon
