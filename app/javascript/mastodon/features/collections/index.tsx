@@ -66,7 +66,7 @@ export const Collections: React.FC<{
     : messages.headingOther;
 
   const pageTitle = intl.formatMessage(titleMessage, {
-    name: account?.get('display_name'),
+    name: account.get('display_name'),
   });
   const pageTitleHtml = intl.formatMessage(titleMessage, {
     name: <DisplayNameSimple account={account} />,
