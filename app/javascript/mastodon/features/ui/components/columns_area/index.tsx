@@ -122,7 +122,7 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
       tabIndex={isModalOpen ? undefined : 0}
     >
       <MultiColumnContent>{children}</MultiColumnContent>
-      {isBirdUi && !multiColumn && <Blue2ScrollToTop />}
+      {/* Bird UI advanced interface intentionally has no scroll-to-top control. */}
     </main>
   );
 };
