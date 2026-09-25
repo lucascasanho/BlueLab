@@ -35,7 +35,7 @@
 }
 
 
-.root[data-bluelab-composer-message='true'][data-bluelab-composer-compact='true'] {
+:global(body[data-theme='blue-2']) .root[data-bluelab-composer-message='true'][data-bluelab-composer-compact='true'] {
   margin-top: auto;
   padding: 0;
   gap: var(--space-xs);
@@ -298,7 +298,7 @@ textarea.textarea {
 
 
 
-.root[data-bluelab-composer-message='true'] {
+:global(body[data-theme='blue-2']) .root[data-bluelab-composer-message='true'] {
   .content {
     gap: var(--space-xs);
   }
