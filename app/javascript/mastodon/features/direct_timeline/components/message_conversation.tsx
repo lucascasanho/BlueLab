@@ -13,7 +13,7 @@ import {
   unmountConversations,
 } from '@/mastodon/actions/conversations';
 import { directCompose, resetCompose } from '@/mastodon/actions/compose';
-import { dismissComposer, resetComposer } from '@/mastodon/reducers/slices/composer';
+import { dismissComposer } from '@/mastodon/reducers/slices/composer';
 import { RedesignComposeForm } from '@/mastodon/features/compose/redesign';
 import { Avatar } from '@/mastodon/components/avatar';
 import { Column } from '@/mastodon/components/column';
