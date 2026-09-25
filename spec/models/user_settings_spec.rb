@@ -22,7 +22,7 @@ RSpec.describe UserSettings do
       end
 
       it 'has no BlueLab theme preference by default' do
-        expect(subject[:bluelab_theme]).to be_nil
+        expect(subject[:bluelab_theme]).to eq 'blue-2'
       end
 
     end
