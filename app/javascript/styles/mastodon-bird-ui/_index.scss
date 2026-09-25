@@ -108,11 +108,10 @@
 @use 'components/picture-in-picture';
 
 // Micro interactions
-@use 'micro-interactions/heart';
+@use 'micro-interactions/native-favourites';
 
-// Navigation/layout formerly bundled in the heart micro-interaction; kept in
-// its original cascade position so dropping the favourite styling for a native
-// favourite animation does not affect the navigation layout.
+// Keep the native favourite integration in the micro-interaction section so
+// action-bar stars and favourite navigation icons share one implementation.
 @use 'components/mobile-navigation';
 
 // Advanced web interface
