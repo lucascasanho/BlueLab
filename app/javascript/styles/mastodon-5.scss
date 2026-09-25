@@ -65,6 +65,16 @@ body[data-theme='mastodon-5'] {
     color: var(--m5-text);
   }
 
+  // Material Symbols are SVG paths without an explicit fill attribute.
+  // Force them to follow the element's text color in this theme.
+  .navigationRoot svg path,
+  .mobileChrome svg path,
+  .desktopComposer svg path,
+  .column-header__button svg path,
+  .column-header__back-button svg path {
+    fill: currentColor;
+  }
+
   .status,
   .notification,
   .notification-group,
