@@ -182,10 +182,10 @@ module ThemeHelper
   end
 
   # Users may choose one of the small set of themes exposed by BlueLab.
-  # Setting.theme remains the fallback for accounts without a valid per-user choice.
+  # The BlueLab preference is stored separately from the instance-wide Mastodon theme.
   def current_theme
     available_themes = Themes.instance.selectable_names
-    user_theme = current_user&.setting_theme
+    user_theme = current_user&.setting_bluelab_theme
     site_theme = Setting.theme
 
     return user_theme if available_themes.include?(user_theme)
