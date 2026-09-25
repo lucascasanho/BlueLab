@@ -430,7 +430,7 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
               <ColumnLink
                 transparent
                 to='/conversations'
-                icon='at'
+                icon={isBirdUi ? 'message' : 'at'}
                 iconComponent={isBirdUi ? Blue2MessageIcon : AlternateEmailIcon}
                 text={intl.formatMessage(messages.direct)}
               />
