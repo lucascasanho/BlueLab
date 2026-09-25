@@ -18,7 +18,6 @@ import { store } from 'mastodon/store';
 import { isProduction } from 'mastodon/utils/environment';
 import { BodyScrollLock } from 'mastodon/features/ui/components/body_scroll_lock';
 import { startComposeDraftPersistence } from 'mastodon/features/compose/redesign/draft_persistence';
-import { AccountSwitcher } from 'mastodon/features/account_switcher';
 
 import { ScrollContext } from './scroll_container/scroll_context';
 
@@ -58,7 +57,6 @@ export default class Mastodon extends PureComponent {
                   </FocusTargetProvider>
                 </ScrollContext>
                 <BodyScrollLock />
-                <AccountSwitcher />
               </Router>
 
               <Helmet defaultTitle={title} titleTemplate={`%s - ${title}`} />
