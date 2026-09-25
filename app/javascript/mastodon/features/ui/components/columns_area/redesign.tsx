@@ -274,7 +274,7 @@ export const ColumnsAreaRedesign: React.FC<{
         )}
 
         {isFireBirdMobileLayout && <RedesignMobileNavigation />}
-        {!isFireBirdMobileLayout && <FireBirdComposeLauncher />}
+        {!isFireBirdMobileLayout && isFireBirdHome && <FireBirdComposeLauncher />}
 
         <main
           className={classNames(
