@@ -2,20 +2,26 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import { Search } from '@/mastodon/features/compose/components/search';
+import { useIdentity } from '@/mastodon/identity_context';
+import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
-import { Blue2ComposeButton } from './navigation';
+import PublicIcon from '@/material-icons/400-24px/public.svg?react';
+
+import { Blue2HomeIcon } from './icons';
 import classes from './right_rail.module.scss';
 
 interface TrendTag {
   name: string;
 }
 
-export const Blue2RightRail: React.FC = () => {
+export const Blue2RightRail: React.FC<{ variant?: 'birdUi' }> = ({ variant }) => {
   const intl = useIntl();
+  const { signedIn } = useIdentity();
+  const isBirdUiVariant = variant === 'birdUi';
   const [tags, setTags] = useState<TrendTag[]>([]);
   const [trendMenuOpen, setTrendMenuOpen] = useState(false);
   const [trendsHidden, setTrendsHidden] = useState(false);
@@ -68,14 +74,54 @@ export const Blue2RightRail: React.FC = () => {
   );
 
   return (
-    <aside className={classes.root}>
-      <div className={classes.searchHost}>
-        <Search singleColumn />
-      </div>
-
-      <Blue2ComposeButton className={classes.rightRailComposeButton} />
-
+    <aside className={`${classes.root} ${isBirdUiVariant ? classes.birdUiVariant : ''}`} >
       <div className={classes.content}>
+        <div className={classes.searchHost}>
+          <Search singleColumn />
+        </div>
+
+        {!isBirdUiVariant && (
+          <nav className={classes.feeds} aria-label='Timelines'>
+          {signedIn && (
+            <NavLink
+              className={classes.feedShortcut}
+              activeClassName={classes.feedShortcutActive}
+              exact
+              to='/home'
+            >
+              <span className={classes.feedIcon}>
+                <Blue2HomeIcon size={18} />
+              </span>
+              <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
+            </NavLink>
+          )}
+
+          <NavLink
+            className={classes.feedShortcut}
+            activeClassName={classes.feedShortcutActive}
+            exact
+            to='/public/local'
+          >
+            <span className={classes.feedIcon}>
+              <GroupsIcon />
+            </span>
+            <span>{blue2Text(intl.locale, 'federation')}</span>
+          </NavLink>
+
+          <NavLink
+            className={classes.feedShortcut}
+            activeClassName={classes.feedShortcutActive}
+            exact
+            to='/public'
+          >
+            <span className={classes.feedIcon}>
+              <PublicIcon />
+            </span>
+            <span>{blue2Text(intl.locale, 'global')}</span>
+          </NavLink>
+          </nav>
+        )}
+
         {!trendsHidden && (
           <section className={classes.card}>
             <div className={classes.cardHeader}>
@@ -109,6 +155,35 @@ export const Blue2RightRail: React.FC = () => {
           </section>
         )}
       </div>
+
+      {!isBirdUiVariant && (
+        <footer className={classes.footer}>
+        <a href='/about'>
+          <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
+        </a>
+        <span>·</span>
+        <a href='/privacy-policy'>
+          <FormattedMessage
+            id='footer.privacy_policy_short'
+            defaultMessage='Privacy'
+          />
+        </a>
+        <span>·</span>
+        <a href='/terms-of-service'>
+          <FormattedMessage
+            id='footer.terms_of_service_short'
+            defaultMessage='Terms'
+          />
+        </a>
+        <span>·</span>
+        <Link to='/keyboard-shortcuts'>
+          <FormattedMessage
+            id='keyboard_shortcuts.heading'
+            defaultMessage='Keyboard Shortcuts'
+          />
+        </Link>
+        </footer>
+      )}
 
       {trendMenuOpen && (
         <div
