@@ -127,16 +127,30 @@ RSpec.describe ThemeHelper do
       end
     end
 
-    context 'when a signed-in user has an older personal theme preference' do
+    context 'when a signed-in user has a BlueLab personal theme preference' do
       let(:current_user) { Fabricate :user }
 
       before do
         allow(helper).to receive(:current_user).and_return(current_user)
-        current_user.settings.update(theme: 'alternate', noindex: false)
+        current_user.settings.update(bluelab_theme: 'alternate', noindex: false)
         Setting.theme = 'blue-2'
       end
 
-      it 'ignores the personal preference and follows the administrator theme' do
+      it 'uses the personal preference without changing the administrator theme' do
+        expect(subject).to eq('alternate')
+        expect(Setting.theme).to eq('blue-2')
+      end
+    end
+
+    context 'when a signed-in user has no BlueLab personal theme preference' do
+      let(:current_user) { Fabricate :user }
+
+      before do
+        allow(helper).to receive(:current_user).and_return(current_user)
+        Setting.theme = 'blue-2'
+      end
+
+      it 'follows the administrator theme' do
         expect(subject).to eq('blue-2')
       end
     end
