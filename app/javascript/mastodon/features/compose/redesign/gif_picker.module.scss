@@ -27,7 +27,7 @@
   }
 
   strong {
-    @include mixins.type-label-lg;
+    @include mixins.type-label;
 
     flex: 0 0 auto;
   }
