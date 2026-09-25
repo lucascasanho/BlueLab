@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import classNames from 'classnames';
 
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
 import { Header } from '@/mastodon/features/custom_homepage/components/header';
 import { CollapsibleNavigationPanel } from '@/mastodon/features/navigation_panel';
@@ -106,6 +107,7 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
       tabIndex={isModalOpen ? undefined : 0}
     >
       <MultiColumnContent>{children}</MultiColumnContent>
+      {isBirdUi && <Blue2ScrollToTop />}
     </main>
   );
 };
@@ -113,6 +115,9 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
 export const ColumnsArea: React.FC<ColumnsAreaProps> = (props) => {
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const isBirdUi =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'mastodon-bird-ui-auto';
 
   if (isBlue2) {
     return <ColumnsAreaRedesign {...props} />;
