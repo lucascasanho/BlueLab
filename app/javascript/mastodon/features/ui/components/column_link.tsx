@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { useRouteMatch, NavLink } from 'react-router-dom';
+import { NavLink, useLocation, useRouteMatch } from 'react-router-dom';
 
 import { Icon } from 'mastodon/components/icon';
 import type { IconProp } from 'mastodon/components/icon';
@@ -18,6 +18,7 @@ export const ColumnLink: React.FC<{
   badge?: React.ReactNode;
   transparent?: boolean;
   className?: string;
+  exact?: boolean;
   id?: string;
 }> = ({
   icon,
@@ -30,8 +31,11 @@ export const ColumnLink: React.FC<{
   method,
   badge,
   transparent,
+  exact,
+  isActive: isActiveProp,
   ...other
 }) => {
+  const location = useLocation();
   const match = useRouteMatch(
     (typeof to === 'string' ? to : to?.pathname) ?? '',
   );
@@ -62,7 +66,10 @@ export const ColumnLink: React.FC<{
     ) : (
       iconElement
     ));
-  const active = !!match;
+  // Use the same active calculation for the rendered class and the icon.
+  // This prevents NavLink's default prefix matching from leaving Home active
+  // while the user is actually on a public feed.
+  const active = isActiveProp ? isActiveProp(match, location) : !!match;
 
   if (href) {
     return (
@@ -74,7 +81,14 @@ export const ColumnLink: React.FC<{
     );
   } else if (to) {
     return (
-      <NavLink to={to} className={className} {...other}>
+      <NavLink
+        to={to}
+        className={() => classNames(className, { active })}
+        activeClassName=''
+        exact={exact}
+        isActive={isActiveProp}
+        {...other}
+      >
         {active ? activeIconElement : iconElement}
         <span>{text}</span>
         {badgeElement}

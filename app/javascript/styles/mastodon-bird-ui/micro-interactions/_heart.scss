@@ -151,3 +151,22 @@ html.no-reduce-motion
     background-image: var(--icon-heart-hover);
   }
 }
+
+/*
+ * The redesign action bar uses ToggleButton instead of the legacy
+ * .icon-button.star-icon. Reuse Mastodon's existing spring rotation so the
+ * favourite animation is present in every Bird UI action-bar context too.
+ */
+html.no-reduce-motion {
+  .favourite-spin {
+    &.activate > .icon {
+      animation: spring-rotate-in 1s linear;
+      transform-origin: 50% 52%;
+    }
+
+    &.deactivate > .icon {
+      animation: spring-rotate-out 1s linear;
+      transform-origin: 50% 52%;
+    }
+  }
+}

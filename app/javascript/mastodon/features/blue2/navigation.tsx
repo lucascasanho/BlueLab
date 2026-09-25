@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 
-import { CaretRightIcon, StackIcon } from '@phosphor-icons/react';
+import { CaretRightIcon, StackIcon, StarIcon } from '@phosphor-icons/react';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import { useAccount } from '@/mastodon/hooks/useAccount';
@@ -197,6 +197,12 @@ export const Blue2Navigation: React.FC<{
               <FormattedMessage
                 id='navigation_bar.lists'
                 defaultMessage='Lists'
+              />
+            </Item>
+            <Item to='/favourites' icon={StarIcon}>
+              <FormattedMessage
+                id='navigation_bar.favourites'
+                defaultMessage='Favorites'
               />
             </Item>
             <Item to='/bookmarks' icon={Blue2BookmarkIcon}>

@@ -205,6 +205,44 @@
     font-weight: var(--font-weight-bold);
   }
 
+  .navigation-panel .column-link--transparent {
+    background-color: transparent !important;
+
+    .column-link__icon {
+      background-image: none !important;
+      background-color: transparent !important;
+      color: var(--color-light-text) !important;
+      fill: currentColor !important;
+      stroke: currentColor !important;
+    }
+
+    .column-link__icon path {
+      display: block !important;
+      fill: currentColor !important;
+      stroke: currentColor !important;
+    }
+  }
+
+  // Only the icon receives the instance accent. The active link itself keeps
+  // the normal transparent background and white text.
+  .navigation-panel .column-link--transparent.active {
+    background-color: transparent !important;
+
+    .column-link__icon {
+      background-image: none !important;
+      background-color: transparent !important;
+      color: var(--color-bg-brand-base) !important;
+      fill: currentColor !important;
+      stroke: currentColor !important;
+    }
+
+    .column-link__icon path {
+      display: block !important;
+      fill: currentColor !important;
+      stroke: currentColor !important;
+    }
+  }
+
   // Top panel
   .account__section-headline a.active::after,
   .account__section-headline button.active::after,

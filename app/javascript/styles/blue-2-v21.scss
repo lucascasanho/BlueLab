@@ -31,3 +31,32 @@ body[data-theme='blue-2'] {
     border-radius: inherit;
   }
 }
+
+
+/*
+ * Favourite icon refinement for the Blue 2 timeline.
+ *
+ * The favourite control wraps the Phosphor icon in .favourite-animation-target.
+ * Scope the size rule to .status__action-bar so the detailed post page keeps its
+ * own native button sizing.
+ */
+body[data-theme='blue-2'] {
+  .status__action-bar button.star-icon
+    .favourite-animation-target,
+  .status__action-bar button.star-icon
+    .favourite-animation-target > .icon {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    flex: 0 0 18px;
+  }
+
+  .status__action-bar button.star-icon[aria-pressed='true'],
+  .status__action-bar button.star-icon[aria-pressed='true']
+    .favourite-animation-target,
+  .status__action-bar button.star-icon[aria-pressed='true']
+    .favourite-animation-target > .icon {
+    color: var(--color-yellow) !important;
+  }
+}

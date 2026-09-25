@@ -23,6 +23,7 @@ interface Props {
   disabled?: boolean;
   inverted?: boolean;
   animate?: boolean;
+  iconWrapperClassName?: string;
   overlay?: boolean;
   tabIndex?: number;
   counter?: number;
@@ -50,6 +51,7 @@ export const IconButton = forwardRef<HTMLButtonElement, Props>(
       active = false,
       disabled = false,
       animate = false,
+      iconWrapperClassName,
       overlay = false,
       tabIndex = 0,
       ariaHidden = false,
@@ -106,9 +108,17 @@ export const IconButton = forwardRef<HTMLButtonElement, Props>(
       'icon-button--with-counter': typeof counter !== 'undefined',
     });
 
+    const iconElement = (
+      <Icon id={icon} icon={iconComponent} aria-hidden='true' />
+    );
+
     let contents = (
       <>
-        <Icon id={icon} icon={iconComponent} aria-hidden='true' />{' '}
+        {iconWrapperClassName ? (
+          <span className={iconWrapperClassName}>{iconElement}</span>
+        ) : (
+          iconElement
+        )}{' '}
         {typeof counter !== 'undefined' && (
           <span className='icon-button__counter'>
             <AnimatedNumber value={counter} />

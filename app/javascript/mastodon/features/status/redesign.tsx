@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useParams } from 'react-router';
 
-import { BookmarkSimpleIcon } from '@phosphor-icons/react';
+import { BookmarkSimpleIcon, StarIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
 import { statusInteraction } from '@/mastodon/actions/interactions_typed';
@@ -64,6 +64,11 @@ const messages = defineMessages({
   detailedStatus: {
     id: 'status.detailed_status',
     defaultMessage: 'Detailed conversation view',
+  },
+  favourite: { id: 'status.favourite', defaultMessage: 'Favorite' },
+  removeFavourite: {
+    id: 'status.remove_favourite',
+    defaultMessage: 'Remove from favorites',
   },
 });
 
@@ -130,6 +135,20 @@ export const StatusPage: React.FC = () => {
       }),
     );
   }, [dispatch, statusId]);
+  const handleFavouriteClick = useCallback(() => {
+    dispatch(
+      statusInteraction({
+        statusId,
+        intent: 'favourite',
+        contextType: 'detailed',
+      }),
+    );
+  }, [dispatch, statusId]);
+
+  const favouriteIcon = useIconWeight(
+    StarIcon,
+    status?.favourited && 'fill',
+  );
   const bookmarkIcon = useIconWeight(
     BookmarkSimpleIcon,
     status?.bookmarked && 'fill',
@@ -148,6 +167,9 @@ export const StatusPage: React.FC = () => {
   }
 
   const { account } = status;
+  const favouriteTitle = intl.formatMessage(
+    status.favourited ? messages.removeFavourite : messages.favourite,
+  );
   const isLocal = !account.acct.includes('@');
   const isIndexable = !account.noindex;
 
@@ -194,6 +216,17 @@ export const StatusPage: React.FC = () => {
         title={columnTitle}
         extraButtons={
           <>
+            <ToggleIconButton
+              size='sm'
+              variant='ghost'
+              active={status.favourited}
+              icon={favouriteIcon}
+              onClick={handleFavouriteClick}
+              className='star-icon'
+              title={favouriteTitle}
+            >
+              {favouriteTitle}
+            </ToggleIconButton>
             <ToggleIconButton
               size='sm'
               variant='ghost'

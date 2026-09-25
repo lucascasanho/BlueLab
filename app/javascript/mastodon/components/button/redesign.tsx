@@ -110,18 +110,25 @@ const BaseButton: React.FC<BaseButtonProps> = ({
 export type ButtonProps = BaseButtonProps & {
   leadingIcon?: IconProp;
   trailingIcon?: IconProp;
+  leadingIconWrapperClassName?: string;
 };
 
 export const Button: React.FC<ButtonProps> = ({
   children,
   leadingIcon,
   trailingIcon,
+  leadingIconWrapperClassName,
   ...props
 }) => (
   <BaseButton {...props}>
-    {leadingIcon && !props.loading && (
-      <Icon id='leading' icon={leadingIcon} className={classes.icon} />
-    )}
+    {leadingIcon && !props.loading &&
+      (leadingIconWrapperClassName ? (
+        <span className={leadingIconWrapperClassName}>
+          <Icon id='leading' icon={leadingIcon} className={classes.icon} />
+        </span>
+      ) : (
+        <Icon id='leading' icon={leadingIcon} className={classes.icon} />
+      ))}
     {props.loading && <LoadingIcon />}
     {children}
     {trailingIcon && (

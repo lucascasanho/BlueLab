@@ -108,7 +108,7 @@
 @use 'components/picture-in-picture';
 
 // Micro interactions
-@use 'micro-interactions/heart';
+@use 'micro-interactions/native-favourites';
 
 // Navigation/layout formerly bundled in the heart micro-interaction; kept in
 // its original cascade position so dropping the favourite styling for a native

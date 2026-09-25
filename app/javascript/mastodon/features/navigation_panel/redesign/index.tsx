@@ -12,6 +12,7 @@ import {
   BellIcon,
   ChatCircleDotsIcon,
   BookmarkSimpleIcon,
+  StarIcon,
   PlusIcon,
 } from '@phosphor-icons/react';
 
@@ -302,6 +303,16 @@ export const RedesignNavigationPanel: React.FC<{
                   </NavigationLink>
                   <NavigationLink
                     stacked
+                    to='/favourites'
+                    iconComponent={StarIcon}
+                  >
+                    <FormattedMessage
+                      id='navigation_bar.favourites'
+                      defaultMessage='Favorites'
+                    />
+                  </NavigationLink>
+                  <NavigationLink
+                    stacked
                     to='/bookmarks'
                     iconComponent={BookmarkSimpleIcon}
                   >
@@ -337,6 +348,16 @@ export const RedesignNavigationPanel: React.FC<{
                       id='tabs_bar.messages'
                       defaultMessage='Messages'
                       description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
+                    />
+                  </NavigationLink>
+                  <NavigationLink
+                    stacked
+                    to='/favourites'
+                    iconComponent={StarIcon}
+                  >
+                    <FormattedMessage
+                      id='navigation_bar.favourites'
+                      defaultMessage='Favorites'
                     />
                   </NavigationLink>
                   <NavigationLink

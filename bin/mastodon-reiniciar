@@ -10,8 +10,10 @@ target="${1:-}"
 
 case "$target" in
   blue)
+    # Blue usa PostgreSQL 17, Redis padrão da instalação e o streaming
+    # instanciado na porta 4000.
     database_units=(postgresql@17-main.service redis-server.service)
-    application_units=(blue-web.service blue-sidekiq.service blue-streaming.service)
+    application_units=(blue-web.service blue-sidekiq.service blue-streaming@4000.service)
     edge_units=(nginx.service cloudflared.service)
     rails_health_url="http://127.0.0.1:3000/health"
     nginx_health_url="http://127.0.0.1/health"
@@ -19,7 +21,7 @@ case "$target" in
     ;;
   espelunca)
     database_units=(postgresql.service redis-server@espelunca.service)
-    application_units=(espelunca-web.service espelunca-sidekiq.service espelunca-streaming.service)
+    application_units=(espelunca-web.service espelunca-sidekiq.service espelunca-streaming@4001.service)
     edge_units=(nginx.service cloudflared-espelunca.service)
     rails_health_url="http://127.0.0.1:3001/health"
     nginx_health_url="http://127.0.0.1/health"
@@ -30,7 +32,6 @@ case "$target" in
     exit 2
     ;;
 esac
-
 wait_for_http() {
   local name="$1"
   local url="$2"
@@ -73,7 +74,13 @@ restart_group 'APLICAÇÃO' "${application_units[@]}"
 wait_for_http 'Rails' "$rails_health_url"
 wait_for_http 'streaming' "$streaming_health_url"
 
-restart_group 'BORDA' "${edge_units[@]}"
+restart_group 'NGINX' nginx.service
 wait_for_http 'nginx' "$nginx_health_url"
+
+if [[ "$target" == blue ]]; then
+  restart_group 'CLOUDFLARE' cloudflared.service
+else
+  restart_group 'CLOUDFLARE ESPELUNCA' cloudflared-espelunca.service
+fi
 
 printf 'Sucesso: %s reiniciado e saudável.\n' "$target"

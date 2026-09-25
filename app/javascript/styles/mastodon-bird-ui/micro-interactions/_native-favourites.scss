@@ -1,51 +1,121 @@
-// Used in place of _heart.scss / _star.scss when the target Mastodon ships its
-// own native favourite animation, see
-// https://github.com/mementomori-social/mastodon/pull/10
-// Bird UI does not restyle the favourite button itself (the native SVG handles
-// it), but the sidebar and notification Favourites icons are not native, so
-// they are still themed here: heart by default, star when the viewer chose
-// stars (the use-stars class).
+// Bird UI favourite treatment.
+//
+// The action bar uses Mastodon's native star SVG. Legacy Bird UI icon
+// replacement rules hide those SVG paths, so reveal only the favourite star.
+// Sidebar and notification favourite icons are static and therefore always use
+// the star artwork as well. The icon is never switched back to a heart by the
+// viewer's historical icon preference.
 .layout-single-column,
 .layout-multiple-columns {
-  // Re-show the native favourite SVG in the action bar. Bird UI's icon reset
-  // hides every action-bar icon path; this stays less specific than core's
-  // outline/solid toggle so that toggle keeps working.
-  .status__action-bar .star-icon path,
-  .detailed-status__action-bar .star-icon path {
-    display: block;
+  // Re-show the native favourite SVG in redesigned and legacy action bars.
+  .status__action-bar .favourite-animation-target > svg path,
+  .detailed-status__action-bar .star-icon .icon-star path,
+  .status__action-bar .star-icon .icon-star path {
+    display: block !important;
   }
 
-  // Sidebar column links and notifications: heart by default.
+  // Sidebar column links and notifications always use stars.
   .column-link .icon-star {
-    background-image: var(--icon-heart-column-link);
+    background-image: var(--icon-star-column-link);
+    background-repeat: no-repeat;
   }
 
   .column-link.active .icon-star {
-    background-image: var(--icon-heart-column-link-active);
+    background-image: var(--icon-star-column-link-active);
   }
 
   .notification-group--favourite .icon-star,
   .notification-favourite .icon-star {
-    background-image: var(--icon-heart-notification);
+    background-image: var(--icon-star-notification);
     background-repeat: no-repeat;
+  }
+
+  .status__action-bar .favourite-animation-target,
+  .detailed-status__action-bar .star-icon,
+  .status__action-bar .star-icon,
+  .icon-button.star-icon {
+    color: var(--color-dim);
+  }
+
+  // The redesigned timeline action keeps a compact 28px hit area around the
+  // 18px glyph. Show the actual Phosphor SVG instead of hiding it behind the
+  // legacy Bird UI icon replacement layer.
+  .status__action-bar button.star-icon {
+    box-sizing: border-box;
+    min-width: 28px !important;
+    width: 28px !important;
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    column-gap: 0 !important;
+  }
+
+  .status__action-bar button.star-icon .favourite-animation-target {
+    box-sizing: border-box;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    margin: 0 !important;
+    background-image: none !important;
+  }
+
+  .status__action-bar button.star-icon .favourite-animation-target > .icon {
+    box-sizing: border-box;
+    display: block !important;
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    margin: 0 !important;
+    opacity: 1 !important;
+    background-image: none !important;
+    color: var(--color-dim) !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
+
+  .status__action-bar button.star-icon
+    .favourite-animation-target > .icon path {
+    display: block !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
+
+  .status__action-bar button.star-icon[aria-pressed='true']
+    .favourite-animation-target > .icon,
+  .status__action-bar button.star-icon[aria-pressed='true']
+    .favourite-animation-target > .icon path {
+    color: var(--color-yellow) !important;
+    fill: var(--color-yellow) !important;
+    stroke: var(--color-yellow) !important;
   }
 }
 
-// When the viewer chose stars, the sidebar/notification icons follow.
-html.use-stars {
-  .layout-single-column,
-  .layout-multiple-columns {
-    .column-link .icon-star {
-      background-image: var(--icon-star-column-link);
-    }
+// The detailed-post action already has the correct yellow star. Keep legacy
+// Bird UI controls on the same semantic color without relying on a theme-name
+// data attribute.
+.layout-single-column,
+.layout-multiple-columns {
+  button.star-icon[aria-pressed='true'],
+  button.star-icon.active,
+  .icon-button.star-icon.active {
+    --fg: var(--color-yellow) !important;
+    color: var(--color-yellow) !important;
+  }
 
-    .column-link.active .icon-star {
-      background-image: var(--icon-star-column-link-active);
-    }
-
-    .notification-group--favourite .icon-star,
-    .notification-favourite .icon-star {
-      background-image: var(--icon-star-notification);
-    }
+  .status__action-bar button.star-icon[aria-pressed='true']
+    .favourite-animation-target,
+  .detailed-status__action-bar .icon-button.star-icon.active,
+  .detailed-status__action-bar .icon-button.star-icon.active .icon,
+  .detailed-status__action-bar .icon-button.star-icon.active .icon-star {
+    color: var(--color-yellow) !important;
   }
 }

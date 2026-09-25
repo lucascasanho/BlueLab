@@ -23,6 +23,7 @@ import { Dropdown } from '@/mastodon/components/dropdown_menu';
 import { me, quickBoosting } from '@/mastodon/initial_state';
 
 import { IconButton } from '@/mastodon/components/icon_button';
+import { animateFavouriteIcon } from '@/mastodon/components/status/favourite_animation';
 import { injectIntl } from '@/mastodon/components/intl';
 import { BoostButton } from '../boost_button';
 import { RemoveQuoteHint } from './remove_quote_hint';
@@ -148,10 +149,12 @@ class StatusActionBar extends ImmutablePureComponent {
     });
   };
 
-  handleFavouriteClick = () => {
+  handleFavouriteClick = (event) => {
     const { signedIn } = this.props.identity;
+    const active = this.props.status.get('favourited');
 
     if (signedIn) {
+      animateFavouriteIcon(event.currentTarget, active);
       this.props.onFavourite(this.props.status);
     } else {
       this.props.onInteractionModal(this.props.status, 'favourite');
@@ -418,7 +421,7 @@ class StatusActionBar extends ImmutablePureComponent {
           <BoostButton statusId={status.get('id')} counters={withCounters} />
         </div>
         <div className='status__action-bar__button-wrapper'>
-          <IconButton className='status__action-bar__button star-icon' animate active={status.get('favourited')} title={favouriteTitle} icon='star' iconComponent={status.get('favourited') ? StarIcon : StarBorderIcon} onClick={this.handleFavouriteClick} counter={withCounters ? status.get('favourites_count') : undefined} />
+          <IconButton iconWrapperClassName='favourite-animation-target' className='status__action-bar__button star-icon' active={status.get('favourited')} title={favouriteTitle} icon='star' iconComponent={status.get('favourited') ? StarIcon : StarBorderIcon} onClick={this.handleFavouriteClick} counter={withCounters ? status.get('favourites_count') : undefined} />
         </div>
         <div className='status__action-bar__button-wrapper'>
           <IconButton className='status__action-bar__button bookmark-icon' disabled={!signedIn} active={status.get('bookmarked')} title={bookmarkTitle} icon='bookmark' iconComponent={status.get('bookmarked') ? BookmarkIcon : BookmarkBorderIcon} onClick={this.handleBookmarkClick} />

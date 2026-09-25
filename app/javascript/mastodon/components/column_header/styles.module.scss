@@ -119,3 +119,23 @@
 .extraStickyContent {
   background: var(--color-bg-primary);
 }
+
+
+// Bird UI title bars must be opaque and use the exact page background.
+// This covers the redesigned ColumnHeader CSS-module surface.
+:global(body[data-theme='mastodon-bird-ui-auto']) {
+  .root {
+    background: var(--color-bg) !important;
+    background-color: var(--color-bg) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .layout,
+  .extraStickyContent {
+    background: var(--color-bg) !important;
+    background-color: var(--color-bg) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
