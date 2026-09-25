@@ -24,7 +24,7 @@
       = theme_style_tags Setting.default_settings['theme']
       = vite_typescript_tag 'error.ts', crossorigin: 'anonymous'
 
-  %body{ class: (bluelab_error ? 'error error--bluelab' : 'error'), data: (bluelab_error ? { theme: current_theme } : nil) }
+  %body{ class: (bluelab_error ? 'error error--bluelab' : 'error'), data: (bluelab_error ? { theme: 'blue-2' } : nil) }
     - if bluelab_error
       %main.error-page
         .error-page__brand
