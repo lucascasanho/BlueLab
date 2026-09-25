@@ -273,3 +273,30 @@
 .actionsButtonGap {
   margin-inline-end: auto;
 }
+
+
+/* Bird UI: match the detailed-post favourite control's yellow active state. */
+:global(body[data-theme='mastodon-bird-ui-auto']) .favouriteButton {
+  --fg: var(--color-dim);
+  color: var(--color-dim);
+}
+
+:global(body[data-theme='mastodon-bird-ui-auto'])
+  .favouriteButton[aria-pressed='true'] {
+  --fg: var(--color-yellow) !important;
+  color: var(--color-yellow) !important;
+}
+
+:global(body[data-theme='mastodon-bird-ui-auto'])
+  .favouriteButton[aria-pressed='true']
+  .favourite-animation-target,
+:global(body[data-theme='mastodon-bird-ui-auto'])
+  .favouriteButton[aria-pressed='true']
+  .favourite-animation-target > .icon,
+:global(body[data-theme='mastodon-bird-ui-auto'])
+  .favouriteButton[aria-pressed='true']
+  .favourite-animation-target > .icon path {
+  color: var(--color-yellow) !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
