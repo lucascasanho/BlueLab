@@ -138,3 +138,12 @@
   color: var(--color-text-secondary);
   text-align: center;
 }
+@media (width <= 759px) {
+  .page {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  :global(.ui--mobile-chrome-hidden) .page {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
