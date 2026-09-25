@@ -155,6 +155,7 @@ export const RedesignComposeForm: React.FC<
       data-bluelab-composer
       data-bluelab-composer-embedded={embedded ? 'true' : undefined}
       data-bluelab-composer-compact={compact ? 'true' : undefined}
+      data-bluelab-composer-message={isMessage ? 'true' : undefined}
       onSubmit={onSubmit}
       onWheelCapture={handleWheelCapture}
       aria-labelledby={titleId}
