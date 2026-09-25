@@ -60,6 +60,21 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
 
   const history = useAppHistory();
 
+  const handleBlue2ColumnPin = useCallback(() => {
+    if (!blue2ColumnPinning.pinned) {
+      history.replace('/');
+    }
+    blue2ColumnPinning.onPin();
+  }, [blue2ColumnPinning.onPin, blue2ColumnPinning.pinned, history]);
+
+  const handleBlue2ColumnMoveLeft = useCallback(() => {
+    blue2ColumnPinning.onMove(-1);
+  }, [blue2ColumnPinning.onMove]);
+
+  const handleBlue2ColumnMoveRight = useCallback(() => {
+    blue2ColumnPinning.onMove(1);
+  }, [blue2ColumnPinning.onMove]);
+
   const blue2ColumnSettings = showBlue2ColumnSettings ? (
     <Menu>
       <MenuTrigger as={ColumnHeaderButton} icon={DotsThreeIcon}>
@@ -76,14 +91,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
         )}
       </MenuTrigger>
       <MenuList placement='bottom-end' strategy='fixed'>
-        <MenuItem
-          onClick={() => {
-            if (!blue2ColumnPinning.pinned) {
-              history.replace('/');
-            }
-            blue2ColumnPinning.onPin();
-          }}
-        >
+        <MenuItem onClick={handleBlue2ColumnPin}>
           {blue2ColumnPinning.pinned ? (
             <FormattedMessage id='column_header.unpin' defaultMessage='Unpin' />
           ) : (
@@ -93,13 +101,13 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
         {blue2ColumnPinning.pinned && <MenuItemDivider />}
         {blue2ColumnPinning.pinned && (
           <>
-            <MenuItem onClick={() => blue2ColumnPinning.onMove(-1)}>
+            <MenuItem onClick={handleBlue2ColumnMoveLeft}>
               <FormattedMessage
                 id='column_header.moveLeft_settings'
                 defaultMessage='Move column to the left'
               />
             </MenuItem>
-            <MenuItem onClick={() => blue2ColumnPinning.onMove(1)}>
+            <MenuItem onClick={handleBlue2ColumnMoveRight}>
               <FormattedMessage
                 id='column_header.moveRight_settings'
                 defaultMessage='Move column to the right'
