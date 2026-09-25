@@ -54,6 +54,9 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
   const useBlueLabComposer = useAppSelector(
     (state) => state.compose.get('composer_editor') !== 'mastodon',
   );
+  const isBirdUi =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'mastodon-bird-ui-auto';
 
   if (minimalShell) {
     return (
@@ -85,7 +88,7 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
           </div>
         </div>
 
-        {useBlueLabComposer && <ComposeRedesignButton />}
+        {!isBirdUi && useBlueLabComposer && <ComposeRedesignButton />}
 
         <main className='columns-area__panels__main'>
           <div className='tabs-bar__wrapper'>
@@ -96,6 +99,7 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
         </main>
 
         <CollapsibleNavigationPanel />
+        {isBirdUi && <Blue2ScrollToTop />}
       </div>
     );
   }
@@ -115,9 +119,6 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
 export const ColumnsArea: React.FC<ColumnsAreaProps> = (props) => {
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
-  const isBirdUi =
-    typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'mastodon-bird-ui-auto';
 
   if (isBlue2) {
     return <ColumnsAreaRedesign {...props} />;
