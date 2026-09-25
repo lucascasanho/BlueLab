@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -188,7 +189,7 @@ export const AccountSwitcher: React.FC = () => {
     defaultMessage: 'Switch account',
   });
 
-  return (
+  const switcher = (
     <div className={classes.root}>
       <button
         ref={setAnchor}
@@ -334,4 +335,8 @@ export const AccountSwitcher: React.FC = () => {
       )}
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(switcher, document.body)
+    : switcher;
 };
