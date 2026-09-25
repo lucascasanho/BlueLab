@@ -54,7 +54,8 @@
     }
   }
 
-  a {
+  a,
+  .bugReportButton {
     color: var(--color-text-secondary);
     text-decoration: underline;
 
