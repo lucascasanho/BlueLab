@@ -107,7 +107,6 @@ export const RedesignNavigationPanel: React.FC<{
   );
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
-  const isBlue2SlideOut = isBlue2 && mode === 'slide-out';
 
   const openComposer = useCallback(() => {
     dispatch(closeNavigation());
