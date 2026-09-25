@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { Avatar } from '@/mastodon/components/avatar';
 import { MenuItemGroup } from '@/mastodon/components/menu';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
@@ -223,9 +222,10 @@ const AccountList: React.FC<{
                 void switchAccount(storedAccount);
               }}
             >
-              <Avatar
-                account={storedAccount}
-                size={variant === 'blue2' ? 34 : 32}
+              <img
+                src={storedAccount.avatar}
+                alt=''
+                className={classes.avatar}
               />
               <span className={classes.accountText}>
                 <strong>{label}</strong>
@@ -302,7 +302,12 @@ const AccountSwitcherActions: React.FC<{
   );
 
   if (variant === 'navigation') {
-    return <>{Content}</>;
+    return (
+      <>
+        <li>{Content.props.children[0]}</li>
+        {registrationsOpen && <li>{Content.props.children[2]}</li>}
+      </>
+    );
   }
 
   return <div>{Content}</div>;
