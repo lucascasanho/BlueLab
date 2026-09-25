@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import classNames from 'classnames';
 
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
 import { Header } from '@/mastodon/features/custom_homepage/components/header';
@@ -97,6 +98,12 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
 
           <div className='columns-area columns-area--mobile'>{children}</div>
         </main>
+
+        {isBirdUi && (
+          <aside className='bird-ui-right-rail'>
+            <Blue2RightRail showProfileCard />
+          </aside>
+        )}
 
         <CollapsibleNavigationPanel />
         {isBirdUi && <Blue2ScrollToTop />}
