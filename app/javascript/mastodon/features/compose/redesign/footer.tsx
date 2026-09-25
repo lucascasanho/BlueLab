@@ -133,18 +133,17 @@ export const ComposeFooter: React.FC<{
       <ComposeEmojiButton onPick={onEmojiPick} />
 
       {!isMessage && (
-      <IconButton
-        size='sm'
-        icon={ChartBarHorizontalIcon}
-        disabled={hasQuote || hasPoll || !!activeThreadItemId}
-        onClick={handlePoll}
-      >
-        <FormattedMessage
-          id='poll_button.add_poll'
-          defaultMessage='Add a poll'
-        />
-      </IconButton>
-
+        <IconButton
+          size='sm'
+          icon={ChartBarHorizontalIcon}
+          disabled={hasQuote || hasPoll || !!activeThreadItemId}
+          onClick={handlePoll}
+        >
+          <FormattedMessage
+            id='poll_button.add_poll'
+            defaultMessage='Add a poll'
+          />
+        </IconButton>
       )}
       {!isMessage && <ComposeSchedule />}
 
