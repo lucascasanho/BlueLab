@@ -170,6 +170,14 @@ export const RedesignNavigationPanel: React.FC<{
                 defaultMessage='Explore'
               />
             </NavigationLink>
+            {mode === 'slide-out' && isBlue2 && (
+              <NavigationLink to='/favourites' iconComponent={StarIcon}>
+                <FormattedMessage
+                  id='navigation_bar.favourites'
+                  defaultMessage='Favorites'
+                />
+              </NavigationLink>
+            )}
             <NavigationLink
               withSpaceAfter
               to='/public/local'
@@ -299,6 +307,7 @@ export const RedesignNavigationPanel: React.FC<{
                     description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
                   />
                 </NavigationLink>
+{mode !== 'slide-out' && (
                 <NavigationLink
                   stacked
                   to='/favourites'
@@ -309,6 +318,7 @@ export const RedesignNavigationPanel: React.FC<{
                     defaultMessage='Favorites'
                   />
                 </NavigationLink>
+                )}
                 <NavigationLink
                   stacked
                   to='/bookmarks'
