@@ -11,8 +11,8 @@ import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 
-import { Blue2HomeIcon } from './icons';
 import { Blue2AccountMenu } from './account_menu';
+import { Blue2HomeIcon } from './icons';
 import { Blue2ComposeButton } from './navigation';
 
 interface TrendTag {
