@@ -288,9 +288,6 @@
 }
 
 .root.navigationPanelProfile {
-  // The Bird UI profile card must remain inside the navigation column even
-  // when the generic hover rule expands the account button.
-  overflow: hidden;
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
@@ -304,8 +301,6 @@
     position: relative;
     inset: auto;
     width: 100%;
-    max-width: 100%;
-    min-width: 0;
     min-height: 64px;
     padding: 8px 10px 8px 8px;
     border: 1px solid var(--color-border-primary, #2a2a3a);
@@ -332,9 +327,7 @@
   &:focus-within .accountButton,
   .accountButton[aria-expanded='true'] {
     width: 100%;
-    max-width: 100%;
     padding: 8px 10px 8px 8px;
-    overflow: hidden;
     background: var(--color-bg-tertiary, #20202c);
   }
 }
