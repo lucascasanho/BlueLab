@@ -1,5 +1,5 @@
 // Bird UI favourite treatment.
-//
+// 
 // Sidebar and notification favourite icons are static and always use the star
 // artwork. Status action favourites use Mastodon's native favourite control.
 .layout-single-column,
@@ -67,6 +67,16 @@
     filter: none;
   }
 
+  // The native material SVG and the Bird UI background artwork were being
+  // painted together, making the star look heavier than the source asset.
+  // Keep only the Bird UI artwork; the favourite animation runs on the
+  // .favourite-animation-target wrapper, so hiding the SVG path does not
+  // disable the interaction animation.
+  .status__action-bar .icon-button.star-icon .icon-star path,
+  .detailed-status__action-bar .icon-button.star-icon .icon-star path {
+    display: none !important;
+  }
+
   .status__action-bar button.icon-button.star-icon.active .icon-star,
   .detailed-status__action-bar button.icon-button.star-icon.active .icon-star,
   .status__action-bar button.icon-button.star-icon.active:not(.activated) .icon-star,
@@ -76,6 +86,6 @@
     ) !important;
     background-size: 18px 18px;
     opacity: 1;
-    filter: saturate(1.35) brightness(0.85);
+    filter: none;
   }
 }
