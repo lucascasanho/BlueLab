@@ -13,11 +13,30 @@
     margin-bottom: 0;
     overflow-y: auto;
     padding: 10px;
+    position: relative;
   }
 
-  // The legacy navigation pane uses a fixed inner container. Give the Bird UI
-  // navigation panel an explicit viewport height so its flex spacer can push
-  // the footer all the way to the bottom instead of leaving it after the menu.
+  // Keep the BlueLab footer anchored to the bottom of the navigation panel.
+  // The legacy shell has several flex/overflow rules that otherwise allow the
+  // footer to participate in the normal flow and appear immediately after the menu.
+  .navigation-panel > footer {
+    bottom: 10px;
+    inset-inline: 10px;
+    margin-top: 0;
+    position: absolute;
+    z-index: 2;
+  }
+
+  .navigation-panel > .flex-spacer {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .navigation-panel__menu {
+    padding-bottom: 52px;
+  }
+
+  // The legacy navigation pane uses a fixed inner container.
   .columns-area__panels__pane--navigational .columns-area__panels__pane__inner {
     height: 100dvh;
   }
