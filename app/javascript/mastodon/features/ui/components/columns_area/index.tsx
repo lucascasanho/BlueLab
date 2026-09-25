@@ -132,7 +132,7 @@ export const ColumnsArea: React.FC<ColumnsAreaProps> = (props) => {
   const theme =
     typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
 
-  if (theme === 'blue-2') {
+  if (theme === 'blue-2' || theme === 'firebird') {
     return <ColumnsAreaRedesign {...props} />;
   }
 

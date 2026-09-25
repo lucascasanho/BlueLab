@@ -112,3 +112,67 @@
   background: var(--color-bg-primary);
   box-shadow: var(--dropdown-shadow);
 }
+
+
+/* FireBird mobile navigation: flat Twitter-like bottom bar, not the BlueLab pill. */
+:global(body[data-theme='firebird']) .root {
+  bottom: env(safe-area-inset-bottom);
+  padding: 0;
+  z-index: 500;
+  align-items: stretch;
+  gap: 0;
+}
+
+:global(body[data-theme='firebird']) .floatingCard {
+  width: 100%;
+  border-radius: 0;
+  border-top: 1px solid var(--firebird-border, #eff3f4);
+  background: var(--firebird-bg, #fff);
+  box-shadow: none;
+  padding: 0 4px;
+}
+
+:global(body[data-theme='firebird']) .list {
+  height: 56px;
+  padding: 0;
+}
+
+:global(body[data-theme='firebird']) .list > li {
+  display: flex;
+  flex: 1 1 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(body[data-theme='firebird']) .floatingCard {
+    background: var(--firebird-bg, #000);
+    border-top-color: var(--firebird-border, #2f3336);
+  }
+}
+
+
+
+
+:global(body[data-theme='firebird']) .root > button {
+  position: fixed;
+  inset-inline-end: 16px;
+  bottom: calc(68px + env(safe-area-inset-bottom));
+  z-index: 510;
+  width: 52px;
+  min-width: 52px;
+  height: 52px;
+  min-height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--firebird-blue, #1d9bf0);
+  color: #fff;
+  box-shadow: 0 3px 12px rgb(0 0 0 / 22%);
+}
+
+:global(body[data-theme='firebird']) .root > button:hover,
+:global(body[data-theme='firebird']) .root > button:focus-visible {
+  background: var(--firebird-blue-hover, #1a8cd8);
+  color: #fff;
+  outline: 2px solid var(--firebird-blue, #1d9bf0);
+  outline-offset: 2px;
+}
