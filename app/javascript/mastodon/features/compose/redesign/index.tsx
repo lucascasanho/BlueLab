@@ -62,6 +62,7 @@ interface RedesignComposeFormProps {
   autoFocus?: boolean;
   className?: string;
   embedded?: boolean;
+  compact?: boolean;
   noMinimize?: boolean;
   redirectOnSuccess?: boolean;
 }
@@ -74,6 +75,7 @@ export const RedesignComposeForm: React.FC<
   autoFocus,
   className,
   embedded = false,
+  compact = false,
   noMinimize,
   redirectOnSuccess,
   ref,
@@ -152,6 +154,7 @@ export const RedesignComposeForm: React.FC<
       role={embedded ? 'region' : 'dialog'}
       data-bluelab-composer
       data-bluelab-composer-embedded={embedded ? 'true' : undefined}
+      data-bluelab-composer-compact={compact ? 'true' : undefined}
       onSubmit={onSubmit}
       onWheelCapture={handleWheelCapture}
       aria-labelledby={titleId}
@@ -161,41 +164,45 @@ export const RedesignComposeForm: React.FC<
         <div className={classes.background} />
       )}
 
-      <ComposeFormHeader
-        id={titleId}
-        noMinimize={noMinimize || embedded}
-        noClose={embedded}
-      />
+      {!compact && (
+        <ComposeFormHeader
+          id={titleId}
+          noMinimize={noMinimize || embedded}
+          noClose={embedded}
+        />
+      )}
 
       <div
         className={classes.content}
         data-compose-scroll-container
         data-compose-scroll-zone='panel'
       >
-        <ComposeReply />
+        {!compact && <ComposeReply />}
 
-        <div className={classes.toolbar} data-bluelab-compose-toolbar>
-          <ComposeVisibility
-            className={classes.flexGrowWrap}
-            activeThreadItemId={activeThreadItemId}
-          />
-
-          <LanguageButton activeThreadItemId={activeThreadItemId} />
-
-          <ToggleButton
-            size='sm'
-            active={sensitive}
-            onClick={onSensitiveChange}
-            leadingIcon={sensitiveIcon}
-          >
-            <FormattedMessage
-              id='compose.sensitive'
-              defaultMessage='Sensitive'
+        {!compact && (
+          <div className={classes.toolbar} data-bluelab-compose-toolbar>
+            <ComposeVisibility
+              className={classes.flexGrowWrap}
+              activeThreadItemId={activeThreadItemId}
             />
-          </ToggleButton>
-        </div>
 
-        {isMessage && (
+            <LanguageButton activeThreadItemId={activeThreadItemId} />
+
+            <ToggleButton
+              size='sm'
+              active={sensitive}
+              onClick={onSensitiveChange}
+              leadingIcon={sensitiveIcon}
+            >
+              <FormattedMessage
+                id='compose.sensitive'
+                defaultMessage='Sensitive'
+              />
+            </ToggleButton>
+          </div>
+        )}
+
+        {!compact && isMessage && (
           <p className={classes.toolbarMessage}>
             <Icon id='lock-open' icon={LockSimpleOpenIcon} />
             <FormattedMessage
