@@ -33,7 +33,10 @@ Warden::Manager.after_fetch do |user, warden|
 end
 
 Warden::Manager.before_logout do |_, warden|
-  SessionActivation.deactivate warden.cookies.signed['_session_id']
+  unless warden.request.session[:account_switcher]
+    SessionActivation.deactivate warden.cookies.signed['_session_id']
+  end
+
   warden.cookies.delete('_session_id')
 end
 
