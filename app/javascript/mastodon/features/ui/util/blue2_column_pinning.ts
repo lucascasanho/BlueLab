@@ -1,5 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
+import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
+
 import { useLocation } from 'react-router';
 
 import {
@@ -14,6 +16,8 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { useColumnIndexContext } from '@/mastodon/components/column/context';
 import { useColumnsContext } from './columns_context';
+
+type Blue2ColumnState = ImmutableMap<string, unknown>;
 
 export interface Blue2ColumnDefinition {
   id: string;
@@ -147,7 +151,9 @@ export const useBlue2ColumnPinning = () => {
   const { multiColumn } = useColumnsContext();
   const columnIndex = useColumnIndexContext();
   const accountId = useAccountId();
-  const columns = useAppSelector((state) => state.settings.get('columns'));
+  const columns = useAppSelector(
+    (state) => state.settings.get('columns') as ImmutableList<Blue2ColumnState>,
+  );
 
   const isBlue2 =
     typeof document !== 'undefined' &&
@@ -161,6 +167,9 @@ export const useBlue2ColumnPinning = () => {
 
   const pinned = isDesktopAdvanced && columnIndex < columns.size;
   const pinnedColumn = pinned ? columns.get(columnIndex) : undefined;
+  const pinnedParams = pinnedColumn?.get('params') as
+    | ImmutableMap<string, unknown>
+    | undefined;
   const routeDefinition = useMemo(
     () => definitionForPath(location.pathname, accountId),
     [accountId, location.pathname],
@@ -169,7 +178,7 @@ export const useBlue2ColumnPinning = () => {
   const definition = pinned
     ? {
         id: pinnedColumn?.get('id'),
-        params: pinnedColumn?.get('params')?.toJS() ?? {},
+        params: pinnedParams?.toJS() ?? {},
       }
     : routeDefinition;
 
