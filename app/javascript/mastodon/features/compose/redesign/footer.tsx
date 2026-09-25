@@ -45,6 +45,7 @@ import {
   selectComposeAttachments,
   selectComposeCanSubmit,
   selectComposeCharsCount,
+  isMessageComposeType,
   selectComposeHasAttachments,
   selectComposeType,
 } from './selectors';
@@ -63,6 +64,7 @@ export const ComposeFooter: React.FC<{
 }> = ({ onEmojiPick, activeThreadItemId = null }) => {
   const intl = useIntl();
   const type = useAppSelector(selectComposeType);
+  const isMessage = isMessageComposeType(type);
   const rootCounter = useAppSelector(selectComposeCharsCount);
   const { hasPoll, quotedStatusId } = useAppSelector(
     selectComposeHasAttachments,
@@ -130,19 +132,20 @@ export const ComposeFooter: React.FC<{
 
       <ComposeEmojiButton onPick={onEmojiPick} />
 
-      <IconButton
-        size='sm'
-        icon={ChartBarHorizontalIcon}
-        disabled={hasQuote || hasPoll || !!activeThreadItemId}
-        onClick={handlePoll}
-      >
-        <FormattedMessage
-          id='poll_button.add_poll'
-          defaultMessage='Add a poll'
-        />
-      </IconButton>
-
-      {type !== 'message' && <ComposeSchedule />}
+      {!isMessage && (
+        <IconButton
+          size='sm'
+          icon={ChartBarHorizontalIcon}
+          disabled={hasQuote || hasPoll || !!activeThreadItemId}
+          onClick={handlePoll}
+        >
+          <FormattedMessage
+            id='poll_button.add_poll'
+            defaultMessage='Add a poll'
+          />
+        </IconButton>
+      )}
+      {!isMessage && <ComposeSchedule />}
 
       <div className={classes.flexGrowWrap}>
         {shouldShowCharacterCounter(
@@ -166,7 +169,7 @@ export const ComposeFooter: React.FC<{
         )}
 
         <div className={classes.primaryActions} data-compose-primary-actions>
-          {type !== 'message' && (
+          {!isMessage && (
             <IconButton
               as='button'
               type='button'
@@ -188,16 +191,16 @@ export const ComposeFooter: React.FC<{
             disabled={!canSubmit}
             loading={isSubmitting}
           >
-            {type !== 'message' && !scheduledAt && (
+            {!isMessage && !scheduledAt && (
               <FormattedMessage id='compose.publish' defaultMessage='Publish' />
             )}
-            {type !== 'message' && scheduledAt && (
+            {!isMessage && scheduledAt && (
               <FormattedMessage
                 id='compose.schedule.submit'
                 defaultMessage='Schedule'
               />
             )}
-            {type === 'message' && (
+            {isMessage && (
               <FormattedMessage
                 id='compose.message.publish'
                 defaultMessage='Send'

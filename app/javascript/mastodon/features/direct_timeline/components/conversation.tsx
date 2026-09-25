@@ -110,10 +110,8 @@ export const Conversation: React.FC<{
         typeof document !== 'undefined' &&
         document.body.dataset.theme === 'blue-2';
 
-      // BlueLab's messages view uses the status-id route so opening a direct
-      // message does not depend on the account-prefixed profile route.
       if (isBlue2) {
-        history.push(`/statuses/${statusId}`);
+        history.push(`/conversations/${id}`);
       } else {
         history.push(
           `/@${lastStatus.getIn(['account', 'acct']) as string}/${statusId}`,
