@@ -2714,6 +2714,13 @@ a.account__display-name {
   color: var(--color-text-favourite-highlight);
 }
 
+.favourite-animation-target {
+  display: inline-flex;
+  line-height: 0;
+  transform-origin: 50% 52%;
+}
+
+
 .icon-button.bookmark-icon.active {
   color: var(--color-text-bookmark-highlight);
 }
