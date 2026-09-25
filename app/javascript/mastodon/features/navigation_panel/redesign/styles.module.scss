@@ -20,10 +20,9 @@
 
   &[data-mode='slide-out'] {
     --navigation-background-color: var(--color-bg-primary);
-    box-sizing: border-box;
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
+
+    overflow: visible;
+    isolation: isolate;
   }
 }
 
@@ -40,6 +39,7 @@
   padding: var(--space-6);
   padding-top: var(--space-1);
   background-color: var(--navigation-background-color);
+  overflow: visible;
 
   &::before {
     @include mixins.scroll-gradient(bottom, var(--navigation-background-color));
@@ -59,10 +59,6 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-1);
   margin-bottom: var(--space-2);
-}
-
-.root[data-mode='static'] .footerNav {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .callout {
