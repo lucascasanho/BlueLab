@@ -112,3 +112,41 @@
   background: var(--color-bg-primary);
   box-shadow: var(--dropdown-shadow);
 }
+
+
+/* FireBird mobile navigation: flat Twitter-like bottom bar, not the BlueLab pill. */
+:global(body[data-theme='firebird']) .root {
+  bottom: env(safe-area-inset-bottom);
+  padding: 0;
+  z-index: 500;
+  align-items: stretch;
+  gap: 0;
+}
+
+:global(body[data-theme='firebird']) .floatingCard {
+  width: 100%;
+  border-radius: 0;
+  border-top: 1px solid var(--firebird-border, #eff3f4);
+  background: var(--firebird-bg, #fff);
+  box-shadow: none;
+  padding: 0 4px;
+}
+
+:global(body[data-theme='firebird']) .list {
+  height: 56px;
+  padding: 0;
+}
+
+:global(body[data-theme='firebird']) .list > li {
+  display: flex;
+  flex: 1 1 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(body[data-theme='firebird']) .floatingCard {
+    background: var(--firebird-bg, #000);
+    border-top-color: var(--firebird-border, #2f3336);
+  }
+}
+
+
