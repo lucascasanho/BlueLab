@@ -6,15 +6,10 @@ import classNames from 'classnames';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import { HashIcon } from '@phosphor-icons/react';
-import { AvatarById } from '@/mastodon/components/avatar';
 
 // BLUELAB_INTEGRATION: optional BlueLab shell widgets and localized labels.
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import { openNavigation } from '@/mastodon/actions/navigation';
-import {
-  composerOriginFromElement,
-  openNewComposer,
-} from '@/mastodon/reducers/slices/composer';
 import { Blue2Announcements } from '@/mastodon/features/blue2/announcements';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
 import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
@@ -24,14 +19,7 @@ import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trig
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
 import { ComposePanel } from '@/mastodon/features/ui/components/compose_panel';
-import {
-  customAppIcon,
-  customFavicon,
-  customInstanceLogo,
-  domain,
-  title,
-} from '@/mastodon/initial_state';
-import { useIdentity } from '@/mastodon/identity_context';
+import { customFavicon, customInstanceLogo } from '@/mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import MenuIcon from '@/material-icons/400-24px/menu.svg?react';
 import { Footer } from 'mastodon/features/custom_homepage/components/footer';
@@ -61,48 +49,6 @@ const TabsBarPortal: React.FC<React.ComponentProps<'div'>> = (props) => {
   return <div {...props} ref={setRef} />;
 };
 
-const FireBirdComposeLauncher: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { accountId } = useIdentity();
-
-  const handleOpen = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      dispatch(
-        openNewComposer({
-          type: 'post',
-          origin: composerOriginFromElement(event.currentTarget),
-        }),
-      );
-    },
-    [dispatch],
-  );
-
-  return (
-    <button
-      type='button'
-      className={classes.firebirdComposeLauncher}
-      onClick={handleOpen}
-      aria-label='Write a new post'
-    >
-      <AvatarById accountId={accountId} size={40} />
-      <span>
-        <FormattedMessage
-          id='compose_form.placeholder'
-          defaultMessage="What's happening?"
-        />
-      </span>
-      <strong>
-        <FormattedMessage
-          id='tabs_bar.publish'
-          defaultMessage='Post'
-        />
-      </strong>
-    </button>
-  );
-};
-
-
-
 export const ColumnsAreaRedesign: React.FC<{
   singleColumn?: boolean;
   minimalShell?: boolean;
@@ -130,12 +76,8 @@ export const ColumnsAreaRedesign: React.FC<{
   );
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
-  const isFireBird =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'firebird';
   const isBlue2MobileLayout =
     isMobile || (isBlue2 && singleColumn && isCompactViewport);
-  const isFireBirdMobileLayout =
-    isMobile || (isFireBird && singleColumn && isCompactViewport);
   // The advanced interface uses /deck/* URLs. On Blue2 mobile/tablet, keep
   // the URL intact but interpret that route as its standard mobile equivalent.
   const blue2Pathname =
@@ -255,7 +197,7 @@ export const ColumnsAreaRedesign: React.FC<{
   if (minimalShell) {
     return (
       <div ref={ref} className={classNames(classes.root, classes.rootMinimal)}>
-        {(isBlue2MobileLayout || isFireBirdMobileLayout) && <RedesignMobileNavigation />}
+        {isBlue2MobileLayout && <RedesignMobileNavigation />}
         <div className={classes.main}>
           <Header />
 
@@ -265,126 +207,6 @@ export const ColumnsAreaRedesign: React.FC<{
 
           <Footer />
         </div>
-      </div>
-    );
-  }
-
-  if (singleColumn && isFireBird) {
-    const fireBirdBrand =
-      customInstanceLogo ?? customAppIcon ?? customFavicon ?? '/favicon.ico';
-    const isFireBirdHome = location.pathname === '/home';
-    const isFireBirdGlobal = location.pathname === '/public';
-
-    return (
-      <div
-        ref={ref}
-        className={classNames(classes.root, classes.firebirdRoot)}
-      >
-        {!isFireBirdMobileLayout && (
-          <aside className={classes.firebirdNavigationWrapper}>
-            <RedesignNavigationPanel
-              siteName={title ?? domain}
-              mode='static'
-            />
-          </aside>
-        )}
-
-        {isFireBirdMobileLayout && <RedesignMobileNavigation />}
-        {!isFireBirdMobileLayout && isFireBirdHome && <FireBirdComposeLauncher />}
-
-        <main
-          className={classNames(
-            classes.main,
-            classes.firebirdMain,
-            (isFireBirdHome || isFireBirdGlobal) && classes.firebirdFeed,
-          )}
-          onTouchStart={handleSwipeStart}
-          onTouchEnd={handleSwipeEnd}
-        >
-          {isFireBirdMobileLayout && (
-            <header className={classes.firebirdMobileTopbar}>
-              <button
-                type='button'
-                className={classes.firebirdMobileMenu}
-                onClick={handleOpenBlue2Navigation}
-                aria-label={intl.formatMessage({
-                  id: 'navigation_bar.menu',
-                  defaultMessage: 'Menu',
-                })}
-              >
-                <MenuIcon width={24} height={24} fill='currentColor' />
-              </button>
-
-              <Link
-                to='/home'
-                className={classes.firebirdMobileBrandLink}
-                aria-label={title ?? domain}
-              >
-                <img
-                  src={fireBirdBrand}
-                  alt=''
-                  className={classes.firebirdMobileBrand}
-                />
-              </Link>
-
-              <span className={classes.firebirdMobileSpacer} />
-            </header>
-          )}
-
-          {(isFireBirdHome || isFireBirdGlobal) && (
-            <header className={classes.firebirdTopbar}>
-              <img
-                src={fireBirdBrand}
-                alt=''
-                className={classes.firebirdBrand}
-              />
-              <Link
-                className={
-                  isFireBirdHome
-                    ? classes.firebirdTabActive
-                    : classes.firebirdTab
-                }
-                to='/home'
-              >
-                <FormattedMessage
-                  id='account.following'
-                  defaultMessage='Following'
-                />
-              </Link>
-              <Link
-                className={
-                  isFireBirdGlobal
-                    ? classes.firebirdTabActive
-                    : classes.firebirdTab
-                }
-                to='/public'
-              >
-                <FormattedMessage
-                  id='tabs_bar.fediverse_feeds'
-                  defaultMessage='Fediverse'
-                />
-              </Link>
-            </header>
-          )}
-
-          {!isFireBirdHome && !isFireBirdGlobal && (
-            <div className={classes.firebirdPortal}>
-              <TabsBarPortal />
-            </div>
-          )}
-
-          <div className='columns-area columns-area--mobile'>
-            {children}
-          </div>
-        </main>
-
-        {!isFireBirdMobileLayout && (
-          <aside className={classes.firebirdRightRail}>
-            <Blue2RightRail />
-          </aside>
-        )}
-
-        <ComposeRedesignButton hostOnly />
       </div>
     );
   }
@@ -591,15 +413,11 @@ export const ColumnsAreaRedesign: React.FC<{
           className={multiColClasses.navigationRail}
           data-expanded={isBlue2AdvancedNavigationExpanded}
         >
-          {isFireBird ? (
-            <RedesignNavigationPanel multiColumn siteName={title ?? domain} />
-          ) : (
-            <Blue2Navigation
-              compact
-              expanded={isBlue2AdvancedNavigationExpanded}
-              onToggleExpanded={handleToggleBlue2AdvancedNavigation}
-            />
-          )}
+          <Blue2Navigation
+            compact
+            expanded={isBlue2AdvancedNavigationExpanded}
+            onToggleExpanded={handleToggleBlue2AdvancedNavigation}
+          />
         </aside>
       )}
       <MultiColumnContent>{children}</MultiColumnContent>
