@@ -312,7 +312,10 @@ export const Blue2AccountMenu: React.FC<{
           {({ props: popoverProps }) => (
             <div
               {...popoverProps}
-              className={classes.menu}
+              className={classNames(
+                classes.menu,
+                variant === 'navigationPanel' && classes.navigationPanelMenu,
+              )}
               role='menu'
               onPointerDown={stopMenuEventPropagation}
             >
