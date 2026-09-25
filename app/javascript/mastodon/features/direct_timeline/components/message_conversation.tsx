@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { useParams } from 'react-router-dom';
 
 import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
+
+import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
 
 import {
   expandConversations,
@@ -25,6 +27,7 @@ import StatusContent from '@/mastodon/components/status/legacy/content';
 import { DisplayNameSimple } from '@/mastodon/components/display_name/simple';
 import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
 import { me } from '@/mastodon/initial_state';
+import type { StatusShape } from '@/mastodon/models/status';
 import { makeGetStatus } from '@/mastodon/selectors';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
@@ -67,7 +70,7 @@ export const MessageConversation: React.FC = () => {
         getStatus(state, { id: statusId }),
       )
       .filter(Boolean),
-  ) as unknown as Immutable.List<Immutable.Record<any>>;
+  ) as Array<Immutable.Record<StatusShape>>;
 
   const accounts = useAppSelector((state) => {
     const ids = conversation?.get('accounts') as
@@ -140,7 +143,7 @@ export const MessageConversation: React.FC = () => {
     };
   }, [dispatch, recipient]);
 
-  if (!conversation || statuses.isEmpty()) {
+  if (!conversation || statuses.length === 0) {
     return (
       <Column>
         <ColumnHeader withBackButton title={intl.formatMessage(messages.title)} />
@@ -247,7 +250,7 @@ export const MessageConversation: React.FC = () => {
             compact
             embedded
             autoFocus
-            onSuccess={() => {
+            onSuccess={(_status: ApiStatusJSON) => {
               void loadMessages();
             }}
           />
