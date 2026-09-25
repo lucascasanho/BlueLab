@@ -18,9 +18,10 @@ interface TrendTag {
   name: string;
 }
 
-export const Blue2RightRail: React.FC = () => {
+export const Blue2RightRail: React.FC<{ variant?: 'birdUi' }> = ({ variant }) => {
   const intl = useIntl();
   const { signedIn } = useIdentity();
+  const isBirdUiVariant = variant === 'birdUi';
   const [tags, setTags] = useState<TrendTag[]>([]);
   const [trendMenuOpen, setTrendMenuOpen] = useState(false);
   const [trendsHidden, setTrendsHidden] = useState(false);
@@ -73,51 +74,53 @@ export const Blue2RightRail: React.FC = () => {
   );
 
   return (
-    <aside className={classes.root}>
+    <aside className={`${classes.root} ${isBirdUiVariant ? classes.birdUiVariant : ''}`}>
       <div className={classes.content}>
         <div className={classes.searchHost}>
           <Search singleColumn />
         </div>
 
-        <nav className={classes.feeds} aria-label='Timelines'>
-          {signedIn && (
+        {!isBirdUiVariant && (
+          <nav className={classes.feeds} aria-label='Timelines'>
+            {signedIn && (
+              <NavLink
+                className={classes.feedShortcut}
+                activeClassName={classes.feedShortcutActive}
+                exact
+                to='/home'
+              >
+                <span className={classes.feedIcon}>
+                  <Blue2HomeIcon size={18} />
+                </span>
+                <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
+              </NavLink>
+            )}
+
             <NavLink
               className={classes.feedShortcut}
               activeClassName={classes.feedShortcutActive}
               exact
-              to='/home'
+              to='/public/local'
             >
               <span className={classes.feedIcon}>
-                <Blue2HomeIcon size={18} />
+                <GroupsIcon />
               </span>
-              <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
+              <span>{blue2Text(intl.locale, 'federation')}</span>
             </NavLink>
-          )}
 
-          <NavLink
-            className={classes.feedShortcut}
-            activeClassName={classes.feedShortcutActive}
-            exact
-            to='/public/local'
-          >
-            <span className={classes.feedIcon}>
-              <GroupsIcon />
-            </span>
-            <span>{blue2Text(intl.locale, 'federation')}</span>
-          </NavLink>
-
-          <NavLink
-            className={classes.feedShortcut}
-            activeClassName={classes.feedShortcutActive}
-            exact
-            to='/public'
-          >
-            <span className={classes.feedIcon}>
-              <PublicIcon />
-            </span>
-            <span>{blue2Text(intl.locale, 'global')}</span>
-          </NavLink>
-        </nav>
+            <NavLink
+              className={classes.feedShortcut}
+              activeClassName={classes.feedShortcutActive}
+              exact
+              to='/public'
+            >
+              <span className={classes.feedIcon}>
+                <PublicIcon />
+              </span>
+              <span>{blue2Text(intl.locale, 'global')}</span>
+            </NavLink>
+          </nav>
+        )}
 
         {!trendsHidden && (
           <section className={classes.card}>
@@ -153,8 +156,9 @@ export const Blue2RightRail: React.FC = () => {
         )}
       </div>
 
-      <footer className={classes.footer}>
-        <a href='/about'>
+      {!isBirdUiVariant && (
+        <footer className={classes.footer}>
+          <a href='/about'>
           <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
         </a>
         <span>·</span>
@@ -173,12 +177,13 @@ export const Blue2RightRail: React.FC = () => {
         </a>
         <span>·</span>
         <Link to='/keyboard-shortcuts'>
-          <FormattedMessage
-            id='keyboard_shortcuts.heading'
-            defaultMessage='Keyboard Shortcuts'
-          />
-        </Link>
-      </footer>
+            <FormattedMessage
+              id='keyboard_shortcuts.heading'
+              defaultMessage='Keyboard Shortcuts'
+            />
+          </Link>
+        </footer>
+      )}
 
       {trendMenuOpen && (
         <div

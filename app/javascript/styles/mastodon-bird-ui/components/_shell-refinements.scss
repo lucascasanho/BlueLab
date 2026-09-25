@@ -1,0 +1,116 @@
+// Bird UI shell refinements inspired by BlueLab's softer chrome.
+body[data-theme='mastodon-bird-ui-auto'] {
+  --bird-ui-shell-border: rgb(56 56 77 / 55%);
+  --bird-ui-shell-border-soft: rgb(56 56 77 / 38%);
+  --bird-ui-shell-radius: 12px;
+
+  // Keep the separators at 1px, but reduce their visual weight with
+  // transparency instead of changing the theme's global border token.
+  .columns-area__panels__main > div {
+    border-color: var(--bird-ui-shell-border) !important;
+  }
+
+  .column > .scrollable {
+    border-width: 1px;
+    border-color: var(--bird-ui-shell-border) !important;
+    border-radius: var(--bird-ui-shell-radius) !important;
+  }
+
+  // Advanced web interface: soften the vertical column dividers and give
+  // each column a rounded content surface.
+  &.layout-multiple-columns {
+    .column {
+      border-inline-end: 1px solid var(--bird-ui-shell-border-soft) !important;
+    }
+
+    .column > .scrollable {
+      border-color: var(--bird-ui-shell-border) !important;
+      border-radius: var(--bird-ui-shell-radius) !important;
+    }
+  }
+
+  // Advanced Bird UI owns the navigation footer. Hide legacy footer mounts
+  // inside the Bird UI navigation panel and any multi-column LinkFooter.
+  &.layout-multiple-columns {
+    // Advanced Bird UI owns the footer. Do not allow legacy footer mounts from
+    // the multiple-column shell to appear alongside it.
+    footer:not([data-bird-ui-footer='true']) {
+      display: none !important;
+    }
+
+    // The profile card is part of the Bird UI navigation shell. Contain every
+    // layer of the widget so long names, borders, and focus/hover states cannot
+    // escape the navigation column.
+    .navigation-panel--bird-ui {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow-x: hidden;
+    }
+
+    .navigation-panel--bird-ui > .bird-ui-profile-slot {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      padding-inline: 10px;
+      overflow: hidden;
+    }
+
+    .navigation-panel--bird-ui > .bird-ui-profile-slot > * {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    .navigation-panel--bird-ui > .bird-ui-profile-slot button {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
+    }
+  }
+
+  &.layout-single-column {
+    @media screen and (width >= 760px) {
+      .column > .scrollable,
+      .tabs-bar__wrapper .column-header,
+      .tabs-bar__wrapper .column-back-button,
+      .explore__search-header,
+      .column-search-header {
+        border-color: var(--bird-ui-shell-border) !important;
+        border-radius: var(--bird-ui-shell-radius) !important;
+      }
+    }
+  }
+}
+
+
+// Bird UI desktop right rail: reuse the BlueLab rail without affecting
+// mobile/tablet layouts that do not have enough horizontal space.
+.bird-ui-right-rail {
+  box-sizing: border-box;
+  order: 3;
+  width: 300px;
+  min-width: 300px;
+  height: 100dvh;
+  min-height: 0;
+}
+
+@media screen and (max-width: 1279px) {
+  .bird-ui-right-rail {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 1280px) {
+  // The legacy compositional pane is only a mobile compose host. Bird UI
+  // now has its compose action in the right rail, so do not reserve an
+  // empty desktop flex item for the old host.
+  .layout-single-column .columns-area__panels__pane--compositional {
+    display: none;
+  }
+}

@@ -59,6 +59,11 @@ import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
 import { AnnualReportNavItem } from '../annual_report/nav_item';
 
+import { Blue2AccountMenu } from '../blue2/account_menu';
+import { Blue2ComposeButton } from '../blue2/navigation';
+import { Blue2FooterLinks } from '../blue2/footer';
+import { Blue2MessageIcon } from '../blue2/icons';
+
 import { DisabledAccountBanner } from './components/disabled_account_banner';
 import { FollowedTagsPanel } from './components/followed_tags_panel';
 import { ListPanel } from './components/list_panel';
@@ -238,6 +243,9 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
   const account = useAccount(me);
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const isBirdUi =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'mastodon-bird-ui-auto';
   const instanceLogo = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
   const composerEditor = useAppSelector(selectComposerEditor);
   const dispatch = useAppDispatch();
@@ -271,7 +279,9 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
 
   return (
     <nav
-      className='navigation-panel'
+      className={classNames('navigation-panel', {
+        'navigation-panel--bird-ui': isBirdUi,
+      })}
       aria-label={intl.formatMessage(messages.main)}
     >
       <div className='navigation-panel__logo'>
@@ -294,16 +304,16 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
         </Link>
       </div>
 
-      {showSearch && <Search singleColumn />}
+      {showSearch && !isBirdUi && <Search singleColumn />}
 
-      {!multiColumn && <ProfileCard />}
+      {!multiColumn && !isBirdUi && <ProfileCard />}
 
       {banner && <div className='navigation-panel__banner'>{banner}</div>}
 
       <ul className='navigation-panel__menu'>
         {signedIn && (
           <>
-            {!multiColumn && (
+            {!multiColumn && !isBirdUi && (
               <li>
                 <button
                   type='button'
@@ -424,8 +434,8 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
               <ColumnLink
                 transparent
                 to='/conversations'
-                icon='at'
-                iconComponent={AlternateEmailIcon}
+                icon={isBirdUi ? 'message' : 'at'}
+                iconComponent={isBirdUi ? Blue2MessageIcon : AlternateEmailIcon}
                 text={intl.formatMessage(messages.direct)}
               />
             </li>
@@ -467,9 +477,21 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
         )}
       </ul>
 
+      {isBirdUi && signedIn && (
+        <Blue2ComposeButton className='bird-ui-compose-button' />
+      )}
+
       <div className='flex-spacer' />
 
-      <Trends />
+      {!isBirdUi && <Trends />}
+
+      {isBirdUi && signedIn && (
+        <div className='bird-ui-profile-slot'>
+          <Blue2AccountMenu variant='navigationPanel' />
+        </div>
+      )}
+
+      {isBirdUi && <Blue2FooterLinks />}
     </nav>
   );
 };

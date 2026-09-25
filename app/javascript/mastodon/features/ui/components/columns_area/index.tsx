@@ -3,6 +3,8 @@ import { useCallback } from 'react';
 import classNames from 'classnames';
 
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
+import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
 import { Header } from '@/mastodon/features/custom_homepage/components/header';
 import { CollapsibleNavigationPanel } from '@/mastodon/features/navigation_panel';
@@ -17,6 +19,7 @@ import {
 
 import { MultiColumnContent } from './multi_column_content';
 import { ColumnsAreaRedesign } from './redesign';
+import { ColumnsAreaMastodon5 } from '../../../mastodon5';
 
 const TabsBarPortal = () => {
   const { setTabsBarElement } = useColumnsContext();
@@ -53,6 +56,9 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
   const useBlueLabComposer = useAppSelector(
     (state) => state.compose.get('composer_editor') !== 'mastodon',
   );
+  const isBirdUi =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'mastodon-bird-ui-auto';
 
   if (minimalShell) {
     return (
@@ -84,7 +90,11 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
           </div>
         </div>
 
-        {useBlueLabComposer && <ComposeRedesignButton />}
+        {isBirdUi ? (
+          <ComposeRedesignButton hostOnly />
+        ) : (
+          useBlueLabComposer && <ComposeRedesignButton />
+        )}
 
         <main className='columns-area__panels__main'>
           <div className='tabs-bar__wrapper'>
@@ -94,7 +104,14 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
           <div className='columns-area columns-area--mobile'>{children}</div>
         </main>
 
+        {isBirdUi && (
+          <aside className='bird-ui-right-rail'>
+            <Blue2RightRail variant='birdUi' />
+          </aside>
+        )}
+
         <CollapsibleNavigationPanel />
+        {isBirdUi && <Blue2ScrollToTop />}
       </div>
     );
   }
@@ -106,16 +123,21 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
       tabIndex={isModalOpen ? undefined : 0}
     >
       <MultiColumnContent>{children}</MultiColumnContent>
+      {/* Bird UI advanced interface intentionally has no scroll-to-top control. */}
     </main>
   );
 };
 
 export const ColumnsArea: React.FC<ColumnsAreaProps> = (props) => {
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const theme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
 
-  if (isBlue2) {
+  if (theme === 'blue-2') {
     return <ColumnsAreaRedesign {...props} />;
+  }
+
+  if (theme === 'mastodon-5') {
+    return <ColumnsAreaMastodon5 {...props} />;
   }
 
   return <ColumnsAreaLegacy {...props} />;

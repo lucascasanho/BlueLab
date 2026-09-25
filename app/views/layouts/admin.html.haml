@@ -5,6 +5,8 @@
 
 - content_for :body_classes, 'admin'
 - blue2_theme = current_theme == 'blue-2'
+- mastodon5_theme = current_theme == 'mastodon-5'
+- mastodon5_preferences_page = mastodon5_theme && request.path.start_with?('/settings/preferences')
 
 - content_for :content do
   - mobile_page_title = strip_tags(content_for(:page_title)).to_s.strip
@@ -17,6 +19,10 @@
             = link_to root_path, class: 'blue2-admin-brand' do
               = image_tag(instance_presenter.auth_logo&.file&.url || favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png'), alt: '')
               %span= Setting.site_title
+          - elsif mastodon5_theme
+            - unless mastodon5_preferences_page
+              = link_to root_path, class: 'mastodon5-admin-brand' do
+                = image_tag(instance_presenter.auth_logo&.file&.url || favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png'), class: 'mastodon5-admin-logo', alt: '')
           - else
             = link_to root_path do
               = render_logo
@@ -27,6 +33,9 @@
                 - if blue2_theme
                   = image_tag(instance_presenter.auth_logo&.file&.url || favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png'), alt: '')
                   %span= Setting.site_title
+                - elsif mastodon5_theme
+                  - unless mastodon5_preferences_page
+                    = image_tag(instance_presenter.auth_logo&.file&.url || favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png'), class: 'mastodon5-admin-logo', alt: '')
                 - else
                   = logo_as_symbol(:wordmark)
 

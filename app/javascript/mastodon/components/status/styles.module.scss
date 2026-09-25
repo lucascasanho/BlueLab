@@ -273,3 +273,41 @@
 .actionsButtonGap {
   margin-inline-end: auto;
 }
+
+
+/* Bird UI: use the exact star artwork from the working detailed-status control. */
+:global(body[data-theme='mastodon-bird-ui-auto']) .favouriteButton
+  .favourite-animation-target {
+  --favourite-star-image: var(--icon-star-detailed-status-action-bar);
+  box-sizing: border-box;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  flex: 0 0 18px;
+  margin: 0;
+  background-image: var(--favourite-star-image) !important;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 18px 18px;
+}
+
+:global(body[data-theme='mastodon-bird-ui-auto'])
+  .favouriteButton
+  .favourite-animation-target
+  > .icon {
+  width: 18px !important;
+  height: 18px !important;
+  opacity: 0 !important;
+}
+
+:global(body[data-theme='mastodon-bird-ui-auto'])
+  .favouriteButton[aria-pressed='true']
+  .favourite-animation-target {
+  --favourite-star-image: var(--icon-star-detailed-status-action-bar-active);
+}
+
+:global(body[data-theme='mastodon-bird-ui-auto'])
+  .favouriteButton[aria-pressed='true'] {
+  color: var(--color-yellow) !important;
+}

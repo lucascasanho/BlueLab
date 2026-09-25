@@ -38,9 +38,11 @@ import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 
 import classes from './account_menu.module.scss';
 
-export const Blue2AccountMenu: React.FC<{ compact?: boolean }> = ({
-  compact,
-}) => {
+export const Blue2AccountMenu: React.FC<{
+  compact?: boolean;
+  className?: string;
+  variant?: 'rightRail' | 'navigationPanel';
+}> = ({ compact, className, variant }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const { accountId, permissions } = useIdentity();
@@ -93,11 +95,16 @@ export const Blue2AccountMenu: React.FC<{ compact?: boolean }> = ({
   });
   const isRtl =
     typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
-  const menuPlacement = compactNavigation
-    ? isRtl
-      ? 'left-start'
-      : 'right-start'
-    : 'bottom-start';
+  const menuPlacement =
+    variant === 'navigationPanel'
+      ? isRtl
+        ? 'top-end'
+        : 'top-start'
+      : compactNavigation
+        ? isRtl
+          ? 'left-start'
+          : 'right-start'
+        : 'bottom-start';
 
   const menuContent = (
     <>
@@ -247,7 +254,15 @@ export const Blue2AccountMenu: React.FC<{ compact?: boolean }> = ({
   );
 
   return (
-    <div className={classNames(classes.root, compact && classes.rootCompact)}>
+    <div
+      className={classNames(
+        classes.root,
+        compact && classes.rootCompact,
+        variant === 'rightRail' && classes.rightRailProfile,
+        variant === 'navigationPanel' && classes.navigationPanelProfile,
+        className,
+      )}
+    >
       <button
         ref={setAnchor}
         type='button'
@@ -302,7 +317,10 @@ export const Blue2AccountMenu: React.FC<{ compact?: boolean }> = ({
           {({ props: popoverProps }) => (
             <div
               {...popoverProps}
-              className={classes.menu}
+              className={classNames(
+                classes.menu,
+                variant === 'navigationPanel' && classes.navigationPanelMenu,
+              )}
               role='menu'
               onPointerDown={stopMenuEventPropagation}
             >

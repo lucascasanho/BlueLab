@@ -161,6 +161,7 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
         leadingIconWrapperClassName='favourite-animation-target'
         onClick={handleFavouriteClick}
         className={classNames(
+          classes.favouriteButton,
           'star-icon',
           !onlyResponses && classes.actionsButtonGap,
         )}

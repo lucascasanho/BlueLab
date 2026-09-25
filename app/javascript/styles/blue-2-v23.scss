@@ -1,0 +1,102 @@
+@use 'blue-2-v21';
+
+/*
+ * BlueLab settings navigation refinement.
+ *
+ * Scope: Blue 2 theme only.
+ * The Rails Simple Navigation tree uses nested <ul>/<li> elements and marks
+ * the current leaf with .simple-navigation-active-leaf. Some releases also
+ * expose .selected, so both states are supported here.
+ *
+ * The hierarchy is intentionally generic: Preferences, Security, Data,
+ * Moderation and Administration all receive the same treatment.
+ */
+body[data-theme='blue-2'] {
+  .admin-wrapper .sidebar nav {
+    > ul {
+      > li > a {
+        margin: 2px 0;
+        padding: 12px 14px;
+        border-radius: 10px;
+        color: var(--blue2-text);
+        font-weight: 600;
+      }
+
+      /*
+       * A section containing the current page remains visibly contextual,
+       * but is quieter than the actual current destination.
+       */
+      li:has(> ul .simple-navigation-active-leaf) > a,
+      li:has(> ul .selected) > a {
+        color: var(--blue2-text) !important;
+        font-weight: 700;
+      }
+
+      /*
+       * Every submenu is visually subordinate to its parent. This is generic
+       * rather than tied to one menu id, so moderation/admin submenus are
+       * treated the same way as Preferences submenus.
+       */
+      li > ul {
+        margin: 2px 0 8px;
+        padding: 3px 0 3px 14px;
+        border-inline-start: 1px solid var(--blue2-border-soft);
+      }
+
+      li > ul a {
+        min-height: 36px;
+        margin: 1px 0;
+        padding: 8px 12px 8px 16px;
+        border-radius: 8px;
+        color: var(--blue2-muted) !important;
+        font-size: 13px;
+        font-weight: 550;
+      }
+
+      li > ul a:hover,
+      li > ul a:focus-visible {
+        background: var(--blue2-hover);
+        color: var(--blue2-text) !important;
+      }
+
+      /*
+       * The active leaf is the only navigation item that gets the full
+       * selected treatment. This makes the open page immediately obvious.
+       */
+      li.simple-navigation-active-leaf > a,
+      li > a.selected {
+        background: var(--blue2-surface-raised);
+        color: var(--blue2-blue) !important;
+        font-weight: 700;
+        box-shadow: inset 3px 0 0 var(--blue2-blue);
+      }
+
+      /*
+       * Preserve the semantic warning color when the software-update entry
+       * happens to be the active leaf.
+       */
+      li.warning.simple-navigation-active-leaf > a,
+      li.warning > a.selected {
+        color: var(--color-text-warning) !important;
+        box-shadow: inset 3px 0 0 var(--color-text-warning);
+      }
+
+      /*
+       * Nested admin/moderation trees get one additional level of indentation
+       * without becoming visually dense.
+       */
+      li > ul li > ul {
+        margin-top: 1px;
+        margin-bottom: 5px;
+        padding-inline-start: 12px;
+      }
+
+      li > ul li > ul a {
+        min-height: 34px;
+        padding-top: 7px;
+        padding-bottom: 7px;
+        font-size: 12.5px;
+      }
+    }
+  }
+}

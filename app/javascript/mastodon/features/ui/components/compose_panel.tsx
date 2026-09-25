@@ -19,6 +19,9 @@ export const ComposePanel: React.FC<{ showComposer?: boolean }> = ({
   showComposer = true,
 }) => {
   const dispatch = useAppDispatch();
+  const isBirdUi =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'mastodon-bird-ui-auto';
   const handleFocus = useCallback(() => {
     if (showComposer) {
       dispatch(changeComposing(true));
@@ -66,7 +69,9 @@ export const ComposePanel: React.FC<{ showComposer?: boolean }> = ({
 
       {!showComposer && <div className='flex-spacer' />}
 
-      <LinkFooter context={singleColumn ? 'default' : 'multi-column'} />
+      {!isBirdUi && (
+        <LinkFooter context={singleColumn ? 'default' : 'multi-column'} />
+      )}
     </div>
   );
 };

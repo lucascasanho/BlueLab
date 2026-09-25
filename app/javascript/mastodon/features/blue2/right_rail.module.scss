@@ -354,3 +354,11 @@
     width: 270px;
   }
 }
+
+
+:global(body[data-theme='mastodon-bird-ui-auto']) .root.birdUiVariant {
+  .feeds,
+  .footer {
+    display: none;
+  }
+}

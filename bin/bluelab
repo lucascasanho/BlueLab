@@ -123,14 +123,28 @@ capturar_configuracoes() {
   [[ -s "$destino" ]] || falhar "não foi possível registrar limites/cores do painel"
 }
 
+restaurar_configuracoes() {
+  local origem="$1"
+  local codigo='require "json"; data=JSON.parse(File.read(ENV.fetch("BLUELAB_ARQUIVO_CONFIG"))); Setting.transaction { data.each { |k, v| Setting.public_send("#{k}=", v) } }'
+  BLUELAB_ARQUIVO_CONFIG="$origem" env RAILS_ENV=production bundle exec rails runner "$codigo" >/dev/null
+}
+
 comparar_configuracoes() {
   local antes="$1" depois="$2"
   if ! cmp -s "$antes" "$depois"; then
-    echo "As configurações administrativas mudaram durante a atualização:" >&2
+    echo "As configurações administrativas mudaram durante a atualização; restaurando os valores anteriores..." >&2
     diff -u "$antes" "$depois" || true
-    falhar "limites, cores ou outra configuração protegida não foi preservada"
+    restaurar_configuracoes "$antes" || falhar "não foi possível restaurar as configurações administrativas protegidas"
+
+    local restaurado="$DIR_ESTADO/configuracoes-restauradas-${ALVO}.json"
+    capturar_configuracoes "$restaurado"
+    if ! cmp -s "$antes" "$restaurado"; then
+      echo "A configuração restaurada ainda diverge do estado anterior:" >&2
+      diff -u "$antes" "$restaurado" || true
+      falhar "limites, cores ou outra configuração protegida não foi preservada"
+    fi
   fi
-  echo "Limites e cores do painel: preservados."
+  echo "Limites, cores e demais configurações protegidas: preservados."
 }
 
 alinhar_codigo() {
@@ -392,14 +406,33 @@ atualizar() {
 promover() {
   [[ "$ALVO" == blue ]] || falhar "promoção só pode ser executada no mastodon.blue"
   preparar_git
-  local teste estavel local_head implantado merge_base tree_estavel tree_base promovido
-  teste="$(git rev-parse "$REMOTO/$CANAL_TESTE")"
+  local teste_atual teste estavel local_head implantado merge_base tree_estavel tree_base promovido
+  teste_atual="$(git rev-parse "$REMOTO/$CANAL_TESTE")"
   estavel="$(git rev-parse "$REMOTO/$CANAL_ESTAVEL")"
   local_head="$(git rev-parse HEAD)"
   implantado="$(cat "$DIR_ESTADO/ultimo-implantado-blue.sha" 2>/dev/null || true)"
 
-  [[ "$local_head" == "$teste" ]] || falhar "o Blue não está no HEAD atual de $CANAL_TESTE"
-  [[ "$implantado" == "$teste" ]] || falhar "$CANAL_TESTE mudou desde o último teste; atualize e teste novamente"
+  # O SHA registrado como último implantado/testado é a fonte de verdade para
+  # promoção. Isso permite que GitHub avance a BlueLab-Test sem promover
+  # acidentalmente commits que ainda não passaram pelo teste no Blue.
+  if [[ -n "$implantado" ]] &&
+     git cat-file -e "$implantado^{commit}" 2>/dev/null &&
+     git merge-base --is-ancestor "$implantado" "$teste_atual" 2>/dev/null; then
+    teste="$implantado"
+
+    if [[ "$teste" != "$teste_atual" ]]; then
+      echo
+      echo "BlueLab-Test avançou após o último teste."
+      echo "  Último SHA realmente testado: $teste"
+      echo "  Ponta atual do canal de teste: $teste_atual"
+      echo "A promoção usará somente o SHA que foi testado no Blue."
+    fi
+  else
+    teste="$teste_atual"
+    [[ "$local_head" == "$teste_atual" ]] || falhar "o Blue não está no HEAD atual de $CANAL_TESTE e não há um SHA testado válido para promover"
+    [[ "$implantado" == "$teste_atual" ]] || falhar "$CANAL_TESTE mudou desde o último teste; atualize e teste novamente"
+  fi
+
   [[ -z "$(git status --porcelain=v1)" ]] || falhar "há alterações locais"
   executar git diff --check "$teste"
 
