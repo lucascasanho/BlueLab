@@ -57,6 +57,7 @@ export const ComposeUpload: React.FC<{
       attachment={attachment}
       className={classNames(className, classes.mediaUpload)}
       sensitive={sensitive}
+      animateGifv
     >
       {sensitive && attachment.blurhash && (
         <Blurhash hash={attachment.blurhash} className={classes.blurHash} />
