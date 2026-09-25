@@ -31,26 +31,3 @@ body[data-theme='blue-2'] {
     border-radius: inherit;
   }
 }
-
-
-/*
- * Favourite icon refinement.
- *
- * The redesign action bar uses the same star artwork as the detailed post
- * view, but its icon slot is slightly larger than the other action glyphs.
- */
-body[data-theme='blue-2'] {
-  .status__action-bar .star-icon > .icon {
-    width: 18px;
-    height: 18px;
-  }
-
-  .status__action-bar .star-icon[aria-pressed='true'] {
-    --fg: var(--color-yellow);
-    color: var(--color-yellow);
-  }
-
-  .detailed-status__action-bar .star-icon.active {
-    color: var(--color-yellow);
-  }
-}

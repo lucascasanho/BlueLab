@@ -9,12 +9,11 @@ import {
   BookmarkSimpleIcon,
   ChatCircleIcon,
   DotsThreeIcon,
+  HeartIcon,
   QuotesIcon,
   ShareFatIcon,
+  StarIcon,
 } from '@phosphor-icons/react';
-
-import StarIcon from '@/material-icons/400-24px/star-fill.svg?react';
-import StarBorderIcon from '@/material-icons/400-24px/star.svg?react';
 
 import { statusInteraction } from '@/mastodon/actions/interactions';
 import { fetchStatus } from '@/mastodon/actions/statuses';
@@ -108,7 +107,13 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   }, [contextType, dispatch, statusId]);
 
   const intl = useIntl();
-  const favouriteIcon = status?.favourited ? StarIcon : StarBorderIcon;
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const FavouriteIcon = isBlue2 ? StarIcon : HeartIcon;
+  const favouriteIcon = useIconWeight(
+    FavouriteIcon,
+    status?.favourited && 'fill',
+  );
   const bookmarkIcon = useIconWeight(
     BookmarkSimpleIcon,
     status?.bookmarked && 'fill',
@@ -153,10 +158,7 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
         title={favouriteTitle}
         leadingIcon={favouriteIcon}
         onClick={handleFavouriteClick}
-        className={classNames(
-          'star-icon',
-          !onlyResponses && classes.actionsButtonGap,
-        )}
+        className={classNames(!onlyResponses && classes.actionsButtonGap)}
       >
         {withCounters && status.favourites_count}
       </ToggleButton>
