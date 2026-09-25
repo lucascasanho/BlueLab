@@ -53,5 +53,23 @@ RSpec.describe 'API V1 Conversations' do
         end
       end
     end
+  describe 'GET /api/v1/conversations/:id/messages', :inline_jobs do
+    it 'returns all messages for matching participants' do
+      first = PostStatusService.new.call(other.account, text: 'First @alice', visibility: 'direct')
+      second = PostStatusService.new.call(other.account, text: 'Second @alice', visibility: 'direct')
+
+      conversation = AccountConversation.where(account: user.account).find do |item|
+        item.participant_account_ids.include?(other.account.id)
+      end
+
+      expect(conversation).to be_present
+
+      get "/api/v1/conversations/#{conversation.id}/messages", headers: headers
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body.map { |status| status[:id] }).to eq([first.id.to_s, second.id.to_s])
+    end
+  end
+
   end
 end
