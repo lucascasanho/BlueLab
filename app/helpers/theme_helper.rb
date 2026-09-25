@@ -70,6 +70,17 @@ module ThemeHelper
         #{logo_token}
         --color-bg-brand-base: #{accent};
         --color-bg-brand-base-hover: color-mix(in srgb, #{accent}, black 15%);
+
+        // Legacy semantic aliases used by Bird UI and older Mastodon controls.
+        // They intentionally resolve to the administrator-selected instance accent.
+        --color-brand-mastodon: #{accent};
+        --color-brand-mastodon-links: #{accent};
+        --color-accent: #{accent};
+        --color-accent-dark: #{accent};
+        --color-accent-dark-50: color-mix(in srgb, #{accent}, transparent 50%);
+        --color-hashtag: #{accent};
+        --color-mention: #{accent};
+        --color-link: #{accent};
         --color-bg-brand-soft: color-mix(in srgb, #{accent}, transparent 85%);
         --color-bg-brand-softest: color-mix(in srgb, #{accent}, transparent 90%);
       }

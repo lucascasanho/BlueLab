@@ -51,6 +51,10 @@ body[data-theme='mastodon-bird-ui-auto'] {
     .favourite-animation-target,
   .status__action-bar button.star-icon[aria-pressed='true']
     .favourite-animation-target > svg,
+  .status__action-bar button.star-icon[aria-pressed='true']
+    .favourite-animation-target > .icon,
+  .detailed-status__action-bar .icon-button.star-icon.active,
+  .detailed-status__action-bar .icon-button.star-icon.active .icon,
   .detailed-status__action-bar .icon-button.star-icon.active .icon-star {
     color: var(--color-yellow) !important;
   }
