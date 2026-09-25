@@ -150,6 +150,8 @@ body[data-theme='mastodon-bird-ui-auto'] button.star-icon
   color: var(--color-dim) !important;
 }
 
+body[data-theme='mastodon-bird-ui-auto']
+  button.star-icon.active .favourite-animation-target,
 body[data-theme='mastodon-bird-ui-auto'] button.star-icon[aria-pressed='true']
   .favourite-animation-target {
   background-image: var(
