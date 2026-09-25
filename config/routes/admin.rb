@@ -148,6 +148,15 @@ namespace :admin do
 
   resources :report_notes, only: [:create, :destroy]
 
+  resources :bug_reports, only: [:index, :show] do
+    member do
+      post :assign_to_self
+      post :unassign
+      post :reopen
+      post :resolve
+    end
+  end
+
   resources :accounts, only: [:index, :show, :destroy], concerns: :batch do
     member do
       post :enable
