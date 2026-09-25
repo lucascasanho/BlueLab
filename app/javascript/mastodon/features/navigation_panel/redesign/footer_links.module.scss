@@ -38,7 +38,8 @@
     gap: var(--space-2);
   }
 
-  a {
+  a,
+  .bugReportButton {
     color: var(--blue2-muted, #9aa8b4);
     text-decoration: none;
 
