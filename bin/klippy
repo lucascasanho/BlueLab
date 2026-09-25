@@ -180,7 +180,7 @@ else
 fi
 
 unset KLIPY_KEY
-KLIPY_KEY="$(sed -n 's/^data-urlencode = "key:\(.*\)"$/\1/p' "$CURL_CONFIG")"
+KLIPY_KEY="$(sed -n 's/^data-urlencode = "key=\(.*\)"$/\1/p' "$CURL_CONFIG")"
 rm -f "$CURL_CONFIG" "$CURL_RESPONSE"
 [ -n "$KLIPY_KEY" ] || falhar "não consegui recuperar a chave validada"
 
