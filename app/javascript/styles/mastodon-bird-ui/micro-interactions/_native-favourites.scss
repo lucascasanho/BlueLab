@@ -37,15 +37,15 @@
     color: var(--color-dim);
   }
 
-  // The redesigned timeline action uses the same 18px star artwork and
-  // yellow active asset as the working detailed-post action bar. Keep the
-  // native animation target as the element that rotates.
+  // The redesigned timeline action keeps a compact 28px hit area around the
+  // 18px glyph. Show the actual Phosphor SVG instead of hiding it behind the
+  // legacy Bird UI icon replacement layer.
   .status__action-bar button.star-icon {
     box-sizing: border-box;
-    min-width: 32px !important;
-    width: 32px !important;
-    min-height: 32px !important;
-    height: 32px !important;
+    min-width: 28px !important;
+    width: 28px !important;
+    min-height: 28px !important;
+    height: 28px !important;
     padding: 0 !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -64,22 +64,9 @@
     min-width: 18px;
     min-height: 18px;
     margin: 0 !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-    background-size: 18px 18px !important;
-    background-image: var(--icon-star-detailed-status-action-bar) !important;
+    background-image: none !important;
   }
 
-  .status__action-bar button.star-icon[aria-pressed='true']
-    .favourite-animation-target {
-    background-image: var(
-      --icon-star-detailed-status-action-bar-active
-    ) !important;
-  }
-
-  // The Phosphor SVG stays in the DOM for accessibility/animation structure,
-  // but the visual is supplied by the same asset used by the working detail
-  // page star, avoiding Bird UI's legacy dim-color override.
   .status__action-bar button.star-icon .favourite-animation-target > .icon {
     box-sizing: border-box;
     display: block !important;
@@ -88,8 +75,27 @@
     min-width: 18px !important;
     min-height: 18px !important;
     margin: 0 !important;
-    opacity: 0 !important;
+    opacity: 1 !important;
     background-image: none !important;
+    color: var(--color-dim) !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
+
+  .status__action-bar button.star-icon
+    .favourite-animation-target > .icon path {
+    display: block !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
+
+  .status__action-bar button.star-icon[aria-pressed='true']
+    .favourite-animation-target > .icon,
+  .status__action-bar button.star-icon[aria-pressed='true']
+    .favourite-animation-target > .icon path {
+    color: var(--color-yellow) !important;
+    fill: var(--color-yellow) !important;
+    stroke: var(--color-yellow) !important;
   }
 }
 

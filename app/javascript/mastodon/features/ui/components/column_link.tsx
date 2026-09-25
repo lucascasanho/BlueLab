@@ -66,6 +66,9 @@ export const ColumnLink: React.FC<{
     ) : (
       iconElement
     ));
+  // Use the same active calculation for the rendered class and the icon.
+  // This prevents NavLink's default prefix matching from leaving Home active
+  // while the user is actually on a public feed.
   const active = isActiveProp ? isActiveProp(match, location) : !!match;
 
   if (href) {
@@ -80,7 +83,8 @@ export const ColumnLink: React.FC<{
     return (
       <NavLink
         to={to}
-        className={className}
+        className={() => classNames(className, { active })}
+        activeClassName=''
         exact={exact}
         isActive={isActiveProp}
         {...other}
