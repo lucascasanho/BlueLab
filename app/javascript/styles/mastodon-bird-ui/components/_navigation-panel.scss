@@ -392,4 +392,28 @@
     margin: 0 0 52px;
   }
 
+
+  // Bird UI owns this navigation menu. Keep the DOM/source order instead of
+  // inheriting the legacy <li> ordering rules that were written for the old
+  // flat menu structure.
+  &.layout-single-column,
+  &.layout-multiple-columns {
+    .navigation-panel--bird-ui > .navigation-panel__menu > li {
+      order: 0 !important;
+      flex: 0 0 auto;
+    }
+
+    .navigation-panel--bird-ui {
+      overflow-x: hidden;
+    }
+
+    .navigation-panel--bird-ui > .bird-ui-profile-slot {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow: visible;
+    }
+  }
+
 }
