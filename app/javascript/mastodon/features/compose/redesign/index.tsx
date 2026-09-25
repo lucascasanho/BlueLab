@@ -40,6 +40,7 @@ import { ComposeReply } from './reply';
 import { RichComposeEditor } from './rich_editor';
 import { resolveComposeScrollTarget } from './scroll';
 import {
+  isMessageComposeType,
   selectComposeCanSubmit,
   selectComposeSensitive,
   selectComposeType,
@@ -79,6 +80,7 @@ export const RedesignComposeForm: React.FC<
   ...props
 }) => {
   const type = useAppSelector(selectComposeType);
+  const isMessage = isMessageComposeType(type);
   const rootSensitive = useAppSelector(selectComposeSensitive);
   const threadItems = useAppSelector(
     (state) => state.compose.get('thread_items') as ImmutableList<ThreadItem>,
@@ -155,7 +157,7 @@ export const RedesignComposeForm: React.FC<
       aria-labelledby={titleId}
       className={classNames(className, classes.root)}
     >
-      {(type === 'message' || type === 'replyPrivate') && (
+      {isMessage && (
         <div className={classes.background} />
       )}
 
@@ -193,7 +195,7 @@ export const RedesignComposeForm: React.FC<
           </ToggleButton>
         </div>
 
-        {type === 'message' && (
+        {isMessage && (
           <p className={classes.toolbarMessage}>
             <Icon id='lock-open' icon={LockSimpleOpenIcon} />
             <FormattedMessage
