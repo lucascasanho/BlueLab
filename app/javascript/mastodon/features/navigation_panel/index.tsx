@@ -279,7 +279,9 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
 
   return (
     <nav
-      className='navigation-panel'
+      className={classNames('navigation-panel', {
+        'navigation-panel--bird-ui': isBirdUi,
+      })}
       aria-label={intl.formatMessage(messages.main)}
     >
       <div className='navigation-panel__logo'>
