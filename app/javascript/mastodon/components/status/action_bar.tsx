@@ -114,7 +114,10 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   const intl = useIntl();
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
-  const FavouriteIcon = isBlue2 ? StarIcon : HeartIcon;
+  const isBirdUI =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'mastodon-bird-ui-auto';
+  const FavouriteIcon = isBlue2 || isBirdUI ? StarIcon : HeartIcon;
   const favouriteIcon = useIconWeight(
     FavouriteIcon,
     status?.favourited && 'fill',
