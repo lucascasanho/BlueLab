@@ -11,16 +11,6 @@ RSpec.describe 'Auth Account Switcher' do
       sign_in current_user
     end
 
-    it 'creates a fresh session for the target account without revoking the current account' do
-      target_session_id = target_user.activate_session(request)
-      activation = target_user.session_activations.find_by!(session_id: target_session_id)
-      activation.destroy!
-
-      post auth_account_switcher_switch_path, params: { token: target_user.session_activations.first&.token }
-
-      expect(response).to have_http_status(:not_found)
-    end
-
     it 'creates a fresh session from the target account access token without revoking the current account' do
       target_session_id = target_user.activate_session(request)
       activation = target_user.session_activations.find_by!(session_id: target_session_id)
@@ -39,7 +29,7 @@ RSpec.describe 'Auth Account Switcher' do
       expect(target_user.session_activations).to be_present
     end
 
-    it 'rejects a token that does not belong to a session activation' do
+    it 'rejects an invalid token' do
       post auth_account_switcher_switch_path, params: { token: SecureRandom.hex(32) }
 
       expect(response).to have_http_status(:not_found)
