@@ -85,8 +85,18 @@ const FireBirdComposeLauncher: React.FC = () => {
       aria-label='Write a new post'
     >
       <AvatarById accountId={accountId} size={40} />
-      <span>What is happening?</span>
-      <strong>Post</strong>
+      <span>
+        <FormattedMessage
+          id='compose_form.placeholder'
+          defaultMessage="What's happening?"
+        />
+      </span>
+      <strong>
+        <FormattedMessage
+          id='tabs_bar.publish'
+          defaultMessage='Post'
+        />
+      </strong>
     </button>
   );
 };
