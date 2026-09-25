@@ -271,46 +271,48 @@ const AccountSwitcherActions: React.FC<{
 }> = ({ variant }) => {
   const linkClass =
     variant === 'blue2' ? classes.action : classes.navigationAction;
-  const itemWrapper = variant === 'navigation' ? 'li' : 'div';
 
-  const Content = (
-    <>
-      <a
-        href='/auth/sign_in?account_switcher=1'
-        className={linkClass}
-        data-menu-item={variant === 'navigation' ? true : undefined}
-      >
-        <FormattedMessage
-          id='account_switcher.sign_in'
-          defaultMessage='Sign in to another account'
-        />
-      </a>
-
-      {registrationsOpen && (
-        <a
-          href='/auth/sign_up?account_switcher=1'
-          className={linkClass}
-          data-menu-item={variant === 'navigation' ? true : undefined}
-        >
-          <FormattedMessage
-            id='account_switcher.create'
-            defaultMessage='Create another account'
-          />
-        </a>
-      )}
-    </>
+  const signInLink = (
+    <a
+      href='/auth/sign_in?account_switcher=1'
+      className={linkClass}
+      data-menu-item={variant === 'navigation' ? true : undefined}
+    >
+      <FormattedMessage
+        id='account_switcher.sign_in'
+        defaultMessage='Sign in to another account'
+      />
+    </a>
   );
+
+  const createLink = registrationsOpen ? (
+    <a
+      href='/auth/sign_up?account_switcher=1'
+      className={linkClass}
+      data-menu-item={variant === 'navigation' ? true : undefined}
+    >
+      <FormattedMessage
+        id='account_switcher.create'
+        defaultMessage='Create another account'
+      />
+    </a>
+  ) : null;
 
   if (variant === 'navigation') {
     return (
       <>
-        <li>{Content.props.children[0]}</li>
-        {registrationsOpen && <li>{Content.props.children[2]}</li>}
+        <li>{signInLink}</li>
+        {createLink && <li>{createLink}</li>}
       </>
     );
   }
 
-  return <div>{Content}</div>;
+  return (
+    <div>
+      {signInLink}
+      {createLink}
+    </div>
+  );
 };
 
 export const AccountSwitcherMenuSection: React.FC<{
