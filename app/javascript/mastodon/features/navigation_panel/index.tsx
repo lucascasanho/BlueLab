@@ -59,6 +59,7 @@ import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
 import { AnnualReportNavItem } from '../annual_report/nav_item';
 
+import { Blue2AccountMenu } from '../blue2/account_menu';
 import { Blue2MessageIcon } from '../blue2/icons';
 import { Blue2FooterLinks } from '../blue2/footer';
 
@@ -300,7 +301,11 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
         </Link>
       </div>
 
-      {showSearch && <Search singleColumn />}
+      {isBirdUi && signedIn && (
+        <Blue2AccountMenu variant='navigationPanel' />
+      )}
+
+      {showSearch && !isBirdUi && <Search singleColumn />}
 
       {!multiColumn && !isBirdUi && <ProfileCard />}
 
