@@ -171,16 +171,6 @@ export const RedesignNavigationPanel: React.FC<{
                 defaultMessage='Explore'
               />
             </NavigationLink>
-            {isBlue2SlideOut && (
-              <>
-                <NavigationLink to='/favourites' iconComponent={StarIcon}>
-                  <FormattedMessage
-                    id='navigation_bar.favourites'
-                    defaultMessage='Favorites'
-                  />
-                </NavigationLink>
-              </>
-            )}
             <NavigationLink
               withSpaceAfter
               to='/public/local'
@@ -196,39 +186,6 @@ export const RedesignNavigationPanel: React.FC<{
                 />
               )}
             </NavigationLink>
-            {isBlue2SlideOut && (
-              <>
-                <NavigationLink
-                  to='/notifications'
-                  iconComponent={BellIcon}
-                  badgeCount={notificationsCount}
-                >
-                  <FormattedMessage
-                    id='tabs_bar.notifications'
-                    defaultMessage='Notifications'
-                  />
-                </NavigationLink>
-                <NavigationLink
-                  to='/conversations'
-                  iconComponent={ChatCircleDotsIcon}
-                >
-                  <FormattedMessage
-                    id='tabs_bar.messages'
-                    defaultMessage='Messages'
-                    description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
-                  />
-                </NavigationLink>
-                <NavigationLink
-                  to='/bookmarks'
-                  iconComponent={BookmarkSimpleIcon}
-                >
-                  <FormattedMessage
-                    id='tabs_bar.saved'
-                    defaultMessage='Saved'
-                  />
-                </NavigationLink>
-              </>
-            )}
             <ListSection
               id='custom-feeds'
               title={
@@ -320,8 +277,7 @@ export const RedesignNavigationPanel: React.FC<{
             )}
           </ul>
           <footer className={classes.footer} data-stuck={!isScrolledToBottom}>
-            {!isBlue2SlideOut && (
-              <ul className={classes.footerNav}>
+            <ul className={classes.footerNav}>
                 <NavigationLink
                   stacked
                   to='/notifications'
@@ -364,8 +320,7 @@ export const RedesignNavigationPanel: React.FC<{
                     defaultMessage='Saved'
                   />
                 </NavigationLink>
-              </ul>
-            )}
+            </ul>
             {mode === 'slide-out' ? (
               <NavigationAccountCardAndMenu inSlideOut />
             ) : (
