@@ -101,12 +101,12 @@ show-error
 get
 url = "https://api.klipy.com/v2/featured"
 output = "$CURL_RESPONSE"
-data-urlencode = "key:$KLIPY_KEY"
-data-urlencode = "country:BR"
-data-urlencode = "locale:pt_BR"
-data-urlencode = "contentfilter:high"
-data-urlencode = "media_filter:gif,tinygif"
-data-urlencode = "limit:1"
+data-urlencode = "key=$KLIPY_KEY"
+data-urlencode = "country=BR"
+data-urlencode = "locale=pt_BR"
+data-urlencode = "contentfilter=high"
+data-urlencode = "media_filter=gif,tinygif"
+data-urlencode = "limit=1"
 EOF
 
 echo
