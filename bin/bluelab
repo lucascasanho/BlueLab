@@ -123,14 +123,28 @@ capturar_configuracoes() {
   [[ -s "$destino" ]] || falhar "não foi possível registrar limites/cores do painel"
 }
 
+restaurar_configuracoes() {
+  local origem="$1"
+  local codigo='require "json"; data=JSON.parse(File.read(ENV.fetch("BLUELAB_ARQUIVO_CONFIG"))); Setting.transaction { data.each { |k, v| Setting.public_send("#{k}=", v) } }'
+  BLUELAB_ARQUIVO_CONFIG="$origem" env RAILS_ENV=production bundle exec rails runner "$codigo" >/dev/null
+}
+
 comparar_configuracoes() {
   local antes="$1" depois="$2"
   if ! cmp -s "$antes" "$depois"; then
-    echo "As configurações administrativas mudaram durante a atualização:" >&2
+    echo "As configurações administrativas mudaram durante a atualização; restaurando os valores anteriores..." >&2
     diff -u "$antes" "$depois" || true
-    falhar "limites, cores ou outra configuração protegida não foi preservada"
+    restaurar_configuracoes "$antes" || falhar "não foi possível restaurar as configurações administrativas protegidas"
+
+    local restaurado="$DIR_ESTADO/configuracoes-restauradas-${ALVO}.json"
+    capturar_configuracoes "$restaurado"
+    if ! cmp -s "$antes" "$restaurado"; then
+      echo "A configuração restaurada ainda diverge do estado anterior:" >&2
+      diff -u "$antes" "$restaurado" || true
+      falhar "limites, cores ou outra configuração protegida não foi preservada"
+    fi
   fi
-  echo "Limites e cores do painel: preservados."
+  echo "Limites, cores e demais configurações protegidas: preservados."
 }
 
 alinhar_codigo() {
