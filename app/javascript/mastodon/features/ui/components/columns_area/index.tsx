@@ -19,6 +19,7 @@ import {
 
 import { MultiColumnContent } from './multi_column_content';
 import { ColumnsAreaRedesign } from './redesign';
+import { ColumnsAreaMastodon5 } from '../../../mastodon5';
 
 const TabsBarPortal = () => {
   const { setTabsBarElement } = useColumnsContext();
@@ -128,11 +129,15 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
 };
 
 export const ColumnsArea: React.FC<ColumnsAreaProps> = (props) => {
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const theme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
 
-  if (isBlue2) {
+  if (theme === 'blue-2') {
     return <ColumnsAreaRedesign {...props} />;
+  }
+
+  if (theme === 'mastodon-5') {
+    return <ColumnsAreaMastodon5 {...props} />;
   }
 
   return <ColumnsAreaLegacy {...props} />;
