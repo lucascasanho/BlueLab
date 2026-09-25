@@ -599,7 +599,15 @@ export const RichComposeEditor: React.FC<{
   );
   const text = value ?? globalText;
   const contentType = contentTypeProp ?? globalContentType;
-  const isMarkdown = contentType === 'text/markdown';
+  const isBlueLabTheme =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'blue-2';
+  const forceMessageMarkdown =
+    isBlueLabTheme && ['message', 'replyPrivate'].includes(type);
+  const isMarkdown = forceMessageMarkdown || contentType === 'text/markdown';
+  const visibleCommands = forceMessageMarkdown
+    ? commands.filter(([command]) => inlineCommands.includes(command as InlineCommand))
+    : commands;
   const customEmojis = useCustomEmojis();
   const ref = useRef<HTMLDivElement>(null);
   const hiddenRef = useRef<HTMLTextAreaElement>(null);
@@ -649,6 +657,16 @@ export const RichComposeEditor: React.FC<{
   useEffect(() => {
     if (autoFocus && ref.current) focusAtEnd(ref.current);
   }, [autoFocus]);
+
+  useEffect(() => {
+    if (forceMessageMarkdown && contentType !== 'text/markdown') {
+      if (onContentTypeChange) {
+        onContentTypeChange('text/markdown');
+      } else {
+        dispatch(changeComposeContentType('text/markdown'));
+      }
+    }
+  }, [contentType, dispatch, forceMessageMarkdown, onContentTypeChange]);
 
   useEffect(() => {
     const editor = ref.current;
@@ -822,7 +840,7 @@ export const RichComposeEditor: React.FC<{
           role='toolbar'
           aria-label={intl.formatMessage(messages.toolbar)}
         >
-          {commands.map(([command, icon, message, value]) => {
+          {visibleCommands.map(([command, icon, message, value]) => {
             const stateKey = value ?? command;
             const active = activeFormats.has(stateKey);
             const label = intl.formatMessage(message);
