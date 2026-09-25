@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import api from '@/mastodon/api';
 import { Avatar } from '@/mastodon/components/avatar';
-import { Popover } from '@/mastodon/components/popover';
+import { MenuItemGroup } from '@/mastodon/components/menu';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
 import { getAccessToken, registrationsOpen } from '@/mastodon/initial_state';
+import api from '@/mastodon/api';
 
 import classes from './styles.module.scss';
 
@@ -97,18 +96,25 @@ const switchToStoredAccount = async (account: StoredAccount) => {
   window.location.assign(window.location.href);
 };
 
-export const AccountSwitcher: React.FC = () => {
-  const intl = useIntl();
+interface AccountSwitcherState {
+  signedIn: boolean;
+  accountId: string | null;
+  storedAccounts: StoredAccount[];
+  switchingId: string | null;
+  error: boolean;
+  switchAccount: (account: StoredAccount) => Promise<void>;
+  removeAccount: (event: React.MouseEvent, accountId: string) => void;
+}
+
+export const useAccountSwitcher = (): AccountSwitcherState => {
   const { signedIn, accountId } = useIdentity();
   const account = useAccount(accountId);
   const accessToken = getAccessToken();
 
   const [storedAccounts, setStoredAccounts] =
     useState<StoredAccount[]>(readStoredAccounts);
-  const [open, setOpen] = useState(false);
   const [switchingId, setSwitchingId] = useState<string | null>(null);
   const [error, setError] = useState(false);
-  const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (!signedIn || !account || !accountId || !accessToken) {
@@ -129,20 +135,9 @@ export const AccountSwitcher: React.FC = () => {
     setStoredAccounts(next);
   }, [accessToken, account, accountId, signedIn]);
 
-  const handleOpen = useCallback(() => {
-    setError(false);
-    setOpen((value) => !value);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setOpen(false);
-    anchor?.focus({ preventScroll: true });
-  }, [anchor]);
-
-  const handleSwitch = useCallback(
+  const switchAccount = useCallback(
     async (target: StoredAccount) => {
       if (target.id === accountId) {
-        setOpen(false);
         return;
       }
 
@@ -167,7 +162,7 @@ export const AccountSwitcher: React.FC = () => {
     [accountId],
   );
 
-  const handleRemove = useCallback(
+  const removeAccount = useCallback(
     (event: React.MouseEvent, targetId: string) => {
       event.stopPropagation();
 
@@ -180,163 +175,192 @@ export const AccountSwitcher: React.FC = () => {
     [accountId],
   );
 
-  if (!signedIn || !account || !accountId || !accessToken) {
+  return {
+    signedIn: !!signedIn,
+    accountId: accountId ?? null,
+    storedAccounts,
+    switchingId,
+    error,
+    switchAccount,
+    removeAccount,
+  };
+};
+
+const AccountList: React.FC<{
+  variant: 'blue2' | 'navigation';
+  state: AccountSwitcherState;
+}> = ({ variant, state }) => {
+  const { accountId, storedAccounts, switchingId, switchAccount, removeAccount } =
+    state;
+  const intl = useIntl();
+
+  return (
+    <>
+      {storedAccounts.map((storedAccount) => {
+        const active = storedAccount.id === accountId;
+        const label = storedAccount.displayName || storedAccount.username;
+
+        return (
+          <li
+            key={storedAccount.id}
+            className={
+              variant === 'blue2'
+                ? classes.accountRow
+                : classes.navigationAccountRow
+            }
+          >
+            <button
+              type='button'
+              className={
+                variant === 'blue2'
+                  ? classes.accountButton
+                  : classes.navigationAccountButton
+              }
+              data-menu-item={variant === 'navigation' ? true : undefined}
+              aria-current={active ? 'page' : undefined}
+              disabled={active || switchingId !== null}
+              onClick={() => {
+                void switchAccount(storedAccount);
+              }}
+            >
+              <Avatar
+                account={storedAccount}
+                size={variant === 'blue2' ? 34 : 32}
+              />
+              <span className={classes.accountText}>
+                <strong>{label}</strong>
+                <span>@{storedAccount.acct}</span>
+              </span>
+              {active && (
+                <span className={classes.current}>
+                  <FormattedMessage
+                    id='account_switcher.current'
+                    defaultMessage='Current'
+                  />
+                </span>
+              )}
+            </button>
+
+            {!active && (
+              <button
+                type='button'
+                className={classes.removeButton}
+                disabled={switchingId !== null}
+                aria-label={intl.formatMessage(
+                  {
+                    id: 'account_switcher.remove',
+                    defaultMessage:
+                      'Remove {account} from this device',
+                  },
+                  { account: label },
+                )}
+                onClick={(event) => removeAccount(event, storedAccount.id)}
+              >
+                ×
+              </button>
+            )}
+          </li>
+        );
+      })}
+    </>
+  );
+};
+
+const AccountSwitcherActions: React.FC<{
+  variant: 'blue2' | 'navigation';
+}> = ({ variant }) => {
+  const linkClass =
+    variant === 'blue2' ? classes.action : classes.navigationAction;
+  const itemWrapper = variant === 'navigation' ? 'li' : 'div';
+
+  const Content = (
+    <>
+      <a
+        href='/auth/sign_in?account_switcher=1'
+        className={linkClass}
+        data-menu-item={variant === 'navigation' ? true : undefined}
+      >
+        <FormattedMessage
+          id='account_switcher.sign_in'
+          defaultMessage='Sign in to another account'
+        />
+      </a>
+
+      {registrationsOpen && (
+        <a
+          href='/auth/sign_up?account_switcher=1'
+          className={linkClass}
+          data-menu-item={variant === 'navigation' ? true : undefined}
+        >
+          <FormattedMessage
+            id='account_switcher.create'
+            defaultMessage='Create another account'
+          />
+        </a>
+      )}
+    </>
+  );
+
+  if (variant === 'navigation') {
+    return <>{Content}</>;
+  }
+
+  return <div>{Content}</div>;
+};
+
+export const AccountSwitcherMenuSection: React.FC<{
+  variant: 'blue2' | 'navigation';
+}> = ({ variant }) => {
+  const state = useAccountSwitcher();
+  const { signedIn, storedAccounts, error } = state;
+
+  if (!signedIn) {
     return null;
   }
 
-  const accountLabel = intl.formatMessage({
-    id: 'account_switcher.label',
-    defaultMessage: 'Switch account',
-  });
-
-  const switcher = (
-    <div className={classes.root}>
-      <button
-        ref={setAnchor}
-        type='button'
-        className={classes.trigger}
-        aria-label={accountLabel}
-        aria-expanded={open}
-        aria-haspopup='menu'
-        onClick={handleOpen}
-      >
-        <Avatar account={account} size={40} />
-      </button>
-
-      {open && anchor && (
-        <Popover
-          isOpen={open}
-          onClose={handleClose}
-          reference={anchor}
-          placement='bottom-end'
-          strategy='fixed'
-          offset={8}
-        >
-          {({ props: popoverProps }) => (
-            <div
-              {...popoverProps}
-              className={classes.panel}
-              role='menu'
-              aria-label={accountLabel}
-            >
-              <div className={classes.header}>
-                <FormattedMessage
-                  id='account_switcher.title'
-                  defaultMessage='Accounts'
-                />
-                <span className={classes.count}>{storedAccounts.length}</span>
-              </div>
-
-              <div className={classes.accounts}>
-                {storedAccounts.map((storedAccount) => {
-                  const active = storedAccount.id === accountId;
-                  const label =
-                    storedAccount.displayName || storedAccount.username;
-
-                  return (
-                    <div
-                      key={storedAccount.id}
-                      className={classes.accountRow}
-                      role='none'
-                    >
-                      <button
-                        type='button'
-                        className={classes.accountButton}
-                        role='menuitem'
-                        aria-current={active ? 'page' : undefined}
-                        disabled={switchingId !== null}
-                        onClick={() => {
-                          void handleSwitch(storedAccount);
-                        }}
-                      >
-                        <img
-                          src={storedAccount.avatar}
-                          alt=''
-                          className={classes.avatar}
-                        />
-                        <span className={classes.accountText}>
-                          <strong>{label}</strong>
-                          <span>@{storedAccount.acct}</span>
-                        </span>
-                        {active && (
-                          <span className={classes.current}>
-                            <FormattedMessage
-                              id='account_switcher.current'
-                              defaultMessage='Current'
-                            />
-                          </span>
-                        )}
-                      </button>
-
-                      {!active && (
-                        <button
-                          type='button'
-                          className={classes.removeButton}
-                          disabled={switchingId !== null}
-                          aria-label={intl.formatMessage(
-                            {
-                              id: 'account_switcher.remove',
-                              defaultMessage:
-                                'Remove {account} from this device',
-                            },
-                            { account: label },
-                          )}
-                          onClick={(event) =>
-                            handleRemove(event, storedAccount.id)
-                          }
-                        >
-                          ×
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {error && (
-                <p className={classes.error} role='alert'>
-                  <FormattedMessage
-                    id='account_switcher.error'
-                    defaultMessage='This account session is no longer available. Sign in again to add it.'
-                  />
-                </p>
-              )}
-
-              <div className={classes.divider} />
-
-              <a
-                href='/auth/sign_in?account_switcher=1'
-                className={classes.action}
-                role='menuitem'
-                onClick={handleClose}
-              >
-                <FormattedMessage
-                  id='account_switcher.sign_in'
-                  defaultMessage='Sign in to another account'
-                />
-              </a>
-
-              {registrationsOpen && (
-                <a
-                  href='/auth/sign_up?account_switcher=1'
-                  className={classes.action}
-                  role='menuitem'
-                  onClick={handleClose}
-                >
-                  <FormattedMessage
-                    id='account_switcher.create'
-                    defaultMessage='Create another account'
-                  />
-                </a>
-              )}
-            </div>
-          )}
-        </Popover>
-      )}
-    </div>
+  const sectionLabel = (
+    <FormattedMessage id='account_switcher.title' defaultMessage='Accounts' />
   );
 
-  return typeof document !== 'undefined'
-    ? createPortal(switcher, document.body)
-    : switcher;
+  if (variant === 'navigation') {
+    return (
+      <MenuItemGroup label={sectionLabel}>
+        <AccountList variant='navigation' state={state} />
+        {error && (
+          <li className={classes.navigationError} role='alert'>
+            <FormattedMessage
+              id='account_switcher.error'
+              defaultMessage='This account session is no longer available. Sign in again to add it.'
+            />
+          </li>
+        )}
+        <AccountSwitcherActions variant='navigation' />
+      </MenuItemGroup>
+    );
+  }
+
+  return (
+    <div className={classes.section}>
+      <div className={classes.header}>
+        <span>{sectionLabel}</span>
+        <span className={classes.count}>{storedAccounts.length}</span>
+      </div>
+
+      <ul className={classes.accounts}>
+        <AccountList variant='blue2' state={state} />
+      </ul>
+
+      {error && (
+        <p className={classes.error} role='alert'>
+          <FormattedMessage
+            id='account_switcher.error'
+            defaultMessage='This account session is no longer available. Sign in again to add it.'
+          />
+        </p>
+      )}
+
+      <div className={classes.divider} />
+      <AccountSwitcherActions variant='blue2' />
+    </div>
+  );
 };
