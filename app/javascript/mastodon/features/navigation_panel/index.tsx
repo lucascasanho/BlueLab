@@ -59,6 +59,9 @@ import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
 import { AnnualReportNavItem } from '../annual_report/nav_item';
 
+import { Blue2MessageIcon } from '../blue2/icons';
+import { Blue2FooterLinks } from '../blue2/footer';
+
 import { DisabledAccountBanner } from './components/disabled_account_banner';
 import { FollowedTagsPanel } from './components/followed_tags_panel';
 import { ListPanel } from './components/list_panel';
@@ -238,6 +241,9 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
   const account = useAccount(me);
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const isBirdUi =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'mastodon-bird-ui-auto';
   const instanceLogo = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
   const composerEditor = useAppSelector(selectComposerEditor);
   const dispatch = useAppDispatch();
@@ -425,7 +431,7 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
                 transparent
                 to='/conversations'
                 icon='at'
-                iconComponent={AlternateEmailIcon}
+                iconComponent={isBirdUi ? Blue2MessageIcon : AlternateEmailIcon}
                 text={intl.formatMessage(messages.direct)}
               />
             </li>
@@ -470,6 +476,8 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
       <div className='flex-spacer' />
 
       <Trends />
+
+      {isBirdUi && <Blue2FooterLinks />}
     </nav>
   );
 };
