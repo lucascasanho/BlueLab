@@ -392,7 +392,7 @@ atualizar() {
 promover() {
   [[ "$ALVO" == blue ]] || falhar "promoção só pode ser executada no mastodon.blue"
   preparar_git
-  local teste estavel local_head implantado promovido
+  local teste estavel local_head implantado merge_base tree_estavel tree_base promovido
   teste="$(git rev-parse "$REMOTO/$CANAL_TESTE")"
   estavel="$(git rev-parse "$REMOTO/$CANAL_ESTAVEL")"
   local_head="$(git rev-parse HEAD)"
@@ -400,18 +400,58 @@ promover() {
 
   [[ "$local_head" == "$teste" ]] || falhar "o Blue não está no HEAD atual de $CANAL_TESTE"
   [[ "$implantado" == "$teste" ]] || falhar "$CANAL_TESTE mudou desde o último teste; atualize e teste novamente"
-  git merge-base --is-ancestor "$estavel" "$teste" || falhar "os canais divergiram; promoção automática não é segura"
   [[ -z "$(git status --porcelain=v1)" ]] || falhar "há alterações locais"
+  executar git diff --check "$teste"
 
   if [[ "$estavel" == "$teste" ]]; then
     echo "Canal $CANAL_ESTAVEL já está no SHA testado: $teste"
     return 0
   fi
 
-  executar git push "$REMOTO" "$teste:refs/heads/$CANAL_ESTAVEL"
+  if git merge-base --is-ancestor "$estavel" "$teste" 2>/dev/null; then
+    promovido="$teste"
+    echo "BlueLab-Test contém o canal estável; promoção fast-forward."
+  else
+    merge_base="$(git merge-base "$estavel" "$teste" 2>/dev/null || true)"
+    [[ -n "$merge_base" ]] || falhar "não foi possível determinar uma base comum entre os canais"
+
+    tree_estavel="$(git rev-parse "$estavel^{tree}")"
+    tree_base="$(git rev-parse "$merge_base^{tree}")"
+
+    if [[ "$tree_estavel" != "$tree_base" ]]; then
+      echo
+      echo "Os canais realmente divergiram em conteúdo:"
+      echo "  Canal estável : $estavel"
+      echo "  Canal de teste: $teste"
+      echo "  Base comum    : $merge_base"
+      falhar "o canal estável contém alterações que não fazem parte do canal testado; integração manual é necessária"
+    fi
+
+    echo "Os canais possuem histórico divergente, mas o canal estável conserva exatamente a árvore da base comum."
+    echo "Será criado um commit de promoção com os dois históricos, sem descartar o histórico do canal estável."
+
+    if ! promovido="$(
+      GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-BlueLab Promotor}" \
+      GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-bluelab-promotor@localhost}" \
+      GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-BlueLab Promotor}" \
+      GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-bluelab-promotor@localhost}" \
+      git commit-tree "$(git rev-parse "$teste^{tree}")" \
+        -p "$estavel" \
+        -p "$teste" \
+        -m "promote: BlueLab-Test -> BlueLab"
+    )"; then
+      falhar "não foi possível criar o commit de promoção"
+    fi
+
+    echo "Commit de promoção criado: $promovido"
+  fi
+
+  executar git push "$REMOTO" "$promovido:refs/heads/$CANAL_ESTAVEL"
   executar git fetch --prune "$REMOTO" "+refs/heads/$CANAL_ESTAVEL:refs/remotes/$REMOTO/$CANAL_ESTAVEL"
-  promovido="$(git rev-parse "$REMOTO/$CANAL_ESTAVEL")"
-  [[ "$promovido" == "$teste" ]] || falhar "o GitHub não confirmou $CANAL_ESTAVEL no SHA testado"
+
+  local confirmado
+  confirmado="$(git rev-parse "$REMOTO/$CANAL_ESTAVEL")"
+  [[ "$confirmado" == "$promovido" ]] || falhar "o GitHub não confirmou $CANAL_ESTAVEL no commit promovido"
 
   executar mkdir -p "$DIR_ESTADO"
   {
@@ -420,14 +460,15 @@ promover() {
     echo "SHA_PROMOVIDO=$promovido"
     echo "CANAL_ORIGEM=$CANAL_TESTE"
     echo "CANAL_DESTINO=$CANAL_ESTAVEL"
+    echo "PROMOCAO_COM_HISTORICO_DIVERGENTE=$([[ "$promovido" != "$teste" ]] && echo 1 || echo 0)"
   } >"$DIR_ESTADO/promocao-pronta.txt"
 
   echo "Promoção concluída."
-  echo "$CANAL_ESTAVEL agora aponta exatamente para o SHA testado: $promovido"
+  echo "$CANAL_ESTAVEL agora contém exatamente o código testado em $teste."
+  echo "SHA promovido: $promovido"
   echo "A Espelunca já pode executar 'bluelab' para receber esta versão."
   echo "Registro: $DIR_ESTADO/promocao-pronta.txt"
 }
-
 estado() {
   preparar_git
   printf '%-16s %s\n' "$CANAL_ESTAVEL" "$(git rev-parse "$REMOTO/$CANAL_ESTAVEL")"
