@@ -1,6 +1,6 @@
 import type React from 'react';
 import type { ReactNode } from 'react';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
@@ -174,9 +174,61 @@ const LoadingIcon: React.FC = () => (
 
 export const ToggleButton: React.FC<
   ButtonProps & { active?: boolean; animate?: boolean }
-> = ({ active, animate = false, className, ...props }) => {
+> = ({ active, animate = false, className, onClick, ...props }) => {
+  const [clickAnimation, setClickAnimation] = useState<
+    'activate' | 'deactivate' | null
+  >(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const animationTimeoutRef = useRef<number | null>(null);
   const previousActive = usePrevious(active) ?? active;
   const shouldAnimate = animate && active !== previousActive;
+
+  useEffect(
+    () => () => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      if (animationTimeoutRef.current !== null) {
+        window.clearTimeout(animationTimeoutRef.current);
+      }
+    },
+    [],
+  );
+
+  const triggerClickAnimation = useCallback(() => {
+    if (!animate) {
+      return;
+    }
+
+    const animation = active ? 'deactivate' : 'activate';
+
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+    if (animationTimeoutRef.current !== null) {
+      window.clearTimeout(animationTimeoutRef.current);
+    }
+
+    setClickAnimation(null);
+    animationFrameRef.current = requestAnimationFrame(() => {
+      setClickAnimation(animation);
+      animationTimeoutRef.current = window.setTimeout(() => {
+        setClickAnimation(null);
+        animationTimeoutRef.current = null;
+      }, 1000);
+      animationFrameRef.current = null;
+    });
+  }, [active, animate]);
+
+  const handleClick: React.MouseEventHandler<
+    HTMLButtonElement & HTMLAnchorElement
+  > = useCallback(
+    (event) => {
+      triggerClickAnimation();
+      onClick?.(event);
+    },
+    [onClick, triggerClickAnimation],
+  );
 
   return (
     <Button
@@ -185,9 +237,11 @@ export const ToggleButton: React.FC<
       // Toggle buttons always have neutral until pressed.
       color='neutral'
       className={classNames(className, classes.toggle, {
-        activate: shouldAnimate && active,
-        deactivate: shouldAnimate && !active,
+        activate: (shouldAnimate && active) || clickAnimation === 'activate',
+        deactivate:
+          (shouldAnimate && !active) || clickAnimation === 'deactivate',
       })}
+      onClick={handleClick}
     />
   );
 };
