@@ -6,7 +6,12 @@ import { useParams } from 'react-router-dom';
 import { ChatCircleDotsIcon, ReplyIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
-import { markConversationRead } from '@/mastodon/actions/conversations';
+import {
+  expandConversations,
+  markConversationRead,
+  mountConversations,
+  unmountConversations,
+} from '@/mastodon/actions/conversations';
 import { openNewComposer } from '@/mastodon/reducers/slices/composer';
 import { Button } from '@/mastodon/components/button/redesign';
 import { Column } from '@/mastodon/components/column';
@@ -78,6 +83,15 @@ export const MessageConversation: React.FC = () => {
 
     return recipientId ? state.accounts.get(recipientId) : undefined;
   });
+
+  useEffect(() => {
+    dispatch(mountConversations());
+    dispatch(expandConversations());
+
+    return () => {
+      dispatch(unmountConversations());
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     if (id) {
