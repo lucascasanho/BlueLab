@@ -405,9 +405,13 @@ export const ColumnsAreaRedesign: React.FC<{
   return (
     <main
       ref={ref}
-      className={classNames(multiColClasses.root, {
-        unscrollable: isModalOpen,
-      })}
+      className={classNames(
+        multiColClasses.root,
+        isBlue2 && multiColClasses.blue2Root,
+        {
+          unscrollable: isModalOpen,
+        },
+      )}
       tabIndex={isModalOpen ? undefined : 0}
     >
       {!isMobile && (
