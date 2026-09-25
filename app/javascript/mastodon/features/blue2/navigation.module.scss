@@ -1,3 +1,5 @@
+@use '@/styles/mastodon/variables' as *;
+
 .root {
   box-sizing: border-box;
   width: 240px;
@@ -223,8 +225,6 @@
     transform: scale(0.98);
   }
 }
-
-@use '@/styles/mastodon/variables' as *;
 
 @media (width < $no-gap-breakpoint) {
   .root:not(.rootExpanded) {
