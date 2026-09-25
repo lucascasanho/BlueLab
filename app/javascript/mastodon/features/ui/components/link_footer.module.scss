@@ -54,9 +54,24 @@
     }
   }
 
-  a {
+  a,
+  .bugReportButton {
     color: var(--color-text-secondary);
     text-decoration: underline;
+
+    &:hover,
+    &:focus,
+    &:active {
+      text-decoration: none;
+    }
+  }
+
+  .bugReportButton {
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font: inherit;
 
     &:hover,
     &:focus,
