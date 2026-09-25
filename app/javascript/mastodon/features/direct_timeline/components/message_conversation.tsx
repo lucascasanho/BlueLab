@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { useParams } from 'react-router-dom';
 
-import { ChatCircleDotsIcon, ReplyIcon } from '@phosphor-icons/react';
+import { ArrowUUpLeftIcon, ChatCircleDotsIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
 import {
@@ -199,7 +199,7 @@ export const MessageConversation: React.FC = () => {
           onClick={handleReply}
           disabled={!recipient}
         >
-          <ReplyIcon size={18} />
+          <ArrowUUpLeftIcon size={18} />
           {intl.formatMessage(messages.reply)}
         </Button>
       </div>
