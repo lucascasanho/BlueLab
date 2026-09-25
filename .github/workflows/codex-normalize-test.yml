@@ -1,0 +1,36 @@
+name: Codex normalize test
+
+on:
+  push:
+    branches:
+      - 'chatgpt/20260925-bluelab-message-markdown-toolbar'
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Set up Javascript environment
+        uses: ./.github/actions/setup-javascript
+
+      - name: Apply repository format and safe JS fixes
+        run: |
+          yarn format
+          yarn fix:js
+
+      - name: Commit fixes
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: normalize BlueLab-Test baseline"
+          git push
