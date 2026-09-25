@@ -26,6 +26,26 @@
     width: unset !important;
   }
 
+  // Keep the redesigned action buttons compact and circular on hover.
+  .status__action-bar > button {
+    box-sizing: border-box;
+    min-width: 36px;
+    min-height: 36px;
+    width: 36px;
+    height: 36px;
+    padding-inline: 8px;
+  }
+
+  .status__action-bar > button > .icon,
+  .status__action-bar > button > .favourite-animation-target > .icon {
+    box-sizing: border-box;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    flex: 0 0 20px;
+  }
+
   // Fix reply button not starting from the beginning
   .status__action-bar .icon-button:nth-of-type(1) {
     min-width: 42.22px !important;

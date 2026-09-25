@@ -10,9 +10,24 @@
   // Re-show the native favourite SVG in the action bar. Bird UI's icon reset
   // hides every action-bar icon path; this stays less specific than core's
   // outline/solid toggle so that toggle keeps working.
-  .status__action-bar .star-icon path,
-  .detailed-status__action-bar .star-icon path {
+  .status__action-bar .favourite-animation-target > svg path,
+  .detailed-status__action-bar .favourite-animation-target > svg path {
     display: block;
+  }
+
+  .status__action-bar .favourite-animation-target,
+  .detailed-status__action-bar .favourite-animation-target {
+    color: var(--color-dim);
+  }
+
+  .status__action-bar button[aria-pressed='true'] .favourite-animation-target,
+  .detailed-status__action-bar .icon-button.active .favourite-animation-target {
+    color: var(--color-yellow);
+  }
+
+  .status__action-bar .favourite-animation-target > svg,
+  .detailed-status__action-bar .favourite-animation-target > svg {
+    background-image: none !important;
   }
 
   // Sidebar column links and notifications: heart by default.
