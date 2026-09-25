@@ -224,7 +224,9 @@
   }
 }
 
-@media (width < 1180px) {
+@use '@/styles/mastodon/variables' as *;
+
+@media (width < $no-gap-breakpoint) {
   .root:not(.rootExpanded) {
     width: 76px;
     align-items: center;
