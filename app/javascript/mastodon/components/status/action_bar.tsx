@@ -9,7 +9,6 @@ import {
   BookmarkSimpleIcon,
   ChatCircleIcon,
   DotsThreeIcon,
-  HeartIcon,
   QuotesIcon,
   ShareFatIcon,
   StarIcon,
@@ -112,14 +111,8 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   }, [contextType, dispatch, statusId]);
 
   const intl = useIntl();
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
-  const isBirdUI =
-    typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'mastodon-bird-ui-auto';
-  const FavouriteIcon = isBlue2 || isBirdUI ? StarIcon : HeartIcon;
   const favouriteIcon = useIconWeight(
-    FavouriteIcon,
+    StarIcon,
     status?.favourited && 'fill',
   );
   const bookmarkIcon = useIconWeight(
@@ -167,7 +160,10 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
         leadingIcon={favouriteIcon}
         leadingIconWrapperClassName='favourite-animation-target'
         onClick={handleFavouriteClick}
-        className={!onlyResponses ? classes.actionsButtonGap : undefined}
+        className={classNames(
+          'star-icon',
+          !onlyResponses && classes.actionsButtonGap,
+        )}
       >
         {withCounters && status.favourites_count}
       </ToggleButton>

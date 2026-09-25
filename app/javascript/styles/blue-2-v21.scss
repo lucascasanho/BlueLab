@@ -31,3 +31,29 @@ body[data-theme='blue-2'] {
     border-radius: inherit;
   }
 }
+
+
+/*
+ * Favourite icon refinement for Blue 2.
+ *
+ * Keep the star glyph at the same 18px footprint as the other status actions
+ * and use yellow while the favourite toggle is active.
+ */
+body[data-theme='blue-2'] {
+  button.star-icon > .icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  button.star-icon[aria-pressed='true'],
+  button.star-icon.active,
+  .icon-button.star-icon.active {
+    --fg: var(--color-yellow) !important;
+    color: var(--color-yellow) !important;
+  }
+
+  .icon-button.star-icon .icon-star {
+    --size-icon: 18px;
+    background-size: 18px 18px;
+  }
+}
