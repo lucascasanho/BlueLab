@@ -128,10 +128,12 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
 };
 
 export const ColumnsArea: React.FC<ColumnsAreaProps> = (props) => {
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const isThemeRedesign =
+    typeof document !== 'undefined' &&
+    (document.body.dataset.theme === 'blue-2' ||
+      document.body.dataset.theme === 'firebird');
 
-  if (isBlue2) {
+  if (isThemeRedesign) {
     return <ColumnsAreaRedesign {...props} />;
   }
 
