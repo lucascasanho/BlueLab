@@ -1,7 +1,7 @@
-- bluelab_error = respond_to?(:current_theme) && current_theme == 'blue-2' && response.status == 404
+- bluelab_error = Setting.theme == 'blue-2' && response.status == 404
 
 !!!
-%html{ bluelab_error ? html_attributes.merge('data-theme' => current_theme) : { lang: I18n.locale, 'data-contrast' => 'auto', 'data-color-scheme' => 'auto' } }
+%html{ lang: I18n.locale, 'data-theme' => (bluelab_error ? 'blue-2' : nil), 'data-contrast' => 'auto', 'data-color-scheme' => 'auto', 'data-system-theme' => (bluelab_error ? 'true' : nil) }
   %head
     %meta{ 'content' => 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type' }/
     %meta{ charset: 'utf-8' }/
@@ -13,9 +13,9 @@
       = vite_react_refresh_tag
       = vite_polyfills_tag
       = vite_typescript_tag 'theme-selection.ts', crossorigin: 'anonymous', blocking: 'render'
-      = theme_style_tags current_theme
+      = theme_style_tags 'blue-2'
       = instance_customization_styles
-      = theme_color_tags color_scheme
+      = theme_color_tags 'auto'
     - else
       = vite_client_tag
       = vite_react_refresh_tag
