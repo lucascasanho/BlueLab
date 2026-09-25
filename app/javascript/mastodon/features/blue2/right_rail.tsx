@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import { Search } from '@/mastodon/features/compose/components/search';
@@ -81,27 +81,42 @@ export const Blue2RightRail: React.FC = () => {
 
         <nav className={classes.feeds} aria-label='Timelines'>
           {signedIn && (
-            <Link className={classes.feedShortcut} to='/home'>
+            <NavLink
+              className={classes.feedShortcut}
+              activeClassName={classes.feedShortcutActive}
+              exact
+              to='/home'
+            >
               <span className={classes.feedIcon}>
                 <Blue2HomeIcon size={18} />
               </span>
               <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
-            </Link>
+            </NavLink>
           )}
 
-          <Link className={classes.feedShortcut} to='/public/local'>
+          <NavLink
+            className={classes.feedShortcut}
+            activeClassName={classes.feedShortcutActive}
+            exact
+            to='/public/local'
+          >
             <span className={classes.feedIcon}>
               <GroupsIcon />
             </span>
             <span>{blue2Text(intl.locale, 'federation')}</span>
-          </Link>
+          </NavLink>
 
-          <Link className={classes.feedShortcut} to='/public'>
+          <NavLink
+            className={classes.feedShortcut}
+            activeClassName={classes.feedShortcutActive}
+            exact
+            to='/public'
+          >
             <span className={classes.feedIcon}>
               <PublicIcon />
             </span>
             <span>{blue2Text(intl.locale, 'global')}</span>
-          </Link>
+          </NavLink>
         </nav>
 
         {!trendsHidden && (
