@@ -47,42 +47,44 @@
 }
 
 .search {
+  @include mixins.search-input;
+
   display: flex;
-  box-sizing: border-box;
   align-items: center;
   gap: var(--space-xs);
-  min-height: 40px;
-  padding-inline: var(--space-sm);
-  border: 1px solid var(--color-border-primary);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-primary);
+  padding: 12px 16px;
 
   &:focus-within {
-    outline: 2px solid var(--color-border-brand);
-    outline-offset: -2px;
+    outline-color: var(--color-border-brand);
   }
 
   svg {
     flex: 0 0 auto;
-    width: var(--space-md);
-    height: var(--space-md);
-    color: var(--color-text-tertiary);
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-secondary);
   }
 
   input {
     min-width: 0;
     width: 100%;
-    min-height: 38px;
+    min-height: 0;
     border: 0;
     outline: 0;
     padding: 0;
     appearance: none;
     background: transparent;
-    color: var(--color-text-primary);
+    color: inherit;
     font: inherit;
 
     &::placeholder {
-      color: var(--color-text-tertiary);
+      color: var(--color-text-secondary);
+      opacity: 1;
+    }
+
+    &::-webkit-search-cancel-button,
+    &::-webkit-search-decoration {
+      appearance: none;
     }
   }
 }
