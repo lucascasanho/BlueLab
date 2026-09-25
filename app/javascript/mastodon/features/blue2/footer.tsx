@@ -13,38 +13,38 @@ export const Blue2FooterLinks: React.FC = () => {
 
   return (
     <footer className={classes.root} data-bird-ui-footer='true'>
-    <Link to='/about'>
-      <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
-    </Link>
-    <span>·</span>
-    <Link to='/privacy-policy'>
-      <FormattedMessage
-        id='footer.privacy_policy_short'
-        defaultMessage='Privacy'
-      />
-    </Link>
-    <span>·</span>
-    <Link to='/terms-of-service'>
-      <FormattedMessage
-        id='footer.terms_of_service_short'
-        defaultMessage='Terms'
-      />
-    </Link>
-    <span>·</span>
-    <Link to='/keyboard-shortcuts'>
-      <FormattedMessage
-        id='keyboard_shortcuts.heading'
-        defaultMessage='Keyboard Shortcuts'
-      />
-    </Link>
-    {me && (
-      <>
-        <span>·</span>
-        <button type='button' onClick={openBugReport}>
-          <BugReportLabel />
-        </button>
-      </>
-    )}
+      <Link to='/about'>
+        <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
+      </Link>
+      <span>·</span>
+      <Link to='/privacy-policy'>
+        <FormattedMessage
+          id='footer.privacy_policy_short'
+          defaultMessage='Privacy'
+        />
+      </Link>
+      <span>·</span>
+      <Link to='/terms-of-service'>
+        <FormattedMessage
+          id='footer.terms_of_service_short'
+          defaultMessage='Terms'
+        />
+      </Link>
+      <span>·</span>
+      <Link to='/keyboard-shortcuts'>
+        <FormattedMessage
+          id='keyboard_shortcuts.heading'
+          defaultMessage='Keyboard Shortcuts'
+        />
+      </Link>
+      {me && (
+        <>
+          <span>·</span>
+          <button type='button' onClick={openBugReport}>
+            <BugReportLabel />
+          </button>
+        </>
+      )}
     </footer>
   );
 };
