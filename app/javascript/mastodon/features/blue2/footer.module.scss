@@ -1,0 +1,41 @@
+.root {
+  box-sizing: border-box;
+  margin-top: auto;
+  padding-top: 26px;
+  padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  color: var(--blue2-muted, var(--color-text-secondary, #717c9b));
+  font-size: 12px;
+  line-height: 1.35;
+
+  a {
+    color: inherit !important;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--blue2-text, var(--color-text-primary, #fff)) !important;
+      text-decoration: underline;
+      outline: none;
+    }
+  }
+
+  span {
+    color: inherit;
+  }
+}
+
+:global(body[data-theme='mastodon-bird-ui-auto']) .root {
+  color: var(--color-text-secondary, #717c9b);
+
+  a {
+    color: inherit !important;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--color-text-primary, #fff) !important;
+    }
+  }
+}
