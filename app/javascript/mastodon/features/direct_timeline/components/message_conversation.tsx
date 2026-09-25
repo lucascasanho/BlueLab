@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { useParams } from 'react-router-dom';
 
-import { ArrowUUpLeftIcon, ChatCircleDotsIcon } from '@phosphor-icons/react';
+import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
 import {
@@ -12,8 +12,9 @@ import {
   mountConversations,
   unmountConversations,
 } from '@/mastodon/actions/conversations';
-import { openNewComposer } from '@/mastodon/reducers/slices/composer';
-import { Button } from '@/mastodon/components/button/redesign';
+import { dismissComposer, resetComposer } from '@/mastodon/reducers/slices/composer';
+import { directCompose, resetCompose } from '@/mastodon/actions/compose';
+import { RedesignComposeForm } from '@/mastodon/features/compose/redesign';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
 import AttachmentList from '@/mastodon/components/attachment_list';
@@ -99,6 +100,18 @@ export const MessageConversation: React.FC = () => {
     }
   }, [dispatch, id]);
 
+  useEffect(() => {
+    if (!recipient) return;
+
+    dispatch(resetCompose());
+    dispatch(directCompose(recipient));
+    dispatch(dismissComposer());
+
+    return () => {
+      dispatch(resetCompose());
+    };
+  }, [dispatch, recipient]);
+
   if (!conversation || !status) {
     return (
       <Column>
@@ -112,17 +125,6 @@ export const MessageConversation: React.FC = () => {
   }
 
   const isMine = status.getIn(['account', 'id']) === me;
-
-  const handleReply = () => {
-    if (!recipient) return;
-
-    dispatch(
-      openNewComposer({
-        type: 'message',
-        toAccountId: recipient.get('id') as string,
-      }),
-    );
-  };
 
   const participantAccounts = accounts.filter(
     (account): account is NonNullable<typeof account> =>
@@ -193,15 +195,14 @@ export const MessageConversation: React.FC = () => {
           </article>
         </div>
 
-        <Button
-          variant='solid'
-          color='accent'
-          onClick={handleReply}
-          disabled={!recipient}
-        >
-          <ArrowUUpLeftIcon size={18} />
-          {intl.formatMessage(messages.reply)}
-        </Button>
+        {recipient && (
+          <RedesignComposeForm
+            className={classes.replyComposer}
+            compact
+            embedded
+            autoFocus
+          />
+        )}
       </div>
 
       <Helmet>
