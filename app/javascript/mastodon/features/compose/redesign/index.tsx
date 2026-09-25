@@ -7,6 +7,8 @@ import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
+import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
+
 import { LockSimpleOpenIcon, PepperIcon } from '@phosphor-icons/react';
 
 import {
@@ -65,6 +67,7 @@ interface RedesignComposeFormProps {
   compact?: boolean;
   noMinimize?: boolean;
   redirectOnSuccess?: boolean;
+  onSuccess?: (status: ApiStatusJSON) => void;
 }
 
 type ThreadItem = ImmutableMap<string, unknown>;
@@ -78,6 +81,7 @@ export const RedesignComposeForm: React.FC<
   compact = false,
   noMinimize,
   redirectOnSuccess,
+  onSuccess,
   ref,
   ...props
 }) => {
@@ -102,7 +106,7 @@ export const RedesignComposeForm: React.FC<
     : rootSensitive.sensitiveText;
 
   const { onSensitiveChange, onSensitiveTextChange, onEmojiPick, onSubmit } =
-    useComposeHandlers(redirectOnSuccess, activeThreadItemId);
+    useComposeHandlers(redirectOnSuccess, activeThreadItemId, onSuccess);
 
   const intl = useIntl();
   const titleId = useId();
@@ -285,6 +289,7 @@ const allowedAroundShortCode =
 function useComposeHandlers(
   redirectOnSuccess?: boolean,
   activeThreadItemId: string | null = null,
+  onSuccess?: (status: ApiStatusJSON) => void,
 ) {
   const text = useAppSelector((state) => state.compose.get('text') as string);
   const activeThreadItem = useAppSelector((state) => {
@@ -415,6 +420,7 @@ function useComposeHandlers(
       dispatch(
         submitComposer({
           redirectOnSuccess,
+          onSuccess,
         }),
       );
 
@@ -422,7 +428,7 @@ function useComposeHandlers(
         event.preventDefault();
       }
     },
-    [canSubmit, dispatch, redirectOnSuccess],
+    [canSubmit, dispatch, onSuccess, redirectOnSuccess],
   );
 
   return {
