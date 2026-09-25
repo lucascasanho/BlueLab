@@ -605,7 +605,9 @@ export const RichComposeEditor: React.FC<{
   const forceMessageMarkdown = isBlueLabTheme && isMessageComposeType(type);
   const isMarkdown = forceMessageMarkdown || contentType === 'text/markdown';
   const visibleCommands = forceMessageMarkdown
-    ? commands.filter(([command]) => inlineCommands.includes(command as InlineCommand))
+    ? commands.filter(([command]) =>
+        inlineCommands.includes(command as InlineCommand),
+      )
     : commands;
   const customEmojis = useCustomEmojis();
   const ref = useRef<HTMLDivElement>(null);
