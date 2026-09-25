@@ -2,11 +2,23 @@
 
 body[data-theme='mastodon-5'] {
   --m5-bg: var(--color-bg-primary);
-  --m5-surface: var(--color-bg-elevated);
-  --m5-border: var(--color-border-primary);
+  --m5-surface: var(--color-bg-secondary);
+  --m5-border: color-mix(
+    in srgb,
+    var(--color-border-primary) 80%,
+    var(--color-text-primary) 20%
+  );
   --m5-text: var(--color-text-primary);
-  --m5-muted: var(--color-text-secondary);
-  --m5-hover: var(--color-bg-brand-softest);
+  --m5-muted: color-mix(
+    in srgb,
+    var(--color-text-primary) 65%,
+    var(--color-text-secondary) 35%
+  );
+  --m5-hover: color-mix(
+    in srgb,
+    var(--color-bg-primary) 88%,
+    var(--color-text-primary) 12%
+  );
 
   min-width: 0;
   margin: 0;
@@ -133,11 +145,73 @@ body[data-theme='mastodon-5'] {
   .confirmation-modal,
   .boost-modal,
   .report-dialog-modal,
-  .privacy-dropdown__dropdown {
+  .privacy-dropdown__dropdown,
+  .language-dropdown__dropdown,
+  .visibility-dropdown__dropdown {
     background: var(--m5-surface);
     color: var(--m5-text);
     border-color: var(--m5-border);
     box-shadow: 0 16px 40px rgb(0 0 0 / 30%);
+  }
+
+  .dropdown-menu__container__header,
+  .dropdown-menu__item-subtitle {
+    color: var(--m5-muted);
+  }
+
+  .dropdown-menu__item,
+  .dropdown-menu__item a,
+  .dropdown-menu__item button {
+    color: var(--m5-text);
+  }
+
+  .dropdown-menu__item {
+    &--dangerous {
+      color: var(--color-text-error);
+    }
+
+    &--highlighted {
+      color: var(--color-text-brand);
+    }
+
+    a,
+    button {
+      &:hover,
+      &:focus,
+      &:active {
+        &:where(:not(:disabled, [aria-disabled='true'])) {
+          background: var(--m5-hover);
+        }
+      }
+    }
+  }
+
+  .privacy-dropdown__option,
+  .visibility-dropdown__option {
+    color: var(--m5-text);
+
+    &:hover,
+    &:active {
+      background: var(--m5-hover);
+    }
+
+    &.active,
+    &:focus {
+      background: var(--color-bg-brand-base);
+      color: var(--color-text-on-brand-base);
+    }
+  }
+
+  .privacy-dropdown__option__content,
+  .visibility-dropdown__option__content,
+  .privacy-dropdown__option__additional,
+  .visibility-dropdown__option__additional {
+    color: var(--m5-muted);
+  }
+
+  .privacy-dropdown__option__content strong,
+  .visibility-dropdown__option__content strong {
+    color: var(--m5-text);
   }
 
   [data-bluelab-composer] {
