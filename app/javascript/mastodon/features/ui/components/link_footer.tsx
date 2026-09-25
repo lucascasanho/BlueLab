@@ -75,13 +75,17 @@ export const LinkFooter: React.FC<{
             </a>
           </li>
           {me && (
-      <li>
-        <button type='button' className={classes.bugReportButton} onClick={openBugReport}>
-          <BugReportLabel />
-        </button>
-      </li>
-    )}
-    <li className={classes.version}>
+            <li>
+              <button
+                type='button'
+                className={classes.bugReportButton}
+                onClick={openBugReport}
+              >
+                <BugReportLabel />
+              </button>
+            </li>
+          )}
+          <li className={classes.version}>
             <FormattedMessage
               id='footer.bluelab_version'
               defaultMessage='Mastodon v{version} BlueLab'
