@@ -78,7 +78,7 @@
   transition: none;
 }
 
-:global(body[data-theme='firebird']) .navigationRail[ data-expanded='true' ] {
+:global(body[data-theme='firebird']) .navigationRail[data-expanded='true'] {
   width: 278px;
 }
 
