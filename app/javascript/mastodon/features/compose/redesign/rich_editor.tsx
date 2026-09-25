@@ -32,7 +32,7 @@ import {
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
-import { selectComposeType } from './selectors';
+import { isMessageComposeType, selectComposeType } from './selectors';
 import classes from './styles.module.scss';
 
 const messages = defineMessages({
@@ -602,8 +602,7 @@ export const RichComposeEditor: React.FC<{
   const isBlueLabTheme =
     typeof document !== 'undefined' &&
     document.body.dataset.theme === 'blue-2';
-  const forceMessageMarkdown =
-    isBlueLabTheme && ['message', 'replyPrivate'].includes(type);
+  const forceMessageMarkdown = isBlueLabTheme && isMessageComposeType(type);
   const isMarkdown = forceMessageMarkdown || contentType === 'text/markdown';
   const visibleCommands = forceMessageMarkdown
     ? commands.filter(([command]) => inlineCommands.includes(command as InlineCommand))
