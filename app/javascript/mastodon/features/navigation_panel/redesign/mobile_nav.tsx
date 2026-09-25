@@ -30,6 +30,8 @@ import { MobileNavLink } from './navigation_link';
 export const RedesignMobileNavigation: React.FC = () => {
   const { accountId, signedIn } = useIdentity();
   const account = useAccount(accountId);
+  const location = useLocation();
+  const isMessageConversation = location.pathname.startsWith('/conversations/');
 
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
@@ -81,7 +83,7 @@ export const RedesignMobileNavigation: React.FC = () => {
             <FormattedMessage id='tabs_bar.profile' defaultMessage='Profile' />
           </MobileNavLink>
         </ul>
-        <ComposeRedesignButton inline />
+        {!isMessageConversation && <ComposeRedesignButton inline />}
       </nav>
 
       <SlideOutNavigation />
