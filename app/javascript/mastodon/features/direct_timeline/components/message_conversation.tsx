@@ -12,14 +12,13 @@ import {
   mountConversations,
   unmountConversations,
 } from '@/mastodon/actions/conversations';
-import { dismissComposer, resetComposer } from '@/mastodon/reducers/slices/composer';
 import { directCompose, resetCompose } from '@/mastodon/actions/compose';
+import { dismissComposer, resetComposer } from '@/mastodon/reducers/slices/composer';
 import { RedesignComposeForm } from '@/mastodon/features/compose/redesign';
 import { Avatar } from '@/mastodon/components/avatar';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
 import AttachmentList from '@/mastodon/components/attachment_list';
-import AvatarComposite from '@/mastodon/components/avatar_composite';
 import StatusContent from '@/mastodon/components/status/legacy/content';
 import { DisplayNameSimple } from '@/mastodon/components/display_name/simple';
 import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
@@ -129,18 +128,24 @@ export const MessageConversation: React.FC = () => {
   );
 
   const displayAccount = status.get('account');
-  const statusText = typeof status.get('text') === 'string' ? status.get('text') as string : '';
-  const mentions = status.get('mentions') as Immutable.List<Immutable.Map<string, unknown>>;
-  const showSenderName = mentions.size > 1 || mentions.some((mention) => {
-    const acct = mention.get('acct');
-    const username = mention.get('username');
-    const trimmedText = statusText.trimStart();
+  const statusText =
+    typeof status.get('text') === 'string' ? (status.get('text') as string) : '';
+  const mentions = status.get('mentions') as Immutable.List<
+    Immutable.Map<string, unknown>
+  >;
+  const trimmedText = statusText.trimStart();
+  const showSenderName =
+    mentions.size > 1 ||
+    mentions.some((mention) => {
+      const acct = mention.get('acct');
+      const username = mention.get('username');
+      const startsWithMention =
+        (typeof acct === 'string' && trimmedText.startsWith(`@${acct}`)) ||
+        (typeof username === 'string' &&
+          trimmedText.startsWith(`@${username}`));
 
-    return (
-      (typeof acct === 'string' && !trimmedText.startsWith(`@${acct}`)) ||
-      (typeof username === 'string' && !trimmedText.startsWith(`@${username}`))
-    );
-  });
+      return !startsWithMention;
+    });
 
   return (
     <Column label={intl.formatMessage(messages.title)}>
