@@ -58,11 +58,6 @@ export const MessageConversation: React.FC = () => {
     >).find((item) => item.get('id') === id),
   );
 
-  const lastStatusId = conversation?.get('last_status') as
-    | string
-    | null
-    | undefined;
-
   const statuses = useAppSelector((state) =>
     messageStatusIds
       .map((statusId) =>
