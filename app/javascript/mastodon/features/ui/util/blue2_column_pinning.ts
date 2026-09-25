@@ -124,7 +124,7 @@ const definitionForPath = (
   if (hashtagMatch) {
     return {
       id: 'HASHTAG',
-      params: { id: decodeURIComponent(hashtagMatch[1]) },
+      params: { id: decodeURIComponent(hashtagMatch[1] ?? '') },
     };
   }
 
