@@ -217,9 +217,9 @@ const ComposeGifDropdown: React.FC<
       } finally {
         if (requestControllerRef.current === controller) {
           requestControllerRef.current = null;
+          setLoading(false);
+          setLoadingMore(false);
         }
-        setLoading(false);
-        setLoadingMore(false);
       }
     },
     [],
