@@ -1,0 +1,46 @@
+- content_for :page_title do
+  = t('admin.bug_reports.title')
+
+.filters
+  .filter-subset
+    %strong= t('admin.bug_reports.status')
+    %ul
+      %li= filter_link_to t('admin.bug_reports.all'), status: nil
+      %li= filter_link_to t('admin.bug_reports.open'), status: 'open'
+      %li= filter_link_to t('admin.bug_reports.resolved'), status: 'resolved'
+
+- if @bug_reports.empty?
+  = nothing_here 'nothing-here--under-tabs'
+- else
+  .table-wrapper
+    %table.table
+      %thead
+        %tr
+          %th= t('admin.bug_reports.id')
+          %th= t('admin.bug_reports.reported_by')
+          %th= t('admin.bug_reports.description')
+          %th= t('admin.bug_reports.created_at')
+          %th= t('admin.bug_reports.status')
+          %th= t('admin.bug_reports.assigned_to')
+          %th= t('admin.bug_reports.attachments')
+          %th
+      %tbody
+        - @bug_reports.each do |bug_report|
+          %tr
+            %td= bug_report.id
+            %td= admin_account_link_to bug_report.account
+            %td
+              .one-line= truncate(bug_report.description, length: 120)
+            %td
+              %time.time-ago{ datetime: bug_report.created_at.iso8601, title: l(bug_report.created_at) }
+                = l(bug_report.created_at)
+            %td= bug_report.resolved? ? t('admin.bug_reports.status_resolved') : t('admin.bug_reports.status_open')
+            %td
+              - if bug_report.assigned_account.present?
+                = admin_account_link_to bug_report.assigned_account
+              - else
+                = t('admin.bug_reports.none')
+            %td= bug_report.media_attachments.size
+            %td= link_to t('admin.bug_reports.view'), admin_bug_report_path(bug_report)
+
+= paginate @bug_reports

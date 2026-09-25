@@ -3,7 +3,9 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 
-import { domain, termsOfServiceEnabled } from '@/mastodon/initial_state';
+import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
+import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
+import { domain, me, termsOfServiceEnabled } from '@/mastodon/initial_state';
 
 import classes from './footer_links.module.scss';
 
@@ -12,6 +14,7 @@ export const NavigationFooterLinks: React.FC<{
   multiColumn?: boolean;
   variant?: 'default' | 'blue2';
 }> = ({ siteName = domain, multiColumn, variant = 'default' }) => {
+  const openBugReport = useOpenBugReport();
   const multiColumnLinkAttrs = multiColumn
     ? {
         target: '_blank',
@@ -47,6 +50,17 @@ export const NavigationFooterLinks: React.FC<{
             />
           </NavLink>
         </li>
+        {me && (
+          <li>
+            <button
+              type='button'
+              className={classes.bugReportButton}
+              onClick={openBugReport}
+            >
+              <BugReportLabel />
+            </button>
+          </li>
+        )}
         {termsOfServiceEnabled && (
           <li>
             <NavLink

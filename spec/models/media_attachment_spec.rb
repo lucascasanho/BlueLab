@@ -317,6 +317,16 @@ RSpec.describe MediaAttachment, :attachment_processing do
     it { is_expected.to be_an(Arel::Nodes::Grouping) }
   end
 
+  describe '.unattached' do
+    it 'does not treat bug report attachments as orphaned' do
+      report = Fabricate(:bug_report)
+      attachment = Fabricate(:media_attachment, account: report.account, bug_report: report)
+
+      expect(described_class.unattached).to_not include(attachment)
+      expect(described_class.attached).to include(attachment)
+    end
+  end
+
   private
 
   def media_metadata
