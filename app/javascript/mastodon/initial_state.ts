@@ -9,6 +9,7 @@ export type InitialStateLanguage = [
 
 interface InitialStateMeta {
   access_token: string;
+  account_switcher_token?: string;
   advanced_layout?: boolean;
   auto_play_gif: boolean;
   activity_api_enabled: boolean;
@@ -186,4 +187,8 @@ export const languages = initialState?.languages.map((lang) => {
 
 export function getAccessToken(): string | undefined {
   return getMeta('access_token');
+}
+
+export function getAccountSwitcherToken(): string | undefined {
+  return getMeta('account_switcher_token');
 }
