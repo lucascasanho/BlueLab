@@ -2408,6 +2408,7 @@ pt-BR:
     title: Os termos de serviço do %{domain} estão mudando
   themes:
     blue-2: BlueLab
+    firebird: FireBird
     default: Vanilla
     mastodon-bird-ui-auto: Bird UI
   time:
