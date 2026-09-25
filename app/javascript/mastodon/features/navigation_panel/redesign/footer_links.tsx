@@ -52,7 +52,11 @@ export const NavigationFooterLinks: React.FC<{
         </li>
         {me && (
           <li>
-            <button type='button' className={classes.bugReportButton} onClick={openBugReport}>
+            <button
+              type='button'
+              className={classes.bugReportButton}
+              onClick={openBugReport}
+            >
               <BugReportLabel />
             </button>
           </li>
