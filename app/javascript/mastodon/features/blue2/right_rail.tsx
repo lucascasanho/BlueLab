@@ -5,6 +5,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Link, NavLink } from 'react-router-dom';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
+import { Blue2AccountMenu } from './account_menu';
+import { Blue2ComposeButton } from './navigation';
 import { Search } from '@/mastodon/features/compose/components/search';
 import { useIdentity } from '@/mastodon/identity_context';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
@@ -18,7 +20,9 @@ interface TrendTag {
   name: string;
 }
 
-export const Blue2RightRail: React.FC = () => {
+export const Blue2RightRail: React.FC<{ showProfileCard?: boolean }> = ({
+  showProfileCard = false,
+}) => {
   const intl = useIntl();
   const { signedIn } = useIdentity();
   const [tags, setTags] = useState<TrendTag[]>([]);
@@ -74,6 +78,13 @@ export const Blue2RightRail: React.FC = () => {
 
   return (
     <aside className={classes.root}>
+      {showProfileCard && signedIn && (
+        <>
+          <Blue2AccountMenu className={classes.rightRailProfile} />
+          <Blue2ComposeButton className={classes.rightRailComposeButton} />
+        </>
+      )}
+
       <div className={classes.content}>
         <div className={classes.searchHost}>
           <Search singleColumn />
