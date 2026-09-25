@@ -38,9 +38,10 @@ import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 
 import classes from './account_menu.module.scss';
 
-export const Blue2AccountMenu: React.FC<{ compact?: boolean }> = ({
-  compact,
-}) => {
+export const Blue2AccountMenu: React.FC<{
+  compact?: boolean;
+  className?: string;
+}> = ({ compact, className }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const { accountId, permissions } = useIdentity();
@@ -247,7 +248,9 @@ export const Blue2AccountMenu: React.FC<{ compact?: boolean }> = ({
   );
 
   return (
-    <div className={classNames(classes.root, compact && classes.rootCompact)}>
+    <div
+      className={classNames(classes.root, compact && classes.rootCompact, className)}
+    >
       <button
         ref={setAnchor}
         type='button'
