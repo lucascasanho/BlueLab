@@ -65,6 +65,12 @@ body[data-theme='mastodon-5'] {
     color: var(--m5-text);
   }
 
+  // Keep global Mastodon icon buttons visible in dark mode.
+  .column-header__button svg path,
+  .column-header__back-button svg path {
+    fill: currentColor;
+  }
+
   .status,
   .notification,
   .notification-group,
