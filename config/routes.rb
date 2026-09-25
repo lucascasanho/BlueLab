@@ -83,6 +83,7 @@ Rails.application.routes.draw do
       end
     end
 
+    post '/auth/account_switcher/switch', to: 'auth/account_switcher#switch', as: :auth_account_switcher_switch
     get '/auth/passkey/options', to: 'auth/sessions#passkey_options', as: :auth_passkey_options
     post '/auth/passkey', to: 'auth/sessions#passkey', as: :auth_passkey
     get '/auth/passkey/two_factor', to: 'auth/sessions#passkey_two_factor', as: :auth_passkey_two_factor

@@ -125,6 +125,8 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def after_sign_in_path_for(resource)
+    return root_path if account_switcher_flow?
+
     last_url = stored_location_for(:user)
 
     if home_paths(resource).include?(last_url)
@@ -135,6 +137,8 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def require_no_authentication
+    return if account_switcher_flow?
+
     super
 
     # Delete flash message that isn't entirely useful and may be confusing in
@@ -185,6 +189,10 @@ class Auth::SessionsController < Devise::SessionsController
 
   def continue_after?
     truthy_param?(:continue)
+  end
+
+  def account_switcher_flow?
+    truthy_param?(:account_switcher)
   end
 
   def restart_session

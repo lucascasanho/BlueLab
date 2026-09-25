@@ -8,6 +8,6 @@ class Auth::AcceptancesController < ApplicationController
   private
 
   def registration_params
-    params.permit(:accept, :invite_code).compact_blank
+    params.permit(:accept, :invite_code, :account_switcher).compact_blank
   end
 end

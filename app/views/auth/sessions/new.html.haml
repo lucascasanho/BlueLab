@@ -1,8 +1,10 @@
+- account_switcher_flow = ActiveModel::Type::Boolean.new.cast(params[:account_switcher])
+
 - content_for :page_title do
-  = t('auth.login')
+  = account_switcher_flow ? 'Sign in to another account' : t('auth.login')
 
 - content_for :blue2_auth_title do
-  = t('auth.login')
+  = account_switcher_flow ? 'Sign in to another account' : t('auth.login')
 
 - content_for :blue2_auth_subtitle do
   = t('auth.sign_in.preamble_html', domain: site_hostname)
@@ -11,10 +13,10 @@
   = render partial: 'shared/og'
 
 - unless omniauth_only?
-  = simple_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f|
+  = simple_form_for(resource, as: resource_name, url: session_path(resource_name, account_switcher: account_switcher_flow ? '1' : nil)) do |f|
     .sign-in-introduction
-      %h1.title= t('auth.sign_in.title', domain: site_hostname)
-      %p.lead= t('auth.sign_in.preamble_html', domain: site_hostname)
+      %h1.title= account_switcher_flow ? 'Sign in to another account' : t('auth.sign_in.title', domain: site_hostname)
+      %p.lead= account_switcher_flow ? 'Your current account will remain available in the account switcher.' : t('auth.sign_in.preamble_html', domain: site_hostname)
     .fields-group
       = f.input :email,
                 as: :string,
