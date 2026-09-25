@@ -95,11 +95,16 @@ export const Blue2AccountMenu: React.FC<{
   });
   const isRtl =
     typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
-  const menuPlacement = compactNavigation
-    ? isRtl
-      ? 'left-start'
-      : 'right-start'
-    : 'bottom-start';
+  const menuPlacement =
+    variant === 'navigationPanel'
+      ? isRtl
+        ? 'top-end'
+        : 'top-start'
+      : compactNavigation
+        ? isRtl
+          ? 'left-start'
+          : 'right-start'
+        : 'bottom-start';
 
   const menuContent = (
     <>
