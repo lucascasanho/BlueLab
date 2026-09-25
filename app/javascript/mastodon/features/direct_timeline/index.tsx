@@ -136,10 +136,17 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
                         ? 'column_header.unpin'
                         : 'column_header.pin'
                     }
-                    defaultMessage={
-                      blue2ColumnPinning.pinned ? 'Unpin' : 'Pin'
-                    }
-                  />
+                    {blue2ColumnPinning.pinned ? (
+                      <FormattedMessage
+                        id='column_header.unpin'
+                        defaultMessage='Unpin'
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id='column_header.pin'
+                        defaultMessage='Pin'
+                      />
+                    )}
                 </span>
               </button>
             )}
