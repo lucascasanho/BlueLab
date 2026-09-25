@@ -245,7 +245,7 @@ export const ColumnsAreaRedesign: React.FC<{
   if (minimalShell) {
     return (
       <div ref={ref} className={classNames(classes.root, classes.rootMinimal)}>
-        {isBlue2MobileLayout && <RedesignMobileNavigation />}
+        {(isBlue2MobileLayout || isFireBirdMobileLayout) && <RedesignMobileNavigation />}
         <div className={classes.main}>
           <Header />
 
