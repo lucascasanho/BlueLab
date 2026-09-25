@@ -116,7 +116,7 @@ RSpec.describe ThemeHelper do
     context 'when the administrator selected another selectable theme' do
       before { Setting.theme = 'mastodon-5' }
 
-      it { is_expected.to eq('alternate') }
+      it { is_expected.to eq('mastodon-5') }
     end
 
     context 'when the administrator theme is invalid' do
