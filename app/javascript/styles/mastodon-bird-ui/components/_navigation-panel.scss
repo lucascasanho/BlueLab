@@ -358,12 +358,16 @@
     height: 24px;
     width: 24px;
   }
+  .navigation-panel__menu {
+    padding-bottom: 0;
+  }
+
   .bird-ui-compose-button {
     align-self: center;
     width: fit-content;
     min-width: 0;
     min-height: 44px;
-    margin: 12px auto 0;
+    margin: 8px auto 0;
     padding-inline: 16px;
   }
 
