@@ -9,7 +9,7 @@
   flex: 1 1 auto;
   justify-content: flex-start;
   gap: var(--multi-column-gap);
-  padding-inline: calc(76px + var(--multi-column-gap)) var(--multi-column-gap);
+  padding-inline-end: var(--multi-column-gap);
   overflow-x: auto;
   scroll-padding-inline-start: var(--multi-column-navigation-width);
 
@@ -37,19 +37,29 @@
   }
 }
 
-.navigationRail {
-  position: fixed;
-  z-index: 102;
-  inset-block: 0;
+.blue2MultiColumnRoot {
+  min-width: 0;
+}
+
+.navigationWrapper {
+  position: sticky;
   inset-inline-start: 0;
+  top: 0;
+  z-index: 102;
+  flex: 0 0 76px;
   width: 76px;
+  min-width: 76px;
+  height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom);
   overflow: hidden;
   background: var(--blue2-bg, #000);
   border-inline-end: 1px solid var(--blue2-border-soft, #17232c);
-  transition: width 200ms ease;
+  transition: width 200ms ease, flex-basis 200ms ease;
 
   &[data-expanded='true'] {
-    width: 264px;
+    flex-basis: 240px;
+    width: 240px;
+    min-width: 240px;
   }
 }
 
@@ -67,44 +77,15 @@
   display: contents;
 }
 
-// BlueLab tablet keeps the navigation rail in its own 76px track and
-// gives the timeline columns their own horizontal scrolling area.
 @media (min-width: $mobile-menu-breakpoint) and (max-width: ($no-gap-breakpoint - 1)) {
   .blue2MultiColumnRoot {
     height: 100dvh;
     min-height: 100dvh;
-    padding: 0;
-    gap: 0;
     overflow: hidden;
+    gap: var(--multi-column-gap);
   }
 
-  .blue2MultiColumnRoot .navigationRail {
-    position: relative;
-    inset: auto;
-    flex: 0 0 76px;
-    width: 76px;
-    min-width: 76px;
-    height: 100dvh;
+  .blue2MultiColumnRoot .navigationWrapper {
     align-self: stretch;
-    overflow: hidden;
-  }
-
-  .blue2MultiColumnRoot .navigationRail[data-expanded='true'] {
-    flex-basis: 76px;
-    width: 76px;
-    min-width: 76px;
-  }
-
-  .blue2MultiColumnRoot .multiColumnContent {
-    min-width: 0;
-    min-height: 100%;
-    flex: 1 1 auto;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-inline: var(--multi-column-gap);
-  }
-
-  .blue2MultiColumnRoot.unscrollable .multiColumnContent {
-    overflow-x: hidden;
   }
 }
