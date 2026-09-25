@@ -93,6 +93,12 @@
   scrollbar-width: thin;
 }
 
+.navigationRoot svg path,
+.mobileChrome svg path,
+.desktopComposer svg path {
+  fill: currentColor;
+}
+
 .navigationRoot[data-mode='drawer'] {
   height: auto;
   min-height: 100%;
