@@ -54,7 +54,7 @@ export const Collections: React.FC<{
   const accountId = columnAccountId ?? routeAccountId;
   const account = useAccount(accountId);
   const routeMatch = useRouteMatch();
-  const path = routeMatch.path;
+  const path = routeMatch?.path ?? '';
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const useRedesignHeader = isRedesignEnabled() || isBlue2;
@@ -66,7 +66,7 @@ export const Collections: React.FC<{
     : messages.headingOther;
 
   const pageTitle = intl.formatMessage(titleMessage, {
-    name: account.get('display_name'),
+    name: account?.get('display_name'),
   });
   const pageTitleHtml = intl.formatMessage(titleMessage, {
     name: <DisplayNameSimple account={account} />,
