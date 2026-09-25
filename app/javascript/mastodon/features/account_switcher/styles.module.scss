@@ -3,6 +3,18 @@
   color: var(--color-text-primary, var(--blue2-text, currentColor));
 }
 
+
+.navigationSection {
+  margin: 0;
+  padding: 0;
+
+  > ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
 .header {
   min-height: 30px;
   padding: 3px 8px 6px;
