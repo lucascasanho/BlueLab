@@ -249,7 +249,11 @@ export const Blue2AccountMenu: React.FC<{
 
   return (
     <div
-      className={classNames(classes.root, compact && classes.rootCompact, className)}
+      className={classNames(
+        classes.root,
+        compact && classes.rootCompact,
+        className,
+      )}
     >
       <button
         ref={setAnchor}
