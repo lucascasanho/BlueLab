@@ -71,6 +71,8 @@ export const ColumnsAreaRedesign: React.FC<{
   );
   const isMobile = useBreakpoint('openable');
   const isCompactViewport = useBreakpoint('full');
+  const shouldExpandBlue2AdvancedNavigation =
+    isBlue2AdvancedNavigationExpanded && !isCompactViewport;
   const useMastodonComposer = useAppSelector(
     (state) => state.compose.get('composer_editor') === 'mastodon',
   );
@@ -411,11 +413,11 @@ export const ColumnsAreaRedesign: React.FC<{
       {!isMobile && (
         <aside
           className={multiColClasses.navigationRail}
-          data-expanded={isBlue2AdvancedNavigationExpanded}
+          data-expanded={shouldExpandBlue2AdvancedNavigation}
         >
           <Blue2Navigation
             compact
-            expanded={isBlue2AdvancedNavigationExpanded}
+            expanded={shouldExpandBlue2AdvancedNavigation}
             onToggleExpanded={handleToggleBlue2AdvancedNavigation}
           />
         </aside>
