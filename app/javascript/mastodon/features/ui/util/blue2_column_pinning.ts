@@ -95,7 +95,7 @@ const definitionForPath = (
     return { id: 'LISTS', params: {} };
   }
 
-  const listMatch = path.match(/^\/lists\/([^/]+)$/);
+  const listMatch = /^\/lists\/([^/]+)$/.exec(path);
   if (listMatch) {
     return { id: 'LIST', params: { id: listMatch[1] } };
   }
@@ -120,13 +120,13 @@ const definitionForPath = (
     return { id: 'FOLLOW_REQUESTS', params: {} };
   }
 
-  const hashtagMatch = path.match(/^\/tags\/([^/]+)$/);
+  const hashtagMatch = /^\/tags\/([^/]+)$/.exec(path);
   if (hashtagMatch) {
     return { id: 'HASHTAG', params: { id: decodeURIComponent(hashtagMatch[1]) } };
   }
 
-  const collectionsMatch = path.match(
-    /^\/@[^/]+\/collections(?:\/featuring-you)?$/,
+  const collectionsMatch = /^\/@[^/]+\/collections(?:\/featuring-you)?$/.exec(
+    path,
   );
   if (collectionsMatch && accountId) {
     return {
