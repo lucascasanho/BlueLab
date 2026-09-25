@@ -44,3 +44,21 @@ body[data-theme='mastodon-bird-ui-auto'] {
     }
   }
 }
+
+
+// Bird UI desktop right rail: reuse the BlueLab rail without affecting
+// mobile/tablet layouts that do not have enough horizontal space.
+.bird-ui-right-rail {
+  box-sizing: border-box;
+  order: 3;
+  width: 300px;
+  min-width: 300px;
+  height: 100dvh;
+  min-height: 0;
+}
+
+@media screen and (max-width: 1279px) {
+  .bird-ui-right-rail {
+    display: none;
+  }
+}
