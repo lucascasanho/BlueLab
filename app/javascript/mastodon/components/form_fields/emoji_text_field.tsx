@@ -33,6 +33,7 @@ export type EmojiInputProps = {
   counterMax?: number;
   recommended?: boolean;
   blue2EmojiEditor?: boolean;
+  mastodon5EmojiEditor?: boolean;
 } & Omit<CommonFieldWrapperProps, 'wrapperClassName'>;
 
 export const EmojiTextInputField: FC<
@@ -48,6 +49,7 @@ export const EmojiTextInputField: FC<
   recommended,
   disabled,
   blue2EmojiEditor = false,
+  mastodon5EmojiEditor = false,
   ...otherProps
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -61,6 +63,7 @@ export const EmojiTextInputField: FC<
     maxLength,
     disabled,
     blue2EmojiEditor,
+    mastodon5EmojiEditor,
     inputRef,
     value,
     onChange,
@@ -107,6 +110,7 @@ export const EmojiTextAreaField: FC<
     maxLength,
     disabled,
     blue2EmojiEditor,
+    mastodon5EmojiEditor,
     inputRef: textareaRef,
     value,
     onChange,
@@ -141,9 +145,13 @@ export type EmojiFieldWrapperProps = EmojiInputProps & {
 };
 
 const EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = (props) => {
+  const isMastodon5Theme =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'mastodon-5';
+
   if (
-    props.blue2EmojiEditor &&
-    (isBlue2Theme() || isBirdUiTheme())
+    (props.blue2EmojiEditor && (isBlue2Theme() || isBirdUiTheme())) ||
+    (props.mastodon5EmojiEditor && isMastodon5Theme)
   ) {
     return <Blue2EmojiFieldWrapper {...props} />;
   }
@@ -161,6 +169,7 @@ const DefaultEmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   recommended = false,
   maxLength: _maxLength,
   blue2EmojiEditor: _blue2EmojiEditor,
+  mastodon5EmojiEditor: _mastodon5EmojiEditor,
   ...otherProps
 }) => {
   const counterId = useId();
