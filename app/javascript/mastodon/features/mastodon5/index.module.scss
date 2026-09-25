@@ -18,7 +18,17 @@
   width: 100%;
   height: 100dvh;
   min-width: 0;
-  border-inline-end: 1px solid var(--m5-border, var(--color-border-primary));
+  border-inline-end: 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-block: 20px;
+    inset-inline-end: 0;
+    width: 1px;
+    border-radius: 999px;
+    background: var(--m5-border, var(--color-border-primary));
+  }
 }
 
 .main {
@@ -93,9 +103,13 @@
   scrollbar-width: thin;
 }
 
-.navigationRoot svg path,
-.mobileChrome svg path,
-.desktopComposer svg path {
+.newPost > svg path,
+.link > svg path,
+.sectionAction > svg path,
+.subLink > svg path,
+.mobileMenuButton > svg path,
+.mobileItem > svg path,
+.drawerClose > svg path {
   fill: currentColor;
 }
 
