@@ -14,6 +14,7 @@ import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 import { Blue2AccountMenu } from './account_menu';
 import { Blue2HomeIcon } from './icons';
 import { Blue2ComposeButton } from './navigation';
+import classes from './right_rail.module.scss';
 
 interface TrendTag {
   name: string;
