@@ -1,5 +1,4 @@
 mastodon-bird-ui-auto: styles/mastodon-bird-ui-auto.scss
 blue-2: styles/blue-2-v21.scss
 mastodon-5: styles/mastodon-5-v1.scss
-firebird: styles/firebird.scss
 default: styles/application.scss
