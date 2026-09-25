@@ -20,9 +20,7 @@
 
   &[data-mode='slide-out'] {
     --navigation-background-color: var(--color-bg-primary);
-
-    overflow: visible;
-    isolation: isolate;
+    min-width: 0;
   }
 }
 
@@ -39,7 +37,6 @@
   padding: var(--space-6);
   padding-top: var(--space-1);
   background-color: var(--navigation-background-color);
-  overflow: visible;
 
   &::before {
     @include mixins.scroll-gradient(bottom, var(--navigation-background-color));
