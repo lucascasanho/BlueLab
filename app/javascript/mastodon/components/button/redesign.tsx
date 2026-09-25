@@ -1,14 +1,12 @@
 import type React from 'react';
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback } from 'react';
 
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 import type { LinkProps } from 'react-router-dom';
 
 import { CaretDownIcon } from '@phosphor-icons/react';
-
-import { usePrevious } from '@/mastodon/hooks/usePrevious';
 
 import { CircularProgress } from '../circular_progress';
 import type { IconProp } from '../icon';
@@ -112,18 +110,25 @@ const BaseButton: React.FC<BaseButtonProps> = ({
 export type ButtonProps = BaseButtonProps & {
   leadingIcon?: IconProp;
   trailingIcon?: IconProp;
+  leadingIconWrapperClassName?: string;
 };
 
 export const Button: React.FC<ButtonProps> = ({
   children,
   leadingIcon,
   trailingIcon,
+  leadingIconWrapperClassName,
   ...props
 }) => (
   <BaseButton {...props}>
-    {leadingIcon && !props.loading && (
-      <Icon id='leading' icon={leadingIcon} className={classes.icon} />
-    )}
+    {leadingIcon && !props.loading &&
+      (leadingIconWrapperClassName ? (
+        <span className={leadingIconWrapperClassName}>
+          <Icon id='leading' icon={leadingIcon} className={classes.icon} />
+        </span>
+      ) : (
+        <Icon id='leading' icon={leadingIcon} className={classes.icon} />
+      ))}
     {props.loading && <LoadingIcon />}
     {children}
     {trailingIcon && (
@@ -172,79 +177,19 @@ const LoadingIcon: React.FC = () => (
   />
 );
 
-export const ToggleButton: React.FC<
-  ButtonProps & { active?: boolean; animate?: boolean }
-> = ({ active, animate = false, className, onClick, ...props }) => {
-  const [clickAnimation, setClickAnimation] = useState<
-    'activate' | 'deactivate' | null
-  >(null);
-  const animationFrameRef = useRef<number | null>(null);
-  const animationTimeoutRef = useRef<number | null>(null);
-  const previousActive = usePrevious(active) ?? active;
-  const shouldAnimate = animate && active !== previousActive;
-
-  useEffect(
-    () => () => {
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      if (animationTimeoutRef.current !== null) {
-        window.clearTimeout(animationTimeoutRef.current);
-      }
-    },
-    [],
-  );
-
-  const triggerClickAnimation = useCallback(() => {
-    if (!animate) {
-      return;
-    }
-
-    const animation = active ? 'deactivate' : 'activate';
-
-    if (animationFrameRef.current !== null) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-    if (animationTimeoutRef.current !== null) {
-      window.clearTimeout(animationTimeoutRef.current);
-    }
-
-    setClickAnimation(null);
-    animationFrameRef.current = requestAnimationFrame(() => {
-      setClickAnimation(animation);
-      animationTimeoutRef.current = window.setTimeout(() => {
-        setClickAnimation(null);
-        animationTimeoutRef.current = null;
-      }, 1000);
-      animationFrameRef.current = null;
-    });
-  }, [active, animate]);
-
-  const handleClick: React.MouseEventHandler<
-    HTMLButtonElement & HTMLAnchorElement
-  > = useCallback(
-    (event) => {
-      triggerClickAnimation();
-      onClick?.(event);
-    },
-    [onClick, triggerClickAnimation],
-  );
-
-  return (
-    <Button
-      aria-pressed={active}
-      {...props}
-      // Toggle buttons always have neutral until pressed.
-      color='neutral'
-      className={classNames(className, classes.toggle, {
-        activate: (shouldAnimate && active) || clickAnimation === 'activate',
-        deactivate:
-          (shouldAnimate && !active) || clickAnimation === 'deactivate',
-      })}
-      onClick={handleClick}
-    />
-  );
-};
+export const ToggleButton: React.FC<ButtonProps & { active?: boolean }> = ({
+  active,
+  className,
+  ...props
+}) => (
+  <Button
+    aria-pressed={active}
+    {...props}
+    // Toggle buttons always have neutral until pressed.
+    color='neutral'
+    className={classNames(className, classes.toggle)}
+  />
+);
 
 export const ToggleIconButton: React.FC<
   IconButtonProps & { active?: boolean }

@@ -23,13 +23,15 @@ export function animateFavouriteIcon(
     return;
   }
 
-  const icon = button.querySelector<HTMLElement>('.icon');
+  const target = button.querySelector<HTMLElement>(
+    '.favourite-animation-target',
+  );
 
-  if (!icon || typeof icon.animate !== 'function') {
+  if (!target || typeof target.animate !== 'function') {
     return;
   }
 
-  icon.animate(active ? springRotateOut : springRotateIn, {
+  target.animate(active ? springRotateOut : springRotateIn, {
     duration: 1000,
     easing: 'linear',
     fill: 'none',
