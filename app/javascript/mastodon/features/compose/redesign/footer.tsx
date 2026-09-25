@@ -132,6 +132,7 @@ export const ComposeFooter: React.FC<{
 
       <ComposeEmojiButton onPick={onEmojiPick} />
 
+      {!isMessage && (
       <IconButton
         size='sm'
         icon={ChartBarHorizontalIcon}
@@ -144,6 +145,7 @@ export const ComposeFooter: React.FC<{
         />
       </IconButton>
 
+      )}
       {!isMessage && <ComposeSchedule />}
 
       <div className={classes.flexGrowWrap}>
