@@ -5,8 +5,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Link, NavLink } from 'react-router-dom';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
-import { Blue2AccountMenu } from './account_menu';
-import { Blue2ComposeButton } from './navigation';
 import { Search } from '@/mastodon/features/compose/components/search';
 import { useIdentity } from '@/mastodon/identity_context';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
@@ -14,7 +12,8 @@ import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 
 import { Blue2HomeIcon } from './icons';
-import classes from './right_rail.module.scss';
+import { Blue2AccountMenu } from './account_menu';
+import { Blue2ComposeButton } from './navigation';
 
 interface TrendTag {
   name: string;
