@@ -35,8 +35,8 @@ const messages = defineMessages({
     defaultMessage: 'GIFs',
   },
   search: {
-    id: 'gif_button.search',
-    defaultMessage: 'Search KLIPY',
+    id: 'search.placeholder',
+    defaultMessage: 'Search',
   },
   loading: {
     id: 'gif_button.loading',
@@ -317,7 +317,6 @@ const ComposeGifDropdown: React.FC<
     >
       <div className={classes.header}>
         <div className={classes.titleRow}>
-          <GifIcon aria-hidden='true' />
           <strong>
             <FormattedMessage
               id={messages.title.id}
