@@ -1,3 +1,4 @@
+// These angles match Mastodon's existing spring-rotate-in/out keyframes.
 const springRotateIn = [
   { transform: 'rotate(0deg)' },
   { transform: 'rotate(-484.8deg)', offset: 0.3 },
