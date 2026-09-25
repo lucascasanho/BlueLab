@@ -1,4 +1,4 @@
-- bluelab_error = respond_to?(:current_theme) && current_theme == 'blue-2'
+- bluelab_error = respond_to?(:current_theme) && current_theme == 'blue-2' && response.status == 404
 
 !!!
 %html{ bluelab_error ? html_attributes.merge('data-theme' => current_theme) : { lang: I18n.locale, 'data-contrast' => 'auto', 'data-color-scheme' => 'auto' } }
