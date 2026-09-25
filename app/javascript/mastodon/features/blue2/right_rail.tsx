@@ -6,10 +6,7 @@ import { Link } from 'react-router-dom';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import { Search } from '@/mastodon/features/compose/components/search';
-import { useIdentity } from '@/mastodon/identity_context';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
-
-import { Blue2AccountMenu } from './account_menu';
 import { Blue2ComposeButton } from './navigation';
 import classes from './right_rail.module.scss';
 
@@ -17,11 +14,8 @@ interface TrendTag {
   name: string;
 }
 
-export const Blue2RightRail: React.FC<{ showProfileCard?: boolean }> = ({
-  showProfileCard = false,
-}) => {
+export const Blue2RightRail: React.FC = () => {
   const intl = useIntl();
-  const { signedIn } = useIdentity();
   const [tags, setTags] = useState<TrendTag[]>([]);
   const [trendMenuOpen, setTrendMenuOpen] = useState(false);
   const [trendsHidden, setTrendsHidden] = useState(false);
@@ -79,12 +73,7 @@ export const Blue2RightRail: React.FC<{ showProfileCard?: boolean }> = ({
         <Search singleColumn />
       </div>
 
-      {showProfileCard && signedIn && (
-        <>
-          <Blue2AccountMenu className={classes.rightRailProfile} />
-          <Blue2ComposeButton className={classes.rightRailComposeButton} />
-        </>
-      )}
+      <Blue2ComposeButton className={classes.rightRailComposeButton} />
 
       <div className={classes.content}>
         {!trendsHidden && (
@@ -120,33 +109,6 @@ export const Blue2RightRail: React.FC<{ showProfileCard?: boolean }> = ({
           </section>
         )}
       </div>
-
-      <footer className={classes.footer}>
-        <a href='/about'>
-          <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
-        </a>
-        <span>·</span>
-        <a href='/privacy-policy'>
-          <FormattedMessage
-            id='footer.privacy_policy_short'
-            defaultMessage='Privacy'
-          />
-        </a>
-        <span>·</span>
-        <a href='/terms-of-service'>
-          <FormattedMessage
-            id='footer.terms_of_service_short'
-            defaultMessage='Terms'
-          />
-        </a>
-        <span>·</span>
-        <Link to='/keyboard-shortcuts'>
-          <FormattedMessage
-            id='keyboard_shortcuts.heading'
-            defaultMessage='Keyboard Shortcuts'
-          />
-        </Link>
-      </footer>
 
       {trendMenuOpen && (
         <div
