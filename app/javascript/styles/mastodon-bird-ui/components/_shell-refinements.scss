@@ -62,3 +62,12 @@ body[data-theme='mastodon-bird-ui-auto'] {
     display: none;
   }
 }
+
+@media screen and (min-width: 1280px) {
+  // The legacy compositional pane is only a mobile compose host. Bird UI
+  // now has its compose action in the right rail, so do not reserve an
+  // empty desktop flex item for the old host.
+  .layout-single-column .columns-area__panels__pane--compositional {
+    display: none;
+  }
+}
