@@ -2409,6 +2409,7 @@ pt-BR:
   themes:
     blue-2: BlueLab
     mastodon-5: Mastodon 5.0
+    firebird: FireBird
     default: Vanilla
     mastodon-bird-ui-auto: Bird UI
   time:
