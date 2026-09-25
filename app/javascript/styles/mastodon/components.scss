@@ -674,6 +674,8 @@ body > [data-popover-placement] {
     }
 
     &__actions {
+      position: relative;
+      z-index: 1;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
@@ -694,6 +696,7 @@ body > [data-popover-placement] {
       inset-inline-start: 0;
       object-fit: cover;
       pointer-events: none;
+      z-index: 0;
     }
 
     &__preview {
