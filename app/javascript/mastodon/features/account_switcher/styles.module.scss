@@ -1,125 +1,89 @@
-.root {
-  position: fixed;
-  z-index: 1100;
-  inset-block-start: max(8px, env(safe-area-inset-top));
-  inset-inline-end: 12px;
-  pointer-events: none;
-}
-
-.trigger {
-  width: 44px;
-  height: 44px;
-  padding: 2px;
-  border: 1px solid var(--color-border-primary);
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  background: var(--color-bg-secondary);
-  color: var(--color-text-primary);
-  box-shadow: var(--dropdown-shadow, 0 4px 16px rgb(0 0 0 / 18%));
-  pointer-events: auto;
-  cursor: pointer;
-}
-
-.trigger:hover,
-.trigger:focus-visible,
-.trigger[aria-expanded='true'] {
-  border-color: var(--color-border-primary);
-  background: var(--color-bg-primary);
-  outline: 2px solid var(--color-border-primary);
-  outline-offset: 1px;
-}
-
-.panel {
-  box-sizing: border-box;
-  width: min(340px, calc(100vw - 16px));
-  max-height: min(620px, calc(100dvh - 16px));
-  padding: 10px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  border: 1px solid var(--color-border-primary);
-  border-radius: var(--radius-lg, 12px);
-  background: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  box-shadow: var(--dropdown-shadow, 0 14px 40px rgb(0 0 0 / 28%));
-  pointer-events: auto;
+.section {
+  padding: 2px 0 4px;
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
 }
 
 .header {
-  min-height: 32px;
-  padding: 2px 4px 8px;
+  min-height: 30px;
+  padding: 3px 8px 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  color: var(--color-text-primary);
-  font-size: 15px;
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
+  font-size: 12px;
   font-weight: 700;
+  text-transform: none;
 }
 
 .count {
-  min-width: 22px;
-  min-height: 20px;
-  padding: 2px 7px;
+  min-width: 20px;
+  min-height: 18px;
+  padding: 1px 6px;
   border-radius: 999px;
-  background: var(--color-bg-secondary);
-  color: var(--color-text-primary);
-  font-size: 12px;
-  line-height: 20px;
+  background: var(--color-bg-secondary, var(--blue2-hover, currentColor));
+  color: var(--color-text-secondary, var(--blue2-muted, currentColor));
+  font-size: 11px;
+  line-height: 18px;
   text-align: center;
 }
 
 .accounts {
   display: grid;
   gap: 2px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
 }
 
-.accountRow {
+.accountRow,
+.navigationAccountRow {
   min-width: 0;
   display: flex;
   align-items: stretch;
   gap: 2px;
+  list-style: none;
 }
 
-.accountButton {
+.accountButton,
+.navigationAccountButton {
   box-sizing: border-box;
   min-width: 0;
-  min-height: 56px;
+  min-height: 48px;
   flex: 1 1 auto;
-  padding: 7px;
+  padding: 6px 8px;
   border: 0;
   border-radius: var(--radius-sm, 8px);
   display: flex;
   align-items: center;
   gap: 9px;
   background: transparent;
-  color: var(--color-text-primary);
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
   text-align: start;
   cursor: pointer;
 }
 
+.accountButton {
+  width: 100%;
+}
+
 .accountButton:hover:not(:disabled),
-.accountButton:focus-visible:not(:disabled) {
-  background: var(--color-bg-secondary);
+.accountButton:focus-visible:not(:disabled),
+.navigationAccountButton:hover:not(:disabled),
+.navigationAccountButton:focus-visible:not(:disabled) {
+  background: var(--color-bg-highlight, var(--blue2-hover, rgb(127 127 127 / 12%)));
   outline: none;
 }
 
-.accountButton[aria-current='page'] {
-  background: var(--color-bg-secondary);
+.accountButton[aria-current='page'],
+.navigationAccountButton[aria-current='page'] {
+  background: var(--color-bg-secondary, var(--blue2-hover, rgb(127 127 127 / 10%)));
 }
 
-.accountButton:disabled {
-  cursor: wait;
-  opacity: 0.7;
-}
-
-.avatar {
-  flex: 0 0 40px;
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  object-fit: cover;
-  background: var(--color-bg-secondary);
+.accountButton:disabled,
+.navigationAccountButton:disabled {
+  cursor: default;
+  opacity: 1;
 }
 
 .accountText {
@@ -139,23 +103,29 @@
 }
 
 .accountText strong {
-  color: var(--color-text-primary);
-  font-size: 14px;
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
+  font-size: 13px;
+  line-height: 1.2;
 }
 
 .accountText > span {
-  color: var(--color-text-secondary);
-  font-size: 12px;
+  color: var(--color-text-secondary, var(--blue2-muted, currentColor));
+  font-size: 11px;
+  line-height: 1.2;
 }
 
 .current {
   flex: 0 0 auto;
+  max-width: 58px;
+  overflow: hidden;
   padding: 3px 6px;
   border-radius: 999px;
-  background: var(--color-bg-secondary);
-  color: var(--color-text-primary);
-  font-size: 11px;
+  background: var(--color-bg-secondary, var(--blue2-hover, rgb(127 127 127 / 10%)));
+  color: var(--color-text-secondary, var(--blue2-muted, currentColor));
+  font-size: 10px;
   font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .removeButton {
@@ -166,73 +136,101 @@
   border: 0;
   border-radius: var(--radius-sm, 8px);
   background: transparent;
-  color: var(--color-text-secondary);
-  font-size: 20px;
+  color: var(--color-text-secondary, var(--blue2-muted, currentColor));
+  font-size: 19px;
   line-height: 1;
   cursor: pointer;
 }
 
 .removeButton:hover,
 .removeButton:focus-visible {
-  background: var(--color-bg-secondary);
-  color: var(--color-text-primary);
+  background: var(--color-bg-highlight, var(--blue2-hover, rgb(127 127 127 / 12%)));
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
   outline: none;
 }
 
 .divider {
   height: 1px;
-  margin: 8px 2px;
-  background: var(--color-border-primary);
+  margin: 6px 4px;
+  background: var(--color-border-primary, var(--blue2-border-soft, rgb(127 127 127 / 20%)));
 }
 
-.action {
+.action,
+.navigationAction {
   box-sizing: border-box;
-  min-height: 44px;
-  padding: 9px 10px;
+  min-height: 42px;
+  padding: 8px 10px;
   border-radius: var(--radius-sm, 8px);
   display: flex;
   align-items: center;
-  color: var(--color-text-primary);
-  font-size: 13px;
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
+  font-size: 12px;
   font-weight: 600;
   text-decoration: none;
 }
 
+.action {
+  width: 100%;
+}
+
 .action:hover,
-.action:focus-visible {
-  background: var(--color-bg-secondary);
-  color: var(--color-text-primary);
+.action:focus-visible,
+.navigationAction:hover,
+.navigationAction:focus-visible {
+  background: var(--color-bg-highlight, var(--blue2-hover, rgb(127 127 127 / 12%)));
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
+  text-decoration: none;
   outline: none;
 }
 
-.error {
-  margin: 8px 4px 4px;
-  color: var(--color-text-primary);
-  font-size: 12px;
-  line-height: 1.35;
+.error,
+.navigationError {
+  margin: 6px 8px 4px;
+  color: var(--color-text-secondary, var(--blue2-muted, currentColor));
+  font-size: 11px;
+  line-height: 1.4;
 }
 
-@media (width <= 759px) {
-  .root {
-    inset-inline-end: 8px;
+.navigationError {
+  margin: 4px var(--space-sm) 6px;
+}
+
+.navigationAccountRow {
+  width: 100%;
+}
+
+.navigationAccountButton {
+  min-height: 50px;
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.navigationAction {
+  width: 100%;
+  text-decoration: none;
+}
+
+@media (width < 600px) {
+  .section {
+    padding-block-end: 2px;
   }
 
-  .trigger {
-    width: 42px;
-    height: 42px;
+  .accountButton,
+  .navigationAccountButton {
+    min-height: 48px;
   }
 
-  .panel {
-    width: min(340px, calc(100vw - 16px));
-    max-height: calc(100dvh - 16px);
+  .action,
+  .navigationAction {
+    min-height: 46px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .trigger,
   .accountButton,
+  .navigationAccountButton,
   .removeButton,
-  .action {
+  .action,
+  .navigationAction {
     transition: none;
   }
 }
