@@ -37,3 +37,5 @@ jobs:
           fi
           git commit -m "chore: fix CI formatting and automatic lint issues"
           git push
+
+# Temporary workflow; removed after CI cleanup.
