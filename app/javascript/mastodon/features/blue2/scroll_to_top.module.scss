@@ -85,3 +85,20 @@
     bottom: max(18px, env(safe-area-inset-bottom));
   }
 }
+
+
+:global(body[data-theme='mastodon-bird-ui-auto']) .root {
+  border-color: rgb(56 56 77 / 55%);
+  background: color-mix(
+    in srgb,
+    var(--color-bg-primary, #1e2028) 94%,
+    transparent
+  );
+  color: var(--color-text-primary, #fff);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--color-bg-secondary, rgb(255 255 255 / 5%));
+    color: var(--color-text-primary, #fff);
+  }
+}
