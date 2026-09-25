@@ -753,7 +753,6 @@ proteção de prontidão de deploy. Confirmar o estado real com `git status`, re
 remotas e `git log` antes de agir; não incluir extrações adicionais do shell no mesmo
 lote sem nova análise própria.
 
-
 ### Correção do bootstrap do comando `bluelab` — 2026-09-22
 
 O pipeline canônico passou a usar exclusivamente `BlueLab-Test` no Blue e
@@ -786,7 +785,6 @@ validações.
 **Único próximo passo seguro:** executar `bluelab` na Espelunca novamente e
 registrar se o runtime Ruby foi preparado e se o deploy completo terminou.
 
-
 ### Bootstrap de autoatualização do comando — 2026-09-22
 
 A primeira correção de runtime não podia ser alcançada pela cópia antiga de
@@ -812,7 +810,6 @@ normais.
 instalado na Espelunca e executar `bluelab` novamente. Não executar Bundler,
 Rails ou migrations manualmente antes disso.
 
-
 ### Correção da instalação automática do Ruby — 2026-09-22
 
 A versão `4.0.7` continua sendo a versão exigida pelo `.ruby-version` do BlueLab
@@ -837,7 +834,6 @@ execução anterior parou antes do Bundler porque `ruby-build` não conhecia
 comando deve primeiro atualizar sua própria cópia, depois atualizar/instalar
 `ruby-build`, instalar Ruby `4.0.7` e prosseguir com o deploy.
 
-
 ### Correção da instalação das gems no deploy — 2026-09-22
 
 A Espelunca alcançou o SHA do canal corretamente e preparou Ruby `4.0.7`, mas
@@ -859,7 +855,6 @@ confirmados na Espelunca após essa correção.
 **Único próximo passo seguro:** executar `bluelab` na Espelunca novamente e deixar
 a etapa `bundle install` concluir antes de avaliar migrations, assets e restart.
 
-
 ### Correção da ordem das dependências Ruby/JS — 2026-09-22
 
 A tentativa de deploy na Espelunca confirmou que a implementação anterior ainda
@@ -868,6 +863,7 @@ Consequentemente, as gems ausentes continuavam causando `Bundler::GemNotFound`
 e a etapa de instalação nunca era alcançada.
 
 O `bin/bluelab` foi reorganizado em duas etapas:
+
 - `instalar_dependencias`: executa primeiro `bundle install`, `bundle check`
   e `yarn install --immutable`;
 - `aplicar_migrations`: executa migrations somente depois de o bundle estar
@@ -885,7 +881,6 @@ Correção publicada em `e18a6dda0ca03d9c973d921cbfd349fdfab6e5aa`, com
 **Único próximo passo seguro:** executar `bluelab` na Espelunca novamente. O
 comando deve chegar efetivamente à etapa `bundle install` antes de qualquer
 comando Rails.
-
 
 ### Redução do paralelismo do Bundler — 2026-09-22
 

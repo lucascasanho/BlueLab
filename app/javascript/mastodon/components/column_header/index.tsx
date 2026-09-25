@@ -8,12 +8,18 @@ import { useLocation } from 'react-router';
 import { ArrowLeftIcon, DotsThreeIcon, ListIcon } from '@phosphor-icons/react';
 import type { DistributedOmit } from 'type-fest';
 
-import { Menu, MenuItem, MenuItemDivider, MenuList, MenuTrigger } from '@/mastodon/components/menu';
 import { openNavigation } from '@/mastodon/actions/navigation';
+import {
+  Menu,
+  MenuItem,
+  MenuItemDivider,
+  MenuList,
+  MenuTrigger,
+} from '@/mastodon/components/menu';
 import { getColumnSkipLinkId } from '@/mastodon/features/ui/components/skip_links';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
-import { useAppDispatch } from '@/mastodon/store';
 import { useBlue2ColumnPinning } from '@/mastodon/features/ui/util/blue2_column_pinning';
+import { useAppDispatch } from '@/mastodon/store';
 import { hasReactChildren } from '@/mastodon/utils/has_react_children';
 
 import type { IconButtonProps } from '../button/redesign';
@@ -55,8 +61,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     (withBackButton === 'auto' && location.state?.fromMastodon);
   const hasExtraStickyContent = hasReactChildren(extraStickyContent);
   const { canPin, pinned, onPin, onMove } = useBlue2ColumnPinning();
-  const showBlue2ColumnSettings =
-    canPin && !hasReactChildren(extraButtons);
+  const showBlue2ColumnSettings = canPin && !hasReactChildren(extraButtons);
 
   const history = useAppHistory();
 
@@ -79,15 +84,9 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     <Menu>
       <MenuTrigger as={ColumnHeaderButton} icon={DotsThreeIcon}>
         {pinned ? (
-          <FormattedMessage
-            id='column_header.unpin'
-            defaultMessage='Unpin'
-          />
+          <FormattedMessage id='column_header.unpin' defaultMessage='Unpin' />
         ) : (
-          <FormattedMessage
-            id='column_header.pin'
-            defaultMessage='Pin'
-          />
+          <FormattedMessage id='column_header.pin' defaultMessage='Pin' />
         )}
       </MenuTrigger>
       <MenuList placement='bottom-end' strategy='fixed'>

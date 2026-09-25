@@ -54,7 +54,9 @@
   overflow: hidden;
   background: var(--blue2-bg, #000);
   border-inline-end: 1px solid var(--blue2-border-soft, #17232c);
-  transition: width 200ms ease, flex-basis 200ms ease;
+  transition:
+    width 200ms ease,
+    flex-basis 200ms ease;
 
   &[data-expanded='true'] {
     flex-basis: 240px;

@@ -1,20 +1,20 @@
 import { useCallback, useMemo } from 'react';
 
-import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
-
 import { useLocation } from 'react-router';
+
+import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import {
   addColumn,
   moveColumn,
   removeColumn,
 } from '@/mastodon/actions/columns';
+import { useColumnIndexContext } from '@/mastodon/components/column/context';
 import { useAccountId } from '@/mastodon/hooks/useAccountId';
 import { forceSingleColumn } from '@/mastodon/initial_state';
 import { isBlue2MobileViewport } from '@/mastodon/is_mobile';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
-import { useColumnIndexContext } from '@/mastodon/components/column/context';
 import { useColumnsContext } from './columns_context';
 
 type Blue2ColumnState = ImmutableMap<string, unknown>;
@@ -122,7 +122,10 @@ const definitionForPath = (
 
   const hashtagMatch = /^\/tags\/([^/]+)$/.exec(path);
   if (hashtagMatch) {
-    return { id: 'HASHTAG', params: { id: decodeURIComponent(hashtagMatch[1]) } };
+    return {
+      id: 'HASHTAG',
+      params: { id: decodeURIComponent(hashtagMatch[1]) },
+    };
   }
 
   const collectionsMatch = /^\/@[^/]+\/collections(?:\/featuring-you)?$/.exec(
@@ -156,8 +159,7 @@ export const useBlue2ColumnPinning = () => {
   );
 
   const isBlue2 =
-    typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'blue-2';
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const isDesktopAdvanced =
     isBlue2 &&
     !forceSingleColumn &&

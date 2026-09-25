@@ -5,6 +5,8 @@ import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 import { ChatCircleDotsIcon, PlusIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
+// BLUELAB_INTEGRATION: BlueLab-owned labels for the optional BlueLab theme.
+import { blue2Text } from '@/bluelab/i18n/blue2';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';
 import {
@@ -13,8 +15,6 @@ import {
   ColumnSettingsMenu,
 } from '@/mastodon/components/column_header';
 import { MultiColumnMenuItems } from '@/mastodon/components/column_header/multicolumn_settings';
-// BLUELAB_INTEGRATION: BlueLab-owned labels for the optional BlueLab theme.
-import { blue2Text } from '@/bluelab/i18n/blue2';
 import { useBlue2ColumnPinning } from '@/mastodon/features/ui/util/blue2_column_pinning';
 import {
   composerOriginFromElement,

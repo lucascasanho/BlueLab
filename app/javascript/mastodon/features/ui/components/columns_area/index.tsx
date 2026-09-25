@@ -2,9 +2,9 @@ import { useCallback } from 'react';
 
 import classNames from 'classnames';
 
-import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
+import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
 import { Header } from '@/mastodon/features/custom_homepage/components/header';
 import { CollapsibleNavigationPanel } from '@/mastodon/features/navigation_panel';
@@ -12,6 +12,7 @@ import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useColumnsContext } from '@/mastodon/features/ui/util/columns_context';
 import { useAppSelector } from '@/mastodon/store';
 
+import { ColumnsAreaMastodon5 } from '../../../mastodon5';
 import {
   ComposePanel,
   RedirectToMobileComposeIfNeeded,
@@ -19,7 +20,6 @@ import {
 
 import { MultiColumnContent } from './multi_column_content';
 import { ColumnsAreaRedesign } from './redesign';
-import { ColumnsAreaMastodon5 } from '../../../mastodon5';
 
 const TabsBarPortal = () => {
   const { setTabsBarElement } = useColumnsContext();

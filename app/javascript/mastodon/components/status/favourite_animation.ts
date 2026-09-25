@@ -15,10 +15,7 @@ const springRotateOut = [
   { transform: 'rotate(0deg)' },
 ];
 
-export function animateFavouriteIcon(
-  button: Element,
-  active: boolean,
-): void {
+export function animateFavouriteIcon(button: Element, active: boolean): void {
   if (!document.documentElement.classList.contains('no-reduce-motion')) {
     return;
   }
