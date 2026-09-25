@@ -23,9 +23,12 @@
 }
 
 .rightRailComposeButton {
-  width: 100%;
-  margin: 0 0 10px;
+  width: fit-content;
+  min-width: 0;
   min-height: 44px;
+  margin: 0 0 10px;
+  padding-inline: 16px;
+  align-self: flex-start;
 }
 
 .searchHost {
@@ -131,52 +134,6 @@
     background: var(--blue2-hover, #18212a);
     outline: none;
   }
-}
-
-.feeds {
-  margin-top: 10px;
-}
-
-.feedShortcut {
-  min-height: 36px;
-  padding: 0 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--blue2-text, #f7f7f8) !important;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-  border-radius: 8px;
-
-  &:hover,
-  &:focus-visible {
-    color: var(--blue2-text, #f7f7f8) !important;
-    background: var(--blue2-hover, #18212a);
-    text-decoration: none;
-    outline: none;
-  }
-}
-
-.feedIcon {
-  width: 24px;
-  height: 24px;
-  border-radius: 5px;
-  display: grid;
-  place-items: center;
-  background: color-mix(in srgb, var(--blue2-search, #15202b) 86%, transparent);
-  color: var(--blue2-text, #f7f7f8);
-
-  svg {
-    width: 17px;
-    height: 17px;
-    fill: currentColor;
-  }
-}
-
-.feedShortcutActive .feedIcon {
-  background: var(--blue2-blue, #0085ff);
-  color: #fff;
 }
 
 .card {
