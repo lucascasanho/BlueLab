@@ -77,7 +77,9 @@ export const Blue2RightRail: React.FC<{
   );
 
   return (
-    <aside className={`${classes.root} ${isBirdUiVariant ? classes.birdUiVariant : ''}`}>
+    <aside
+      className={`${classes.root} ${isBirdUiVariant ? classes.birdUiVariant : ''} ${isMobileVariant ? classes.mobileVariant : ''}`}
+    >
       <div className={classes.content}>
         <div className={classes.searchHost}>
           <Search singleColumn />
