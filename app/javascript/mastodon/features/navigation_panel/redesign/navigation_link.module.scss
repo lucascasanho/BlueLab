@@ -134,3 +134,28 @@
     inset-inline-start: calc(50% + var(--space-half));
   }
 }
+
+
+/* FireBird mobile icon treatment. */
+:global(body[data-theme='firebird']) .linkMobile {
+  min-height: 56px;
+  padding: 0;
+  border-radius: 0;
+  color: var(--firebird-muted, #536471);
+}
+
+:global(body[data-theme='firebird']) .linkMobile[aria-current='page'] {
+  color: var(--firebird-text, #0f1419);
+  background: transparent;
+}
+
+:global(body[data-theme='firebird']) .linkMobile:hover,
+:global(body[data-theme='firebird']) .linkMobile:focus-visible {
+  background: var(--firebird-surface-soft, #f7f9f9);
+}
+
+:global(body[data-theme='firebird']) .linkMobile .icon {
+  width: 24px;
+  height: 24px;
+}
+
