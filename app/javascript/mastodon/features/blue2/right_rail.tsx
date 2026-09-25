@@ -82,43 +82,43 @@ export const Blue2RightRail: React.FC<{ variant?: 'birdUi' }> = ({ variant }) =>
 
         {!isBirdUiVariant && (
           <nav className={classes.feeds} aria-label='Timelines'>
-          {signedIn && (
+            {signedIn && (
+              <NavLink
+                className={classes.feedShortcut}
+                activeClassName={classes.feedShortcutActive}
+                exact
+                to='/home'
+              >
+                <span className={classes.feedIcon}>
+                  <Blue2HomeIcon size={18} />
+                </span>
+                <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
+              </NavLink>
+            )}
+
             <NavLink
               className={classes.feedShortcut}
               activeClassName={classes.feedShortcutActive}
               exact
-              to='/home'
+              to='/public/local'
             >
               <span className={classes.feedIcon}>
-                <Blue2HomeIcon size={18} />
+                <GroupsIcon />
               </span>
-              <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
+              <span>{blue2Text(intl.locale, 'federation')}</span>
             </NavLink>
-          )}
 
-          <NavLink
-            className={classes.feedShortcut}
-            activeClassName={classes.feedShortcutActive}
-            exact
-            to='/public/local'
-          >
-            <span className={classes.feedIcon}>
-              <GroupsIcon />
-            </span>
-            <span>{blue2Text(intl.locale, 'federation')}</span>
-          </NavLink>
-
-          <NavLink
-            className={classes.feedShortcut}
-            activeClassName={classes.feedShortcutActive}
-            exact
-            to='/public'
-          >
-            <span className={classes.feedIcon}>
-              <PublicIcon />
-            </span>
-            <span>{blue2Text(intl.locale, 'global')}</span>
-          </NavLink>
+            <NavLink
+              className={classes.feedShortcut}
+              activeClassName={classes.feedShortcutActive}
+              exact
+              to='/public'
+            >
+              <span className={classes.feedIcon}>
+                <PublicIcon />
+              </span>
+              <span>{blue2Text(intl.locale, 'global')}</span>
+            </NavLink>
           </nav>
         )}
 
@@ -158,7 +158,7 @@ export const Blue2RightRail: React.FC<{ variant?: 'birdUi' }> = ({ variant }) =>
 
       {!isBirdUiVariant && (
         <footer className={classes.footer}>
-        <a href='/about'>
+          <a href='/about'>
           <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
         </a>
         <span>·</span>
@@ -177,11 +177,11 @@ export const Blue2RightRail: React.FC<{ variant?: 'birdUi' }> = ({ variant }) =>
         </a>
         <span>·</span>
         <Link to='/keyboard-shortcuts'>
-          <FormattedMessage
-            id='keyboard_shortcuts.heading'
-            defaultMessage='Keyboard Shortcuts'
-          />
-        </Link>
+            <FormattedMessage
+              id='keyboard_shortcuts.heading'
+              defaultMessage='Keyboard Shortcuts'
+            />
+          </Link>
         </footer>
       )}
 
