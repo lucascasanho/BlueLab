@@ -10,7 +10,8 @@
   font-size: 12px;
   line-height: 1.35;
 
-  a {
+  a,
+  button {
     color: inherit !important;
     text-decoration: none;
 
@@ -25,12 +26,21 @@
   span {
     color: inherit;
   }
+
+  button {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+  }
 }
 
 :global(body[data-theme='mastodon-bird-ui-auto']) .root {
   color: var(--color-text-secondary, #717c9b);
 
-  a {
+  a,
+  button {
     color: inherit !important;
 
     &:hover,
