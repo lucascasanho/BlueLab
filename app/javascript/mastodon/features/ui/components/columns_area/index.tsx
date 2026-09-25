@@ -19,7 +19,7 @@ import {
 
 import { MultiColumnContent } from './multi_column_content';
 import { ColumnsAreaRedesign } from './redesign';
-import { ColumnsAreaMastodon5 } from '../../mastodon5';
+import { ColumnsAreaMastodon5 } from '../../../mastodon5';
 
 const TabsBarPortal = () => {
   const { setTabsBarElement } = useColumnsContext();
