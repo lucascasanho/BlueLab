@@ -48,6 +48,10 @@ import { FormFieldWrapper } from './form_field_wrapper';
 export const isBlue2Theme = () =>
   typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
+export const isBirdUiTheme = () =>
+  typeof document !== 'undefined' &&
+  document.body.dataset.theme === 'mastodon-bird-ui-auto';
+
 const escapeHtml = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
