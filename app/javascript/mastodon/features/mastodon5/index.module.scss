@@ -1,12 +1,12 @@
 .root {
   box-sizing: border-box;
-  width: min(1400px, 100%);
+  width: min(1440px, 100%);
   min-height: 100dvh;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(248px, 280px) minmax(0, 680px) minmax(0, 1fr);
-  column-gap: 24px;
-  padding: 0 16px;
+  grid-template-columns: minmax(220px, 240px) minmax(0, 680px) minmax(0, 1fr);
+  column-gap: 28px;
+  padding: 0 20px 0 16px;
   background: var(--m5-bg, var(--color-bg-primary));
 }
 
@@ -35,26 +35,54 @@
   grid-column: 2;
   min-width: 0;
   min-height: 100dvh;
+  padding-top: 8px;
+  padding-bottom: 8px;
   background: var(--m5-bg, var(--color-bg-primary));
 }
 
 .pageHeader {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  min-height: 48px;
-  background: color-mix(in srgb, var(--m5-bg, #fff) 92%, transparent);
-  border-bottom: 1px solid var(--m5-border, var(--color-border-primary));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.pageHeader :global(#tabs-bar__portal) {
-  width: 100%;
-  min-height: 48px;
+  display: none;
 }
 
 .content {
+  min-width: 0;
+}
+
+.content :global(.columns-area--mobile) {
+  gap: 0;
+}
+
+.content :global(.columns-area--mobile) > :global(.column),
+.advancedContent :global(.column) {
+  background: var(--m5-surface, var(--color-bg-secondary));
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.content :global(.columns-area--mobile) > :global(.column) > :global(.scrollable),
+.advancedContent :global(.column) > :global(.scrollable) {
+  border: 0;
+  border-radius: 0;
+  background: var(--m5-surface, var(--color-bg-secondary));
+}
+
+.content :global(.columns-area--mobile) > :global(.column) :global(.column-header),
+.advancedContent :global(.column) :global(.column-header) {
+  background: var(--m5-surface, var(--color-bg-secondary));
+  border: 0;
+}
+
+.content :global(.columns-area--mobile) > :global(.column) :global(.column-header),
+.advancedContent :global(.column) :global(.column-header) {
+  border-radius: 16px 16px 0 0;
+}
+
+.advancedContent :global(.columns-area) {
+  gap: 10px;
+}
+
+.advancedContent :global(.columns-area) > div {
   min-width: 0;
 }
 
@@ -70,7 +98,9 @@
   width: 100%;
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: minmax(248px, 280px) minmax(0, 1fr);
+  grid-template-columns: minmax(220px, 240px) minmax(0, 1fr);
+  column-gap: 28px;
+  padding: 0 20px 0 16px;
   background: var(--m5-bg, var(--color-bg-primary));
 }
 
@@ -78,6 +108,7 @@
   min-width: 0;
   min-height: 100dvh;
   overflow-x: auto;
+  padding-block: 8px;
 }
 
 .minimal {
@@ -95,7 +126,7 @@
   box-sizing: border-box;
   width: 100%;
   height: 100dvh;
-  padding: 20px 16px 18px;
+  padding: 18px 8px 18px 0;
   display: flex;
   flex-direction: column;
   color: var(--m5-text, var(--color-text-primary));
@@ -103,19 +134,20 @@
   scrollbar-width: thin;
 }
 
-.newPost > svg path,
-.link > svg path,
-.sectionAction > svg path,
-.subLink > svg path,
-.mobileMenuButton > svg path,
-.mobileItem > svg path,
-.drawerClose > svg path {
+.newPost > svg > path,
+.link > svg > path,
+.sectionAction > svg > path,
+.subLink > svg > path,
+.mobileMenuButton > svg > path,
+.mobileItem > svg > path,
+.drawerClose > svg > path {
   fill: currentColor;
 }
 
 .navigationRoot[data-mode='drawer'] {
   height: auto;
   min-height: 100%;
+  padding-inline: 16px;
   background: var(--m5-bg, var(--color-bg-primary));
 }
 
@@ -249,6 +281,13 @@
   margin-top: 10px;
   padding-top: 12px;
   border-top: 1px solid var(--m5-border, var(--color-border-primary));
+}
+
+.content :global(.status),
+.content :global(.notification),
+.content :global(.notification-group) {
+  border-bottom: 1px solid color-mix(in srgb, var(--m5-bg) 84%, var(--color-black) 16%);
+  background: var(--m5-surface, var(--color-bg-secondary));
 }
 
 .sectionTitle {
@@ -405,11 +444,8 @@
   .main {
     width: 100%;
     min-height: 100dvh;
+    padding: 0;
     padding-bottom: calc(58px + env(safe-area-inset-bottom));
-  }
-
-  .pageHeader {
-    top: 58px;
   }
 
   .mobileChrome {
@@ -596,6 +632,17 @@
 
   .advancedContent {
     overflow-x: hidden;
+    padding-block: 0;
+  }
+
+  .content :global(.columns-area--mobile) > :global(.column),
+  .advancedContent :global(.column) {
+    border-radius: 0;
+  }
+
+  .content :global(.columns-area--mobile) > :global(.column) :global(.column-header),
+  .advancedContent :global(.column) :global(.column-header) {
+    border-radius: 0;
   }
 }
 
@@ -605,6 +652,6 @@
   }
 
   .navigationRoot {
-    padding-inline: 12px;
+    padding-inline: 0;
   }
 }
