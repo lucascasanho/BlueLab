@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, forwardRef } from 'react';
 
 import classNames from 'classnames';
 
@@ -23,6 +23,7 @@ interface Props {
   disabled?: boolean;
   inverted?: boolean;
   animate?: boolean;
+  iconWrapperClassName?: string;
   overlay?: boolean;
   tabIndex?: number;
   counter?: number;
@@ -50,6 +51,7 @@ export const IconButton = forwardRef<HTMLButtonElement, Props>(
       active = false,
       disabled = false,
       animate = false,
+      iconWrapperClassName,
       overlay = false,
       tabIndex = 0,
       ariaHidden = false,
@@ -57,60 +59,15 @@ export const IconButton = forwardRef<HTMLButtonElement, Props>(
     },
     buttonRef,
   ) => {
-    const [clickAnimation, setClickAnimation] = useState<
-      'activate' | 'deactivate' | null
-    >(null);
-    const animationFrameRef = useRef<number | null>(null);
-    const animationTimeoutRef = useRef<number | null>(null);
-
-    useEffect(
-      () => () => {
-        if (animationFrameRef.current !== null) {
-          cancelAnimationFrame(animationFrameRef.current);
-        }
-        if (animationTimeoutRef.current !== null) {
-          window.clearTimeout(animationTimeoutRef.current);
-        }
-      },
-      [],
-    );
-
-    const triggerClickAnimation = useCallback(() => {
-      if (!animate) {
-        return;
-      }
-
-      const animation = active ? 'deactivate' : 'activate';
-
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      if (animationTimeoutRef.current !== null) {
-        window.clearTimeout(animationTimeoutRef.current);
-      }
-
-      // Remove the class first so consecutive clicks always restart the CSS animation.
-      setClickAnimation(null);
-      animationFrameRef.current = requestAnimationFrame(() => {
-        setClickAnimation(animation);
-        animationTimeoutRef.current = window.setTimeout(() => {
-          setClickAnimation(null);
-          animationTimeoutRef.current = null;
-        }, 1000);
-        animationFrameRef.current = null;
-      });
-    }, [active, animate]);
-
     const handleClick: React.MouseEventHandler<HTMLButtonElement> = useCallback(
       (e) => {
         e.preventDefault();
 
         if (!disabled) {
-          triggerClickAnimation();
           onClick?.(e);
         }
       },
-      [disabled, onClick, triggerClickAnimation],
+      [disabled, onClick],
     );
 
     const handleMouseDown: React.MouseEventHandler<HTMLButtonElement> =
@@ -145,16 +102,23 @@ export const IconButton = forwardRef<HTMLButtonElement, Props>(
       active,
       disabled,
       inverted,
-      activate: (shouldAnimate && active) || clickAnimation === 'activate',
-      deactivate:
-        (shouldAnimate && !active) || clickAnimation === 'deactivate',
+      activate: shouldAnimate && active,
+      deactivate: shouldAnimate && !active,
       overlayed: overlay,
       'icon-button--with-counter': typeof counter !== 'undefined',
     });
 
+    const iconElement = (
+      <Icon id={icon} icon={iconComponent} aria-hidden='true' />
+    );
+
     let contents = (
       <>
-        <Icon id={icon} icon={iconComponent} aria-hidden='true' />{' '}
+        {iconWrapperClassName ? (
+          <span className={iconWrapperClassName}>{iconElement}</span>
+        ) : (
+          iconElement
+        )}{' '}
         {typeof counter !== 'undefined' && (
           <span className='icon-button__counter'>
             <AnimatedNumber value={counter} />
