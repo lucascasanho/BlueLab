@@ -7,7 +7,7 @@
   = account_switcher_flow ? t('auth.sign_in.another_account.title') : t('auth.login')
 
 - content_for :blue2_auth_subtitle do
-  = t('auth.sign_in.preamble_html', domain: site_hostname)
+  = account_switcher_flow ? t('auth.sign_in.another_account.notice') : t('auth.sign_in.preamble_html', domain: site_hostname)
 
 - content_for :header_tags do
   = render partial: 'shared/og'
