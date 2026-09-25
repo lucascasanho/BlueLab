@@ -605,6 +605,9 @@ export const RichComposeEditor: React.FC<{
   const forceMessageMarkdown =
     isBlueLabTheme && ['message', 'replyPrivate'].includes(type);
   const isMarkdown = forceMessageMarkdown || contentType === 'text/markdown';
+  const visibleCommands = forceMessageMarkdown
+    ? commands.filter(([command]) => inlineCommands.includes(command as InlineCommand))
+    : commands;
   const customEmojis = useCustomEmojis();
   const ref = useRef<HTMLDivElement>(null);
   const hiddenRef = useRef<HTMLTextAreaElement>(null);
@@ -837,7 +840,7 @@ export const RichComposeEditor: React.FC<{
           role='toolbar'
           aria-label={intl.formatMessage(messages.toolbar)}
         >
-          {commands.map(([command, icon, message, value]) => {
+          {visibleCommands.map(([command, icon, message, value]) => {
             const stateKey = value ?? command;
             const active = activeFormats.has(stateKey);
             const label = intl.formatMessage(message);
