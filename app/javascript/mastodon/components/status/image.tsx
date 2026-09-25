@@ -6,6 +6,7 @@ import type {
   ApiVideoAttachmentJSON,
 } from '@/mastodon/api_types/media_attachments';
 import { Blurhash } from '@/mastodon/components/blurhash';
+import { GIFV } from '@/mastodon/components/gifv';
 import type { MediaAttachmentShape } from '@/mastodon/models/status';
 
 import classes from './styles.module.scss';
@@ -22,6 +23,7 @@ export const StatusImage: React.FC<
       | MediaAttachmentShape<StatusImageAttachmentJSON>;
     children?: React.ReactNode;
     sensitive?: boolean;
+    animateGifv?: boolean;
   } & React.ComponentPropsWithRef<'div'>
 > = ({ attachment, children, sensitive, className, style, ...props }) => {
   let x = 50;
@@ -35,7 +37,7 @@ export const StatusImage: React.FC<
 
   const imgStyle = {
     backgroundImage:
-      !sensitive && attachment.preview_url
+      !sensitive && attachment.preview_url && !(animateGifv && attachment.type === 'gifv')
         ? `url(${attachment.preview_url})`
         : undefined,
     backgroundPosition: `${x}% ${y}%`,
@@ -50,6 +52,12 @@ export const StatusImage: React.FC<
       style={imgStyle}
       data-color-scheme='dark'
     >
+      {animateGifv && attachment.type === 'gifv' && !sensitive && (
+        <div className={classes.animatedGif} aria-hidden='true'>
+          <GIFV src={attachment.url} />
+        </div>
+      )}
+
       {sensitive && attachment.blurhash && (
         <Blurhash
           hash={attachment.blurhash}
