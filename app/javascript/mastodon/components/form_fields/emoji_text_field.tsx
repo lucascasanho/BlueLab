@@ -17,6 +17,7 @@ import { EmojiPickerButton } from '../emoji/picker_button';
 
 import {
   Blue2EmojiFieldWrapper,
+  isBirdUiTheme,
   isBlue2Theme,
 } from './blue2_emoji_field_wrapper';
 import classes from './emoji_text_field.module.scss';
@@ -140,7 +141,10 @@ export type EmojiFieldWrapperProps = EmojiInputProps & {
 };
 
 const EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = (props) => {
-  if (props.blue2EmojiEditor && isBlue2Theme()) {
+  if (
+    props.blue2EmojiEditor &&
+    (isBlue2Theme() || isBirdUiTheme())
+  ) {
     return <Blue2EmojiFieldWrapper {...props} />;
   }
 
