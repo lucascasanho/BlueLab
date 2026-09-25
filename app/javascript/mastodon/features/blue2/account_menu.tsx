@@ -41,7 +41,8 @@ import classes from './account_menu.module.scss';
 export const Blue2AccountMenu: React.FC<{
   compact?: boolean;
   className?: string;
-}> = ({ compact, className }) => {
+  variant?: 'rightRail' | 'navigationPanel';
+}> = ({ compact, className, variant }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const { accountId, permissions } = useIdentity();
@@ -252,6 +253,8 @@ export const Blue2AccountMenu: React.FC<{
       className={classNames(
         classes.root,
         compact && classes.rootCompact,
+        variant === 'rightRail' && classes.rightRailProfile,
+        variant === 'navigationPanel' && classes.navigationPanelProfile,
         className,
       )}
     >
