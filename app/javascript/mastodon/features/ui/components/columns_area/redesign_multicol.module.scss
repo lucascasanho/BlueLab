@@ -9,7 +9,7 @@
   flex: 1 1 auto;
   justify-content: flex-start;
   gap: var(--multi-column-gap);
-  padding-inline-end: var(--multi-column-gap);
+  padding-inline: calc(76px + var(--multi-column-gap)) var(--multi-column-gap);
   overflow-x: auto;
   scroll-padding-inline-start: var(--multi-column-navigation-width);
 
@@ -37,55 +37,24 @@
   }
 }
 
-.blue2MultiColumnRoot {
-  min-width: 0;
-}
-
-.navigationWrapper {
-  position: sticky;
-  inset-inline-start: 0;
-  top: 0;
+.navigationRail {
+  position: fixed;
   z-index: 102;
-  flex: 0 0 76px;
+  inset-block: 0;
+  inset-inline-start: 0;
   width: 76px;
-  min-width: 76px;
-  height: 100dvh;
-  padding-bottom: env(safe-area-inset-bottom);
   overflow: hidden;
   background: var(--blue2-bg, #000);
   border-inline-end: 1px solid var(--blue2-border-soft, #17232c);
-  transition: width 200ms ease, flex-basis 200ms ease;
+  transition: width 200ms ease;
 
   &[data-expanded='true'] {
-    flex-basis: 240px;
-    width: 240px;
-    min-width: 240px;
+    width: 264px;
   }
 }
 
 @media (max-width: ($mobile-menu-breakpoint - 1)) {
   .root {
     padding-inline: 0;
-  }
-}
-
-.blue2MultiColumnRoot {
-  min-width: 0;
-}
-
-.multiColumnContent {
-  display: contents;
-}
-
-@media (min-width: $mobile-menu-breakpoint) and (max-width: ($no-gap-breakpoint - 1)) {
-  .blue2MultiColumnRoot {
-    height: 100dvh;
-    min-height: 100dvh;
-    overflow: hidden;
-    gap: var(--multi-column-gap);
-  }
-
-  .blue2MultiColumnRoot .navigationWrapper {
-    align-self: stretch;
   }
 }
