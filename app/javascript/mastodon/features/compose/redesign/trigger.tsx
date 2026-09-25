@@ -134,7 +134,11 @@ export const ComposeRedesignButton: React.FC<{
    * Render the button in regular document flow instead of fixed positioning for mobile layout
    */
   inline?: boolean;
-}> = ({ inline }) => {
+  /**
+   * Keep this component as a composer host without rendering its launcher button.
+   */
+  hostOnly?: boolean;
+}> = ({ inline, hostOnly = false }) => {
   const displayState = useAppSelector((state) => state.composer.displayState);
   const origin = useAppSelector((state) => state.composer.origin);
   const editor = useAppSelector(selectComposerEditor);
@@ -249,14 +253,20 @@ export const ComposeRedesignButton: React.FC<{
 
   if (!signedIn) return null;
 
+  // Some themes provide their own composer launcher but still need this component
+  // mounted as the host for the shared redesigned composer state.
+  if (hostOnly && displayState !== 'showing') return null;
+
   // BLUE 2.0 owns its launcher UI elsewhere, so keep this global trigger hidden
   // while idle/minimized. When the shared state changes to showing, however,
   // this component must stay mounted because it is the desktop composer host.
-  if (shouldHideBlue2GlobalTrigger(isBlue2, inline, displayState)) return null;
+  if (!hostOnly && shouldHideBlue2GlobalTrigger(isBlue2, inline, displayState)) {
+    return null;
+  }
 
   // BLUE 2.0 always uses the redesigned composer so the theme can provide the
   // Bluesky-like compose experience without changing the editor used by other themes.
-  if (editor === 'mastodon' && !isBlue2) {
+  if (editor === 'mastodon' && !isBlue2 && !hostOnly) {
     return (
       <IconButton
         icon={ComposeIcon}
