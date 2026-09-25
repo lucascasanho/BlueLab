@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import classes from './footer.module.scss';
 
 export const Blue2FooterLinks: React.FC = () => (
-  <footer className={classes.root}>
+  <footer className={classes.root} data-bird-ui-footer='true'>
     <Link to='/about'>
       <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
     </Link>
