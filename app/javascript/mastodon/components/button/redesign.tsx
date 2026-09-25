@@ -174,7 +174,7 @@ const LoadingIcon: React.FC = () => (
 
 export const ToggleButton: React.FC<
   ButtonProps & { active?: boolean; animate?: boolean }
-> = ({ active, animate = false, className, ...props }) => {
+> = ({ active, animate = false, className, onClick, ...props }) => {
   const [clickAnimation, setClickAnimation] = useState<
     'activate' | 'deactivate' | null
   >(null);
@@ -220,12 +220,14 @@ export const ToggleButton: React.FC<
     });
   }, [active, animate]);
 
-  const handleClick: React.MouseEventHandler<HTMLButtonElement> = useCallback(
+  const handleClick: React.MouseEventHandler<
+    HTMLButtonElement & HTMLAnchorElement
+  > = useCallback(
     (event) => {
       triggerClickAnimation();
-      props.onClick?.(event);
+      onClick?.(event);
     },
-    [props, triggerClickAnimation],
+    [onClick, triggerClickAnimation],
   );
 
   return (
