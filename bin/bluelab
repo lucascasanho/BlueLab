@@ -406,14 +406,33 @@ atualizar() {
 promover() {
   [[ "$ALVO" == blue ]] || falhar "promoção só pode ser executada no mastodon.blue"
   preparar_git
-  local teste estavel local_head implantado merge_base tree_estavel tree_base promovido
-  teste="$(git rev-parse "$REMOTO/$CANAL_TESTE")"
+  local teste_atual teste estavel local_head implantado merge_base tree_estavel tree_base promovido
+  teste_atual="$(git rev-parse "$REMOTO/$CANAL_TESTE")"
   estavel="$(git rev-parse "$REMOTO/$CANAL_ESTAVEL")"
   local_head="$(git rev-parse HEAD)"
   implantado="$(cat "$DIR_ESTADO/ultimo-implantado-blue.sha" 2>/dev/null || true)"
 
-  [[ "$local_head" == "$teste" ]] || falhar "o Blue não está no HEAD atual de $CANAL_TESTE"
-  [[ "$implantado" == "$teste" ]] || falhar "$CANAL_TESTE mudou desde o último teste; atualize e teste novamente"
+  # O SHA registrado como último implantado/testado é a fonte de verdade para
+  # promoção. Isso permite que GitHub avance a BlueLab-Test sem promover
+  # acidentalmente commits que ainda não passaram pelo teste no Blue.
+  if [[ -n "$implantado" ]] &&
+     git cat-file -e "$implantado^{commit}" 2>/dev/null &&
+     git merge-base --is-ancestor "$implantado" "$teste_atual" 2>/dev/null; then
+    teste="$implantado"
+
+    if [[ "$teste" != "$teste_atual" ]]; then
+      echo
+      echo "BlueLab-Test avançou após o último teste."
+      echo "  Último SHA realmente testado: $teste"
+      echo "  Ponta atual do canal de teste: $teste_atual"
+      echo "A promoção usará somente o SHA que foi testado no Blue."
+    fi
+  else
+    teste="$teste_atual"
+    [[ "$local_head" == "$teste_atual" ]] || falhar "o Blue não está no HEAD atual de $CANAL_TESTE e não há um SHA testado válido para promover"
+    [[ "$implantado" == "$teste_atual" ]] || falhar "$CANAL_TESTE mudou desde o último teste; atualize e teste novamente"
+  fi
+
   [[ -z "$(git status --porcelain=v1)" ]] || falhar "há alterações locais"
   executar git diff --check "$teste"
 
