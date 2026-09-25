@@ -278,7 +278,7 @@ export const Mastodon5Navigation: React.FC<{
                   defaultMessage='Profile'
                 />
               </NavigationLink>
-              <Link to='/settings/preferences' className={classes.link}>
+              <a href='/settings/preferences' className={classes.link}>
                 <SettingsIcon className={classes.icon} aria-hidden='true' />
                 <span className={classes.label}>
                   <FormattedMessage
@@ -286,7 +286,7 @@ export const Mastodon5Navigation: React.FC<{
                     defaultMessage='Preferences'
                   />
                 </span>
-              </Link>
+              </a>
             </div>
 
             {account && (
