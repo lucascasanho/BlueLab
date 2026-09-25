@@ -60,8 +60,9 @@ import { useAppSelector, useAppDispatch } from 'mastodon/store';
 import { AnnualReportNavItem } from '../annual_report/nav_item';
 
 import { Blue2AccountMenu } from '../blue2/account_menu';
-import { Blue2MessageIcon } from '../blue2/icons';
+import { Blue2ComposeButton } from '../blue2/navigation';
 import { Blue2FooterLinks } from '../blue2/footer';
+import { Blue2MessageIcon } from '../blue2/icons';
 
 import { DisabledAccountBanner } from './components/disabled_account_banner';
 import { FollowedTagsPanel } from './components/followed_tags_panel';
@@ -301,10 +302,6 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
         </Link>
       </div>
 
-      {isBirdUi && signedIn && (
-        <Blue2AccountMenu variant='navigationPanel' />
-      )}
-
       {showSearch && !isBirdUi && <Search singleColumn />}
 
       {!multiColumn && !isBirdUi && <ProfileCard />}
@@ -314,7 +311,7 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
       <ul className='navigation-panel__menu'>
         {signedIn && (
           <>
-            {!multiColumn && (
+            {!multiColumn && !isBirdUi && (
               <li>
                 <button
                   type='button'
@@ -478,9 +475,19 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
         )}
       </ul>
 
+      {isBirdUi && signedIn && (
+        <Blue2ComposeButton className='bird-ui-compose-button' />
+      )}
+
       <div className='flex-spacer' />
 
-      <Trends />
+      {!isBirdUi && <Trends />}
+
+      {isBirdUi && signedIn && (
+        <div className='bird-ui-profile-slot'>
+          <Blue2AccountMenu variant='navigationPanel' />
+        </div>
+      )}
 
       {isBirdUi && <Blue2FooterLinks />}
     </nav>
