@@ -20,6 +20,11 @@ RSpec.describe UserSettings do
       it 'does not show trending tags by default' do
         expect(subject[:'web.trends']).to be false
       end
+
+      it 'has no BlueLab theme preference by default' do
+        expect(subject[:bluelab_theme]).to be_nil
+      end
+
     end
 
     context 'when setting is set' do
