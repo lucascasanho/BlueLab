@@ -322,7 +322,7 @@
   }
 }
 
-@media (max-width: 1174px) {
+@media (width <= 1174px) {
   // BlueLab uses the compact/mobile shell for every non-desktop viewport.
   // The advanced deck is a desktop-only presentation for this theme.
   .blue2Root {

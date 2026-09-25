@@ -164,24 +164,27 @@ export const Blue2RightRail: React.FC<{
       {!isBirdUiVariant && !isMobileVariant && (
         <footer className={classes.footer}>
           <a href='/about'>
-          <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
-        </a>
-        <span>·</span>
-        <a href='/privacy-policy'>
-          <FormattedMessage
-            id='footer.privacy_policy_short'
-            defaultMessage='Privacy'
-          />
-        </a>
-        <span>·</span>
-        <a href='/terms-of-service'>
-          <FormattedMessage
-            id='footer.terms_of_service_short'
-            defaultMessage='Terms'
-          />
-        </a>
-        <span>·</span>
-        <Link to='/keyboard-shortcuts'>
+            <FormattedMessage
+              id='custom_homepage.about'
+              defaultMessage='About'
+            />
+          </a>
+          <span>·</span>
+          <a href='/privacy-policy'>
+            <FormattedMessage
+              id='footer.privacy_policy_short'
+              defaultMessage='Privacy'
+            />
+          </a>
+          <span>·</span>
+          <a href='/terms-of-service'>
+            <FormattedMessage
+              id='footer.terms_of_service_short'
+              defaultMessage='Terms'
+            />
+          </a>
+          <span>·</span>
+          <Link to='/keyboard-shortcuts'>
             <FormattedMessage
               id='keyboard_shortcuts.heading'
               defaultMessage='Keyboard Shortcuts'
