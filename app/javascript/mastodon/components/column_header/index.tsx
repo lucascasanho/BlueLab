@@ -54,31 +54,31 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     withBackButton === true ||
     (withBackButton === 'auto' && location.state?.fromMastodon);
   const hasExtraStickyContent = hasReactChildren(extraStickyContent);
-  const blue2ColumnPinning = useBlue2ColumnPinning();
+  const { canPin, pinned, onPin, onMove } = useBlue2ColumnPinning();
   const showBlue2ColumnSettings =
-    blue2ColumnPinning.canPin && !hasReactChildren(extraButtons);
+    canPin && !hasReactChildren(extraButtons);
 
   const history = useAppHistory();
 
   const handleBlue2ColumnPin = useCallback(() => {
-    if (!blue2ColumnPinning.pinned) {
+    if (!pinned) {
       history.replace('/');
     }
-    blue2ColumnPinning.onPin();
-  }, [blue2ColumnPinning.onPin, blue2ColumnPinning.pinned, history]);
+    onPin();
+  }, [onPin, pinned, history]);
 
   const handleBlue2ColumnMoveLeft = useCallback(() => {
-    blue2ColumnPinning.onMove(-1);
-  }, [blue2ColumnPinning.onMove]);
+    onMove(-1);
+  }, [onMove]);
 
   const handleBlue2ColumnMoveRight = useCallback(() => {
-    blue2ColumnPinning.onMove(1);
-  }, [blue2ColumnPinning.onMove]);
+    onMove(1);
+  }, [onMove]);
 
   const blue2ColumnSettings = showBlue2ColumnSettings ? (
     <Menu>
       <MenuTrigger as={ColumnHeaderButton} icon={DotsThreeIcon}>
-        {blue2ColumnPinning.pinned ? (
+        {pinned ? (
           <FormattedMessage
             id='column_header.unpin'
             defaultMessage='Unpin'
@@ -92,14 +92,14 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
       </MenuTrigger>
       <MenuList placement='bottom-end' strategy='fixed'>
         <MenuItem onClick={handleBlue2ColumnPin}>
-          {blue2ColumnPinning.pinned ? (
+          {pinned ? (
             <FormattedMessage id='column_header.unpin' defaultMessage='Unpin' />
           ) : (
             <FormattedMessage id='column_header.pin' defaultMessage='Pin' />
           )}
         </MenuItem>
-        {blue2ColumnPinning.pinned && <MenuItemDivider />}
-        {blue2ColumnPinning.pinned && (
+        {pinned && <MenuItemDivider />}
+        {pinned && (
           <>
             <MenuItem onClick={handleBlue2ColumnMoveLeft}>
               <FormattedMessage
