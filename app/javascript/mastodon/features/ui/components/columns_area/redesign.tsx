@@ -24,7 +24,13 @@ import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trig
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
 import { ComposePanel } from '@/mastodon/features/ui/components/compose_panel';
-import { customFavicon, customInstanceLogo } from '@/mastodon/initial_state';
+import {
+  customAppIcon,
+  customFavicon,
+  customInstanceLogo,
+  domain,
+  title,
+} from '@/mastodon/initial_state';
 import { useIdentity } from '@/mastodon/identity_context';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import MenuIcon from '@/material-icons/400-24px/menu.svg?react';
