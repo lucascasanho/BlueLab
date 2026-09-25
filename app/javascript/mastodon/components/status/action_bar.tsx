@@ -16,8 +16,8 @@ import {
 } from '@phosphor-icons/react';
 
 import { statusInteraction } from '@/mastodon/actions/interactions';
-import { animateFavouriteIcon } from '@/mastodon/components/status/favourite_animation';
 import { fetchStatus } from '@/mastodon/actions/statuses';
+import { animateFavouriteIcon } from '@/mastodon/components/status/favourite_animation';
 import { useCurrentAccountId } from '@/mastodon/hooks/useAccountId';
 import { useAccountStatus } from '@/mastodon/hooks/useStatus';
 import { quickBoosting } from '@/mastodon/initial_state';
@@ -160,9 +160,9 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
         size='sm'
         variant='ghost'
         active={status.favourited}
-        animate
         title={favouriteTitle}
         leadingIcon={favouriteIcon}
+        leadingIconWrapperClassName='favourite-animation-target'
         onClick={handleFavouriteClick}
         className={classNames(
           'favourite-spin',
