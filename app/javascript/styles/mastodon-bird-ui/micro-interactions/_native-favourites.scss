@@ -36,6 +36,66 @@
   .icon-button.star-icon {
     color: var(--color-dim);
   }
+
+  // The redesigned action bar uses a 32px button with an 18px glyph. Keep
+  // the hover circle proportional and center the native Phosphor star inside it.
+  .status__action-bar button.star-icon {
+    box-sizing: border-box;
+    min-width: 32px !important;
+    width: 32px !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    column-gap: 0 !important;
+  }
+
+  .status__action-bar button.star-icon .favourite-animation-target {
+    box-sizing: border-box;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    margin: 0 !important;
+  }
+
+  .status__action-bar button.star-icon .favourite-animation-target > .icon {
+    box-sizing: border-box;
+    display: block !important;
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    margin: 0 !important;
+    background-image: none !important;
+    color: inherit;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
+
+  .status__action-bar button.star-icon .favourite-animation-target > .icon path {
+    display: block !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
+
+  // Active favourites must use the standard Bird UI yellow, regardless of the
+  // neutral toggle button's own active foreground token.
+  .status__action-bar button.star-icon[aria-pressed='true'],
+  .status__action-bar button.star-icon[aria-pressed='true'] .favourite-animation-target,
+  .status__action-bar button.star-icon[aria-pressed='true'] .favourite-animation-target > .icon,
+  .status__action-bar button.star-icon[aria-pressed='true'] .favourite-animation-target > .icon path {
+    --fg: var(--color-yellow) !important;
+    color: var(--color-yellow) !important;
+    fill: var(--color-yellow) !important;
+    stroke: var(--color-yellow) !important;
+  }
 }
 
 // Every Bird UI favourite control becomes yellow when active.

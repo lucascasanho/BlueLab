@@ -205,6 +205,24 @@
     font-weight: var(--font-weight-bold);
   }
 
+  // Use the administrator-selected instance accent for the active icon in
+  // the right navigation panel instead of Bird UI's hard-coded SVG artwork.
+  .navigation-panel .column-link--transparent.active .column-link__icon {
+    background-image: none !important;
+    color: var(--color-bg-brand-base) !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
+
+  .navigation-panel
+    .column-link--transparent.active
+    .column-link__icon
+    path {
+    display: block !important;
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
+
   // Top panel
   .account__section-headline a.active::after,
   .account__section-headline button.active::after,

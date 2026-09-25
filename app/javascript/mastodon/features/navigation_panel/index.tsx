@@ -209,6 +209,16 @@ const ProfileCard: React.FC = () => {
   );
 };
 
+const isHomeActive = (_match: unknown, { pathname }: { pathname: string }) =>
+  pathname === '/home';
+
+const isExploreActive = (
+  match: unknown,
+  { pathname }: { pathname: string },
+) => {
+  return !!match || pathname.startsWith('/explore');
+};
+
 const isFirehoseActive = (
   match: unknown,
   { pathname }: { pathname: string },
@@ -316,6 +326,8 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
                 icon='home'
                 iconComponent={HomeIcon}
                 activeIconComponent={HomeActiveIcon}
+                isActive={isHomeActive}
+                exact
                 text={intl.formatMessage(messages.home)}
               />
             </li>
@@ -329,6 +341,7 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
               to='/explore'
               icon='explore'
               iconComponent={TrendingUpIcon}
+              isActive={isExploreActive}
               text={intl.formatMessage(messages.explore)}
             />
           </li>
