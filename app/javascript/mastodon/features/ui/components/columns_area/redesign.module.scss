@@ -299,7 +299,6 @@
 @media (width < 1180px) and (min-width: $mobile-menu-breakpoint) {
   .blue2Root {
     --navigation-min-width: 76px;
-    --navigation-max-width: 76px;
 
     grid-template-columns: 76px minmax(0, 600px) minmax(0, 1fr);
   }
