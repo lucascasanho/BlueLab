@@ -4,21 +4,7 @@
 - content_for :heading_actions do
   = button_tag t('generic.save_changes'), class: 'button', form: 'edit_user'
 
-- blue2_theme = current_theme == 'blue-2'
-
 = simple_form_for current_user, url: settings_preferences_appearance_path, html: { id: :edit_user } do |f|
-  - if current_user.can?(:manage_settings) && !blue2_theme
-    .fields-group
-      = f.input :setting_theme,
-                collection: Themes.instance.names,
-                hint: t('appearance.instance_theme_hint'),
-                include_blank: false,
-                input_html: { id: :instance_theme, name: :instance_theme },
-                label: t('appearance.instance_theme'),
-                label_method: ->(theme) { I18n.t("themes.#{theme}", default: theme, site_title: site_title) },
-                selected: Setting.theme,
-                wrapper: :with_label
-
   .fields-row
     .fields-group.fields-row__column.fields-row__column-6
       = f.input :locale,
@@ -29,16 +15,6 @@
                 selected: I18n.locale,
                 wrapper: :with_label
 
-      - if current_user.can?(:manage_settings) && blue2_theme
-        = f.input :setting_theme,
-                  collection: Themes.instance.names,
-                  hint: t('appearance.instance_theme_hint'),
-                  include_blank: false,
-                  input_html: { id: :instance_theme, name: :instance_theme },
-                  label: t('appearance.instance_theme'),
-                  label_method: ->(theme) { I18n.t("themes.#{theme}", default: theme, site_title: site_title) },
-                  selected: Setting.theme,
-                  wrapper: :with_label
 
     .fields-group.fields-row__column.fields-row__column-6
       = f.input :time_zone,
@@ -49,6 +25,16 @@
 
   .fields-group
     = f.simple_fields_for :settings, current_user.settings do |ff|
+      .fields-group
+        = ff.input :theme,
+                   collection: Themes.instance.selectable_names,
+                   hint: t('appearance.theme_hint'),
+                   include_blank: false,
+                   label: t('appearance.theme'),
+                   label_method: ->(theme) { I18n.t("themes.#{theme}", default: theme, site_title: site_title) },
+                   selected: Themes.instance.selectable_names.include?(current_user.setting_theme) ? current_user.setting_theme : Themes.instance.selectable_names.first,
+                   wrapper: :with_label
+
       .input.horizontal-options
         = ff.input :'web.color_scheme',
                    as: :radio_buttons,
