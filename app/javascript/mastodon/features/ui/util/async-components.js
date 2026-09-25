@@ -168,6 +168,10 @@ export function ReportModal () {
   return import('../components/report_modal');
 }
 
+export function BugReportModal () {
+  return import('../../bug_report/bug_report_modal').then((module) => ({ default: module.BugReportModal }));
+}
+
 export function ReportCollectionModal () {
   return import('../components/report_collection_modal')
     .then((module) => ({ default: module.ReportCollectionModal }));;
