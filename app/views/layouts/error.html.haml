@@ -1,20 +1,43 @@
+- bluelab_error = respond_to?(:current_theme) && current_theme == 'blue-2'
+
 !!!
-%html{ lang: I18n.locale, 'data-contrast': 'auto', 'data-color-scheme': 'auto' }
+%html{ bluelab_error ? html_attributes.merge('data-theme' => current_theme) : { lang: I18n.locale, 'data-contrast' => 'auto', 'data-color-scheme' => 'auto' } }
   %head
     %meta{ 'content' => 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type' }/
     %meta{ charset: 'utf-8' }/
     %title= safe_join([yield(:page_title), Setting.default_settings['site_title']], ' - ')
     %meta{ content: 'width=device-width,initial-scale=1', name: 'viewport' }/
-    = vite_client_tag
-    = vite_react_refresh_tag
-    = vite_polyfills_tag
-    = vite_typescript_tag 'theme-selection.ts', crossorigin: 'anonymous', blocking: 'render'
-    = theme_style_tags Setting.default_settings['theme']
-    = vite_typescript_tag 'error.ts', crossorigin: 'anonymous'
-  %body.error
-    %main.dialog
-      .dialog__illustration
-        %img{ alt: Setting.default_settings['site_title'], src: '/oops.png' }/
-      .dialog__message
-        %h1= yield :content
-        %a{ class: 'button button-secondary', href: '/' }= t('errors.go_home')
+
+    - if bluelab_error
+      = theme_style_tags current_theme
+      = instance_customization_styles
+      = theme_color_tags color_scheme
+    - else
+      = vite_client_tag
+      = vite_react_refresh_tag
+      = vite_polyfills_tag
+      = vite_typescript_tag 'theme-selection.ts', crossorigin: 'anonymous', blocking: 'render'
+      = theme_style_tags Setting.default_settings['theme']
+      = vite_typescript_tag 'error.ts', crossorigin: 'anonymous'
+
+  %body{ class: (bluelab_error ? 'error error--bluelab' : 'error') }
+    - if bluelab_error
+      %main.error-page
+        .error-page__brand
+          = image_tag(instance_presenter.auth_logo&.file&.url || favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png'), alt: '', class: 'error-page__icon')
+          %span= Setting.site_title
+
+        .error-page__content
+          .error-page__code 404
+          %h1= yield :content
+          %p= t('errors.go_home')
+          = link_to root_path, class: 'button error-page__home' do
+            = material_symbol('home', whitespace: false)
+            = t('errors.go_home')
+    - else
+      %main.dialog
+        .dialog__illustration
+          %img{ alt: Setting.default_settings['site_title'], src: '/oops.png' }/
+        .dialog__message
+          %h1= yield :content
+          %a{ class: 'button button-secondary', href: '/' }= t('errors.go_home')
