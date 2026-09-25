@@ -109,12 +109,6 @@ export const MessageConversation: React.FC = () => {
     };
   }, [dispatch]);
 
-  useEffect(() => {
-    if (id) {
-      void loadMessages();
-    }
-  }, [id, loadMessages]);
-
   const latestStatusId = conversation?.get('last_status') as
     | string
     | null
