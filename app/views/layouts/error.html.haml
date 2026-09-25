@@ -9,6 +9,10 @@
     %meta{ content: 'width=device-width,initial-scale=1', name: 'viewport' }/
 
     - if bluelab_error
+      = vite_client_tag
+      = vite_react_refresh_tag
+      = vite_polyfills_tag
+      = vite_typescript_tag 'theme-selection.ts', crossorigin: 'anonymous', blocking: 'render'
       = theme_style_tags current_theme
       = instance_customization_styles
       = theme_color_tags color_scheme
@@ -30,7 +34,6 @@
         .error-page__content
           .error-page__code 404
           %h1= yield :content
-          %p= t('errors.go_home')
           = link_to root_path, class: 'button error-page__home' do
             = material_symbol('home', whitespace: false)
             = t('errors.go_home')
