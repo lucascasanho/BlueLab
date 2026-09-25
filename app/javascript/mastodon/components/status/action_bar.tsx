@@ -16,6 +16,7 @@ import {
 } from '@phosphor-icons/react';
 
 import { statusInteraction } from '@/mastodon/actions/interactions';
+import { animateFavouriteIcon } from '@/mastodon/components/status/favourite_animation';
 import { fetchStatus } from '@/mastodon/actions/statuses';
 import { useCurrentAccountId } from '@/mastodon/hooks/useAccountId';
 import { useAccountStatus } from '@/mastodon/hooks/useStatus';
@@ -83,9 +84,13 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   const handleReplyClick = useCallback(() => {
     dispatch(statusInteraction({ statusId, intent: 'reply', contextType }));
   }, [contextType, dispatch, statusId]);
-  const handleFavouriteClick = useCallback(() => {
-    dispatch(statusInteraction({ statusId, intent: 'favourite', contextType }));
-  }, [contextType, dispatch, statusId]);
+  const handleFavouriteClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      animateFavouriteIcon(event.currentTarget, status?.favourited ?? false);
+      dispatch(statusInteraction({ statusId, intent: 'favourite', contextType }));
+    },
+    [contextType, dispatch, status?.favourited, statusId],
+  );
   const handleShareClick = useCallback(() => {
     if (!statusUrl) {
       return;
