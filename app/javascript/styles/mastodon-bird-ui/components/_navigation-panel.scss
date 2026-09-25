@@ -358,11 +358,20 @@
     height: 24px;
     width: 24px;
   }
-  .navigation-panel__menu {
+  // Bird UI shell order: logo -> menu -> compose -> flexible space ->
+  // profile -> footer. These are direct children of the navigation panel,
+  // while navigation-ordering.scss already assigns orders to logo/menu/spacer.
+  .navigation-panel > .navigation-panel__logo {
+    order: 1;
+  }
+
+  .navigation-panel > .navigation-panel__menu {
+    order: 2;
     padding-bottom: 0;
   }
 
-  .bird-ui-compose-button {
+  .navigation-panel > .bird-ui-compose-button {
+    order: 3;
     align-self: center;
     width: fit-content;
     min-width: 0;
@@ -371,9 +380,16 @@
     padding-inline: 16px;
   }
 
-  .bird-ui-profile-slot {
-    margin-top: auto;
-    margin-bottom: 52px;
+  .navigation-panel > .flex-spacer {
+    order: 4;
+  }
+
+  .navigation-panel > .bird-ui-profile-slot {
+    order: 5;
+    flex: 0 0 64px;
+    width: 100%;
+    min-height: 64px;
+    margin: 0 0 52px;
   }
 
 }
