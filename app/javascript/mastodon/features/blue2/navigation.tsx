@@ -7,7 +7,6 @@ import { NavLink } from 'react-router-dom';
 
 import { CaretRightIcon, HouseIcon, StackIcon, StarIcon } from '@phosphor-icons/react';
 
-
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
