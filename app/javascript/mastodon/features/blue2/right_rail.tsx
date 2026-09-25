@@ -18,10 +18,13 @@ interface TrendTag {
   name: string;
 }
 
-export const Blue2RightRail: React.FC<{ variant?: 'birdUi' }> = ({ variant }) => {
+export const Blue2RightRail: React.FC<{
+  variant?: 'birdUi' | 'mobile';
+}> = ({ variant }) => {
   const intl = useIntl();
   const { signedIn } = useIdentity();
   const isBirdUiVariant = variant === 'birdUi';
+  const isMobileVariant = variant === 'mobile';
   const [tags, setTags] = useState<TrendTag[]>([]);
   const [trendMenuOpen, setTrendMenuOpen] = useState(false);
   const [trendsHidden, setTrendsHidden] = useState(false);
@@ -156,7 +159,7 @@ export const Blue2RightRail: React.FC<{ variant?: 'birdUi' }> = ({ variant }) =>
         )}
       </div>
 
-      {!isBirdUiVariant && (
+      {!isBirdUiVariant && !isMobileVariant && (
         <footer className={classes.footer}>
           <a href='/about'>
           <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
