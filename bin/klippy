@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+
+# Configure e ative o picker de GIF KLIPY no laboratório Blue.
+# Este comando é deliberadamente restrito ao canal BlueLab-Test.
+#
+# Uso:
+#   klippy
+#
+# A chave nunca é impressa, versionada ou passada como argumento de processo.
+# Ela fica somente no .env.production local, usado pelo build Vite.
+#
+# Fontes:
+# - https://docs.klipy.com/
+# - https://docs.klipy.com/stickers-api
+
+set -Eeuo pipefail
+
+REPO="${BLUELAB_REPO:-$HOME/blue}"
+ENV_FILE="$REPO/.env.production"
+
+falhar() {
+  echo
+  echo "ERRO: $*" >&2
+  exit 1
+}
+
+[[ -d "$REPO/.git" ]] || falhar "não encontrei o repositório Blue em: $REPO"
+[[ -f "$ENV_FILE" ]] || falhar "não encontrei $ENV_FILE"
+command -v git >/dev/null 2>&1 || falhar "git não está disponível"
+command -v yarn >/dev/null 2>&1 || falhar "yarn não está disponível"
+
+BRANCH="$(git -C "$REPO" branch --show-current)"
+[[ "$BRANCH" == "BlueLab-Test" ]] || falhar "este comando só pode ser executado na branch BlueLab-Test (branch atual: $BRANCH)"
+
+echo "KLIPY para BlueLab-Test"
+echo
+echo "A chave será salva somente em:"
+echo "  $ENV_FILE"
+echo
+echo "Ela não será exibida nem enviada ao Git."
+echo
+
+read -rsp "Cole a chave Test da KLIPY: " KLIPY_KEY
+echo
+
+[[ -n "$KLIPY_KEY" ]] || falhar "a chave não pode estar vazia"
+
+TMP_KEY="$(mktemp "${TMPDIR:-/tmp}/klippy-key.XXXXXX")"
+TMP_ENV="$(mktemp "${TMPDIR:-/tmp}/klippy-env.XXXXXX")"
+cleanup() {
+  rm -f "$TMP_KEY" "$TMP_ENV"
+}
+trap cleanup EXIT
+
+chmod 600 "$TMP_KEY"
+printf '%s' "$KLIPY_KEY" > "$TMP_KEY"
+unset KLIPY_KEY
+
+chmod 600 "$TMP_ENV"
+
+if grep -q '^VITE_KLIPY_API_KEY=' "$ENV_FILE"; then
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" == VITE_KLIPY_API_KEY=* ]]; then
+      printf 'VITE_KLIPY_API_KEY=' >> "$TMP_ENV"
+      cat "$TMP_KEY" >> "$TMP_ENV"
+      printf '\n' >> "$TMP_ENV"
+    else
+      printf '%s\n' "$line" >> "$TMP_ENV"
+    fi
+  done < "$ENV_FILE"
+else
+  cat "$ENV_FILE" > "$TMP_ENV"
+  printf '\nVITE_KLIPY_API_KEY=' >> "$TMP_ENV"
+  cat "$TMP_KEY" >> "$TMP_ENV"
+  printf '\n' >> "$TMP_ENV"
+fi
+
+chmod 600 "$TMP_ENV"
+mv "$TMP_ENV" "$ENV_FILE"
+
+echo "OK: chave KLIPY configurada localmente."
+echo
+echo "Recriando o bundle de produção..."
+
+cd "$REPO"
+yarn build:production || falhar "o build falhou; o Blue não foi reiniciado"
+
+echo
+echo "Build concluído. Reiniciando o Blue..."
+
+if command -v blue-reiniciar >/dev/null 2>&1; then
+  blue-reiniciar
+else
+  sudo systemctl restart blue-web.service blue-sidekiq.service
+  sudo systemctl restart blue-streaming@4000.service 2>/dev/null || true
+fi
+
+echo
+if systemctl is-active --quiet blue-web.service; then
+  echo "KLIPY está ativo no BlueLab-Test."
+  echo "Abra o compositor novo em mastodon.blue e clique em GIF."
+else
+  falhar "blue-web.service não ficou ativo após o reinício"
+fi
