@@ -66,16 +66,28 @@
   }
 
   input {
+    box-sizing: border-box;
     min-width: 0;
     width: 100%;
     min-height: 0;
-    border: 0;
-    outline: 0;
+    margin: 0;
     padding: 0;
-    appearance: none;
-    background: transparent;
-    color: inherit;
+    border: 0 !important;
+    border-radius: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    color: var(--color-text-primary);
     font: inherit;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+
+    &:focus,
+    &:focus-visible {
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+    }
 
     &::placeholder {
       color: var(--color-text-secondary);
@@ -84,7 +96,9 @@
 
     &::-webkit-search-cancel-button,
     &::-webkit-search-decoration {
+      display: none;
       appearance: none;
+      -webkit-appearance: none;
     }
   }
 }
