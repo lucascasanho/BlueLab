@@ -25,7 +25,7 @@ export const StatusImage: React.FC<
     sensitive?: boolean;
     animateGifv?: boolean;
   } & React.ComponentPropsWithRef<'div'>
-> = ({ attachment, children, sensitive, className, style, ...props }) => {
+> = ({ attachment, children, sensitive, animateGifv = false, className, style, ...props }) => {
   let x = 50;
   let y = 50;
   const focusX = attachment.meta.focus?.x;
