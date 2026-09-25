@@ -151,3 +151,33 @@ html.no-reduce-motion
     background-image: var(--icon-heart-hover);
   }
 }
+
+// The current legacy action bar uses Material SVG stars. Bird UI's original
+// sprite styling was written for non-SVG icons, so its background sprite would
+// render a second star behind the SVG and could become oversized during the
+// activation animation. Keep the native SVG as the only visible icon.
+.layout-single-column,
+.layout-multiple-columns {
+  .status__action-bar .icon-button .favourite-animation-target > svg.icon-star,
+  .detailed-status__action-bar
+    .icon-button
+    .favourite-animation-target
+    > svg.icon-star {
+    background-image: none !important;
+  }
+}
+
+html.no-reduce-motion {
+  .status__action-bar
+    .icon-button.star-icon
+    .favourite-animation-target
+    > svg.icon-star,
+  .detailed-status__action-bar
+    .icon-button.star-icon
+    .favourite-animation-target
+    > svg.icon-star {
+    animation: none !important;
+    background-image: none !important;
+    content: normal !important;
+  }
+}
