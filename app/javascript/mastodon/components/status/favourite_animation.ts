@@ -31,7 +31,7 @@ export function animateFavouriteIcon(
     return;
   }
 
-  target.animate(active ? springRotateIn : springRotateOut, {
+  target.animate(active ? springRotateOut : springRotateIn, {
     duration: 1000,
     easing: 'linear',
     fill: 'none',
