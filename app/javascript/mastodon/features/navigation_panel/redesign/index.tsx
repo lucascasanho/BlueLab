@@ -308,16 +308,16 @@ export const RedesignNavigationPanel: React.FC<{
                   />
                 </NavigationLink>
 {mode !== 'slide-out' && (
-                <NavigationLink
-                  stacked
-                  to='/favourites'
-                  iconComponent={StarIcon}
-                >
-                  <FormattedMessage
-                    id='navigation_bar.favourites'
-                    defaultMessage='Favorites'
-                  />
-                </NavigationLink>
+                  <NavigationLink
+                    stacked
+                    to='/favourites'
+                    iconComponent={StarIcon}
+                  >
+                    <FormattedMessage
+                      id='navigation_bar.favourites'
+                      defaultMessage='Favorites'
+                    />
+                  </NavigationLink>
                 )}
                 <NavigationLink
                   stacked
