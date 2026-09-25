@@ -97,6 +97,18 @@
     fill: var(--color-yellow) !important;
     stroke: var(--color-yellow) !important;
   }
+
+  // The redesigned timeline action bar does not use the legacy
+  // .status__action-bar class, so the active state must also reach the
+  // animation target directly from the pressed star button.
+  button.star-icon[aria-pressed='true']
+    .favourite-animation-target > .icon,
+  button.star-icon[aria-pressed='true']
+    .favourite-animation-target > .icon path {
+    color: var(--color-yellow) !important;
+    fill: var(--color-yellow) !important;
+    stroke: var(--color-yellow) !important;
+  }
 }
 
 // The detailed-post action already has the correct yellow star. Keep legacy
