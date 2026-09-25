@@ -4,6 +4,8 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import classNames from 'classnames';
 
+import StarIconFilled from '@/material-icons/400-24px/star-fill.svg?react';
+import StarIconBorder from '@/material-icons/400-24px/star.svg?react';
 import {
   ArrowsClockwiseIcon,
   BookmarkSimpleIcon,
@@ -16,7 +18,6 @@ import {
 
 import { statusInteraction } from '@/mastodon/actions/interactions';
 import { fetchStatus } from '@/mastodon/actions/statuses';
-import { animateFavouriteIcon } from '@/mastodon/components/status/favourite_animation';
 import { useCurrentAccountId } from '@/mastodon/hooks/useAccountId';
 import { useAccountStatus } from '@/mastodon/hooks/useStatus';
 import { quickBoosting } from '@/mastodon/initial_state';
@@ -31,6 +32,7 @@ import {
   ToggleButton,
   ToggleIconButton,
 } from '../button/redesign';
+import { IconButton as LegacyIconButton } from '../icon_button';
 import { iconWeight, useIconWeight } from '../icon';
 import {
   Menu,
@@ -83,13 +85,9 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   const handleReplyClick = useCallback(() => {
     dispatch(statusInteraction({ statusId, intent: 'reply', contextType }));
   }, [contextType, dispatch, statusId]);
-  const handleFavouriteClick = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      animateFavouriteIcon(event.currentTarget, status?.favourited ?? false);
-      dispatch(statusInteraction({ statusId, intent: 'favourite', contextType }));
-    },
-    [contextType, dispatch, status?.favourited, statusId],
-  );
+  const handleFavouriteClick = useCallback(() => {
+    dispatch(statusInteraction({ statusId, intent: 'favourite', contextType }));
+  }, [contextType, dispatch, statusId]);
   const handleShareClick = useCallback(() => {
     if (!statusUrl) {
       return;
@@ -152,21 +150,19 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
         {withCounters && status.reblogs_count}
       </StatusReblogButton>
 
-      <ToggleButton
-        size='sm'
-        variant='ghost'
-        active={status.favourited}
-        title={favouriteTitle}
-        leadingIcon={favouriteIcon}
-        leadingIconWrapperClassName='favourite-animation-target'
-        onClick={handleFavouriteClick}
+      <LegacyIconButton
         className={classNames(
           'star-icon',
           !onlyResponses && classes.actionsButtonGap,
         )}
-      >
-        {withCounters && status.favourites_count}
-      </ToggleButton>
+        icon='star'
+        iconComponent={status.favourited ? StarIconFilled : StarIconBorder}
+        active={status.favourited}
+        animate
+        title={favouriteTitle}
+        onClick={handleFavouriteClick}
+        counter={withCounters ? status.favourites_count : undefined}
+      />
     </>
   );
 
