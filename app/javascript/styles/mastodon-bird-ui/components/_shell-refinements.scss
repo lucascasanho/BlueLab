@@ -1,0 +1,46 @@
+// Bird UI shell refinements inspired by BlueLab's softer chrome.
+body[data-theme='mastodon-bird-ui-auto'] {
+  --bird-ui-shell-border: rgb(56 56 77 / 55%);
+  --bird-ui-shell-border-soft: rgb(56 56 77 / 38%);
+  --bird-ui-shell-radius: 12px;
+
+  // Keep the separators at 1px, but reduce their visual weight with
+  // transparency instead of changing the theme's global border token.
+  .columns-area__panels__main > div {
+    border-color: var(--bird-ui-shell-border) !important;
+  }
+
+  .column > .scrollable {
+    border-width: 1px;
+    border-color: var(--bird-ui-shell-border) !important;
+    border-radius: var(--bird-ui-shell-radius) !important;
+  }
+
+  // Advanced web interface: soften the vertical column dividers and give
+  // each column a rounded content surface.
+  &.layout-multiple-columns {
+    .column {
+      border-inline-end: 1px solid var(--bird-ui-shell-border-soft) !important;
+    }
+
+    .column > .scrollable {
+      border-color: var(--bird-ui-shell-border) !important;
+      border-radius: var(--bird-ui-shell-radius) !important;
+    }
+  }
+
+  // Single-column desktop/tablet panels keep a little more separation from
+  // the page edge while remaining visually lighter than the base theme.
+  &.layout-single-column {
+    @media screen and (width >= 760px) {
+      .column > .scrollable,
+      .tabs-bar__wrapper .column-header,
+      .tabs-bar__wrapper .column-back-button,
+      .explore__search-header,
+      .column-search-header {
+        border-color: var(--bird-ui-shell-border) !important;
+        border-radius: var(--bird-ui-shell-radius) !important;
+      }
+    }
+  }
+}
