@@ -22,15 +22,6 @@
   flex: 0 0 auto;
 }
 
-.rightRailComposeButton {
-  width: fit-content;
-  min-width: 0;
-  min-height: 44px;
-  margin: 10px auto;
-  padding-inline: 16px;
-  align-self: center;
-}
-
 .searchHost {
   position: relative;
   z-index: 20;
@@ -136,6 +127,52 @@
   }
 }
 
+.feeds {
+  margin-top: 10px;
+}
+
+.feedShortcut {
+  min-height: 36px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--blue2-text, #f7f7f8) !important;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--blue2-text, #f7f7f8) !important;
+    background: var(--blue2-hover, #18212a);
+    text-decoration: none;
+    outline: none;
+  }
+}
+
+.feedIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--blue2-search, #15202b) 86%, transparent);
+  color: var(--blue2-text, #f7f7f8);
+
+  svg {
+    width: 17px;
+    height: 17px;
+    fill: currentColor;
+  }
+}
+
+.feedShortcutActive .feedIcon {
+  background: var(--blue2-blue, #0085ff);
+  color: #fff;
+}
+
 .card {
   margin-top: 18px;
   padding: 13px 14px 15px;
@@ -217,6 +254,29 @@
   color: var(--blue2-muted-2, #6f7f8c);
 }
 
+.footer {
+  margin-top: auto;
+  padding-top: 26px;
+  padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  color: var(--blue2-muted, #83929f);
+  font-size: 12px;
+
+  a {
+    color: inherit !important;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--blue2-text, #f7f7f8) !important;
+      text-decoration: underline;
+      outline: none;
+    }
+  }
+}
+
 .modalBackdrop {
   position: fixed;
   z-index: 10000;
@@ -295,17 +355,10 @@
   }
 }
 
-:global(body[data-theme='mastodon-bird-ui-auto']) .root {
-  --blue2-bg: var(--color-bg-primary);
-  --blue2-surface: var(--color-bg-secondary);
-  --blue2-surface-raised: var(--color-bg-primary);
-  --blue2-search: var(--color-bg-secondary);
-  --blue2-hover: var(--color-bg-tertiary);
-  --blue2-border: var(--color-border-primary);
-  --blue2-border-soft: var(--color-border-primary);
-  --blue2-text: var(--color-text-primary);
-  --blue2-muted: var(--color-text-secondary);
-  --blue2-muted-2: var(--color-text-secondary);
-  --blue2-blue: var(--color-accent);
-  --blue2-blue-hover: var(--color-accent-dark);
+
+:global(body[data-theme='mastodon-bird-ui-auto']) .root.birdUiVariant {
+  .feeds,
+  .footer {
+    display: none;
+  }
 }
