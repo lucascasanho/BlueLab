@@ -7,7 +7,7 @@ const labels: Record<string, string> = {
   fr: 'Signaler un bug',
 };
 
-export const BugReportLabel: React.FC = () => {
+export const BugReportLabel = () => {
   const intl = useIntl();
   const locale = intl.locale.toLowerCase();
 
