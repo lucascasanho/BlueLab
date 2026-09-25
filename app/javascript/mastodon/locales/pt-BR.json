@@ -1522,11 +1522,11 @@
   "visibility_modal.quote_label": "Quem pode citar",
   "visibility_modal.quote_nobody": "Apenas eu",
   "visibility_modal.quote_public": "Qualquer um",
-  "visibility_modal.save": "Salvar"
+  "visibility_modal.save": "Salvar",
   "account_switcher.title": "Contas",
   "account_switcher.current": "Atual",
   "account_switcher.sign_in": "Entrar em outra conta",
   "account_switcher.create": "Criar outra conta",
   "account_switcher.remove": "Remover {account} deste dispositivo",
-  "account_switcher.error": "A sessão desta conta não está mais disponível. Entre novamente para adicioná-la.",
+  "account_switcher.error": "A sessão desta conta não está mais disponível. Entre novamente para adicioná-la."
 }
