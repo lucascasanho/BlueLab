@@ -104,7 +104,7 @@ RSpec.describe ThemeHelper do
     subject { helper.current_theme }
 
     before do
-      allow(Themes.instance).to receive(:names).and_return %w(default blue-2 alternate)
+      allow(Themes.instance).to receive(:names).and_return %w(default blue-2 mastodon-5)
     end
 
     context 'when the administrator selected BlueLab' do
@@ -113,8 +113,8 @@ RSpec.describe ThemeHelper do
       it { is_expected.to eq('blue-2') }
     end
 
-    context 'when the administrator selected another available theme' do
-      before { Setting.theme = 'alternate' }
+    context 'when the administrator selected another selectable theme' do
+      before { Setting.theme = 'mastodon-5' }
 
       it { is_expected.to eq('alternate') }
     end
@@ -132,12 +132,12 @@ RSpec.describe ThemeHelper do
 
       before do
         allow(helper).to receive(:current_user).and_return(current_user)
-        current_user.settings.update(bluelab_theme: 'alternate', noindex: false)
+        current_user.settings.update(bluelab_theme: 'mastodon-5', noindex: false)
         Setting.theme = 'blue-2'
       end
 
       it 'uses the personal preference without changing the administrator theme' do
-        expect(subject).to eq('alternate')
+        expect(subject).to eq('mastodon-5')
         expect(Setting.theme).to eq('blue-2')
       end
     end
