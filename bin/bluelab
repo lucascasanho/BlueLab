@@ -113,6 +113,12 @@ preservar_local() {
 instalar_comando_atual() {
   executar mkdir -p "$DIR_INSTALACAO"
   executar install -m 0755 "$REPO/bin/bluelab" "$COMANDO_INSTALADO"
+
+  # Utilitários auxiliares versionados no repositório também são instalados
+  # no mesmo diretório de comandos do atualizador.
+  if [[ -f "$REPO/bin/klippy" ]]; then
+    executar install -m 0755 "$REPO/bin/klippy" "$DIR_INSTALACAO/klippy"
+  fi
 }
 
 capturar_configuracoes() {
