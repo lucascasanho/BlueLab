@@ -152,32 +152,21 @@ html.no-reduce-motion
   }
 }
 
-// The current legacy action bar uses Material SVG stars. Bird UI's original
-// sprite styling was written for non-SVG icons, so its background sprite would
-// render a second star behind the SVG and could become oversized during the
-// activation animation. Keep the native SVG as the only visible icon.
-.layout-single-column,
-.layout-multiple-columns {
-  .status__action-bar .icon-button .favourite-animation-target > svg.icon-star,
-  .detailed-status__action-bar
-    .icon-button
-    .favourite-animation-target
-    > svg.icon-star {
-    background-image: none !important;
-  }
-}
-
+/*
+ * The redesign action bar uses ToggleButton instead of the legacy
+ * .icon-button.star-icon. Reuse Mastodon's existing spring rotation so the
+ * favourite animation is present in every Bird UI action-bar context too.
+ */
 html.no-reduce-motion {
-  .status__action-bar
-    .icon-button.star-icon
-    .favourite-animation-target
-    > svg.icon-star,
-  .detailed-status__action-bar
-    .icon-button.star-icon
-    .favourite-animation-target
-    > svg.icon-star {
-    animation: none !important;
-    background-image: none !important;
-    content: normal !important;
+  .favourite-spin {
+    &.activate > .icon {
+      animation: spring-rotate-in 1s linear;
+      transform-origin: 50% 52%;
+    }
+
+    &.deactivate > .icon {
+      animation: spring-rotate-out 1s linear;
+      transform-origin: 50% 52%;
+    }
   }
 }
