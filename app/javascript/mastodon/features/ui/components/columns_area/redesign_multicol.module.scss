@@ -63,9 +63,48 @@
   min-width: 0;
 }
 
-// Keep the compact BlueLab rail aligned with the 76px navigation gutter.
+.multiColumnContent {
+  display: contents;
+}
+
+// BlueLab tablet keeps the navigation rail in its own 76px track and
+// gives the timeline columns their own horizontal scrolling area.
 @media (min-width: $mobile-menu-breakpoint) and (max-width: ($no-gap-breakpoint - 1)) {
-  .blue2MultiColumnRoot .navigationRail[data-expanded='true'] {
+  .blue2MultiColumnRoot {
+    height: 100dvh;
+    min-height: 100dvh;
+    padding: 0;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  .blue2MultiColumnRoot .navigationRail {
+    position: relative;
+    inset: auto;
+    flex: 0 0 76px;
     width: 76px;
+    min-width: 76px;
+    height: 100dvh;
+    align-self: stretch;
+    overflow: hidden;
+  }
+
+  .blue2MultiColumnRoot .navigationRail[data-expanded='true'] {
+    flex-basis: 76px;
+    width: 76px;
+    min-width: 76px;
+  }
+
+  .blue2MultiColumnRoot .multiColumnContent {
+    min-width: 0;
+    min-height: 100%;
+    flex: 1 1 auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-inline: var(--multi-column-gap);
+  }
+
+  .blue2MultiColumnRoot.unscrollable .multiColumnContent {
+    overflow-x: hidden;
   }
 }
