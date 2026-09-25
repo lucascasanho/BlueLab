@@ -372,12 +372,12 @@
 
   .navigation-panel > .bird-ui-compose-button {
     order: 3;
-    align-self: center;
-    width: fit-content;
+    align-self: flex-start;
+    width: auto;
     min-width: 0;
     min-height: 44px;
-    margin: 8px auto 0;
-    padding-inline: 16px;
+    margin: 15px 6px 0;
+    padding: 0 20px;
   }
 
   .navigation-panel > .flex-spacer {
