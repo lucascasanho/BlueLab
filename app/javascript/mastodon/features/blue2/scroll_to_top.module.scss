@@ -1,9 +1,9 @@
 // BlueLab desktop only: place the floating control immediately beside the
 // main 600px column, without changing its position in other themes or modes.
-  :global(body[data-theme='blue-2']) .root {
-    left: calc(50% - 374px);
-    right: auto;
-  }
+:global(body[data-theme='blue-2']) .root {
+  left: calc(50% - 374px);
+  right: auto;
+}
 
 .root {
   position: fixed;
