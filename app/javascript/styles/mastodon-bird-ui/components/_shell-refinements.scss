@@ -29,12 +29,13 @@ body[data-theme='mastodon-bird-ui-auto'] {
     }
   }
 
-  // Single-column desktop/tablet panels keep a little more separation from
-  // the page edge while remaining visually lighter than the base theme.
+  // Advanced Bird UI owns the navigation footer. Hide legacy footer mounts
+  // inside the Bird UI navigation panel and any multi-column LinkFooter.
   &.layout-multiple-columns {
-    // The legacy shell may also mount LinkFooter in the advanced interface.
-    // Bird UI has its own footer in the navigation panel, so keep only that
-    // footer and avoid rendering two footer link groups.
+    .navigation-panel--bird-ui > footer:not([data-bird-ui-footer='true']) {
+      display: none !important;
+    }
+
     footer[data-context='multi-column'] {
       display: none !important;
     }
