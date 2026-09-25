@@ -250,6 +250,16 @@ body[data-theme='mastodon-5'] {
   }
 }
 
+.mastodon5-admin-logo {
+  width: 40px;
+  height: 40px;
+  max-width: 40px;
+  max-height: 40px;
+  flex: 0 0 40px;
+  object-fit: contain;
+  display: block;
+}
+
 @media (width <= 759px) {
   body[data-theme='mastodon-5'] {
     .status__content,
