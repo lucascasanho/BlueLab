@@ -681,12 +681,19 @@ body > [data-popover-placement] {
     }
 
     &__preview,
-    &__visualizer {
+    &__visualizer,
+    &__video {
       position: absolute;
       width: 100%;
       height: 100%;
       z-index: -1;
       top: 0;
+    }
+
+    &__video {
+      inset-inline-start: 0;
+      object-fit: cover;
+      pointer-events: none;
     }
 
     &__preview {
