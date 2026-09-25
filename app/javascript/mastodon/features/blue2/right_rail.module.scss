@@ -26,9 +26,9 @@
   width: fit-content;
   min-width: 0;
   min-height: 44px;
-  margin: 0 0 10px;
+  margin: 10px auto;
   padding-inline: 16px;
-  align-self: flex-start;
+  align-self: center;
 }
 
 .searchHost {
@@ -215,29 +215,6 @@
 .rank {
   flex: 0 0 18px;
   color: var(--blue2-muted-2, #6f7f8c);
-}
-
-.footer {
-  margin-top: auto;
-  padding-top: 26px;
-  padding-bottom: env(safe-area-inset-bottom);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  color: var(--blue2-muted, #83929f);
-  font-size: 12px;
-
-  a {
-    color: inherit !important;
-    text-decoration: none;
-
-    &:hover,
-    &:focus-visible {
-      color: var(--blue2-text, #f7f7f8) !important;
-      text-decoration: underline;
-      outline: none;
-    }
-  }
 }
 
 .modalBackdrop {
