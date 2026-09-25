@@ -33,6 +33,15 @@
       margin-inline: 0;
     }
 
+    .items {
+      width: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
+      align-items: center;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
     .item {
       width: 48px;
       height: 48px;
