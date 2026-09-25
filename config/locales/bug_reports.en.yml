@@ -1,0 +1,47 @@
+en:
+  admin:
+    bug_reports:
+      title: Bug reports
+      report_title: Bug report %{id}
+      all: All
+      open: Open
+      resolved: Resolved
+      id: ID
+      reported_by: Reported by
+      created_at: Created
+      status: Status
+      assigned_to: Assigned to
+      attachments: Attachments
+      view: View
+      none: None
+      details: Report details
+      description: Description
+      technical_details: Technical details
+      browser: Browser
+      browser_version: Browser version
+      operating_system: Operating system
+      operating_system_version: Operating-system version
+      interface_language: Interface language
+      theme: Theme
+      interface_layout: Interface mode
+      current_path: Page when reported
+      viewport: Viewport
+      app_version: BlueLab version
+      request_id: Request ID
+      user_agent: User agent
+      recent_errors: Recent client errors
+      no_errors: No recent client errors were captured.
+      message: Message
+      stack: Stack
+      attachments_title: Attached media
+      no_attachments: No media attached.
+      assign_to_self: Assign to me
+      unassign: Unassign
+      resolve: Mark as resolved
+      reopen: Reopen
+      back: Back to bug reports
+      resolved_by: Resolved by
+      resolved_at: Resolved at
+      resolved_msg: Bug report marked as resolved.
+      status_open: Open
+      status_resolved: Resolved
