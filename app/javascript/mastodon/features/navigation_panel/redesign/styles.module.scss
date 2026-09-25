@@ -61,6 +61,10 @@
   margin-bottom: var(--space-2);
 }
 
+.root[data-mode='static'] .footerNav {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .callout {
   margin-inline: var(--space-4);
 }
