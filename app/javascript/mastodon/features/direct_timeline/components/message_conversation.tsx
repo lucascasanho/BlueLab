@@ -33,10 +33,6 @@ const messages = defineMessages({
     id: 'messages.conversation.title',
     defaultMessage: 'Conversation',
   },
-  reply: {
-    id: 'messages.conversation.reply',
-    defaultMessage: 'Reply',
-  },
   empty: {
     id: 'messages.conversation.empty',
     defaultMessage: 'This conversation is no longer available.',
