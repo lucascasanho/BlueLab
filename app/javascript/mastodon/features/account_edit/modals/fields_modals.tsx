@@ -266,7 +266,7 @@ export const EditFieldModal = forwardRef<
       className={classes.wrapper}
     >
       <EmojiTextInputField
-        blue2EmojiEditor
+        blue2EmojiEditor mastodon5EmojiEditor
         name='label'
         value={newLabel}
         onChange={setNewLabel}
@@ -280,7 +280,7 @@ export const EditFieldModal = forwardRef<
       />
 
       <EmojiTextInputField
-        blue2EmojiEditor
+        blue2EmojiEditor mastodon5EmojiEditor
         name='value'
         value={newValue}
         onChange={setNewValue}

@@ -64,7 +64,7 @@ export const BioModal: FC<BaseConfirmationModalProps> = ({ onClose }) => {
       noFocusButton
     >
       <EmojiTextAreaField
-        blue2EmojiEditor
+        blue2EmojiEditor mastodon5EmojiEditor
         label=''
         value={newBio}
         onChange={setNewBio}

@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import classNames from 'classnames';
 
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { ColumnsAreaMastodon5 } from '@/mastodon/features/mastodon5';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
 import { Header } from '@/mastodon/features/custom_homepage/components/header';
 import { CollapsibleNavigationPanel } from '@/mastodon/features/navigation_panel';
@@ -111,11 +112,15 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
 };
 
 export const ColumnsArea: React.FC<ColumnsAreaProps> = (props) => {
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const theme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
 
-  if (isBlue2) {
+  if (theme === 'blue-2') {
     return <ColumnsAreaRedesign {...props} />;
+  }
+
+  if (theme === 'mastodon-5') {
+    return <ColumnsAreaMastodon5 {...props} />;
   }
 
   return <ColumnsAreaLegacy {...props} />;

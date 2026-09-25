@@ -96,6 +96,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   recommended = false,
   maxLength,
   blue2EmojiEditor: _blue2EmojiEditor,
+  mastodon5EmojiEditor: _mastodon5EmojiEditor,
   ...otherProps
 }) => {
   const counterId = useId();
