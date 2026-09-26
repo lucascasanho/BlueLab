@@ -395,7 +395,12 @@ textarea.textarea {
   display: flex;
   align-items: center;
   gap: var(--space-3xs);
-  font-family: var(--font-monospace);
+  min-width: 0;
+  flex: 0 1 auto;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
   color: var(--color-text-tertiary);
   margin-inline-start: auto;
 }
