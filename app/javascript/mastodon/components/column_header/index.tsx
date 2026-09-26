@@ -38,6 +38,7 @@ export interface ColumnHeaderProps {
   // Set to auto to display the back button based on
   // the `fromMastodon` location state
   withBackButton?: boolean | 'auto';
+  onBackButtonClick?: () => void;
   withUnreadMarker?: boolean;
   extraButtons?: React.ReactNode;
   extraStickyContent?: React.ReactNode;
@@ -47,6 +48,7 @@ export interface ColumnHeaderProps {
 export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   title,
   withBackButton,
+  onBackButtonClick,
   withUnreadMarker,
   extraButtons,
   extraStickyContent,
@@ -57,6 +59,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   const columnIndex = useColumnIndexContext();
   const location = useLocation<LocationState>();
   const hasBackButton =
+    typeof onBackButtonClick === 'function' ||
     withBackButton === true ||
     (withBackButton === 'auto' && location.state?.fromMastodon);
   const hasExtraStickyContent = hasReactChildren(extraStickyContent);
@@ -128,7 +131,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
       )}
     >
       <div className={classes.layout} data-has-unread={withUnreadMarker}>
-        {hasBackButton ? <BackButton /> : <MobileMenuButton />}
+        {hasBackButton ? <BackButton onClick={onBackButtonClick} /> : <MobileMenuButton />}
         <NavigationFocusTarget className={classes.title}>
           <button
             type='button'
@@ -189,16 +192,21 @@ export const ColumnHeaderButton: React.FC<ColumnHeaderButtonProps> = ({
   );
 };
 
-const BackButton: React.FC = () => {
+const BackButton: React.FC<{ onClick?: () => void }> = ({ onClick }) => {
   const history = useAppHistory();
 
   const goBack = useCallback(() => {
+    if (onClick) {
+      onClick();
+      return;
+    }
+
     if (history.location.state?.fromMastodon) {
       history.goBack();
     } else {
       history.push('/');
     }
-  }, [history]);
+  }, [history, onClick]);
 
   return (
     <div className={classes.leftButton}>
