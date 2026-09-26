@@ -9,6 +9,8 @@ fr:
       id: ID
       reported_by: Signalé par
       created_at: Créé le
+      anonymous: Visiteur
+      error_page: Page d’erreur
       status: Statut
       assigned_to: Assigné à
       attachments: Pièces jointes
