@@ -198,7 +198,12 @@ class Status extends ImmutablePureComponent {
   };
 
   handleBlue2CardClick = e => {
+    const isBlue2 =
+      typeof document !== 'undefined' &&
+      document.body.dataset.theme === 'blue-2';
+
     if (
+      !isBlue2 ||
       e.defaultPrevented ||
       (e.target instanceof Element &&
         e.target.closest(
