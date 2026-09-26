@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class BugReportsController < ApplicationController
+  layout 'auth'
   def new
     @error_page = valid_error_page(params[:error_page])
     @current_path = sanitize_path(params[:current_path]) || request.path
