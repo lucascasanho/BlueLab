@@ -13,12 +13,10 @@ export const NavigationFooterLinks: React.FC<{
   siteName?: string;
   multiColumn?: boolean;
   variant?: 'default' | 'blue2';
-  showBugReport?: boolean;
 }> = ({
   siteName = domain,
   multiColumn,
   variant = 'default',
-  showBugReport = false,
 }) => {
   const openBugReport = useOpenBugReport();
   const multiColumnLinkAttrs = multiColumn
@@ -56,8 +54,7 @@ export const NavigationFooterLinks: React.FC<{
             />
           </NavLink>
         </li>
-        {showBugReport && (
-          <li>
+        <li>
             <button
               type='button'
               className={classes.bugReportButton}
@@ -65,8 +62,7 @@ export const NavigationFooterLinks: React.FC<{
             >
               <BugReportLabel />
             </button>
-          </li>
-        )}
+        </li>
         {termsOfServiceEnabled && (
           <li>
             <NavLink
