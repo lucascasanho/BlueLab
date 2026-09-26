@@ -88,7 +88,7 @@ export const EmbeddedStatus: React.FC<{
 
       clickCoordinatesRef.current = null;
     },
-    [clickCoordinatesRef, statusId, account, history],
+    [clickCoordinatesRef, statusId, account, history, onOpen],
   );
 
   const handleContentWarningClick = useCallback(() => {
