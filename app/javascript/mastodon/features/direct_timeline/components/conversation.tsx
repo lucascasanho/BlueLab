@@ -228,7 +228,7 @@ export const Conversation: React.FC<{
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         role='button'
-        onPointerUp={(event) => {
+        onPointerDown={(event) => {
           if (
             (event.target as HTMLElement).closest(
               '.status__action-bar, button, [role="menuitem"]',
