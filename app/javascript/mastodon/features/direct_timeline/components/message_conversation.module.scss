@@ -1,10 +1,11 @@
 .column {
   display: flex;
   flex: 1 1 auto;
-  flex-direction: column;
   width: 100%;
   min-width: 0;
   min-height: 0;
+  height: 100%;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -56,6 +57,23 @@
   overscroll-behavior-y: contain;
   scrollbar-width: thin;
   padding: var(--space-2xs) var(--space-2xs) var(--space-xs);
+}
+
+:global(body[data-theme='blue-2']) .messageListContent {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100%;
+  margin-top: auto;
+  gap: var(--space-xs);
+}
+
+:global(body[data-theme='blue-2']) .replyComposer {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
 }
 
 .message {
@@ -324,5 +342,36 @@
 
   :global(.ui--mobile-chrome-hidden) .page {
     padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+
+/*
+ * BlueLab message layout sizing is isolated to the Blue2 theme. The outer
+ * column owns the viewport and the message list is the only scrolling region,
+ * leaving the reply composer anchored below it.
+ */
+@media (width <= 1174px) {
+  :global(body[data-theme='blue-2']) .column {
+    height: calc(100dvh - var(--mobile-bottom-nav-height, 64px));
+  }
+
+  :global(body[data-theme='blue-2']) .page {
+    height: 100%;
+    min-height: 0;
+    padding-bottom: var(--space-2);
+  }
+
+  :global(body[data-theme='blue-2']) .replyComposer {
+    margin-bottom: calc(
+      var(--mobile-bottom-nav-height, 64px) + env(safe-area-inset-bottom)
+    );
+  }
+}
+
+@media (width >= 1175px) {
+  :global(body[data-theme='blue-2']) .column {
+    height: 100dvh;
+    max-height: 100dvh;
   }
 }
