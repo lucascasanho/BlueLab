@@ -6,7 +6,7 @@ class Api::V1::ConversationsController < Api::BaseController
   before_action -> { doorkeeper_authorize! :read, :'read:statuses' }, only: [:index, :show, :messages, :by_status]
   before_action -> { doorkeeper_authorize! :write, :'write:conversations' }, except: [:index, :messages, :by_status]
   before_action :require_user!
-  before_action :set_conversation, except: [:index, :by_status]
+  before_action :set_conversation, except: [:index, :by_status, :read]
   after_action :insert_pagination_headers, only: :index
 
   def index
@@ -43,6 +43,11 @@ class Api::V1::ConversationsController < Api::BaseController
   end
 
   def read
+    conversation = AccountConversation.where(account: current_account).find_by(id: params[:id])
+
+    return head :no_content unless conversation
+
+    @conversation = conversation
     matching_conversations.update_all(unread: false, updated_at: Time.current)
     head :no_content
   end
@@ -63,8 +68,16 @@ class Api::V1::ConversationsController < Api::BaseController
       participant_account_ids: participant_account_ids,
     )
 
-    conversation = if status.conversation_id.present?
-      conversations
+    # Prefer the exact account-conversation row that contains the status.
+    # This prevents a notification from opening a newer or stale row with
+    # the same participant set.
+    conversation = conversations
+      .where('? = ANY(status_ids)', status.id)
+      .order(last_status_id: :desc)
+      .first
+
+    if conversation.nil? && status.conversation_id.present?
+      conversation = conversations
         .where(conversation_id: status.conversation_id)
         .order(last_status_id: :desc)
         .first
@@ -108,7 +121,11 @@ class Api::V1::ConversationsController < Api::BaseController
   end
 
   def conversation_statuses
-    status_ids = matching_conversations.pluck(:status_ids).flatten.uniq
+    account_conversations = matching_conversations
+    status_ids = (
+      account_conversations.pluck(:status_ids).flatten +
+      account_conversations.pluck(:last_status_id)
+    ).compact.uniq
 
     Status.where(id: status_ids)
       .includes(
