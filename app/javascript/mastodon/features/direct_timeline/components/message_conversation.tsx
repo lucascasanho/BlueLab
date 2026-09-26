@@ -167,15 +167,34 @@ export const MessageConversation: React.FC = () => {
   const loadMessages = useCallback(() => {
     if (!id) return Promise.resolve([]);
 
-    return dispatch(fetchConversationMessages(id)).then((statuses) => {
+    const applyStatuses = (statuses: Array<{ id: string }>) => {
       const fetchedStatusIds = statuses.map((status) => status.id);
 
       setMessageStatusIds((current) =>
         [...new Set([...current, ...fetchedStatusIds])].sort(compareId),
       );
       return statuses;
-    });
-  }, [dispatch, id]);
+    };
+
+    return dispatch(fetchConversationMessages(id))
+      .then(applyStatuses)
+      .catch(async (error) => {
+        if (!sourceStatusId) throw error;
+
+        const recoveredId = await dispatch(
+          findConversationForStatus(sourceStatusId),
+        );
+
+        if (!recoveredId || recoveredId === id) throw error;
+
+        browserHistory.replace(`/conversations/${recoveredId}`, {
+          statusId: sourceStatusId,
+        });
+
+        const statuses = await dispatch(fetchConversationMessages(recoveredId));
+        return applyStatuses(statuses);
+      });
+  }, [dispatch, id, sourceStatusId]);
 
   useEffect(() => {
     dispatch(mountConversations());
