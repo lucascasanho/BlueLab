@@ -37,6 +37,38 @@ RSpec.describe 'API V1 Conversations' do
       expect(response.parsed_body.first[:conversation_id]).to be_present
     end
 
+    it 'collapses multiple account conversations from one native thread' do
+      first = PostStatusService.new.call(
+        other.account,
+        text: 'First @alice',
+        visibility: :direct,
+      )
+      other_two = Fabricate(:user)
+      PostStatusService.new.call(
+        other_two.account,
+        text: '@alice Second',
+        visibility: :direct,
+        thread: first,
+      )
+
+      expect(
+        AccountConversation.where(
+          account: user.account,
+          conversation_id: first.conversation_id,
+        ).count
+      ).to eq(2)
+
+      get '/api/v1/conversations', headers: headers
+
+      thread_rows = response.parsed_body.select do |conversation|
+        conversation[:conversation_id] == first.conversation_id.to_s
+      end
+
+      expect(thread_rows.size).to eq(1)
+      expect(thread_rows.first[:accounts].size).to eq(2)
+    end
+
+
     context 'with since_id' do
       context 'when requesting old posts' do
         it 'returns conversations' do
