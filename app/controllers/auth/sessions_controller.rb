@@ -216,7 +216,7 @@ class Auth::SessionsController < Devise::SessionsController
     return :two_factor_ldap_authenticatable if Devise.ldap_authentication
     return :two_factor_pam_authenticatable if Devise.pam_authentication
 
-    :database
+    :database_authenticatable
   end
 
   def account_switcher_flow?
