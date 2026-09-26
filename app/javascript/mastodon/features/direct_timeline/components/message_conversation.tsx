@@ -596,7 +596,10 @@ export const MessageConversation: React.FC = () => {
                   />
                   <IconButton
                     className={
-                      classes.messageAction + ' ' + classes.messageFavourite
+                      classes.messageAction +
+                      ' ' +
+                      classes.messageFavourite +
+                      ' star-icon'
                     }
                     animate
                     active={!!status.get('favourited')}
