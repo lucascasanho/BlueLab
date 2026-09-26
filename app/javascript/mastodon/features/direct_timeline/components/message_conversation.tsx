@@ -87,12 +87,18 @@ export const MessageConversation: React.FC = () => {
     const ids = new Set<string>();
 
     conversationGroup.forEach((item) => {
-      item.get('accounts').forEach((accountId) => {
-        if (accountId !== me) ids.add(accountId);
+      const accounts = item.get('accounts');
+
+      if (!Immutable.List.isList(accounts)) return;
+
+      accounts.forEach((accountId) => {
+        if (typeof accountId === 'string' && accountId !== me) {
+          ids.add(accountId);
+        }
       });
     });
 
-    return [...ids];
+    return [...ids].sort();
   }, [conversationGroup]);
 
   const accounts = useAppSelector((state) => state.accounts);
@@ -250,8 +256,8 @@ export const MessageConversation: React.FC = () => {
             >;
             const trimmedText = statusText.trimStart();
             const showSenderName =
-              mentions.size > 1 ||
-              mentions.some((mention) => {
+              mentions?.size > 1 ||
+              mentions?.some((mention) => {
                 const acct = mention.get('acct');
                 const username = mention.get('username');
                 const startsWithMention =
@@ -269,6 +275,10 @@ export const MessageConversation: React.FC = () => {
             const replyTarget = replyTargetId
               ? statuses.find((candidate) => candidate.get('id') === replyTargetId)
               : undefined;
+            const replyTargetText =
+              replyTarget && typeof replyTarget.get('text') === 'string'
+                ? (replyTarget.get('text') as string)
+                : '';
 
             return (
               <article
@@ -306,12 +316,9 @@ export const MessageConversation: React.FC = () => {
                             account={replyTarget.get('account')}
                           />
                         ),
-                        text: (
-                          (replyTarget.get('text') as string).slice(0, 80) +
-                          ((replyTarget.get('text') as string).length > 80
-                            ? '…'
-                            : '')
-                        ),
+                        text:
+                          replyTargetText.slice(0, 80) +
+                          (replyTargetText.length > 80 ? '…' : ''),
                       }}
                     />
                   </button>
