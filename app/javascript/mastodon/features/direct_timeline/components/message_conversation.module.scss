@@ -1,8 +1,16 @@
+.column {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .page {
   display: flex;
-  flex: 1 1 auto;
+  flex: 1 1 0;
+  min-width: 0;
   min-height: 0;
-  height: 100%;
+  height: auto;
   box-sizing: border-box;
   flex-direction: column;
   gap: var(--space-xs);
@@ -12,6 +20,7 @@
 
 .messageList {
   display: flex;
+  min-width: 0;
   flex: 1 1 auto;
   min-height: 0;
   flex-direction: column;
@@ -168,6 +177,11 @@
 :global(body[data-theme='blue-2']) .messageBody :global(.status__content),
 :global(body[data-theme='blue-2']) .messageBody :global(.status__content p) {
   color: var(--blue2-text) !important;
+}
+
+.replyComposer {
+  flex: 0 0 auto;
+  min-height: 0;
 }
 
 .messageActions {
