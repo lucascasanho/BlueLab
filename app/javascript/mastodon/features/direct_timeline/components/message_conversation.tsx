@@ -256,10 +256,10 @@ export const MessageConversation: React.FC = () => {
   }, [id, latestThreadStatusId, loadMessages]);
 
   useEffect(() => {
-    if (id) {
-      dispatch(markConversationRead(id));
+    if (id && conversationResolved && conversation) {
+      void dispatch(markConversationRead(id)).catch(() => undefined);
     }
-  }, [dispatch, id]);
+  }, [conversation, conversationResolved, dispatch, id]);
 
   const participantAccountIdsKey = participantIds.join(',');
   const participantAccountsRef = useRef(participantAccounts);
