@@ -11,7 +11,11 @@ class Api::V1::ConversationsController < Api::BaseController
 
   def index
     @conversations = paginated_conversations
-    render json: @conversations, each_serializer: REST::ConversationSerializer, relationships: StatusRelationshipsPresenter.new(@conversations.map(&:last_status), current_user&.account_id)
+    hydrate_conversation_participants!
+
+    render json: @conversations,
+           each_serializer: REST::ConversationSerializer,
+           relationships: StatusRelationshipsPresenter.new(@conversations.map(&:last_status), current_user&.account_id)
   end
 
   def show
@@ -100,7 +104,14 @@ class Api::V1::ConversationsController < Api::BaseController
   end
 
   def paginated_conversations
-    AccountConversation.where(account: current_account)
+    latest_per_thread = AccountConversation
+      .where(account: current_account)
+      .select(:id)
+      .order(Arel.sql('conversation_id, last_status_id DESC, id DESC'))
+      .distinct_on(:conversation_id)
+
+    AccountConversation
+      .where(id: latest_per_thread)
       .includes(
         account: [:account_stat, user: :role],
         last_status: [
@@ -115,6 +126,27 @@ class Api::V1::ConversationsController < Api::BaseController
         ]
       )
       .to_a_paginated_by_id(limit_param(LIMIT), params_slice(:max_id, :since_id, :min_id))
+  end
+
+  def hydrate_conversation_participants!
+    return if @conversations.empty?
+
+    conversation_ids = @conversations.map(&:conversation_id)
+    participant_ids_by_conversation = AccountConversation
+      .where(account: current_account, conversation_id: conversation_ids)
+      .pluck(:conversation_id, :participant_account_ids)
+      .each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |(conversation_id, ids), result|
+        result[conversation_id].concat(ids)
+      end
+
+    participant_ids = participant_ids_by_conversation.values.flatten.uniq
+    accounts_by_id = Account.where(id: participant_ids).index_by(&:id)
+
+    @conversations.each do |conversation|
+      conversation.participant_accounts = participant_ids_by_conversation[conversation.conversation_id]
+        .uniq
+        .filter_map { |account_id| accounts_by_id[account_id] }
+    end
   end
 
   def next_path
