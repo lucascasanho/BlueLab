@@ -121,26 +121,6 @@ export const RedesignNavigationPanel: React.FC<{
   });
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
-  const unreadMessagesCount = useAppSelector((state) => {
-    const conversations = state.conversations.get('items');
-
-    return groupedConversationRepresentatives(conversations)
-      .filter((conversation) => conversation.get('unread'))
-      .length;
-  });
-
-  useEffect(() => {
-    if (!signedIn || !isBlue2) return;
-
-    dispatch(mountConversations());
-    dispatch(expandConversations());
-    const disconnect = dispatch(connectDirectStream());
-
-    return () => {
-      dispatch(unmountConversations());
-      disconnect();
-    };
-  }, [dispatch, isBlue2, signedIn]);
 
   useEffect(() => {
     if (!signedIn || !isBlue2) return;
