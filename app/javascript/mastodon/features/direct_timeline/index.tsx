@@ -15,7 +15,6 @@ import {
   ColumnSettingsMenu,
 } from '@/mastodon/components/column_header';
 import { MultiColumnMenuItems } from '@/mastodon/components/column_header/multicolumn_settings';
-import { useBlue2ColumnPinning } from '@/mastodon/features/ui/util/blue2_column_pinning';
 import {
   composerOriginFromElement,
   openNewComposer,
@@ -131,7 +130,8 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
               inline
             />
           ) : (
-          <ColumnHeader
+            <>
+              <ColumnHeader
             title={title}
             extraButtons={
               <>
@@ -190,6 +190,7 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
               />
             </div>
           </section>
+            </>
           )}
         </div>
 
