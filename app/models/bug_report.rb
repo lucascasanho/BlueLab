@@ -12,7 +12,7 @@ class BugReport < ApplicationRecord
 
   enum :status, { open: 0, resolved: 1 }
 
-  belongs_to :account
+  belongs_to :account, optional: true
   belongs_to :assigned_account, class_name: 'Account', optional: true
   belongs_to :resolved_by_account, class_name: 'Account', optional: true
 
