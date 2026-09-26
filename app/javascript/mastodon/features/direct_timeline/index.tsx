@@ -149,6 +149,7 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
                 <ColumnHeaderButton
                   showTextOnDesktop
                   variant='solid'
+                  color='accent'
                   icon={ChatCircleDotsIcon}
                   onClick={handleNewConversation}
                 >
