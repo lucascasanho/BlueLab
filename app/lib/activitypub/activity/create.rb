@@ -107,6 +107,8 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
       account: @account,
       text: @status_parser.processed_text,
       language: @status_parser.language,
+      generator_name: @status_parser.generator_name,
+      generator_url: @status_parser.generator_url,
       spoiler_text: @status_parser.processed_spoiler_text,
       created_at: @status_parser.created_at,
       edited_at: @status_parser.edited_at && @status_parser.edited_at != @status_parser.created_at ? @status_parser.edited_at : nil,
