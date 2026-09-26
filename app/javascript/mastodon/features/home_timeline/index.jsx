@@ -151,9 +151,9 @@ class HomeTimeline extends PureComponent {
 
     return (
       <Column bindToDocument={!multiColumn} label={title}>
-        {isRedesignEnabled() ? (
+        {isRedesignEnabled() || isBlue2 ? (
           <ColumnHeader
-            title={intl.formatMessage(messages.following)}
+            title={title}
             withBackButton={multiColumn && !pinned && 'auto'}
             withUnreadMarker={hasUnread}
             extraButtons={

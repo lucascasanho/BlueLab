@@ -53,6 +53,8 @@ class Blocks extends ImmutablePureComponent {
 
   render () {
     const { intl, accountIds, hasMore, multiColumn, isLoading } = this.props;
+    const isBlue2 =
+      typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
     if (!accountIds) {
       return (
@@ -66,7 +68,7 @@ class Blocks extends ImmutablePureComponent {
 
     return (
       <Column bindToDocument={!multiColumn}>
-        {isRedesignEnabled() ? (
+        {isRedesignEnabled() || isBlue2 ? (
           <ColumnHeader withBackButton={multiColumn && 'auto'} title={intl.formatMessage(messages.heading_redesign)} />
         ) : (
           <LegacyColumnHeader icon='ban' iconComponent={BlockIcon} title={intl.formatMessage(messages.heading)} showBackButton />

@@ -164,16 +164,18 @@ class HashtagTimeline extends PureComponent {
 
   render () {
     const { hasUnread, columnId, multiColumn, local, hasFeedAccess } = this.props;
+    const isBlue2 =
+      typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
     const { id } = this.props.params;
     const pinned = !!columnId;
-    const withHeadingSection = !isRedesignEnabled() && !pinned;
+    const withHeadingSection = !(isRedesignEnabled() || isBlue2) && !pinned;
 
     const title = <>#{this.title()}</>;
     const titleAsString = `#${id}`;
 
     return (
       <Column bindToDocument={!multiColumn} label={titleAsString}>
-        {isRedesignEnabled() ? (
+        {isRedesignEnabled() || isBlue2 ? (
           <ColumnHeader
             title={title}
             withUnreadMarker={hasUnread}

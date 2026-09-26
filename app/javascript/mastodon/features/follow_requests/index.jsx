@@ -59,6 +59,8 @@ class FollowRequests extends ImmutablePureComponent {
 
   render () {
     const { intl, accountIds, hasMore, multiColumn, locked, domain, isLoading } = this.props;
+    const isBlue2 =
+      typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
     const emptyMessage = <FormattedMessage id='empty_column.follow_requests' defaultMessage="You don't have any follow requests yet. When you receive one, it will show up here." />;
     const unlockedPrependMessage = !locked && accountIds.size > 0 && (
@@ -73,7 +75,7 @@ class FollowRequests extends ImmutablePureComponent {
 
     return (
       <Column bindToDocument={!multiColumn}>
-        {isRedesignEnabled() ? (
+        {isRedesignEnabled() || isBlue2 ? (
           <ColumnHeader withBackButton title={intl.formatMessage(messages.heading)} />
         ) : (
           <LegacyColumnHeader icon='user-plus' iconComponent={PersonAddIcon} title={intl.formatMessage(messages.heading)} showBackButton />

@@ -63,6 +63,8 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
     (state) => state.settings.get('columns') as ImmutableList<ColumnMap>,
   );
   const composerEditor = useAppSelector(selectComposerEditor);
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const useBlueLabComposer =
     composerEditor === 'bluelab' &&
     typeof document !== 'undefined' &&
@@ -211,7 +213,7 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
       bindToDocument={!multiColumn}
       label={intl.formatMessage(navbarMessages.publish)}
     >
-      {isRedesignEnabled() ? (
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
           withBackButton
           title={intl.formatMessage(navbarMessages.publish)}

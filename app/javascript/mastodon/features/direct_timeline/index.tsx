@@ -115,38 +115,37 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
           className={blue2Classes.root}
           data-bluelab-messages-advanced={multiColumn ? 'true' : undefined}
         >
-          <header className={blue2Classes.header}>
-            <h1>{title}</h1>
-            <button
-              type='button'
-              className={blue2Classes.headerButton}
-              onClick={handleNewConversation}
-            >
-              <ChatCircleDotsIcon size={19} />
-              <span>{blue2Text(intl.locale, 'newConversation')}</span>
-            </button>
-            {blue2ColumnPinning.canPin && (
-              <button
-                type='button'
-                className={blue2Classes.headerButton}
-                onClick={blue2ColumnPinning.onPin}
-              >
-                <span>
-                  {blue2ColumnPinning.pinned ? (
-                    <FormattedMessage
-                      id='column_header.unpin'
-                      defaultMessage='Unpin'
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id='column_header.pin'
-                      defaultMessage='Pin'
-                    />
-                  )}
-                </span>
-              </button>
-            )}
-          </header>
+          <ColumnHeader
+            title={title}
+            withBackButton={multiColumn && !pinned && 'auto'}
+            extraButtons={
+              <>
+                <ColumnHeaderButton
+                  showTextOnDesktop
+                  variant='solid'
+                  icon={ChatCircleDotsIcon}
+                  onClick={handleNewConversation}
+                >
+                  {blue2Text(intl.locale, 'newConversation')}
+                </ColumnHeaderButton>
+                {blue2ColumnPinning.canPin && (
+                  <ColumnHeaderButton onClick={blue2ColumnPinning.onPin}>
+                    {blue2ColumnPinning.pinned ? (
+                      <FormattedMessage
+                        id='column_header.unpin'
+                        defaultMessage='Unpin'
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id='column_header.pin'
+                        defaultMessage='Pin'
+                      />
+                    )}
+                  </ColumnHeaderButton>
+                )}
+              </>
+            }
+          />
 
           <div className={blue2Classes.notice}>
             <FormattedMessage

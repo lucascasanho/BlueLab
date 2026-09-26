@@ -32,7 +32,9 @@ const Bookmarks: React.FC<{
   multiColumn: boolean;
 }> = ({ columnId, multiColumn }) => {
   const intl = useIntl();
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch(); 
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const statusIds = useAppSelector((state) =>
     getStatusList(state, 'bookmarks'),
   );
@@ -81,7 +83,7 @@ const Bookmarks: React.FC<{
       bindToDocument={!multiColumn}
       label={intl.formatMessage(messages.heading)}
     >
-      {isRedesignEnabled() ? (
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
           title={intl.formatMessage(messages.heading_redesign)}
           withBackButton={multiColumn && !pinned && 'auto'}

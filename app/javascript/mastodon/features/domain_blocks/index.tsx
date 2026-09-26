@@ -62,6 +62,9 @@ const Blocks: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
     setDomains((prev) => prev.filter((d) => d !== domain));
   }, []);
 
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+
   const emptyMessage = (
     <FormattedMessage
       id='empty_column.domain_blocks'
@@ -74,7 +77,7 @@ const Blocks: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
       bindToDocument={!multiColumn}
       label={intl.formatMessage(messages.heading)}
     >
-      {isRedesignEnabled() ? (
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
           withBackButton
           title={intl.formatMessage(messages.heading)}

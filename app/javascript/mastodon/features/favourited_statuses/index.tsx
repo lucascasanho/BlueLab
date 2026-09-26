@@ -35,7 +35,9 @@ const Favourites: React.FC<{ columnId: string; multiColumn: boolean }> = ({
   multiColumn,
 }) => {
   const dispatch = useAppDispatch();
-  const intl = useIntl();
+  const intl = useIntl(); 
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const statusIds = useAppSelector((state) =>
     getStatusList(state, 'favourites'),
   );
@@ -84,7 +86,7 @@ const Favourites: React.FC<{ columnId: string; multiColumn: boolean }> = ({
       bindToDocument={!multiColumn}
       label={intl.formatMessage(messages.heading)}
     >
-      {isRedesignEnabled() ? (
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
           title={intl.formatMessage(messages.heading_redesign)}
           withBackButton={multiColumn && !pinned && 'auto'}
