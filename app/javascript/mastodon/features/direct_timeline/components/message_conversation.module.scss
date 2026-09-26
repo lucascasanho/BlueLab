@@ -295,6 +295,14 @@
   gap: var(--space-2);
 }
 
+.loading {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+}
+
 .empty {
   display: flex;
   flex-direction: column;
