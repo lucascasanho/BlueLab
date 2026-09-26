@@ -33,7 +33,7 @@ Warden::Manager.after_fetch do |user, warden|
 end
 
 Warden::Manager.before_logout do |_, warden|
-  account_switcher_flow = warden.request.session[:account_switcher] == true
+  account_switcher_flow = warden.request.env['mastodon.account_switcher_authentication'] == true
 
   unless account_switcher_flow
     SessionActivation.deactivate warden.cookies.signed['_session_id']
