@@ -1572,6 +1572,9 @@ pt-BR:
       another_account:
         title: "Entrar em outra conta"
         notice: "Sua conta atual continuará disponível no seletor de contas."
+      another_account:
+        two_factor_title: "Verifique sua identidade"
+        two_factor_notice: "Digite o código de verificação da conta que você está adicionando."
     sign_up:
       manual_review: Inscrições no %{domain} passam pela revisão manual dos nossos moderadores. Para nos ajudar a processar o seu cadastro, escreva um pouco sobre você e por que você quer uma conta no %{domain}.
       preamble: Com uma conta neste servidor Mastodon, você poderá seguir qualquer outra pessoa no fediverso, independentemente de onde a conta dela esteja hospedada.
