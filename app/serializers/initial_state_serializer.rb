@@ -40,7 +40,6 @@ class InitialStateSerializer < ActiveModel::Serializer
                                                 Setting.hide_status_character_counter
                                               end
       store[:wrapstodon] = wrapstodon
-      store[:account_switcher_token] = object.current_account.user.account_switcher_token
     else
       store[:auto_play_gif] = Setting.auto_play_gif
       store[:display_media] = Setting.display_media
@@ -174,10 +173,5 @@ class InitialStateSerializer < ActiveModel::Serializer
 
   def sso_redirect
     "/auth/auth/#{Devise.omniauth_providers[0]}" if ENV['ONE_CLICK_SSO_LOGIN'] == 'true' && ENV['OMNIAUTH_ONLY'] == 'true' && Devise.omniauth_providers.length == 1
-  end
-
-  def account_switcher_token
-    web_app = Doorkeeper::Application.find_by(superapp: true)
-    object.current_account&.user&.token_for_app(web_app)&.token
   end
 end
