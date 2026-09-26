@@ -1,5 +1,6 @@
 import { defineMessages, useIntl } from 'react-intl';
 
+import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
 import LockIcon from '@/material-icons/400-24px/lock.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
@@ -29,6 +30,10 @@ export const VisibilityIcon: React.FC<{ visibility: StatusVisibility }> = ({
 }) => {
   const intl = useIntl();
 
+  const isBlue2 =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'blue-2';
+
   const visibilityIconInfo = {
     public: {
       icon: 'globe',
@@ -46,8 +51,8 @@ export const VisibilityIcon: React.FC<{ visibility: StatusVisibility }> = ({
       text: intl.formatMessage(messages.private_short),
     },
     direct: {
-      icon: 'at',
-      iconComponent: AlternateEmailIcon,
+      icon: isBlue2 ? 'message' : 'at',
+      iconComponent: isBlue2 ? ChatCircleDotsIcon : AlternateEmailIcon,
       text: intl.formatMessage(messages.direct_short),
     },
   };
