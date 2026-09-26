@@ -197,6 +197,14 @@ export const RedesignNavigationPanel: React.FC<{
                 defaultMessage='Explore'
               />
             </NavigationLink>
+            {mode === 'slide-out' && isBlue2 && (
+              <NavigationLink to='/favourites' iconComponent={StarIcon}>
+                <FormattedMessage
+                  id='navigation_bar.favourites'
+                  defaultMessage='Favorites'
+                />
+              </NavigationLink>
+            )}
             <NavigationLink
               withSpaceAfter
               to='/public/local'
@@ -407,6 +415,7 @@ export const RedesignNavigationPanel: React.FC<{
               <NavigationFooterLinks
                 multiColumn={multiColumn}
                 siteName={siteName}
+                variant={isBlue2 ? 'blue2' : 'default'}
               />
             )}
           </footer>
@@ -419,6 +428,7 @@ export const RedesignNavigationPanel: React.FC<{
             <NavigationFooterLinks
               multiColumn={multiColumn}
               siteName={siteName}
+              variant={isBlue2 ? 'blue2' : 'default'}
             />
           )}
         </footer>
