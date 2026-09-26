@@ -7,6 +7,8 @@ import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
+import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
+
 import { LockSimpleOpenIcon, PepperIcon } from '@phosphor-icons/react';
 
 import {
@@ -40,6 +42,7 @@ import { ComposeReply } from './reply';
 import { RichComposeEditor } from './rich_editor';
 import { resolveComposeScrollTarget } from './scroll';
 import {
+  isMessageComposeType,
   selectComposeCanSubmit,
   selectComposeSensitive,
   selectComposeType,
@@ -61,8 +64,10 @@ interface RedesignComposeFormProps {
   autoFocus?: boolean;
   className?: string;
   embedded?: boolean;
+  compact?: boolean;
   noMinimize?: boolean;
   redirectOnSuccess?: boolean;
+  onSuccess?: (status: ApiStatusJSON) => void;
 }
 
 type ThreadItem = ImmutableMap<string, unknown>;
@@ -73,12 +78,15 @@ export const RedesignComposeForm: React.FC<
   autoFocus,
   className,
   embedded = false,
+  compact = false,
   noMinimize,
   redirectOnSuccess,
+  onSuccess,
   ref,
   ...props
 }) => {
   const type = useAppSelector(selectComposeType);
+  const isMessage = isMessageComposeType(type);
   const rootSensitive = useAppSelector(selectComposeSensitive);
   const threadItems = useAppSelector(
     (state) => state.compose.get('thread_items') as ImmutableList<ThreadItem>,
@@ -98,7 +106,7 @@ export const RedesignComposeForm: React.FC<
     : rootSensitive.sensitiveText;
 
   const { onSensitiveChange, onSensitiveTextChange, onEmojiPick, onSubmit } =
-    useComposeHandlers(redirectOnSuccess, activeThreadItemId);
+    useComposeHandlers(redirectOnSuccess, activeThreadItemId, onSuccess);
 
   const intl = useIntl();
   const titleId = useId();
@@ -137,6 +145,7 @@ export const RedesignComposeForm: React.FC<
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={autoFocus}
         onSubmit={onSubmit}
+        messageToolbar={isMessage && embedded}
       >
         <ComposeAttachments className={classes.attachments} />
       </RichComposeEditor>
@@ -150,50 +159,56 @@ export const RedesignComposeForm: React.FC<
       role={embedded ? 'region' : 'dialog'}
       data-bluelab-composer
       data-bluelab-composer-embedded={embedded ? 'true' : undefined}
+      data-bluelab-composer-compact={compact ? 'true' : undefined}
+      data-bluelab-composer-message={isMessage ? 'true' : undefined}
       onSubmit={onSubmit}
       onWheelCapture={handleWheelCapture}
       aria-labelledby={titleId}
       className={classNames(className, classes.root)}
     >
-      {(type === 'message' || type === 'replyPrivate') && (
+      {isMessage && (
         <div className={classes.background} />
       )}
 
-      <ComposeFormHeader
-        id={titleId}
-        noMinimize={noMinimize || embedded}
-        noClose={embedded}
-      />
+      {!compact && (
+        <ComposeFormHeader
+          id={titleId}
+          noMinimize={noMinimize || embedded}
+          noClose={embedded}
+        />
+      )}
 
       <div
         className={classes.content}
         data-compose-scroll-container
         data-compose-scroll-zone='panel'
       >
-        <ComposeReply />
+        {!compact && <ComposeReply />}
 
-        <div className={classes.toolbar} data-bluelab-compose-toolbar>
-          <ComposeVisibility
-            className={classes.flexGrowWrap}
-            activeThreadItemId={activeThreadItemId}
-          />
-
-          <LanguageButton activeThreadItemId={activeThreadItemId} />
-
-          <ToggleButton
-            size='sm'
-            active={sensitive}
-            onClick={onSensitiveChange}
-            leadingIcon={sensitiveIcon}
-          >
-            <FormattedMessage
-              id='compose.sensitive'
-              defaultMessage='Sensitive'
+        {!compact && (
+          <div className={classes.toolbar} data-bluelab-compose-toolbar>
+            <ComposeVisibility
+              className={classes.flexGrowWrap}
+              activeThreadItemId={activeThreadItemId}
             />
-          </ToggleButton>
-        </div>
 
-        {type === 'message' && (
+            <LanguageButton activeThreadItemId={activeThreadItemId} />
+
+            <ToggleButton
+              size='sm'
+              active={sensitive}
+              onClick={onSensitiveChange}
+              leadingIcon={sensitiveIcon}
+            >
+              <FormattedMessage
+                id='compose.sensitive'
+                defaultMessage='Sensitive'
+              />
+            </ToggleButton>
+          </div>
+        )}
+
+        {!compact && isMessage && (
           <p className={classes.toolbarMessage}>
             <Icon id='lock-open' icon={LockSimpleOpenIcon} />
             <FormattedMessage
@@ -275,6 +290,7 @@ const allowedAroundShortCode =
 function useComposeHandlers(
   redirectOnSuccess?: boolean,
   activeThreadItemId: string | null = null,
+  onSuccess?: (status: ApiStatusJSON) => void,
 ) {
   const text = useAppSelector((state) => state.compose.get('text') as string);
   const activeThreadItem = useAppSelector((state) => {
@@ -405,6 +421,7 @@ function useComposeHandlers(
       dispatch(
         submitComposer({
           redirectOnSuccess,
+          onSuccess,
         }),
       );
 
@@ -412,7 +429,7 @@ function useComposeHandlers(
         event.preventDefault();
       }
     },
-    [canSubmit, dispatch, redirectOnSuccess],
+    [canSubmit, dispatch, onSuccess, redirectOnSuccess],
   );
 
   return {
