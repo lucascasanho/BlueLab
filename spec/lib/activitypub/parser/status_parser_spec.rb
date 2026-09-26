@@ -40,6 +40,34 @@ RSpec.describe ActivityPub::Parser::StatusParser do
     }
   end
 
+  context 'with a generator' do
+    let(:object_json) do
+      super().merge(
+        generator: {
+          type: 'Application',
+          name: 'Blue Web',
+          url: 'https://mastodon.blue/',
+        }
+      )
+    end
+
+    it 'parses the generator name and URL' do
+      expect(subject.generator_name).to eq 'Blue Web'
+      expect(subject.generator_url).to eq 'https://mastodon.blue/'
+    end
+  end
+
+  context 'with a string generator' do
+    let(:object_json) do
+      super().merge(generator: 'Blue Web')
+    end
+
+    it 'parses the generator name' do
+      expect(subject.generator_name).to eq 'Blue Web'
+      expect(subject.generator_url).to be_nil
+    end
+  end
+
   it 'correctly parses status' do
     expect(subject).to have_attributes(
       text: '@bob lorem ipsum',
