@@ -3,7 +3,7 @@
 class Api::V1::ConversationsController < Api::BaseController
   LIMIT = 20
 
-  before_action -> { doorkeeper_authorize! :read, :'read:statuses' }, only: [:index, :messages, :by_status]
+  before_action -> { doorkeeper_authorize! :read, :'read:statuses' }, only: [:index, :show, :messages, :by_status]
   before_action -> { doorkeeper_authorize! :write, :'write:conversations' }, except: [:index, :messages, :by_status]
   before_action :require_user!
   before_action :set_conversation, except: [:index, :by_status]
@@ -12,6 +12,12 @@ class Api::V1::ConversationsController < Api::BaseController
   def index
     @conversations = paginated_conversations
     render json: @conversations, each_serializer: REST::ConversationSerializer, relationships: StatusRelationshipsPresenter.new(@conversations.map(&:last_status), current_user&.account_id)
+  end
+
+  def show
+    render json: @conversation,
+           serializer: REST::ConversationSerializer,
+           relationships: StatusRelationshipsPresenter.new([@conversation.last_status], current_user&.account_id)
   end
 
   def messages
@@ -55,14 +61,15 @@ class Api::V1::ConversationsController < Api::BaseController
   end
 
   def matching_conversations
-    AccountConversation.where(account: current_account)
-      .where(conversation_id: @conversation.conversation_id)
-      .or(
-        AccountConversation.where(
-          account: current_account,
-          participant_account_ids: @conversation.participant_account_ids,
-        ),
+    account_conversations = AccountConversation.where(account: current_account)
+
+    if @conversation.conversation_id.present?
+      account_conversations.where(conversation_id: @conversation.conversation_id)
+    else
+      account_conversations.where(
+        participant_account_ids: @conversation.participant_account_ids,
       )
+    end
   end
 
   def conversation_statuses
