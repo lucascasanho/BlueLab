@@ -135,6 +135,8 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def require_no_authentication
+    return if truthy_param?(:account_switcher)
+
     super
 
     # Delete flash message that isn't entirely useful and may be confusing in

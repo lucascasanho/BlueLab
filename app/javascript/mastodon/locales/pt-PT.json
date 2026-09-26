@@ -1430,7 +1430,7 @@
   "visibility_modal.save": "Guardar",
   "account_switcher.title": "Contas",
   "account_switcher.current": "Atual",
-  "account_switcher.sign_in": "Iniciar sessão noutra conta",
+  "account_switcher.sign_in": "Entrar noutra conta",
   "account_switcher.create": "Criar outra conta",
   "account_switcher.remove": "Remover {account} deste dispositivo",
   "account_switcher.error": "A sessão desta conta já não está disponível. Inicie sessão novamente para a adicionar."
