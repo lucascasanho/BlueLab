@@ -1,3 +1,5 @@
+import { List as ImmutableList } from 'immutable';
+
 import { compareId } from '@/mastodon/compare_id';
 
 const participantKey = (conversation) =>
@@ -69,10 +71,21 @@ export const groupedConversationRepresentatives = (conversations) =>
   groupConversations(conversations)
     .map((group) => {
       const representative = newestConversation(group);
-      return representative.set(
-        'unread',
-        group.some((conversation) => conversation.get('unread')),
-      );
+      const accounts = group
+        .reduce(
+          (combined, conversation) =>
+            combined.concat(conversation.get('accounts')),
+          ImmutableList(),
+        )
+        .toSet()
+        .toList();
+
+      return representative
+        .set('accounts', accounts)
+        .set(
+          'unread',
+          group.some((conversation) => conversation.get('unread')),
+        );
     })
     .sort((a, b) => {
       const aId = a.get('last_status');
