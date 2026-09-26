@@ -6,15 +6,19 @@ RSpec.describe ErrorResponses do
   render_views
 
   shared_examples 'error response' do |code|
-    before { routes.draw { get 'show' => 'anonymous#show' } }
+    before do
+      Setting.theme = 'blue-2'
+      routes.draw { get 'show' => 'anonymous#show' }
+    end
 
-    it "returns http #{code} and renders error template" do
+    it "returns http #{code} and renders the BlueLab error template" do
       get 'show'
 
       expect(response)
         .to have_http_status(code)
       expect(response.parsed_body)
-        .to have_css('body[class=error]')
+        .to have_css('body.error--bluelab[data-theme="blue-2"]')
+        .and have_css('.error-page__code', text: code.to_s)
         .and have_css('h1', text: error_content(code))
         .and have_css('a.error-page__report[href^="/bug_reports/new"]')
     end
@@ -125,5 +129,31 @@ RSpec.describe ErrorResponses do
     end
 
     it_behaves_like 'error response', 422
+  end
+
+  context 'when the instance defaults to BlueLab but the signed-in user chose another theme' do
+    controller(ApplicationController) do
+      def show = not_found
+    end
+
+    let(:user) { Fabricate(:user) }
+
+    before do
+      Setting.theme = 'blue-2'
+      user.settings.update(bluelab_theme: 'default', noindex: false)
+      allow(controller).to receive(:current_user).and_return(user)
+      routes.draw { get 'show' => 'anonymous#show' }
+    end
+
+    it 'uses the standard Mastodon error page for that user' do
+      get 'show'
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.parsed_body)
+        .to have_css('body.error')
+        .and have_no_css('body.error--bluelab')
+        .and have_no_css('.error-page')
+        .and have_css('.dialog')
+    end
   end
 end
