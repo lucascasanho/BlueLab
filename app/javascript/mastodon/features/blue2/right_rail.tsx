@@ -5,6 +5,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Link, NavLink } from 'react-router-dom';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
+import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
+import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
 import { Search } from '@/mastodon/features/compose/components/search';
 import { useIdentity } from '@/mastodon/identity_context';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
@@ -22,6 +24,7 @@ export const Blue2RightRail: React.FC<{
   variant?: 'birdUi' | 'mobile';
 }> = ({ variant }) => {
   const intl = useIntl();
+  const openBugReport = useOpenBugReport();
   const { signedIn } = useIdentity();
   const isBirdUiVariant = variant === 'birdUi';
   const isMobileVariant = variant === 'mobile';
@@ -190,6 +193,14 @@ export const Blue2RightRail: React.FC<{
               defaultMessage='Keyboard Shortcuts'
             />
           </Link>
+          <span>·</span>
+          <button
+            className={classes.bugReportButton}
+            type='button'
+            onClick={openBugReport}
+          >
+            <BugReportLabel />
+          </button>
         </footer>
       )}
 
