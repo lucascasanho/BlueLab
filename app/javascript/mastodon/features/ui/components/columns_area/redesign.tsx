@@ -84,10 +84,15 @@ export const ColumnsAreaRedesign: React.FC<{
     isBlue2 && isBlue2MobileLayout && location.pathname.startsWith('/deck')
       ? location.pathname.slice(5) || '/home'
       : location.pathname;
+  const isBlue2MessagesPage =
+    isBlue2 &&
+    (blue2Pathname === '/conversations' ||
+      blue2Pathname.startsWith('/conversations/'));
   const isBlue2Home = isBlue2 && blue2Pathname === '/home';
   const isBlue2Global = isBlue2 && blue2Pathname === '/public';
   const isBlue2Search = isBlue2 && blue2Pathname === '/search';
-  const isBlue2FeedPage = isBlue2Home || isBlue2Global;
+  const isBlue2FeedPage =
+    (isBlue2Home || isBlue2Global) && !isBlue2MessagesPage;
   const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
 
   useEffect(() => {
@@ -392,7 +397,7 @@ export const ColumnsAreaRedesign: React.FC<{
         ) : isMobile ? (
           <RedesignMobileNavigation />
         ) : (
-          <ComposeRedesignButton />
+          !isBlue2MessagesPage && <ComposeRedesignButton />
         )}
 
         <main className={classes.main}>{children}</main>
