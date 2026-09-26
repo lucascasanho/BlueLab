@@ -5,6 +5,29 @@
   overflow: hidden;
 }
 
+:global(body.layout-multiple-columns) .column {
+  box-sizing: border-box;
+  flex: 0 0 clamp(
+    360px,
+    calc(
+      (
+        100vw - 76px - (var(--space-2) * 5)
+      ) / 4
+    ),
+    400px
+  );
+  width: clamp(
+    360px,
+    calc(
+      (
+        100vw - 76px - (var(--space-2) * 5)
+      ) / 4
+    ),
+    400px
+  );
+  max-width: 400px;
+}
+
 .page {
   display: flex;
   flex: 1 1 0;
