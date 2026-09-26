@@ -124,7 +124,7 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
         className={isBlue2 ? (
           multiColumn
             ? `${blue2Classes.column} ${blue2Classes.advancedColumn}`
-            : blue2Classes.column
+            : `${blue2Classes.column} ${activeConversationId ? blue2Classes.conversationColumn : ''}`
         ) : undefined}
       >
         <div
