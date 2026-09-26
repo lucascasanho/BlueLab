@@ -360,6 +360,7 @@
   min-width: 0;
   min-height: 0;
   flex: 1 1 auto;
+  overflow: hidden;
 }
 
 :global(body[data-theme='blue-2']) .messageList {
@@ -402,23 +403,19 @@
 @media (width <= 1174px) {
   :global(body[data-theme='blue-2']) .column {
     height: calc(100dvh - var(--mobile-bottom-nav-height, 64px));
-  }
-
-  :global(body[data-theme='blue-2']) .page {
-    padding-bottom: calc(
-      var(--mobile-bottom-nav-height, 64px) +
-      env(safe-area-inset-bottom)
-    );
-  }
-
-  :global(.ui--mobile-chrome-hidden)
-    :global(body[data-theme='blue-2']) .page {
-    padding-bottom: 0;
+    max-height: calc(100dvh - var(--mobile-bottom-nav-height, 64px));
   }
 
   :global(body[data-theme='blue-2'])
     .replyComposer[data-bluelab-composer-compact='true'] {
     padding-bottom: 0;
+  }
+
+  :global(body[data-theme='blue-2'])
+    :global(.ui--mobile-chrome-hidden)
+    .column {
+    height: 100dvh;
+    max-height: 100dvh;
   }
 }
 
