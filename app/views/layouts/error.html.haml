@@ -38,8 +38,7 @@
             = link_to root_path, class: 'button error-page__home' do
               = material_symbol('home', whitespace: false)
               = t('errors.go_home')
-            = link_to new_bug_report_path(error_page: response.status, current_path: request.path), class: 'button button-secondary error-page__report' do
-              = t('bug_reports.link')
+            %a.button.button-secondary.error-page__report{ href: "/bug_reports/new?error_page=#{response.status}&current_path=#{ERB::Util.url_encode(request.path)}", target: '_self' }= t('bug_reports.link')
     - else
       %main.dialog
         .dialog__illustration
@@ -48,5 +47,4 @@
           %h1= yield :content
           .dialog__actions
             %a{ class: 'button button-secondary', href: '/' }= t('errors.go_home')
-            = link_to new_bug_report_path(error_page: response.status, current_path: request.path), class: 'button button-secondary' do
-              = t('bug_reports.link')
+            %a.button.button-secondary.error-page__report{ href: "/bug_reports/new?error_page=#{response.status}&current_path=#{ERB::Util.url_encode(request.path)}", target: '_self' }= t('bug_reports.link')
