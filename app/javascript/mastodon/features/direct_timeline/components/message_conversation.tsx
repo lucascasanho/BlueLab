@@ -472,7 +472,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       <ColumnHeader
         withBackButton={!inline}
         onBackButtonClick={onBack}
-        title=
+        title={
           <div className={classes.headerTitle}>
             <ChatCircleDotsIcon size={18} />
             <span>
