@@ -34,13 +34,19 @@
         .error-page__content
           .error-page__code 404
           %h1= yield :content
-          = link_to root_path, class: 'button error-page__home' do
-            = material_symbol('home', whitespace: false)
-            = t('errors.go_home')
+          .error-page__actions
+            = link_to root_path, class: 'button error-page__home' do
+              = material_symbol('home', whitespace: false)
+              = t('errors.go_home')
+            = link_to new_bug_report_path(error_page: response.status, current_path: request.path), class: 'button button-secondary error-page__report' do
+              = t('bug_reports.link')
     - else
       %main.dialog
         .dialog__illustration
           %img{ alt: Setting.default_settings['site_title'], src: '/oops.png' }/
         .dialog__message
           %h1= yield :content
-          %a{ class: 'button button-secondary', href: '/' }= t('errors.go_home')
+          .dialog__actions
+            %a{ class: 'button button-secondary', href: '/' }= t('errors.go_home')
+            = link_to new_bug_report_path(error_page: response.status, current_path: request.path), class: 'button button-secondary' do
+              = t('bug_reports.link')
