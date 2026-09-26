@@ -12,10 +12,12 @@ const conversation = (
   accounts: string[],
   lastStatus: string,
   unread = false,
+  threadId?: string | null,
 ) =>
   ImmutableMap({
     id,
     conversation_id: conversationId,
+    thread_id: threadId ?? conversationId,
     accounts: ImmutableList(accounts),
     last_status: lastStatus,
     unread,
@@ -31,13 +33,22 @@ describe('direct conversation grouping', () => {
     ]);
   });
 
-  test('does not merge separate native conversations with the same participants', () => {
-    const first = conversation('1', '100', ['alice'], '10');
-    const second = conversation('2', '200', ['alice'], '20');
+  test('does not merge separate threads with the same participants', () => {
+    const first = conversation('1', '100', ['alice'], '10', false, '1');
+    const second = conversation('2', '200', ['alice'], '20', false, '2');
 
     expect(groupConversations(ImmutableList([first, second]))).toEqual([
       [first],
       [second],
+    ]);
+  });
+
+  test('merges sent and received account-conversation rows for one reply thread', () => {
+    const sent = conversation('1', '100', ['joe'], '10', false, 'root-10');
+    const received = conversation('2', '200', ['alice'], '20', false, 'root-10');
+
+    expect(groupConversations(ImmutableList([sent, received]))).toEqual([
+      [sent, received],
     ]);
   });
 
