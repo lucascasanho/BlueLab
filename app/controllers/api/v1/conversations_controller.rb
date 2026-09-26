@@ -39,7 +39,7 @@ class Api::V1::ConversationsController < Api::BaseController
   end
 
   def unread
-    @conversation.update!(unread: true)
+    matching_conversations.update_all(unread: true, updated_at: Time.current)
     render json: @conversation, serializer: REST::ConversationSerializer
   end
 
