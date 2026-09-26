@@ -110,6 +110,7 @@ export const getBugReportDiagnostics = (interfaceLanguage: string) => {
     client_errors: [...recentErrors],
   };
 };
+
 export const populateBugReportFormDiagnostics = (
   form: HTMLFormElement,
   interfaceLanguage: string,
