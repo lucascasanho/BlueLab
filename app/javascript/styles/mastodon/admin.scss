@@ -1249,6 +1249,16 @@ a.name-tag,
   align-items: center;
 }
 
+.content__heading__actions:has(.verification-request-heading-actions) {
+  @media screen and (max-width: $no-columns-breakpoint) {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+}
+
 .verification-request-heading-actions {
   @media screen and (max-width: $no-columns-breakpoint) {
     width: 100%;
