@@ -152,7 +152,7 @@
   }
 }
 
-// BLUE 2.0 uses an inline launcher in the timeline and renders the redesigned
+// Mastodon 5.0 keeps composer access in the page layout, so the global\n// floating launcher must not appear. The theme gate prevents this rule from\n// affecting any other theme.\n:global(body[data-theme='mastodon-5']) .button:not(.buttonInline) {\n  display: none;\n}\n\n// BLUE 2.0 uses an inline launcher in the timeline and renders the redesigned
 // composer as a centered Bluesky-like dialog. These selectors are impossible
 // to match in other themes because the body data attribute is theme-specific.
 :global(body[data-theme='blue-2']) .button:not(.buttonInline) {
