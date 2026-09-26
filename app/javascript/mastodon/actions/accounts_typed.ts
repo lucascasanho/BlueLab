@@ -94,6 +94,11 @@ export const unpinAccountSuccess = createAction<{
   relationship: ApiRelationshipJSON;
 }>('accounts/unpin/SUCCESS');
 
+export const updateVerificationBadgeVisibility = createAction<{
+  id: string;
+  visible: boolean;
+}>('accounts/updateVerificationBadgeVisibility');
+
 export const fetchRelationshipsSuccess = createAction(
   'relationships/fetch/SUCCESS',
   actionWithSkipLoadingTrue<{ relationships: ApiRelationshipJSON[] }>,

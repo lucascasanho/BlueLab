@@ -16,6 +16,7 @@ import InsertChartIcon from '@/material-icons/400-24px/insert_chart.svg?react';
 import PersonIcon from '@/material-icons/400-24px/person-fill.svg?react';
 import PersonAddIcon from '@/material-icons/400-24px/person_add-fill.svg?react';
 import RepeatIcon from '@/material-icons/400-24px/repeat.svg?react';
+import ShieldQuestionIcon from '@/material-icons/400-24px/shield_question.svg?react';
 import StarIcon from '@/material-icons/400-24px/star-fill.svg?react';
 import { Account } from 'mastodon/components/account';
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
@@ -44,6 +45,7 @@ const messages = defineMessages({
   quoted_update: { id: 'notification.quoted_update', defaultMessage: '{name} edited a post you have quoted' },
   adminSignUp: { id: 'notification.admin.sign_up', defaultMessage: '{name} signed up' },
   adminReport: { id: 'notification.admin.report', defaultMessage: '{name} reported {target}' },
+  adminVerificationRequest: { id: 'notification.admin.verification_request', defaultMessage: '{name} requested a verification badge' },
   relationshipsSevered: { id: 'notification.relationships_severance_event', defaultMessage: 'Lost connections with {name}' },
   moderationWarning: { id: 'notification.moderation_warning', defaultMessage: 'You have received a moderation warning' },
   quote: { id: 'notification.label.quote', defaultMessage: '{name} quoted your post'}
@@ -490,6 +492,34 @@ class Notification extends ImmutablePureComponent {
     );
   }
 
+  renderAdminVerificationRequest (notification, account) {
+    const { intl, unread } = this.props;
+    const message = intl.formatMessage(messages.adminVerificationRequest, { name: account.get('acct') });
+    const screenReaderMessage = notificationForScreenReader(intl, message, notification.get('created_at'));
+
+    return (
+      <a
+        href='/admin/verification_requests'
+        className={classNames('notification notification-admin-verification-request focusable', { unread })}
+        tabIndex={0}
+        aria-label={screenReaderMessage}
+      >
+        <div className='notification__message'>
+          <Icon id='shield-question' icon={ShieldQuestionIcon} />
+
+          <span title={notification.get('created_at')}>
+            <FormattedMessage
+              {...messages.adminVerificationRequest}
+              values={{
+                name: <LinkedDisplayName className='notification__display-name' displayProps={{ account, variant: 'simple' }} />,
+              }}
+            />
+          </span>
+        </div>
+      </a>
+    );
+  }
+
   renderAdminReport (notification, account, link) {
     const { intl, unread, report } = this.props;
 
@@ -554,6 +584,8 @@ class Notification extends ImmutablePureComponent {
       return this.renderAdminSignUp(notification, account, link);
     case 'admin.report':
       return this.renderAdminReport(notification, account, link);
+    case 'admin.verification_request':
+      return this.renderAdminVerificationRequest(notification, account);
     }
 
     return null;

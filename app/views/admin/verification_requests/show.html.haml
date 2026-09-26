@@ -1,0 +1,60 @@
+- content_for :page_title do
+  = t('admin.verification_requests.title')
+
+- content_for :heading_actions do
+  .verification-request-heading-actions
+    = link_to t('admin.verification_requests.back'), admin_verification_requests_path(status: 'pending'), class: 'button button-secondary button--compact'
+
+    - if @verification_request.pending?
+      = button_to t('admin.verification_requests.approve'), approve_admin_verification_request_path(@verification_request), method: :post, class: 'button button-secondary button--compact', data: { confirm: t('admin.accounts.are_you_sure') }
+      = button_to t('admin.verification_requests.deny'), deny_admin_verification_request_path(@verification_request), method: :post, class: 'button button--dangerous button--compact', data: { confirm: t('admin.accounts.are_you_sure') }
+
+.report-header
+  .report-header__card
+    .account-card
+      = link_to ActivityPub::TagManager.instance.url_for(@verification_request.account), target: '_blank', rel: 'noopener', class: 'account-card__permalink' do
+        .account-card__header
+          = image_tag @verification_request.account.header.url, alt: ''
+        .account-card__title
+          .account-card__title__avatar
+            = image_tag @verification_request.account.avatar.url, alt: ''
+          .display-name
+            %bdi
+              %strong.emojify.p-name= display_name(@verification_request.account, custom_emojify: true)
+            %span= acct(@verification_request.account)
+  .report-header__details
+    .report-header__details__item
+      .report-header__details__item__header
+        %strong= t('admin.verification_requests.requested_at')
+      .report-header__details__item__content
+        %time.time-ago{ datetime: @verification_request.created_at.iso8601, title: l(@verification_request.created_at) }= l(@verification_request.created_at)
+    .report-header__details__item
+      .report-header__details__item__header
+        %strong= t('admin.verification_requests.status')
+      .report-header__details__item__content
+        - if @verification_request.pending?
+          %span.neutral-hint= t('admin.verification_requests.status_pending')
+        - elsif @verification_request.approved?
+          %span.positive-hint= t('admin.verification_requests.status_approved')
+        - else
+          %span.negative-hint= t('admin.verification_requests.status_denied')
+    - if @verification_request.resolved?
+      .report-header__details__item
+        .report-header__details__item__header
+          %strong= t('admin.verification_requests.resolved_by')
+        .report-header__details__item__content= admin_account_link_to @verification_request.resolved_by_account
+      .report-header__details__item
+        .report-header__details__item__header
+          %strong= t('admin.verification_requests.resolved_at')
+        .report-header__details__item__content
+          %time{ datetime: @verification_request.resolved_at.iso8601 }= l(@verification_request.resolved_at)
+
+%h3= t('admin.verification_requests.explanation')
+- if @verification_request.explanation.present?
+  .speech-bubble
+    .speech-bubble__bubble
+      = simple_format(@verification_request.explanation)
+    .speech-bubble__owner
+      = admin_account_link_to @verification_request.account
+- else
+  .muted-hint= t('admin.verification_requests.no_message')
