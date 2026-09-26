@@ -1,8 +1,5 @@
 import { FormattedMessage } from 'react-intl';
 
-import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
-import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
-
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 
@@ -83,9 +80,6 @@ export const NavigationFooterLinks: React.FC<{
           </li>
         )}
       </ul>
-      <button type='button' className={classes.bugReportButton} onClick={openBugReport}>
-        <BugReportLabel />
-      </button>
     </div>
   );
 };
