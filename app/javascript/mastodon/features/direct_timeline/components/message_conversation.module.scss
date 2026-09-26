@@ -186,11 +186,11 @@
 
 .messageFavourite {
   &.active {
-    color: #ffb609;
+    color: #ffb609 !important;
   }
 
-  &.activate > :global(.icon-star),
-  &.deactivate > :global(.icon-star) {
+  &.activate :global(.icon-star),
+  &.deactivate :global(.icon-star) {
     animation: messageFavouriteSpin 0.45s ease-out;
   }
 }
