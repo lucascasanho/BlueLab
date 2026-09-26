@@ -29,21 +29,28 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def create
-    # Devise normally stops an already-authenticated browser from entering
-    # another account. During account switching, clear only Warden's current
-    # user so the password strategy authenticates the requested account.
-    # The previous SessionActivation remains valid for switching back.
     if truthy_param?(:account_switcher)
+      # Devise's normal strategy order starts with the persistent browser
+      # session. During an additional-account login that would authenticate
+      # the account already in the browser before checking the submitted
+      # credentials. Clear only Warden's current user and authenticate the
+      # submitted credentials with the appropriate credential strategy.
       session[:account_switcher] = true
       warden.logout(:user) if warden.authenticated?(:user)
-    end
 
-    super do |resource|
-      # We only need to call this if this hasn't already been
-      # called from one of the two-factor or sign-in token
-      # authentication methods
-
+      self.resource = warden.authenticate!(account_switcher_auth_strategy, auth_options)
+      set_flash_message!(:notice, :signed_in)
+      sign_in(resource_name, resource)
       on_authentication_success(resource, :password) unless @on_authentication_success_called
+      respond_with resource, location: after_sign_in_path_for(resource)
+    else
+      super do |resource|
+        # We only need to call this if this hasn't already been
+        # called from one of the two-factor or sign-in token
+        # authentication methods
+
+        on_authentication_success(resource, :password) unless @on_authentication_success_called
+      end
     end
   end
 
@@ -203,6 +210,13 @@ class Auth::SessionsController < Devise::SessionsController
 
   def continue_after?
     truthy_param?(:continue)
+  end
+
+  def account_switcher_auth_strategy
+    return :two_factor_ldap_authenticatable if Devise.ldap_authentication
+    return :two_factor_pam_authenticatable if Devise.pam_authentication
+
+    :database
   end
 
   def account_switcher_flow?
