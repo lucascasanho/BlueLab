@@ -9,6 +9,12 @@ RSpec.describe 'Admin Verification Requests' do
 
   before { sign_in admin }
 
+  describe 'badge visibility' do
+    it 'keeps the badge visible by default' do
+      expect(account.reload.verified_badge_visible).to be(true)
+    end
+  end
+
   describe 'GET /admin/verification_requests' do
     it 'shows pending requests by default' do
       get admin_verification_requests_path
