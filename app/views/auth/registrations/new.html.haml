@@ -1,10 +1,10 @@
 - account_switcher_flow = ActiveModel::Type::Boolean.new.cast(params[:account_switcher])
 
 - content_for :page_title do
-  = account_switcher_flow ? 'Create another account' : t('auth.register')
+  = account_switcher_flow ? t('auth.sign_up.another_account.title') : t('auth.register')
 
 - content_for :blue2_auth_title do
-  = account_switcher_flow ? 'Create another account' : t('auth.register')
+  = account_switcher_flow ? t('auth.sign_up.another_account.title') : t('auth.register')
 
 - content_for :blue2_auth_subtitle do
   = t('auth.sign_up.preamble', site_title: site_title)
