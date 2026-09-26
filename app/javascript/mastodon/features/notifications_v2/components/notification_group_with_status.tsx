@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type MouseEvent } from 'react';
 import type { JSX } from 'react';
 
 import classNames from 'classnames';
@@ -80,6 +80,18 @@ export const NotificationGroupWithStatus: React.FC<{
     (state) => state.statuses.getIn([statusId, 'visibility']) === 'direct',
   );
 
+  const handleCardClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (!(event.target instanceof Element)) return;
+    if (event.target.closest('a,button,input,textarea,select,[role="link"]')) return;
+    if (!statusId) return;
+
+    if (isPrivateMention) {
+      dispatch(openConversationForStatus(statusId));
+    } else {
+      dispatch(navigateToStatus(statusId));
+    }
+  };
+
   const handlers = useMemo(
     () => ({
       open: () => {
@@ -117,6 +129,7 @@ export const NotificationGroupWithStatus: React.FC<{
           },
         )}
         tabIndex={0}
+        onClick={handleCardClick}
       >
         <div className='notification-group__icon'>
           <Icon icon={icon} id={iconId} />
@@ -152,7 +165,10 @@ export const NotificationGroupWithStatus: React.FC<{
           </div>
 
           {statusId && (
-            <div className='notification-group__main__status'>
+            <div
+              className='notification-group__main__status'
+              onClick={(event) => event.stopPropagation()}
+            >
               <EmbeddedStatus statusId={statusId} onOpen={handleStatusOpen} />
             </div>
           )}
