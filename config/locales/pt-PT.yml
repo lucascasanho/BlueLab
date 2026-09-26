@@ -1435,7 +1435,6 @@ pt-PT:
       another_account:
         title: "Iniciar sessão noutra conta"
         notice: "A sua conta atual continuará disponível no seletor de contas."
-      another_account:
         two_factor_title: "Verifique a sua identidade"
         two_factor_notice: "Introduza o código de verificação da conta que está a adicionar."
     sign_up:
