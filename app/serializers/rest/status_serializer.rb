@@ -22,7 +22,7 @@ class REST::StatusSerializer < ActiveModel::Serializer
   attribute :content_type, if: :source_requested?
 
   belongs_to :reblog, serializer: REST::StatusSerializer
-  belongs_to :application, if: :show_application?
+  attribute :application, if: :show_application?
   belongs_to :account, serializer: REST::AccountSerializer
 
   has_many :ordered_media_attachments, key: :media_attachments, serializer: REST::MediaAttachmentSerializer
@@ -59,7 +59,23 @@ class REST::StatusSerializer < ActiveModel::Serializer
   end
 
   def show_application?
-    object.account.user_shows_application? || (current_user? && current_user.account_id == object.account_id)
+    object.generator_name.present? ||
+      object.account.user_shows_application? ||
+      (current_user? && current_user.account_id == object.account_id)
+  end
+
+  def application
+    if object.application.present?
+      {
+        name: object.application.name == 'Web' ? Setting.site_title : object.application.name,
+        website: object.application.website.presence,
+      }.compact
+    elsif object.generator_name.present?
+      {
+        name: object.generator_name,
+        website: object.generator_url.presence,
+      }.compact
+    end
   end
 
   def visibility
