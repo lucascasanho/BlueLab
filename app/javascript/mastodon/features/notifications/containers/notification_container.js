@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import { mentionCompose } from '../../../actions/compose';
-import { findConversationForStatus } from '../../../actions/conversations';
+import { findConversationForStatus, openConversationForStatus } from '../../../actions/conversations';
 import {
   toggleFavourite,
   toggleReblog,
@@ -47,7 +47,7 @@ const mapDispatchToProps = dispatch => ({
   },
 
   onOpenConversation (statusId) {
-    return dispatch(findConversationForStatus(statusId));
+    return dispatch(openConversationForStatus(statusId));
   },
 });
 
