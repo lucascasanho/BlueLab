@@ -68,6 +68,8 @@ const Firehose = ({ feedType, multiColumn }) => {
   const { signedIn, permissions } = useIdentity();
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   const onlyMedia = useAppSelector((state) => state.getIn(['settings', 'firehose', 'onlyMedia'], false));
   const hasUnread = useAppSelector((state) => state.getIn(['timelines', `${feedType}${onlyMedia ? ':media' : ''}`, 'unread'], 0) > 0);
@@ -182,15 +184,17 @@ const Firehose = ({ feedType, multiColumn }) => {
     title = messages.title_singular;
   }
 
+  const title = isRedesignEnabled() ? messages.title_redesign : messages.title;
+
   return (
-    <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.title)}>
-      {isRedesignEnabled() ? (
+    <Column bindToDocument={!multiColumn} label={intl.formatMessage(title)}>
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
-          title={intl.formatMessage(messages.title_redesign)}
+          title={intl.formatMessage(title)
           withBackButton={multiColumn && 'auto'}
           withUnreadMarker={hasUnread}
           extraButtons={multiColumn &&
-            <ColumnSettingsMenu labelPrefix={intl.formatMessage(messages.title_redesign)}>
+            <ColumnSettingsMenu labelPrefix={intl.formatMessage(title)}>
               <MultiColumnMenuItems onPin={handlePin} />
             </ColumnSettingsMenu>
           }
@@ -236,7 +240,7 @@ const Firehose = ({ feedType, multiColumn }) => {
       />
 
       <Helmet>
-        <title>{intl.formatMessage(messages.title)}</title>
+        <title>{intl.formatMessage(title)}</title>
         <meta name='robots' content='noindex' />
       </Helmet>
     </Column>
