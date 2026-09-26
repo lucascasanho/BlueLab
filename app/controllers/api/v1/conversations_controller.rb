@@ -3,8 +3,8 @@
 class Api::V1::ConversationsController < Api::BaseController
   LIMIT = 20
 
-  before_action -> { doorkeeper_authorize! :read, :'read:statuses' }, only: [:index, :messages]
-  before_action -> { doorkeeper_authorize! :write, :'write:conversations' }, except: [:index, :messages]
+  before_action -> { doorkeeper_authorize! :read, :'read:statuses' }, only: [:index, :messages, :by_status]
+  before_action -> { doorkeeper_authorize! :write, :'write:conversations' }, except: [:index, :messages, :by_status]
   before_action :require_user!
   before_action :set_conversation, except: [:index, :by_status]
   after_action :insert_pagination_headers, only: :index
