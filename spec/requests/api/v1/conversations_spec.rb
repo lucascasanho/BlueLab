@@ -56,6 +56,45 @@ RSpec.describe 'API V1 Conversations' do
     end
   end
 
+  describe 'GET /api/v1/conversations/:id', :inline_jobs do
+    it 'returns a conversation directly by id' do
+      status = PostStatusService.new.call(
+        other.account,
+        text: 'Hello @alice',
+        visibility: :direct,
+      )
+      conversation = AccountConversation.where(account: user.account).find_by(
+        conversation_id: status.conversation_id,
+      )
+
+      get "/api/v1/conversations/#{conversation.id}", headers: headers
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body[:id]).to eq(conversation.id.to_s)
+      expect(response.parsed_body[:conversation_id]).to eq(
+        conversation.conversation_id.to_s,
+      )
+    end
+  end
+
+  describe 'GET /api/v1/conversations/by-status/:status_id', :inline_jobs do
+    it 'resolves a direct status to its conversation' do
+      status = PostStatusService.new.call(
+        other.account,
+        text: 'Hello @alice',
+        visibility: :direct,
+      )
+      conversation = AccountConversation.where(account: user.account).find_by(
+        conversation_id: status.conversation_id,
+      )
+
+      get "/api/v1/conversations/by-status/#{status.id}", headers: headers
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body[:id]).to eq(conversation.id.to_s)
+    end
+  end
+
   describe 'GET /api/v1/conversations/:id/messages', :inline_jobs do
     it 'returns all messages from the same native conversation when participant sets change' do
       first = PostStatusService.new.call(
