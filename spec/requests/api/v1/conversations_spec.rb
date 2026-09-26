@@ -35,6 +35,8 @@ RSpec.describe 'API V1 Conversations' do
       expect(response.parsed_body.size).to eq 2
       expect(response.parsed_body.first[:accounts].size).to eq 1
       expect(response.parsed_body.first[:conversation_id]).to be_present
+      expect(response.parsed_body.first[:thread_id]).to be_present
+
     end
 
     it 'collapses multiple account conversations from one native thread' do
@@ -167,7 +169,7 @@ RSpec.describe 'API V1 Conversations' do
   end
 
   describe 'GET /api/v1/conversations/:id/messages', :inline_jobs do
-    it 'returns all messages from the same native conversation when participant sets change' do
+    it 'returns all messages from the same reply thread when conversation ids differ' do
       first = PostStatusService.new.call(
         other.account,
         text: 'First @alice',
@@ -181,16 +183,23 @@ RSpec.describe 'API V1 Conversations' do
         thread: first,
       )
 
-      expect(second.conversation_id).to eq(first.conversation_id)
+      alternate_conversation = Conversation.create!
+      second.update_column(:conversation_id, alternate_conversation.id)
 
-      conversation = AccountConversation.find_by(
+      first_conversation = AccountConversation.where(
         account: user.account,
-        conversation_id: first.conversation_id,
-      )
+        conversation_id: first.reload.conversation_id,
+      ).first
+      second_conversation = AccountConversation.where(
+        account: user.account,
+      ).find_by('? = ANY(status_ids)', second.id)
 
-      expect(conversation).to be_present
+      expect(first_conversation).to be_present
+      expect(second_conversation).to be_present
 
-      get "/api/v1/conversations/#{conversation.id}/messages", headers: headers
+      second_conversation.update_column(:conversation_id, alternate_conversation.id)
+
+      get "/api/v1/conversations/#{first_conversation.id}/messages", headers: headers
 
       expect(response).to have_http_status(200)
       expect(response.parsed_body.map { |status| status[:id] })
