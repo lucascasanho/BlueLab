@@ -190,6 +190,13 @@ export function replyCompose(status) {
   };
 }
 
+export function replyComposeInline(status) {
+  return {
+    type: COMPOSE_REPLY,
+    status,
+  };
+}
+
 export function replyComposeById(statusId) {
   return (dispatch, getState) => {
     const state = getState();
@@ -264,6 +271,13 @@ export function directCompose(account) {
       const position = getState().getIn(['compose', 'text'], '').length;
       dispatch(requestComposerFocus({ start: position, end: position }));
     }
+  };
+}
+
+export function directComposeInline(account) {
+  return {
+    type: COMPOSE_DIRECT,
+    account,
   };
 }
 
