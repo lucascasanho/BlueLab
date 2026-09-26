@@ -2,6 +2,7 @@ es:
   admin:
     verification_requests:
       title: Solicitudes de verificación
+      request_title: Solicitud de verificación #%{id}
       pending: Pendientes
       all: Todas
       resolved: Resueltas
