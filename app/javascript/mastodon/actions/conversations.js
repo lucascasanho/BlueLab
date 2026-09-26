@@ -66,7 +66,9 @@ export const findConversationForStatus = statusId => () =>
 export const openConversationForStatus = statusId => dispatch =>
   dispatch(findConversationForStatus(statusId))
     .then(conversationId => {
-      browserHistory.push(`/conversations/${conversationId}`);
+      browserHistory.push(`/conversations/${conversationId}`, {
+        statusId,
+      });
       return conversationId;
     })
     .catch(() => {
