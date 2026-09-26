@@ -575,6 +575,7 @@ export const RichComposeEditor: React.FC<{
   onContentTypeChange?: (value: string) => void;
   onFiles?: (files: FileList) => void;
   dismissOnEscape?: boolean;
+  messageToolbar?: boolean;
 }> = ({
   onSubmit,
   children,
@@ -587,6 +588,7 @@ export const RichComposeEditor: React.FC<{
   onContentTypeChange,
   onFiles,
   dismissOnEscape = true,
+  messageToolbar = false,
 }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -604,11 +606,16 @@ export const RichComposeEditor: React.FC<{
     document.body.dataset.theme === 'blue-2';
   const forceMessageMarkdown = isBlueLabTheme && isMessageComposeType(type);
   const isMarkdown = forceMessageMarkdown || contentType === 'text/markdown';
-  const visibleCommands = forceMessageMarkdown
-    ? commands.filter(([command]) =>
-        inlineCommands.includes(command as InlineCommand),
-      )
-    : commands;
+  const messageCommands = commands.filter(
+    ([command, _icon, _message, value]) =>
+      inlineCommands.includes(command as InlineCommand) ||
+      (command === 'formatBlock' && value === 'blockquote'),
+  );
+  const visibleCommands = messageToolbar
+    ? messageCommands
+    : forceMessageMarkdown
+      ? messageCommands
+      : commands;
   const customEmojis = useCustomEmojis();
   const ref = useRef<HTMLDivElement>(null);
   const hiddenRef = useRef<HTMLTextAreaElement>(null);
@@ -864,19 +871,21 @@ export const RichComposeEditor: React.FC<{
               </IconButton>
             );
           })}
-          <IconButton
-            as='button'
-            type='button'
-            size='sm'
-            icon={LinkIcon}
-            title={intl.formatMessage(messages.link)}
-            color={activeFormats.has('link') ? 'accent' : 'neutral'}
-            aria-pressed={activeFormats.has('link')}
-            onMouseDown={preventToolbarFocus}
-            onClick={handleLink}
-          >
-            {intl.formatMessage(messages.link)}
-          </IconButton>
+          {!messageToolbar && (
+            <IconButton
+              as='button'
+              type='button'
+              size='sm'
+              icon={LinkIcon}
+              title={intl.formatMessage(messages.link)}
+              color={activeFormats.has('link') ? 'accent' : 'neutral'}
+              aria-pressed={activeFormats.has('link')}
+              onMouseDown={preventToolbarFocus}
+              onClick={handleLink}
+            >
+              {intl.formatMessage(messages.link)}
+            </IconButton>
+          )}
         </div>
       )}
       <div
