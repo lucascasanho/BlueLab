@@ -92,6 +92,8 @@ const Lists: React.FC<{
   const intl = useIntl();
   const lists = useAppSelector((state) => getOrderedLists(state));
   const { signedIn } = useIdentity();
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   useEffect(() => {
     if (signedIn) {
