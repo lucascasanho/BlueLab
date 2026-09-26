@@ -400,8 +400,16 @@
 
 @media (width <= 1174px) {
   :global(body[data-theme='blue-2']) .column {
-    height: calc(100dvh - var(--mobile-bottom-nav-height, 64px));
-    max-height: calc(100dvh - var(--mobile-bottom-nav-height, 64px));
+    height: calc(
+      100dvh -
+      56px -
+      var(--mobile-bottom-nav-height, 64px)
+    );
+    max-height: calc(
+      100dvh -
+      56px -
+      var(--mobile-bottom-nav-height, 64px)
+    );
   }
 
   :global(body[data-theme='blue-2'])
@@ -412,8 +420,8 @@
   :global(body[data-theme='blue-2'])
     :global(.ui--mobile-chrome-hidden)
     .column {
-    height: 100dvh;
-    max-height: 100dvh;
+    height: calc(100dvh - 56px);
+    max-height: calc(100dvh - 56px);
   }
 }
 
