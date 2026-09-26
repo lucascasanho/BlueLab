@@ -22,7 +22,6 @@ import {
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch } from '@/mastodon/store';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
-import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
 import { addColumn, removeColumn, moveColumn } from 'mastodon/actions/columns';
 import {
   mountConversations,
@@ -220,8 +219,8 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
         />
       ) : (
         <LegacyColumnHeader
-          icon='at'
-          iconComponent={AlternateEmailIcon}
+          icon='message'
+          iconComponent={ChatCircleDotsIcon}
           title={intl.formatMessage(messages.title)}
           onPin={handlePin}
           onMove={handleMove}
