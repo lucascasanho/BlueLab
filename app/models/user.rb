@@ -327,28 +327,6 @@ class User < ApplicationRecord
     ).session_id
   end
 
-  def account_switcher_token
-    web_app = Doorkeeper::Application.find_by(superapp: true)
-    return if web_app.nil?
-
-    session_token_ids = session_activations.where.not(access_token_id: nil).select(:access_token_id)
-
-    access_token = Doorkeeper::AccessToken
-      .where(application_id: web_app.id, resource_owner_id: id, revoked_at: nil)
-      .where.not(id: session_token_ids)
-      .first
-
-    return access_token.token if access_token
-
-    Doorkeeper::AccessToken.create!(
-      application_id: web_app.id,
-      resource_owner_id: id,
-      scopes: SessionActivation::DEFAULT_SCOPES.join(' '),
-      expires_in: Doorkeeper.configuration.access_token_expires_in,
-      use_refresh_token: Doorkeeper.configuration.refresh_token_enabled?
-    ).token
-  end
-
   def clear_other_sessions(id)
     session_activations.exclusive(id)
   end
