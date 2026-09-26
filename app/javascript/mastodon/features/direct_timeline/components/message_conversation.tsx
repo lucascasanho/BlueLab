@@ -318,7 +318,11 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
   const renderShell = (content: React.ReactNode) => {
     if (inline) {
-      return <div className={classes.column}>{content}</div>;
+      return (
+        <div className={`${classes.column} ${classes.inlineColumn}`}>
+          {content}
+        </div>
+      );
     }
 
     return (
