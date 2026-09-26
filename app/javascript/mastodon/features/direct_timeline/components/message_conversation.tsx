@@ -17,7 +17,11 @@ import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
 import { importFetchedStatus } from '@/mastodon/actions/importer';
 import { toggleFavourite } from '@/mastodon/actions/interactions';
 import { fetchStatus } from '@/mastodon/actions/statuses';
-import { directCompose, replyComposeInline, resetCompose } from '@/mastodon/actions/compose';
+import {
+  directComposeInline,
+  replyComposeInline,
+  resetCompose,
+} from '@/mastodon/actions/compose';
 import { connectDirectStream } from '@/mastodon/actions/streaming';
 import {
   expandConversations,
@@ -82,7 +86,7 @@ export const MessageConversation: React.FC = () => {
     [conversationItems, id],
   );
 
-  const threadId = conversation?.get('thread_id') as
+  const nativeConversationId = conversation?.get('conversation_id') as
     | string
     | null
     | undefined;
@@ -90,16 +94,28 @@ export const MessageConversation: React.FC = () => {
   const threadConversations = useMemo(() => {
     if (!conversation) return [];
 
-    if (threadId) {
-      return conversationItems
-        .filter((item) => item.get('thread_id') === threadId)
-        .toArray();
-    }
+    const targetParticipants = conversation.get('accounts') as
+      | Immutable.List<string>
+      | undefined;
 
     return conversationItems
-      .filter((item) => item.get('id') === conversation.get('id'))
+      .filter((item) => {
+        const sameParticipants =
+          ImmutableList.isList(item.get('accounts')) &&
+          ImmutableList.isList(targetParticipants) &&
+          item
+            .get('accounts')
+            .sort()
+            .equals(targetParticipants.sort());
+
+        const sameNativeConversation =
+          !!nativeConversationId &&
+          item.get('conversation_id') === nativeConversationId;
+
+        return sameParticipants || sameNativeConversation;
+      })
       .toArray();
-  }, [conversation, conversationItems, threadId]);
+  }, [conversation, conversationItems, nativeConversationId]);
 
   const participantIds = useMemo(() => {
     const ids = new Set<string>();
@@ -232,7 +248,7 @@ export const MessageConversation: React.FC = () => {
     dispatch(resetCompose());
 
     recipients.forEach((account) => {
-      dispatch(directCompose(account));
+      dispatch(directComposeInline(account));
     });
 
     dispatch(dismissComposer());
