@@ -56,7 +56,7 @@ SimpleNavigation::Configuration.run do |navigation|
     end
 
     n.item :moderation, safe_join([material_symbol('gavel'), t('moderation.title')]), nil, if: -> { current_user.can?(:manage_reports, :view_audit_log, :manage_users, :manage_invites, :manage_taxonomies, :manage_federation, :manage_blocks) && !self_destruct } do |s|
-      s.item :reports, safe_join([material_symbol('flag'), t('admin.reports.title')]), admin_reports_path, highlights_on: %r{/admin/reports|admin/report_notes}, if: -> { current_user.can?(:manage_reports) }
+      s.item :reports, safe_join([material_symbol('flag'), t('admin.reports.title')]), admin_reports_path, highlights_on: %r{/admin/reports|admin/report_notes}, html: { class: 'reports-navigation-item' }, if: -> { current_user.can?(:manage_reports) }
       s.item :bug_reports, safe_join([material_symbol('bug_report'), t('admin.bug_reports.title')]), admin_bug_reports_path, highlights_on: %r{/admin/bug_reports}, html: { class: 'bug-reports-navigation-item' }, if: -> { current_user.can?(:manage_reports) }
       s.item :appeals, safe_join([material_symbol('feedback'), t('admin.disputes.appeals.title')]), admin_disputes_appeals_path, highlights_on: %r{/admin/disputes/}, if: -> { current_user.can?(:manage_appeals) }
       s.item :accounts, safe_join([material_symbol('groups'), t('admin.accounts.title')]), admin_accounts_path(origin: 'local'), highlights_on: %r{/admin/accounts|admin/account_moderation_notes|/admin/pending_accounts|/admin/users}, if: -> { current_user.can?(:manage_users) }
