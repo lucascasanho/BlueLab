@@ -35,7 +35,11 @@ const messages = defineMessages({
     defaultMessage: 'Custom Feeds',
   },
   create: { id: 'lists.create_list', defaultMessage: 'Create list' },
-  create_redesign: { id: 'lists.create', defaultMessage: 'Create' },
+  create_redesign: {
+    id: 'custom_feeds.create',
+    defaultMessage: 'Create',
+  },
+  create_blue2: { id: 'lists.create', defaultMessage: 'Create' },
   edit: { id: 'lists.edit', defaultMessage: 'Edit list' },
   delete: { id: 'lists.delete', defaultMessage: 'Delete list' },
   more: { id: 'status.more', defaultMessage: 'More' },
@@ -136,6 +140,9 @@ const Lists: React.FC<{
   const title = intl.formatMessage(
     isRedesignEnabled() || isBlue2 ? messages.heading_redesign : messages.heading,
   );
+  const createLabel = intl.formatMessage(
+    isBlue2 ? messages.create_blue2 : messages.create_redesign,
+  );
 
   return (
     <Column bindToDocument={!multiColumn} label={title}>
@@ -151,7 +158,7 @@ const Lists: React.FC<{
               as='link'
               to='/lists/new'
             >
-              {intl.formatMessage(messages.create_redesign)}
+              {createLabel}
             </ColumnHeaderButton>
           }
         />
