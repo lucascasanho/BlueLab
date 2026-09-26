@@ -5,6 +5,7 @@ import classNames from 'classnames';
 
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
 import { replyComposeById } from 'mastodon/actions/compose';
+import { openConversationForStatus } from 'mastodon/actions/conversations';
 import { navigateToStatus } from 'mastodon/actions/statuses';
 import { Avatar } from 'mastodon/components/avatar';
 import { AvatarGroup } from 'mastodon/components/avatar_group';
@@ -82,14 +83,18 @@ export const NotificationGroupWithStatus: React.FC<{
   const handlers = useMemo(
     () => ({
       open: () => {
-        dispatch(navigateToStatus(statusId));
+        if (isPrivateMention) {
+          dispatch(openConversationForStatus(statusId));
+        } else {
+          dispatch(navigateToStatus(statusId));
+        }
       },
 
       reply: () => {
         dispatch(replyComposeById(statusId));
       },
     }),
-    [dispatch, statusId],
+    [dispatch, isPrivateMention, statusId],
   );
 
   return (
