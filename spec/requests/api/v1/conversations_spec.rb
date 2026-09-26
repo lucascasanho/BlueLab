@@ -56,6 +56,36 @@ RSpec.describe 'API V1 Conversations' do
   end
 
   describe 'GET /api/v1/conversations/:id/messages', :inline_jobs do
+    it 'returns all messages from the same native conversation when participant sets change' do
+      first = PostStatusService.new.call(
+        other.account,
+        text: 'First @alice',
+        visibility: :direct,
+      )
+      other_two = Fabricate(:user)
+      second = PostStatusService.new.call(
+        other_two.account,
+        text: '@alice Second',
+        visibility: :direct,
+        thread: first,
+      )
+
+      expect(second.conversation_id).to eq(first.conversation_id)
+
+      conversation = AccountConversation.find_by(
+        account: user.account,
+        conversation_id: first.conversation_id,
+      )
+
+      expect(conversation).to be_present
+
+      get "/api/v1/conversations/#{conversation.id}/messages", headers: headers
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body.map { |status| status[:id] })
+        .to contain_exactly(first.id.to_s, second.id.to_s)
+    end
+
     it 'returns all messages for matching participants' do
       first = PostStatusService.new.call(other.account, text: 'First @alice', visibility: 'direct')
       second = PostStatusService.new.call(other.account, text: 'Second @alice', visibility: 'direct')
