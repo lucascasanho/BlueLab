@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 
@@ -101,6 +101,8 @@ export const Conversation: React.FC<{
         | undefined,
   );
   const accounts = useAppSelector((state) => getAccounts(state, accountIds));
+
+  const pointerActivationRef = useRef(false);
 
   const handleClick = useCallback(() => {
     if (unread) {
@@ -226,7 +228,24 @@ export const Conversation: React.FC<{
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         role='button'
+        onPointerUp={(event) => {
+          if (
+            (event.target as HTMLElement).closest(
+              '.status__action-bar, button, [role="menuitem"]',
+            )
+          ) {
+            return;
+          }
+
+          pointerActivationRef.current = true;
+          handleClick();
+        }}
         onClick={(event) => {
+          if (pointerActivationRef.current) {
+            pointerActivationRef.current = false;
+            return;
+          }
+
           if (
             (event.target as HTMLElement).closest(
               '.status__action-bar, button, [role="menuitem"]',
