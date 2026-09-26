@@ -63,6 +63,35 @@
   overflow-wrap: anywhere;
 }
 
+.replyContext {
+  display: block;
+  width: 100%;
+  margin-block-end: var(--space-2xs);
+  padding: var(--space-2xs) var(--space-xs);
+  border: 0;
+  border-inline-start: 2px solid var(--color-border-brand);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  font-size: 0.85em;
+  line-height: 1.35;
+  text-align: start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.replyContext:hover,
+.replyContext:focus-visible {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.replyButton {
+  align-self: flex-end;
+  margin-block-start: var(--space-2xs);
+}
+
 :global(body[data-theme='blue-2']) .replyComposer {
   width: 100%;
   min-width: 0;
