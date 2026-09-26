@@ -1,4 +1,5 @@
 import api, { getLinks } from '../api';
+import { browserHistory } from '../components/router';
 
 import {
   importFetchedAccounts,
@@ -61,6 +62,13 @@ export const expandConversations = ({ maxId } = {}) => (dispatch, getState) => {
 
 export const findConversationForStatus = statusId => () =>
   api().get(`/api/v1/conversations/by-status/${statusId}`).then(response => response.data.id);
+
+export const openConversationForStatus = statusId => dispatch =>
+  dispatch(findConversationForStatus(statusId))
+    .then(conversationId => {
+      browserHistory.push(`/conversations/${conversationId}`);
+      return conversationId;
+    });
 
 export const fetchConversationMessages = conversationId => dispatch =>
   api().get(`/api/v1/conversations/${conversationId}/messages`).then(response => {
