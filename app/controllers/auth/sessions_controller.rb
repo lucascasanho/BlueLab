@@ -29,14 +29,19 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def create
-    if truthy_param?(:account_switcher)
-      # Keep the previous SessionActivation alive, but do not allow the
-      # session-cookie strategy to authenticate the account that is already
-      # active in this browser. The normal Devise flow still handles password,
-      # LDAP/PAM, 2FA and passkey authentication.
-      session[:account_switcher] = true
+    if account_switcher_flow?
+      # Skip Mastodon's persistent-session strategy so an additional-account
+      # login authenticates the submitted credentials instead of the account
+      # already stored in the browser. If the 2FA before-action has already
+      # authenticated the target account, do not log that user out again.
       request.env['mastodon.account_switcher_authentication'] = true
-      warden.logout(:user) if warden.authenticated?(:user)
+
+      current_warden_user = warden.user(:user, run_callbacks: false)
+      attempt_user_id = session[:attempt_user_id].to_i if session[:attempt_user_id].present?
+
+      if current_warden_user && current_warden_user.id != attempt_user_id
+        warden.logout(:user)
+      end
     end
 
     super do |resource|
@@ -203,13 +208,6 @@ class Auth::SessionsController < Devise::SessionsController
 
   def continue_after?
     truthy_param?(:continue)
-  end
-
-  def account_switcher_auth_strategy
-    return :two_factor_ldap_authenticatable if Devise.ldap_authentication
-    return :two_factor_pam_authenticatable if Devise.pam_authentication
-
-    :database_authenticatable
   end
 
   def account_switcher_flow?
