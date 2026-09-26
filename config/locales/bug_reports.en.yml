@@ -47,7 +47,7 @@ en:
       resolved_msg: Bug report marked as resolved.
       status_open: Open
       status_resolved: Resolved
-bug_reports:
+  bug_reports:
     link: Report a bug
     title: Report a bug
     lead: Describe what happened and attach screenshots, GIFs, audio or video when useful.
