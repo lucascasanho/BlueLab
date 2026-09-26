@@ -191,9 +191,20 @@ export function replyCompose(status) {
 }
 
 export function replyComposeInline(status) {
-  return {
-    type: COMPOSE_REPLY,
-    status,
+  return (dispatch, getState) => {
+    dispatch({
+      type: COMPOSE_REPLY,
+      status,
+      inline: true,
+    });
+
+    if (isRedesignEnabled()) {
+      const text = getState().getIn(['compose', 'text'], '');
+      dispatch(requestComposerFocus({
+        start: text.search(/\s/) + 1,
+        end: text.length,
+      }));
+    }
   };
 }
 
@@ -278,6 +289,7 @@ export function directComposeInline(account) {
   return {
     type: COMPOSE_DIRECT,
     account,
+    inline: true,
   };
 }
 
