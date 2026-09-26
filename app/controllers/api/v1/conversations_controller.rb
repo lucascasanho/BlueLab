@@ -65,7 +65,7 @@ class Api::V1::ConversationsController < Api::BaseController
   end
 
   def destroy
-    @conversation.destroy!
+    matching_conversations.destroy_all
     render_empty
   end
 
