@@ -299,7 +299,9 @@ const NewListWrapper: React.FC<{
   }, [dispatch, signedIn, id]);
 
   const isLoading = id && !list;
-  const title = intl.formatMessage(id ? messages.edit : messages.create);
+  const title = intl.formatMessage(
+    id ? messages.edit : messagesLegacy.create,
+  );
 
   return (
     <Column bindToDocument={!multiColumn} label={title}>
