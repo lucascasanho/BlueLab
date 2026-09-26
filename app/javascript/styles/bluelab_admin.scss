@@ -39,23 +39,5 @@ $bluelab-admin-content-max-width: 1400px;
       flex: 0 1 auto;
     }
 
-    .sidebar {
-      nav > ul {
-        .bug-reports-navigation-item {
-          display: block;
-          width: 100%;
-          height: auto;
-          margin: 0;
-        }
-
-        .bug-reports-navigation-item > a {
-          box-sizing: border-box;
-          width: 100%;
-          min-width: 0;
-          margin: 0;
-          white-space: nowrap;
-        }
-      }
-    }
   }
 }
