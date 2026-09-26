@@ -27,6 +27,7 @@ pt-BR:
       role_not_assignable: Você não pode conceder o cargo "Verificado" porque a posição dele está acima da sua.
       account_unavailable: Esta conta não possui mais um usuário local.
       role_would_be_downgraded: A solicitação não pode ser aprovada porque substituiria um cargo superior pelo "Verificado".
+      no_message: Nenhuma mensagem foi enviada.
       empty: Nenhuma solicitação de verificação encontrada.
   notification_mailer:
     admin:

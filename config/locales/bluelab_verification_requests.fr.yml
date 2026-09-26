@@ -27,6 +27,7 @@ fr:
       role_not_assignable: Vous ne pouvez pas attribuer le rôle « Verificado » car sa position est supérieure à la vôtre.
       account_unavailable: Ce compte n’a plus d’utilisateur local.
       role_would_be_downgraded: La demande ne peut pas être approuvée car elle remplacerait un rôle supérieur par « Verificado ».
+      no_message: Aucun message n’a été fourni.
       empty: Aucune demande de vérification trouvée.
   notification_mailer:
     admin:

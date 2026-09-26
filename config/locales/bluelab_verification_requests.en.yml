@@ -27,6 +27,7 @@ en:
       role_not_assignable: You cannot assign the "Verificado" role because its position is above your role.
       account_unavailable: This account no longer has a local user.
       role_would_be_downgraded: The request cannot be approved because it would replace a higher role with "Verificado".
+      no_message: No message was provided.
       empty: No verification requests found.
   notification_mailer:
     admin:

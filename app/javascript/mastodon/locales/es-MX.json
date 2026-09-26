@@ -1553,7 +1553,7 @@
   "account_edit.verification.popover.criteria": "Los criterios son internos y los define el equipo de moderación.",
   "account_edit.verification.popover.federation": "El sello no es compatible con toda la federación ni con las aplicaciones cliente de Mastodon. Está limitado a instancias que utilizan el fork de BlueLab y a la versión web.",
   "account_edit.verification.popover.disclaimer": "Este sello no tiene ninguna relación con Mastodon GmbH. Puedes volver a solicitarlo después de 30 días.",
-  "account_edit.verification.popover.explanation_label": "Mensaje para la moderación (opcional)",
+  "account_edit.verification.popover.explanation_label": "Mensaje para la moderación",
   "account_edit.verification.popover.explanation_hint": "Puedes enviar la solicitud sin escribir un mensaje. Máximo de 5.000 caracteres.",
   "account_edit.verification.popover.submit": "Enviar solicitud",
   "account_edit.verification.popover.cancel": "Cancelar",

@@ -8,29 +8,52 @@
     = link_to t('admin.verification_requests.approve'), approve_admin_verification_request_path(@verification_request), method: :post, class: 'button', data: { confirm: t('admin.accounts.are_you_sure') }
     = link_to t('admin.verification_requests.deny'), deny_admin_verification_request_path(@verification_request), method: :post, class: 'button', data: { confirm: t('admin.accounts.are_you_sure') }
 
-.report-card
-  %h2= t('admin.verification_requests.details')
-
-  %dl
-    %div
-      %dt= t('admin.verification_requests.account')
-      %dd= admin_account_link_to @verification_request.account
-    %div
-      %dt= t('admin.verification_requests.requested_at')
-      %dd
-        %time{ datetime: @verification_request.created_at.iso8601 }= l(@verification_request.created_at)
-    %div
-      %dt= t('admin.verification_requests.status')
-      %dd= t("admin.verification_requests.status_#{@verification_request.status}")
-    - if @verification_request.explanation.present?
-      %div
-        %dt= t('admin.verification_requests.explanation')
-        %dd= simple_format(@verification_request.explanation)
+.report-header
+  .report-header__card
+    .account-card
+      = link_to ActivityPub::TagManager.instance.url_for(@verification_request.account), target: '_blank', rel: 'noopener', class: 'account-card__permalink' do
+        .account-card__header
+          = image_tag @verification_request.account.header.url, alt: ''
+        .account-card__title
+          .account-card__title__avatar
+            = image_tag @verification_request.account.avatar.url, alt: ''
+          .display-name
+            %bdi
+              %strong.emojify.p-name= display_name(@verification_request.account, custom_emojify: true)
+            %span= acct(@verification_request.account)
+  .report-header__details
+    .report-header__details__item
+      .report-header__details__item__header
+        %strong= t('admin.verification_requests.requested_at')
+      .report-header__details__item__content
+        %time.time-ago{ datetime: @verification_request.created_at.iso8601, title: l(@verification_request.created_at) }= l(@verification_request.created_at)
+    .report-header__details__item
+      .report-header__details__item__header
+        %strong= t('admin.verification_requests.status')
+      .report-header__details__item__content
+        - if @verification_request.pending?
+          %span.neutral-hint= t('admin.verification_requests.status_pending')
+        - elsif @verification_request.approved?
+          %span.positive-hint= t('admin.verification_requests.status_approved')
+        - else
+          %span.negative-hint= t('admin.verification_requests.status_denied')
     - if @verification_request.resolved?
-      %div
-        %dt= t('admin.verification_requests.resolved_by')
-        %dd= admin_account_link_to @verification_request.resolved_by_account
-      %div
-        %dt= t('admin.verification_requests.resolved_at')
-        %dd
+      .report-header__details__item
+        .report-header__details__item__header
+          %strong= t('admin.verification_requests.resolved_by')
+        .report-header__details__item__content= admin_account_link_to @verification_request.resolved_by_account
+      .report-header__details__item
+        .report-header__details__item__header
+          %strong= t('admin.verification_requests.resolved_at')
+        .report-header__details__item__content
           %time{ datetime: @verification_request.resolved_at.iso8601 }= l(@verification_request.resolved_at)
+
+%h3= t('admin.verification_requests.explanation')
+- if @verification_request.explanation.present?
+  .speech-bubble.positive
+    .speech-bubble__bubble
+      = simple_format(@verification_request.explanation)
+    .speech-bubble__owner
+      = admin_account_link_to @verification_request.account
+- else
+  .muted-hint= t('admin.verification_requests.no_message')

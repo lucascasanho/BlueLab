@@ -47,7 +47,7 @@ const messages = defineMessages({
   },
   explanationLabel: {
     id: 'account_edit.verification.popover.explanation_label',
-    defaultMessage: 'Message to moderation (optional)',
+    defaultMessage: 'Message to moderation',
   },
   explanationHint: {
     id: 'account_edit.verification.popover.explanation_hint',
@@ -137,17 +137,17 @@ export const VerificationRequestTrigger: FC = () => {
 
   return (
     <>
-      <button
+      <Button
         ref={setTriggerElement}
-        type='button'
         className={editClasses.editButton}
+        type='button'
         aria-haspopup='dialog'
         aria-expanded={open}
         aria-controls={popoverId}
         onClick={handleTrigger}
       >
         {intl.formatMessage(messages.trigger)}
-      </button>
+      </Button>
 
       <Popover
         isOpen={open}
