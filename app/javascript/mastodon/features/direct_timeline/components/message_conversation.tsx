@@ -357,7 +357,10 @@ export const MessageConversation: React.FC = () => {
   }
 
   return (
-    <Column label={intl.formatMessage(messages.title)}>
+    <Column
+      label={intl.formatMessage(messages.title)}
+      className={classes.column}
+    >
       <ColumnHeader
         withBackButton
         title={
@@ -548,6 +551,10 @@ export const MessageConversation: React.FC = () => {
                   ? current
                   : [...current, status.id],
               );
+
+              participantAccountsRef.current.forEach((account) => {
+                dispatch(directComposeInline(account));
+              });
             }}
           />
         )}
