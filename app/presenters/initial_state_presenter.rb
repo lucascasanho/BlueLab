@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class InitialStatePresenter < ActiveModelSerializers::Model
-  attributes :settings, :push_subscription, :token,
+  attributes :settings, :push_subscription, :token, :session_id,
              :current_account, :admin, :owner, :text, :visibility,
              :disabled_account, :moved_to_account, :critical_updates_pending
 
