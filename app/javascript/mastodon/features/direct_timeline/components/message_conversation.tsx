@@ -29,6 +29,7 @@ import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
 import { me } from '@/mastodon/initial_state';
 import type { StatusShape } from '@/mastodon/models/status';
 import { makeGetStatus } from '@/mastodon/selectors';
+import { importFetchedStatus } from '@/mastodon/actions/importer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import classes from './message_conversation.module.scss';
@@ -104,15 +105,32 @@ export const MessageConversation: React.FC = () => {
     };
   }, [dispatch]);
 
-  const latestStatusId = conversation?.get('last_status') as
-    | string
-    | null
-    | undefined;
+  const participantKey = conversation
+    ? (conversation.get('accounts') as Immutable.List<string>).sort().join(',')
+    : '';
+
+  const latestMatchingStatusId = useAppSelector((state) => {
+    if (!participantKey) return null;
+
+    return (state.conversations.get('items') as Immutable.List<
+      Immutable.Map<string, unknown>
+    >)
+      .filter(
+        (item) =>
+          (item.get('accounts') as Immutable.List<string>)
+            .sort()
+            .join(',') === participantKey,
+      )
+      .map((item) => item.get('last_status') as string | null)
+      .filter(Boolean)
+      .sort((a, b) => (a && b ? a.localeCompare(b) : 0))
+      .last();
+  });
 
   useEffect(() => {
-    if (!id || !latestStatusId) return;
+    if (!id || !latestMatchingStatusId) return;
     void loadMessages();
-  }, [id, latestStatusId, loadMessages]);
+  }, [id, latestMatchingStatusId, loadMessages]);
 
   useEffect(() => {
     if (id) {
@@ -239,8 +257,13 @@ export const MessageConversation: React.FC = () => {
             compact
             embedded
             autoFocus
-            onSuccess={(_status: ApiStatusJSON) => {
-              void loadMessages();
+            onSuccess={(status: ApiStatusJSON) => {
+              dispatch(importFetchedStatus(status));
+              setMessageStatusIds((current) =>
+                current.includes(status.id)
+                  ? current
+                  : [...current, status.id],
+              );
             }}
           />
         )}
