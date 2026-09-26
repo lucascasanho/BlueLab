@@ -72,7 +72,7 @@ module Devise
     class SessionActivationRememberable < Authenticatable
       def valid?
         @session_cookie = nil
-        session_cookie.present?
+        session_cookie.present? && !request.env['mastodon.account_switcher_authentication']
       end
 
       def authenticate!
