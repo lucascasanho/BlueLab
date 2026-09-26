@@ -756,7 +756,7 @@
   "empty_column.collections.featured_in_undiscoverable": "Para as pessoas adicionarem você às coleções, você precisa permitir destaque em experiências de descoberta através de <link>Preferências > Privacidade e alcance</link>",
   "empty_column.collections_self": "Você ainda não criou nenhuma coleção.",
   "empty_column.community": "A linha local está vazia. Publique algo para começar!",
-  "empty_column.direct": "Você ainda não tem mensagens privadas. Quando você enviar ou receber uma, será exibida aqui.",
+  "empty_column.direct": "Você ainda não tem mensagens diretas. Quando você enviar ou receber uma, será exibida aqui.",
   "empty_column.disabled_feed": "Este feed foi desativado pelos administradores de seu servidor.",
   "empty_column.domain_blocks": "Nada aqui.",
   "empty_column.explore_statuses": "Nada está em alta no momento. Volte mais tarde!",
