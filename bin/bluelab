@@ -485,9 +485,9 @@ promover() {
 
       if git -C "$tmp" cherry-pick --no-commit "$commit" >/dev/null 2>&1; then
         if [[ -n "$(git -C "$tmp" diff --cached --name-only)" ]]; then
-          GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-BlueLab Promotor}" \
-          GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-bluelab-promotor@localhost}" \
-          if ! git -C "$tmp" commit -C "$commit" >/dev/null; then
+          if ! GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-BlueLab Promotor}" \
+             GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-bluelab-promotor@localhost}" \
+             git -C "$tmp" commit -C "$commit" >/dev/null; then
             git -C "$tmp" cherry-pick --abort >/dev/null 2>&1 || true
             falhar "não foi possível criar o commit promovido para $commit"
           fi
