@@ -336,6 +336,8 @@ export const RedesignNavigationPanel: React.FC<{
               <NavigationFooterLinks
                 multiColumn={multiColumn}
                 siteName={siteName}
+                variant={isBlue2 ? 'blue2' : 'default'}
+                showBugReport={signedIn}
               />
             )}
           </footer>
@@ -348,6 +350,8 @@ export const RedesignNavigationPanel: React.FC<{
             <NavigationFooterLinks
               multiColumn={multiColumn}
               siteName={siteName}
+              variant={isBlue2 ? 'blue2' : 'default'}
+              showBugReport={signedIn}
             />
           )}
         </footer>
