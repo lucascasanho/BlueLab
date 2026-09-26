@@ -19,11 +19,9 @@ vi.mock('./emoji', () => ({
   ComposeEmojiButton: () => <button type='button'>Emoji</button>,
 }));
 
-const renderFooter = (privacy: 'public' | 'direct' = 'public') => {
+const renderFooter = () => {
   const store = configureStore({
-    reducer: reducerWithInitialState({
-      compose: { text: 'First post', privacy },
-    }),
+    reducer: reducerWithInitialState({ compose: { text: 'First post' } }),
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware(defaultMiddleware),
   });
@@ -38,23 +36,6 @@ const renderFooter = (privacy: 'public' | 'direct' = 'public') => {
 };
 
 describe('BlueLab compose primary actions', () => {
-  test('uses message actions for direct replies', () => {
-    renderFooter('direct');
-
-    expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Publish' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', {
-        name: 'Add another post to this thread',
-      }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Schedule' }),
-    ).not.toBeInTheDocument();
-  });
-
   test('keeps the circular thread button immediately before Publish and adds at the end', () => {
     const { container, store } = renderFooter();
     const group = container.querySelector('[data-compose-primary-actions]');

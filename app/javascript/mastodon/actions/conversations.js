@@ -59,12 +59,6 @@ export const expandConversations = ({ maxId } = {}) => (dispatch, getState) => {
     .catch(err => dispatch(expandConversationsFail(err)));
 };
 
-export const fetchConversationMessages = conversationId => dispatch =>
-  api().get(`/api/v1/conversations/${conversationId}/messages`).then(response => {
-    dispatch(importFetchedStatuses(response.data));
-    return response.data;
-  });
-
 export const expandConversationsRequest = () => ({
   type: CONVERSATIONS_FETCH_REQUEST,
 });

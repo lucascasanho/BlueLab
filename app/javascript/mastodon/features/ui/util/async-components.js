@@ -34,12 +34,6 @@ export function DirectTimeline() {
   return import('../../direct_timeline');
 }
 
-export function MessageConversation() {
-  return import('../../direct_timeline/components/message_conversation').then(
-    module => ({ default: module.MessageConversation }),
-  );
-}
-
 export function ListTimeline () {
   return import('../../list_timeline');
 }
@@ -166,11 +160,6 @@ export function DomainBlockModal () {
 
 export function ReportModal () {
   return import('../components/report_modal');
-}
-
-export function BugReportModal () {
-  return import('../../bug_report/bug_report_modal')
-    .then(module => ({ default: module.BugReportModal }));
 }
 
 export function ReportCollectionModal () {

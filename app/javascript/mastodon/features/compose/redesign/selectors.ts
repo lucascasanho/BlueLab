@@ -40,9 +40,6 @@ export const selectComposeType = createAppSelector(
   },
 );
 
-export const isMessageComposeType = (type: ComposeType) =>
-  type === 'message' || type === 'replyPrivate';
-
 export const selectComposeCharsCount = createAppSelector(
   [
     (state) => state.server.server.item?.configuration.statuses.max_characters,

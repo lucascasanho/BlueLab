@@ -108,7 +108,6 @@ namespace :api, format: false do
 
     resources :conversations, only: [:index, :destroy] do
       member do
-        get :messages
         post :read
         post :unread
       end

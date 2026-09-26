@@ -351,13 +351,7 @@ export const selectIsMinimized = createAppSelector(
 
 export const submitComposer = createAppThunk(
   (
-    {
-      redirectOnSuccess,
-      onSuccess,
-    }: {
-      redirectOnSuccess?: boolean;
-      onSuccess?: (status: ApiStatusJSON) => void;
-    },
+    { redirectOnSuccess }: { redirectOnSuccess?: boolean },
     { getState, dispatch },
   ) => {
     const textareaValue = getComposerTextarea()?.value;
@@ -415,8 +409,6 @@ export const submitComposer = createAppThunk(
     } else {
       dispatch(
         submitCompose((status: ApiStatusJSON) => {
-          onSuccess?.(status);
-
           if (redirectOnSuccess) {
             window.location.assign(status.url);
           }
