@@ -84,6 +84,10 @@ export const DetailedStatus: React.FC<{
 
   const { signedIn } = useIdentity();
 
+  const isBlue2 =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'blue-2';
+
   const handleOpenVideo = useCallback(
     (options: VideoModalOptions) => {
       const lang = (status.getIn(['translation', 'language']) ||
@@ -428,8 +432,8 @@ export const DetailedStatus: React.FC<{
           <div className='status__prepend'>
             <div className='status__prepend-icon-wrapper'>
               <Icon
-                id='at'
-                icon={AlternateEmailIcon}
+                id={isBlue2 ? 'message' : 'at'}
+                icon={isBlue2 ? ChatCircleDotsIcon : AlternateEmailIcon}
                 className='status__prepend-icon'
               />
             </div>
