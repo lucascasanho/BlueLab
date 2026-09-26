@@ -65,17 +65,24 @@ export const EmbeddedStatus: React.FC<{
         element = element.parentNode as HTMLDivElement | null;
       }
 
-      if (deltaX + deltaY < 5 && account) {
-        const path = `/@${account.acct}/${statusId}`;
-
+      if (deltaX + deltaY < 5) {
         if (button === 0 && !(ctrlKey || metaKey)) {
-          onOpen?.();
-
-          if (!onOpen) {
-            history.push(path, { focusTarget: FOCUS_TARGET.POST });
+          if (onOpen) {
+            onOpen();
+          } else if (account) {
+            history.push(`/@${account.acct}/${statusId}`, {
+              focusTarget: FOCUS_TARGET.POST,
+            });
           }
-        } else if (button === 1 || (button === 0 && (ctrlKey || metaKey))) {
-          window.open(path, '_blank', 'noopener');
+        } else if (
+          account &&
+          (button === 1 || (button === 0 && (ctrlKey || metaKey)))
+        ) {
+          window.open(
+            `/@${account.acct}/${statusId}`,
+            '_blank',
+            'noopener',
+          );
         }
       }
 
