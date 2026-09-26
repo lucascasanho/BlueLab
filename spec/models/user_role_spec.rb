@@ -108,6 +108,14 @@ RSpec.describe UserRole do
       role = Fabricate(:user_role, name: 'verified', permissions: UserRole::Flags::NONE)
       expect(role).not_to be_verified_by_instance
     end
+
+    it 'supports both verification role names together' do
+      portuguese_role = Fabricate(:user_role, name: 'Verificado', permissions: UserRole::Flags::NONE)
+      english_role = Fabricate(:user_role, name: 'Verified', permissions: UserRole::Flags::NONE)
+
+      expect(portuguese_role).to be_verified_by_instance
+      expect(english_role).to be_verified_by_instance
+    end
   end
 
   describe '#can?' do
