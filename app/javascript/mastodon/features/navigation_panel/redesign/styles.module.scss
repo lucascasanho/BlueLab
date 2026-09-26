@@ -65,9 +65,4 @@
   margin-inline: var(--space-4);
 }
 
-// Mastodon 5.0 keeps the redesigned navigation, but the footer links
-// should sit slightly lower without changing the footer's layout box.
-:global(body[data-theme='mastodon-5']) .footer > :last-child {
-  position: relative;
-  top: var(--space-2);
-}
+
