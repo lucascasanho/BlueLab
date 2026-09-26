@@ -24,7 +24,7 @@ es:
       approved_msg: Insignia de verificación concedida y solicitud resuelta.
       denied_msg: Solicitud de verificación cerrada sin conceder la insignia.
       already_resolved: Esta solicitud de verificación ya fue resuelta.
-      verified_role_missing: El rol "Verificado" no existe.
+      verified_role_missing: No existe el rol "Verificado" ni "Verified".
       role_not_assignable: No puedes conceder el rol "Verificado" porque su posición está por encima de la tuya.
       account_unavailable: Esta cuenta ya no tiene un usuario local.
       role_would_be_downgraded: No se puede aprobar la solicitud porque sustituiría un rol superior por "Verificado".
