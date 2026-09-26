@@ -435,18 +435,45 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     return () => window.cancelAnimationFrame(frame);
   }, [highlightStatus, pendingScrollStatusId, statuses]);
 
+  const initialScrollConversationIdRef = useRef<string | null>(null);
+
   useEffect(() => {
-    if (!inline || !id || !messagesResolved) return;
+    if (!id || !messagesResolved || statuses.length === 0) return;
+    if (initialScrollConversationIdRef.current === id) return;
 
-    const frame = window.requestAnimationFrame(() => {
-      const list = messageListRef.current;
-      if (!list) return;
+    const lastStatus = statuses[statuses.length - 1];
+    if (!lastStatus) return;
 
-      list.scrollTop = list.scrollHeight;
+    let frame = 0;
+    let secondFrame = 0;
+
+    frame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        const list = messageListRef.current;
+        const lastMessage = document.getElementById(
+          'message-' + lastStatus.get('id'),
+        );
+
+        if (!list) return;
+
+        if (lastMessage) {
+          lastMessage.scrollIntoView({
+            behavior: 'auto',
+            block: 'end',
+          });
+        } else {
+          list.scrollTop = list.scrollHeight;
+        }
+
+        initialScrollConversationIdRef.current = id;
+      });
     });
 
-    return () => window.cancelAnimationFrame(frame);
-  }, [id, inline, messagesResolved]);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.cancelAnimationFrame(secondFrame);
+    };
+  }, [id, messagesResolved, statuses]);
 
   const handleReply = useCallback(
     (status: Immutable.Record<StatusShape>) => {
