@@ -2070,7 +2070,7 @@ pt-BR:
     reblog:
       body: "%{name} impulsionou a sua publicação:"
       subject: "%{name} impulsionou a sua publicação"
-      title: Novo impulso
+      title: Novo RePost
     severed_relationships:
       subject: Você perdeu conexões devido a uma decisão da moderação
     status:
@@ -2330,7 +2330,7 @@ pt-BR:
       video:
         one: "%{count} vídeo"
         other: "%{count} vídeos"
-    boosted_from_html: Impulso de %{acct_link}
+    boosted_from_html: RePost de %{acct_link}
     content_warning: 'Aviso de conteúdo: %{warning}'
     content_warnings:
       hide: Ocultar publicação
@@ -2349,7 +2349,7 @@ pt-BR:
       direct: Publicações visíveis apenas para usuários mencionados não podem ser fixadas
       limit: Você alcançou o número limite de publicações fixadas
       ownership: As publicações dos outros não podem ser fixadas
-      reblog: Um impulso não pode ser fixado
+      reblog: Um RePost não pode ser fixado
     quote_error:
       not_available: Publicação indisponível
       pending_approval: Publicação pendente
@@ -2373,9 +2373,9 @@ pt-BR:
     exceptions: Exceções
     explanation: A eliminação automatizada é realizada com baixa prioridade. Pode haver um atraso entre atingir o limite de idade e ser removido.
     ignore_favs: Ignorar favoritos
-    ignore_reblogs: Ignorar impulsos
+    ignore_reblogs: Ignorar RePosts
     interaction_exceptions: Exceções baseadas nas interações
-    interaction_exceptions_explanation: Postagens que excedem temporariamente o limite de favoritos ou de impulso podem ser retidos mesmo que posteriormente diminuam.
+    interaction_exceptions_explanation: Postagens que excedem temporariamente o limite de favoritos ou de RePost podem ser retidos mesmo que posteriormente diminuam.
     keep_direct: Manter mensagens diretas
     keep_direct_hint: Não exclui nenhuma de suas mensagens diretas
     keep_media: Manter publicações com mídia
@@ -2401,7 +2401,7 @@ pt-BR:
     min_favs: Manter publicações favoritadas por ao menos
     min_favs_hint: Não exclui suas publicações que receberam pelo menos esta quantidade de favoritos. Deixe em branco para excluir publicações independentemente da quantidade de favoritos
     min_reblogs: Manter publicações impulsionadas por ao menos
-    min_reblogs_hint: Não exclui publicações que receberam pelo menos esta quantidade de impulsos. Deixe em branco para excluir publicações independentemente da quantidade de impulsos
+    min_reblogs_hint: Não exclui publicações que receberam pelo menos esta quantidade de RePosts. Deixe em branco para excluir publicações independentemente da quantidade de RePosts
   stream_entries:
     sensitive_content: Conteúdo sensível
   strikes:
