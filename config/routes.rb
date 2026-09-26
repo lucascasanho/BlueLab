@@ -186,6 +186,11 @@ Rails.application.routes.draw do
   get '/@:username_with_domain/(*any)', to: 'home#index', constraints: { username_with_domain: %r{([^/])+?} }, as: :account_with_domain, format: false
   get '/settings', to: redirect('/settings/profile')
 
+  # Public bug reporting must be registered before the settings and catch-all
+  # routes so it remains directly reachable when the visitor is logged out.
+  get '/bug_reports/new', to: 'bug_reports#new', as: :new_bug_report, defaults: { format: :html }
+  post '/bug_reports', to: 'bug_reports#create', as: :bug_reports
+
   draw(:settings)
 
   namespace :disputes do
@@ -229,9 +234,6 @@ Rails.application.routes.draw do
     end
   end
   resource :statuses_cleanup, controller: :statuses_cleanup, only: [:show, :update]
-
-  get '/bug_reports/new', to: 'bug_reports#new', as: :new_bug_report
-  post '/bug_reports', to: 'bug_reports#create', as: :bug_reports
 
   get '/media_proxy/:id/(*any)', to: 'media_proxy#show', as: :media_proxy, format: false
   resources :backups, only: [] do
