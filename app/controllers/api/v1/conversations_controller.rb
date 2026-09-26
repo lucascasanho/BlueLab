@@ -43,13 +43,8 @@ class Api::V1::ConversationsController < Api::BaseController
   end
 
   def read
-    conversation = AccountConversation.where(account: current_account).find_by(id: params[:id])
-
-    return head :no_content unless conversation
-
-    @conversation = conversation
-    matching_conversations.update_all(unread: false, updated_at: Time.current)
-    head :no_content
+    @conversation.update!(unread: false)
+    render json: @conversation, serializer: REST::ConversationSerializer
   end
 
   def by_status
