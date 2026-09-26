@@ -12,7 +12,6 @@ const conversation = (
   accounts: string[],
   lastStatus: string,
   unread = false,
-  threadId?: string | null,
 ) =>
   ImmutableMap({
     id,
