@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 import { List as ImmutableList } from 'immutable';
@@ -23,9 +23,11 @@ import {
   resetCompose,
 } from '@/mastodon/actions/compose';
 import { connectDirectStream } from '@/mastodon/actions/streaming';
+import { browserHistory } from '@/mastodon/components/router';
 import {
   expandConversations,
   fetchConversation,
+  findConversationForStatus,
   fetchConversationMessages,
   markConversationRead,
   mountConversations,
@@ -65,6 +67,8 @@ const getStatus = makeGetStatus();
 
 export const MessageConversation: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const sourceStatusId = (location.state as { statusId?: string } | undefined)?.statusId;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [messageStatusIds, setMessageStatusIds] = useState<string[]>([]);
@@ -185,7 +189,23 @@ export const MessageConversation: React.FC = () => {
       setMessagesResolved(false);
 
       void dispatch(fetchConversation(id))
-        .catch(() => undefined)
+        .catch(async () => {
+          if (!sourceStatusId || cancelled) return;
+
+          try {
+            const recoveredId = await dispatch(
+              findConversationForStatus(sourceStatusId),
+            );
+
+            if (!cancelled && recoveredId && recoveredId !== id) {
+              browserHistory.replace(`/conversations/${recoveredId}`, {
+                statusId: sourceStatusId,
+              });
+            }
+          } catch {
+            // Keep the existing unavailable state when recovery also fails.
+          }
+        })
         .finally(() => {
           if (!cancelled) setConversationResolved(true);
         });
