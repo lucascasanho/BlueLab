@@ -14,6 +14,15 @@ RSpec.describe ActivityPub::NoteSerializer do
   let!(:reply_by_account_third) { Fabricate(:status, account: account, thread: parent, visibility: :public) }
   let!(:reply_by_account_visibility_direct) { Fabricate(:status, account: account, thread: parent, visibility: :direct) }
 
+  it 'includes the instance name as the federated generator' do
+    expect(subject).to include(
+      'generator' => {
+        'type' => 'Application',
+        'name' => Setting.site_title,
+      }
+    )
+  end
+
   it 'has the expected shape and replies collection' do
     expect(subject).to include({
       '@context' => include('https://www.w3.org/ns/activitystreams'),
