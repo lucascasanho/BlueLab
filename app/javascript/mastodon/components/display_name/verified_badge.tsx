@@ -11,7 +11,7 @@ import { Popover } from '../popover';
 import type { DisplayNameProps } from './index';
 import classes from './verified_badge.module.scss';
 
-const VERIFIED_ROLE_NAME = 'Verificado';
+const VERIFIED_ROLE_NAMES = ['Verificado', 'Verified'] as const;
 
 const copy = {
   en: {
@@ -142,7 +142,7 @@ export function hasVerifiedRole(account: DisplayNameProps['account']) {
   }
 
   return Array.from(account.roles).some(
-    (role) => role.name === VERIFIED_ROLE_NAME,
+    (role) => VERIFIED_ROLE_NAMES.includes(role.name as (typeof VERIFIED_ROLE_NAMES)[number]),
   );
 }
 
