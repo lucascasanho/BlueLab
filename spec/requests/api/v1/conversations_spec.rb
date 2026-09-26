@@ -222,6 +222,41 @@ RSpec.describe 'API V1 Conversations' do
       expect(response).to have_http_status(200)
       expect(response.parsed_body[:id]).to eq(current_conversation.id.to_s)
     end
+
+    it 'prefers the row that actually contains the status over a newer row with the same native thread' do
+      old_status = PostStatusService.new.call(
+        other.account,
+        text: 'Old @alice',
+        visibility: :direct,
+      )
+      old_conversation = AccountConversation.where(
+        account: user.account,
+        conversation_id: old_status.conversation_id,
+      ).first
+
+      current_status = PostStatusService.new.call(
+        user.account,
+        text: "@#{other.account.username} Current",
+        visibility: :direct,
+      )
+      current_conversation = AccountConversation.where(
+        account: user.account,
+        participant_account_ids: [other.account.id],
+      ).order(last_status_id: :desc).first
+
+      expect(old_conversation).to be_present
+      expect(current_conversation).to be_present
+
+      old_conversation.update_columns(
+        conversation_id: current_conversation.conversation_id,
+        last_status_id: old_status.id,
+      )
+
+      get "/api/v1/conversations/by-status/#{old_status.id}", headers: headers
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body[:id]).to eq(old_conversation.id.to_s)
+    end
   end
 
   describe 'GET /api/v1/conversations/:id/messages', :inline_jobs do
