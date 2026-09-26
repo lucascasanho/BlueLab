@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 
@@ -33,6 +33,7 @@ import { title as siteTitle } from 'mastodon/initial_state';
 
 import blue2Classes from './blue2.module.scss';
 import { ConversationsList } from './components/conversations_list';
+import { MessageConversation } from './components/message_conversation';
 
 const messages = defineMessages({
   title: { id: 'column.direct', defaultMessage: 'Private mentions' },
@@ -53,7 +54,6 @@ interface ColumnBase {
 const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const blue2ColumnPinning = useBlue2ColumnPinning();
   const pinned = !!columnId;
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
@@ -64,6 +64,15 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
         ? messages.title_redesign
         : messages.title,
   );
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+
+  const handleOpenConversation = useCallback((conversationId: string) => {
+    setActiveConversationId(conversationId);
+  }, []);
+
+  const handleBackConversation = useCallback(() => {
+    setActiveConversationId(null);
+  }, []);
 
   const composeNewMessage = useCallback(() => {
     dispatch(openNewComposer({ type: 'message' }));
@@ -115,9 +124,15 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
           className={blue2Classes.root}
           data-bluelab-messages-advanced={multiColumn ? 'true' : undefined}
         >
+          {activeConversationId ? (
+            <MessageConversation
+              conversationId={activeConversationId}
+              onBack={handleBackConversation}
+              inline
+            />
+          ) : (
           <ColumnHeader
             title={title}
-            withBackButton={multiColumn && !pinned && 'auto'}
             extraButtons={
               <>
                 <ColumnHeaderButton
@@ -128,20 +143,14 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
                 >
                   {blue2Text(intl.locale, 'newConversation')}
                 </ColumnHeaderButton>
-                {blue2ColumnPinning.canPin && (
-                  <ColumnHeaderButton onClick={blue2ColumnPinning.onPin}>
-                    {blue2ColumnPinning.pinned ? (
-                      <FormattedMessage
-                        id='column_header.unpin'
-                        defaultMessage='Unpin'
-                      />
-                    ) : (
-                      <FormattedMessage
-                        id='column_header.pin'
-                        defaultMessage='Pin'
-                      />
-                    )}
-                  </ColumnHeaderButton>
+                {multiColumn && (
+                  <ColumnSettingsMenu labelPrefix={title}>
+                    <MultiColumnMenuItems
+                      pinned={pinned}
+                      onPin={handlePin}
+                      onMove={handleMove}
+                    />
+                  </ColumnSettingsMenu>
                 )}
               </>
             }
@@ -177,9 +186,11 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
                   </div>
                 }
                 bindToDocument={!multiColumn}
+                onOpenConversation={handleOpenConversation}
               />
             </div>
           </section>
+          )}
         </div>
 
         <Helmet>
