@@ -8,6 +8,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
+import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 
@@ -18,7 +19,6 @@ import type { StatusLike } from '@/mastodon/components/status/legacy/hashtag_bar
 import { getHashtagBarForStatus } from '@/mastodon/components/status/legacy/hashtag_bar';
 import { PictureInPicturePlaceholder } from '@/mastodon/components/status/legacy/picture_in_picture_placeholder';
 import { QuotedStatus } from '@/mastodon/components/status/legacy/quoted';
-import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
 import { AnimatedNumber } from 'mastodon/components/animated_number';
 import { Avatar } from 'mastodon/components/avatar';
 import { DisplayName } from 'mastodon/components/display_name';
@@ -428,9 +428,10 @@ export const DetailedStatus: React.FC<{
           <div className='status__prepend'>
             <div className='status__prepend-icon-wrapper'>
               <Icon
-                id='at'
-                icon={AlternateEmailIcon}
+                id='message'
+                icon={ChatCircleDotsIcon}
                 className='status__prepend-icon'
+                aria-hidden='true'
               />
             </div>
             <FormattedMessage
