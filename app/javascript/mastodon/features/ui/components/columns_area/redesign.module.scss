@@ -208,8 +208,10 @@
 }
 
 .blue2Feed {
-  :global(.column-header),
-  :global(.column-header__wrapper) {
+  // Feed titles are rendered by the BlueLab shell above the Following/Global
+  // tabs. Hide the modern in-column header instead of the legacy global class,
+  // which does not match the CSS-module ColumnHeader.
+  :global(.columns-area--mobile) > * > header {
     display: none;
   }
 }
