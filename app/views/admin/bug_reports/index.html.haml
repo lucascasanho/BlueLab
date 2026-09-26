@@ -19,6 +19,7 @@
           %th= t('admin.bug_reports.id')
           %th= t('admin.bug_reports.reported_by')
           %th= t('admin.bug_reports.description')
+          %th= t('admin.bug_reports.error_page')
           %th= t('admin.bug_reports.created_at')
           %th= t('admin.bug_reports.status')
           %th= t('admin.bug_reports.assigned_to')
@@ -28,9 +29,14 @@
         - @bug_reports.each do |bug_report|
           %tr
             %td= bug_report.id
-            %td= admin_account_link_to bug_report.account
+            %td
+              - if bug_report.account.present?
+                = admin_account_link_to bug_report.account
+              - else
+                = t('admin.bug_reports.anonymous')
             %td
               .one-line= truncate(bug_report.description, length: 120)
+            %td= bug_report.error_page.presence || t('admin.bug_reports.none')
             %td
               %time.time-ago{ datetime: bug_report.created_at.iso8601, title: l(bug_report.created_at) }
                 = l(bug_report.created_at)
