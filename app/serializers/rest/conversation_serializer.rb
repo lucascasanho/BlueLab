@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class REST::ConversationSerializer < ActiveModel::Serializer
-  attributes :id, :unread, :conversation_id, :thread_id
+  attributes :id, :unread, :conversation_id
 
   has_many :participant_accounts, key: :accounts, serializer: REST::AccountSerializer
   has_one :last_status, serializer: REST::StatusSerializer
@@ -14,7 +14,4 @@ class REST::ConversationSerializer < ActiveModel::Serializer
     object.conversation_id.to_s
   end
 
-  def thread_id
-    object.thread_id
-  end
 end
