@@ -42,10 +42,10 @@ export const groupConversations = (conversations) => {
       return;
     }
 
-    const merged = [conversation];
+    const merged = matchingIndexes.flatMap((index) => groups[index]);
+    merged.push(conversation);
 
     [...matchingIndexes].reverse().forEach((index) => {
-      merged.push(...groups[index]);
       groups.splice(index, 1);
     });
 
