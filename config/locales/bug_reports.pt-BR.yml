@@ -9,6 +9,8 @@ pt-BR:
       id: ID
       reported_by: Relatado por
       created_at: Criado em
+      anonymous: Visitante
+      error_page: Página de erro
       status: Status
       assigned_to: Responsável
       attachments: Anexos
