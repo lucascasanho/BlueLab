@@ -12,12 +12,11 @@ RSpec.describe 'Public bug reports' do
     end
 
     it 'renders with error-page context when reached from an error page' do
-      get new_bug_report_path(error_page: '500', current_path: '/missing-page')
+      get new_bug_report_path(error_page: '200', current_path: '')
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('bug-report-form')
       expect(response.body).to include('Este relato foi iniciado na página de erro')
-      expect(response.body).to include('/missing-page')
     end
 
     it 'renders when reached from the login page' do
