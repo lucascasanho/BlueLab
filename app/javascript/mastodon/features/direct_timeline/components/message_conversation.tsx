@@ -350,6 +350,8 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     };
   }, [dispatch, participantAccountIdsKey]);
 
+  const messageListRef = useRef<HTMLDivElement>(null);
+
   const highlightTimeoutRef = useRef<number | null>(null);
 
   useEffect(
@@ -429,6 +431,19 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     return () => window.cancelAnimationFrame(frame);
   }, [highlightStatus, pendingScrollStatusId, statuses]);
 
+  useEffect(() => {
+    if (!inline || !id || !messagesResolved) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      const list = messageListRef.current;
+      if (!list) return;
+
+      list.scrollTop = list.scrollHeight;
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [id, inline, messagesResolved]);
+
   const handleReply = useCallback(
     (status: Immutable.Record<StatusShape>) => {
       dispatch(replyComposeInline(status));
@@ -491,7 +506,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       />
 
       <div className={classes.page}>
-        <div className={classes.messageList}>
+        <div className={classes.messageList} ref={messageListRef}>
           <div className={classes.messageListContent}>
             {statuses.map((status) => {
             const isMine = status.getIn(['account', 'id']) === me;
