@@ -111,7 +111,10 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
   if (isBlue2) {
     return (
       <Column bindToDocument={!multiColumn} label={title}>
-        <div className={blue2Classes.root}>
+        <div
+          className={blue2Classes.root}
+          data-bluelab-messages-advanced={multiColumn ? 'true' : undefined}
+        >
           <header className={blue2Classes.header}>
             <h1>{title}</h1>
             <button
