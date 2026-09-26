@@ -48,14 +48,6 @@
       text-decoration: underline;
     }
   }
-
-  .bugReportButton {
-    padding: 0;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-    font: inherit;
-  }
 }
 
 .list {
@@ -68,16 +60,33 @@
   .bugReportButton {
     color: var(--color-text-secondary);
     text-decoration: underline;
+  }
 
-    &[aria-current='page'] {
-      color: var(--color-text-primary);
-      text-decoration: none;
-    }
+  .bugReportButton {
+    appearance: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+  }
 
+  a,
+  .bugReportButton {
     &:hover,
     &:focus,
-    &:active {
+    &:active,
+    &:focus-visible {
       text-decoration: none;
     }
+  }
+
+  a[aria-current='page'] {
+    color: var(--color-text-primary);
+    text-decoration: none;
   }
 }
