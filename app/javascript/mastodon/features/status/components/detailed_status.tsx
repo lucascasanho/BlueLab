@@ -8,6 +8,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
+import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 
@@ -426,7 +427,12 @@ export const DetailedStatus: React.FC<{
         {status.get('visibility') === 'direct' && (
           <div className='status__prepend'>
             <div className='status__prepend-icon-wrapper'>
-              <VisibilityIcon visibility='direct' />
+              <Icon
+                id='message'
+                icon={ChatCircleDotsIcon}
+                className='status__prepend-icon'
+                aria-hidden='true'
+              />
             </div>
             <FormattedMessage
               id='status.direct_indicator'
