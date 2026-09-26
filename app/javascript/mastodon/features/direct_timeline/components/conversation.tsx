@@ -103,13 +103,13 @@ export const Conversation: React.FC<{
   const accounts = useAppSelector((state) => getAccounts(state, accountIds));
 
   const handleClick = useCallback(() => {
+    if (unread) {
+      dispatch(markConversationRead(id));
+    }
+
     if (onOpenConversation) {
       onOpenConversation(id);
       return;
-    }
-
-    if (unread) {
-      dispatch(markConversationRead(id));
     }
 
     if (lastStatus) {
