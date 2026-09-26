@@ -24,7 +24,6 @@ class Auth::AccountSwitcherController < ApplicationController
       same_site: :lax,
     }
 
-    warden.set_user(user, scope: :user)
     session.delete(:account_switcher)
 
     render json: {
