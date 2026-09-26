@@ -6,7 +6,6 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { useHistory } from 'react-router-dom';
 
 import type { ModalType } from '@/mastodon/actions/modal';
-import { fetchAccount } from '@/mastodon/actions/accounts';
 import { openModal } from '@/mastodon/actions/modal';
 import { AccountBio } from '@/mastodon/components/account_bio';
 import { Avatar } from '@/mastodon/components/avatar';
@@ -25,6 +24,7 @@ import {
   fetchProfile,
   patchProfile,
 } from '@/mastodon/reducers/slices/profile_edit';
+import { updateVerificationBadgeVisibility } from '@/mastodon/actions/accounts_typed';
 import { apiUpdateVerificationBadge } from '@/mastodon/api/verification';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
@@ -202,7 +202,12 @@ export const AccountEdit: FC = () => {
     try {
       const result = await apiUpdateVerificationBadge(nextVisible);
       setBadgeVisible(result.verified_badge_visible);
-      dispatch(fetchAccount(account.id));
+      dispatch(
+        updateVerificationBadgeVisibility({
+          id: account.id,
+          visible: result.verified_badge_visible,
+        }),
+      );
     } catch {
       setBadgeVisible(!nextVisible);
     } finally {
