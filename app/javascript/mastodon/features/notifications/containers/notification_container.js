@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 
 import { mentionCompose } from '../../../actions/compose';
+import { findConversationForStatus } from '../../../actions/conversations';
 import {
   toggleFavourite,
   toggleReblog,
@@ -43,6 +44,10 @@ const mapDispatchToProps = dispatch => ({
 
   onToggleHidden (status) {
     dispatch(toggleStatusSpoilers(status.get('id')));
+  },
+
+  onOpenConversation (statusId) {
+    return dispatch(findConversationForStatus(statusId));
   },
 });
 
