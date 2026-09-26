@@ -604,7 +604,8 @@ export const RichComposeEditor: React.FC<{
   const isBlueLabTheme =
     typeof document !== 'undefined' &&
     document.body.dataset.theme === 'blue-2';
-  const forceMessageMarkdown = isBlueLabTheme && isMessageComposeType(type);
+  const forceMessageMarkdown =
+    messageToolbar || (isBlueLabTheme && isMessageComposeType(type));
   const isMarkdown = forceMessageMarkdown || contentType === 'text/markdown';
   const messageCommands = commands.filter(
     ([command, _icon, _message, value]) =>
