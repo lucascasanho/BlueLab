@@ -36,6 +36,14 @@ const renderFooter = () => {
 };
 
 describe('BlueLab compose primary actions', () => {
+  test('shows only the remaining character count', () => {
+    const { container } = renderFooter();
+    const counter = container.querySelector('[class*="counter"]');
+
+    expect(counter).toHaveTextContent('490');
+    expect(counter).not.toHaveTextContent('/500');
+  });
+
   test('keeps the circular thread button immediately before Publish and adds at the end', () => {
     const { container, store } = renderFooter();
     const group = container.querySelector('[data-compose-primary-actions]');
