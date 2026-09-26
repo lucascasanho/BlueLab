@@ -1,15 +1,17 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { useParams } from 'react-router-dom';
 
 import { ChatCircleDotsIcon } from '@phosphor-icons/react';
+
+import ReplyIcon from '@/material-icons/400-24px/reply.svg?react';
 import { Helmet } from '@unhead/react/helmet';
 
 import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
 
 import { importFetchedStatus } from '@/mastodon/actions/importer';
-import { directCompose, resetCompose } from '@/mastodon/actions/compose';
+import { directCompose, replyCompose, resetCompose } from '@/mastodon/actions/compose';
 import { connectDirectStream } from '@/mastodon/actions/streaming';
 import {
   expandConversations,
@@ -30,7 +32,11 @@ import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
 import { me } from '@/mastodon/initial_state';
 import type { StatusShape } from '@/mastodon/models/status';
 import { makeGetStatus } from '@/mastodon/selectors';
+import { compareId } from '@/mastodon/compare_id';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+
+import { groupConversations } from '../conversation_grouping';
+import { IconButton } from '@/mastodon/components/icon_button';
 
 import classes from './message_conversation.module.scss';
 
@@ -53,10 +59,44 @@ export const MessageConversation: React.FC = () => {
   const dispatch = useAppDispatch();
   const [messageStatusIds, setMessageStatusIds] = useState<string[]>([]);
 
-  const conversation = useAppSelector((state) =>
-    (state.conversations.get('items') as Immutable.List<
-      Immutable.Map<string, unknown>
-    >).find((item) => item.get('id') === id),
+  const conversationItems = useAppSelector(
+    (state) =>
+      state.conversations.get('items') as Immutable.List<
+        Immutable.Map<string, unknown>
+      >,
+  );
+
+  const conversation = useMemo(
+    () => conversationItems.find((item) => item.get('id') === id),
+    [conversationItems, id],
+  );
+
+  const conversationGroup = useMemo(() => {
+    if (!conversation) return [];
+
+    return (
+      groupConversations(conversationItems).find((group) =>
+        group.some((item) => item.get('id') === conversation.get('id')),
+      ) ?? []
+    );
+  }, [conversation, conversationItems]);
+
+  const participantIds = useMemo(() => {
+    const ids = new Set();
+
+    conversationGroup.forEach((item) => {
+      item.get('accounts').forEach((accountId) => {
+        if (accountId !== me) ids.add(accountId);
+      });
+    });
+
+    return [...ids];
+  }, [conversationGroup]);
+
+  const participantAccounts = useAppSelector((state) =>
+    participantIds
+      .map((accountId) => state.accounts.get(accountId))
+      .filter(Boolean),
   );
 
   const statuses = useAppSelector((state) =>
@@ -67,23 +107,6 @@ export const MessageConversation: React.FC = () => {
       )
       .filter(Boolean),
   ) as Array<Immutable.Record<StatusShape>>;
-
-  const accounts = useAppSelector((state) => {
-    const ids = conversation?.get('accounts') as
-      | Immutable.List<string>
-      | undefined;
-
-    return ids ? ids.map((accountId) => state.accounts.get(accountId)) : [];
-  });
-
-  const recipient = useAppSelector((state) => {
-    const ids = conversation?.get('accounts') as
-      | Immutable.List<string>
-      | undefined;
-    const recipientId = ids?.find((accountId) => accountId !== me);
-
-    return recipientId ? state.accounts.get(recipientId) : undefined;
-  });
 
   const loadMessages = useCallback(() => {
     if (!id) return Promise.resolve([]);
@@ -105,30 +128,28 @@ export const MessageConversation: React.FC = () => {
     };
   }, [dispatch]);
 
-  const participantKey = conversation
-    ? (conversation.get('accounts') as Immutable.List<string>).sort().join(',')
-    : '';
+  const latestMatchingStatusId = useMemo(
+    () =>
+      conversationGroup.reduce<string | null>((latest, item) => {
+        const statusId = item.get('last_status') as string | null;
 
-  const latestMatchingStatusId = useAppSelector((state) => {
-    if (!participantKey) return null;
+        if (!statusId) return latest;
+        if (!latest || compareId(statusId, latest) > 0) return statusId;
 
-    return (state.conversations.get('items') as Immutable.List<
-      Immutable.Map<string, unknown>
-    >)
-      .filter(
-        (item) =>
-          (item.get('accounts') as Immutable.List<string>)
-            .sort()
-            .join(',') === participantKey,
-      )
-      .map((item) => item.get('last_status') as string | null)
-      .filter(Boolean)
-      .sort((a, b) => (a && b ? a.localeCompare(b) : 0))
-      .last();
-  });
+        return latest;
+      }, null),
+    [conversationGroup],
+  );
 
   useEffect(() => {
     if (!id || !latestMatchingStatusId) return;
+
+    setMessageStatusIds((current) =>
+      current.includes(latestMatchingStatusId)
+        ? current
+        : [...current, latestMatchingStatusId].sort(compareId),
+    );
+
     void loadMessages();
   }, [id, latestMatchingStatusId, loadMessages]);
 
@@ -138,17 +159,30 @@ export const MessageConversation: React.FC = () => {
     }
   }, [dispatch, id]);
 
+  const participantAccountIdsKey = participantIds.join(',');
+
   useEffect(() => {
-    if (!recipient) return;
+    if (participantAccounts.length === 0) return;
 
     dispatch(resetCompose());
-    dispatch(directCompose(recipient));
+
+    participantAccounts.forEach((account) => {
+      dispatch(directCompose(account));
+    });
+
     dispatch(dismissComposer());
 
     return () => {
       dispatch(resetCompose());
     };
-  }, [dispatch, recipient]);
+  }, [dispatch, participantAccountIdsKey, participantAccounts]);
+
+  const handleReply = useCallback(
+    (status: Immutable.Record<StatusShape>) => {
+      dispatch(replyCompose(status));
+    },
+    [dispatch],
+  );
 
   if (!conversation || statuses.length === 0) {
     return (
@@ -175,13 +209,13 @@ export const MessageConversation: React.FC = () => {
           <div className={classes.headerTitle}>
             <ChatCircleDotsIcon size={18} />
             <span>
-              {participantAccounts.size === 1 && participantAccounts.first() ? (
-                <DisplayNameSimple account={participantAccounts.first()} />
+              {participantAccounts.length === 1 && participantAccounts[0] ? (
+                <DisplayNameSimple account={participantAccounts[0]} />
               ) : (
                 <FormattedMessage
                   id='messages.conversation.participants'
                   defaultMessage='{count, plural, one {Message} other {Conversation}}'
-                  values={{ count: participantAccounts.size }}
+                  values={{ count: participantAccounts.length }}
                 />
               )}
             </span>
@@ -216,8 +250,16 @@ export const MessageConversation: React.FC = () => {
                 return !startsWithMention;
               });
 
+            const replyTargetId = status.get('in_reply_to_id') as
+              | string
+              | null;
+            const replyTarget = replyTargetId
+              ? statuses.find((candidate) => candidate.get('id') === replyTargetId)
+              : undefined;
+
             return (
               <article
+                id={`message-${status.get('id') as string}`}
                 key={status.get('id') as string}
                 className={classes.message}
                 data-own-message={isMine ? 'true' : 'false'}
@@ -231,6 +273,36 @@ export const MessageConversation: React.FC = () => {
                   )}
                   <RelativeTimestamp timestamp={status.get('created_at')} />
                 </div>
+
+                {replyTarget && (
+                  <button
+                    type='button'
+                    className={classes.replyContext}
+                    onClick={() =>
+                      document
+                        .getElementById(`message-${replyTargetId}`)
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                    }
+                  >
+                    <FormattedMessage
+                      id='messages.conversation.replying_to'
+                      defaultMessage='Replying to {name}: {text}'
+                      values={{
+                        name: (
+                          <DisplayNameSimple
+                            account={replyTarget.get('account')}
+                          />
+                        ),
+                        text: (
+                          (replyTarget.get('text') as string).slice(0, 80) +
+                          ((replyTarget.get('text') as string).length > 80
+                            ? '…'
+                            : '')
+                        ),
+                      }}
+                    />
+                  </button>
+                )}
 
                 <div className={classes.messageBody}>
                   <StatusContent
@@ -246,12 +318,23 @@ export const MessageConversation: React.FC = () => {
                     media={status.get('media_attachments')}
                   />
                 )}
+
+                <IconButton
+                  className={classes.replyButton}
+                  title={intl.formatMessage({
+                    id: 'status.reply',
+                    defaultMessage: 'Reply',
+                  })}
+                  icon='reply'
+                  iconComponent={ReplyIcon}
+                  onClick={() => handleReply(status)}
+                />
               </article>
             );
           })}
         </div>
 
-        {recipient && (
+        {participantAccounts.length > 0 && (
           <RedesignComposeForm
             className={classes.replyComposer}
             compact
