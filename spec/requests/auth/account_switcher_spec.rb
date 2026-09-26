@@ -11,6 +11,18 @@ RSpec.describe 'Auth Account Switcher' do
       sign_in current_user
     end
 
+  describe 'Account switcher credential' do
+    it 'is independent from SessionActivation credentials' do
+      token = current_user.account_switcher_token
+      current_user.session_activations.destroy_all
+
+      access_token = Doorkeeper::AccessToken.find_by(token: token)
+
+      expect(access_token).to be_present
+      expect(SessionActivation.exists?(access_token_id: access_token.id)).to be(false)
+    end
+  end
+
     it 'creates a fresh session from the target account persistent credential without revoking the current account' do
       target_token = target_user.account_switcher_token
 
