@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { ImmutablePureComponent } from 'react-immutable-pure-component';
 
+import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 import { VisibilityIcon } from '@/mastodon/components/visibility_icon';
 import RepeatIcon from '@/material-icons/400-24px/repeat.svg?react';
 import { Hotkeys } from '@/mastodon/components/hotkeys';
@@ -457,7 +458,13 @@ class Status extends ImmutablePureComponent {
       prepend = (
         <div className='status__prepend'>
           <div className='status__prepend__icon'>
-            <VisibilityIcon visibility='direct' />
+            <Icon
+              id='message'
+              icon={ChatCircleDotsIcon}
+              width={18}
+              height={18}
+              aria-hidden='true'
+            />
           </div>
           <FormattedMessage id='status.direct_indicator' defaultMessage='Private mention' tagName='span' />
         </div>
