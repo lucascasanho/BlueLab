@@ -101,6 +101,18 @@ export const NotificationGroupWithStatus: React.FC<{
     [dispatch, isPrivateMention, statusId],
   );
 
+  const handleStatusOpen = () => {
+    const isBlue2 =
+      typeof document !== 'undefined' &&
+      document.body.dataset.theme === 'blue-2';
+
+    if (isBlue2 && isPrivateMention) {
+      dispatch(openConversationForStatus(statusId));
+    } else {
+      dispatch(navigateToStatus(statusId));
+    }
+  };
+
   return (
     <Hotkeys handlers={handlers}>
       <div
@@ -149,7 +161,7 @@ export const NotificationGroupWithStatus: React.FC<{
 
           {statusId && (
             <div className='notification-group__main__status'>
-              <EmbeddedStatus statusId={statusId} />
+              <EmbeddedStatus statusId={statusId} onOpen={handleStatusOpen} />
             </div>
           )}
 
