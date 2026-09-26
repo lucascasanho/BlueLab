@@ -130,6 +130,9 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
         <div
           className={blue2Classes.root}
           data-bluelab-messages-advanced={multiColumn ? 'true' : undefined}
+          data-bluelab-messages-conversation={
+            activeConversationId ? 'true' : undefined
+          }
         >
           {activeConversationId ? (
             <MessageConversation
