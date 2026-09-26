@@ -13,7 +13,7 @@
   = render partial: 'shared/og'
 
 - unless omniauth_only?
-  = simple_form_for(resource, as: resource_name, url: session_path(resource_name, account_switcher: account_switcher_flow ? '1' : nil)) do |f|
+  = simple_form_for(resource, as: resource_name, url: account_switcher_flow ? auth_account_switcher_authenticate_path : session_path(resource_name)) do |f|
     .sign-in-introduction
       %h1.title= account_switcher_flow ? t('auth.sign_in.another_account.title') : t('auth.sign_in.title', domain: site_hostname)
       %p.lead= account_switcher_flow ? t('auth.sign_in.another_account.notice') : t('auth.sign_in.preamble_html', domain: site_hostname)
