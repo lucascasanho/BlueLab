@@ -27,13 +27,16 @@ RSpec.describe 'Admin Verification Requests' do
   describe 'POST approve' do
     it 'grants the Verificado role and resolves the request' do
       Fabricate(:user_role, name: UserRole::VERIFIED_ROLE_NAME)
+      Fabricate(:user_role, name: 'Verified')
 
-      post approve_admin_verification_request_path(verification_request)
+      I18n.with_locale(:en) do
+        post approve_admin_verification_request_path(verification_request)
+      end
 
       expect(response).to have_http_status(:see_other)
       expect(response).to redirect_to(admin_verification_requests_path(status: 'pending'))
       expect(verification_request.reload.status).to eq('approved')
-      expect(account.user.reload.role.name).to eq(UserRole::VERIFIED_ROLE_NAME)
+      expect(account.user.reload.role.name).to eq('Verified')
       expect(account.reload.verified_by_role_since).to be_present
     end
   end
