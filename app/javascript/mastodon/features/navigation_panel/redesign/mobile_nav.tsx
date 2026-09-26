@@ -31,9 +31,13 @@ export const RedesignMobileNavigation: React.FC = () => {
   const { accountId, signedIn } = useIdentity();
   const account = useAccount(accountId);
   const location = useLocation();
+  const blue2Pathname =
+    location.pathname.startsWith('/deck')
+      ? location.pathname.slice(5) || '/home'
+      : location.pathname;
   const isMessagesPage =
-    location.pathname === '/conversations' ||
-    location.pathname.startsWith('/conversations/');
+    blue2Pathname === '/conversations' ||
+    blue2Pathname.startsWith('/conversations/');
 
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
