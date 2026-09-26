@@ -123,7 +123,7 @@ export const RedesignNavigationPanel: React.FC<{
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   useEffect(() => {
-    if (!signedIn) return;
+    if (!signedIn || !isBlue2) return;
 
     dispatch(mountConversations());
     dispatch(expandConversations());
@@ -134,7 +134,7 @@ export const RedesignNavigationPanel: React.FC<{
       dispatch(unmountConversations());
       disconnect();
     };
-  }, [dispatch, signedIn]);
+  }, [dispatch, isBlue2, signedIn]);
 
   const openComposer = useCallback(() => {
     dispatch(closeNavigation());
