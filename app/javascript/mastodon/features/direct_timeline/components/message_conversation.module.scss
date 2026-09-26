@@ -346,24 +346,79 @@
 
 
 /*
- * BlueLab message layout sizing is isolated to the Blue2 theme. The outer
- * column owns the viewport and the message list is the only scrolling region,
- * leaving the reply composer anchored below it.
+ * BlueLab message conversations have their own layout contract. Only this
+ * theme/component uses these rules: the column fills its host, the history
+ * owns scrolling, and the composer stays outside that scroll region.
  */
+:global(body[data-theme='blue-2']) .column {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+}
+
+:global(body[data-theme='blue-2']) .page {
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+:global(body[data-theme='blue-2']) .messageList {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+:global(body[data-theme='blue-2']) .messageListContent {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100%;
+  margin-top: auto;
+  gap: var(--space-xs);
+}
+
+:global(body[data-theme='blue-2']) .replyComposer {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+:global(body[data-theme='blue-2'])
+  .replyComposer[data-bluelab-composer-compact='true']
+  [data-compose-scroll-container] {
+  overflow: hidden;
+}
+
+:global(body[data-theme='blue-2'])
+  .replyComposer[data-bluelab-composer-compact='true']
+  .richEditor {
+  max-height: 7rem;
+}
+
 @media (width <= 1174px) {
   :global(body[data-theme='blue-2']) .column {
     height: calc(100dvh - var(--mobile-bottom-nav-height, 64px));
   }
 
   :global(body[data-theme='blue-2']) .page {
-    min-height: 0;
-    padding-bottom: var(--space-2);
+    padding-bottom: calc(
+      var(--mobile-bottom-nav-height, 64px) +
+      env(safe-area-inset-bottom)
+    );
   }
 
-  :global(body[data-theme='blue-2']) .replyComposer {
-    margin-bottom: calc(
-      var(--mobile-bottom-nav-height, 64px) + env(safe-area-inset-bottom)
-    );
+  :global(.ui--mobile-chrome-hidden)
+    :global(body[data-theme='blue-2']) .page {
+    padding-bottom: 0;
+  }
+
+  :global(body[data-theme='blue-2'])
+    .replyComposer[data-bluelab-composer-compact='true'] {
+    padding-bottom: 0;
   }
 }
 
@@ -371,5 +426,10 @@
   :global(body[data-theme='blue-2']) .advancedColumn {
     height: 100dvh;
     max-height: 100dvh;
+    min-height: 0;
+  }
+
+  :global(body[data-theme='blue-2']) .page {
+    min-height: 0;
   }
 }
