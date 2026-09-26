@@ -455,7 +455,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     return renderShell(
       <>
         <ColumnHeader
-          withBackButton={!inline}
+          withBackButton
           onBackButtonClick={onBack}
           title={intl.formatMessage(messages.title)}
         />
