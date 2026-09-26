@@ -102,6 +102,13 @@
   overflow: hidden;
 }
 
+.root[data-bluelab-messages-conversation='true'] > * {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+
 
 .root[data-bluelab-messages-advanced='true'] .inbox,
 .root[data-bluelab-messages-advanced='true'] .listWrap,
