@@ -68,6 +68,9 @@ export const openConversationForStatus = statusId => dispatch =>
     .then(conversationId => {
       browserHistory.push(`/conversations/${conversationId}`);
       return conversationId;
+    })
+    .catch(() => {
+      browserHistory.push('/conversations');
     });
 
 export const fetchConversationMessages = conversationId => dispatch =>
