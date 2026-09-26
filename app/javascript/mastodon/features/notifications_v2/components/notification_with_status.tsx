@@ -97,6 +97,18 @@ export const NotificationWithStatus: React.FC<{
 
   if (!statusId || isFiltered) return null;
 
+  const handleStatusOpen = () => {
+    const isBlue2 =
+      typeof document !== 'undefined' &&
+      document.body.dataset.theme === 'blue-2';
+
+    if (isBlue2 && isPrivateMention) {
+      dispatch(openConversationForStatus(statusId));
+    } else {
+      dispatch(navigateToStatus(statusId));
+    }
+  };
+
   return (
     <Hotkeys handlers={handlers}>
       <div
@@ -120,6 +132,7 @@ export const NotificationWithStatus: React.FC<{
         <Status
           id={statusId}
           contextType='notifications'
+          onOpen={handleStatusOpen}
           withDismiss
           skipPrepend
           avatarSize={40}
