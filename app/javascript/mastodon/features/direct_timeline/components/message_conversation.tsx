@@ -5,8 +5,9 @@ import { useParams } from 'react-router-dom';
 
 import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 
-import ReplyIcon from '@/material-icons/400-24px/reply.svg?react';
 import { Helmet } from '@unhead/react/helmet';
+
+import ReplyIcon from '@/material-icons/400-24px/reply.svg?react';
 
 import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
 
@@ -29,14 +30,14 @@ import AttachmentList from '@/mastodon/components/attachment_list';
 import StatusContent from '@/mastodon/components/status/legacy/content';
 import { DisplayNameSimple } from '@/mastodon/components/display_name/simple';
 import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
+import { compareId } from '@/mastodon/compare_id';
+import { IconButton } from '@/mastodon/components/icon_button';
 import { me } from '@/mastodon/initial_state';
 import type { StatusShape } from '@/mastodon/models/status';
 import { makeGetStatus } from '@/mastodon/selectors';
-import { compareId } from '@/mastodon/compare_id';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { groupConversations } from '../conversation_grouping';
-import { IconButton } from '@/mastodon/components/icon_button';
 
 import classes from './message_conversation.module.scss';
 
@@ -82,7 +83,7 @@ export const MessageConversation: React.FC = () => {
   }, [conversation, conversationItems]);
 
   const participantIds = useMemo(() => {
-    const ids = new Set();
+    const ids = new Set<string>();
 
     conversationGroup.forEach((item) => {
       item.get('accounts').forEach((accountId) => {
@@ -196,11 +197,6 @@ export const MessageConversation: React.FC = () => {
       </Column>
     );
   }
-
-  const participantAccounts = accounts.filter(
-    (account): account is NonNullable<typeof account> =>
-      account !== undefined && account !== null && account.get('id') !== me,
-  );
 
   return (
     <Column label={intl.formatMessage(messages.title)}>
