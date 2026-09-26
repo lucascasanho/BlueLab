@@ -154,6 +154,16 @@
 .blue2MessagesMain {
   padding-bottom: 0 !important;
   contain: none;
+
+  @media (width <= 1174px) {
+    padding-bottom: var(--mobile-bottom-nav-height) !important;
+  }
+
+  @media (width <= 1174px) {
+    :global(.ui--mobile-chrome-hidden) & {
+      padding-bottom: 0 !important;
+    }
+  }
 }
 
 .blue2RightRail {
