@@ -336,7 +336,7 @@ export const RedesignNavigationPanel: React.FC<{
                   description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
                 />
               </NavigationLink>
-              {mode !== 'slide-out' && (
+              {!isBlue2 && (
                 <NavigationLink
                   stacked
                   to='/favourites'
