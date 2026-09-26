@@ -105,13 +105,13 @@ export const Conversation: React.FC<{
   const pointerActivationRef = useRef<number | null>(null);
 
   const handleClick = useCallback(() => {
-    if (unread) {
-      dispatch(markConversationRead(id));
-    }
-
     if (onOpenConversation) {
       onOpenConversation(id);
       return;
+    }
+
+    if (unread) {
+      dispatch(markConversationRead(id));
     }
 
     if (lastStatus) {
