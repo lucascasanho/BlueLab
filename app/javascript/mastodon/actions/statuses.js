@@ -1,6 +1,7 @@
 import { defineMessages } from 'react-intl';
 
 import { browserHistory } from 'mastodon/components/router';
+import { FOCUS_TARGET } from 'mastodon/components/navigation_focus_target';
 
 import api from '../api';
 
@@ -363,7 +364,9 @@ export const navigateToStatus = (statusId) => {
     const acct = state.accounts.getIn([accountId, 'acct']);
 
     if (acct) {
-      browserHistory.push(`/@${acct}/${statusId}`);
+      browserHistory.push(`/@${acct}/${statusId}`, {
+        focusTarget: FOCUS_TARGET.POST,
+      });
     }
   };
 };
