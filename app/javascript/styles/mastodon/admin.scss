@@ -1231,6 +1231,18 @@ a.name-tag,
     min-width: 0;
     max-width: 100%;
   }
+
+  .button.button--dangerous {
+    background-color: var(--color-bg-error-base) !important;
+    color: var(--color-text-on-error-base) !important;
+
+    &:active,
+    &:focus,
+    &:hover {
+      background-color: var(--color-bg-error-base-hover) !important;
+      color: var(--color-text-on-error-base) !important;
+    }
+  }
 }
 
 .verification-request-action-bar {
@@ -1240,8 +1252,51 @@ a.name-tag,
 .verification-request-heading-actions {
   @media screen and (max-width: $no-columns-breakpoint) {
     width: 100%;
+    flex-direction: column;
+    align-items: stretch;
     justify-content: flex-start;
+
+    & > form,
+    & > a {
+      width: 100%;
+      flex: 1 1 auto;
+    }
+
+    .button {
+      width: 100%;
+    }
   }
+}
+
+.verification-requests-list {
+  @media screen and (max-width: $no-columns-breakpoint) {
+    .verification-request-action-bar {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    .verification-request-actions {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+
+      & > form,
+      & > a {
+        flex: 1 1 100%;
+        width: 100%;
+      }
+
+      .button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.verification-request-meta-separator {
+  color: var(--color-text-tertiary);
 }
 
 .verification-requests-list {
