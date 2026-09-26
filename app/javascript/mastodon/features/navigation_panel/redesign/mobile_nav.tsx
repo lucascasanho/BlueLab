@@ -36,6 +36,11 @@ export const RedesignMobileNavigation: React.FC = () => {
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
   );
+  const unreadMessagesCount = useAppSelector((state) => {
+    const conversations = state.conversations.get('items');
+
+    return conversations.some((conversation) => conversation.get('unread'));
+  });
 
   if (!signedIn) {
     return <SlideOutNavigation />;
@@ -57,7 +62,11 @@ export const RedesignMobileNavigation: React.FC = () => {
           >
             <FormattedMessage id='tabs_bar.search' defaultMessage='Search' />
           </MobileNavLink>
-          <MobileNavLink to='/conversations' iconComponent={ChatCircleDotsIcon}>
+          <MobileNavLink
+            to='/conversations'
+            iconComponent={ChatCircleDotsIcon}
+            withDot={unreadMessagesCount}
+          >
             <FormattedMessage
               id='tabs_bar.messages'
               defaultMessage='Messages'
