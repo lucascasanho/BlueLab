@@ -9,7 +9,7 @@ class REST::AccountSerializer < ActiveModel::Serializer
   attributes :id, :username, :acct, :display_name, :locked, :bot, :discoverable, :indexable, :group, :created_at,
              :note, :url, :uri, :avatar, :avatar_static, :avatar_description, :header, :header_static, :header_description,
              :followers_count, :following_count, :statuses_count, :last_status_at, :hide_collections,
-             :show_media, :show_media_replies, :show_featured, :verified_by_role, :verified_by_role_since,
+             :show_media, :show_media_replies, :show_featured, :verified_by_role, :verified_by_role_since, :verified_badge_visible,
              :instance_verification
 
   has_one :moved_to_account, key: :moved, serializer: REST::AccountSerializer, if: :moved_and_not_nested?
@@ -185,6 +185,12 @@ class REST::AccountSerializer < ActiveModel::Serializer
     else
       object.remote_instance_verification.present?
     end
+  end
+
+  def verified_badge_visible
+    return false if object.unavailable?
+
+    object.verified_badge_visible?
   end
 
   def verified_by_role_since

@@ -87,6 +87,7 @@ export interface BaseApiAccountJSON {
   invalid_handle?: boolean;
   verified_by_role?: boolean;
   verified_by_role_since?: string | null;
+  verified_badge_visible?: boolean;
   instance_verification?: ApiInstanceVerificationJSON | null;
 }
 

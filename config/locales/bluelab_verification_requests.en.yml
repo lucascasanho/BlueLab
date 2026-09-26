@@ -1,0 +1,34 @@
+en:
+  admin:
+    verification_requests:
+      title: Verification requests
+      pending: Pending
+      all: All
+      resolved: Resolved
+      id: ID
+      account: Account
+      requested_at: Requested at
+      explanation: Message
+      status: Status
+      status_pending: Pending
+      status_approved: Approved and verified
+      status_denied: Denied
+      view: View
+      approve: Grant verification
+      deny: Close without granting
+      back: Back to verification requests
+      details: Request details
+      resolved_by: Resolved by
+      resolved_at: Resolved at
+      approved_msg: Verification badge granted and request resolved.
+      denied_msg: Verification request closed without granting the badge.
+      already_resolved: This verification request has already been resolved.
+      verified_role_missing: The "Verificado" role does not exist.
+      role_not_assignable: You cannot assign the "Verificado" role because its position is above your role.
+      account_unavailable: This account no longer has a local user.
+      role_would_be_downgraded: The request cannot be approved because it would replace a higher role with "Verificado".
+      empty: No verification requests found.
+  notification_mailer:
+    admin:
+      verification_request:
+        subject: "%{name} requested a verification badge"

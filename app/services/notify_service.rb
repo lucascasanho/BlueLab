@@ -7,6 +7,7 @@ class NotifyService < BaseService
   NON_EMAIL_TYPES = %i(
     admin.report
     admin.sign_up
+    admin.verification_request
     update
     quoted_update
     poll

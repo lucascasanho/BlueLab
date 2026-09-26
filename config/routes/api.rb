@@ -140,6 +140,8 @@ namespace :api, format: false do
       scope module: :profile do
         resource :avatar, only: :destroy
         resource :header, only: :destroy
+        resource :verification_request, only: [:show, :create]
+        resource :verification_badge, only: :update
       end
     end
 

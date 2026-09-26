@@ -1,0 +1,34 @@
+pt-BR:
+  admin:
+    verification_requests:
+      title: Solicitações de verificação
+      pending: Pendentes
+      all: Todas
+      resolved: Resolvidas
+      id: ID
+      account: Conta
+      requested_at: Solicitada em
+      explanation: Mensagem
+      status: Status
+      status_pending: Pendente
+      status_approved: Aprovada e verificada
+      status_denied: Negada
+      view: Ver
+      approve: Conceder verificação
+      deny: Encerrar sem conceder
+      back: Voltar às solicitações de verificação
+      details: Detalhes da solicitação
+      resolved_by: Resolvida por
+      resolved_at: Resolvida em
+      approved_msg: Selo de verificado concedido e solicitação resolvida.
+      denied_msg: Solicitação de verificação encerrada sem conceder o selo.
+      already_resolved: Esta solicitação de verificação já foi resolvida.
+      verified_role_missing: O cargo "Verificado" não existe.
+      role_not_assignable: Você não pode conceder o cargo "Verificado" porque a posição dele está acima da sua.
+      account_unavailable: Esta conta não possui mais um usuário local.
+      role_would_be_downgraded: A solicitação não pode ser aprovada porque substituiria um cargo superior pelo "Verificado".
+      empty: Nenhuma solicitação de verificação encontrada.
+  notification_mailer:
+    admin:
+      verification_request:
+        subject: "%{name} solicitou um selo de verificado"

@@ -1,0 +1,41 @@
+- content_for :page_title do
+  = t('admin.verification_requests.title')
+
+.filters
+  .filter-subset
+    %strong= t('admin.verification_requests.status')
+    %ul
+      %li= filter_link_to t('admin.verification_requests.pending'), status: 'pending'
+      %li= filter_link_to t('admin.verification_requests.all'), status: 'all'
+      %li= filter_link_to t('admin.verification_requests.resolved'), status: 'resolved'
+
+- if @verification_requests.empty?
+  = nothing_here 'nothing-here--under-tabs'
+- else
+  .table-wrapper
+    %table.table
+      %thead
+        %tr
+          %th= t('admin.verification_requests.id')
+          %th= t('admin.verification_requests.account')
+          %th= t('admin.verification_requests.requested_at')
+          %th= t('admin.verification_requests.explanation')
+          %th= t('admin.verification_requests.status')
+          %th
+      %tbody
+        - @verification_requests.each do |verification_request|
+          %tr
+            %td= verification_request.id
+            %td= admin_account_link_to verification_request.account
+            %td
+              %time.time-ago{ datetime: verification_request.created_at.iso8601, title: l(verification_request.created_at) }
+                = l(verification_request.created_at)
+            %td
+              .one-line= truncate(verification_request.explanation, length: 120)
+            %td= t("admin.verification_requests.status_#{verification_request.status}")
+            %td
+              = link_to t('admin.verification_requests.view'), admin_verification_request_path(verification_request)
+              - if verification_request.pending?
+                = link_to t('admin.verification_requests.approve'), approve_admin_verification_request_path(verification_request), method: :post, class: 'table-action-link', data: { confirm: t('admin.accounts.are_you_sure') }
+                = link_to t('admin.verification_requests.deny'), deny_admin_verification_request_path(verification_request), method: :post, class: 'table-action-link', data: { confirm: t('admin.accounts.are_you_sure') }
+  = paginate @verification_requests

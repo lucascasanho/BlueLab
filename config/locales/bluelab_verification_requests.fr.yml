@@ -1,0 +1,34 @@
+fr:
+  admin:
+    verification_requests:
+      title: Demandes de vérification
+      pending: En attente
+      all: Toutes
+      resolved: Résolues
+      id: ID
+      account: Compte
+      requested_at: Demandée le
+      explanation: Message
+      status: Statut
+      status_pending: En attente
+      status_approved: Approuvée et vérifiée
+      status_denied: Refusée
+      view: Voir
+      approve: Accorder la vérification
+      deny: Clôturer sans accorder
+      back: Retour aux demandes de vérification
+      details: Détails de la demande
+      resolved_by: Résolue par
+      resolved_at: Résolue le
+      approved_msg: Badge de vérification accordé et demande résolue.
+      denied_msg: Demande de vérification clôturée sans accorder le badge.
+      already_resolved: Cette demande de vérification a déjà été résolue.
+      verified_role_missing: Le rôle « Verificado » n’existe pas.
+      role_not_assignable: Vous ne pouvez pas attribuer le rôle « Verificado » car sa position est supérieure à la vôtre.
+      account_unavailable: Ce compte n’a plus d’utilisateur local.
+      role_would_be_downgraded: La demande ne peut pas être approuvée car elle remplacerait un rôle supérieur par « Verificado ».
+      empty: Aucune demande de vérification trouvée.
+  notification_mailer:
+    admin:
+      verification_request:
+        subject: "%{name} a demandé un badge de vérification"

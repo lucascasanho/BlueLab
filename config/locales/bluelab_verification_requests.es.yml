@@ -1,0 +1,34 @@
+es:
+  admin:
+    verification_requests:
+      title: Solicitudes de verificación
+      pending: Pendientes
+      all: Todas
+      resolved: Resueltas
+      id: ID
+      account: Cuenta
+      requested_at: Solicitada el
+      explanation: Mensaje
+      status: Estado
+      status_pending: Pendiente
+      status_approved: Aprobada y verificada
+      status_denied: Denegada
+      view: Ver
+      approve: Conceder verificación
+      deny: Cerrar sin conceder
+      back: Volver a las solicitudes de verificación
+      details: Detalles de la solicitud
+      resolved_by: Resuelta por
+      resolved_at: Resuelta el
+      approved_msg: Insignia de verificación concedida y solicitud resuelta.
+      denied_msg: Solicitud de verificación cerrada sin conceder la insignia.
+      already_resolved: Esta solicitud de verificación ya fue resuelta.
+      verified_role_missing: El rol "Verificado" no existe.
+      role_not_assignable: No puedes conceder el rol "Verificado" porque su posición está por encima de la tuya.
+      account_unavailable: Esta cuenta ya no tiene un usuario local.
+      role_would_be_downgraded: No se puede aprobar la solicitud porque sustituiría un rol superior por "Verificado".
+      empty: No se encontraron solicitudes de verificación.
+  notification_mailer:
+    admin:
+      verification_request:
+        subject: "%{name} solicitó una insignia de verificación"

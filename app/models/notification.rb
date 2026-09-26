@@ -87,6 +87,10 @@ class Notification < ApplicationRecord
       filterable: false,
       baseline: false,
     }.freeze,
+    'admin.verification_request': {
+      filterable: false,
+      baseline: false,
+    }.freeze,
     quote: {
       filterable: true,
       baseline: true,
@@ -250,6 +254,8 @@ class Notification < ApplicationRecord
       self.from_account_id = activity&.status&.account_id
     when 'Account'
       self.from_account_id = activity&.id
+    when 'VerificationRequest'
+      self.from_account_id = activity&.account_id
     when 'AccountRelationshipSeveranceEvent', 'AccountWarning', 'GeneratedAnnualReport'
       # These do not really have an originating account, but this is mandatory
       # in the data model, and the recipient's account will by definition

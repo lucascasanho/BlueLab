@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+class AddVerifiedBadgeVisibleToAccounts < ActiveRecord::Migration[8.0]
+  def change
+    add_column :accounts, :verified_badge_visible, :boolean, null: false, default: true
+  end
+end

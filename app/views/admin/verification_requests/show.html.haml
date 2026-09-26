@@ -1,0 +1,36 @@
+- content_for :page_title do
+  = t('admin.verification_requests.title')
+
+- content_for :heading_actions do
+  = link_to t('admin.verification_requests.back'), admin_verification_requests_path(status: 'pending'), class: 'button'
+
+  - if @verification_request.pending?
+    = link_to t('admin.verification_requests.approve'), approve_admin_verification_request_path(@verification_request), method: :post, class: 'button', data: { confirm: t('admin.accounts.are_you_sure') }
+    = link_to t('admin.verification_requests.deny'), deny_admin_verification_request_path(@verification_request), method: :post, class: 'button', data: { confirm: t('admin.accounts.are_you_sure') }
+
+.report-card
+  %h2= t('admin.verification_requests.details')
+
+  %dl
+    %div
+      %dt= t('admin.verification_requests.account')
+      %dd= admin_account_link_to @verification_request.account
+    %div
+      %dt= t('admin.verification_requests.requested_at')
+      %dd
+        %time{ datetime: @verification_request.created_at.iso8601 }= l(@verification_request.created_at)
+    %div
+      %dt= t('admin.verification_requests.status')
+      %dd= t("admin.verification_requests.status_#{@verification_request.status}")
+    - if @verification_request.explanation.present?
+      %div
+        %dt= t('admin.verification_requests.explanation')
+        %dd= simple_format(@verification_request.explanation)
+    - if @verification_request.resolved?
+      %div
+        %dt= t('admin.verification_requests.resolved_by')
+        %dd= admin_account_link_to @verification_request.resolved_by_account
+      %div
+        %dt= t('admin.verification_requests.resolved_at')
+        %dd
+          %time{ datetime: @verification_request.resolved_at.iso8601 }= l(@verification_request.resolved_at)
