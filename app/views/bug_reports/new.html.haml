@@ -1,0 +1,46 @@
+- content_for :page_title do
+  = t('bug_reports.title')
+
+- content_for :blue2_auth_title do
+  = t('bug_reports.title')
+
+- content_for :blue2_auth_subtitle do
+  = t('bug_reports.lead')
+
+- content_for :header_tags do
+  = vite_stylesheet_tag 'styles/bug_reports.scss', media: 'all'
+
+.bug-report-page
+  - if @error_page.present?
+    .bug-report-page__context
+      = t('bug_reports.error_page', code: @error_page)
+
+  = form_with url: bug_reports_path, method: :post, multipart: true, local: true, html: { id: 'bug-report-form', class: 'simple_form' } do
+    = hidden_field_tag :error_page, @error_page
+    = hidden_field_tag :current_path, @current_path
+    = hidden_field_tag :interface_language, I18n.locale.to_s
+    = hidden_field_tag :theme, current_theme
+    = hidden_field_tag :interface_layout, @interface_layout
+    = hidden_field_tag :viewport
+    = hidden_field_tag :app_version, Rails.configuration.x.mastodon.version
+    = hidden_field_tag :client_errors
+
+    .fields-group
+      %label{ for: 'bug-report-description' }= t('bug_reports.description')
+      = text_area_tag :description, @bug_report&.description, id: 'bug-report-description', maxlength: BugReport::MAX_DESCRIPTION_LENGTH, required: true, rows: 8, placeholder: t('bug_reports.placeholder')
+      %span.hint= t('bug_reports.character_limit', count: BugReport::MAX_DESCRIPTION_LENGTH)
+
+    .fields-group
+      %label{ for: 'bug-report-files' }= t('bug_reports.attachments')
+      %span.hint= t('bug_reports.attachment_hint')
+      = file_field_tag 'files[]', id: 'bug-report-files', multiple: true, accept: 'image/*,video/*,audio/*'
+
+    .bug-report-page__notice
+      = t('bug_reports.diagnostic_notice')
+
+    - if @bug_report&.errors&.any?
+      = render 'shared/error_messages', object: @bug_report
+
+    .actions
+      = submit_tag t('bug_reports.submit'), class: 'button'
+      = link_to t('bug_reports.back'), request.referer.presence || root_path, class: 'button button-secondary'
