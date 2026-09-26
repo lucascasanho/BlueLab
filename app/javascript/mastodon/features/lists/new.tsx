@@ -287,6 +287,9 @@ const NewListWrapper: React.FC<{
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const history = useHistory();
+  const isBlue2 =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'blue-2';
   const { signedIn } = useIdentity();
   const { id } = useParams<{ id?: string }>();
   const list = useAppSelector((state) =>
@@ -301,7 +304,7 @@ const NewListWrapper: React.FC<{
 
   const isLoading = id && !list;
   const title = intl.formatMessage(
-    id ? messages.edit : messagesLegacy.create,
+    id ? messages.edit : isBlue2 ? messagesLegacy.create : messages.create,
   );
 
   return (
@@ -309,7 +312,9 @@ const NewListWrapper: React.FC<{
       {isRedesignEnabled() ? (
         <ColumnHeader
           withBackButton
-          onBackButtonClick={() => history.push('/lists')}
+          {...(isBlue2
+            ? { onBackButtonClick: () => history.push('/lists') }
+            : {})}
           title={title}
         />
       ) : (
