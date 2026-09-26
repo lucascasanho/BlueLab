@@ -165,7 +165,7 @@ RSpec.describe 'API V1 Conversations' do
       )
       sent = PostStatusService.new.call(
         user.account,
-        text: 'Hello Joe',
+        text: "@#{other.account.username} Hello Joe",
         visibility: :direct,
       )
 
