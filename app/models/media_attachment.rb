@@ -215,7 +215,7 @@ class MediaAttachment < ApplicationRecord
   validates_attachment_size :thumbnail, less_than: ->(_) { MediaAttachment.image_limit }
   remotable_attachment :thumbnail, -> { MediaAttachment.image_limit }, suppress_errors: true, download_on_assign: false
 
-  validates :account, presence: true
+  validates :account, presence: true, unless: -> { bug_report_id.present? }
   validates :description, length: { maximum: MAX_DESCRIPTION_LENGTH }, if: :local?
   validates :file, presence: true, if: :local?
   validates :thumbnail, absence: true, if: -> { local? && !audio_or_video? }
