@@ -100,13 +100,13 @@ export const MessageConversation: React.FC = () => {
 
     return conversationItems
       .filter((item) => {
+        const itemParticipants = item.get('accounts') as
+          | Immutable.List<string>
+          | undefined;
         const sameParticipants =
-          ImmutableList.isList(item.get('accounts')) &&
+          ImmutableList.isList(itemParticipants) &&
           ImmutableList.isList(targetParticipants) &&
-          item
-            .get('accounts')
-            .sort()
-            .equals(targetParticipants.sort());
+          itemParticipants.sort().equals(targetParticipants.sort());
 
         const sameNativeConversation =
           !!nativeConversationId &&
@@ -505,7 +505,10 @@ export const MessageConversation: React.FC = () => {
                     onClick={() => handleReply(status)}
                   />
                   <IconButton
-                    className={classes.messageAction}
+                    className={
+                      classes.messageAction + ' ' + classes.messageFavourite
+                    }
+                    animate
                     active={!!status.get('favourited')}
                     title={intl.formatMessage(
                       status.get('favourited')
