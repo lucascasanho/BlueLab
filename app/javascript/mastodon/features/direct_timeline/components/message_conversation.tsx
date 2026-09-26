@@ -208,9 +208,12 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   }, [dispatch, id, sourceStatusId]);
 
   useEffect(() => {
-    dispatch(mountConversations());
-    dispatch(expandConversations());
-    const disconnect = dispatch(connectDirectStream());
+    if (!inline) {
+      dispatch(mountConversations());
+      dispatch(expandConversations());
+    }
+
+    const disconnect = inline ? undefined : dispatch(connectDirectStream());
 
     let cancelled = false;
 
@@ -245,10 +248,12 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
     return () => {
       cancelled = true;
-      dispatch(unmountConversations());
-      disconnect();
+      if (!inline) {
+        dispatch(unmountConversations());
+        disconnect?.();
+      }
     };
-  }, [dispatch, id]);
+  }, [dispatch, id, inline]);
 
   const latestThreadStatusId = useMemo(
     () =>
