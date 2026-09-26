@@ -88,6 +88,28 @@ RSpec.describe UserRole do
     end
   end
 
+  describe '.verifies_instance_profile?' do
+    it 'recognizes the Portuguese verification role name without privileges' do
+      role = Fabricate(:user_role, name: 'Verificado', permissions: UserRole::Flags::NONE)
+      expect(role).to be_verified_by_instance
+    end
+
+    it 'recognizes the English verification role name without privileges' do
+      role = Fabricate(:user_role, name: 'Verified', permissions: UserRole::Flags::NONE)
+      expect(role).to be_verified_by_instance
+    end
+
+    it 'keeps admin and moderation privilege based verification working' do
+      role = Fabricate(:user_role, permissions: UserRole::VERIFICATION_PRIVILEGES.map { |name| UserRole::FLAGS.fetch(name) }.reduce(0, :|))
+      expect(role).to be_verified_by_instance
+    end
+
+    it 'does not treat similar role names as verification roles' do
+      role = Fabricate(:user_role, name: 'verified', permissions: UserRole::Flags::NONE)
+      expect(role).not_to be_verified_by_instance
+    end
+  end
+
   describe '#can?' do
     subject { Fabricate :user_role }
 
