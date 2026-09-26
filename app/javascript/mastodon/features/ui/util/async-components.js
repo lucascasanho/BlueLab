@@ -34,6 +34,12 @@ export function DirectTimeline() {
   return import('../../direct_timeline');
 }
 
+export function MessageConversation() {
+  return import('../../direct_timeline/components/message_conversation').then(
+    module => ({ default: module.MessageConversation }),
+  );
+}
+
 export function ListTimeline () {
   return import('../../list_timeline');
 }
