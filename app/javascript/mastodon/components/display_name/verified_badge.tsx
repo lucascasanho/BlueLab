@@ -142,7 +142,7 @@ export function hasVerifiedRole(account: DisplayNameProps['account']) {
   }
 
   return Array.from(account.roles).some(
-    (role) => VERIFIED_ROLE_NAMES.includes(role.name as (typeof VERIFIED_ROLE_NAMES)[number]),
+    (role) => VERIFIED_ROLE_NAMES.some((name) => role.name === name),
   );
 }
 
