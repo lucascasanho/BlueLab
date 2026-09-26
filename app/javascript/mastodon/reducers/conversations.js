@@ -25,6 +25,7 @@ const initialState = ImmutableMap({
 const conversationToMap = item => ImmutableMap({
   id: item.id,
   conversation_id: item.conversation_id,
+  thread_id: item.thread_id || item.conversation_id || item.id,
   unread: item.unread,
   accounts: ImmutableList(item.accounts.map(a => a.id)),
   last_status: item.last_status ? item.last_status.id : null,
