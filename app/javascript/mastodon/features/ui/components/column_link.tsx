@@ -83,7 +83,7 @@ export const ColumnLink: React.FC<{
     return (
       <NavLink
         to={to}
-        className={() => classNames(className, { active })}
+        className={classNames(className, { active })}
         activeClassName=''
         exact={exact}
         isActive={isActiveProp}

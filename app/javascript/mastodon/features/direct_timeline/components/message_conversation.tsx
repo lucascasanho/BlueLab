@@ -80,9 +80,9 @@ export const MessageConversation: React.FC = () => {
     if (!conversation) return [];
 
     if (nativeConversationId) {
-      return conversationItems.filter(
-        (item) => item.get('conversation_id') === nativeConversationId,
-      ).toArray();
+      return conversationItems
+        .filter((item) => item.get('conversation_id') === nativeConversationId)
+        .toArray();
     }
 
     return conversationItems
@@ -314,7 +314,8 @@ export const MessageConversation: React.FC = () => {
                         defaultMessage: 'Replying to {name}',
                       },
                       {
-                        name: replyTarget.getIn(['account', 'display_name']) ||
+                        name:
+                          replyTarget.getIn(['account', 'display_name']) ||
                           replyTarget.getIn(['account', 'username']),
                       },
                     )}

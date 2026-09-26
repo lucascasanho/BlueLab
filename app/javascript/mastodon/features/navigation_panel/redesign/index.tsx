@@ -170,6 +170,14 @@ export const RedesignNavigationPanel: React.FC<{
                 defaultMessage='Explore'
               />
             </NavigationLink>
+            {mode === 'slide-out' && isBlue2 && (
+              <NavigationLink to='/favourites' iconComponent={StarIcon}>
+                <FormattedMessage
+                  id='navigation_bar.favourites'
+                  defaultMessage='Favorites'
+                />
+              </NavigationLink>
+            )}
             <NavigationLink
               withSpaceAfter
               to='/public/local'
@@ -276,108 +284,59 @@ export const RedesignNavigationPanel: React.FC<{
             )}
           </ul>
           <footer className={classes.footer} data-stuck={!isScrolledToBottom}>
-            {mode !== 'slide-out' && (
-              <>
-                <ul className={classes.footerNav}>
-                  <NavigationLink
-                    stacked
-                    to='/notifications'
-                    iconComponent={BellIcon}
-                    badgeCount={notificationsCount}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.notifications'
-                      defaultMessage='Notifications'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/conversations'
-                    iconComponent={ChatCircleDotsIcon}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.messages'
-                      defaultMessage='Messages'
-                      description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/favourites'
-                    iconComponent={StarIcon}
-                  >
-                    <FormattedMessage
-                      id='navigation_bar.favourites'
-                      defaultMessage='Favorites'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/bookmarks'
-                    iconComponent={BookmarkSimpleIcon}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.saved'
-                      defaultMessage='Saved'
-                    />
-                  </NavigationLink>
-                </ul>
-                <NavigationAccountCardAndMenu />
-              </>
-            )}
-            {mode === 'slide-out' && (
-              <>
-                <ul className={classes.footerNav}>
-                  <NavigationLink
-                    stacked
-                    to='/notifications'
-                    iconComponent={BellIcon}
-                    badgeCount={notificationsCount}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.notifications'
-                      defaultMessage='Notifications'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/conversations'
-                    iconComponent={ChatCircleDotsIcon}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.messages'
-                      defaultMessage='Messages'
-                      description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/favourites'
-                    iconComponent={StarIcon}
-                  >
-                    <FormattedMessage
-                      id='navigation_bar.favourites'
-                      defaultMessage='Favorites'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/bookmarks'
-                    iconComponent={BookmarkSimpleIcon}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.saved'
-                      defaultMessage='Saved'
-                    />
-                  </NavigationLink>
-                </ul>
-                <NavigationAccountCardAndMenu inSlideOut />
-              </>
+            <ul className={classes.footerNav}>
+              <NavigationLink
+                stacked
+                to='/notifications'
+                iconComponent={BellIcon}
+                badgeCount={notificationsCount}
+              >
+                <FormattedMessage
+                  id='tabs_bar.notifications'
+                  defaultMessage='Notifications'
+                />
+              </NavigationLink>
+              <NavigationLink
+                stacked
+                to='/conversations'
+                iconComponent={ChatCircleDotsIcon}
+              >
+                <FormattedMessage
+                  id='tabs_bar.messages'
+                  defaultMessage='Messages'
+                  description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
+                />
+              </NavigationLink>
+              {mode !== 'slide-out' && (
+                <NavigationLink
+                  stacked
+                  to='/favourites'
+                  iconComponent={StarIcon}
+                >
+                  <FormattedMessage
+                    id='navigation_bar.favourites'
+                    defaultMessage='Favorites'
+                  />
+                </NavigationLink>
+              )}
+              <NavigationLink
+                stacked
+                to='/bookmarks'
+                iconComponent={BookmarkSimpleIcon}
+              >
+                <FormattedMessage id='tabs_bar.saved' defaultMessage='Saved' />
+              </NavigationLink>
+            </ul>
+            {mode === 'slide-out' ? (
+              <NavigationAccountCardAndMenu inSlideOut />
+            ) : (
+              <NavigationAccountCardAndMenu />
             )}
             {!multiColumn && (
               <NavigationFooterLinks
                 multiColumn={multiColumn}
                 siteName={siteName}
+                variant={isBlue2 ? 'blue2' : 'default'}
               />
             )}
           </footer>
@@ -390,6 +349,7 @@ export const RedesignNavigationPanel: React.FC<{
             <NavigationFooterLinks
               multiColumn={multiColumn}
               siteName={siteName}
+              variant={isBlue2 ? 'blue2' : 'default'}
             />
           )}
         </footer>

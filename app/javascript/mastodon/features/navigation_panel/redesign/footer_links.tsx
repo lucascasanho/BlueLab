@@ -1,11 +1,10 @@
 import { FormattedMessage } from 'react-intl';
 
-import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
-import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
-
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 
+import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
+import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
 import { domain, termsOfServiceEnabled } from '@/mastodon/initial_state';
 
 import classes from './footer_links.module.scss';
@@ -14,9 +13,12 @@ export const NavigationFooterLinks: React.FC<{
   siteName?: string;
   multiColumn?: boolean;
   variant?: 'default' | 'blue2';
-}> = ({ siteName = domain, multiColumn, variant = 'default' }) => {
+}> = ({
+  siteName = domain,
+  multiColumn,
+  variant = 'default',
+}) => {
   const openBugReport = useOpenBugReport();
-
   const multiColumnLinkAttrs = multiColumn
     ? {
         target: '_blank',
@@ -30,7 +32,9 @@ export const NavigationFooterLinks: React.FC<{
         variant === 'blue2' && classes.rootBlue2,
       )}
     >
-      <h2 className={classes.heading}>{siteName}</h2>
+      {variant !== 'blue2' && (
+        <h2 className={classes.heading}>{siteName}</h2>
+      )}
       <ul className={classes.list}>
         <li>
           <NavLink to='/about' {...multiColumnLinkAttrs}>
@@ -52,6 +56,15 @@ export const NavigationFooterLinks: React.FC<{
             />
           </NavLink>
         </li>
+        <li>
+          <button
+              type='button'
+              className={classes.bugReportButton}
+              onClick={openBugReport}
+            >
+              <BugReportLabel />
+          </button>
+        </li>
         {termsOfServiceEnabled && (
           <li>
             <NavLink
@@ -67,9 +80,6 @@ export const NavigationFooterLinks: React.FC<{
           </li>
         )}
       </ul>
-      <button type='button' className={classes.bugReportButton} onClick={openBugReport}>
-        <BugReportLabel />
-      </button>
     </div>
   );
 };

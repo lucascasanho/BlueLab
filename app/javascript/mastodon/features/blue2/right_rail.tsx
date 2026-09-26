@@ -5,6 +5,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Link, NavLink } from 'react-router-dom';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
+import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
+import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
 import { Search } from '@/mastodon/features/compose/components/search';
 import { useIdentity } from '@/mastodon/identity_context';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
@@ -18,10 +20,14 @@ interface TrendTag {
   name: string;
 }
 
-export const Blue2RightRail: React.FC<{ variant?: 'birdUi' }> = ({ variant }) => {
+export const Blue2RightRail: React.FC<{
+  variant?: 'birdUi' | 'mobile';
+}> = ({ variant }) => {
   const intl = useIntl();
+  const openBugReport = useOpenBugReport();
   const { signedIn } = useIdentity();
   const isBirdUiVariant = variant === 'birdUi';
+  const isMobileVariant = variant === 'mobile';
   const [tags, setTags] = useState<TrendTag[]>([]);
   const [trendMenuOpen, setTrendMenuOpen] = useState(false);
   const [trendsHidden, setTrendsHidden] = useState(false);
@@ -74,7 +80,9 @@ export const Blue2RightRail: React.FC<{ variant?: 'birdUi' }> = ({ variant }) =>
   );
 
   return (
-    <aside className={`${classes.root} ${isBirdUiVariant ? classes.birdUiVariant : ''}`}>
+    <aside
+      className={`${classes.root} ${isBirdUiVariant ? classes.birdUiVariant : ''} ${isMobileVariant ? classes.mobileVariant : ''}`}
+    >
       <div className={classes.content}>
         <div className={classes.searchHost}>
           <Search singleColumn />
@@ -156,32 +164,43 @@ export const Blue2RightRail: React.FC<{ variant?: 'birdUi' }> = ({ variant }) =>
         )}
       </div>
 
-      {!isBirdUiVariant && (
+      {!isBirdUiVariant && !isMobileVariant && (
         <footer className={classes.footer}>
           <a href='/about'>
-          <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
-        </a>
-        <span>·</span>
-        <a href='/privacy-policy'>
-          <FormattedMessage
-            id='footer.privacy_policy_short'
-            defaultMessage='Privacy'
-          />
-        </a>
-        <span>·</span>
-        <a href='/terms-of-service'>
-          <FormattedMessage
-            id='footer.terms_of_service_short'
-            defaultMessage='Terms'
-          />
-        </a>
-        <span>·</span>
-        <Link to='/keyboard-shortcuts'>
+            <FormattedMessage
+              id='custom_homepage.about'
+              defaultMessage='About'
+            />
+          </a>
+          <span>·</span>
+          <a href='/privacy-policy'>
+            <FormattedMessage
+              id='footer.privacy_policy_short'
+              defaultMessage='Privacy'
+            />
+          </a>
+          <span>·</span>
+          <a href='/terms-of-service'>
+            <FormattedMessage
+              id='footer.terms_of_service_short'
+              defaultMessage='Terms'
+            />
+          </a>
+          <span>·</span>
+          <Link to='/keyboard-shortcuts'>
             <FormattedMessage
               id='keyboard_shortcuts.heading'
               defaultMessage='Keyboard Shortcuts'
             />
           </Link>
+          <span>·</span>
+          <button
+            className={classes.bugReportButton}
+            type='button'
+            onClick={openBugReport}
+          >
+            <BugReportLabel />
+          </button>
         </footer>
       )}
 

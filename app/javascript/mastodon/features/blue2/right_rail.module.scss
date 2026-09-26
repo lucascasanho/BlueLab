@@ -264,7 +264,8 @@
   color: var(--blue2-muted, #83929f);
   font-size: 12px;
 
-  a {
+  a,
+  .bugReportButton {
     color: inherit !important;
     text-decoration: none;
 
@@ -274,6 +275,15 @@
       text-decoration: underline;
       outline: none;
     }
+  }
+
+  .bugReportButton {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
   }
 }
 
@@ -355,6 +365,27 @@
   }
 }
 
+.mobileVariant {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+
+  .feeds,
+  .feedShortcut,
+  .card,
+  .footer {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .feedShortcut {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
 
 :global(body[data-theme='mastodon-bird-ui-auto']) .root.birdUiVariant {
   .feeds,
