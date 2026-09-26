@@ -337,7 +337,6 @@ export const RedesignNavigationPanel: React.FC<{
                 multiColumn={multiColumn}
                 siteName={siteName}
                 variant={isBlue2 ? 'blue2' : 'default'}
-                showBugReport={signedIn}
               />
             )}
           </footer>
@@ -351,7 +350,6 @@ export const RedesignNavigationPanel: React.FC<{
               multiColumn={multiColumn}
               siteName={siteName}
               variant={isBlue2 ? 'blue2' : 'default'}
-              showBugReport={signedIn}
             />
           )}
         </footer>
