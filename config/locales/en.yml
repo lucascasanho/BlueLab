@@ -1597,7 +1597,6 @@ en:
       another_account:
         title: "Sign in to another account"
         notice: "Your current account will remain available in the account switcher."
-      another_account:
         two_factor_title: "Verify your identity"
         two_factor_notice: "Enter the verification code for the account you are adding."
     sign_up:
