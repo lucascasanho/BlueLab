@@ -198,6 +198,27 @@ body.error--bluelab {
     height: 18px;
   }
 
+  .error-page__actions {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    pointer-events: auto;
+  }
+
+  .error-page__report {
+    position: relative;
+    z-index: 6;
+    min-height: 42px;
+    padding-inline: 22px;
+    border-radius: 999px;
+    pointer-events: auto;
+  }
+
   @media (width <= 759px) {
     .error-page {
       padding: 24px 16px 40px;
