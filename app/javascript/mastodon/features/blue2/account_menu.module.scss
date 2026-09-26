@@ -199,7 +199,27 @@
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text-secondary, var(--blue2-muted, currentColor)) transparent;
+  scrollbar-gutter: stable;
   border: 1px solid var(--blue2-border-soft, #17232c);
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: var(--color-text-secondary, var(--blue2-muted, currentColor));
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-primary, var(--blue2-text, currentColor));
+  }
   border-radius: 12px;
   background: var(--blue2-surface-raised, #101820);
   color: var(--blue2-text, #f7f7f8);
