@@ -1,8 +1,5 @@
 import { FormattedMessage } from 'react-intl';
 
-import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
-import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
-
 import { Link } from 'react-router-dom';
 
 import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
