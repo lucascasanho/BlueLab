@@ -50,6 +50,22 @@ RSpec.describe REST::StatusSerializer do
       end
     end
 
+    context 'with federated generator metadata' do
+      before do
+        status.update!(
+          generator_name: 'Blue Web',
+          generator_url: 'https://mastodon.blue/'
+        )
+      end
+
+      it 'exposes the generator as the status application' do
+        expect(subject['application']).to eq(
+          'name' => 'Blue Web',
+          'website' => 'https://mastodon.blue/'
+        )
+      end
+    end
+
     context 'with only trusted counts' do
       it 'shows the trusted counts' do
         expect(subject['reblogs_count']).to eq(10)

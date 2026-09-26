@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_12_150002) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1318,6 +1318,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_12_150002) do
     t.bigint "account_id", null: false
     t.bigint "application_id"
     t.string "content_type"
+    t.string "generator_name"
+    t.text "generator_url"
     t.bigint "conversation_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "deleted_at", precision: nil

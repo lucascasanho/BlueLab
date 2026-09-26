@@ -277,6 +277,28 @@ RSpec.describe ActivityPub::Activity::Create do
         end
       end
 
+      context 'with federated generator metadata' do
+        let(:object_json) do
+          build_object(
+            to: 'as:Public',
+            generator: {
+              type: 'Application',
+              name: 'Blue Web',
+              url: 'https://mastodon.blue/',
+            }
+          )
+        end
+
+        it 'persists the generator metadata' do
+          expect { subject.perform }.to change(sender.statuses, :count).by(1)
+
+          status = sender.statuses.first
+
+          expect(status.generator_name).to eq 'Blue Web'
+          expect(status.generator_url).to eq 'https://mastodon.blue/'
+        end
+      end
+
       context 'with a standalone post' do
         let(:object_json) { build_object }
 
