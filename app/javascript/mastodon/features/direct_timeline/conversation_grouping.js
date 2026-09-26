@@ -9,9 +9,17 @@ const participantKey = (conversation) =>
 const conversationKey = (conversation) =>
   conversation.get('conversation_id');
 
-const related = (left, right) =>
-  conversationKey(left) === conversationKey(right) ||
-  participantKey(left) === participantKey(right);
+const related = (left, right) => {
+  const leftConversationKey = conversationKey(left);
+  const rightConversationKey = conversationKey(right);
+
+  return (
+    participantKey(left) === participantKey(right) ||
+    (!!leftConversationKey &&
+      !!rightConversationKey &&
+      leftConversationKey === rightConversationKey)
+  );
+};
 
 export const groupConversations = (conversations) => {
   const groups = [];
