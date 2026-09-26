@@ -24,10 +24,7 @@ import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
 const messages = defineMessages({
   heading: { id: 'column.favourites', defaultMessage: 'Favorites' },
-  heading_redesign: {
-    id: 'navigation_bar.liked_posts',
-    defaultMessage: 'Liked Posts',
-  },
+  heading_redesign: { id: 'column.favourites', defaultMessage: 'Favorites' },
 });
 
 const Favourites: React.FC<{ columnId: string; multiColumn: boolean }> = ({
