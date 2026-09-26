@@ -74,13 +74,19 @@ class Api::V1::ConversationsController < Api::BaseController
   def matching_conversations
     account_conversations = AccountConversation.where(account: current_account)
 
-    if @conversation.conversation_id.present?
-      account_conversations.where(conversation_id: @conversation.conversation_id)
-    else
-      account_conversations.where(
-        participant_account_ids: @conversation.participant_account_ids,
-      )
-    end
+    by_conversation = if @conversation.conversation_id.present?
+                        account_conversations.where(
+                          conversation_id: @conversation.conversation_id,
+                        )
+                      else
+                        account_conversations.none
+                      end
+
+    by_participants = account_conversations.where(
+      participant_account_ids: @conversation.participant_account_ids,
+    )
+
+    by_conversation.or(by_participants)
   end
 
   def conversation_statuses
