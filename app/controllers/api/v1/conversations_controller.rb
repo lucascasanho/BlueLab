@@ -44,7 +44,7 @@ class Api::V1::ConversationsController < Api::BaseController
 
   def read
     matching_conversations.update_all(unread: false, updated_at: Time.current)
-    render json: @conversation, serializer: REST::ConversationSerializer
+    head :no_content
   end
 
   def by_status
