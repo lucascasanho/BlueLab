@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class CreateBugReports < ActiveRecord::Migration[8.0]
+  disable_ddl_transaction!
+
   def change
     create_table :bug_reports do |t|
       t.references :account, null: false, foreign_key: { on_delete: :cascade }
@@ -27,6 +29,6 @@ class CreateBugReports < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_reference :media_attachments, :bug_report, foreign_key: { on_delete: :cascade }, index: true
+    add_reference :media_attachments, :bug_report, index: { algorithm: :concurrently }
   end
 end
