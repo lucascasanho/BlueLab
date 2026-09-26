@@ -24,7 +24,7 @@ en:
       approved_msg: Verification badge granted and request resolved.
       denied_msg: Verification request closed without granting the badge.
       already_resolved: This verification request has already been resolved.
-      verified_role_missing: The "Verificado" role does not exist.
+      verified_role_missing: Neither the "Verificado" nor "Verified" role exists.
       role_not_assignable: You cannot assign the "Verificado" role because its position is above your role.
       account_unavailable: This account no longer has a local user.
       role_would_be_downgraded: The request cannot be approved because it would replace a higher role with "Verificado".
