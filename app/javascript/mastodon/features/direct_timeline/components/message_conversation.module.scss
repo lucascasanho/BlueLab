@@ -184,6 +184,31 @@
   border-radius: 50%;
 }
 
+.messageFavourite {
+  &.active {
+    color: #ffb609;
+  }
+
+  &.activate > :global(.icon-star),
+  &.deactivate > :global(.icon-star) {
+    animation: messageFavouriteSpin 0.45s ease-out;
+  }
+}
+
+@keyframes messageFavouriteSpin {
+  from {
+    transform: rotate(0deg) scale(0.85);
+  }
+
+  70% {
+    transform: rotate(300deg) scale(1.08);
+  }
+
+  to {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
 :global(body[data-theme='blue-2']) .replyComposer {
   width: 100%;
   min-width: 0;
