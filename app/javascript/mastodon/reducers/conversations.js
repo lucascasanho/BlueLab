@@ -118,8 +118,21 @@ export default function conversations(state = initialState, action) {
     return filterConversations(state, [action.payload.relationship.id]);
   case blockDomainSuccess.type:
     return filterConversations(state, action.payload.accounts);
-  case CONVERSATIONS_DELETE_SUCCESS:
-    return state.update('items', list => list.filterNot(item => item.get('id') === action.id));
+  case CONVERSATIONS_DELETE_SUCCESS: {
+    const target = state.get('items').find(item => item.get('id') === action.id);
+
+    if (!target) return state;
+
+    const targetConversationId = target.get('conversation_id');
+
+    return state.update('items', list =>
+      targetConversationId
+        ? list.filterNot(
+            item => item.get('conversation_id') === targetConversationId,
+          )
+        : list.filterNot(item => item.get('id') === action.id),
+    );
+  }
   default:
     return state;
   }
