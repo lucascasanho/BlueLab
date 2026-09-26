@@ -8,7 +8,7 @@
   = t('bug_reports.lead')
 
 - content_for :header_tags do
-  = vite_stylesheet_tag 'styles/bug_reports.scss', media: 'all'
+  = vite_stylesheet_tag 'bug_reports.scss', media: 'all'
 
 .bug-report-page
   - if @error_page.present?
