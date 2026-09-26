@@ -59,7 +59,9 @@ class REST::StatusSerializer < ActiveModel::Serializer
   end
 
   def show_application?
-    object.application.present? || object.generator_name.present?
+    object.generator_name.present? ||
+      object.account.user_shows_application? ||
+      (current_user? && current_user.account_id == object.account_id)
   end
 
   def application
