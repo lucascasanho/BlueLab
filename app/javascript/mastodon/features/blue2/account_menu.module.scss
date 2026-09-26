@@ -181,6 +181,7 @@
   }
 
   .homeButton {
+    display: none;
     width: 52px;
     justify-content: center;
     padding: 0;
@@ -201,6 +202,7 @@
   scrollbar-width: thin;
   scrollbar-color: var(--color-text-secondary, var(--blue2-muted, currentColor)) transparent;
   scrollbar-gutter: stable;
+  border: 1px solid var(--blue2-border-soft, #17232c);
 
   &::-webkit-scrollbar {
     width: 5px;
@@ -218,8 +220,6 @@
   &::-webkit-scrollbar-thumb:hover {
     background: var(--color-text-primary, var(--blue2-text, currentColor));
   }
-
-  border: 1px solid var(--blue2-border-soft, #17232c);
   border-radius: 12px;
   background: var(--blue2-surface-raised, #101820);
   color: var(--blue2-text, #f7f7f8);
@@ -352,8 +352,6 @@
     background: var(--color-bg-tertiary, #20202c);
   }
 }
-
-
 
 .navigationPanelMenu {
   border-color: var(--color-border-primary);
