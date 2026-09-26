@@ -316,6 +316,8 @@ export const Blue2AccountMenu: React.FC<{
           placement={menuPlacement}
           strategy='fixed'
           offset={4}
+          constrainToViewport
+          scrollable
         >
           {({ props: popoverProps }) => (
             <div
