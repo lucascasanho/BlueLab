@@ -83,7 +83,11 @@ export const NotificationGroupWithStatus: React.FC<{
   const handlers = useMemo(
     () => ({
       open: () => {
-        if (isPrivateMention) {
+        const isBlue2 =
+          typeof document !== 'undefined' &&
+          document.body.dataset.theme === 'blue-2';
+
+        if (isBlue2 && isPrivateMention) {
           dispatch(openConversationForStatus(statusId));
         } else {
           dispatch(navigateToStatus(statusId));
