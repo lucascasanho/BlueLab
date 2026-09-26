@@ -17,7 +17,10 @@ module Admin
     def approve
       authorize @verification_request, :resolve?
 
-      verified_role = UserRole.find_by(name: UserRole::VERIFIED_ROLE_NAME)
+      preferred_verification_role_name = I18n.locale.to_s.start_with?('en') ? 'Verified' : UserRole::VERIFIED_ROLE_NAME
+      verified_role = UserRole.where(name: UserRole::VERIFIED_ROLE_NAMES)
+                               .sort_by { |role| role.name == preferred_verification_role_name ? 0 : 1 }
+                               .first
       unless verified_role
         return redirect_to admin_verification_request_path(@verification_request),
                            alert: I18n.t('admin.verification_requests.verified_role_missing'),
