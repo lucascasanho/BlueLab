@@ -2,7 +2,6 @@ import { FormattedMessage } from 'react-intl';
 
 import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
 import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
-import { me } from '@/mastodon/initial_state';
 
 import { Link } from 'react-router-dom';
 
@@ -12,7 +11,7 @@ export const Blue2FooterLinks: React.FC = () => {
   const openBugReport = useOpenBugReport();
 
   return (
-  <footer className={classes.root} data-bird-ui-footer='true'>
+    <footer className={classes.root} data-bird-ui-footer='true'>
     <Link to='/about'>
       <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
     </Link>
@@ -37,14 +36,10 @@ export const Blue2FooterLinks: React.FC = () => {
         defaultMessage='Keyboard Shortcuts'
       />
     </Link>
-    {me && (
-      <>
-        <span>·</span>
-        <button type='button' onClick={openBugReport}>
-          <BugReportLabel />
-        </button>
-      </>
-    )}
+    <span>·</span>
+    <button type='button' onClick={openBugReport}>
+      <BugReportLabel />
+    </button>
   </footer>
   );
 };
