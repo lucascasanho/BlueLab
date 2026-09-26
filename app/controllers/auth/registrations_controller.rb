@@ -43,6 +43,12 @@ class Auth::RegistrationsController < Devise::RegistrationsController
 
   protected
 
+  def require_no_authentication
+    return if truthy_param?(:account_switcher)
+
+    super
+  end
+
   def update_resource(resource, params)
     params[:password] = nil if Devise.pam_authentication && resource.encrypted_password.blank?
 
