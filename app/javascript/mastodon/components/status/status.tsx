@@ -132,6 +132,27 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
     (!showDespiteFilter && isFiltered) ||
     (!!status.spoiler_text && status.hidden);
 
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+
+  const handleBlue2CardClick: React.MouseEventHandler<HTMLElement> = (event) => {
+    if (!isBlue2 || event.defaultPrevented) {
+      return;
+    }
+
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      target.closest(
+        'a, button, input, textarea, select, option, video, audio, iframe, [role="button"], [role="checkbox"], [role="switch"], [role="slider"], [contenteditable="true"], .media-gallery, .video-player, .audio-player, .status-card',
+      )
+    ) {
+      return;
+    }
+
+    handlers.onOpenClick(event);
+  };
+
   if (hidden) {
     return (
       <StatusHotkeys {...hotkeysProps}>
@@ -146,6 +167,8 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
     <StatusContext.Provider value={{ id, contextType }}>
       <StatusHotkeys
         {...hotkeysProps}
+        onClick={handleBlue2CardClick}
+        onAuxClick={handleBlue2CardClick}
         className={classNames(
           classes.root,
           variant === 'thread' && classes.variantThread,
