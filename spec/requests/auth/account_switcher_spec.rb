@@ -66,6 +66,22 @@ RSpec.describe 'Auth Account Switcher' do
 
       expect(controller.current_user).to eq target_user
     end
+
+    it 'switches back to the original account after signing into another account' do
+      get root_path
+      expect(controller.current_user).to eq target_user
+
+      post auth_account_switcher_switch_path, params: {
+        token: current_user.account_switcher_token,
+      }
+
+      expect(response).to have_http_status(:ok)
+
+      get root_path
+
+      expect(controller.current_user).to eq current_user
+      expect(target_user.session_activations).to be_present
+    end
   end
 
   describe 'GET /auth/sign_in?account_switcher=1' do
