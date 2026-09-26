@@ -82,7 +82,7 @@ export const MessageConversation: React.FC = () => {
     [conversationItems, id],
   );
 
-  const nativeConversationId = conversation?.get('conversation_id') as
+  const threadId = conversation?.get('thread_id') as
     | string
     | null
     | undefined;
@@ -90,16 +90,16 @@ export const MessageConversation: React.FC = () => {
   const threadConversations = useMemo(() => {
     if (!conversation) return [];
 
-    if (nativeConversationId) {
+    if (threadId) {
       return conversationItems
-        .filter((item) => item.get('conversation_id') === nativeConversationId)
+        .filter((item) => item.get('thread_id') === threadId)
         .toArray();
     }
 
     return conversationItems
       .filter((item) => item.get('id') === conversation.get('id'))
       .toArray();
-  }, [conversation, conversationItems, nativeConversationId]);
+  }, [conversation, conversationItems, threadId]);
 
   const participantIds = useMemo(() => {
     const ids = new Set<string>();
