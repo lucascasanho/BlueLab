@@ -116,23 +116,44 @@
   overflow: hidden;
 }
 
-.accountText strong,
-.accountText > span {
+.accountName {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.22em;
+}
+
+.accountName strong {
+  min-width: 0;
   overflow: hidden;
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
+  font-size: 13px;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.accountText strong {
-  color: var(--color-text-primary, var(--blue2-text, currentColor));
-  font-size: 13px;
-  line-height: 1.2;
+.verificationBadge {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
-.accountText > span {
+.verificationIcon {
+  display: block;
+  width: 1em;
+  height: 1em;
+}
+
+.handle {
+  overflow: hidden;
   color: var(--color-text-secondary, var(--blue2-muted, currentColor));
   font-size: 11px;
   line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .current {
