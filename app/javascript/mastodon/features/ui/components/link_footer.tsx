@@ -2,9 +2,9 @@ import { FormattedMessage } from 'react-intl';
 
 import { Link } from 'react-router-dom';
 
-import { domain, version } from 'mastodon/initial_state';
 import { BugReportLabel } from 'mastodon/features/bug_report/bug_report_label';
 import { useOpenBugReport } from 'mastodon/features/bug_report/use_bug_report';
+import { domain, version } from 'mastodon/initial_state';
 
 import classes from './link_footer.module.scss';
 
