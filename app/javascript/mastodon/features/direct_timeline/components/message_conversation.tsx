@@ -179,6 +179,7 @@ export const MessageConversation: React.FC = () => {
 
   const handleReply = useCallback(
     (status: Immutable.Record<StatusShape>) => {
+      dispatch(resetCompose());
       dispatch(replyCompose(status));
     },
     [dispatch],
