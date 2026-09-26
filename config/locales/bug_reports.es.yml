@@ -45,3 +45,18 @@ es:
       resolved_msg: Informe de error marcado como resuelto.
       status_open: Abierto
       status_resolved: Resuelto
+bug_reports:
+    link: Informar un error
+    title: Informar un error
+    lead: Describe lo ocurrido y adjunta capturas, GIF, audio o vídeo cuando sea útil.
+    description: ¿Qué ocurrió?
+    placeholder: Describe el error, lo que esperabas que ocurriera y cómo reproducir el problema.
+    character_limit: Máximo de %{count} caracteres.
+    attachments: Adjuntos
+    attachment_hint: Imágenes, GIF, audio y vídeo. Hasta 5 archivos.
+    diagnostic_notice: El navegador, sistema operativo, idioma, tema, modo de interfaz, ventana y errores recientes del cliente pueden incluirse automáticamente.
+    error_page: Este informe se inició desde la página de error %{code}.
+    submit: Enviar informe
+    back: Cancelar
+    success_title: Informe enviado
+    success_body: Tu informe se envió a los administradores de la instancia con los diagnósticos técnicos disponibles.
