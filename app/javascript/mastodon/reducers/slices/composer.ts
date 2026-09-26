@@ -144,6 +144,7 @@ const composerSlice = createSlice({
     builder.addMatcher(
       (action) =>
         isAction(action) &&
+        !(action as { inline?: boolean }).inline &&
         [
           COMPOSE_REPLY,
           COMPOSE_FOCUS,
