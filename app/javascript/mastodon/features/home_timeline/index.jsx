@@ -35,7 +35,7 @@ import { MultiColumnMenuItems } from '@/mastodon/components/column_header/multic
 
 const messages = defineMessages({
   title: { id: 'column.home', defaultMessage: 'Home' },
-  following: { id: 'column.following', defaultMessage: 'Following' },
+  following: { id: 'account.following', defaultMessage: 'Following' },
   show_announcements: { id: 'home.show_announcements', defaultMessage: 'Show announcements' },
   hide_announcements: { id: 'home.hide_announcements', defaultMessage: 'Hide announcements' },
 });
