@@ -284,6 +284,13 @@ export function directCompose(account) {
   };
 }
 
+export function directComposeInline(account) {
+  return {
+    type: COMPOSE_DIRECT,
+    account,
+  };
+}
+
 export function submitCompose(successCallback) {
   return function (dispatch, getState) {
     if (getState().getIn(['compose', 'is_submitting'])) return;
