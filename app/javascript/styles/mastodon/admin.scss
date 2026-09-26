@@ -162,6 +162,13 @@ $content-width: 840px;
         border-bottom: 0;
       }
 
+      // Keep the bug-report icon identical to the native moderation shortcuts.
+      .bug-reports-navigation-item > a .icon {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 16px;
+      }
+
       #instance_customization > a {
         white-space: nowrap;
       }

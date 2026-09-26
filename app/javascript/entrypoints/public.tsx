@@ -13,6 +13,7 @@ import axios from 'axios';
 import { on } from 'delegated-events';
 import { throttle } from 'lodash';
 
+import { populateBugReportFormDiagnostics } from '@/mastodon/features/bug_report/diagnostics';
 import { determineEmojiMode } from '@/mastodon/features/emoji/mode';
 import { updateHtmlWithEmoji } from '@/mastodon/features/emoji/render';
 import type { InitialState } from '@/mastodon/initial_state';
@@ -186,6 +187,18 @@ async function loaded() {
   truncateRuleHints();
 
   applyRailsA11yPatches();
+
+  const bugReportForm = document.querySelector<HTMLFormElement>(
+    '#bug-report-form',
+  );
+  if (bugReportForm) {
+    bugReportForm.addEventListener('submit', () => {
+      populateBugReportFormDiagnostics(
+        bugReportForm,
+        document.documentElement.lang,
+      );
+    });
+  }
 
   const reactComponents = document.querySelectorAll('[data-component]');
 

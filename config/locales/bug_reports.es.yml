@@ -1,0 +1,64 @@
+es:
+  admin:
+    bug_reports:
+      title: Informes de errores
+      report_title: Informe de error %{id}
+      all: Todos
+      open: Abiertos
+      resolved: Resueltos
+      id: ID
+      reported_by: Informado por
+      created_at: Creado
+      anonymous: Visitante
+      error_page: Página de error
+      status: Estado
+      assigned_to: Asignado a
+      attachments: Adjuntos
+      view: Ver
+      none: Ninguno
+      details: Detalles del informe
+      description: Descripción
+      technical_details: Información técnica
+      browser: Navegador
+      browser_version: Versión del navegador
+      operating_system: Sistema operativo
+      operating_system_version: Versión del sistema operativo
+      interface_language: Idioma de la interfaz
+      theme: Tema
+      interface_layout: Modo de interfaz
+      current_path: Página al informar
+      viewport: Ventana
+      app_version: Versión de BlueLab
+      request_id: ID de la solicitud
+      user_agent: User agent
+      recent_errors: Errores recientes del cliente
+      no_errors: No se capturaron errores recientes del cliente.
+      message: Mensaje
+      stack: Stack
+      attachments_title: Archivos adjuntos
+      no_attachments: No hay archivos adjuntos.
+      assign_to_self: Asignarme
+      unassign: Quitar asignación
+      resolve: Marcar como resuelto
+      reopen: Reabrir
+      back: Volver a los informes de errores
+      resolved_by: Resuelto por
+      resolved_at: Resuelto el
+      resolved_msg: Informe de error marcado como resuelto.
+      status_open: Abierto
+      status_resolved: Resuelto
+  bug_reports:
+    link: Informar un error
+    title: Informar un error
+    lead: Describe lo ocurrido y adjunta capturas, GIF, audio o vídeo cuando sea útil.
+    description: ¿Qué ocurrió?
+    placeholder: Describe el error, lo que esperabas que ocurriera y cómo reproducir el problema.
+    character_limit: Máximo de %{count} caracteres.
+    attachments: Adjuntos
+    attachment_hint: Imágenes, GIF, audio y vídeo. Hasta 5 archivos.
+    diagnostic_notice: El navegador, sistema operativo, idioma, tema, modo de interfaz, ventana y errores recientes del cliente pueden incluirse automáticamente.
+    error_page: Este informe se inició desde la página de error %{code}.
+    submit: Enviar informe
+    back: Cancelar
+    success_title: Informe enviado
+    success_body: Tu informe se envió a los administradores de la instancia con los diagnósticos técnicos disponibles.

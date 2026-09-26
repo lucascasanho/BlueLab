@@ -1,0 +1,64 @@
+fr:
+  admin:
+    bug_reports:
+      title: Rapports de bugs
+      report_title: Rapport de bug %{id}
+      all: Tous
+      open: Ouverts
+      resolved: Résolus
+      id: ID
+      reported_by: Signalé par
+      created_at: Créé le
+      anonymous: Visiteur
+      error_page: Page d’erreur
+      status: Statut
+      assigned_to: Assigné à
+      attachments: Pièces jointes
+      view: Voir
+      none: Aucun
+      details: Détails du rapport
+      description: Description
+      technical_details: Informations techniques
+      browser: Navigateur
+      browser_version: Version du navigateur
+      operating_system: Système d’exploitation
+      operating_system_version: Version du système d’exploitation
+      interface_language: Langue de l’interface
+      theme: Thème
+      interface_layout: Mode d’interface
+      current_path: Page au moment du signalement
+      viewport: Fenêtre d’affichage
+      app_version: Version de BlueLab
+      request_id: ID de requête
+      user_agent: User agent
+      recent_errors: Erreurs récentes du client
+      no_errors: Aucune erreur récente du client n’a été capturée.
+      message: Message
+      stack: Stack
+      attachments_title: Médias joints
+      no_attachments: Aucun média joint.
+      assign_to_self: M’assigner
+      unassign: Retirer l’assignation
+      resolve: Marquer comme résolu
+      reopen: Rouvrir
+      back: Retour aux rapports de bugs
+      resolved_by: Résolu par
+      resolved_at: Résolu le
+      resolved_msg: Rapport de bug marqué comme résolu.
+      status_open: Ouvert
+      status_resolved: Résolu
+  bug_reports:
+    link: Signaler un bug
+    title: Signaler un bug
+    lead: Décrivez le problème et joignez des captures, des GIF, de l’audio ou de la vidéo si nécessaire.
+    description: Que s’est-il passé ?
+    placeholder: Décrivez le bug, le résultat attendu et les étapes pour reproduire le problème.
+    character_limit: Maximum de %{count} caractères.
+    attachments: Pièces jointes
+    attachment_hint: Images, GIF, audio et vidéo. Jusqu’à 5 fichiers.
+    diagnostic_notice: Le navigateur, le système d’exploitation, la langue, le thème, le mode d’interface, la fenêtre et les erreurs récentes du client peuvent être inclus automatiquement.
+    error_page: Ce rapport a été ouvert depuis la page d’erreur %{code}.
+    submit: Envoyer le rapport
+    back: Annuler
+    success_title: Rapport envoyé
+    success_body: Votre rapport a été envoyé aux administrateurs de l’instance avec les diagnostics techniques disponibles.

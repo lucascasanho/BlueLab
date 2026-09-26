@@ -86,7 +86,6 @@ Rails.application.routes.draw do
     post '/auth/account_switcher/switch', to: 'auth/account_switcher#switch', as: :auth_account_switcher_switch
     post '/auth/account_switcher/authenticate', to: 'auth/account_switcher#authenticate', as: :auth_account_switcher_authenticate
     get '/auth/account_switcher/two_factor', to: 'auth/account_switcher#two_factor', as: :auth_account_switcher_two_factor
-
     get '/auth/passkey/options', to: 'auth/sessions#passkey_options', as: :auth_passkey_options
     post '/auth/passkey', to: 'auth/sessions#passkey', as: :auth_passkey
     get '/auth/passkey/two_factor', to: 'auth/sessions#passkey_two_factor', as: :auth_passkey_two_factor
@@ -186,6 +185,11 @@ Rails.application.routes.draw do
 
   get '/@:username_with_domain/(*any)', to: 'home#index', constraints: { username_with_domain: %r{([^/])+?} }, as: :account_with_domain, format: false
   get '/settings', to: redirect('/settings/profile')
+
+  # Public bug reporting must be registered before the settings and catch-all
+  # routes so it remains directly reachable when the visitor is logged out.
+  get '/bug_reports/new', to: 'bug_reports#new', as: :new_bug_report, defaults: { format: :html }
+  post '/bug_reports', to: 'bug_reports#create', as: :bug_reports
 
   draw(:settings)
 

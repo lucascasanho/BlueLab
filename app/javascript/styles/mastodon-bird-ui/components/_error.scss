@@ -18,3 +18,13 @@
     max-width: 420px;
   }
 }
+
+.error-page__report {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+}

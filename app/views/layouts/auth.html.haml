@@ -1,7 +1,7 @@
 - content_for :header_tags do
   = vite_typescript_tag 'public.tsx', crossorigin: 'anonymous'
 
-- custom_auth_brand = %w(auth/registrations auth/setup auth/confirmations).include?(controller_path) || (controller_path == 'auth/sessions' && action_name == 'new') || (controller_path == 'settings/passkeys' && action_name == 'new')
+- custom_auth_brand = %w(auth/registrations auth/setup auth/confirmations bug_reports).include?(controller_path) || (controller_path == 'auth/sessions' && action_name == 'new') || (controller_path == 'settings/passkeys' && action_name == 'new')
 - blue2_theme = current_theme == 'blue-2'
 
 - content_for :content do

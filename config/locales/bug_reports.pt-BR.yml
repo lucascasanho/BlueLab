@@ -1,0 +1,64 @@
+pt-BR:
+  admin:
+    bug_reports:
+      title: Relatos de bugs
+      report_title: Relato de bug %{id}
+      all: Todos
+      open: Abertos
+      resolved: Resolvidos
+      id: ID
+      reported_by: Relatado por
+      created_at: Criado em
+      anonymous: Visitante
+      error_page: Página de erro
+      status: Status
+      assigned_to: Responsável
+      attachments: Anexos
+      view: Ver
+      none: Nenhum
+      details: Detalhes do relato
+      description: Descrição
+      technical_details: Informações técnicas
+      browser: Navegador
+      browser_version: Versão do navegador
+      operating_system: Sistema operacional
+      operating_system_version: Versão do sistema operacional
+      interface_language: Idioma da interface
+      theme: Tema
+      interface_layout: Modo da interface
+      current_path: Página no momento do relato
+      viewport: Janela de visualização
+      app_version: Versão do BlueLab
+      request_id: ID da requisição
+      user_agent: User agent
+      recent_errors: Erros recentes do cliente
+      no_errors: Nenhum erro recente do cliente foi capturado.
+      message: Mensagem
+      stack: Stack
+      attachments_title: Mídia anexada
+      no_attachments: Nenhuma mídia anexada.
+      assign_to_self: Atribuir a mim
+      unassign: Remover atribuição
+      resolve: Marcar como resolvido
+      reopen: Reabrir
+      back: Voltar aos relatos de bugs
+      resolved_by: Resolvido por
+      resolved_at: Resolvido em
+      resolved_msg: Relato de bug marcado como resolvido.
+      status_open: Aberto
+      status_resolved: Resolvido
+  bug_reports:
+    link: Relatar bug
+    title: Relatar bug
+    lead: Descreva o que aconteceu e anexe capturas, GIFs, áudio ou vídeo quando forem úteis.
+    description: O que aconteceu?
+    placeholder: Descreva o bug, o que você esperava que acontecesse e como reproduzir o problema.
+    character_limit: Máximo de %{count} caracteres.
+    attachments: Anexos
+    attachment_hint: Imagens, GIFs, áudio e vídeo. Até 5 arquivos.
+    diagnostic_notice: Navegador, sistema operacional, idioma, tema, modo da interface, tamanho da janela e erros recentes do cliente podem ser incluídos automaticamente.
+    error_page: Este relato foi iniciado na página de erro %{code}.
+    submit: Enviar relato
+    back: Cancelar
+    success_title: Relato enviado
+    success_body: Seu relato foi enviado aos administradores da instância com os diagnósticos técnicos disponíveis.

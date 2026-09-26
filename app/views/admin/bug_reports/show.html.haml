@@ -1,0 +1,141 @@
+- content_for :page_title do
+  = t('admin.bug_reports.report_title', id: @bug_report.id)
+
+- content_for :heading_actions do
+  = link_to t('admin.bug_reports.back'), admin_bug_reports_path, class: 'button'
+
+  - if @bug_report.open?
+    = link_to t('admin.bug_reports.resolve'), resolve_admin_bug_report_path(@bug_report), method: :post, class: 'button'
+  - else
+    = link_to t('admin.bug_reports.reopen'), reopen_admin_bug_report_path(@bug_report), method: :post, class: 'button'
+
+.report-card
+  %h2= t('admin.bug_reports.details')
+
+  %dl
+    %div
+      %dt= t('admin.bug_reports.reported_by')
+      %dd
+        - if @bug_report.account.present?
+          = admin_account_link_to @bug_report.account
+        - else
+          = t('admin.bug_reports.anonymous')
+    %div
+      %dt= t('admin.bug_reports.created_at')
+      %dd
+        %time{ datetime: @bug_report.created_at.iso8601 }= l(@bug_report.created_at)
+    %div
+      %dt= t('admin.bug_reports.status')
+      %dd= @bug_report.resolved? ? t('admin.bug_reports.status_resolved') : t('admin.bug_reports.status_open')
+    %div
+      %dt= t('admin.bug_reports.assigned_to')
+      %dd
+        - if @bug_report.assigned_account.present?
+          = admin_account_link_to @bug_report.assigned_account
+          = link_to t('admin.bug_reports.unassign'), unassign_admin_bug_report_path(@bug_report), method: :post, class: 'button'
+        - else
+          = link_to t('admin.bug_reports.assign_to_self'), assign_to_self_admin_bug_report_path(@bug_report), method: :post, class: 'button'
+    - if @bug_report.resolved?
+      %div
+        %dt= t('admin.bug_reports.resolved_by')
+        %dd= admin_account_link_to @bug_report.resolved_by_account
+      %div
+        %dt= t('admin.bug_reports.resolved_at')
+        %dd
+          %time{ datetime: @bug_report.resolved_at.iso8601 }= l(@bug_report.resolved_at)
+
+%hr.spacer/
+
+%h2= t('admin.bug_reports.description')
+.report-card
+  = simple_format(@bug_report.description)
+
+%hr.spacer/
+
+%h2= t('admin.bug_reports.technical_details')
+.report-card
+  %table.table
+    %tbody
+      %tr
+        %th= t('admin.bug_reports.browser')
+        %td= @bug_report.browser.presence || t('admin.bug_reports.none')
+      %tr
+        %th= t('admin.bug_reports.browser_version')
+        %td= @bug_report.browser_version.presence || t('admin.bug_reports.none')
+      %tr
+        %th= t('admin.bug_reports.operating_system')
+        %td= @bug_report.operating_system.presence || t('admin.bug_reports.none')
+      %tr
+        %th= t('admin.bug_reports.operating_system_version')
+        %td= @bug_report.operating_system_version.presence || t('admin.bug_reports.none')
+      %tr
+        %th= t('admin.bug_reports.interface_language')
+        %td= @bug_report.interface_language.presence || t('admin.bug_reports.none')
+      %tr
+        %th= t('admin.bug_reports.theme')
+        %td= @bug_report.theme.presence || t('admin.bug_reports.none')
+      %tr
+        %th= t('admin.bug_reports.interface_layout')
+        %td= @bug_report.interface_layout.presence || t('admin.bug_reports.none')
+      %tr
+        %th= t('admin.bug_reports.error_page')
+        %td= @bug_report.error_page.presence || t('admin.bug_reports.none')
+      %tr
+        %th= t('admin.bug_reports.current_path')
+        %td= @bug_report.current_path.presence || t('admin.bug_reports.none')
+      %tr
+        %th= t('admin.bug_reports.viewport')
+        %td= @bug_report.viewport.presence || t('admin.bug_reports.none')
+      %tr
+        %th= t('admin.bug_reports.app_version')
+        %td= @bug_report.app_version.presence || t('admin.bug_reports.none')
+      %tr
+        %th= t('admin.bug_reports.request_id')
+        %td= @bug_report.request_id.presence || t('admin.bug_reports.none')
+      %tr
+        %th= t('admin.bug_reports.user_agent')
+        %td= @bug_report.user_agent.presence || t('admin.bug_reports.none')
+
+%hr.spacer/
+
+%h2= t('admin.bug_reports.recent_errors')
+- if @bug_report.client_errors.present?
+  - @bug_report.client_errors.each do |error|
+    %details
+      %summary= [error['type'], error['message'], error['status']].compact_blank.join(' · ')
+      %table.table
+        %tbody
+          - if error['message'].present?
+            %tr
+              %th= t('admin.bug_reports.message')
+              %td= error['message']
+          - if error['stack'].present?
+            %tr
+              %th= t('admin.bug_reports.stack')
+              %td
+                %pre= error['stack']
+          - error.except('stack', 'message').each do |key, value|
+            %tr
+              %th= key.humanize
+              %td= value
+- else
+  %p= t('admin.bug_reports.no_errors')
+
+%hr.spacer/
+
+%h2= t('admin.bug_reports.attachments_title')
+- if @media_attachments.present?
+  - @media_attachments.each do |attachment|
+    .report-card
+      - url = attachment.file.url(:original)
+      %p
+        %strong= attachment.file_file_name
+        = link_to attachment.file_file_name, url, target: '_blank', rel: 'noopener'
+      - if attachment.gifv? || attachment.video?
+        %video{ src: url, controls: true, preload: 'metadata', style: 'max-width: 100%; height: auto;' }
+      - elsif attachment.audio?
+        %audio{ src: url, controls: true, preload: 'metadata' }
+      - else
+        = image_tag url, alt: attachment.file_file_name, loading: 'lazy', style: 'max-width: 100%; height: auto;'
+- else
+  %p= t('admin.bug_reports.no_attachments')

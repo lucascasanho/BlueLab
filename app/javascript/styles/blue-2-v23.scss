@@ -101,6 +101,7 @@ body[data-theme='blue-2'] {
   }
 }
 
+
 /*
  * BlueLab standalone error pages.
  * Kept behind the explicit body class added by the Rails error layout so
@@ -195,6 +196,27 @@ body.error--bluelab {
   .error-page__home .icon {
     width: 18px;
     height: 18px;
+  }
+
+  .error-page__actions {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    pointer-events: auto;
+  }
+
+  .error-page__report {
+    position: relative;
+    z-index: 6;
+    min-height: 42px;
+    padding-inline: 22px;
+    border-radius: 999px;
+    pointer-events: auto;
   }
 
   @media (width <= 759px) {

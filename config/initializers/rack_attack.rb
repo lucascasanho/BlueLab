@@ -157,6 +157,14 @@ class Rack::Attack
     req.oauth_application_fingerprint if RegistrationProtection.enabled?
   end
 
+  throttle('throttle_bug_reports/ip', limit: 20, period: 1.hour) do |req|
+    req.throttleable_remote_ip if req.post? && req.path_matches?('/api/v1/bug_reports')
+  end
+
+  throttle('throttle_bug_reports/web/ip', limit: 20, period: 1.hour) do |req|
+    req.throttleable_remote_ip if req.post? && req.path == '/bug_reports'
+  end
+
   throttle('throttle_sign_up_attempts/ip', limit: 25, period: 5.minutes) do |req|
     req.throttleable_remote_ip if req.post? && req.path_matches?('/auth')
   end
