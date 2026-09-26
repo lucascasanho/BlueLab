@@ -184,17 +184,19 @@ const Firehose = ({ feedType, multiColumn }) => {
     title = messages.title_singular;
   }
 
-  const title = isRedesignEnabled() ? messages.title_redesign : messages.title;
+  const displayTitle = intl.formatMessage(
+    isRedesignEnabled() && !isBlue2 ? messages.title_redesign : title,
+  );
 
   return (
-    <Column bindToDocument={!multiColumn} label={intl.formatMessage(title)}>
+    <Column bindToDocument={!multiColumn} label={displayTitle}>
       {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
-          title={intl.formatMessage(title)
+          title={displayTitle}
           withBackButton={multiColumn && 'auto'}
           withUnreadMarker={hasUnread}
           extraButtons={multiColumn &&
-            <ColumnSettingsMenu labelPrefix={intl.formatMessage(title)}>
+            <ColumnSettingsMenu labelPrefix={displayTitle}>
               <MultiColumnMenuItems onPin={handlePin} />
             </ColumnSettingsMenu>
           }
@@ -204,7 +206,7 @@ const Firehose = ({ feedType, multiColumn }) => {
           icon='globe'
           iconComponent={PublicIcon}
           active={hasUnread}
-          title={intl.formatMessage(title)}
+          title={displayTitle}
           onPin={handlePin}
           multiColumn={multiColumn}
           scrollTopOnClick
@@ -240,7 +242,7 @@ const Firehose = ({ feedType, multiColumn }) => {
       />
 
       <Helmet>
-        <title>{intl.formatMessage(title)}</title>
+        <title>{displayTitle}</title>
         <meta name='robots' content='noindex' />
       </Helmet>
     </Column>
