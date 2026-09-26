@@ -1592,5 +1592,11 @@
   "visibility_modal.quote_label": "Who can quote",
   "visibility_modal.quote_nobody": "Just me",
   "visibility_modal.quote_public": "Anyone",
-  "visibility_modal.save": "Save"
+  "visibility_modal.save": "Save",
+  "account_switcher.title": "Accounts",
+  "account_switcher.current": "Current",
+  "account_switcher.sign_in": "Sign in to another account",
+  "account_switcher.create": "Create another account",
+  "account_switcher.remove": "Remove {account} from this device",
+  "account_switcher.error": "This account session is no longer available. Sign in again to add it."
 }
