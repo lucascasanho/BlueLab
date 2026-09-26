@@ -11,6 +11,8 @@ import { Avatar } from '@/mastodon/components/avatar';
 import { Badge } from '@/mastodon/components/badge';
 import { DisplayName } from '@/mastodon/components/display_name';
 import { useAccountHandle } from '@/mastodon/components/display_name/default';
+import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
+import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useColumnsContext } from '@/mastodon/features/ui/util/columns_context';
@@ -50,6 +52,26 @@ import { MultiColumnContent } from '../ui/components/columns_area/multi_column_c
 import classes from './index.module.scss';
 
 type IconComponent = React.ComponentType<React.SVGProps<SVGSVGElement>>;
+
+const Mastodon5Footer: React.FC = () => {
+  const openBugReport = useOpenBugReport();
+
+  return (
+    <footer className={classes.desktopFooter}>
+      <a href='/about'>About</a>
+      <span>·</span>
+      <a href='/privacy-policy'>Privacy</a>
+      <span>·</span>
+      <a href='/terms-of-service'>Terms</a>
+      <span>·</span>
+      <a href='/keyboard-shortcuts'>Keyboard Shortcuts</a>
+      <span>·</span>
+      <button type='button' onClick={openBugReport}>
+        <BugReportLabel />
+      </button>
+    </footer>
+  );
+};
 
 const NavigationLink: React.FC<{
   to: string;
@@ -521,6 +543,7 @@ export const ColumnsAreaMastodon5: React.FC<{
           <MultiColumnContent>{children}</MultiColumnContent>
         </section>
         <ComposeRedesignButton />
+        <Mastodon5Footer />
       </main>
     );
   }
@@ -544,6 +567,7 @@ export const ColumnsAreaMastodon5: React.FC<{
       <div className={classes.desktopComposer}>
         <ComposeRedesignButton />
       </div>
+      <Mastodon5Footer />
     </div>
   );
 };
