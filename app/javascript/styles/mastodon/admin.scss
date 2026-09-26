@@ -1213,15 +1213,35 @@ a.name-tag,
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 
-  & > form {
+  & > form,
+  & > a {
     display: inline-flex;
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
     margin: 0;
+  }
+
+  .button {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
   }
 }
 
 .verification-request-action-bar {
   align-items: center;
+}
+
+.verification-request-heading-actions {
+  @media screen and (max-width: $no-columns-breakpoint) {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }
 
 .verification-requests-list {
