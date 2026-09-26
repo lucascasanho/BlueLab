@@ -17,11 +17,11 @@
 .rootBlue2 {
   margin: var(--space-4);
   margin-top: auto;
-  padding: var(--space-4);
-  border: 1px solid var(--blue2-border-soft, #17232c);
-  border-radius: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   display: block;
-  background: var(--blue2-surface-raised, #101820);
+  background: transparent;
   color: var(--blue2-muted, #9aa8b4);
   font-size: 13px;
   line-height: 1.45;
