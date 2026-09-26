@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 class Api::V1::BugReportsController < Api::BaseController
-  before_action -> { doorkeeper_authorize! :write, :'write:reports' }
-  before_action :require_user!
+  skip_before_action :require_authenticated_user!
 
   def create
     @bug_report = BugReport.create!(
@@ -15,7 +14,8 @@ class Api::V1::BugReportsController < Api::BaseController
       interface_language: bug_report_params[:interface_language].presence || I18n.locale.to_s,
       theme: bug_report_params[:theme].presence,
       interface_layout: bug_report_params[:interface_layout].presence,
-      current_path: bug_report_params[:current_path].presence,
+      current_path: sanitize_path(bug_report_params[:current_path]),
+      error_page: sanitize_error_page(bug_report_params[:error_page]),
       viewport: bug_report_params[:viewport].presence,
       app_version: bug_report_params[:app_version].presence || Rails.configuration.x.mastodon.version,
       request_id: request.request_id,
@@ -51,10 +51,19 @@ class Api::V1::BugReportsController < Api::BaseController
       :theme,
       :interface_layout,
       :current_path,
+      :error_page,
       :viewport,
       :app_version,
       :client_errors
     )
+  end
+
+  def sanitize_path(value)
+    value.to_s.split('?').first.truncate(500).presence
+  end
+
+  def sanitize_error_page(value)
+    value.to_s.match?(/\A\d{3}\z/) ? value.to_s : nil
   end
 
   def client_errors
