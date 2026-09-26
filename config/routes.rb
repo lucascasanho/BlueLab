@@ -228,6 +228,8 @@ Rails.application.routes.draw do
   end
   resource :statuses_cleanup, controller: :statuses_cleanup, only: [:show, :update]
 
+  resources :bug_reports, only: [:new, :create]
+
   get '/media_proxy/:id/(*any)', to: 'media_proxy#show', as: :media_proxy, format: false
   resources :backups, only: [] do
     member { get :download, format: false }
