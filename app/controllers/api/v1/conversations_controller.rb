@@ -20,7 +20,7 @@ class Api::V1::ConversationsController < Api::BaseController
   def show
     conversation = matching_conversations
       .includes(account: [:account_stat, user: :role], last_status: [:media_attachments, :status_stat, :tags, :active_mentions, { account: [:account_stat, user: :role] }])
-      .order(last_status_id: :desc)
+      .order(Arel.sql('last_status_id DESC NULLS LAST, id DESC'))
       .first
 
     return head :not_found unless conversation
@@ -79,11 +79,11 @@ class Api::V1::ConversationsController < Api::BaseController
     if conversation.nil? && status.conversation_id.present?
       conversation = conversations
         .where(conversation_id: status.conversation_id)
-        .order(last_status_id: :desc)
+        .order(Arel.sql('last_status_id DESC NULLS LAST, id DESC'))
         .first
     end
 
-    conversation ||= conversations.order(last_status_id: :desc).first
+    conversation ||= conversations.order(Arel.sql('last_status_id DESC NULLS LAST, id DESC')).first
 
     return head :not_found unless conversation
 
@@ -146,7 +146,7 @@ class Api::V1::ConversationsController < Api::BaseController
     latest_per_participant_set = AccountConversation
       .where(account: current_account)
       .select("DISTINCT ON (participant_account_ids) id")
-      .order(Arel.sql('participant_account_ids, last_status_id DESC, id DESC'))
+      .order(Arel.sql('participant_account_ids, last_status_id DESC NULLS LAST, id DESC'))
 
     AccountConversation
       .where(id: latest_per_participant_set)
