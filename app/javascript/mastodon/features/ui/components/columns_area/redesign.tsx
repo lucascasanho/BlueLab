@@ -237,6 +237,7 @@ export const ColumnsAreaRedesign: React.FC<{
           className={classNames(
             classes.main,
             classes.blue2Main,
+            isBlue2MessagesPage && classes.blue2MessagesMain,
             isBlue2FeedPage && classes.blue2Home,
           )}
           onTouchStart={handleSwipeStart}
