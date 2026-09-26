@@ -39,6 +39,7 @@ class Auth::AccountSwitcherController < ApplicationController
     access_token = Doorkeeper::AccessToken.find_by(token: token)
     return if access_token.nil? || access_token.revoked_at.present?
     return unless access_token.application&.superapp?
+    return if SessionActivation.exists?(access_token_id: access_token.id)
 
     access_token.resource_owner
   end
