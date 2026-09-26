@@ -1476,7 +1476,7 @@ pt-BR:
     advanced_settings: Configurações avançadas
     animations_and_accessibility: Animações e acessibilidade
     boosting_preferences: Preferências de impulsionamento
-    boosting_preferences_info_html: "<strong>Dica:</strong> Independentemente das configurações, <kbd>Shift</kbd> + <kbd>Clique</kbd> no ícone %{icon} Impulsionar irá impulsionar imediatamente."
+    boosting_preferences_info_html: "<strong>Dica:</strong> Independentemente das configurações, <kbd>Shift</kbd> + <kbd>Clique</kbd> no ícone %{icon} RePostar irá RePostar imediatamente."
     discovery: Descobrir
     instance_theme: Tema do site
     instance_theme_hint: Configuração administrativa aplicada a todas as pessoas deste servidor. Somente funções com permissão para gerenciar configurações podem alterá-la.
