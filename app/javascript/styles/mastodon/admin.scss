@@ -1252,18 +1252,29 @@ a.name-tag,
 .verification-request-heading-actions {
   @media screen and (max-width: $no-columns-breakpoint) {
     width: 100%;
-    flex-direction: column;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     align-items: stretch;
-    justify-content: flex-start;
+    justify-content: stretch;
+    gap: 8px;
 
     & > form,
     & > a {
       width: 100%;
-      flex: 1 1 auto;
+      max-width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      margin: 0;
     }
 
     .button {
+      display: flex;
       width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
   }
 }
@@ -1271,25 +1282,47 @@ a.name-tag,
 .verification-requests-list {
   @media screen and (max-width: $no-columns-breakpoint) {
     .verification-request-action-bar {
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
       flex-direction: column;
       align-items: stretch;
       gap: 10px;
     }
 
+    .verification-request-action-bar > .announcements-list__item__meta {
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
     .verification-request-actions {
       width: 100%;
-      display: flex;
-      flex-wrap: wrap;
+      max-width: 100%;
+      min-width: 0;
+      margin-inline-start: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
       align-items: stretch;
+      gap: 8px;
+      box-sizing: border-box;
 
       & > form,
       & > a {
-        flex: 1 1 100%;
+        flex: 1 1 auto;
         width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        margin: 0;
       }
 
       .button {
+        display: flex;
         width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
       }
     }
   }
