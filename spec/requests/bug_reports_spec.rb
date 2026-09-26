@@ -10,6 +10,13 @@ RSpec.describe 'Public bug reports' do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('bug-report-form')
     end
+
+    it 'renders when reached from the login page' do
+      get new_bug_report_path(current_path: '/auth/sign_in')
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('bug-report-form')
+    end
   end
 
   describe 'POST /bug_reports' do
