@@ -24,7 +24,7 @@ fr:
       approved_msg: Badge de vérification accordé et demande résolue.
       denied_msg: Demande de vérification clôturée sans accorder le badge.
       already_resolved: Cette demande de vérification a déjà été résolue.
-      verified_role_missing: Le rôle « Verificado » n’existe pas.
+      verified_role_missing: Les rôles « Verificado » et « Verified » n’existent pas.
       role_not_assignable: Vous ne pouvez pas attribuer le rôle « Verificado » car sa position est supérieure à la vôtre.
       account_unavailable: Ce compte n’a plus d’utilisateur local.
       role_would_be_downgraded: La demande ne peut pas être approuvée car elle remplacerait un rôle supérieur par « Verificado ».
