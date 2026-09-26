@@ -47,7 +47,7 @@ pt-BR:
       resolved_msg: Relato de bug marcado como resolvido.
       status_open: Aberto
       status_resolved: Resolvido
-bug_reports:
+  bug_reports:
     link: Relatar bug
     title: Relatar bug
     lead: Descreva o que aconteceu e anexe capturas, GIFs, áudio ou vídeo quando forem úteis.
