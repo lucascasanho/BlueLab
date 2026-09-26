@@ -12,7 +12,7 @@ const account = (id: string, lastUsedAt = 0): StoredAccount => ({
   displayName: id.toUpperCase(),
   avatar: 'https://example.social/avatars/' + id + '.png',
   url: 'https://example.social/@' + id,
-  token: 'token-' + id,
+  sessionId: 'session-' + id,
   lastUsedAt,
 });
 
@@ -29,12 +29,12 @@ describe('account switcher storage', () => {
     expect(second.map((item) => item.id)).toEqual(['bob', 'alice']);
 
     const refreshed = upsertStoredAccount(
-      { ...account('alice'), token: 'token-alice-new' },
+      { ...account('alice'), sessionId: 'session-alice-new' },
       300,
     );
 
     expect(refreshed.map((item) => item.id)).toEqual(['alice', 'bob']);
-    expect(readStoredAccounts()[0].token).toBe('token-alice-new');
+    expect(readStoredAccounts()[0].sessionId).toBe('session-alice-new');
   });
 
   it('keeps the browser vault within the default ten-session server capacity', () => {
