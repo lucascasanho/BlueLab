@@ -93,6 +93,7 @@ export const NavigationAccountCardAndMenu: React.FC<{
           strategy='fixed'
           offset={8}
           maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
+          className={classes.accountMenu}
           data-testid='account-menu'
         >
           <AccountMenuItems />
