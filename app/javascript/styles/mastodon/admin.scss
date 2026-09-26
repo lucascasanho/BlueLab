@@ -1207,6 +1207,37 @@ a.name-tag,
   }
 }
 
+.verification-request-actions,
+.verification-request-heading-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+
+  & > form {
+    display: inline-flex;
+    margin: 0;
+  }
+}
+
+.verification-request-action-bar {
+  align-items: center;
+}
+
+.verification-requests-list {
+  .announcements-list__item__title {
+    margin-bottom: 8px;
+  }
+
+  .announcements-list__item__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+}
+
 .announcements-list,
 .filters-list {
   border: 1px solid var(--color-border-primary);
