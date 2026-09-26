@@ -1,0 +1,17 @@
+- content_for :page_title do
+  = t('auth.sign_in.another_account.two_factor_title')
+
+- content_for :blue2_auth_title do
+  = t('auth.sign_in.another_account.two_factor_title')
+
+- content_for :blue2_auth_subtitle do
+  = t('auth.sign_in.another_account.two_factor_notice')
+
+.simple_form
+  = form_with url: auth_account_switcher_authenticate_path, scope: :user, method: :post, html: { class: 'simple_form' } do |f|
+    .fields-group
+      = label_tag 'user_otp_attempt', t('simple_form.labels.defaults.otp_attempt')
+      = number_field_tag 'user[otp_attempt]', nil, autofocus: true, autocomplete: 'one-time-code', required: true, inputmode: 'numeric'
+
+    .actions
+      = f.submit t('auth.login'), class: 'button btn'
