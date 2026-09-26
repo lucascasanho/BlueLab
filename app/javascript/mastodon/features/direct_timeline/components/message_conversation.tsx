@@ -670,6 +670,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         {participantAccounts.length > 0 && (
           <RedesignComposeForm
             className={classes.replyComposer}
+            compact
             embedded
             autoFocus
             onSuccess={(status: ApiStatusJSON) => {
