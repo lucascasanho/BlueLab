@@ -1569,10 +1569,21 @@ pt-BR:
     sign_in:
       preamble_html: Entre com suas credenciais de domínios ( <strong>%{domain}</strong> ) . Se sua conta estiver hospedada em um servidor diferente, você não deve conseguir acessar este conteúdo.
       title: Entrar em %{domain}
+
+      another_account:
+        title: "Entrar em outra conta"
+        notice: "Sua conta atual continuará disponível no seletor de contas."
+        two_factor_title: "Verifique sua identidade"
+        two_factor_notice: "Digite o código de verificação da conta que você está adicionando."
+        passkey_only: "Esta conta usa uma passkey e não pode ser adicionada com senha."
+
     sign_up:
       manual_review: Inscrições no %{domain} passam pela revisão manual dos nossos moderadores. Para nos ajudar a processar o seu cadastro, escreva um pouco sobre você e por que você quer uma conta no %{domain}.
       preamble: Com uma conta neste servidor Mastodon, você poderá seguir qualquer outra pessoa no fediverso, independentemente de onde a conta dela esteja hospedada.
       title: Então vamos lá criar uma conta em %{domain}.
+      another_account:
+        title: "Criar outra conta"
+
     status:
       account_status: Status da conta
       confirming: Confirmação por e-mail pendente.
