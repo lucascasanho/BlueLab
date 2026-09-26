@@ -47,7 +47,7 @@ es:
       resolved_msg: Informe de error marcado como resuelto.
       status_open: Abierto
       status_resolved: Resuelto
-bug_reports:
+  bug_reports:
     link: Informar un error
     title: Informar un error
     lead: Describe lo ocurrido y adjunta capturas, GIF, audio o vídeo cuando sea útil.
