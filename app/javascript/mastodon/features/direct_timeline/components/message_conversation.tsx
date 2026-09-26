@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { useParams } from 'react-router-dom';
@@ -173,13 +173,17 @@ export const MessageConversation: React.FC = () => {
   }, [dispatch, id]);
 
   const participantAccountIdsKey = participantIds.join(',');
+  const participantAccountsRef = useRef(participantAccounts);
+  participantAccountsRef.current = participantAccounts;
 
   useEffect(() => {
-    if (participantAccounts.length === 0) return;
+    const recipients = participantAccountsRef.current;
+
+    if (recipients.length === 0) return;
 
     dispatch(resetCompose());
 
-    participantAccounts.forEach((account) => {
+    recipients.forEach((account) => {
       dispatch(directCompose(account));
     });
 
@@ -188,7 +192,7 @@ export const MessageConversation: React.FC = () => {
     return () => {
       dispatch(resetCompose());
     };
-  }, [dispatch, participantAccountIdsKey, participantAccounts]);
+  }, [dispatch, participantAccountIdsKey]);
 
   const handleReply = useCallback(
     (status: Immutable.Record<StatusShape>) => {
