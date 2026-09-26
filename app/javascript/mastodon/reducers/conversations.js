@@ -105,13 +105,21 @@ export default function conversations(state = initialState, action) {
       if (!target) return list;
 
       const targetConversationId = target.get('conversation_id');
+      const targetParticipants = target.get('accounts');
 
-      return list.map(item =>
-        targetConversationId &&
-        item.get('conversation_id') === targetConversationId
+      return list.map(item => {
+        const sameParticipants = item
+          .get('accounts')
+          .sort()
+          .equals(targetParticipants.sort());
+        const sameNativeConversation =
+          !!targetConversationId &&
+          item.get('conversation_id') === targetConversationId;
+
+        return sameParticipants || sameNativeConversation
           ? item.set('unread', false)
-          : item,
-      );
+          : item;
+      });
     });
   case blockAccountSuccess.type:
   case muteAccountSuccess.type:
@@ -124,13 +132,20 @@ export default function conversations(state = initialState, action) {
     if (!target) return state;
 
     const targetConversationId = target.get('conversation_id');
+    const targetParticipants = target.get('accounts');
 
     return state.update('items', list =>
-      targetConversationId
-        ? list.filterNot(
-            item => item.get('conversation_id') === targetConversationId,
-          )
-        : list.filterNot(item => item.get('id') === action.id),
+      list.filterNot(item => {
+        const sameParticipants = item
+          .get('accounts')
+          .sort()
+          .equals(targetParticipants.sort());
+        const sameNativeConversation =
+          !!targetConversationId &&
+          item.get('conversation_id') === targetConversationId;
+
+        return sameParticipants || sameNativeConversation;
+      }),
     );
   }
   default:
