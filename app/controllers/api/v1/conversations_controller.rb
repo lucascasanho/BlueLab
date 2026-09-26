@@ -3,15 +3,43 @@
 class Api::V1::ConversationsController < Api::BaseController
   LIMIT = 20
 
-  before_action -> { doorkeeper_authorize! :read, :'read:statuses' }, only: :index
-  before_action -> { doorkeeper_authorize! :write, :'write:conversations' }, except: :index
+  before_action -> { doorkeeper_authorize! :read, :'read:statuses' }, only: [:index, :show, :messages, :by_status]
+  before_action -> { doorkeeper_authorize! :write, :'write:conversations' }, except: [:index, :messages, :by_status]
   before_action :require_user!
-  before_action :set_conversation, except: :index
+  before_action :set_conversation, except: [:index, :by_status, :read]
   after_action :insert_pagination_headers, only: :index
 
   def index
     @conversations = paginated_conversations
-    render json: @conversations, each_serializer: REST::ConversationSerializer, relationships: StatusRelationshipsPresenter.new(@conversations.map(&:last_status), current_user&.account_id)
+
+    render json: @conversations,
+           each_serializer: REST::ConversationSerializer,
+           relationships: StatusRelationshipsPresenter.new(@conversations.map(&:last_status), current_user&.account_id)
+  end
+
+  def show
+    conversation = matching_conversations
+      .includes(account: [:account_stat, user: :role], last_status: [:media_attachments, :status_stat, :tags, :active_mentions, { account: [:account_stat, user: :role] }])
+      .order(Arel.sql('last_status_id DESC NULLS LAST, id DESC'))
+      .first
+
+    return head :not_found unless conversation
+
+    conversation.participant_accounts = matching_conversations
+      .flat_map(&:participant_accounts)
+      .uniq { |account| account.id }
+
+    render json: conversation,
+           serializer: REST::ConversationSerializer,
+           relationships: StatusRelationshipsPresenter.new([conversation.last_status], current_user&.account_id)
+  end
+
+  def messages
+    statuses = conversation_statuses
+
+    render json: statuses,
+           each_serializer: REST::StatusSerializer,
+           relationships: StatusRelationshipsPresenter.new(statuses, current_user&.account_id)
   end
 
   def read
@@ -19,13 +47,50 @@ class Api::V1::ConversationsController < Api::BaseController
     render json: @conversation, serializer: REST::ConversationSerializer
   end
 
+  def by_status
+    status = Status.find_by(id: params[:status_id])
+
+    return head :not_found unless status
+
+    participant_account_ids = (
+      status.active_mentions.pluck(:account_id) +
+      [status.account_id] -
+      [current_account.id]
+    ).uniq.sort
+
+    conversations = AccountConversation.where(
+      account: current_account,
+      participant_account_ids: participant_account_ids,
+    )
+
+    # Prefer the exact account-conversation row that contains the status.
+    # This prevents a notification from opening a newer or stale row with
+    # the same participant set.
+    conversation = conversations
+      .where('? = ANY(status_ids)', status.id)
+      .order(last_status_id: :desc)
+      .first
+
+    if conversation.nil? && status.conversation_id.present?
+      conversation = conversations
+        .where(conversation_id: status.conversation_id)
+        .order(Arel.sql('last_status_id DESC NULLS LAST, id DESC'))
+        .first
+    end
+
+    conversation ||= conversations.order(Arel.sql('last_status_id DESC NULLS LAST, id DESC')).first
+
+    return head :not_found unless conversation
+
+    render json: { id: conversation.id.to_s }
+  end
   def unread
-    @conversation.update!(unread: true)
+    matching_conversations.update_all(unread: true, updated_at: Time.current)
     render json: @conversation, serializer: REST::ConversationSerializer
   end
 
   def destroy
-    @conversation.destroy!
+    matching_conversations.destroy_all
     render_empty
   end
 
@@ -35,8 +100,51 @@ class Api::V1::ConversationsController < Api::BaseController
     @conversation = AccountConversation.where(account: current_account).find(params[:id])
   end
 
+  def matching_conversations
+    account_conversations = AccountConversation.where(account: current_account)
+    participant_matches = account_conversations.where(
+      participant_account_ids: @conversation.participant_account_ids,
+    )
+
+    if @conversation.conversation_id.present?
+      participant_matches.or(
+        account_conversations.where(conversation_id: @conversation.conversation_id),
+      )
+    else
+      participant_matches
+    end
+  end
+
+  def conversation_statuses
+    account_conversations = matching_conversations
+    status_ids = (
+      account_conversations.pluck(:status_ids).flatten +
+      account_conversations.pluck(:last_status_id)
+    ).compact.uniq
+
+    Status.where(id: status_ids)
+      .includes(
+        :media_attachments,
+        :preloadable_poll,
+        :status_stat,
+        :tags,
+        {
+          preview_cards_status: { preview_card: { author_account: [:account_stat, user: :role] } },
+          active_mentions: :account,
+          account: [:account_stat, user: :role],
+        }
+      )
+      .order(id: :asc)
+  end
+
   def paginated_conversations
-    AccountConversation.where(account: current_account)
+    latest_per_participant_set = AccountConversation
+      .where(account: current_account)
+      .select("DISTINCT ON (participant_account_ids) id")
+      .order(Arel.sql('participant_account_ids, last_status_id DESC NULLS LAST, id DESC'))
+
+    AccountConversation
+      .where(id: latest_per_participant_set)
       .includes(
         account: [:account_stat, user: :role],
         last_status: [
