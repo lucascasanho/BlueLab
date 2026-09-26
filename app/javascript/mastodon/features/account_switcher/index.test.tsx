@@ -14,6 +14,16 @@ const account = (id: string, lastUsedAt = 0): StoredAccount => ({
   url: 'https://example.social/@' + id,
   sessionId: 'session-' + id,
   lastUsedAt,
+  emojis: [
+    {
+      shortcode: 'test_custom',
+      static_url: 'https://example.social/emoji/test_custom.png',
+      url: 'https://example.social/emoji/test_custom.gif',
+      category: '',
+      featured: false,
+      visible_in_picker: true,
+    },
+  ],
 });
 
 describe('account switcher storage', () => {
@@ -35,6 +45,11 @@ describe('account switcher storage', () => {
 
     expect(refreshed.map((item) => item.id)).toEqual(['alice', 'bob']);
     expect(readStoredAccounts()[0].sessionId).toBe('session-alice-new');
+    expect(readStoredAccounts()[0].emojis?.[0]).toMatchObject({
+      shortcode: 'test_custom',
+      static_url: 'https://example.social/emoji/test_custom.png',
+      url: 'https://example.social/emoji/test_custom.gif',
+    });
   });
 
   it('keeps the browser vault within the default ten-session server capacity', () => {
