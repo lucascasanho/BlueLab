@@ -92,3 +92,6 @@
 
   .actions
     = f.button :button, @invite&.bypass_approval? ? t('auth.register') : sign_up_message, type: :submit
+
+
+.form-footer= render 'auth/shared/links'
