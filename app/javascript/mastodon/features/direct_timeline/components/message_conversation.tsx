@@ -310,6 +310,25 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     }
   }, [id, latestThreadStatusId, loadMessages]);
 
+  const initialReadStateRef = useRef<{
+    conversationId: string;
+    unread: boolean;
+    lastReadStatusId: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!id || !conversation || initialReadStateRef.current?.conversationId === id) {
+      return;
+    }
+
+    initialReadStateRef.current = {
+      conversationId: id,
+      unread: Boolean(conversation.get('unread')),
+      lastReadStatusId:
+        (conversation.get('last_read_status_id') as string | null) ?? null,
+    };
+  }, [conversation, id]);
+
   useEffect(() => {
     if (id && conversationResolved && conversation) {
       void dispatch(markConversationRead(id)).catch(() => undefined);
