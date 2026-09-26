@@ -40,7 +40,7 @@ class Auth::SessionsController < Devise::SessionsController
       attempt_user_id = session[:attempt_user_id].to_i if session[:attempt_user_id].present?
 
       if current_warden_user && current_warden_user.id != attempt_user_id
-        warden.logout(:user)
+        warden.set_user(nil, scope: :user, store: false, run_callbacks: false)
       end
     end
 
