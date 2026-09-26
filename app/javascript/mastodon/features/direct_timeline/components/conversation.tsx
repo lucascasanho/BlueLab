@@ -102,7 +102,7 @@ export const Conversation: React.FC<{
   );
   const accounts = useAppSelector((state) => getAccounts(state, accountIds));
 
-  const pointerActivationRef = useRef(false);
+  const pointerActivationRef = useRef<number | null>(null);
 
   const handleClick = useCallback(() => {
     if (unread) {
@@ -237,14 +237,18 @@ export const Conversation: React.FC<{
             return;
           }
 
-          pointerActivationRef.current = true;
+          pointerActivationRef.current = Date.now();
           handleClick();
         }}
         onClick={(event) => {
-          if (pointerActivationRef.current) {
-            pointerActivationRef.current = false;
+          const pointerActivatedAt = pointerActivationRef.current;
+          if (
+            pointerActivatedAt !== null &&
+            Date.now() - pointerActivatedAt < 500
+          ) {
             return;
           }
+          pointerActivationRef.current = null;
 
           if (
             (event.target as HTMLElement).closest(
