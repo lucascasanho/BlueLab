@@ -1,4 +1,4 @@
-- bluelab_error = Setting.theme == 'blue-2' && response.status == 404
+- bluelab_error = current_theme == 'blue-2'
 
 !!!
 %html{ lang: I18n.locale, 'data-theme' => (bluelab_error ? 'blue-2' : nil), 'data-contrast' => 'auto', 'data-color-scheme' => 'auto', 'data-system-theme' => (bluelab_error ? 'true' : nil) }
@@ -32,7 +32,7 @@
           %span= Setting.site_title
 
         .error-page__content
-          .error-page__code 404
+          .error-page__code= response.status
           %h1= yield :content
           .error-page__actions
             = link_to root_path, class: 'button error-page__home' do
