@@ -2160,7 +2160,7 @@ en:
     nickname_hint: For example, iPhone, Windows Hello, or YubiKey
     not_supported: This browser doesn't support passkeys.
     registered_on: Added on %{date}
-    sign_in: Sign in with a passkey
+    sign_in: Passkey
     title: Passkeys
   polls:
     errors:
