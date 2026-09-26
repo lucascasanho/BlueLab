@@ -139,6 +139,37 @@ RSpec.describe 'API V1 Conversations' do
   end
 
   describe 'GET /api/v1/conversations/by-status/:status_id', :inline_jobs do
+    it 'falls back to the current participant conversation when the old row is gone' do
+      old_status = PostStatusService.new.call(
+        other.account,
+        text: 'Old @alice',
+        visibility: :direct,
+      )
+      old_conversation = AccountConversation.where(
+        account: user.account,
+        conversation_id: old_status.conversation_id,
+      ).first
+      old_conversation.destroy!
+
+      current_status = PostStatusService.new.call(
+        user.account,
+        text: "@#{other.account.username} Current",
+        visibility: :direct,
+      )
+      current_conversation = AccountConversation.where(
+        account: user.account,
+        participant_account_ids: [other.account.id],
+      ).order(last_status_id: :desc).first
+
+      expect(old_conversation).not_to be_persisted
+      expect(current_conversation).to be_present
+
+      get "/api/v1/conversations/by-status/#{old_status.id}", headers: headers
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body[:id]).to eq(current_conversation.id.to_s)
+    end
+
     it 'resolves a direct status to its conversation' do
       status = PostStatusService.new.call(
         other.account,
