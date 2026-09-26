@@ -35,7 +35,7 @@ const messages = defineMessages({
     defaultMessage: 'Custom Feeds',
   },
   create: { id: 'lists.create_list', defaultMessage: 'Create list' },
-  create_redesign: { id: 'custom_feeds.create', defaultMessage: 'Create' },
+  create_redesign: { id: 'lists.create', defaultMessage: 'Create' },
   edit: { id: 'lists.edit', defaultMessage: 'Edit list' },
   delete: { id: 'lists.delete', defaultMessage: 'Delete list' },
   more: { id: 'status.more', defaultMessage: 'More' },
