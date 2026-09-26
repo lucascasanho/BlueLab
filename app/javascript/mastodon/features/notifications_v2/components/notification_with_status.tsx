@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
 import { replyComposeById } from 'mastodon/actions/compose';
+import { openConversationForStatus } from 'mastodon/actions/conversations';
 import { toggleReblog, toggleFavourite } from 'mastodon/actions/interactions';
 import {
   navigateToStatus,
@@ -64,7 +65,15 @@ export const NotificationWithStatus: React.FC<{
   const handlers = useMemo(
     () => ({
       open: () => {
-        dispatch(navigateToStatus(statusId));
+        const isBlue2 =
+          typeof document !== 'undefined' &&
+          document.body.dataset.theme === 'blue-2';
+
+        if (isBlue2 && isPrivateMention) {
+          dispatch(openConversationForStatus(statusId));
+        } else {
+          dispatch(navigateToStatus(statusId));
+        }
       },
 
       reply: () => {
@@ -83,10 +92,22 @@ export const NotificationWithStatus: React.FC<{
         dispatch(toggleStatusSpoilers(statusId));
       },
     }),
-    [dispatch, statusId],
+    [dispatch, isPrivateMention, statusId],
   );
 
   if (!statusId || isFiltered) return null;
+
+  const handleStatusOpen = () => {
+    const isBlue2 =
+      typeof document !== 'undefined' &&
+      document.body.dataset.theme === 'blue-2';
+
+    if (isBlue2 && isPrivateMention) {
+      dispatch(openConversationForStatus(statusId));
+    } else {
+      dispatch(navigateToStatus(statusId));
+    }
+  };
 
   return (
     <Hotkeys handlers={handlers}>
@@ -111,6 +132,7 @@ export const NotificationWithStatus: React.FC<{
         <Status
           id={statusId}
           contextType='notifications'
+          onOpen={handleStatusOpen}
           withDismiss
           skipPrepend
           avatarSize={40}
