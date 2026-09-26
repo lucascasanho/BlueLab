@@ -32,7 +32,7 @@ import {
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
-import { selectComposeType } from './selectors';
+import { isMessageComposeType, selectComposeType } from './selectors';
 import classes from './styles.module.scss';
 
 const messages = defineMessages({
@@ -575,6 +575,7 @@ export const RichComposeEditor: React.FC<{
   onContentTypeChange?: (value: string) => void;
   onFiles?: (files: FileList) => void;
   dismissOnEscape?: boolean;
+  messageToolbar?: boolean;
 }> = ({
   onSubmit,
   children,
@@ -587,6 +588,7 @@ export const RichComposeEditor: React.FC<{
   onContentTypeChange,
   onFiles,
   dismissOnEscape = true,
+  messageToolbar = false,
 }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -599,7 +601,22 @@ export const RichComposeEditor: React.FC<{
   );
   const text = value ?? globalText;
   const contentType = contentTypeProp ?? globalContentType;
-  const isMarkdown = contentType === 'text/markdown';
+  const isBlueLabTheme =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'blue-2';
+  const forceMessageMarkdown =
+    messageToolbar || (isBlueLabTheme && isMessageComposeType(type));
+  const isMarkdown = forceMessageMarkdown || contentType === 'text/markdown';
+  const messageCommands = commands.filter(
+    ([command, _icon, _message, value]) =>
+      inlineCommands.includes(command as InlineCommand) ||
+      (command === 'formatBlock' && value === 'blockquote'),
+  );
+  const visibleCommands = messageToolbar
+    ? messageCommands
+    : forceMessageMarkdown
+      ? messageCommands
+      : commands;
   const customEmojis = useCustomEmojis();
   const ref = useRef<HTMLDivElement>(null);
   const hiddenRef = useRef<HTMLTextAreaElement>(null);
@@ -649,6 +666,16 @@ export const RichComposeEditor: React.FC<{
   useEffect(() => {
     if (autoFocus && ref.current) focusAtEnd(ref.current);
   }, [autoFocus]);
+
+  useEffect(() => {
+    if (forceMessageMarkdown && contentType !== 'text/markdown') {
+      if (onContentTypeChange) {
+        onContentTypeChange('text/markdown');
+      } else {
+        dispatch(changeComposeContentType('text/markdown'));
+      }
+    }
+  }, [contentType, dispatch, forceMessageMarkdown, onContentTypeChange]);
 
   useEffect(() => {
     const editor = ref.current;
@@ -822,7 +849,7 @@ export const RichComposeEditor: React.FC<{
           role='toolbar'
           aria-label={intl.formatMessage(messages.toolbar)}
         >
-          {commands.map(([command, icon, message, value]) => {
+          {visibleCommands.map(([command, icon, message, value]) => {
             const stateKey = value ?? command;
             const active = activeFormats.has(stateKey);
             const label = intl.formatMessage(message);
@@ -845,19 +872,21 @@ export const RichComposeEditor: React.FC<{
               </IconButton>
             );
           })}
-          <IconButton
-            as='button'
-            type='button'
-            size='sm'
-            icon={LinkIcon}
-            title={intl.formatMessage(messages.link)}
-            color={activeFormats.has('link') ? 'accent' : 'neutral'}
-            aria-pressed={activeFormats.has('link')}
-            onMouseDown={preventToolbarFocus}
-            onClick={handleLink}
-          >
-            {intl.formatMessage(messages.link)}
-          </IconButton>
+          {!messageToolbar && (
+            <IconButton
+              as='button'
+              type='button'
+              size='sm'
+              icon={LinkIcon}
+              title={intl.formatMessage(messages.link)}
+              color={activeFormats.has('link') ? 'accent' : 'neutral'}
+              aria-pressed={activeFormats.has('link')}
+              onMouseDown={preventToolbarFocus}
+              onClick={handleLink}
+            >
+              {intl.formatMessage(messages.link)}
+            </IconButton>
+          )}
         </div>
       )}
       <div
@@ -870,7 +899,7 @@ export const RichComposeEditor: React.FC<{
         aria-label={ariaLabel}
         aria-multiline='true'
         data-placeholder={intl.formatMessage(
-          type === 'message'
+          isMessageComposeType(type)
             ? messages.messagePlaceholder
             : messages.postPlaceholder,
         )}
