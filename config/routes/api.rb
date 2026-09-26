@@ -106,8 +106,11 @@ namespace :api, format: false do
       end
     end
 
-    resources :conversations, only: [:index, :destroy] do
+    get '/conversations/by-status/:status_id', to: 'conversations#by_status'
+
+    resources :conversations, only: [:index, :show, :destroy] do
       member do
+        get :messages
         post :read
         post :unread
       end
@@ -127,6 +130,7 @@ namespace :api, format: false do
     resources :favourites, only: [:index]
     resources :bookmarks, only: [:index]
     resources :reports, only: [:create]
+    resources :bug_reports, only: [:create]
     resources :trends, only: [:index], controller: 'trends/tags'
     resources :filters, only: [:index, :create, :show, :update, :destroy]
     resources :endorsements, only: [:index]
