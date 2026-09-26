@@ -326,7 +326,7 @@ export const Notifications: React.FC<{
         </LegacyColumnHeader>
       )}
 
-      {!isRedesignEnabled() && filterBar}
+      {!isRedesignEnabled() && !isBlue2 && filterBar}
 
       {scrollContainer}
 
