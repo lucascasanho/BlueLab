@@ -17,7 +17,6 @@ const conversation = (
   ImmutableMap({
     id,
     conversation_id: conversationId,
-    thread_id: threadId ?? conversationId,
     accounts: ImmutableList(accounts),
     last_status: lastStatus,
     unread,
@@ -33,32 +32,30 @@ describe('direct conversation grouping', () => {
     ]);
   });
 
-  test('does not merge separate threads with the same participants', () => {
-    const first = conversation('1', '100', ['alice'], '10', false, '1');
-    const second = conversation('2', '200', ['alice'], '20', false, '2');
+  test('groups separate account-conversation rows with the same participants', () => {
+    const first = conversation('1', '100', ['alice'], '10');
+    const second = conversation('2', '200', ['alice'], '20');
 
     expect(groupConversations(ImmutableList([first, second]))).toEqual([
-      [first],
-      [second],
+      [first, second],
     ]);
   });
 
-  test('merges sent and received account-conversation rows for one reply thread', () => {
-    const sent = conversation('1', '100', ['joe'], '10', false, 'root-10');
-    const received = conversation('2', '200', ['alice'], '20', false, 'root-10');
+  test('keeps sent and received rows for the same conversation together', () => {
+    const sent = conversation('1', '100', ['joe'], '10');
+    const received = conversation('2', '200', ['joe'], '20');
 
     expect(groupConversations(ImmutableList([sent, received]))).toEqual([
       [sent, received],
     ]);
   });
 
-  test('does not merge legacy records that have no native conversation id', () => {
+  test('groups legacy records with the same participants', () => {
     const first = conversation('1', null, ['alice'], '10');
     const second = conversation('2', null, ['alice'], '20');
 
     expect(groupConversations(ImmutableList([first, second]))).toEqual([
-      [first],
-      [second],
+      [first, second],
     ]);
   });
 
