@@ -84,17 +84,7 @@ class Notification extends ImmutablePureComponent {
         document.body.dataset.theme === 'blue-2';
 
       if (isBlue2 && status?.get('visibility') === 'direct') {
-        this.props
-          .onOpenConversation(status.get('id'))
-          .then((conversationId) => {
-            this.props.history.push(`/conversations/${conversationId}`);
-          })
-          .catch(() => {
-            this.props.history.push(
-              `/@${notification.getIn(['status', 'account', 'acct'])}/${notification.get('status')}`,
-            );
-          });
-
+        this.props.onOpenConversation(status.get('id'));
         return;
       }
 
