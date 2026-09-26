@@ -9,12 +9,15 @@ import { List as ImmutableList } from 'immutable';
 import { Helmet } from '@unhead/react/helmet';
 
 import ReplyIcon from '@/material-icons/400-24px/reply.svg?react';
+import StarIcon from '@/material-icons/400-24px/star-fill.svg?react';
+import StarBorderIcon from '@/material-icons/400-24px/star.svg?react';
 
 import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
 
 import { importFetchedStatus } from '@/mastodon/actions/importer';
+import { toggleFavourite } from '@/mastodon/actions/interactions';
 import { fetchStatus } from '@/mastodon/actions/statuses';
-import { directCompose, replyCompose, resetCompose } from '@/mastodon/actions/compose';
+import { directCompose, replyComposeInline, resetCompose } from '@/mastodon/actions/compose';
 import { connectDirectStream } from '@/mastodon/actions/streaming';
 import {
   expandConversations,
@@ -320,8 +323,7 @@ export const MessageConversation: React.FC = () => {
 
   const handleReply = useCallback(
     (status: Immutable.Record<StatusShape>) => {
-      dispatch(resetCompose());
-      dispatch(replyCompose(status));
+      dispatch(replyComposeInline(status));
     },
     [dispatch],
   );
@@ -475,16 +477,40 @@ export const MessageConversation: React.FC = () => {
                   />
                 )}
 
-                <IconButton
-                  className={classes.replyButton}
-                  title={intl.formatMessage({
-                    id: 'status.reply',
-                    defaultMessage: 'Reply',
-                  })}
-                  icon='reply'
-                  iconComponent={ReplyIcon}
-                  onClick={() => handleReply(status)}
-                />
+                <div className={classes.messageActions}>
+                  <IconButton
+                    className={classes.messageAction}
+                    title={intl.formatMessage({
+                      id: 'status.reply',
+                      defaultMessage: 'Reply',
+                    })}
+                    icon='reply'
+                    iconComponent={ReplyIcon}
+                    onClick={() => handleReply(status)}
+                  />
+                  <IconButton
+                    className={classes.messageAction}
+                    active={!!status.get('favourited')}
+                    title={intl.formatMessage(
+                      status.get('favourited')
+                        ? {
+                            id: 'status.remove_favourite',
+                            defaultMessage: 'Remove from favorites',
+                          }
+                        : {
+                            id: 'status.favourite',
+                            defaultMessage: 'Favorite',
+                          },
+                    )}
+                    icon='star'
+                    iconComponent={
+                      status.get('favourited') ? StarIcon : StarBorderIcon
+                    }
+                    onClick={() =>
+                      dispatch(toggleFavourite(status.get('id') as string))
+                    }
+                  />
+                </div>
               </article>
             );
           })}
