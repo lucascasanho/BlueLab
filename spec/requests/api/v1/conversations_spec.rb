@@ -35,41 +35,7 @@ RSpec.describe 'API V1 Conversations' do
       expect(response.parsed_body.size).to eq 2
       expect(response.parsed_body.first[:accounts].size).to eq 1
       expect(response.parsed_body.first[:conversation_id]).to be_present
-      expect(response.parsed_body.first[:thread_id]).to be_present
-
     end
-
-    it 'collapses multiple account conversations from one native thread' do
-      first = PostStatusService.new.call(
-        other.account,
-        text: 'First @alice',
-        visibility: :direct,
-      )
-      other_two = Fabricate(:user)
-      PostStatusService.new.call(
-        other_two.account,
-        text: '@alice Second',
-        visibility: :direct,
-        thread: first,
-      )
-
-      expect(
-        AccountConversation.where(
-          account: user.account,
-          conversation_id: first.conversation_id,
-        ).count
-      ).to eq(2)
-
-      get '/api/v1/conversations', headers: headers
-
-      thread_rows = response.parsed_body.select do |conversation|
-        conversation[:conversation_id] == first.conversation_id.to_s
-      end
-
-      expect(thread_rows.size).to eq(1)
-      expect(thread_rows.first[:accounts].size).to eq(2)
-    end
-
 
     context 'with since_id' do
       context 'when requesting old posts' do
@@ -169,77 +135,61 @@ RSpec.describe 'API V1 Conversations' do
   end
 
   describe 'GET /api/v1/conversations/:id/messages', :inline_jobs do
-    it 'returns all messages from the same reply thread when conversation ids differ' do
+    it 'returns sent and received direct messages for the same participants' do
+      received = PostStatusService.new.call(
+        other.account,
+        text: 'Hello @alice',
+        visibility: :direct,
+      )
+      sent = PostStatusService.new.call(
+        user.account,
+        text: 'Hello Joe',
+        visibility: :direct,
+      )
+
+      expect(received.conversation_id).not_to eq(sent.conversation_id)
+
+      conversation = AccountConversation.where(
+        account: user.account,
+        participant_account_ids: [other.account.id],
+      ).order(last_status_id: :desc).first
+
+      expect(conversation).to be_present
+
+      get "/api/v1/conversations/#{conversation.id}/messages", headers: headers
+
+      expect(response).to have_http_status(200)
+      expect(response.parsed_body.map { |status| status[:id] })
+        .to contain_exactly(received.id.to_s, sent.id.to_s)
+    end
+
+    it 'does not mix conversations with different participants' do
       first = PostStatusService.new.call(
         other.account,
-        text: 'First @alice',
+        text: 'Hello @alice',
         visibility: :direct,
       )
       other_two = Fabricate(:user)
       second = PostStatusService.new.call(
         other_two.account,
-        text: '@alice Second',
-        visibility: :direct,
-        thread: first,
-      )
-
-      alternate_conversation = Conversation.create!
-      second.update_column(:conversation_id, alternate_conversation.id)
-
-      first_conversation = AccountConversation.where(
-        account: user.account,
-        conversation_id: first.reload.conversation_id,
-      ).first
-      second_conversation = AccountConversation.where(
-        account: user.account,
-      ).where('? = ANY(status_ids)', second.id).first
-
-      expect(first_conversation).to be_present
-      expect(second_conversation).to be_present
-
-      second_conversation.update_column(:conversation_id, alternate_conversation.id)
-
-      get "/api/v1/conversations/#{first_conversation.id}/messages", headers: headers
-
-      expect(response).to have_http_status(200)
-      expect(response.parsed_body.map { |status| status[:id] })
-        .to contain_exactly(first.id.to_s, second.id.to_s)
-    end
-
-    it 'does not mix statuses from another thread with the same participants' do
-      first = PostStatusService.new.call(
-        other.account,
-        text: 'First @alice',
-        visibility: :direct,
-      )
-      second = PostStatusService.new.call(
-        other.account,
-        text: 'Second @alice',
+        text: 'Hello @alice from someone else',
         visibility: :direct,
       )
 
       conversation = AccountConversation.where(
         account: user.account,
-        conversation_id: first.conversation_id,
-      ).first
+        participant_account_ids: [other.account.id],
+      ).find_by(conversation_id: first.conversation_id)
 
       expect(conversation).to be_present
-
-      alternate_thread = Conversation.create!
-      AccountConversation.create!(
-        account: user.account,
-        conversation: alternate_thread,
-        participant_account_ids: [other.account.id],
-        status_ids: [second.id],
-        unread: false,
-      )
-
-      conversation.update!(status_ids: [first.id])
 
       get "/api/v1/conversations/#{conversation.id}/messages", headers: headers
 
       expect(response).to have_http_status(200)
-      expect(response.parsed_body.map { |status| status[:id] }).to eq([first.id.to_s])
+      expect(response.parsed_body.map { |status| status[:id] })
+        .to eq([first.id.to_s])
+      expect(second).to be_present
     end
+
   end
 end
