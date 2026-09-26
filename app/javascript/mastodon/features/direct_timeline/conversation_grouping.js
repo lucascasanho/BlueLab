@@ -13,11 +13,14 @@ const related = (left, right) => {
   const leftConversationKey = conversationKey(left);
   const rightConversationKey = conversationKey(right);
 
+  if (leftConversationKey && rightConversationKey) {
+    return leftConversationKey === rightConversationKey;
+  }
+
   return (
-    participantKey(left) === participantKey(right) ||
-    (!!leftConversationKey &&
-      !!rightConversationKey &&
-      leftConversationKey === rightConversationKey)
+    !leftConversationKey &&
+    !rightConversationKey &&
+    participantKey(left) === participantKey(right)
   );
 };
 
