@@ -71,14 +71,36 @@ class Notification extends ImmutablePureComponent {
     cacheMediaWidth: PropTypes.func,
     cachedMediaWidth: PropTypes.number,
     unread: PropTypes.bool,
+    onOpenConversation: PropTypes.func.isRequired,
     ...WithRouterPropTypes,
   };
 
   handleOpen = () => {
-    const { notification } = this.props;
+    const { notification, status } = this.props;
 
     if (notification.get('status')) {
-      this.props.history.push(`/@${notification.getIn(['status', 'account', 'acct'])}/${notification.get('status')}`);
+      const isBlue2 =
+        typeof document !== 'undefined' &&
+        document.body.dataset.theme === 'blue-2';
+
+      if (isBlue2 && status?.get('visibility') === 'direct') {
+        this.props
+          .onOpenConversation(status.get('id'))
+          .then((conversationId) => {
+            this.props.history.push(`/conversations/${conversationId}`);
+          })
+          .catch(() => {
+            this.props.history.push(
+              `/@${notification.getIn(['status', 'account', 'acct'])}/${notification.get('status')}`,
+            );
+          });
+
+        return;
+      }
+
+      this.props.history.push(
+        `/@${notification.getIn(['status', 'account', 'acct'])}/${notification.get('status')}`,
+      );
     } else {
       this.handleOpenProfile();
     }
