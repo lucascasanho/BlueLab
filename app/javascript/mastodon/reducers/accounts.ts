@@ -5,6 +5,7 @@ import {
   followAccountSuccess,
   unfollowAccountSuccess,
   revealAccount,
+  updateVerificationBadgeVisibility,
 } from 'mastodon/actions/accounts_typed';
 import { importAccounts } from 'mastodon/actions/importer/accounts';
 import type { ApiAccountJSON } from 'mastodon/api_types/accounts';
@@ -57,6 +58,10 @@ export const accountsReducer: Reducer<typeof initialState> = (
     return state.setIn([action.payload.id, 'hidden'], false);
   else if (importAccounts.match(action))
     return normalizeAccounts(state, action.payload.accounts);
+  else if (updateVerificationBadgeVisibility.match(action))
+    return state.update(action.payload.id, (account) =>
+      account?.set('verified_badge_visible', action.payload.visible),
+    );
   else if (
     followAccountSuccess.match(action) &&
     !action.payload.alreadyFollowing
