@@ -17,6 +17,13 @@ import {
 } from '@phosphor-icons/react';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
+import {
+  expandConversations,
+  mountConversations,
+  unmountConversations,
+} from '@/mastodon/actions/conversations';
+import { connectDirectStream } from '@/mastodon/actions/streaming';
+import { groupedConversationRepresentatives } from '@/mastodon/features/direct_timeline/conversation_grouping';
 import FediIcon from '@/images/icons/icon_fediverse.svg?react';
 import { fetchLists } from '@/mastodon/actions/lists';
 import { closeNavigation } from '@/mastodon/actions/navigation';
@@ -105,8 +112,29 @@ export const RedesignNavigationPanel: React.FC<{
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
   );
+  const unreadMessagesCount = useAppSelector((state) => {
+    const conversations = state.conversations.get('items');
+
+    return groupedConversationRepresentatives(conversations)
+      .filter((conversation) => conversation.get('unread'))
+      .length;
+  });
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+
+  useEffect(() => {
+    if (!signedIn || !isBlue2) return;
+
+    dispatch(mountConversations());
+    dispatch(expandConversations());
+
+    const disconnect = dispatch(connectDirectStream());
+
+    return () => {
+      dispatch(unmountConversations());
+      disconnect();
+    };
+  }, [dispatch, isBlue2, signedIn]);
 
   const openComposer = useCallback(() => {
     dispatch(closeNavigation());
@@ -170,6 +198,14 @@ export const RedesignNavigationPanel: React.FC<{
                 defaultMessage='Explore'
               />
             </NavigationLink>
+            {mode === 'slide-out' && isBlue2 && (
+              <NavigationLink to='/favourites' iconComponent={StarIcon}>
+                <FormattedMessage
+                  id='navigation_bar.favourites'
+                  defaultMessage='Favorites'
+                />
+              </NavigationLink>
+            )}
             <NavigationLink
               withSpaceAfter
               to='/public/local'
@@ -276,108 +312,60 @@ export const RedesignNavigationPanel: React.FC<{
             )}
           </ul>
           <footer className={classes.footer} data-stuck={!isScrolledToBottom}>
-            {mode !== 'slide-out' && (
-              <>
-                <ul className={classes.footerNav}>
-                  <NavigationLink
-                    stacked
-                    to='/notifications'
-                    iconComponent={BellIcon}
-                    badgeCount={notificationsCount}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.notifications'
-                      defaultMessage='Notifications'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/conversations'
-                    iconComponent={ChatCircleDotsIcon}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.messages'
-                      defaultMessage='Messages'
-                      description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/favourites'
-                    iconComponent={StarIcon}
-                  >
-                    <FormattedMessage
-                      id='navigation_bar.favourites'
-                      defaultMessage='Favorites'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/bookmarks'
-                    iconComponent={BookmarkSimpleIcon}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.saved'
-                      defaultMessage='Saved'
-                    />
-                  </NavigationLink>
-                </ul>
-                <NavigationAccountCardAndMenu />
-              </>
-            )}
-            {mode === 'slide-out' && (
-              <>
-                <ul className={classes.footerNav}>
-                  <NavigationLink
-                    stacked
-                    to='/notifications'
-                    iconComponent={BellIcon}
-                    badgeCount={notificationsCount}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.notifications'
-                      defaultMessage='Notifications'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/conversations'
-                    iconComponent={ChatCircleDotsIcon}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.messages'
-                      defaultMessage='Messages'
-                      description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/favourites'
-                    iconComponent={StarIcon}
-                  >
-                    <FormattedMessage
-                      id='navigation_bar.favourites'
-                      defaultMessage='Favorites'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/bookmarks'
-                    iconComponent={BookmarkSimpleIcon}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.saved'
-                      defaultMessage='Saved'
-                    />
-                  </NavigationLink>
-                </ul>
-                <NavigationAccountCardAndMenu inSlideOut />
-              </>
+            <ul className={classes.footerNav}>
+              <NavigationLink
+                stacked
+                to='/notifications'
+                iconComponent={BellIcon}
+                badgeCount={notificationsCount}
+              >
+                <FormattedMessage
+                  id='tabs_bar.notifications'
+                  defaultMessage='Notifications'
+                />
+              </NavigationLink>
+              <NavigationLink
+                stacked
+                to='/conversations'
+                iconComponent={ChatCircleDotsIcon}
+                badgeCount={unreadMessagesCount}
+              >
+                <FormattedMessage
+                  id='tabs_bar.messages'
+                  defaultMessage='Messages'
+                  description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
+                />
+              </NavigationLink>
+              {mode !== 'slide-out' && (
+                <NavigationLink
+                  stacked
+                  to='/favourites'
+                  iconComponent={StarIcon}
+                >
+                  <FormattedMessage
+                    id='navigation_bar.favourites'
+                    defaultMessage='Favorites'
+                  />
+                </NavigationLink>
+              )}
+              <NavigationLink
+                stacked
+                to='/bookmarks'
+                iconComponent={BookmarkSimpleIcon}
+              >
+                <FormattedMessage id='tabs_bar.saved' defaultMessage='Saved' />
+              </NavigationLink>
+            </ul>
+            {mode === 'slide-out' ? (
+              <NavigationAccountCardAndMenu inSlideOut />
+            ) : (
+              <NavigationAccountCardAndMenu />
             )}
             {!multiColumn && (
               <NavigationFooterLinks
                 multiColumn={multiColumn}
                 siteName={siteName}
+                variant={isBlue2 ? 'blue2' : 'default'}
               />
             )}
           </footer>
@@ -390,6 +378,7 @@ export const RedesignNavigationPanel: React.FC<{
             <NavigationFooterLinks
               multiColumn={multiColumn}
               siteName={siteName}
+              variant={isBlue2 ? 'blue2' : 'default'}
             />
           )}
         </footer>
