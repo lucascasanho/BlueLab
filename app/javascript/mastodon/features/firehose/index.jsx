@@ -6,6 +6,7 @@ import { useIntl, defineMessages, FormattedMessage } from 'react-intl';
 import { Helmet } from '@unhead/react/helmet';
 import { NavLink } from 'react-router-dom';
 
+import { blue2Text } from '@/bluelab/i18n/blue2';
 import { useIdentity } from '@/mastodon/identity_context';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 import { addColumn } from 'mastodon/actions/columns';
