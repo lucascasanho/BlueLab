@@ -26,7 +26,7 @@ export const ConversationsList = ({ scrollKey, ...other }) => {
     [conversations],
   );
 
-  const lastStatusId = groupedConversations.at(-1)?.get('last_status');
+  const lastStatusId = conversations.at(-1)?.get('last_status');
 
   const debouncedLoadMore = useMemo(() => debounce(id => {
     dispatch(expandConversations({ maxId: id }));
