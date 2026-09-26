@@ -121,7 +121,11 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
       <Column
         bindToDocument={!multiColumn}
         label={title}
-        className={isBlue2 ? blue2Classes.column : undefined}
+        className={isBlue2 ? (
+          multiColumn
+            ? `${blue2Classes.column} ${blue2Classes.advancedColumn}`
+            : blue2Classes.column
+        ) : undefined}
       >
         <div
           className={blue2Classes.root}
