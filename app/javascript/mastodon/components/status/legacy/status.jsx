@@ -625,8 +625,8 @@ class Status extends ImmutablePureComponent {
     return (
       <Hotkeys handlers={handlers} focusable={!unfocusable}>
         <div
-          onClick={status.get('visibility') !== 'direct' ? this.handleBlue2CardClick : undefined}
-          onAuxClick={status.get('visibility') !== 'direct' ? this.handleBlue2CardClick : undefined}
+          onClick={this.handleBlue2CardClick}
+          onAuxClick={this.handleBlue2CardClick}
           className={classNames('status__wrapper', `status__wrapper-${status.get('visibility')}`, { 'status__wrapper-reply': !!status.get('in_reply_to_id'), 'status__wrapper--in-thread': !!rootId, unread, focusable: !this.props.muted })} tabIndex={this.props.muted || unfocusable ? null : 0} data-featured={featured ? 'true' : null} aria-label={textForScreenReader({intl, status, rebloggedByText, isQuote: isQuotedPost})} ref={this.handleRef} data-nosnippet={status.getIn(['account', 'noindex'], true) || undefined}>
           {!skipPrepend && prepend}
 
