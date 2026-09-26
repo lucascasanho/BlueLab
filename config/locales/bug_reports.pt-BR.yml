@@ -45,3 +45,18 @@ pt-BR:
       resolved_msg: Relato de bug marcado como resolvido.
       status_open: Aberto
       status_resolved: Resolvido
+bug_reports:
+    link: Relatar bug
+    title: Relatar bug
+    lead: Descreva o que aconteceu e anexe capturas, GIFs, áudio ou vídeo quando forem úteis.
+    description: O que aconteceu?
+    placeholder: Descreva o bug, o que você esperava que acontecesse e como reproduzir o problema.
+    character_limit: Máximo de %{count} caracteres.
+    attachments: Anexos
+    attachment_hint: Imagens, GIFs, áudio e vídeo. Até 5 arquivos.
+    diagnostic_notice: Navegador, sistema operacional, idioma, tema, modo da interface, tamanho da janela e erros recentes do cliente podem ser incluídos automaticamente.
+    error_page: Este relato foi iniciado na página de erro %{code}.
+    submit: Enviar relato
+    back: Cancelar
+    success_title: Relato enviado
+    success_body: Seu relato foi enviado aos administradores da instância com os diagnósticos técnicos disponíveis.
