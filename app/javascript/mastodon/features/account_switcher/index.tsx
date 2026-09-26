@@ -3,9 +3,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import api from '@/mastodon/api';
+import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { MenuItemGroup } from '@/mastodon/components/menu';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
+import type { CustomEmojiShape } from '@/mastodon/models/custom_emoji';
 import {
   getAccountSwitcherSessionId,
   registrationsOpen,
@@ -22,6 +24,7 @@ export interface StoredAccount {
   url: string;
   sessionId: string;
   lastUsedAt: number;
+  emojis?: CustomEmojiShape[];
 }
 
 const STORAGE_KEY = 'mastodon_bluelab_account_switcher_v2';
@@ -39,7 +42,16 @@ const isStoredAccount = (value: unknown): value is StoredAccount =>
   typeof value.avatar === 'string' &&
   typeof value.url === 'string' &&
   typeof value.sessionId === 'string' &&
-  typeof value.lastUsedAt === 'number';
+  typeof value.lastUsedAt === 'number' &&
+  (!('emojis' in value) ||
+    (Array.isArray(value.emojis) &&
+      value.emojis.every(
+        (emoji) =>
+          isRecord(emoji) &&
+          typeof emoji.shortcode === 'string' &&
+          typeof emoji.static_url === 'string' &&
+          typeof emoji.url === 'string',
+      )));
 
 export const readStoredAccounts = (): StoredAccount[] => {
   if (typeof localStorage === 'undefined') {
@@ -129,6 +141,7 @@ const useCurrentAccountSession = () => {
       url: account.url ?? '',
       sessionId: accountSwitcherSessionId,
       lastUsedAt: Date.now(),
+      emojis: account.emojis.toJS(),
     });
   }, [account, accountId, accountSwitcherSessionId, signedIn]);
 
@@ -242,7 +255,11 @@ const AccountList: React.FC<{
                 className={classes.avatar}
               />
               <span className={classes.accountText}>
-                <strong>{label}</strong>
+                <EmojiHTML
+                  as='strong'
+                  htmlString={storedAccount.displayName || storedAccount.username}
+                  extraEmojis={storedAccount.emojis}
+                />
                 <span>@{storedAccount.acct}</span>
               </span>
               {active && (
