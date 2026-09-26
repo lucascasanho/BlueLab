@@ -48,16 +48,34 @@ class Api::V1::ConversationsController < Api::BaseController
   end
 
   def by_status
-    conversation = AccountConversation.where(account: current_account)
-      .where('? = ANY(status_ids)', params[:status_id].to_i)
-      .order(last_status_id: :desc)
-      .first
+    status = Status.find_by(id: params[:status_id])
+
+    return head :not_found unless status
+
+    participant_account_ids = (
+      status.active_mentions.pluck(:account_id) +
+      [status.account_id] -
+      [current_account.id]
+    ).uniq.sort
+
+    conversations = AccountConversation.where(
+      account: current_account,
+      participant_account_ids: participant_account_ids,
+    )
+
+    conversation = if status.conversation_id.present?
+      conversations
+        .where(conversation_id: status.conversation_id)
+        .order(last_status_id: :desc)
+        .first
+    end
+
+    conversation ||= conversations.order(last_status_id: :desc).first
 
     return head :not_found unless conversation
 
     render json: { id: conversation.id.to_s }
   end
-
   def unread
     matching_conversations.update_all(unread: true, updated_at: Time.current)
     render json: @conversation, serializer: REST::ConversationSerializer
