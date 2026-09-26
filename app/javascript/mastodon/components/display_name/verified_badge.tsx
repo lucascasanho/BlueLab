@@ -38,7 +38,7 @@ interface IconProps {
 
 const REMOTE_FALLBACK_COLORS = ['#60a5fa', '#1d9bf0', '#1d4ed8'];
 
-const VerifiedMark: FC<IconProps> = ({
+export const VerifiedMark: FC<IconProps> = ({
   className,
   remoteBadge,
   useRemoteFallback = false,
