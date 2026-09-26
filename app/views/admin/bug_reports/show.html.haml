@@ -15,7 +15,11 @@
   %dl
     %div
       %dt= t('admin.bug_reports.reported_by')
-      %dd= admin_account_link_to @bug_report.account
+      %dd
+        - if @bug_report.account.present?
+          = admin_account_link_to @bug_report.account
+        - else
+          = t('admin.bug_reports.anonymous')
     %div
       %dt= t('admin.bug_reports.created_at')
       %dd
@@ -73,6 +77,9 @@
       %tr
         %th= t('admin.bug_reports.interface_layout')
         %td= @bug_report.interface_layout.presence || t('admin.bug_reports.none')
+      %tr
+        %th= t('admin.bug_reports.error_page')
+        %td= @bug_report.error_page.presence || t('admin.bug_reports.none')
       %tr
         %th= t('admin.bug_reports.current_path')
         %td= @bug_report.current_path.presence || t('admin.bug_reports.none')
