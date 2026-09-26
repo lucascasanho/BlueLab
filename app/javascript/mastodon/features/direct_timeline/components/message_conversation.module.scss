@@ -1,5 +1,8 @@
 .column {
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
@@ -31,6 +34,7 @@
 .page {
   display: flex;
   flex: 1 1 0;
+  width: 100%;
   min-width: 0;
   min-height: 0;
   height: auto;
@@ -57,6 +61,7 @@
 .message {
   align-self: flex-start;
   width: fit-content;
+  min-width: 0;
   max-width: min(760px, calc(100% - var(--space-4)));
   box-sizing: border-box;
   padding: var(--space-3);
