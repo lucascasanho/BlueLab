@@ -108,7 +108,13 @@ class Api::V1::ConversationsController < Api::BaseController
   end
 
   def paginated_conversations
-    AccountConversation.where(account: current_account)
+    latest_per_participant_set = AccountConversation
+      .where(account: current_account)
+      .select("DISTINCT ON (participant_account_ids) id")
+      .order(Arel.sql('participant_account_ids, last_status_id DESC, id DESC'))
+
+    AccountConversation
+      .where(id: latest_per_participant_set)
       .includes(
         account: [:account_stat, user: :role],
         last_status: [
