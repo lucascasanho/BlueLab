@@ -110,3 +110,26 @@ export const getBugReportDiagnostics = (interfaceLanguage: string) => {
     client_errors: [...recentErrors],
   };
 };
+export const populateBugReportFormDiagnostics = (
+  form: HTMLFormElement,
+  interfaceLanguage: string,
+) => {
+  const diagnostics = getBugReportDiagnostics(interfaceLanguage);
+
+  const fields: Record<string, string> = {
+    interface_language: diagnostics.interface_language,
+    theme: diagnostics.theme,
+    interface_layout: diagnostics.interface_layout,
+    viewport: diagnostics.viewport,
+    app_version: diagnostics.app_version,
+    client_errors: JSON.stringify(diagnostics.client_errors),
+  };
+
+  Object.entries(fields).forEach(([name, value]) => {
+    const field = form.elements.namedItem(name);
+
+    if (field instanceof HTMLInputElement) {
+      field.value = value;
+    }
+  });
+};
