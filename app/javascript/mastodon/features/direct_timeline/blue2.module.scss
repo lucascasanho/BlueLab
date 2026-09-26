@@ -96,6 +96,17 @@
   overflow: hidden;
 }
 
+.root[data-bluelab-messages-conversation='true'] {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.root[data-bluelab-messages-conversation='true'] > :global(.message_conversation_column) {
+  min-width: 0;
+  min-height: 0;
+}
+
 .root[data-bluelab-messages-advanced='true'] .inbox,
 .root[data-bluelab-messages-advanced='true'] .listWrap,
 .root[data-bluelab-messages-advanced='true'] :global(.scrollable) {
