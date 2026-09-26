@@ -22,9 +22,10 @@ import { EmbeddedStatusContent } from './embedded_status_content';
 
 export type Mention = RecordOf<ApiMentionJSON>;
 
-export const EmbeddedStatus: React.FC<{ statusId: string }> = ({
-  statusId,
-}) => {
+export const EmbeddedStatus: React.FC<{
+  statusId: string;
+  onOpen?: () => void;
+}> = ({ statusId, onOpen }) => {
   const history = useHistory();
   const clickCoordinatesRef = useRef<[number, number]>(null);
   const dispatch = useAppDispatch();
@@ -64,19 +65,30 @@ export const EmbeddedStatus: React.FC<{ statusId: string }> = ({
         element = element.parentNode as HTMLDivElement | null;
       }
 
-      if (deltaX + deltaY < 5 && account) {
-        const path = `/@${account.acct}/${statusId}`;
-
+      if (deltaX + deltaY < 5) {
         if (button === 0 && !(ctrlKey || metaKey)) {
-          history.push(path, { focusTarget: FOCUS_TARGET.POST });
-        } else if (button === 1 || (button === 0 && (ctrlKey || metaKey))) {
-          window.open(path, '_blank', 'noopener');
+          if (onOpen) {
+            onOpen();
+          } else if (account) {
+            history.push(`/@${account.acct}/${statusId}`, {
+              focusTarget: FOCUS_TARGET.POST,
+            });
+          }
+        } else if (
+          account &&
+          (button === 1 || (button === 0 && (ctrlKey || metaKey)))
+        ) {
+          window.open(
+            `/@${account.acct}/${statusId}`,
+            '_blank',
+            'noopener',
+          );
         }
       }
 
       clickCoordinatesRef.current = null;
     },
-    [clickCoordinatesRef, statusId, account, history],
+    [clickCoordinatesRef, statusId, account, history, onOpen],
   );
 
   const handleContentWarningClick = useCallback(() => {
