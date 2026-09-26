@@ -99,13 +99,29 @@ export default function conversations(state = initialState, action) {
   case CONVERSATIONS_UNMOUNT:
     return state.update('mounted', count => count - 1);
   case CONVERSATIONS_READ:
-    return state.update('items', list => list.map(item => {
-      if (item.get('id') === action.id) {
-        return item.set('unread', false);
-      }
+    return state.update('items', list => {
+      const target = list.find(item => item.get('id') === action.id);
 
-      return item;
-    }));
+      if (!target) return list;
+
+      const targetParticipants = target.get('accounts');
+      const targetConversationId = target.get('conversation_id');
+
+      return list.map(item => {
+        const sameConversation = (
+          targetConversationId &&
+          item.get('conversation_id') === targetConversationId
+        );
+        const sameParticipants = item
+          .get('accounts')
+          .sort()
+          .equals(targetParticipants.sort());
+
+        return sameConversation || sameParticipants
+          ? item.set('unread', false)
+          : item;
+      });
+    });
   case blockAccountSuccess.type:
   case muteAccountSuccess.type:
     return filterConversations(state, [action.payload.relationship.id]);
