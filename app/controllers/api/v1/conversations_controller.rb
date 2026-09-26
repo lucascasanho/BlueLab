@@ -76,27 +76,17 @@ class Api::V1::ConversationsController < Api::BaseController
 
   def matching_conversations
     account_conversations = AccountConversation.where(account: current_account)
-    root_status_id = @conversation.last_status&.thread_root_id
-
-    return account_conversations.where(id: @conversation.id) unless root_status_id
-
-    thread_statuses_sql = <<~SQL.squish
-      WITH RECURSIVE thread_statuses(id, path) AS (
-        SELECT id, ARRAY[id]
-        FROM statuses
-        WHERE id = #{root_status_id.to_i}
-        UNION ALL
-        SELECT statuses.id, thread_statuses.path || statuses.id
-        FROM statuses
-        JOIN thread_statuses ON statuses.in_reply_to_id = thread_statuses.id
-        WHERE NOT statuses.id = ANY(thread_statuses.path)
-      )
-      SELECT id FROM thread_statuses
-    SQL
-
-    account_conversations.where(
-      "status_ids && ARRAY(#{thread_statuses_sql})::bigint[]"
+    participant_matches = account_conversations.where(
+      participant_account_ids: @conversation.participant_account_ids,
     )
+
+    if @conversation.conversation_id.present?
+      participant_matches.or(
+        account_conversations.where(conversation_id: @conversation.conversation_id),
+      )
+    else
+      participant_matches
+    end
   end
 
   def conversation_statuses
