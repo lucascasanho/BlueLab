@@ -36,12 +36,6 @@ class AccountConversation < ApplicationRecord
     @participant_accounts.presence || [account]
   end
 
-  def thread_id
-    return conversation_id.to_s unless last_status_id
-
-    @thread_id ||= last_status&.thread_root_id || last_status_id
-    @thread_id.to_s
-  end
 
   class << self
     def to_a_paginated_by_id(limit, options = {})
