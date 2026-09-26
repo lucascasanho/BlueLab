@@ -12,8 +12,7 @@ class Auth::AccountSwitcherController < ApplicationController
 
     # Preserve the currently active SessionActivation while replacing the
     # Warden user and browser session with the target account.
-    request.env['mastodon.account_switcher_authentication'] = true
-    warden.logout(:user) if warden.authenticated?(:user)
+    warden.set_user(nil, scope: :user, store: false, run_callbacks: false)
 
     session_id = user.activate_session(request)
 
