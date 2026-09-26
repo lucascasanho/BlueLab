@@ -1599,6 +1599,7 @@ en:
         notice: "Your current account will remain available in the account switcher."
         two_factor_title: "Verify your identity"
         two_factor_notice: "Enter the verification code for the account you are adding."
+        passkey_only: This account uses a passkey and cannot be added with a password.
     sign_up:
       manual_review: Sign-ups on %{domain} go through manual review by our moderators. To help us process your registration, write a bit about yourself and why you want an account on %{domain}.
       preamble: With an account on this Mastodon server, you'll be able to follow any other person on the fediverse, regardless of where their account is hosted.
