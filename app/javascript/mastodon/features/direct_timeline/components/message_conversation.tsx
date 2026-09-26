@@ -65,7 +65,9 @@ const messages = defineMessages({
 
 const getStatus = makeGetStatus();
 
-export const MessageConversation: React.FC = () => {
+export const MessageConversation: React.FC<{ multiColumn?: boolean }> = ({
+  multiColumn = false,
+}) => {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const sourceStatusId = (location.state as { statusId?: string } | undefined)?.statusId;
@@ -447,7 +449,10 @@ export const MessageConversation: React.FC = () => {
     <Column
       label={intl.formatMessage(messages.title)}
       className={classes.column}
-    >
+        data-bluelab-messages-conversation-advanced={
+          multiColumn ? 'true' : undefined
+        }
+      >
       <ColumnHeader
         withBackButton
         title={
