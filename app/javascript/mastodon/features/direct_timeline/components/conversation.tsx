@@ -27,6 +27,7 @@ import { replyCompose } from 'mastodon/actions/compose';
 import {
   markConversationRead,
   deleteConversation,
+  openConversationForStatus,
 } from 'mastodon/actions/conversations';
 import { openModal } from 'mastodon/actions/modal';
 import {
@@ -112,7 +113,7 @@ export const Conversation: React.FC<{
         document.body.dataset.theme === 'blue-2';
 
       if (isBlue2) {
-        history.push(`/conversations/${id}`);
+        dispatch(openConversationForStatus(statusId));
       } else {
         history.push(
           `/@${lastStatus.getIn(['account', 'acct']) as string}/${statusId}`,
