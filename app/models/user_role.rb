@@ -101,6 +101,7 @@ class UserRole < ApplicationRecord
   end
 
   VERIFIED_ROLE_NAME = 'Verificado'
+  VERIFIED_ROLE_NAMES = %w(Verificado Verified).freeze
   VERIFICATION_PRIVILEGES = (
     Flags::CATEGORIES[:moderation] + Flags::CATEGORIES[:administration]
   ).uniq.freeze
@@ -139,7 +140,7 @@ class UserRole < ApplicationRecord
   end
 
   def self.verifies_instance_profile?(name:, permissions:)
-    return true if name.to_s == VERIFIED_ROLE_NAME
+    return true if VERIFIED_ROLE_NAMES.include?(name.to_s)
 
     effective_permissions = everyone.permissions | permissions.to_i
     effective_permissions = Flags::ALL if effective_permissions & FLAGS[:administrator] == FLAGS[:administrator]
