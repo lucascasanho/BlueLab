@@ -156,6 +156,7 @@ const Lists: React.FC<{
               variant='solid'
               color='accent'
               icon={PlusIcon}
+              style={isBlue2 ? { color: '#fff' } : undefined}
               as='link'
               to='/lists/new'
             >
