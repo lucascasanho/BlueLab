@@ -144,6 +144,7 @@ const composerSlice = createSlice({
     builder.addMatcher(
       (action) =>
         isAction(action) &&
+        !(action as { inline?: boolean }).inline &&
         [
           COMPOSE_REPLY,
           COMPOSE_FOCUS,
@@ -351,7 +352,13 @@ export const selectIsMinimized = createAppSelector(
 
 export const submitComposer = createAppThunk(
   (
-    { redirectOnSuccess }: { redirectOnSuccess?: boolean },
+    {
+      redirectOnSuccess,
+      onSuccess,
+    }: {
+      redirectOnSuccess?: boolean;
+      onSuccess?: (status: ApiStatusJSON) => void;
+    },
     { getState, dispatch },
   ) => {
     const textareaValue = getComposerTextarea()?.value;
@@ -409,6 +416,8 @@ export const submitComposer = createAppThunk(
     } else {
       dispatch(
         submitCompose((status: ApiStatusJSON) => {
+          onSuccess?.(status);
+
           if (redirectOnSuccess) {
             window.location.assign(status.url);
           }
