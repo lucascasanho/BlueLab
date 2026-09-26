@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 
 import { fetchAccount, lookupAccount } from 'mastodon/actions/accounts';
 import { normalizeForLookup } from 'mastodon/reducers/accounts_map';
