@@ -31,13 +31,12 @@ describe('direct conversation grouping', () => {
     ]);
   });
 
-  test('does not merge separate native conversations with the same participants', () => {
+  test('groups separate native records when they represent the same participants', () => {
     const first = conversation('1', '100', ['alice'], '10');
     const second = conversation('2', '200', ['alice'], '20');
 
     expect(groupConversations(ImmutableList([first, second]))).toEqual([
-      [first],
-      [second],
+      [first, second],
     ]);
   });
 
@@ -47,6 +46,16 @@ describe('direct conversation grouping', () => {
 
     expect(groupConversations(ImmutableList([first, second]))).toEqual([
       [first, second],
+    ]);
+  });
+
+  test('connects participant and native-thread changes into one chat group', () => {
+    const first = conversation('1', '100', ['alice'], '10');
+    const second = conversation('2', '100', ['alice', 'carol'], '20');
+    const third = conversation('3', '200', ['alice', 'carol'], '30');
+
+    expect(groupConversations(ImmutableList([first, second, third]))).toEqual([
+      [first, second, third],
     ]);
   });
 
