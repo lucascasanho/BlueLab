@@ -23,6 +23,7 @@ import { Icon }  from 'mastodon/components/icon';
 import { injectIntl } from '@/mastodon/components/intl';
 import { Hotkeys } from 'mastodon/components/hotkeys';
 import { Status } from 'mastodon/components/status';
+import { FOCUS_TARGET } from 'mastodon/components/navigation_focus_target';
 import { me } from 'mastodon/initial_state';
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 
@@ -86,6 +87,7 @@ class Notification extends ImmutablePureComponent {
 
       this.props.history.push(
         `/@${notification.getIn(['status', 'account', 'acct'])}/${notification.get('status')}`,
+        { focusTarget: FOCUS_TARGET.POST },
       );
     } else {
       this.handleOpenProfile();
