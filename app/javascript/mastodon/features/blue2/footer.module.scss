@@ -10,7 +10,8 @@
   font-size: 12px;
   line-height: 1.35;
 
-  a {
+  a,
+  button {
     color: inherit !important;
     text-decoration: none;
 
@@ -24,6 +25,14 @@
 
   span {
     color: inherit;
+  }
+
+  button {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
   }
 }
 
