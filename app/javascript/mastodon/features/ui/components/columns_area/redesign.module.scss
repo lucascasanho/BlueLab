@@ -400,6 +400,12 @@
     background: var(--blue2-bg, #000);
   }
 
+  // Blue2 mobile has its own utility bar. The Following/Global feed tabs are
+  // intentionally desktop-only and must not occupy mobile vertical space.
+  .blue2Topbar {
+    display: none;
+  }
+
   .blue2Brand {
     display: none;
   }
