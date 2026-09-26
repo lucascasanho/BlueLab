@@ -58,13 +58,33 @@ const Mastodon5Footer: React.FC = () => {
 
   return (
     <footer className={classes.desktopFooter}>
-      <a href='/about'>About</a>
+      <Link to='/about'>
+        <FormattedMessage
+          id='custom_homepage.about'
+          defaultMessage='About'
+        />
+      </Link>
       <span>·</span>
-      <a href='/privacy-policy'>Privacy</a>
+      <Link to='/privacy-policy'>
+        <FormattedMessage
+          id='footer.privacy_policy_short'
+          defaultMessage='Privacy'
+        />
+      </Link>
       <span>·</span>
-      <a href='/terms-of-service'>Terms</a>
+      <Link to='/terms-of-service'>
+        <FormattedMessage
+          id='footer.terms_of_service_short'
+          defaultMessage='Terms'
+        />
+      </Link>
       <span>·</span>
-      <a href='/keyboard-shortcuts'>Keyboard Shortcuts</a>
+      <Link to='/keyboard-shortcuts'>
+        <FormattedMessage
+          id='keyboard_shortcuts.heading'
+          defaultMessage='Keyboard Shortcuts'
+        />
+      </Link>
       <span>·</span>
       <button type='button' onClick={openBugReport}>
         <BugReportLabel />
