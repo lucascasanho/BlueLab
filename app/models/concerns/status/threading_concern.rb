@@ -32,10 +32,10 @@ module Status::ThreadingConcern
   def thread_root_id
     @thread_root_id ||= begin
       status = self
-      visited = Set.new
+      visited = {}
 
-      while status.in_reply_to_id.present? && !visited.include?(status.id)
-        visited << status.id
+      while status.in_reply_to_id.present? && !visited[status.id]
+        visited[status.id] = true
         parent = Status.unscoped.select(:id, :in_reply_to_id).find_by(id: status.in_reply_to_id)
         break if parent.nil?
 
