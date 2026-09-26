@@ -13,8 +13,8 @@ import axios from 'axios';
 import { on } from 'delegated-events';
 import { throttle } from 'lodash';
 
-import { determineEmojiMode } from '@/mastodon/features/emoji/mode';
 import { populateBugReportFormDiagnostics } from '@/mastodon/features/bug_report/diagnostics';
+import { determineEmojiMode } from '@/mastodon/features/emoji/mode';
 import { updateHtmlWithEmoji } from '@/mastodon/features/emoji/render';
 import type { InitialState } from '@/mastodon/initial_state';
 import loadKeyboardExtensions from '@/mastodon/load_keyboard_extensions';
@@ -188,7 +188,9 @@ async function loaded() {
 
   applyRailsA11yPatches();
 
-  const bugReportForm = document.querySelector<HTMLFormElement>('#bug-report-form');
+  const bugReportForm = document.querySelector<HTMLFormElement>(
+    '#bug-report-form',
+  );
   if (bugReportForm) {
     bugReportForm.addEventListener('submit', () => {
       populateBugReportFormDiagnostics(
