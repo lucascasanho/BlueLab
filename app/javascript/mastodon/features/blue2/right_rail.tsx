@@ -5,6 +5,8 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Link, NavLink } from 'react-router-dom';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
+import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
+import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
 import { Search } from '@/mastodon/features/compose/components/search';
 import { useIdentity } from '@/mastodon/identity_context';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
@@ -20,6 +22,7 @@ interface TrendTag {
 
 export const Blue2RightRail: React.FC<{ variant?: 'birdUi' }> = ({ variant }) => {
   const intl = useIntl();
+  const openBugReport = useOpenBugReport();
   const { signedIn } = useIdentity();
   const isBirdUiVariant = variant === 'birdUi';
   const [tags, setTags] = useState<TrendTag[]>([]);
@@ -177,12 +180,20 @@ export const Blue2RightRail: React.FC<{ variant?: 'birdUi' }> = ({ variant }) =>
         </a>
         <span>·</span>
         <Link to='/keyboard-shortcuts'>
-            <FormattedMessage
-              id='keyboard_shortcuts.heading'
-              defaultMessage='Keyboard Shortcuts'
-            />
-          </Link>
-        </footer>
+          <FormattedMessage
+            id='keyboard_shortcuts.heading'
+            defaultMessage='Keyboard Shortcuts'
+          />
+        </Link>
+        <span>·</span>
+        <button
+          className={classes.bugReportButton}
+          type='button'
+          onClick={openBugReport}
+        >
+          <BugReportLabel />
+        </button>
+      </footer>
       )}
 
       {trendMenuOpen && (
