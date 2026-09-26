@@ -331,11 +331,12 @@ class User < ApplicationRecord
     web_app = Doorkeeper::Application.find_by(superapp: true)
     return if web_app.nil?
 
-    access_token = Doorkeeper::AccessToken.find_by(
-      application_id: web_app.id,
-      resource_owner_id: id,
-      revoked_at: nil
-    )
+    session_token_ids = session_activations.where.not(access_token_id: nil).select(:access_token_id)
+
+    access_token = Doorkeeper::AccessToken
+      .where(application_id: web_app.id, resource_owner_id: id, revoked_at: nil)
+      .where.not(id: session_token_ids)
+      .first
 
     return access_token.token if access_token
 
