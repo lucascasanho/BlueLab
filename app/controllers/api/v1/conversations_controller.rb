@@ -15,9 +15,20 @@ class Api::V1::ConversationsController < Api::BaseController
   end
 
   def show
-    render json: @conversation,
+    conversation = matching_conversations
+      .includes(account: [:account_stat, user: :role], last_status: [:media_attachments, :status_stat, :tags, :active_mentions, { account: [:account_stat, user: :role] }])
+      .order(last_status_id: :desc)
+      .first
+
+    return head :not_found unless conversation
+
+    conversation.participant_accounts = matching_conversations
+      .flat_map(&:participant_accounts)
+      .uniq { |account| account.id }
+
+    render json: conversation,
            serializer: REST::ConversationSerializer,
-           relationships: StatusRelationshipsPresenter.new([@conversation.last_status], current_user&.account_id)
+           relationships: StatusRelationshipsPresenter.new([conversation.last_status], current_user&.account_id)
   end
 
   def messages
