@@ -106,9 +106,8 @@ class Api::V1::ConversationsController < Api::BaseController
   def paginated_conversations
     latest_per_thread = AccountConversation
       .where(account: current_account)
-      .select(:id)
+      .select("DISTINCT ON (conversation_id) id")
       .order(Arel.sql('conversation_id, last_status_id DESC, id DESC'))
-      .distinct_on(:conversation_id)
 
     AccountConversation
       .where(id: latest_per_thread)
