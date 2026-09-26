@@ -457,11 +457,38 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   const initialScrollConversationIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!id || !messagesResolved || statuses.length === 0) return;
+    if (
+      !id ||
+      !conversationResolved ||
+      !conversation ||
+      !messagesResolved ||
+      statuses.length === 0
+    ) {
+      return;
+    }
+
     if (initialScrollConversationIdRef.current === id) return;
 
+    const initialReadState = initialReadStateRef.current;
     const lastStatus = statuses[statuses.length - 1];
-    if (!lastStatus) return;
+    const lastReadStatusId = initialReadState?.lastReadStatusId;
+
+    const oldestUnreadStatus =
+      initialReadState?.unread === true
+        ? statuses.find((status) => {
+            const statusId = status.get('id') as string;
+            const isIncoming = status.getIn(['account', 'id']) !== me;
+
+            return (
+              isIncoming &&
+              (!lastReadStatusId || compareId(statusId, lastReadStatusId) > 0)
+            );
+          })
+        : undefined;
+
+    const targetStatus = oldestUnreadStatus ?? lastStatus;
+
+    if (!targetStatus) return;
 
     let frame = 0;
     let secondFrame = 0;
@@ -469,19 +496,19 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     frame = window.requestAnimationFrame(() => {
       secondFrame = window.requestAnimationFrame(() => {
         const list = messageListRef.current;
-        const lastMessage = document.getElementById(
-          'message-' + lastStatus.get('id'),
+        const targetMessage = document.getElementById(
+          'message-' + targetStatus.get('id'),
         );
 
         if (!list) return;
 
-        if (lastMessage) {
-          lastMessage.scrollIntoView({
+        if (targetMessage) {
+          targetMessage.scrollIntoView({
             behavior: 'auto',
-            block: 'end',
+            block: oldestUnreadStatus ? 'center' : 'end',
           });
         } else {
-          list.scrollTop = list.scrollHeight;
+          list.scrollTop = oldestUnreadStatus ? 0 : list.scrollHeight;
         }
 
         initialScrollConversationIdRef.current = id;
@@ -492,7 +519,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       window.cancelAnimationFrame(frame);
       window.cancelAnimationFrame(secondFrame);
     };
-  }, [id, messagesResolved, statuses]);
+  }, [conversation, conversationResolved, id, messagesResolved, statuses]);
 
   const handleReply = useCallback(
     (status: Immutable.Record<StatusShape>) => {
