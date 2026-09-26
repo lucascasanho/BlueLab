@@ -94,6 +94,27 @@ class ActivityPub::Parser::StatusParser
     @object['inReplyTo'].present?
   end
 
+  def generator_name
+    generator = as_array(@object['generator']).first
+    return if generator.nil?
+
+    if generator.is_a?(Hash)
+      generator['name'].presence
+    elsif generator.is_a?(String)
+      generator.presence
+    end
+  end
+
+  def generator_url
+    generator = as_array(@object['generator']).first
+    return if !generator.is_a?(Hash)
+
+    url = value_or_id(generator['url'])
+    return if url.blank? || unsupported_uri_scheme?(url)
+
+    url
+  end
+
   def sensitive
     @object['sensitive']
   end
