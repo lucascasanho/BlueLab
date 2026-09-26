@@ -79,6 +79,19 @@ export const fetchConversationMessages = conversationId => dispatch =>
     return response.data;
   });
 
+export const fetchConversation = conversationId => dispatch =>
+  api().get(`/api/v1/conversations/${conversationId}`).then(response => {
+    dispatch(importFetchedAccounts(response.data.accounts));
+    if (response.data.last_status) {
+      dispatch(importFetchedStatus(response.data.last_status));
+    }
+    dispatch({
+      type: CONVERSATIONS_UPDATE,
+      conversation: response.data,
+    });
+    return response.data;
+  });
+
 export const expandConversationsRequest = () => ({
   type: CONVERSATIONS_FETCH_REQUEST,
 });
