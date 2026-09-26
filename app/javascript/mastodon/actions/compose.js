@@ -190,6 +190,23 @@ export function replyCompose(status) {
   };
 }
 
+export function replyComposeInline(status) {
+  return (dispatch, getState) => {
+    dispatch({
+      type: COMPOSE_REPLY,
+      status,
+    });
+
+    if (isRedesignEnabled()) {
+      const text = getState().getIn(['compose', 'text'], '');
+      dispatch(requestComposerFocus({
+        start: text.search(/\s/) + 1,
+        end: text.length,
+      }));
+    }
+  };
+}
+
 export function replyComposeById(statusId) {
   return (dispatch, getState) => {
     const state = getState();
