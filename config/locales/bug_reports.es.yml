@@ -9,6 +9,8 @@ es:
       id: ID
       reported_by: Informado por
       created_at: Creado
+      anonymous: Visitante
+      error_page: Página de error
       status: Estado
       assigned_to: Asignado a
       attachments: Adjuntos
