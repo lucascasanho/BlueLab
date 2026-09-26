@@ -162,6 +162,19 @@ $content-width: 840px;
         border-bottom: 0;
       }
 
+      .reports-navigation-item > a,
+      .bug-reports-navigation-item > a {
+        box-sizing: border-box;
+        width: auto;
+        max-width: 100%;
+        min-width: 0;
+        display: inline-flex;
+        align-items: center;
+        margin: 0;
+        padding: 12px 15px;
+        white-space: nowrap;
+      }
+
       #instance_customization > a {
         white-space: nowrap;
       }
