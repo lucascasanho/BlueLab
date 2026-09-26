@@ -94,10 +94,14 @@ export const MessageConversation: React.FC = () => {
     return [...ids];
   }, [conversationGroup]);
 
-  const participantAccounts = useAppSelector((state) =>
-    participantIds
-      .map((accountId) => state.accounts.get(accountId))
-      .filter(Boolean),
+  const accounts = useAppSelector((state) => state.accounts);
+
+  const participantAccounts = useMemo(
+    () =>
+      participantIds
+        .map((accountId) => accounts.get(accountId))
+        .filter(Boolean),
+    [accounts, participantIds],
   );
 
   const statuses = useAppSelector((state) =>
