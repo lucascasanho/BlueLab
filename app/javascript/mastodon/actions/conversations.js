@@ -59,6 +59,9 @@ export const expandConversations = ({ maxId } = {}) => (dispatch, getState) => {
     .catch(err => dispatch(expandConversationsFail(err)));
 };
 
+export const findConversationForStatus = statusId => () =>
+  api().get(`/api/v1/conversations/by-status/${statusId}`).then(response => response.data.id);
+
 export const fetchConversationMessages = conversationId => dispatch =>
   api().get(`/api/v1/conversations/${conversationId}/messages`).then(response => {
     dispatch(importFetchedStatuses(response.data));
