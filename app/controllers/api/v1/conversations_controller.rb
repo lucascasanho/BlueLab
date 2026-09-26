@@ -11,7 +11,6 @@ class Api::V1::ConversationsController < Api::BaseController
 
   def index
     @conversations = paginated_conversations
-    hydrate_conversation_participants!
 
     render json: @conversations,
            each_serializer: REST::ConversationSerializer,
@@ -77,12 +76,27 @@ class Api::V1::ConversationsController < Api::BaseController
 
   def matching_conversations
     account_conversations = AccountConversation.where(account: current_account)
+    root_status_id = @conversation.last_status&.thread_root_id
 
-    if @conversation.conversation_id.present?
-      account_conversations.where(conversation_id: @conversation.conversation_id)
-    else
-      account_conversations.where(id: @conversation.id)
-    end
+    return account_conversations.where(id: @conversation.id) unless root_status_id
+
+    thread_statuses_sql = <<~SQL.squish
+      WITH RECURSIVE thread_statuses(id, path) AS (
+        SELECT id, ARRAY[id]
+        FROM statuses
+        WHERE id = #{root_status_id.to_i}
+        UNION ALL
+        SELECT statuses.id, thread_statuses.path || statuses.id
+        FROM statuses
+        JOIN thread_statuses ON statuses.in_reply_to_id = thread_statuses.id
+        WHERE NOT statuses.id = ANY(thread_statuses.path)
+      )
+      SELECT id FROM thread_statuses
+    SQL
+
+    account_conversations.where(
+      "status_ids && ARRAY(#{thread_statuses_sql})::bigint[]"
+    )
   end
 
   def conversation_statuses
@@ -104,13 +118,7 @@ class Api::V1::ConversationsController < Api::BaseController
   end
 
   def paginated_conversations
-    latest_per_thread = AccountConversation
-      .where(account: current_account)
-      .select("DISTINCT ON (conversation_id) id")
-      .order(Arel.sql('conversation_id, last_status_id DESC, id DESC'))
-
-    AccountConversation
-      .where(id: latest_per_thread)
+    AccountConversation.where(account: current_account)
       .includes(
         account: [:account_stat, user: :role],
         last_status: [
@@ -125,27 +133,6 @@ class Api::V1::ConversationsController < Api::BaseController
         ]
       )
       .to_a_paginated_by_id(limit_param(LIMIT), params_slice(:max_id, :since_id, :min_id))
-  end
-
-  def hydrate_conversation_participants!
-    return if @conversations.empty?
-
-    conversation_ids = @conversations.map(&:conversation_id)
-    participant_ids_by_conversation = AccountConversation
-      .where(account: current_account, conversation_id: conversation_ids)
-      .pluck(:conversation_id, :participant_account_ids)
-      .each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |(conversation_id, ids), result|
-        result[conversation_id].concat(ids)
-      end
-
-    participant_ids = participant_ids_by_conversation.values.flatten.uniq
-    accounts_by_id = Account.where(id: participant_ids).index_by(&:id)
-
-    @conversations.each do |conversation|
-      conversation.participant_accounts = participant_ids_by_conversation[conversation.conversation_id]
-        .uniq
-        .filter_map { |account_id| accounts_by_id[account_id] }
-    end
   end
 
   def next_path
