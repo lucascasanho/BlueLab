@@ -50,6 +50,23 @@ RSpec.describe 'Bug reports' do
       expect(report.client_errors.first['type']).to eq 'javascript'
     end
 
+
+    context 'when anonymous' do
+      subject do
+        post '/api/v1/bug_reports', params: params
+      end
+
+      it 'creates the bug report without an account' do
+        subject
+
+        expect(response).to have_http_status(201)
+        expect(BugReport.last).to have_attributes(
+          account: nil,
+          current_path: '/settings/preferences'
+        )
+      end
+    end
+
     it 'rejects an overlong description' do
       params[:description] = 'a' * (BugReport::MAX_DESCRIPTION_LENGTH + 1)
 
