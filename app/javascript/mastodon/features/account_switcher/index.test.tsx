@@ -21,9 +21,19 @@ const account = (id: string, lastUsedAt = 0): StoredAccount => ({
       url: 'https://example.social/emoji/test_custom.gif',
       category: '',
       featured: false,
-      visible_in_picker: true,
+        visible_in_picker: true,
     },
   ],
+  instanceVerification: {
+    issuer: 'Mastodon Blue',
+    issuer_domain: 'mastodon.blue',
+    verified_at: '2026-09-25T12:00:00.000Z',
+    badge: {
+      view_box: '0 0 24 24',
+      path: 'M1 1L23 23Z',
+      colors: ['#60a5fa', '#1d9bf0', '#1d4ed8'],
+    },
+  },
 });
 
 describe('account switcher storage', () => {
@@ -49,6 +59,11 @@ describe('account switcher storage', () => {
       shortcode: 'test_custom',
       static_url: 'https://example.social/emoji/test_custom.png',
       url: 'https://example.social/emoji/test_custom.gif',
+    });
+    expect(readStoredAccounts()[0].instanceVerification?.badge).toEqual({
+      view_box: '0 0 24 24',
+      path: 'M1 1L23 23Z',
+      colors: ['#60a5fa', '#1d9bf0', '#1d4ed8'],
     });
   });
 
