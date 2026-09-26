@@ -65,8 +65,19 @@ const messages = defineMessages({
 
 const getStatus = makeGetStatus();
 
-export const MessageConversation: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+interface MessageConversationProps {
+  conversationId?: string;
+  onBack?: () => void;
+  inline?: boolean;
+}
+
+export const MessageConversation: React.FC<MessageConversationProps> = ({
+  conversationId,
+  onBack,
+  inline = false,
+}) => {
+  const { id: routeId } = useParams<{ id: string }>();
+  const id = conversationId ?? routeId;
   const location = useLocation();
   const sourceStatusId = (location.state as { statusId?: string } | undefined)?.statusId;
   const intl = useIntl();
@@ -300,6 +311,18 @@ export const MessageConversation: React.FC = () => {
     }
   }, [conversation, conversationResolved, dispatch, id]);
 
+  const renderShell = (content: React.ReactNode) => {
+    if (inline) {
+      return <div className={classes.column}>{content}</div>;
+    }
+
+    return (
+      <Column label={intl.formatMessage(messages.title)} className={classes.column}>
+        {content}
+      </Column>
+    );
+  };
+
   const participantAccountIdsKey = participantIds.join(',');
   const participantAccountsRef = useRef(participantAccounts);
   participantAccountsRef.current = participantAccounts;
@@ -409,48 +432,42 @@ export const MessageConversation: React.FC = () => {
   );
 
   if (!conversationResolved || !messagesResolved) {
-    return (
-      <Column
-        label={intl.formatMessage(messages.title)}
-        className={classes.column}
-      >
+    return renderShell(
+      <>
         <ColumnHeader
-          withBackButton
+          withBackButton={!inline}
+          onBackButtonClick={onBack}
           title={intl.formatMessage(messages.title)}
         />
         <div className={classes.loading}>
           <LoadingIndicator />
         </div>
-      </Column>
+      </>,
     );
   }
 
   if (!conversation || statuses.length === 0) {
-    return (
-      <Column
-        label={intl.formatMessage(messages.title)}
-        className={classes.column}
-      >
+    return renderShell(
+      <>
         <ColumnHeader
-          withBackButton
+          withBackButton={!inline}
+          onBackButtonClick={onBack}
           title={intl.formatMessage(messages.title)}
         />
         <div className={classes.empty}>
           <ChatCircleDotsIcon size={42} />
           <span>{intl.formatMessage(messages.empty)}</span>
         </div>
-      </Column>
+      </>,
     );
   }
 
-  return (
-    <Column
-      label={intl.formatMessage(messages.title)}
-      className={classes.column}
-      >
+  return renderShell(
+    <>
       <ColumnHeader
-        withBackButton
-        title={
+        withBackButton={!inline}
+        onBackButtonClick={onBack}
+        title=
           <div className={classes.headerTitle}>
             <ChatCircleDotsIcon size={18} />
             <span>
@@ -654,6 +671,6 @@ export const MessageConversation: React.FC = () => {
         <title>{intl.formatMessage(messages.title)}</title>
         <meta name='robots' content='noindex' />
       </Helmet>
-    </Column>
+    </>,
   );
 };
