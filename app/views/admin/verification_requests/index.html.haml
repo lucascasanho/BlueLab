@@ -37,5 +37,5 @@
               = link_to t('admin.verification_requests.view'), admin_verification_request_path(verification_request)
               - if verification_request.pending?
                 = button_to t('admin.verification_requests.approve'), approve_admin_verification_request_path(verification_request), method: :post, class: 'button button--compact', data: { confirm: t('admin.accounts.are_you_sure') }
-                = button_to t('admin.verification_requests.deny'), deny_admin_verification_request_path(verification_request), method: :post, class: 'button button--small', data: { confirm: t('admin.accounts.are_you_sure') }
+                = button_to t('admin.verification_requests.deny'), deny_admin_verification_request_path(verification_request), method: :post, class: 'button', data: { confirm: t('admin.accounts.are_you_sure') }
   = paginate @verification_requests

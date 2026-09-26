@@ -50,7 +50,7 @@
 
 %h3= t('admin.verification_requests.explanation')
 - if @verification_request.explanation.present?
-  .speech-bubble.positive
+  .speech-bubble
     .speech-bubble__bubble
       = simple_format(@verification_request.explanation)
     .speech-bubble__owner
