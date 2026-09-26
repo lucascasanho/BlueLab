@@ -47,7 +47,7 @@ fr:
       resolved_msg: Rapport de bug marqué comme résolu.
       status_open: Ouvert
       status_resolved: Résolu
-bug_reports:
+  bug_reports:
     link: Signaler un bug
     title: Signaler un bug
     lead: Décrivez le problème et joignez des captures, des GIF, de l’audio ou de la vidéo si nécessaire.
