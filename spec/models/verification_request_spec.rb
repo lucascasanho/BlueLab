@@ -41,12 +41,11 @@ RSpec.describe VerificationRequest do
 
     it 'notifies users who can manage roles' do
       moderator = Fabricate(:user, role: Fabricate(:user_role, permissions: UserRole::FLAGS[:manage_roles]))
-      expect {
-        described_class.create!(account: account, explanation: '')
-      }.to have_enqueued_sidekiq_job(
-        LocalNotificationWorker,
+      request = described_class.create!(account: account, explanation: '')
+
+      expect(LocalNotificationWorker).to have_enqueued_sidekiq_job(
         moderator.account_id,
-        kind_of(Integer),
+        request.id,
         'VerificationRequest',
         'admin.verification_request'
       )

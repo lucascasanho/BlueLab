@@ -36,7 +36,7 @@ class VerificationRequest < ApplicationRecord
       return [:pending, nil] if latest&.pending?
 
       if latest.present?
-        next_request_at = latest.created_at + REQUEST_COOLDOWN
+        next_request_at = (latest.resolved_at || latest.created_at) + REQUEST_COOLDOWN
         return [:cooldown, next_request_at] if next_request_at.future?
       end
 

@@ -29,6 +29,9 @@ module Admin
       user = @verification_request.account.user
       return redirect_to(admin_verification_request_path(@verification_request), alert: I18n.t('admin.verification_requests.account_unavailable')) if user.nil?
 
+      role_changed = false
+      role_would_be_downgraded = false
+
       VerificationRequest.transaction do
         @verification_request.lock!
         raise ActiveRecord::RecordNotFound unless @verification_request.pending?
@@ -36,13 +39,10 @@ module Admin
         user.with_lock do
           if user.role.verified_by_instance?
             @verification_request.resolve!(current_account, status: :approved)
+          elsif user.role.position > verified_role.position
+            role_would_be_downgraded = true
+            raise ActiveRecord::Rollback
           else
-            if user.role.position > verified_role.position
-              raise ActiveRecord::RecordInvalid.new(
-                user.tap { |record| record.errors.add(:role, :elevated) }
-              )
-            end
-
             user.current_account = current_account
             previously_verified = user.role.verified_by_instance?
             user.update!(role: verified_role)
@@ -50,11 +50,16 @@ module Admin
 
             sync_verification_timestamp(user, previously_verified)
             @verification_request.resolve!(current_account, status: :approved)
+            role_changed = true
           end
         end
       end
 
-      log_action :change_role, user unless user.role.verified_by_instance? && user.role.id != verified_role.id
+      if role_would_be_downgraded
+        return redirect_to admin_verification_request_path(@verification_request), alert: I18n.t('admin.verification_requests.role_would_be_downgraded')
+      end
+
+      log_action :change_role, user if role_changed
       log_action :verification_approved, @verification_request
       redirect_to admin_verification_requests_path(status: 'pending'), notice: I18n.t('admin.verification_requests.approved_msg')
     rescue ActiveRecord::RecordNotFound

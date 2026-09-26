@@ -7,11 +7,11 @@ import ShieldQuestionIcon from '@/material-icons/400-24px/shield_question.svg?re
 import { Icon } from 'mastodon/components/icon';
 import { RelativeTimestamp } from 'mastodon/components/relative_timestamp';
 
-import type { NotificationGroupAdminVerificationRequest } from 'mastodon/models/notification_group';
+import type { NotificationGroup } from 'mastodon/models/notification_group';
 import { useAppSelector } from 'mastodon/store';
 
 export const NotificationAdminVerificationRequest: React.FC<{
-  notification: NotificationGroupAdminVerificationRequest;
+  notification: NotificationGroup;
   unread?: boolean;
 }> = ({ notification, unread }) => {
   const account = useAppSelector((state) =>
@@ -23,6 +23,8 @@ export const NotificationAdminVerificationRequest: React.FC<{
   return (
     <a
       href='/admin/verification_requests'
+      target='_blank'
+      rel='noopener noreferrer'
       className={classNames(
         'notification-group notification-group--link notification-group--admin-verification-request focusable',
         { 'notification-group--unread': unread },

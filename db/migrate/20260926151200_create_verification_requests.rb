@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CreateVerificationRequests < ActiveRecord::Migration[8.0]
+class CreateVerificationRequests < ActiveRecord::Migration[8.1]
   def change
     create_table :verification_requests do |t|
       t.references :account, null: false, foreign_key: true

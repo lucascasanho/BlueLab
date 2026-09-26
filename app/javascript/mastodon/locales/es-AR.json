@@ -1543,4 +1543,20 @@
   "visibility_modal.quote_nobody": "Solo yo",
   "visibility_modal.quote_public": "Cualquier cuenta",
   "visibility_modal.save": "Guardar"
+,
+  "account_edit.verification.request_button": "Solicitar sello de verificación",
+  "account_edit.verification.toggle_show": "Mostrar sello de verificación",
+  "account_edit.verification.toggle_hide": "Ocultar sello de verificación",
+  "account_edit.verification.popover.title": "Solicitar sello de verificación",
+  "account_edit.verification.popover.description": "El sello de verificación de BlueLab se concede según criterios internos definidos por la moderación.",
+  "account_edit.verification.popover.free": "El sello es totalmente gratuito. No es necesario enviar documentos personales.",
+  "account_edit.verification.popover.criteria": "Los criterios son internos y los define el equipo de moderación.",
+  "account_edit.verification.popover.federation": "El sello no es compatible con toda la federación ni con las aplicaciones cliente de Mastodon. Está limitado a instancias que utilizan el fork de BlueLab y a la versión web.",
+  "account_edit.verification.popover.disclaimer": "Este sello no tiene ninguna relación con Mastodon GmbH. Puedes volver a solicitarlo después de 30 días.",
+  "account_edit.verification.popover.explanation_label": "Mensaje para la moderación (opcional)",
+  "account_edit.verification.popover.explanation_hint": "Puedes enviar la solicitud sin escribir un mensaje. Máximo de 5.000 caracteres.",
+  "account_edit.verification.popover.submit": "Enviar solicitud",
+  "account_edit.verification.popover.cancel": "Cancelar",
+  "account_edit.verification.popover.error": "No se pudo enviar tu solicitud de verificación. Inténtalo de nuevo.",
+  "notification.admin.verification_request": "{name} solicitó un sello de verificación"
 }

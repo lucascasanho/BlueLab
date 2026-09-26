@@ -1542,4 +1542,20 @@
   "visibility_modal.quote_nobody": "Juste moi",
   "visibility_modal.quote_public": "Tout le monde",
   "visibility_modal.save": "Sauvegarder"
+,
+  "account_edit.verification.request_button": "Demander le badge de vérification",
+  "account_edit.verification.toggle_show": "Afficher le badge de vérification",
+  "account_edit.verification.toggle_hide": "Masquer le badge de vérification",
+  "account_edit.verification.popover.title": "Demander le badge de vérification",
+  "account_edit.verification.popover.description": "Le badge de vérification BlueLab est accordé selon des critères internes définis par la modération.",
+  "account_edit.verification.popover.free": "Le badge est entièrement gratuit. Vous n’avez pas besoin d’envoyer de documents personnels.",
+  "account_edit.verification.popover.criteria": "Les critères sont internes et définis par l’équipe de modération.",
+  "account_edit.verification.popover.federation": "Le badge n’est pas compatible avec toute la fédération ni avec les applications clientes Mastodon. Il est limité aux instances utilisant le fork BlueLab et à la version web.",
+  "account_edit.verification.popover.disclaimer": "Ce badge n’a aucun lien avec Mastodon GmbH. Vous pourrez envoyer une nouvelle demande après 30 jours.",
+  "account_edit.verification.popover.explanation_label": "Message à la modération (facultatif)",
+  "account_edit.verification.popover.explanation_hint": "Vous pouvez envoyer la demande sans écrire de message. 5 000 caractères maximum.",
+  "account_edit.verification.popover.submit": "Envoyer la demande",
+  "account_edit.verification.popover.cancel": "Annuler",
+  "account_edit.verification.popover.error": "Impossible d’envoyer votre demande de vérification. Réessayez.",
+  "notification.admin.verification_request": "{name} a demandé un badge de vérification"
 }

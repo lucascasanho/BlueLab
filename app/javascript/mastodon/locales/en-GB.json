@@ -1377,4 +1377,20 @@
   "visibility_modal.quote_nobody": "Just me",
   "visibility_modal.quote_public": "Anyone",
   "visibility_modal.save": "Save"
+,
+  "account_edit.verification.request_button": "Request verification badge",
+  "account_edit.verification.toggle_show": "Show verification badge",
+  "account_edit.verification.toggle_hide": "Hide verification badge",
+  "account_edit.verification.popover.title": "Request verification badge",
+  "account_edit.verification.popover.description": "The BlueLab verification badge is granted according to internal criteria defined by moderation.",
+  "account_edit.verification.popover.free": "The badge is completely free. You do not need to submit personal documents.",
+  "account_edit.verification.popover.criteria": "The criteria are internal and defined by the moderation team.",
+  "account_edit.verification.popover.federation": "The badge is not compatible with all federation setups or Mastodon client apps. It is limited to instances using the BlueLab fork and to the web version.",
+  "account_edit.verification.popover.disclaimer": "This badge is not affiliated with or endorsed by Mastodon GmbH. You can submit another request after 30 days.",
+  "account_edit.verification.popover.explanation_label": "Message to moderation (optional)",
+  "account_edit.verification.popover.explanation_hint": "You can send the request without a message. Maximum 5,000 characters.",
+  "account_edit.verification.popover.submit": "Submit request",
+  "account_edit.verification.popover.cancel": "Cancel",
+  "account_edit.verification.popover.error": "We could not send your verification request. Please try again.",
+  "notification.admin.verification_request": "{name} requested a verification badge"
 }

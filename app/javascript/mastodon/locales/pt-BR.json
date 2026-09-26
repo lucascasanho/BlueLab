@@ -1543,4 +1543,20 @@
   "messages.conversation.participants": "{count, plural, one {Mensagem} other {Conversa}}",
   "messages.conversation.replying_to": "Respondendo a {name}",
   "messages.conversation.empty": "Conversa indisponível"
+,
+  "account_edit.verification.request_button": "Solicitar selo de verificado",
+  "account_edit.verification.toggle_show": "Exibir selo de verificado",
+  "account_edit.verification.toggle_hide": "Ocultar selo de verificado",
+  "account_edit.verification.popover.title": "Solicitar selo de verificado",
+  "account_edit.verification.popover.description": "O selo de verificado do BlueLab é concedido de acordo com critérios internos definidos pela moderação.",
+  "account_edit.verification.popover.free": "O selo é totalmente gratuito. Não é necessário enviar documentos pessoais.",
+  "account_edit.verification.popover.criteria": "Os critérios são internos e definidos pela equipe de moderação.",
+  "account_edit.verification.popover.federation": "O selo não é compatível com toda a federação nem com apps clientes do Mastodon. Ele fica restrito a instâncias que utilizam o fork BlueLab e à versão web.",
+  "account_edit.verification.popover.disclaimer": "Este selo não possui nenhuma relação com a Mastodon GmbH. Você poderá enviar uma nova solicitação após 30 dias.",
+  "account_edit.verification.popover.explanation_label": "Mensagem para a moderação (opcional)",
+  "account_edit.verification.popover.explanation_hint": "Você pode enviar a solicitação sem escrever uma mensagem. Máximo de 5.000 caracteres.",
+  "account_edit.verification.popover.submit": "Enviar solicitação",
+  "account_edit.verification.popover.cancel": "Cancelar",
+  "account_edit.verification.popover.error": "Não foi possível enviar sua solicitação de verificação. Tente novamente.",
+  "notification.admin.verification_request": "{name} solicitou um selo de verificado"
 }

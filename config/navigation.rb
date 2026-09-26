@@ -55,7 +55,7 @@ SimpleNavigation::Configuration.run do |navigation|
       s.item :follow_recommendations, safe_join([material_symbol('person_add'), t('admin.follow_recommendations.title')]), admin_follow_recommendations_path, highlights_on: %r{/admin/follow_recommendations}
     end
 
-    n.item :moderation, safe_join([material_symbol('gavel'), t('moderation.title')]), nil, if: -> { current_user.can?(:manage_reports, :view_audit_log, :manage_users, :manage_invites, :manage_taxonomies, :manage_federation, :manage_blocks) && !self_destruct } do |s|
+    n.item :moderation, safe_join([material_symbol('gavel'), t('moderation.title')]), nil, if: -> { current_user.can?(:manage_reports, :view_audit_log, :manage_users, :manage_invites, :manage_taxonomies, :manage_federation, :manage_blocks, :manage_roles) && !self_destruct } do |s|
       s.item :reports, safe_join([material_symbol('flag'), t('admin.reports.title')]), admin_reports_path, highlights_on: %r{/admin/reports|admin/report_notes}, html: { class: 'reports-navigation-item' }, if: -> { current_user.can?(:manage_reports) }
       s.item :bug_reports, safe_join([material_symbol('bug_report'), t('admin.bug_reports.title')]), admin_bug_reports_path, highlights_on: %r{/admin/bug_reports}, html: { class: 'bug-reports-navigation-item' }, if: -> { current_user.can?(:manage_reports) }
       s.item :verification_requests, safe_join([material_symbol('shield_question'), t('admin.verification_requests.title')]), admin_verification_requests_path, highlights_on: %r{/admin/verification_requests}, if: -> { current_user.can?(:manage_roles) }
