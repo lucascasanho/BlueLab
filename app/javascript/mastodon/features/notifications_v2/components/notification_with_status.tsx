@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type MouseEvent } from 'react';
 
 import classNames from 'classnames';
 
@@ -62,6 +62,18 @@ export const NotificationWithStatus: React.FC<{
       getStatusHidden(state, { id: statusId, contextType: 'notifications' }),
   );
 
+  const handleCardClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (!(event.target instanceof Element)) return;
+    if (event.target.closest('a,button,input,textarea,select,[role="link"]')) return;
+    if (!statusId) return;
+
+    if (isPrivateMention) {
+      dispatch(openConversationForStatus(statusId));
+    } else {
+      dispatch(navigateToStatus(statusId));
+    }
+  };
+
   const handlers = useMemo(
     () => ({
       open: () => {
@@ -121,6 +133,7 @@ export const NotificationWithStatus: React.FC<{
           },
         )}
         tabIndex={0}
+        onClick={handleCardClick}
       >
         <h2 className='notification-ungrouped__header'>
           <div className='notification-ungrouped__header__icon'>
@@ -129,15 +142,17 @@ export const NotificationWithStatus: React.FC<{
           <span>{label}</span>
         </h2>
 
-        <Status
-          id={statusId}
-          contextType='notifications'
-          onOpen={handleStatusOpen}
-          withDismiss
-          skipPrepend
-          avatarSize={40}
-          unfocusable
-        />
+        <div onClick={(event) => event.stopPropagation()}>
+          <Status
+            id={statusId}
+            contextType='notifications'
+            onOpen={handleStatusOpen}
+            withDismiss
+            skipPrepend
+            avatarSize={40}
+            unfocusable
+          />
+        </div>
       </div>
     </Hotkeys>
   );

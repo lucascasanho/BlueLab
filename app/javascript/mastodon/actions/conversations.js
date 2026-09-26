@@ -35,7 +35,15 @@ export const markConversationRead = conversationId => (dispatch) => {
     id: conversationId,
   });
 
-  return api().post(`/api/v1/conversations/${conversationId}/read`);
+  return api().post(`/api/v1/conversations/${conversationId}/read`)
+    .then(response => {
+      dispatch({
+        type: CONVERSATIONS_UPDATE,
+        conversation: response.data,
+      });
+
+      return response;
+    });
 };
 
 export const expandConversations = ({ maxId } = {}) => (dispatch, getState) => {

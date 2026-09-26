@@ -147,11 +147,12 @@ RSpec.describe ThemeHelper do
 
       before do
         allow(helper).to receive(:current_user).and_return(current_user)
-        Setting.theme = 'blue-2'
+        Setting.theme = 'mastodon-5'
       end
 
-      it 'follows the administrator theme' do
+      it 'uses BlueLab as the default user theme' do
         expect(subject).to eq('blue-2')
+        expect(Setting.theme).to eq('mastodon-5')
       end
     end
   end

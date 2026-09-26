@@ -196,7 +196,7 @@ export const Notifications: React.FC<{
     />
   );
 
-  const { signedIn } = useIdentity();
+  const { signedIn } = useIdentity(); 
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
@@ -326,7 +326,7 @@ export const Notifications: React.FC<{
         </LegacyColumnHeader>
       )}
 
-      {!isRedesignEnabled() && filterBar}
+      {!isRedesignEnabled() && !isBlue2 && filterBar}
 
       {scrollContainer}
 

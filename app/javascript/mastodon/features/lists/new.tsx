@@ -286,6 +286,10 @@ const NewListWrapper: React.FC<{
 }> = ({ multiColumn }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const history = useHistory();
+  const isBlue2 =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'blue-2';
   const { signedIn } = useIdentity();
   const { id } = useParams<{ id?: string }>();
   const list = useAppSelector((state) =>
@@ -299,12 +303,20 @@ const NewListWrapper: React.FC<{
   }, [dispatch, signedIn, id]);
 
   const isLoading = id && !list;
-  const title = intl.formatMessage(id ? messages.edit : messages.create);
+  const title = intl.formatMessage(
+    id ? messages.edit : isBlue2 ? messagesLegacy.create : messages.create,
+  );
 
   return (
     <Column bindToDocument={!multiColumn} label={title}>
-      {isRedesignEnabled() ? (
-        <ColumnHeader withBackButton title={title} />
+      {isRedesignEnabled() || isBlue2 ? (
+        <ColumnHeader
+          withBackButton
+          {...(isBlue2
+            ? { onBackButtonClick: () => history.push('/lists') }
+            : {})}
+          title={title}
+        />
       ) : (
         <LegacyColumnHeader
           title={title}

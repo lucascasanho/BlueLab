@@ -260,7 +260,10 @@ export const ComposeRedesignButton: React.FC<{
   // BLUE 2.0 owns its launcher UI elsewhere, so keep this global trigger hidden
   // while idle/minimized. When the shared state changes to showing, however,
   // this component must stay mounted because it is the desktop composer host.
-  if (!hostOnly && shouldHideBlue2GlobalTrigger(isBlue2, inline, displayState)) {
+  if (
+    !hostOnly &&
+    shouldHideBlue2GlobalTrigger(isBlue2, inline, displayState)
+  ) {
     return null;
   }
 

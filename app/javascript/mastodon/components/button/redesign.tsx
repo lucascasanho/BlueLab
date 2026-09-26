@@ -121,7 +121,8 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => (
   <BaseButton {...props}>
-    {leadingIcon && !props.loading &&
+    {leadingIcon &&
+      !props.loading &&
       (leadingIconWrapperClassName ? (
         <span className={leadingIconWrapperClassName}>
           <Icon id='leading' icon={leadingIcon} className={classes.icon} />

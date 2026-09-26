@@ -12,7 +12,7 @@ class UserSettings
   # Keep Mastodon's legacy theme setting for compatibility. BlueLab account
   # themes are stored separately in :bluelab_theme.
   setting :theme, default: -> { ::Setting.theme }
-  setting :bluelab_theme, default: nil, in: %w(blue-2 mastodon-bird-ui-auto mastodon-5)
+  setting :bluelab_theme, default: 'blue-2', in: %w(blue-2 mastodon-bird-ui-auto mastodon-5)
   setting :noindex, default: -> { ::Setting.noindex }
   setting :show_application, default: true
   setting :default_language, default: nil

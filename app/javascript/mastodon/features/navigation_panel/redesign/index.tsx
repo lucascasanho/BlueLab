@@ -112,6 +112,13 @@ export const RedesignNavigationPanel: React.FC<{
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
   );
+  const unreadMessagesCount = useAppSelector((state) => {
+    const conversations = state.conversations.get('items');
+
+    return groupedConversationRepresentatives(conversations)
+      .filter((conversation) => conversation.get('unread'))
+      .length;
+  });
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const unreadMessagesCount = useAppSelector((state) => {
@@ -127,6 +134,20 @@ export const RedesignNavigationPanel: React.FC<{
 
     dispatch(mountConversations());
     dispatch(expandConversations());
+    const disconnect = dispatch(connectDirectStream());
+
+    return () => {
+      dispatch(unmountConversations());
+      disconnect();
+    };
+  }, [dispatch, isBlue2, signedIn]);
+
+  useEffect(() => {
+    if (!signedIn || !isBlue2) return;
+
+    dispatch(mountConversations());
+    dispatch(expandConversations());
+
     const disconnect = dispatch(connectDirectStream());
 
     return () => {
@@ -311,85 +332,54 @@ export const RedesignNavigationPanel: React.FC<{
             )}
           </ul>
           <footer className={classes.footer} data-stuck={!isScrolledToBottom}>
-            {mode !== 'slide-out' && (
-              <>
-                <ul className={classes.footerNav}>
-                  <NavigationLink
-                    stacked
-                    to='/notifications'
-                    iconComponent={BellIcon}
-                    badgeCount={notificationsCount}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.notifications'
-                      defaultMessage='Notifications'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/conversations'
-                    iconComponent={ChatCircleDotsIcon}
-                    badgeCount={unreadMessagesCount}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.messages'
-                      defaultMessage='Messages'
-                      description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/bookmarks'
-                    iconComponent={BookmarkSimpleIcon}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.saved'
-                      defaultMessage='Saved'
-                    />
-                  </NavigationLink>
-                </ul>
-                <NavigationAccountCardAndMenu />
-              </>
-            )}
-            {mode === 'slide-out' && (
-              <>
-                <ul className={classes.footerNav}>
-                  <NavigationLink
-                    stacked
-                    to='/notifications'
-                    iconComponent={BellIcon}
-                    badgeCount={notificationsCount}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.notifications'
-                      defaultMessage='Notifications'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/conversations'
-                    iconComponent={ChatCircleDotsIcon}
-                    badgeCount={unreadMessagesCount}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.messages'
-                      defaultMessage='Messages'
-                      description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
-                    />
-                  </NavigationLink>
-                  <NavigationLink
-                    stacked
-                    to='/bookmarks'
-                    iconComponent={BookmarkSimpleIcon}
-                  >
-                    <FormattedMessage
-                      id='tabs_bar.saved'
-                      defaultMessage='Saved'
-                    />
-                  </NavigationLink>
-                </ul>
-                <NavigationAccountCardAndMenu inSlideOut />
-              </>
+            <ul className={classes.footerNav}>
+              <NavigationLink
+                stacked
+                to='/notifications'
+                iconComponent={BellIcon}
+                badgeCount={notificationsCount}
+              >
+                <FormattedMessage
+                  id='tabs_bar.notifications'
+                  defaultMessage='Notifications'
+                />
+              </NavigationLink>
+              <NavigationLink
+                stacked
+                to='/conversations'
+                iconComponent={ChatCircleDotsIcon}
+                badgeCount={unreadMessagesCount}
+              >
+                <FormattedMessage
+                  id='tabs_bar.messages'
+                  defaultMessage='Messages'
+                  description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
+                />
+              </NavigationLink>
+              {!isBlue2 && (
+                <NavigationLink
+                  stacked
+                  to='/favourites'
+                  iconComponent={StarIcon}
+                >
+                  <FormattedMessage
+                    id='navigation_bar.favourites'
+                    defaultMessage='Favorites'
+                  />
+                </NavigationLink>
+              )}
+              <NavigationLink
+                stacked
+                to='/bookmarks'
+                iconComponent={BookmarkSimpleIcon}
+              >
+                <FormattedMessage id='tabs_bar.saved' defaultMessage='Saved' />
+              </NavigationLink>
+            </ul>
+            {mode === 'slide-out' ? (
+              <NavigationAccountCardAndMenu inSlideOut />
+            ) : (
+              <NavigationAccountCardAndMenu />
             )}
             {!multiColumn && (
               <NavigationFooterLinks

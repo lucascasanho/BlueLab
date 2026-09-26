@@ -6,6 +6,7 @@ import { useIntl, defineMessages, FormattedMessage } from 'react-intl';
 import { Helmet } from '@unhead/react/helmet';
 import { NavLink } from 'react-router-dom';
 
+import { blue2Text } from '@/bluelab/i18n/blue2';
 import { useIdentity } from '@/mastodon/identity_context';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 import { addColumn } from 'mastodon/actions/columns';
@@ -182,15 +183,21 @@ const Firehose = ({ feedType, multiColumn }) => {
     title = messages.title_singular;
   }
 
+  const displayTitle = isBlue2 && feedType === 'public'
+    ? blue2Text(intl.locale, 'global')
+    : intl.formatMessage(
+      isRedesignEnabled() && !isBlue2 ? messages.title_redesign : title,
+    );
+
   return (
-    <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.title)}>
-      {isRedesignEnabled() ? (
+    <Column bindToDocument={!multiColumn} label={displayTitle}>
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
-          title={intl.formatMessage(messages.title_redesign)}
+          title={displayTitle}
           withBackButton={multiColumn && 'auto'}
           withUnreadMarker={hasUnread}
           extraButtons={multiColumn &&
-            <ColumnSettingsMenu labelPrefix={intl.formatMessage(messages.title_redesign)}>
+            <ColumnSettingsMenu labelPrefix={displayTitle}>
               <MultiColumnMenuItems onPin={handlePin} />
             </ColumnSettingsMenu>
           }
@@ -200,7 +207,7 @@ const Firehose = ({ feedType, multiColumn }) => {
           icon='globe'
           iconComponent={PublicIcon}
           active={hasUnread}
-          title={intl.formatMessage(title)}
+          title={displayTitle}
           onPin={handlePin}
           multiColumn={multiColumn}
           scrollTopOnClick
@@ -236,7 +243,7 @@ const Firehose = ({ feedType, multiColumn }) => {
       />
 
       <Helmet>
-        <title>{intl.formatMessage(messages.title)}</title>
+        <title>{displayTitle}</title>
         <meta name='robots' content='noindex' />
       </Helmet>
     </Column>

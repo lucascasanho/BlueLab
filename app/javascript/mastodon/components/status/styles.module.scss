@@ -274,11 +274,12 @@
   margin-inline-end: auto;
 }
 
-
 /* Bird UI: use the exact star artwork from the working detailed-status control. */
-:global(body[data-theme='mastodon-bird-ui-auto']) .favouriteButton
+:global(body[data-theme='mastodon-bird-ui-auto'])
+  .favouriteButton
   .favourite-animation-target {
   --favourite-star-image: var(--icon-star-detailed-status-action-bar);
+
   box-sizing: border-box;
   width: 18px;
   height: 18px;

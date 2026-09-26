@@ -14,7 +14,7 @@ import {
 
 import { Conversation } from './conversation';
 
-export const ConversationsList = ({ scrollKey, ...other }) => {
+export const ConversationsList = ({ scrollKey, onOpenConversation, ...other }) => {
   const listRef = useRef();
   const conversations = useSelector(state => state.getIn(['conversations', 'items']));
   const isLoading = useSelector(state => state.getIn(['conversations', 'isLoading'], true));
@@ -47,6 +47,7 @@ export const ConversationsList = ({ scrollKey, ...other }) => {
           key={item.get('id')}
           conversation={item}
           scrollKey={scrollKey}
+          onOpenConversation={onOpenConversation}
         />
       ))}
     </ScrollableList>
@@ -55,4 +56,5 @@ export const ConversationsList = ({ scrollKey, ...other }) => {
 
 ConversationsList.propTypes = {
   scrollKey: PropTypes.string.isRequired,
+  onOpenConversation: PropTypes.func,
 };

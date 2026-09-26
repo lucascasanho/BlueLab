@@ -36,6 +36,7 @@ class AccountConversation < ApplicationRecord
     @participant_accounts.presence || [account]
   end
 
+
   class << self
     def to_a_paginated_by_id(limit, options = {})
       array = begin

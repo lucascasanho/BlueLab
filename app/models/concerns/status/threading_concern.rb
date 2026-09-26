@@ -29,6 +29,7 @@ module Status::ThreadingConcern
     find_statuses_from_tree_path(descendant_ids(limit, depth), account, promote: true)
   end
 
+
   def self_replies(limit)
     account.statuses.distributable_visibility.where(in_reply_to_id: id).reorder(id: :asc).limit(limit)
   end

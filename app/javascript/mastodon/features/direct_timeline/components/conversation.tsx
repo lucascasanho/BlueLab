@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 
@@ -84,7 +84,8 @@ interface Conversation {
 export const Conversation: React.FC<{
   conversation: ImmutableRecord<Conversation>;
   scrollKey: string;
-}> = ({ conversation, scrollKey }) => {
+  onOpenConversation?: (conversationId: string) => void;
+}> = ({ conversation, scrollKey, onOpenConversation }) => {
   const id = conversation.get('id');
   const unread = conversation.get('unread');
   const lastStatusId = conversation.get('last_status');
@@ -101,7 +102,14 @@ export const Conversation: React.FC<{
   );
   const accounts = useAppSelector((state) => getAccounts(state, accountIds));
 
+  const pointerActivationRef = useRef<number | null>(null);
+
   const handleClick = useCallback(() => {
+    if (onOpenConversation) {
+      onOpenConversation(id);
+      return;
+    }
+
     if (unread) {
       dispatch(markConversationRead(id));
     }
@@ -120,7 +128,7 @@ export const Conversation: React.FC<{
         );
       }
     }
-  }, [dispatch, history, unread, id, lastStatus]);
+  }, [dispatch, history, unread, id, lastStatus, onOpenConversation]);
 
   const handleMarkAsRead = useCallback(() => {
     dispatch(markConversationRead(id));
@@ -220,7 +228,28 @@ export const Conversation: React.FC<{
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         role='button'
+        onPointerDown={(event) => {
+          if (
+            (event.target as HTMLElement).closest(
+              '.status__action-bar, button, [role="menuitem"]',
+            )
+          ) {
+            return;
+          }
+
+          pointerActivationRef.current = Date.now();
+          handleClick();
+        }}
         onClick={(event) => {
+          const pointerActivatedAt = pointerActivationRef.current;
+          if (
+            pointerActivatedAt !== null &&
+            Date.now() - pointerActivatedAt < 500
+          ) {
+            return;
+          }
+          pointerActivationRef.current = null;
+
           if (
             (event.target as HTMLElement).closest(
               '.status__action-bar, button, [role="menuitem"]',

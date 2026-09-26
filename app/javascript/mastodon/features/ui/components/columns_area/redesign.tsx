@@ -84,10 +84,23 @@ export const ColumnsAreaRedesign: React.FC<{
     isBlue2 && isBlue2MobileLayout && location.pathname.startsWith('/deck')
       ? location.pathname.slice(5) || '/home'
       : location.pathname;
+  const isBlue2MessagesPage =
+    isBlue2 &&
+    (blue2Pathname === '/conversations' ||
+      blue2Pathname.startsWith('/conversations/'));
   const isBlue2Home = isBlue2 && blue2Pathname === '/home';
   const isBlue2Global = isBlue2 && blue2Pathname === '/public';
   const isBlue2Search = isBlue2 && blue2Pathname === '/search';
-  const isBlue2FeedPage = isBlue2Home || isBlue2Global;
+  const isBlue2FeedPage =
+    (isBlue2Home || isBlue2Global) && !isBlue2MessagesPage;
+  const blue2FeedTitle = isBlue2Home
+    ? intl.formatMessage({
+        id: 'account.following',
+        defaultMessage: 'Following',
+      })
+    : isBlue2Global
+      ? blue2Text(intl.locale, 'global')
+      : null;
   const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
 
   useEffect(() => {
@@ -232,6 +245,8 @@ export const ColumnsAreaRedesign: React.FC<{
           className={classNames(
             classes.main,
             classes.blue2Main,
+            isBlue2MessagesPage && classes.blue2MessagesMain,
+            isBlue2FeedPage && classes.blue2Feed,
             isBlue2FeedPage && classes.blue2Home,
           )}
           onTouchStart={handleSwipeStart}
@@ -311,6 +326,11 @@ export const ColumnsAreaRedesign: React.FC<{
 
           {isBlue2FeedPage && (
             <>
+              {!isBlue2MobileLayout && blue2FeedTitle && (
+                <div className={classes.blue2FeedTitle}>
+                  {blue2FeedTitle}
+                </div>
+              )}
               <header
                 className={classNames(
                   classes.blue2Topbar,
@@ -371,7 +391,7 @@ export const ColumnsAreaRedesign: React.FC<{
               onTouchStart={handleBlue2RailSwipeStart}
               onTouchEnd={handleBlue2RailSwipeEnd}
             >
-              <Blue2RightRail />
+              <Blue2RightRail variant='mobile' />
             </aside>
           </div>
         )}
@@ -392,7 +412,7 @@ export const ColumnsAreaRedesign: React.FC<{
         ) : isMobile ? (
           <RedesignMobileNavigation />
         ) : (
-          <ComposeRedesignButton />
+          !isBlue2MessagesPage && <ComposeRedesignButton />
         )}
 
         <main className={classes.main}>{children}</main>

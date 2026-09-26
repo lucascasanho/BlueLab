@@ -23,7 +23,7 @@ const NotificationSettingsModal: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <ModalShell>
+    <ModalShell className='bluelab-notification-settings-modal'>
       <ModalTitle onClose={handleCloseModal}>
         <FormattedMessage
           id='notifications.settings'
@@ -32,7 +32,7 @@ const NotificationSettingsModal: React.FC = () => {
       </ModalTitle>
       <NotificationSettings />
       <ModalActions>
-        <Button variant='solid' onClick={handleCloseModal}>
+        <Button variant='solid' color='accent' onClick={handleCloseModal}>
           <FormattedMessage id='alt_text_modal.done' defaultMessage='Done' />
         </Button>
       </ModalActions>

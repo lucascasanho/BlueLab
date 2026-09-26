@@ -107,7 +107,7 @@ class ActivityPub::Parser::StatusParser
 
   def generator_url
     generator = as_array(@object['generator']).first
-    return unless generator.is_a?(Hash)
+    return if !generator.is_a?(Hash)
 
     url = value_or_id(generator['url'])
     return if url.blank? || unsupported_uri_scheme?(url)

@@ -110,7 +110,9 @@
 
 @media screen and (width <= 600px) {
   :global(body[data-theme='blue-2']) .blue2FieldWrapper .blue2Editor,
-  :global(body[data-theme='mastodon-bird-ui-auto']) .blue2FieldWrapper .blue2Editor,
+  :global(body[data-theme='mastodon-bird-ui-auto'])
+    .blue2FieldWrapper
+    .blue2Editor,
   :global(body[data-theme='mastodon-5']) .blue2FieldWrapper .blue2Editor {
     font-size: 16px;
   }

@@ -65,8 +65,19 @@ const messages = defineMessages({
 
 const getStatus = makeGetStatus();
 
-export const MessageConversation: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+interface MessageConversationProps {
+  conversationId?: string;
+  onBack?: () => void;
+  inline?: boolean;
+}
+
+export const MessageConversation: React.FC<MessageConversationProps> = ({
+  conversationId,
+  onBack,
+  inline = false,
+}) => {
+  const { id: routeId } = useParams<{ id: string }>();
+  const id = conversationId ?? routeId;
   const location = useLocation();
   const sourceStatusId = (location.state as { statusId?: string } | undefined)?.statusId;
   const intl = useIntl();
@@ -197,9 +208,12 @@ export const MessageConversation: React.FC = () => {
   }, [dispatch, id, sourceStatusId]);
 
   useEffect(() => {
-    dispatch(mountConversations());
-    dispatch(expandConversations());
-    const disconnect = dispatch(connectDirectStream());
+    if (!inline) {
+      dispatch(mountConversations());
+      dispatch(expandConversations());
+    }
+
+    const disconnect = inline ? undefined : dispatch(connectDirectStream());
 
     let cancelled = false;
 
@@ -234,10 +248,12 @@ export const MessageConversation: React.FC = () => {
 
     return () => {
       cancelled = true;
-      dispatch(unmountConversations());
-      disconnect();
+      if (!inline) {
+        dispatch(unmountConversations());
+        disconnect?.();
+      }
     };
-  }, [dispatch, id]);
+  }, [dispatch, id, inline]);
 
   const latestThreadStatusId = useMemo(
     () =>
@@ -294,11 +310,46 @@ export const MessageConversation: React.FC = () => {
     }
   }, [id, latestThreadStatusId, loadMessages]);
 
+  const initialReadStateRef = useRef<{
+    conversationId: string;
+    unread: boolean;
+    lastReadStatusId: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!id || !conversation || initialReadStateRef.current?.conversationId === id) {
+      return;
+    }
+
+    initialReadStateRef.current = {
+      conversationId: id,
+      unread: Boolean(conversation.get('unread')),
+      lastReadStatusId:
+        (conversation.get('last_read_status_id') as string | null) ?? null,
+    };
+  }, [conversation, id]);
+
   useEffect(() => {
     if (id && conversationResolved && conversation) {
       void dispatch(markConversationRead(id)).catch(() => undefined);
     }
   }, [conversation, conversationResolved, dispatch, id]);
+
+  const renderShell = (content: React.ReactNode) => {
+    if (inline) {
+      return (
+        <div className={`${classes.column} ${classes.inlineColumn}`}>
+          {content}
+        </div>
+      );
+    }
+
+    return (
+      <Column label={intl.formatMessage(messages.title)} className={classes.column}>
+        {content}
+      </Column>
+    );
+  };
 
   const participantAccountIdsKey = participantIds.join(',');
   const participantAccountsRef = useRef(participantAccounts);
@@ -321,6 +372,8 @@ export const MessageConversation: React.FC = () => {
       dispatch(resetCompose());
     };
   }, [dispatch, participantAccountIdsKey]);
+
+  const messageListRef = useRef<HTMLDivElement>(null);
 
   const highlightTimeoutRef = useRef<number | null>(null);
 
@@ -401,6 +454,73 @@ export const MessageConversation: React.FC = () => {
     return () => window.cancelAnimationFrame(frame);
   }, [highlightStatus, pendingScrollStatusId, statuses]);
 
+  const initialScrollConversationIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (
+      !id ||
+      !conversationResolved ||
+      !conversation ||
+      !messagesResolved ||
+      statuses.length === 0
+    ) {
+      return;
+    }
+
+    if (initialScrollConversationIdRef.current === id) return;
+
+    const initialReadState = initialReadStateRef.current;
+    const lastStatus = statuses[statuses.length - 1];
+    const lastReadStatusId = initialReadState?.lastReadStatusId;
+
+    const oldestUnreadStatus =
+      initialReadState?.unread === true
+        ? statuses.find((status) => {
+            const statusId = status.get('id') as string;
+            const isIncoming = status.getIn(['account', 'id']) !== me;
+
+            return (
+              isIncoming &&
+              (!lastReadStatusId || compareId(statusId, lastReadStatusId) > 0)
+            );
+          })
+        : undefined;
+
+    const targetStatus = oldestUnreadStatus ?? lastStatus;
+
+    if (!targetStatus) return;
+
+    let frame = 0;
+    let secondFrame = 0;
+
+    frame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        const list = messageListRef.current;
+        const targetMessage = document.getElementById(
+          'message-' + targetStatus.get('id'),
+        );
+
+        if (!list) return;
+
+        if (targetMessage) {
+          targetMessage.scrollIntoView({
+            behavior: 'auto',
+            block: oldestUnreadStatus ? 'center' : 'end',
+          });
+        } else {
+          list.scrollTop = oldestUnreadStatus ? 0 : list.scrollHeight;
+        }
+
+        initialScrollConversationIdRef.current = id;
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.cancelAnimationFrame(secondFrame);
+    };
+  }, [conversation, conversationResolved, id, messagesResolved, statuses]);
+
   const handleReply = useCallback(
     (status: Immutable.Record<StatusShape>) => {
       dispatch(replyComposeInline(status));
@@ -409,47 +529,41 @@ export const MessageConversation: React.FC = () => {
   );
 
   if (!conversationResolved || !messagesResolved) {
-    return (
-      <Column
-        label={intl.formatMessage(messages.title)}
-        className={classes.column}
-      >
+    return renderShell(
+      <>
         <ColumnHeader
           withBackButton
+          onBackButtonClick={onBack}
           title={intl.formatMessage(messages.title)}
         />
         <div className={classes.loading}>
           <LoadingIndicator />
         </div>
-      </Column>
+      </>,
     );
   }
 
   if (!conversation || statuses.length === 0) {
-    return (
-      <Column
-        label={intl.formatMessage(messages.title)}
-        className={classes.column}
-      >
+    return renderShell(
+      <>
         <ColumnHeader
           withBackButton
+          onBackButtonClick={onBack}
           title={intl.formatMessage(messages.title)}
         />
         <div className={classes.empty}>
           <ChatCircleDotsIcon size={42} />
           <span>{intl.formatMessage(messages.empty)}</span>
         </div>
-      </Column>
+      </>,
     );
   }
 
-  return (
-    <Column
-      label={intl.formatMessage(messages.title)}
-      className={classes.column}
-    >
+  return renderShell(
+    <>
       <ColumnHeader
         withBackButton
+        onBackButtonClick={onBack}
         title={
           <div className={classes.headerTitle}>
             <ChatCircleDotsIcon size={18} />
@@ -469,8 +583,9 @@ export const MessageConversation: React.FC = () => {
       />
 
       <div className={classes.page}>
-        <div className={classes.messageList}>
-          {statuses.map((status) => {
+        <div className={classes.messageList} ref={messageListRef}>
+          <div className={classes.messageListContent}>
+            {statuses.map((status) => {
             const isMine = status.getIn(['account', 'id']) === me;
             const displayAccount = status.get('account');
             const statusText =
@@ -625,7 +740,8 @@ export const MessageConversation: React.FC = () => {
                 </div>
               </article>
             );
-          })}
+            })}
+          </div>
         </div>
 
         {participantAccounts.length > 0 && (
@@ -654,6 +770,6 @@ export const MessageConversation: React.FC = () => {
         <title>{intl.formatMessage(messages.title)}</title>
         <meta name='robots' content='noindex' />
       </Helmet>
-    </Column>
+    </>,
   );
 };

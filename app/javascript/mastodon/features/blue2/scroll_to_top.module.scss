@@ -1,3 +1,10 @@
+// BlueLab desktop only: place the floating control immediately beside the
+// main 600px column, without changing its position in other themes or modes.
+:global(body[data-theme='blue-2']) .root {
+  left: calc(50% - 374px);
+  right: auto;
+}
+
 .root {
   position: fixed;
   z-index: 25;
@@ -86,7 +93,6 @@
   }
 }
 
-
 :global(body[data-theme='mastodon-bird-ui-auto']) .root {
   border-color: rgb(56 56 77 / 55%);
   background: color-mix(
@@ -103,10 +109,7 @@
   }
 }
 
-
-// BlueLab desktop only: place the floating control immediately beside the
-// main 600px column, without changing its position in other themes or modes.
-@media screen and (min-width: 1180px) {
+@media screen and (width >= 1180px) {
   :global(body[data-theme='blue-2']) .root {
     left: calc(50% - 374px);
     right: auto;
@@ -118,14 +121,14 @@
   }
 }
 
-@media screen and (max-width: 1179px) and (min-width: 760px) {
+@media screen and (width <= 1179px) and (width >= 760px) {
   :global(body[data-theme='mastodon-bird-ui-auto'].layout-single-column) .root {
     left: calc(50% + 308px);
     right: auto;
   }
 }
 
-@media screen and (max-width: 759px) {
+@media screen and (width <= 759px) {
   :global(body[data-theme='mastodon-bird-ui-auto'].layout-single-column) .root {
     left: auto;
     right: 14px;

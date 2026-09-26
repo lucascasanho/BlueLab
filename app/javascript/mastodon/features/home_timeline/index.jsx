@@ -160,14 +160,14 @@ class HomeTimeline extends PureComponent {
               <>
                 {announcementsButton}
                 <HomeColumnSettings>
-                {multiColumn &&
-                  <MultiColumnMenuItems
-                    withDivider
-                    pinned={pinned}
-                    onPin={this.handlePin}
-                    onMove={this.handleMove}
-                  />
-                }
+                  {multiColumn &&
+                    <MultiColumnMenuItems
+                      withDivider
+                      pinned={pinned}
+                      onPin={this.handlePin}
+                      onMove={this.handleMove}
+                    />
+                  }
                 </HomeColumnSettings>
               </>
             }

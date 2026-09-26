@@ -43,7 +43,15 @@ class Api::V1::ConversationsController < Api::BaseController
   end
 
   def read
-    @conversation.update!(unread: false)
+    last_read_status_id = matching_conversations.maximum(:last_status_id)
+
+    matching_conversations.update_all(
+      unread: false,
+      last_read_status_id:,
+      updated_at: Time.current,
+    )
+
+    @conversation.reload
     render json: @conversation, serializer: REST::ConversationSerializer
   end
 

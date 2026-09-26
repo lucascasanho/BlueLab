@@ -152,6 +152,22 @@
   }
 }
 
+  
+.blue2MessagesMain {
+  padding-bottom: 0 !important;
+  contain: none;
+
+  @media (width <= 1174px) {
+    padding-bottom: var(--mobile-bottom-nav-height) !important;
+  }
+
+  @media (width <= 1174px) {
+    :global(.ui--mobile-chrome-hidden) & {
+      padding-bottom: 0 !important;
+    }
+  }
+}
+
 .blue2RightRail {
   grid-column: 3;
   min-width: 0;
@@ -203,11 +219,28 @@
   }
 }
 
-.blue2Home {
-  :global(.column-header),
-  :global(.column-header__wrapper) {
+.blue2Feed {
+  // Feed titles are rendered by the BlueLab shell above the Following/Global
+  // tabs. Hide the modern in-column header instead of the legacy global class,
+  // which does not match the CSS-module ColumnHeader.
+  :global(.columns-area--mobile) > * > header {
     display: none;
   }
+}
+
+.blue2FeedTitle {
+  box-sizing: border-box;
+  min-height: 48px;
+  padding: 14px 20px 8px;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  color: var(--blue2-text, #f7f7f8);
+  background: var(--blue2-bg, #000);
+  border-bottom: 0;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 750;
 }
 
 .blue2Topbar {
@@ -301,6 +334,7 @@
 @media (width < 1180px) and (min-width: $mobile-menu-breakpoint) {
   .blue2Root {
     --navigation-min-width: 76px;
+
     grid-template-columns: 76px minmax(0, 600px) minmax(0, 1fr);
   }
 
@@ -323,7 +357,7 @@
   }
 }
 
-@media (max-width: 1174px) {
+@media (width <= 1174px) {
   // BlueLab uses the compact/mobile shell for every non-desktop viewport.
   // The advanced deck is a desktop-only presentation for this theme.
   .blue2Root {
@@ -399,6 +433,12 @@
     top: 56px;
     height: 50px;
     background: var(--blue2-bg, #000);
+  }
+
+  // Blue2 mobile has its own utility bar. The Following/Global feed tabs are
+  // intentionally desktop-only and must not occupy mobile vertical space.
+  .blue2Topbar {
+    display: none;
   }
 
   .blue2Brand {

@@ -1598,5 +1598,6 @@
   "account_switcher.sign_in": "Sign in to another account",
   "account_switcher.create": "Create another account",
   "account_switcher.remove": "Remove {account} from this device",
-  "account_switcher.error": "This account session is no longer available. Sign in again to add it."
+  "account_switcher.error": "This account session is no longer available. Sign in again to add it.",
+  "messages.conversation.replying_to": "Replying to {name}"
 }

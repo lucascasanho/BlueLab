@@ -24,10 +24,7 @@ import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
 const messages = defineMessages({
   heading: { id: 'column.favourites', defaultMessage: 'Favorites' },
-  heading_redesign: {
-    id: 'navigation_bar.liked_posts',
-    defaultMessage: 'Liked Posts',
-  },
+  heading_redesign: { id: 'column.favourites', defaultMessage: 'Favorites' },
 });
 
 const Favourites: React.FC<{ columnId: string; multiColumn: boolean }> = ({
@@ -35,7 +32,7 @@ const Favourites: React.FC<{ columnId: string; multiColumn: boolean }> = ({
   multiColumn,
 }) => {
   const dispatch = useAppDispatch();
-  const intl = useIntl();
+  const intl = useIntl(); 
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const statusIds = useAppSelector((state) =>

@@ -32,9 +32,12 @@ const Bookmarks: React.FC<{
   multiColumn: boolean;
 }> = ({ columnId, multiColumn }) => {
   const intl = useIntl();
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch(); 
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const title = intl.formatMessage(
+    isRedesignEnabled() || isBlue2 ? messages.heading_redesign : messages.heading,
+  );
   const statusIds = useAppSelector((state) =>
     getStatusList(state, 'bookmarks'),
   );
@@ -81,16 +84,16 @@ const Bookmarks: React.FC<{
   return (
     <Column
       bindToDocument={!multiColumn}
-      label={intl.formatMessage(messages.heading)}
+      label={title}
     >
       {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
-          title={intl.formatMessage(messages.heading_redesign)}
+          title={title}
           withBackButton={multiColumn && !pinned && 'auto'}
           extraButtons={
             multiColumn && (
               <ColumnSettingsMenu
-                labelPrefix={intl.formatMessage(messages.heading_redesign)}
+                labelPrefix={title}
               >
                 <MultiColumnMenuItems
                   pinned={pinned}
@@ -128,9 +131,7 @@ const Bookmarks: React.FC<{
 
       <Helmet>
         <title>
-          {isRedesignEnabled()
-            ? intl.formatMessage(messages.heading_redesign)
-            : intl.formatMessage(messages.heading)}
+          {title}
         </title>
         <meta name='robots' content='noindex' />
       </Helmet>
