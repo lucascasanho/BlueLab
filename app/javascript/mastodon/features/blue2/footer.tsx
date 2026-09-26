@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom';
 
 import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
 import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
-import { me } from '@/mastodon/initial_state';
-
 import classes from './footer.module.scss';
 
 export const Blue2FooterLinks: React.FC = () => {
@@ -37,14 +35,12 @@ export const Blue2FooterLinks: React.FC = () => {
           defaultMessage='Keyboard Shortcuts'
         />
       </Link>
-      {me && (
-        <>
+      <>
           <span>·</span>
           <button type='button' onClick={openBugReport}>
             <BugReportLabel />
           </button>
-        </>
-      )}
+      </>
     </footer>
   );
 };
