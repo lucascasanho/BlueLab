@@ -2,7 +2,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { Link } from 'react-router-dom';
 
-import { domain, me, version } from 'mastodon/initial_state';
+import { domain, version } from 'mastodon/initial_state';
 import { BugReportLabel } from 'mastodon/features/bug_report/bug_report_label';
 import { useOpenBugReport } from 'mastodon/features/bug_report/use_bug_report';
 
@@ -62,8 +62,7 @@ export const LinkFooter: React.FC<{
               />
             </Link>
           </li>
-          {me && (
-            <li>
+          <li>
               <button
                 type='button'
                 className={classes.bugReportButton}
@@ -71,8 +70,7 @@ export const LinkFooter: React.FC<{
               >
                 <BugReportLabel />
               </button>
-            </li>
-          )}
+          </li>
           <li>
             <a
               href='https://github.com/MastodonBlue/BlueLab'
