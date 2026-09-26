@@ -106,6 +106,8 @@ namespace :api, format: false do
       end
     end
 
+    get '/conversations/by-status/:status_id', to: 'conversations#by_status'
+
     resources :conversations, only: [:index, :destroy] do
       member do
         get :messages
