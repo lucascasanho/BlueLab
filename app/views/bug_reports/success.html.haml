@@ -1,0 +1,13 @@
+- content_for :page_title do
+  = t('bug_reports.success_title')
+
+- content_for :blue2_auth_title do
+  = t('bug_reports.success_title')
+
+- content_for :blue2_auth_subtitle do
+  = t('bug_reports.success_body')
+
+.bug-report-page
+  %p.lead= t('bug_reports.success_body')
+  .actions
+    = link_to t('bug_reports.back'), root_path, class: 'button'
