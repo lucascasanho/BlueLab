@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 
 import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
 import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
-import { domain, me, termsOfServiceEnabled } from '@/mastodon/initial_state';
+import { domain, termsOfServiceEnabled } from '@/mastodon/initial_state';
 
 import classes from './footer_links.module.scss';
 
@@ -13,7 +13,13 @@ export const NavigationFooterLinks: React.FC<{
   siteName?: string;
   multiColumn?: boolean;
   variant?: 'default' | 'blue2';
-}> = ({ siteName = domain, multiColumn, variant = 'default' }) => {
+  showBugReport?: boolean;
+}> = ({
+  siteName = domain,
+  multiColumn,
+  variant = 'default',
+  showBugReport = false,
+}) => {
   const openBugReport = useOpenBugReport();
   const multiColumnLinkAttrs = multiColumn
     ? {
@@ -50,7 +56,7 @@ export const NavigationFooterLinks: React.FC<{
             />
           </NavLink>
         </li>
-        {me && (
+        {showBugReport && (
           <li>
             <button
               type='button'
