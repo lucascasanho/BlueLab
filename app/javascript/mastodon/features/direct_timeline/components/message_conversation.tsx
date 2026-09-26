@@ -13,6 +13,7 @@ import ReplyIcon from '@/material-icons/400-24px/reply.svg?react';
 import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
 
 import { importFetchedStatus } from '@/mastodon/actions/importer';
+import { fetchStatus } from '@/mastodon/actions/statuses';
 import { directCompose, replyCompose, resetCompose } from '@/mastodon/actions/compose';
 import { connectDirectStream } from '@/mastodon/actions/streaming';
 import {
@@ -59,6 +60,12 @@ export const MessageConversation: React.FC = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [messageStatusIds, setMessageStatusIds] = useState<string[]>([]);
+  const [highlightedStatusId, setHighlightedStatusId] = useState<string | null>(
+    null,
+  );
+  const [pendingScrollStatusId, setPendingScrollStatusId] = useState<string | null>(
+    null,
+  );
 
   const conversationItems = useAppSelector(
     (state) =>
@@ -172,8 +179,26 @@ export const MessageConversation: React.FC = () => {
     [threadConversations],
   );
 
+  const initialLoadConversationIdRef = useRef<string | null>(null);
+  const observedThreadStatusIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!id || initialLoadConversationIdRef.current === id) return;
+
+    initialLoadConversationIdRef.current = id;
+    observedThreadStatusIdRef.current = null;
+    setPendingScrollStatusId(null);
+    void loadMessages();
+  }, [id, loadMessages]);
+
   useEffect(() => {
     if (!id || !latestThreadStatusId) return;
+
+    const isFirstObservedStatus = observedThreadStatusIdRef.current === null;
+    const statusChanged =
+      observedThreadStatusIdRef.current !== latestThreadStatusId;
+
+    observedThreadStatusIdRef.current = latestThreadStatusId;
 
     setMessageStatusIds((current) =>
       current.includes(latestThreadStatusId)
@@ -181,7 +206,9 @@ export const MessageConversation: React.FC = () => {
         : [...current, latestThreadStatusId].sort(compareId),
     );
 
-    void loadMessages();
+    if (!isFirstObservedStatus && statusChanged) {
+      void loadMessages();
+    }
   }, [id, latestThreadStatusId, loadMessages]);
 
   useEffect(() => {
@@ -211,6 +238,85 @@ export const MessageConversation: React.FC = () => {
       dispatch(resetCompose());
     };
   }, [dispatch, participantAccountIdsKey]);
+
+  const highlightTimeoutRef = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (highlightTimeoutRef.current !== null) {
+        window.clearTimeout(highlightTimeoutRef.current);
+      }
+    },
+    [],
+  );
+
+  const highlightStatus = useCallback((statusId: string) => {
+    setHighlightedStatusId(statusId);
+
+    if (highlightTimeoutRef.current !== null) {
+      window.clearTimeout(highlightTimeoutRef.current);
+    }
+
+    highlightTimeoutRef.current = window.setTimeout(() => {
+      setHighlightedStatusId(null);
+      highlightTimeoutRef.current = null;
+    }, 1400);
+  }, []);
+
+  const scrollToStatus = useCallback(
+    (statusId: string) => {
+      const element = document.getElementById('message-' + statusId);
+
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+        highlightStatus(statusId);
+        return;
+      }
+
+      setMessageStatusIds((current) =>
+        current.includes(statusId)
+          ? current
+          : [...current, statusId].sort(compareId),
+      );
+      setPendingScrollStatusId(statusId);
+      dispatch(
+        fetchStatus(statusId, {
+          forceFetch: true,
+          alsoFetchContext: false,
+        }),
+      );
+    },
+    [dispatch, highlightStatus],
+  );
+
+  useEffect(() => {
+    if (
+      !pendingScrollStatusId ||
+      !statuses.some((status) => status.get('id') === pendingScrollStatusId)
+    ) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      const element = document.getElementById(
+        'message-' + pendingScrollStatusId,
+      );
+
+      if (!element) return;
+
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+      highlightStatus(pendingScrollStatusId);
+      setPendingScrollStatusId(null);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [highlightStatus, pendingScrollStatusId, statuses]);
 
   const handleReply = useCallback(
     (status: Immutable.Record<StatusShape>) => {
@@ -296,7 +402,11 @@ export const MessageConversation: React.FC = () => {
               <article
                 id={`message-${status.get('id') as string}`}
                 key={status.get('id') as string}
-                className={classes.message}
+                className={
+                  highlightedStatusId === (status.get('id') as string)
+                    ? classes.message + ' ' + classes.messageHighlighted
+                    : classes.message
+                }
                 data-own-message={isMine ? 'true' : 'false'}
               >
                 <div className={classes.messageMeta}>
@@ -324,11 +434,7 @@ export const MessageConversation: React.FC = () => {
                           replyTarget.getIn(['account', 'username']),
                       },
                     )}
-                    onClick={() =>
-                      document
-                        .getElementById(`message-${replyTargetId}`)
-                        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                    }
+                    onClick={() => scrollToStatus(replyTargetId)}
                   >
                     <span className={classes.replyContextHeader}>
                       <ReplyIcon
