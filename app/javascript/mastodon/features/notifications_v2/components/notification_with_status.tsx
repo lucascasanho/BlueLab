@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
 import { replyComposeById } from 'mastodon/actions/compose';
+import { openConversationForStatus } from 'mastodon/actions/conversations';
 import { toggleReblog, toggleFavourite } from 'mastodon/actions/interactions';
 import {
   navigateToStatus,
@@ -64,7 +65,11 @@ export const NotificationWithStatus: React.FC<{
   const handlers = useMemo(
     () => ({
       open: () => {
-        dispatch(navigateToStatus(statusId));
+        if (isPrivateMention) {
+          dispatch(openConversationForStatus(statusId));
+        } else {
+          dispatch(navigateToStatus(statusId));
+        }
       },
 
       reply: () => {
@@ -83,7 +88,7 @@ export const NotificationWithStatus: React.FC<{
         dispatch(toggleStatusSpoilers(statusId));
       },
     }),
-    [dispatch, statusId],
+    [dispatch, isPrivateMention, statusId],
   );
 
   if (!statusId || isFiltered) return null;
