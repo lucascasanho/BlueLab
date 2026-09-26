@@ -30,30 +30,23 @@ class Auth::SessionsController < Devise::SessionsController
 
   def create
     if truthy_param?(:account_switcher)
-      # Devise's normal strategy order starts with the persistent browser
-      # session. During an additional-account login that would authenticate
-      # the account already in the browser before checking the submitted
-      # credentials. Clear only Warden's current user and authenticate the
-      # submitted credentials with the appropriate credential strategy.
+      # Keep the previous SessionActivation alive, but do not allow the
+      # session-cookie strategy to authenticate the account that is already
+      # active in this browser. The normal Devise flow still handles password,
+      # LDAP/PAM, 2FA and passkey authentication.
       session[:account_switcher] = true
+      request.env['mastodon.account_switcher_authentication'] = true
       warden.logout(:user) if warden.authenticated?(:user)
+    end
 
-      self.resource = warden.authenticate!(account_switcher_auth_strategy, auth_options)
-      set_flash_message!(:notice, :signed_in)
-      sign_in(resource_name, resource)
+    super do |resource|
+      # We only need to call this if this hasn't already been
+      # called from one of the two-factor or sign-in token
+      # authentication methods
+
       on_authentication_success(resource, :password) unless @on_authentication_success_called
-      respond_with resource, location: after_sign_in_path_for(resource)
-    else
-      super do |resource|
-        # We only need to call this if this hasn't already been
-        # called from one of the two-factor or sign-in token
-        # authentication methods
-
-        on_authentication_success(resource, :password) unless @on_authentication_success_called
-      end
     end
   end
-
   def destroy
     super
     session.delete(:challenge_passed_at)
