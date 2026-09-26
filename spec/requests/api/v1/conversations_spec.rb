@@ -34,6 +34,7 @@ RSpec.describe 'API V1 Conversations' do
 
       expect(response.parsed_body.size).to eq 2
       expect(response.parsed_body.first[:accounts].size).to eq 1
+      expect(response.parsed_body.first[:conversation_id]).to be_present
     end
 
     context 'with since_id' do
