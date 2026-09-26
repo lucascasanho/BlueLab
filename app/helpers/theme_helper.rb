@@ -185,7 +185,7 @@ module ThemeHelper
   # The BlueLab preference is stored separately from the instance-wide Mastodon theme.
   def current_theme
     available_themes = Themes.instance.selectable_names
-    user_theme = current_user&.setting_bluelab_theme
+    user_theme = current_user_if_available&.setting_bluelab_theme
     site_theme = Setting.theme
 
     return user_theme if available_themes.include?(user_theme)
@@ -195,11 +195,11 @@ module ThemeHelper
   end
 
   def color_scheme
-    current_user&.setting_color_scheme || 'auto'
+    current_user_if_available&.setting_color_scheme || 'auto'
   end
 
   def contrast
-    current_user&.setting_contrast || 'auto'
+    current_user_if_available&.setting_contrast || 'auto'
   end
 
   def page_color_scheme
@@ -207,6 +207,14 @@ module ThemeHelper
   end
 
   private
+
+  def current_user_if_available
+    return unless request.respond_to?(:env) && request.env['warden']
+
+    current_user
+  rescue Devise::MissingWarden
+    nil
+  end
 
   def active_custom_stylesheet
     return if cached_custom_css_digest.blank?
