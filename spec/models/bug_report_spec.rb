@@ -10,6 +10,12 @@ RSpec.describe BugReport do
       expect(report).to be_invalid
       expect(report.errors[:description]).to be_present
     end
+
+    it 'allows anonymous reports' do
+      report = Fabricate.build(:bug_report, account: nil)
+
+      expect(report).to be_valid
+    end
   end
 
   describe '#resolve!' do
