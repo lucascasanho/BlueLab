@@ -94,6 +94,8 @@ export const NavigationAccountCardAndMenu: React.FC<{
           offset={8}
           maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
           className={classes.accountMenu}
+          constrainToViewport
+          scrollable
           data-testid='account-menu'
         >
           <AccountMenuItems />
@@ -256,6 +258,8 @@ const SlideOutAccountMenu: React.FC = () => {
           placement='top-end'
           strategy='fixed'
           offset={8}
+          constrainToViewport
+          scrollable
         >
           {({ props: floatingProps }) => (
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions

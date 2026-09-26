@@ -138,6 +138,8 @@ export const PopoverMenuCard = <As extends React.ElementType>({
       strategy={strategy}
       matchReferenceWidth={matchReferenceWidth}
       closeOnClickOutside={closeOnClickOutside}
+      constrainToViewport={constrainToViewport}
+      scrollable={scrollable}
     >
       {({ props: popoverChildProps }) => (
         <MenuCard
