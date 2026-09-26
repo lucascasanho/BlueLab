@@ -102,6 +102,8 @@ export const PopoverMenuCard = <As extends React.ElementType>({
   strategy,
   matchReferenceWidth,
   closeOnClickOutside,
+  constrainToViewport,
+  scrollable,
   mobilePresentation = 'bottom-sheet',
   children,
   className,
