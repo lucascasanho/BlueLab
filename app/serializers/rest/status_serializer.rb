@@ -189,6 +189,10 @@ class REST::StatusSerializer < ActiveModel::Serializer
   class ApplicationSerializer < ActiveModel::Serializer
     attributes :name, :website
 
+    def name
+      object.name == 'Web' ? Setting.site_title : object.name
+    end
+
     def website
       object.website.presence
     end
