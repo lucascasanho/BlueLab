@@ -30,7 +30,9 @@ export const NavigationFooterLinks: React.FC<{
         variant === 'blue2' && classes.rootBlue2,
       )}
     >
-      <h2 className={classes.heading}>{siteName}</h2>
+      {variant !== 'blue2' && (
+        <h2 className={classes.heading}>{siteName}</h2>
+      )}
       <ul className={classes.list}>
         <li>
           <NavLink to='/about' {...multiColumnLinkAttrs}>
