@@ -11,11 +11,8 @@ RSpec.describe 'Auth Account Switcher' do
       sign_in current_user
     end
 
-    it 'creates a fresh session from the target account access token without revoking the current account' do
-      target_session_id = target_user.activate_session(request)
-      activation = target_user.session_activations.find_by!(session_id: target_session_id)
-      target_token = activation.token
-      activation.destroy!
+    it 'creates a fresh session from the target account persistent credential without revoking the current account' do
+      target_token = target_user.account_switcher_token
 
       post auth_account_switcher_switch_path, params: { token: target_token }
 
