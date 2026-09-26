@@ -4,6 +4,7 @@ import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { useParams } from 'react-router-dom';
 
 import { ChatCircleDotsIcon } from '@phosphor-icons/react';
+import { List as ImmutableList } from 'immutable';
 
 import { Helmet } from '@unhead/react/helmet';
 
@@ -96,7 +97,7 @@ export const MessageConversation: React.FC = () => {
     threadConversations.forEach((item) => {
       const accounts = item.get('accounts');
 
-      if (!Immutable.List.isList(accounts)) return;
+      if (!ImmutableList.isList(accounts)) return;
 
       accounts.forEach((accountId) => {
         if (typeof accountId === 'string' && accountId !== me) {
