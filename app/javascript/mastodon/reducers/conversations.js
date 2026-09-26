@@ -104,23 +104,14 @@ export default function conversations(state = initialState, action) {
 
       if (!target) return list;
 
-      const targetParticipants = target.get('accounts');
       const targetConversationId = target.get('conversation_id');
 
-      return list.map(item => {
-        const sameConversation = (
-          targetConversationId &&
-          item.get('conversation_id') === targetConversationId
-        );
-        const sameParticipants = item
-          .get('accounts')
-          .sort()
-          .equals(targetParticipants.sort());
-
-        return sameConversation || sameParticipants
+      return list.map(item =>
+        targetConversationId &&
+        item.get('conversation_id') === targetConversationId
           ? item.set('unread', false)
-          : item;
-      });
+          : item,
+      );
     });
   case blockAccountSuccess.type:
   case muteAccountSuccess.type:
