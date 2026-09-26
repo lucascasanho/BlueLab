@@ -22,9 +22,10 @@ import { EmbeddedStatusContent } from './embedded_status_content';
 
 export type Mention = RecordOf<ApiMentionJSON>;
 
-export const EmbeddedStatus: React.FC<{ statusId: string }> = ({
-  statusId,
-}) => {
+export const EmbeddedStatus: React.FC<{
+  statusId: string;
+  onOpen?: () => void;
+}> = ({ statusId, onOpen }) => {
   const history = useHistory();
   const clickCoordinatesRef = useRef<[number, number]>(null);
   const dispatch = useAppDispatch();
@@ -68,7 +69,11 @@ export const EmbeddedStatus: React.FC<{ statusId: string }> = ({
         const path = `/@${account.acct}/${statusId}`;
 
         if (button === 0 && !(ctrlKey || metaKey)) {
-          history.push(path, { focusTarget: FOCUS_TARGET.POST });
+          onOpen?.();
+
+          if (!onOpen) {
+            history.push(path, { focusTarget: FOCUS_TARGET.POST });
+          }
         } else if (button === 1 || (button === 0 && (ctrlKey || metaKey))) {
           window.open(path, '_blank', 'noopener');
         }
