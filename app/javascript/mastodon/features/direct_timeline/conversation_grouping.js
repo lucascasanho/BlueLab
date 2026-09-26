@@ -3,6 +3,12 @@ import { List as ImmutableList } from 'immutable';
 import { compareId } from '@/mastodon/compare_id';
 
 const conversationKey = (conversation) => {
+  const threadId = conversation.get('thread_id');
+
+  if (threadId) {
+    return `thread:${threadId}`;
+  }
+
   const nativeConversationId = conversation.get('conversation_id');
 
   return nativeConversationId
