@@ -492,7 +492,8 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
       <div className={classes.page}>
         <div className={classes.messageList}>
-          {statuses.map((status) => {
+          <div className={classes.messageListContent}>
+            {statuses.map((status) => {
             const isMine = status.getIn(['account', 'id']) === me;
             const displayAccount = status.get('account');
             const statusText =
@@ -647,7 +648,8 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                 </div>
               </article>
             );
-          })}
+            })}
+          </div>
         </div>
 
         {participantAccounts.length > 0 && (
