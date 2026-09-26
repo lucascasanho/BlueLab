@@ -64,6 +64,33 @@
   }
 }
 
+.accountMenu {
+  max-height: calc(100dvh - 24px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text-secondary) transparent;
+  scrollbar-gutter: stable;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: var(--color-text-secondary);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-primary);
+  }
+}
+
 .slideOutMenu {
   box-sizing: border-box;
   z-index: 1000;
