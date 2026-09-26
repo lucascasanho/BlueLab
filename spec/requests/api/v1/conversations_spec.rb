@@ -36,6 +36,28 @@ RSpec.describe 'API V1 Conversations' do
       expect(response.parsed_body.first[:accounts].size).to eq 1
       expect(response.parsed_body.first[:conversation_id]).to be_present
     end
+    it 'collapses sent and received rows for the same participant conversation' do
+      PostStatusService.new.call(
+        other.account,
+        text: 'Received @alice',
+        visibility: :direct,
+      )
+      PostStatusService.new.call(
+        user.account,
+        text: 'Sent to Joe',
+        visibility: :direct,
+      )
+
+      get '/api/v1/conversations', headers: headers
+
+      matching_rows = response.parsed_body.select do |conversation|
+        conversation[:accounts].one? && conversation[:accounts].first[:id] == other.account.id.to_s
+      end
+
+      expect(matching_rows.size).to eq(1)
+    end
+
+
 
     context 'with since_id' do
       context 'when requesting old posts' do
