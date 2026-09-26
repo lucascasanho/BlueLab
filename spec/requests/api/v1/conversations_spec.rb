@@ -109,6 +109,45 @@ RSpec.describe 'API V1 Conversations' do
     end
   end
 
+  describe 'DELETE /api/v1/conversations/:id', :inline_jobs do
+    it 'deletes every account conversation row in the native thread' do
+      first = PostStatusService.new.call(
+        other.account,
+        text: 'First @alice',
+        visibility: :direct,
+      )
+      other_two = Fabricate(:user)
+      PostStatusService.new.call(
+        other_two.account,
+        text: '@alice Second',
+        visibility: :direct,
+        thread: first,
+      )
+
+      conversation = AccountConversation.where(
+        account: user.account,
+        conversation_id: first.conversation_id,
+      ).first
+
+      expect(
+        AccountConversation.where(
+          account: user.account,
+          conversation_id: first.conversation_id,
+        ).count
+      ).to eq(2)
+
+      delete "/api/v1/conversations/#{conversation.id}", headers: headers
+
+      expect(response).to have_http_status(200)
+      expect(
+        AccountConversation.where(
+          account: user.account,
+          conversation_id: first.conversation_id,
+        ).count
+      ).to eq(0)
+    end
+  end
+
   describe 'GET /api/v1/conversations/by-status/:status_id', :inline_jobs do
     it 'resolves a direct status to its conversation' do
       status = PostStatusService.new.call(
