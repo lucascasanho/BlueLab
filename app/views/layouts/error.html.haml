@@ -38,7 +38,7 @@
             = link_to root_path, class: 'button error-page__home' do
               = material_symbol('home', whitespace: false)
               = t('errors.go_home')
-            %a.button.button-secondary.error-page__report{ href: "/bug_reports/new?error_page=#{response.status}&current_path=#{ERB::Util.url_encode(request.path)}", target: '_self' }= t('bug_reports.link')
+            %a.button.button-secondary.error-page__report{ href: "/bug_reports/new?error_page=#{response.status}&current_path=#{ERB::Util.url_encode(request.path)}", target: '_self', data: { turbo: false } }= t('bug_reports.link')
     - else
       %main.dialog
         .dialog__illustration

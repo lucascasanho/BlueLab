@@ -16,6 +16,7 @@ RSpec.describe ErrorResponses do
       expect(response.parsed_body)
         .to have_css('body[class=error]')
         .and have_css('h1', text: error_content(code))
+        .and have_css('a.error-page__report[href^="/bug_reports/new"]')
     end
 
     def error_content(code)
