@@ -30,10 +30,17 @@ import { MobileNavLink } from './navigation_link';
 export const RedesignMobileNavigation: React.FC = () => {
   const { accountId, signedIn } = useIdentity();
   const account = useAccount(accountId);
+  const location = useLocation();
+  const isMessageConversation = location.pathname.startsWith('/conversations/');
 
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
   );
+  const unreadMessagesCount = useAppSelector((state) => {
+    const conversations = state.conversations.get('items');
+
+    return conversations.some((conversation) => conversation.get('unread'));
+  });
 
   if (!signedIn) {
     return <SlideOutNavigation />;
@@ -55,7 +62,11 @@ export const RedesignMobileNavigation: React.FC = () => {
           >
             <FormattedMessage id='tabs_bar.search' defaultMessage='Search' />
           </MobileNavLink>
-          <MobileNavLink to='/conversations' iconComponent={ChatCircleDotsIcon}>
+          <MobileNavLink
+            to='/conversations'
+            iconComponent={ChatCircleDotsIcon}
+            withDot={unreadMessagesCount}
+          >
             <FormattedMessage
               id='tabs_bar.messages'
               defaultMessage='Messages'
@@ -81,7 +92,7 @@ export const RedesignMobileNavigation: React.FC = () => {
             <FormattedMessage id='tabs_bar.profile' defaultMessage='Profile' />
           </MobileNavLink>
         </ul>
-        <ComposeRedesignButton inline />
+        {!isMessageConversation && <ComposeRedesignButton inline />}
       </nav>
 
       <SlideOutNavigation />
