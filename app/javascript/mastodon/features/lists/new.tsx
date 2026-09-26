@@ -309,7 +309,7 @@ const NewListWrapper: React.FC<{
 
   return (
     <Column bindToDocument={!multiColumn} label={title}>
-      {isRedesignEnabled() ? (
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
           withBackButton
           {...(isBlue2
