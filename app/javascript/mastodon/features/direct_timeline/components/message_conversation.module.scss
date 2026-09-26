@@ -412,16 +412,39 @@
     );
   }
 
+  :global(body[data-theme='blue-2']) .messageList {
+    padding-bottom: calc(88px + var(--space-md));
+    scroll-padding-bottom: calc(88px + var(--space-md));
+  }
+
   :global(body[data-theme='blue-2'])
     .replyComposer[data-bluelab-composer-compact='true'] {
-    padding-bottom: 0;
+    position: fixed;
+    inset-inline: 0;
+    bottom: calc(var(--mobile-bottom-nav-height, 64px));
+    width: 100vw;
+    max-width: none;
+    margin: 0;
+    padding: var(--space-sm);
+    box-sizing: border-box;
   }
 
   :global(body[data-theme='blue-2'])
     :global(.ui--mobile-chrome-hidden)
-    .column {
-    height: calc(100dvh - 56px);
-    max-height: calc(100dvh - 56px);
+    .replyComposer[data-bluelab-composer-compact='true'] {
+    bottom: 0;
+  }
+
+  :global(body[data-theme='blue-2'])
+    .replyComposer[data-bluelab-composer-compact='true']
+    [data-compose-scroll-container] {
+    overflow: hidden;
+  }
+
+  :global(body[data-theme='blue-2'])
+    .replyComposer[data-bluelab-composer-compact='true']
+    .richEditor {
+    max-height: 7rem;
   }
 }
 
