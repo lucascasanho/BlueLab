@@ -36,6 +36,7 @@ import { RedesignComposeForm } from '@/mastodon/features/compose/redesign';
 import { Avatar } from '@/mastodon/components/avatar';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
+import { LoadingIndicator } from '@/mastodon/components/loading_indicator';
 import AttachmentList from '@/mastodon/components/attachment_list';
 import StatusContent from '@/mastodon/components/status/legacy/content';
 import { DisplayNameSimple } from '@/mastodon/components/display_name/simple';
@@ -67,6 +68,8 @@ export const MessageConversation: React.FC = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [messageStatusIds, setMessageStatusIds] = useState<string[]>([]);
+  const [conversationResolved, setConversationResolved] = useState(false);
+  const [messagesResolved, setMessagesResolved] = useState(false);
   const [highlightedStatusId, setHighlightedStatusId] = useState<string | null>(
     null,
   );
@@ -175,11 +178,23 @@ export const MessageConversation: React.FC = () => {
     dispatch(expandConversations());
     const disconnect = dispatch(connectDirectStream());
 
+    let cancelled = false;
+
     if (id) {
-      dispatch(fetchConversation(id)).catch(() => undefined);
+      setConversationResolved(false);
+      setMessagesResolved(false);
+
+      void dispatch(fetchConversation(id))
+        .catch(() => undefined)
+        .finally(() => {
+          if (!cancelled) setConversationResolved(true);
+        });
+    } else {
+      setConversationResolved(true);
     }
 
     return () => {
+      cancelled = true;
       dispatch(unmountConversations());
       disconnect();
     };
@@ -207,7 +222,17 @@ export const MessageConversation: React.FC = () => {
     initialLoadConversationIdRef.current = id;
     observedThreadStatusIdRef.current = null;
     setPendingScrollStatusId(null);
-    void loadMessages();
+
+    let cancelled = false;
+    void loadMessages()
+      .catch(() => undefined)
+      .finally(() => {
+        if (!cancelled) setMessagesResolved(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [id, loadMessages]);
 
   useEffect(() => {
@@ -344,10 +369,33 @@ export const MessageConversation: React.FC = () => {
     [dispatch],
   );
 
+  if (!conversationResolved || !messagesResolved) {
+    return (
+      <Column
+        label={intl.formatMessage(messages.title)}
+        className={classes.column}
+      >
+        <ColumnHeader
+          withBackButton
+          title={intl.formatMessage(messages.title)}
+        />
+        <div className={classes.loading}>
+          <LoadingIndicator />
+        </div>
+      </Column>
+    );
+  }
+
   if (!conversation || statuses.length === 0) {
     return (
-      <Column>
-        <ColumnHeader withBackButton title={intl.formatMessage(messages.title)} />
+      <Column
+        label={intl.formatMessage(messages.title)}
+        className={classes.column}
+      >
+        <ColumnHeader
+          withBackButton
+          title={intl.formatMessage(messages.title)}
+        />
         <div className={classes.empty}>
           <ChatCircleDotsIcon size={42} />
           <span>{intl.formatMessage(messages.empty)}</span>
