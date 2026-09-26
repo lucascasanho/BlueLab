@@ -94,8 +94,6 @@ const Lists: React.FC<{
 }> = ({ multiColumn }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const lists = useAppSelector((state) => getOrderedLists(state));
   const { signedIn } = useIdentity();
   const isBlue2 =
