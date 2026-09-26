@@ -8,14 +8,6 @@ const participantKey = (conversation) =>
     .sort()
     .join(',');
 
-const conversationKey = (conversation) => {
-  const nativeConversationId = conversation.get('conversation_id');
-
-  return nativeConversationId
-    ? `thread:${nativeConversationId}`
-    : `participants:${participantKey(conversation)}`;
-};
-
 const related = (left, right) =>
   participantKey(left) === participantKey(right) ||
   (!!left.get('conversation_id') &&
