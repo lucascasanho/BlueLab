@@ -145,7 +145,7 @@ export const ComposeFooter: React.FC<{
           />
         </IconButton>
       )}
-      {!isMessage && <ComposeSchedule />}
+      <ComposeSchedule />
 
       <div className={classes.flexGrowWrap}>
         {shouldShowCharacterCounter(
