@@ -108,7 +108,7 @@ namespace :api, format: false do
 
     get '/conversations/by-status/:status_id', to: 'conversations#by_status'
 
-    resources :conversations, only: [:index, :destroy] do
+    resources :conversations, only: [:index, :show, :destroy] do
       member do
         get :messages
         post :read
