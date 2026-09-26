@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 
 import { fetchAccount, lookupAccount } from 'mastodon/actions/accounts';
 import { normalizeForLookup } from 'mastodon/reducers/accounts_map';
@@ -36,6 +36,7 @@ export type AccountId = string | null | undefined;
 
 export function useAccountId() {
   const { acct, id } = useParams<Params>();
+  const { pathname } = useLocation();
   const dispatch = useAppDispatch();
   const accountId = useAppSelector((state) =>
     selectNormalizedId(state, acct, id),
@@ -48,10 +49,14 @@ export function useAccountId() {
   useEffect(() => {
     if (typeof accountId === 'undefined' && acct) {
       dispatch(lookupAccount(acct));
-    } else if (accountId && !accountInStore) {
+    } else if (
+      accountId &&
+      !accountInStore &&
+      (pathname.startsWith('/accounts/') || !!acct)
+    ) {
       dispatch(fetchAccount(accountId));
     }
-  }, [dispatch, accountId, acct, accountInStore]);
+  }, [dispatch, accountId, acct, accountInStore, pathname]);
 
   return accountId satisfies AccountId;
 }

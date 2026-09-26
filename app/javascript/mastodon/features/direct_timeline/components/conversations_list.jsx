@@ -8,6 +8,10 @@ import { debounce } from 'lodash';
 import { expandConversations } from 'mastodon/actions/conversations';
 import ScrollableList from 'mastodon/components/scrollable_list';
 
+import {
+  groupedConversationRepresentatives,
+} from '../conversation_grouping';
+
 import { Conversation } from './conversation';
 
 export const ConversationsList = ({ scrollKey, ...other }) => {
@@ -16,6 +20,14 @@ export const ConversationsList = ({ scrollKey, ...other }) => {
   const isLoading = useSelector(state => state.getIn(['conversations', 'isLoading'], true));
   const hasMore = useSelector(state => state.getIn(['conversations', 'hasMore'], false));
   const dispatch = useDispatch();
+
+  const groupedConversations = useMemo(
+    () => groupedConversationRepresentatives(conversations),
+    [conversations],
+  );
+
+  // Immutable.List uses .last(), while Array.prototype.at() is not available
+  // in all runtime paths used by the Mastodon web bundle.
   const lastStatusId = conversations.last()?.get('last_status');
 
   const debouncedLoadMore = useMemo(() => debounce(id => {
@@ -30,7 +42,7 @@ export const ConversationsList = ({ scrollKey, ...other }) => {
 
   return (
     <ScrollableList {...other} scrollKey={scrollKey} isLoading={isLoading} showLoading={isLoading && conversations.isEmpty()} hasMore={hasMore} onLoadMore={handleLoadMore} ref={listRef}>
-      {conversations.map(item => (
+      {groupedConversations.map(item => (
         <Conversation
           key={item.get('id')}
           conversation={item}

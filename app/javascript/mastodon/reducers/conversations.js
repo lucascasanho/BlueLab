@@ -24,6 +24,7 @@ const initialState = ImmutableMap({
 
 const conversationToMap = item => ImmutableMap({
   id: item.id,
+  conversation_id: item.conversation_id,
   unread: item.unread,
   accounts: ImmutableList(item.accounts.map(a => a.id)),
   last_status: item.last_status ? item.last_status.id : null,
@@ -98,20 +99,55 @@ export default function conversations(state = initialState, action) {
   case CONVERSATIONS_UNMOUNT:
     return state.update('mounted', count => count - 1);
   case CONVERSATIONS_READ:
-    return state.update('items', list => list.map(item => {
-      if (item.get('id') === action.id) {
-        return item.set('unread', false);
-      }
+    return state.update('items', list => {
+      const target = list.find(item => item.get('id') === action.id);
 
-      return item;
-    }));
+      if (!target) return list;
+
+      const targetConversationId = target.get('conversation_id');
+      const targetParticipants = target.get('accounts');
+
+      return list.map(item => {
+        const sameParticipants = item
+          .get('accounts')
+          .sort()
+          .equals(targetParticipants.sort());
+        const sameNativeConversation =
+          !!targetConversationId &&
+          item.get('conversation_id') === targetConversationId;
+
+        return sameParticipants || sameNativeConversation
+          ? item.set('unread', false)
+          : item;
+      });
+    });
   case blockAccountSuccess.type:
   case muteAccountSuccess.type:
     return filterConversations(state, [action.payload.relationship.id]);
   case blockDomainSuccess.type:
     return filterConversations(state, action.payload.accounts);
-  case CONVERSATIONS_DELETE_SUCCESS:
-    return state.update('items', list => list.filterNot(item => item.get('id') === action.id));
+  case CONVERSATIONS_DELETE_SUCCESS: {
+    const target = state.get('items').find(item => item.get('id') === action.id);
+
+    if (!target) return state;
+
+    const targetConversationId = target.get('conversation_id');
+    const targetParticipants = target.get('accounts');
+
+    return state.update('items', list =>
+      list.filterNot(item => {
+        const sameParticipants = item
+          .get('accounts')
+          .sort()
+          .equals(targetParticipants.sort());
+        const sameNativeConversation =
+          !!targetConversationId &&
+          item.get('conversation_id') === targetConversationId;
+
+        return sameParticipants || sameNativeConversation;
+      }),
+    );
+  }
   default:
     return state;
   }

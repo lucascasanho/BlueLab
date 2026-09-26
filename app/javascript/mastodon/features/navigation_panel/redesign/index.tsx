@@ -17,6 +17,13 @@ import {
 } from '@phosphor-icons/react';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
+import {
+  expandConversations,
+  mountConversations,
+  unmountConversations,
+} from '@/mastodon/actions/conversations';
+import { connectDirectStream } from '@/mastodon/actions/streaming';
+import { groupedConversationRepresentatives } from '@/mastodon/features/direct_timeline/conversation_grouping';
 import FediIcon from '@/images/icons/icon_fediverse.svg?react';
 import { fetchLists } from '@/mastodon/actions/lists';
 import { closeNavigation } from '@/mastodon/actions/navigation';
@@ -107,6 +114,26 @@ export const RedesignNavigationPanel: React.FC<{
   );
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const unreadMessagesCount = useAppSelector((state) => {
+    const conversations = state.conversations.get('items');
+
+    return groupedConversationRepresentatives(conversations)
+      .filter((conversation) => conversation.get('unread'))
+      .length;
+  });
+
+  useEffect(() => {
+    if (!signedIn || !isBlue2) return;
+
+    dispatch(mountConversations());
+    dispatch(expandConversations());
+    const disconnect = dispatch(connectDirectStream());
+
+    return () => {
+      dispatch(unmountConversations());
+      disconnect();
+    };
+  }, [dispatch, isBlue2, signedIn]);
 
   const openComposer = useCallback(() => {
     dispatch(closeNavigation());
@@ -294,6 +321,7 @@ export const RedesignNavigationPanel: React.FC<{
                     stacked
                     to='/conversations'
                     iconComponent={ChatCircleDotsIcon}
+                    badgeCount={unreadMessagesCount}
                   >
                     <FormattedMessage
                       id='tabs_bar.messages'
@@ -343,6 +371,7 @@ export const RedesignNavigationPanel: React.FC<{
                     stacked
                     to='/conversations'
                     iconComponent={ChatCircleDotsIcon}
+                    badgeCount={unreadMessagesCount}
                   >
                     <FormattedMessage
                       id='tabs_bar.messages'

@@ -1,4 +1,5 @@
 import api, { getLinks } from '../api';
+import { browserHistory } from '../components/router';
 
 import {
   importFetchedAccounts,
@@ -34,7 +35,7 @@ export const markConversationRead = conversationId => (dispatch) => {
     id: conversationId,
   });
 
-  api().post(`/api/v1/conversations/${conversationId}/read`);
+  return api().post(`/api/v1/conversations/${conversationId}/read`);
 };
 
 export const expandConversations = ({ maxId } = {}) => (dispatch, getState) => {
@@ -58,6 +59,40 @@ export const expandConversations = ({ maxId } = {}) => (dispatch, getState) => {
     })
     .catch(err => dispatch(expandConversationsFail(err)));
 };
+
+export const findConversationForStatus = statusId => () =>
+  api().get(`/api/v1/conversations/by-status/${statusId}`).then(response => response.data.id);
+
+export const openConversationForStatus = statusId => dispatch =>
+  dispatch(findConversationForStatus(statusId))
+    .then(conversationId => {
+      browserHistory.push(`/conversations/${conversationId}`, {
+        statusId,
+      });
+      return conversationId;
+    })
+    .catch(() => {
+      browserHistory.push('/conversations');
+    });
+
+export const fetchConversationMessages = conversationId => dispatch =>
+  api().get(`/api/v1/conversations/${conversationId}/messages`).then(response => {
+    dispatch(importFetchedStatuses(response.data));
+    return response.data;
+  });
+
+export const fetchConversation = conversationId => dispatch =>
+  api().get(`/api/v1/conversations/${conversationId}`).then(response => {
+    dispatch(importFetchedAccounts(response.data.accounts));
+    if (response.data.last_status) {
+      dispatch(importFetchedStatus(response.data.last_status));
+    }
+    dispatch({
+      type: CONVERSATIONS_UPDATE,
+      conversation: response.data,
+    });
+    return response.data;
+  });
 
 export const expandConversationsRequest = () => ({
   type: CONVERSATIONS_FETCH_REQUEST,

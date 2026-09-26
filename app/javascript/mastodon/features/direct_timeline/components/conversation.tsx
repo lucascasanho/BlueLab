@@ -27,6 +27,7 @@ import { replyCompose } from 'mastodon/actions/compose';
 import {
   markConversationRead,
   deleteConversation,
+  openConversationForStatus,
 } from 'mastodon/actions/conversations';
 import { openModal } from 'mastodon/actions/modal';
 import {
@@ -74,6 +75,7 @@ const getStatus = makeGetStatus();
 
 interface Conversation {
   id: string;
+  conversation_id: string;
   unread: boolean;
   accounts: ImmutableList<string>;
   last_status: string | null;
@@ -110,10 +112,8 @@ export const Conversation: React.FC<{
         typeof document !== 'undefined' &&
         document.body.dataset.theme === 'blue-2';
 
-      // BlueLab's messages view uses the status-id route so opening a direct
-      // message does not depend on the account-prefixed profile route.
       if (isBlue2) {
-        history.push(`/statuses/${statusId}`);
+        dispatch(openConversationForStatus(statusId));
       } else {
         history.push(
           `/@${lastStatus.getIn(['account', 'acct']) as string}/${statusId}`,
@@ -219,12 +219,26 @@ export const Conversation: React.FC<{
         className={classNames('conversation focusable muted', { unread })}
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
+        role='button'
+        onClick={(event) => {
+          if (
+            (event.target as HTMLElement).closest(
+              '.status__action-bar, button, [role="menuitem"]',
+            )
+          ) {
+            return;
+          }
+
+          handleClick();
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            handleClick();
+          }
+        }}
       >
-        <div
-          className='conversation__avatar'
-          onClick={handleClick}
-          role='presentation'
-        >
+        <div className='conversation__avatar' role='presentation'>
           <AvatarComposite accounts={accounts} size={48} />
         </div>
 
@@ -247,7 +261,6 @@ export const Conversation: React.FC<{
           <StatusContent
             // @ts-expect-error StatusContent isn't typed yet
             status={lastStatus}
-            onClick={handleClick}
             expanded={!lastStatus.get('hidden')}
             onExpandedToggle={handleShowMore}
             collapsible
