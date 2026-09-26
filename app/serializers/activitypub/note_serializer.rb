@@ -7,6 +7,7 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
   context_extensions :atom_uri, :conversation, :sensitive, :voters_count, :quotes, :interaction_policies
 
   attributes :id, :type, :summary,
+             :generator,
              :in_reply_to, :published, :url,
              :attributed_to, :to, :cc, :sensitive,
              :atom_uri, :in_reply_to_atom_uri,
@@ -104,6 +105,13 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
     else
       object.thread.url
     end
+  end
+
+  def generator
+    {
+      type: 'Application',
+      name: Setting.site_title,
+    }
   end
 
   def published
