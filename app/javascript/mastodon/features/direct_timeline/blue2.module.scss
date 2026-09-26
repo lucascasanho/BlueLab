@@ -90,6 +90,19 @@
   height: 100%;
 }
 
+.root[data-bluelab-messages-advanced='true'] {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.root[data-bluelab-messages-advanced='true'] .inbox,
+.root[data-bluelab-messages-advanced='true'] .listWrap,
+.root[data-bluelab-messages-advanced='true'] :global(.scrollable) {
+  min-height: 0;
+  height: 100%;
+}
+
 /*
  * BlueLab messages are presented as soft, separated conversation cards.
  * This deliberately overrides the generic BlueLab inset stroke applied to
