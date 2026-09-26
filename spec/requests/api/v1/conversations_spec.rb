@@ -192,7 +192,7 @@ RSpec.describe 'API V1 Conversations' do
       ).first
       second_conversation = AccountConversation.where(
         account: user.account,
-      ).find_by('? = ANY(status_ids)', second.id)
+      ).where('? = ANY(status_ids)', second.id).first
 
       expect(first_conversation).to be_present
       expect(second_conversation).to be_present
