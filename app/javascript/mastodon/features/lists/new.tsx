@@ -286,6 +286,7 @@ const NewListWrapper: React.FC<{
 }> = ({ multiColumn }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const history = useHistory();
   const { signedIn } = useIdentity();
   const { id } = useParams<{ id?: string }>();
   const list = useAppSelector((state) =>
@@ -306,7 +307,11 @@ const NewListWrapper: React.FC<{
   return (
     <Column bindToDocument={!multiColumn} label={title}>
       {isRedesignEnabled() ? (
-        <ColumnHeader withBackButton title={title} />
+        <ColumnHeader
+          withBackButton
+          onBackButtonClick={() => history.push('/lists')}
+          title={title}
+        />
       ) : (
         <LegacyColumnHeader
           title={title}
