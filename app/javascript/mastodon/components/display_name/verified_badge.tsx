@@ -11,7 +11,7 @@ import { Popover } from '../popover';
 import type { DisplayNameProps } from './index';
 import classes from './verified_badge.module.scss';
 
-const VERIFIED_ROLE_NAME = 'Verificado';
+const VERIFIED_ROLE_NAMES = ['Verificado', 'Verified'] as const;
 
 const copy = {
   en: {
@@ -27,6 +27,20 @@ const copy = {
       `Esta conta foi verificada pela moderação de ${instance}.`,
     since: (date: string) => `Verificado desde: ${date}`,
     sinceUnknown: 'Verificado desde: data não registrada',
+  },
+  es: {
+    title: 'Cuenta verificada',
+    description: (instance: string) =>
+      `Esta cuenta fue verificada por la moderación de ${instance}.`,
+    since: (date: string) => `Verificado desde: ${date}`,
+    sinceUnknown: 'Verificado desde: fecha no registrada',
+  },
+  fr: {
+    title: 'Compte vérifié',
+    description: (instance: string) =>
+      `Ce compte a été vérifié par la modération de ${instance}.`,
+    since: (date: string) => `Vérifié depuis le : ${date}`,
+    sinceUnknown: 'Vérifié depuis : date non enregistrée',
   },
 } as const;
 
@@ -128,7 +142,7 @@ export function hasVerifiedRole(account: DisplayNameProps['account']) {
   }
 
   return Array.from(account.roles).some(
-    (role) => role.name === VERIFIED_ROLE_NAME,
+    (role) => VERIFIED_ROLE_NAMES.some((name) => role.name === name),
   );
 }
 
@@ -171,12 +185,13 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
     [],
   );
 
-  if (!account || !hasVerifiedRole(account)) {
+  if (!account || !hasVerifiedRole(account) || account.verified_badge_visible === false) {
     return null;
   }
 
   const language = intl.locale.toLowerCase().split(/[-_]/)[0];
-  const localizedCopy = language === 'pt' ? copy.pt : copy.en;
+  const localizedCopy =
+    language === 'pt' ? copy.pt : language === 'es' ? copy.es : language === 'fr' ? copy.fr : copy.en;
   const isRemote = account.acct.includes('@');
   const verification = account.instance_verification;
   const remoteBadge = isRemote ? verification?.badge : null;
