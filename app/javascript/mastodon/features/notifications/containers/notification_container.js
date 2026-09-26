@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import { mentionCompose } from '../../../actions/compose';
-import { findConversationForStatus, openConversationForStatus } from '../../../actions/conversations';
+import { openConversationForStatus } from '../../../actions/conversations';
 import {
   toggleFavourite,
   toggleReblog,
