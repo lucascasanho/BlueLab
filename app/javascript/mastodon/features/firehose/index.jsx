@@ -182,9 +182,11 @@ const Firehose = ({ feedType, multiColumn }) => {
     title = messages.title_singular;
   }
 
-  const displayTitle = intl.formatMessage(
-    isRedesignEnabled() && !isBlue2 ? messages.title_redesign : title,
-  );
+  const displayTitle = isBlue2 && feedType === 'public'
+    ? blue2Text(intl.locale, 'global')
+    : intl.formatMessage(
+      isRedesignEnabled() && !isBlue2 ? messages.title_redesign : title,
+    );
 
   return (
     <Column bindToDocument={!multiColumn} label={displayTitle}>
