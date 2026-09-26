@@ -13,9 +13,6 @@ const related = (left, right) =>
   (!!left.get('conversation_id') &&
     left.get('conversation_id') === right.get('conversation_id'));
 
-const related = (left, right) =>
-  conversationKey(left) === conversationKey(right);
-
 export const groupConversations = (conversations) => {
   const groups = [];
 
