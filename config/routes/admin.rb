@@ -148,6 +148,13 @@ namespace :admin do
 
   resources :report_notes, only: [:create, :destroy]
 
+  resources :verification_requests, only: [:index, :show] do
+    member do
+      post :approve
+      post :deny
+    end
+  end
+
   resources :bug_reports, only: [:index, :show] do
     member do
       post :assign_to_self
