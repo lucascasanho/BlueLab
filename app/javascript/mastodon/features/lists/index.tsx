@@ -90,6 +90,8 @@ const Lists: React.FC<{
 }> = ({ multiColumn }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const lists = useAppSelector((state) => getOrderedLists(state));
   const { signedIn } = useIdentity();
 
@@ -101,7 +103,7 @@ const Lists: React.FC<{
 
   const emptyMessage = (
     <>
-      {isRedesignEnabled() ? (
+      {isRedesignEnabled() || isBlue2 ? (
         <span>
           <FormattedMessage
             id='custom_feeds.no_custom_feeds_yet'
@@ -132,12 +134,12 @@ const Lists: React.FC<{
   );
 
   const title = intl.formatMessage(
-    isRedesignEnabled() ? messages.heading_redesign : messages.heading,
+    isRedesignEnabled() || isBlue2 ? messages.heading_redesign : messages.heading,
   );
 
   return (
     <Column bindToDocument={!multiColumn} label={title}>
-      {isRedesignEnabled() ? (
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
           withBackButton
           title={title}

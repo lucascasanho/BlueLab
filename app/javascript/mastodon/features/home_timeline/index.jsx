@@ -35,7 +35,7 @@ import { MultiColumnMenuItems } from '@/mastodon/components/column_header/multic
 
 const messages = defineMessages({
   title: { id: 'column.home', defaultMessage: 'Home' },
-  following: { id: 'column.following', defaultMessage: 'Following' },
+  following: { id: 'account.following', defaultMessage: 'Following' },
   show_announcements: { id: 'home.show_announcements', defaultMessage: 'Show announcements' },
   hide_announcements: { id: 'home.hide_announcements', defaultMessage: 'Hide announcements' },
 });
@@ -151,13 +151,15 @@ class HomeTimeline extends PureComponent {
 
     return (
       <Column bindToDocument={!multiColumn} label={title}>
-        {isRedesignEnabled() ? (
+        {isRedesignEnabled() || isBlue2 ? (
           <ColumnHeader
-            title={intl.formatMessage(messages.following)}
+            title={title}
             withBackButton={multiColumn && !pinned && 'auto'}
             withUnreadMarker={hasUnread}
             extraButtons={
-              <HomeColumnSettings>
+              <>
+                {announcementsButton}
+                <HomeColumnSettings>
                 {multiColumn &&
                   <MultiColumnMenuItems
                     withDivider
@@ -166,7 +168,8 @@ class HomeTimeline extends PureComponent {
                     onMove={this.handleMove}
                   />
                 }
-              </HomeColumnSettings>
+                </HomeColumnSettings>
+              </>
             }
           />
         ) : (

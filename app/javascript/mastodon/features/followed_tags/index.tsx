@@ -63,6 +63,8 @@ const FollowedTag: React.FC<{
 const FollowedTags: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const { tags, loading, next, stale } = useAppSelector(
     (state) => state.followedTags,
   );
@@ -99,7 +101,7 @@ const FollowedTags: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
       bindToDocument={!multiColumn}
       label={intl.formatMessage(messages.heading)}
     >
-      {isRedesignEnabled() ? (
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
           withBackButton
           title={intl.formatMessage(messages.heading)}

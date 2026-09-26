@@ -36,6 +36,8 @@ const messages = defineMessages({
 const Favourites: React.FC<{ multiColumn?: boolean }> = ({ multiColumn }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   const { statusId } = useParams<{ statusId?: string }>();
 
@@ -87,7 +89,7 @@ const Favourites: React.FC<{ multiColumn?: boolean }> = ({ multiColumn }) => {
 
   return (
     <Column bindToDocument={!multiColumn}>
-      {isRedesignEnabled() ? (
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
           withBackButton
           title={intl.formatMessage(messages.title)}

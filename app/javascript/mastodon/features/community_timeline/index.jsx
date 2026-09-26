@@ -134,11 +134,15 @@ class CommunityTimeline extends PureComponent {
       />
     );
 
-    const title = intl.formatMessage(isRedesignEnabled() ? messages.title_redesign : messages.title)
+    const isBlue2 =
+      typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+    const title = intl.formatMessage(
+      isRedesignEnabled() || isBlue2 ? messages.title_redesign : messages.title,
+    );
 
     return (
       <Column bindToDocument={!multiColumn} label={title}>
-        {isRedesignEnabled() ? (
+        {isRedesignEnabled() || isBlue2 ? (
           <ColumnHeader
             title={title}
             withUnreadMarker={hasUnread}

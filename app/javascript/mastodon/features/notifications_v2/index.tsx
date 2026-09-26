@@ -197,6 +197,8 @@ export const Notifications: React.FC<{
   );
 
   const { signedIn } = useIdentity();
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   const filterBar = signedIn ? <FilterBar /> : null;
 
@@ -278,13 +280,14 @@ export const Notifications: React.FC<{
       bindToDocument={!multiColumn}
       label={intl.formatMessage(messages.title)}
     >
-      {isRedesignEnabled() ? (
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
           title={intl.formatMessage(messages.title)}
           withUnreadMarker={isUnread}
           withBackButton={multiColumn && !pinned && 'auto'}
           extraButtons={
             <>
+              {isBlue2 && extraButton}
               <ColumnHeaderButton icon={GearIcon} onClick={openSettingsModal}>
                 <FormattedMessage
                   id='notifications.settings'

@@ -287,10 +287,12 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
   );
 
   const pageTitle = intl.formatMessage(messages.title, { q });
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   return (
     <Column bindToDocument={!multiColumn} label={pageTitle}>
-      {isRedesignEnabled() ? (
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
           title={pageTitle}
           extraStickyContent={extraStickyHeaderContent}

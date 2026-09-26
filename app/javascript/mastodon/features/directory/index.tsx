@@ -52,6 +52,8 @@ export const Directory: React.FC<{
   params?: { order: string; local?: boolean };
 }> = ({ columnId, multiColumn, params }) => {
   const intl = useIntl();
+  const isBlue2 =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const dispatch = useAppDispatch();
 
   const [orderParam, setOrderParam] = useSearchParam('order');
@@ -195,7 +197,7 @@ export const Directory: React.FC<{
       bindToDocument={!multiColumn}
       label={intl.formatMessage(messages.title)}
     >
-      {isRedesignEnabled() ? (
+      {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
           title={intl.formatMessage(messages.title)}
           withBackButton={multiColumn && !pinned && 'auto'}

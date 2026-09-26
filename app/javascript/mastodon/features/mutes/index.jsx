@@ -54,6 +54,8 @@ class Mutes extends ImmutablePureComponent {
 
   render () {
     const { intl, hasMore, accountIds, multiColumn, isLoading } = this.props;
+    const isBlue2 =
+      typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
     if (!accountIds) {
       return (
@@ -67,7 +69,7 @@ class Mutes extends ImmutablePureComponent {
 
     return (
       <Column bindToDocument={!multiColumn}>
-        {isRedesignEnabled() ? (
+        {isRedesignEnabled() || isBlue2 ? (
           <ColumnHeader
             withBackButton
             title={intl.formatMessage(messages.heading)}
