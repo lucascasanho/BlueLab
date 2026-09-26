@@ -1572,7 +1572,6 @@ pt-BR:
       another_account:
         title: "Entrar em outra conta"
         notice: "Sua conta atual continuará disponível no seletor de contas."
-      another_account:
         two_factor_title: "Verifique sua identidade"
         two_factor_notice: "Digite o código de verificação da conta que você está adicionando."
     sign_up:
