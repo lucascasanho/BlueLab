@@ -5,6 +5,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { useHistory } from 'react-router-dom';
 
+import { updateVerificationBadgeVisibility } from '@/mastodon/actions/accounts_typed';
 import type { ModalType } from '@/mastodon/actions/modal';
 import { openModal } from '@/mastodon/actions/modal';
 import { AccountBio } from '@/mastodon/components/account_bio';
@@ -24,7 +25,6 @@ import {
   fetchProfile,
   patchProfile,
 } from '@/mastodon/reducers/slices/profile_edit';
-import { updateVerificationBadgeVisibility } from '@/mastodon/actions/accounts_typed';
 import { apiUpdateVerificationBadge } from '@/mastodon/api/verification';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
