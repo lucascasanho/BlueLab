@@ -2,8 +2,6 @@ import { FormattedMessage } from 'react-intl';
 
 import { Link } from 'react-router-dom';
 
-import { BugReportLabel } from 'mastodon/features/bug_report/bug_report_label';
-import { useOpenBugReport } from 'mastodon/features/bug_report/use_bug_report';
 import { domain, version } from 'mastodon/initial_state';
 
 import classes from './link_footer.module.scss';
@@ -11,7 +9,6 @@ import classes from './link_footer.module.scss';
 export const LinkFooter: React.FC<{
   context?: 'default' | 'multi-column' | 'about';
 }> = ({ context = 'default' }) => {
-  const openBugReport = useOpenBugReport();
   const multiColumn = context === 'multi-column';
   const displayVersion = version?.match(/^\d+\.\d+\.\d+/)?.[0] ?? version ?? '';
 
@@ -61,15 +58,6 @@ export const LinkFooter: React.FC<{
                 defaultMessage='Keyboard shortcuts'
               />
             </Link>
-          </li>
-          <li>
-            <button
-                type='button'
-                className={classes.bugReportButton}
-                onClick={openBugReport}
-              >
-                <BugReportLabel />
-            </button>
           </li>
           <li>
             <a

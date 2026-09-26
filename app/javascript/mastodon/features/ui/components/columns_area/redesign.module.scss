@@ -97,6 +97,7 @@
   --navigation-max-width: 260px;
 
   max-width: 100vw;
+  height: auto;
   min-height: 100dvh;
   padding: 0;
   gap: 0;
@@ -123,6 +124,7 @@
 }
 
 .blue2Main {
+  height: auto;
   grid-column: 2;
   min-width: 0;
   max-width: 600px;
@@ -299,7 +301,6 @@
 @media (width < 1180px) and (min-width: $mobile-menu-breakpoint) {
   .blue2Root {
     --navigation-min-width: 76px;
-
     grid-template-columns: 76px minmax(0, 600px) minmax(0, 1fr);
   }
 
@@ -322,7 +323,7 @@
   }
 }
 
-@media (width <= 1174px) {
+@media (max-width: 1174px) {
   // BlueLab uses the compact/mobile shell for every non-desktop viewport.
   // The advanced deck is a desktop-only presentation for this theme.
   .blue2Root {

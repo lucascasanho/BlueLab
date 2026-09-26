@@ -2,28 +2,16 @@ import { List as ImmutableList } from 'immutable';
 
 import { compareId } from '@/mastodon/compare_id';
 
-const participantKey = (conversation) =>
-  conversation
-    .get('accounts')
-    .sort()
-    .join(',');
+const conversationKey = (conversation) => {
+  const nativeConversationId = conversation.get('conversation_id');
 
-const conversationKey = (conversation) =>
-  conversation.get('conversation_id');
-
-const related = (left, right) => {
-  const leftConversationKey = conversationKey(left);
-  const rightConversationKey = conversationKey(right);
-  const sameParticipants =
-    participantKey(left) === participantKey(right);
-
-  return (
-    sameParticipants ||
-    (!!leftConversationKey &&
-      !!rightConversationKey &&
-      leftConversationKey === rightConversationKey)
-  );
+  return nativeConversationId
+    ? `thread:${nativeConversationId}`
+    : `record:${conversation.get('id')}`;
 };
+
+const related = (left, right) =>
+  conversationKey(left) === conversationKey(right);
 
 export const groupConversations = (conversations) => {
   const groups = [];

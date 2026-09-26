@@ -2,22 +2,18 @@ import { useCallback, useMemo } from 'react';
 
 import { useLocation } from 'react-router';
 
-import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
-
 import {
   addColumn,
   moveColumn,
   removeColumn,
 } from '@/mastodon/actions/columns';
-import { useColumnIndexContext } from '@/mastodon/components/column/context';
 import { useAccountId } from '@/mastodon/hooks/useAccountId';
 import { forceSingleColumn } from '@/mastodon/initial_state';
 import { isBlue2MobileViewport } from '@/mastodon/is_mobile';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
+import { useColumnIndexContext } from '@/mastodon/components/column/context';
 import { useColumnsContext } from './columns_context';
-
-type Blue2ColumnState = ImmutableMap<string, unknown>;
 
 export interface Blue2ColumnDefinition {
   id: string;
@@ -95,7 +91,7 @@ const definitionForPath = (
     return { id: 'LISTS', params: {} };
   }
 
-  const listMatch = /^\/lists\/([^/]+)$/.exec(path);
+  const listMatch = path.match(/^\/lists\/([^/]+)$/);
   if (listMatch) {
     return { id: 'LIST', params: { id: listMatch[1] } };
   }
@@ -120,16 +116,13 @@ const definitionForPath = (
     return { id: 'FOLLOW_REQUESTS', params: {} };
   }
 
-  const hashtagMatch = /^\/tags\/([^/]+)$/.exec(path);
+  const hashtagMatch = path.match(/^\/tags\/([^/]+)$/);
   if (hashtagMatch) {
-    return {
-      id: 'HASHTAG',
-      params: { id: decodeURIComponent(hashtagMatch[1] ?? '') },
-    };
+    return { id: 'HASHTAG', params: { id: decodeURIComponent(hashtagMatch[1]) } };
   }
 
-  const collectionsMatch = /^\/@[^/]+\/collections(?:\/featuring-you)?$/.exec(
-    path,
+  const collectionsMatch = path.match(
+    /^\/@[^/]+\/collections(?:\/featuring-you)?$/,
   );
   if (collectionsMatch && accountId) {
     return {
@@ -154,12 +147,11 @@ export const useBlue2ColumnPinning = () => {
   const { multiColumn } = useColumnsContext();
   const columnIndex = useColumnIndexContext();
   const accountId = useAccountId();
-  const columns = useAppSelector(
-    (state) => state.settings.get('columns') as ImmutableList<Blue2ColumnState>,
-  );
+  const columns = useAppSelector((state) => state.settings.get('columns'));
 
   const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'blue-2';
   const isDesktopAdvanced =
     isBlue2 &&
     !forceSingleColumn &&
@@ -169,9 +161,6 @@ export const useBlue2ColumnPinning = () => {
 
   const pinned = isDesktopAdvanced && columnIndex < columns.size;
   const pinnedColumn = pinned ? columns.get(columnIndex) : undefined;
-  const pinnedParams = pinnedColumn?.get('params') as
-    | ImmutableMap<string, unknown>
-    | undefined;
   const routeDefinition = useMemo(
     () => definitionForPath(location.pathname, accountId),
     [accountId, location.pathname],
@@ -180,7 +169,7 @@ export const useBlue2ColumnPinning = () => {
   const definition = pinned
     ? {
         id: pinnedColumn?.get('id'),
-        params: pinnedParams?.toJS() ?? {},
+        params: pinnedColumn?.get('params')?.toJS() ?? {},
       }
     : routeDefinition;
 

@@ -1,22 +1,21 @@
 #!/usr/bin/env bash
 
-# Configure e ative o picker de GIF KLIPY no laboratório Blue.
-# Este comando é deliberadamente restrito ao canal BlueLab-Test.
+# Configure e ativa o picker de GIF KLIPY em uma instalação Mastodon
+# que contenha a integração BlueLab.
 #
 # Uso:
+#   cd /caminho/da/instancia
 #   klippy
 #
-# A chave nunca é impressa, versionada ou passada como argumento de processo.
-# Ela fica somente no .env.production local, usado pelo build Vite.
+# A chave é validada antes de qualquer alteração. Depois do build, os serviços
+# web, Sidekiq e streaming ligados à mesma árvore Git são reiniciados.
 #
 # Fontes:
 # - https://docs.klipy.com/
 # - https://docs.klipy.com/stickers-api
+# - https://www.freedesktop.org/software/systemd/man/systemctl.html
 
 set -Eeuo pipefail
-
-REPO="${BLUELAB_REPO:-$HOME/blue}"
-ENV_FILE="$REPO/.env.production"
 
 falhar() {
   echo
@@ -24,81 +23,230 @@ falhar() {
   exit 1
 }
 
-[[ -d "$REPO/.git" ]] || falhar "não encontrei o repositório Blue em: $REPO"
-[[ -f "$ENV_FILE" ]] || falhar "não encontrei $ENV_FILE"
-command -v git >/dev/null 2>&1 || falhar "git não está disponível"
+REPO="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+[ -n "$REPO" ] || falhar "execute klippy dentro da árvore Git da instância"
+
+[ -f "$REPO/.env.production" ] || falhar "não encontrei $REPO/.env.production"
+[ -f "$REPO/app/javascript/mastodon/features/compose/redesign/gif_picker.tsx" ] || falhar "o picker KLIPY não está instalado nesta árvore"
 command -v yarn >/dev/null 2>&1 || falhar "yarn não está disponível"
+command -v ruby >/dev/null 2>&1 || falhar "ruby não está disponível"
+command -v systemctl >/dev/null 2>&1 || falhar "systemctl não está disponível"
 
 BRANCH="$(git -C "$REPO" branch --show-current)"
-[[ "$BRANCH" == "BlueLab-Test" ]] || falhar "este comando só pode ser executado na branch BlueLab-Test (branch atual: $BRANCH)"
-
-echo "KLIPY para BlueLab-Test"
-echo
-echo "A chave será salva somente em:"
-echo "  $ENV_FILE"
-echo
-echo "Ela não será exibida nem enviada ao Git."
+echo "Instalação detectada: $REPO"
+echo "Branch: $BRANCH"
 echo
 
-read -rsp "Cole a chave Test da KLIPY: " KLIPY_KEY
-echo
+SERVICES=""
+WEB_FOUND=""
 
-[[ -n "$KLIPY_KEY" ]] || falhar "a chave não pode estar vazia"
+adicionar_servico() {
+  local unit="$1"
 
-TMP_KEY="$(mktemp "${TMPDIR:-/tmp}/klippy-key.XXXXXX")"
-TMP_ENV="$(mktemp "${TMPDIR:-/tmp}/klippy-env.XXXXXX")"
-cleanup() {
-  rm -f "$TMP_KEY" "$TMP_ENV"
+  if [ -z "$SERVICES" ]; then
+    SERVICES="$unit"
+  else
+    SERVICES="$SERVICES $unit"
+  fi
 }
-trap cleanup EXIT
 
-chmod 600 "$TMP_KEY"
-printf '%s' "$KLIPY_KEY" > "$TMP_KEY"
+echo "Detectando serviços da instância..."
+
+while IFS= read -r unit; do
+  [ -n "$unit" ] || continue
+  case "$unit" in
+    *-web.service|*-sidekiq.service|*-streaming.service|*-streaming@*.service)
+      working_dir="$(systemctl show "$unit" -p WorkingDirectory --value 2>/dev/null || true)"
+      exec_start="$(systemctl show "$unit" -p ExecStart --value 2>/dev/null || true)"
+
+      if [ "$working_dir" = "$REPO" ] || [[ "$working_dir" == "$REPO/"* ]] || [[ "$exec_start" == *"$REPO"* ]]; then
+        adicionar_servico "$unit"
+        case "$unit" in
+          *-web.service) WEB_FOUND=1 ;;
+        esac
+      fi
+      ;;
+  esac
+done < <(
+  {
+    systemctl list-units --all --type=service --no-legend --plain 2>/dev/null | awk '{print $1}'
+    systemctl list-unit-files --type=service --no-legend 2>/dev/null | awk '{print $1}'
+  } | sed '/^$/d' | sort -u
+)
+
+[ -n "$WEB_FOUND" ] || falhar "não consegui identificar o serviço web desta instância"
+[ -n "$SERVICES" ] || falhar "não consegui identificar serviços Mastodon ligados a $REPO"
+
+echo "Serviços detectados:"
+printf '  %s\n' $SERVICES
+echo
+
+read -rsp "Cole a chave da KLIPY: " KLIPY_KEY
+echo
+[ -n "$KLIPY_KEY" ] || falhar "a chave não pode estar vazia"
+
+# Evita que espaços acidentais vindos de copiar/colar invalidem a credencial.
+KLIPY_KEY="$(printf '%s' "$KLIPY_KEY" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+[ -n "$KLIPY_KEY" ] || falhar "a chave não pode estar vazia"
+
+CURL_CONFIG="$(mktemp /tmp/klippy-curl.XXXXXX)"
+CURL_RESPONSE="$(mktemp /tmp/klippy-response.XXXXXX)"
+V1_RESPONSE=""
+chmod 600 "$CURL_CONFIG" "$CURL_RESPONSE"
+trap 'rm -f "$CURL_CONFIG" "$CURL_RESPONSE" "$V1_RESPONSE"' EXIT
+
+cat > "$CURL_CONFIG" <<EOF
+silent
+show-error
+get
+url = "https://api.klipy.com/v2/featured"
+output = "$CURL_RESPONSE"
+data-urlencode = "key=$KLIPY_KEY"
+data-urlencode = "country=BR"
+data-urlencode = "locale=pt_BR"
+data-urlencode = "contentfilter=high"
+data-urlencode = "media_filter=gif,tinygif"
+data-urlencode = "limit=1"
+EOF
+
+echo
+echo "Validando a chave da API v2 da KLIPY..."
+
+HTTP_CODE="$(curl --config "$CURL_CONFIG" --write-out '%{http_code}' 2>/dev/null || true)"
+
+if [ "$HTTP_CODE" = "200" ]; then
+  if ruby -rjson -e '
+    payload = JSON.parse(File.read(ARGV.fetch(0)))
+    abort unless payload["result"] != false
+    abort unless payload["results"].is_a?(Array) && payload["results"].any?
+  ' "$CURL_RESPONSE"; then
+    echo "OK: chave aceita pela API v2 da KLIPY."
+  else
+    ERROR_MESSAGE="$(ruby -rjson -e '
+      begin
+        payload = JSON.parse(File.read(ARGV.fetch(0)))
+        message = payload.dig("errors", "message") || payload["message"]
+        message = message.join("; ") if message.is_a?(Array)
+        puts message.to_s unless message.nil?
+      rescue StandardError
+      end
+    ' "$CURL_RESPONSE")"
+    [ -n "$ERROR_MESSAGE" ] || ERROR_MESSAGE="resposta 200 sem resultados válidos"
+    falhar "a API v2 respondeu, mas não validou a credencial: $ERROR_MESSAGE"
+  fi
+else
+  ERROR_MESSAGE="$(ruby -rjson -e '
+    begin
+      payload = JSON.parse(File.read(ARGV.fetch(0)))
+      message = payload.dig("errors", "message") || payload["message"]
+      message = message.join("; ") if message.is_a?(Array)
+      puts message.to_s unless message.nil?
+    rescue StandardError
+    end
+  ' "$CURL_RESPONSE")"
+
+  echo "API v2: HTTP $HTTP_CODE"
+  [ -n "$ERROR_MESSAGE" ] && echo "Mensagem da KLIPY: $ERROR_MESSAGE"
+  echo "Verificando se a credencial fornecida é um app_key da API v1..."
+
+  V1_RESPONSE="$(mktemp /tmp/klippy-v1-response.XXXXXX)"
+  chmod 600 "$V1_RESPONSE"
+
+  V1_URL="https://api.klipy.com/api/v1/"$KLIPY_KEY"/gifs/trending?page=1&per_page=1&locale=BR&content_filter=high&format_filter=gif"
+  V1_HTTP_CODE="$(curl -sS --get --output "$V1_RESPONSE" --write-out '%{http_code}' "$V1_URL" 2>/dev/null || true)"
+
+  if [ "$V1_HTTP_CODE" = "200" ] && ruby -rjson -e '
+    payload = JSON.parse(File.read(ARGV.fetch(0)))
+    exit(payload["result"] == true ? 0 : 1)
+  ' "$V1_RESPONSE"; then
+    falhar "a credencial foi aceita pela API v1 da KLIPY como app_key, mas o picker atual do BlueLab usa a API v2 e precisa de uma chave da API v2"
+  fi
+
+  V1_ERROR_MESSAGE="$(ruby -rjson -e '
+    begin
+      payload = JSON.parse(File.read(ARGV.fetch(0)))
+      message = payload.dig("errors", "message") || payload["message"]
+      message = message.join("; ") if message.is_a?(Array)
+      puts message.to_s unless message.nil?
+    rescue StandardError
+    end
+  ' "$V1_RESPONSE")"
+
+  if [ -n "$V1_ERROR_MESSAGE" ]; then
+    falhar "credencial não aceita pela API v2 (HTTP $HTTP_CODE: $ERROR_MESSAGE) nem pela API v1 ($V1_ERROR_MESSAGE)"
+  fi
+
+  falhar "credencial não aceita pela API v2 (HTTP $HTTP_CODE: $ERROR_MESSAGE); a API v1 também não reconheceu a credencial"
+fi
+
 unset KLIPY_KEY
+KLIPY_KEY="$(sed -n 's/^data-urlencode = "key=\(.*\)"$/\1/p' "$CURL_CONFIG")"
+rm -f "$CURL_CONFIG" "$CURL_RESPONSE"
+[ -n "$KLIPY_KEY" ] || falhar "não consegui recuperar a chave validada"
 
+TMP_ENV="$(mktemp /tmp/klippy-env.XXXXXX)"
 chmod 600 "$TMP_ENV"
 
-if grep -q '^VITE_KLIPY_API_KEY=' "$ENV_FILE"; then
-  while IFS= read -r line || [[ -n "$line" ]]; do
+if grep -q '^VITE_KLIPY_API_KEY=' "$REPO/.env.production"; then
+  while IFS= read -r line || [ -n "$line" ]; do
     if [[ "$line" == VITE_KLIPY_API_KEY=* ]]; then
-      printf 'VITE_KLIPY_API_KEY=' >> "$TMP_ENV"
-      cat "$TMP_KEY" >> "$TMP_ENV"
-      printf '\n' >> "$TMP_ENV"
+      printf 'VITE_KLIPY_API_KEY=%s\n' "$KLIPY_KEY" >> "$TMP_ENV"
     else
       printf '%s\n' "$line" >> "$TMP_ENV"
     fi
-  done < "$ENV_FILE"
+  done < "$REPO/.env.production"
 else
-  cat "$ENV_FILE" > "$TMP_ENV"
-  printf '\nVITE_KLIPY_API_KEY=' >> "$TMP_ENV"
-  cat "$TMP_KEY" >> "$TMP_ENV"
-  printf '\n' >> "$TMP_ENV"
+  cat "$REPO/.env.production" > "$TMP_ENV"
+  printf '\nVITE_KLIPY_API_KEY=%s\n' "$KLIPY_KEY" >> "$TMP_ENV"
 fi
 
+unset KLIPY_KEY
 chmod 600 "$TMP_ENV"
-mv "$TMP_ENV" "$ENV_FILE"
+mv "$TMP_ENV" "$REPO/.env.production"
 
-echo "OK: chave KLIPY configurada localmente."
 echo
+echo "OK: chave salva localmente."
 echo "Recriando o bundle de produção..."
 
-cd "$REPO"
-yarn build:production || falhar "o build falhou; o Blue não foi reiniciado"
-
-echo
-echo "Build concluído. Reiniciando o Blue..."
-
-if command -v blue-reiniciar >/dev/null 2>&1; then
-  blue-reiniciar
-else
-  sudo systemctl restart blue-web.service blue-sidekiq.service
-  sudo systemctl restart blue-streaming@4000.service 2>/dev/null || true
+if ! (cd "$REPO" && yarn build:production); then
+  falhar "o build falhou; nenhum serviço foi reiniciado"
 fi
 
 echo
-if systemctl is-active --quiet blue-web.service; then
-  echo "KLIPY está ativo no BlueLab-Test."
-  echo "Abra o compositor novo em mastodon.blue e clique em GIF."
-else
-  falhar "blue-web.service não ficou ativo após o reinício"
-fi
+echo "Build concluído. Reiniciando os serviços detectados..."
+
+sudo systemctl restart $SERVICES
+
+echo
+echo "Aguardando os serviços..."
+for tentativa in $(seq 1 20); do
+  todos_ativos=1
+
+  for unit in $SERVICES; do
+    if ! systemctl is-active --quiet "$unit"; then
+      todos_ativos=0
+      break
+    fi
+  done
+
+  if [ "$todos_ativos" = 1 ]; then
+    echo
+    printf '%-36s %s\n' "SERVIÇO" "ESTADO"
+    for unit in $SERVICES; do
+      printf '%-36s %s\n' "$unit" "$(systemctl is-active "$unit" 2>/dev/null || true)"
+    done
+    echo
+    echo "KLIPY ativado com sucesso em $REPO."
+    exit 0
+  fi
+
+  sleep 1
+done
+
+echo
+echo "Estado dos serviços após a tentativa:"
+for unit in $SERVICES; do
+  printf '  %-34s %s\n' "$unit" "$(systemctl is-active "$unit" 2>/dev/null || true)"
+done
+
+falhar "um ou mais serviços não ficaram ativos após o reinício"

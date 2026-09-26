@@ -74,7 +74,6 @@ const getStatus = makeGetStatus();
 
 interface Conversation {
   id: string;
-  conversation_id: string;
   unread: boolean;
   accounts: ImmutableList<string>;
   last_status: string | null;

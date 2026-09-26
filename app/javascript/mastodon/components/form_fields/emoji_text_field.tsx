@@ -97,7 +97,6 @@ export const EmojiTextAreaField: FC<
   hint,
   status,
   blue2EmojiEditor = false,
-  mastodon5EmojiEditor = false,
   ...otherProps
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);

@@ -1,5 +1,5 @@
 // Bird UI favourite treatment.
-
+// 
 // Sidebar and notification favourite icons are static and always use the star
 // artwork. Status action favourites use Mastodon's native favourite control.
 .layout-single-column,
@@ -40,7 +40,6 @@
   button.star-icon.active,
   .icon-button.star-icon.active {
     --fg: var(--color-yellow) !important;
-
     color: var(--color-yellow) !important;
   }
 
@@ -59,7 +58,6 @@
   .status__action-bar .icon-button.star-icon .icon-star,
   .detailed-status__action-bar .icon-button.star-icon .icon-star {
     --size-icon: 18px;
-
     background-image: var(--icon-star-detailed-status-action-bar);
     background-position: center;
     background-repeat: no-repeat;
@@ -81,12 +79,8 @@
 
   .status__action-bar button.icon-button.star-icon.active .icon-star,
   .detailed-status__action-bar button.icon-button.star-icon.active .icon-star,
-  .status__action-bar
-    button.icon-button.star-icon.active:not(.activated)
-    .icon-star,
-  .detailed-status__action-bar
-    button.icon-button.star-icon.active:not(.activated)
-    .icon-star {
+  .status__action-bar button.icon-button.star-icon.active:not(.activated) .icon-star,
+  .detailed-status__action-bar button.icon-button.star-icon.active:not(.activated) .icon-star {
     background-image: var(
       --icon-star-detailed-status-action-bar-active
     ) !important;

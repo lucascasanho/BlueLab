@@ -86,9 +86,7 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   const handleFavouriteClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       animateFavouriteIcon(event.currentTarget, status?.favourited ?? false);
-      dispatch(
-        statusInteraction({ statusId, intent: 'favourite', contextType }),
-      );
+      dispatch(statusInteraction({ statusId, intent: 'favourite', contextType }));
     },
     [contextType, dispatch, status?.favourited, statusId],
   );
@@ -113,7 +111,10 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   }, [contextType, dispatch, statusId]);
 
   const intl = useIntl();
-  const favouriteIcon = useIconWeight(StarIcon, status?.favourited && 'fill');
+  const favouriteIcon = useIconWeight(
+    StarIcon,
+    status?.favourited && 'fill',
+  );
   const bookmarkIcon = useIconWeight(
     BookmarkSimpleIcon,
     status?.bookmarked && 'fill',

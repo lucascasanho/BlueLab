@@ -145,7 +145,10 @@ export const StatusPage: React.FC = () => {
     );
   }, [dispatch, statusId]);
 
-  const favouriteIcon = useIconWeight(StarIcon, status?.favourited && 'fill');
+  const favouriteIcon = useIconWeight(
+    StarIcon,
+    status?.favourited && 'fill',
+  );
   const bookmarkIcon = useIconWeight(
     BookmarkSimpleIcon,
     status?.bookmarked && 'fill',

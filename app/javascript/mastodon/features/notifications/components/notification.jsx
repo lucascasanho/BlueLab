@@ -79,11 +79,7 @@ class Notification extends ImmutablePureComponent {
     const { notification, status } = this.props;
 
     if (notification.get('status')) {
-      const isBlue2 =
-        typeof document !== 'undefined' &&
-        document.body.dataset.theme === 'blue-2';
-
-      if (isBlue2 && status?.get('visibility') === 'direct') {
+      if (status?.get('visibility') === 'direct') {
         this.props.onOpenConversation(status.get('id'));
         return;
       }

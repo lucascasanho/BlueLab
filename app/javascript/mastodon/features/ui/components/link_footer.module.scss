@@ -39,19 +39,6 @@
   text-decoration: none;
 }
 
-.bugReportButton {
-  appearance: none;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  line-height: inherit;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
 .list {
   display: inline;
 
@@ -67,8 +54,7 @@
     }
   }
 
-  a,
-  .bugReportButton {
+  a {
     color: var(--color-text-secondary);
     text-decoration: underline;
 

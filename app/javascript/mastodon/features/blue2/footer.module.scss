@@ -39,8 +39,7 @@
 :global(body[data-theme='mastodon-bird-ui-auto']) .root {
   color: var(--color-text-secondary, #717c9b);
 
-  a,
-  button {
+  a {
     color: inherit !important;
 
     &:hover,

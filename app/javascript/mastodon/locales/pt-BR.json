@@ -1528,5 +1528,6 @@
   "account_switcher.sign_in": "Entrar em outra conta",
   "account_switcher.create": "Criar outra conta",
   "account_switcher.remove": "Remover {account} deste dispositivo",
-  "account_switcher.error": "A sessão desta conta não está mais disponível. Entre novamente para adicioná-la."
+  "account_switcher.error": "A sessão desta conta não está mais disponível. Entre novamente para adicioná-la.",
+  "messages.conversation.replying_to": "Respondendo a {name}"
 }

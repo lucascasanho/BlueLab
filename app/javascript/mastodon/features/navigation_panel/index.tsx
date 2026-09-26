@@ -58,10 +58,11 @@ import { selectUnreadNotificationGroupsCount } from 'mastodon/selectors/notifica
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
 import { AnnualReportNavItem } from '../annual_report/nav_item';
+
 import { Blue2AccountMenu } from '../blue2/account_menu';
+import { Blue2ComposeButton } from '../blue2/navigation';
 import { Blue2FooterLinks } from '../blue2/footer';
 import { Blue2MessageIcon } from '../blue2/icons';
-import { Blue2ComposeButton } from '../blue2/navigation';
 
 import { DisabledAccountBanner } from './components/disabled_account_banner';
 import { FollowedTagsPanel } from './components/followed_tags_panel';

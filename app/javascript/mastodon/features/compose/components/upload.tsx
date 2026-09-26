@@ -73,9 +73,6 @@ export const Upload: React.FC<{
     transition,
   };
   const preview_url = media.get('preview_url') as string | null;
-  const mediaUrl = media.get('url') as string | null;
-  const mediaType = media.get('type') as string | null;
-  const isAnimatedGif = mediaType === 'gifv' && !!mediaUrl;
   const blurhash = media.get('blurhash') as string | null;
 
   return (
@@ -103,20 +100,7 @@ export const Upload: React.FC<{
         {sensitive && blurhash && (
           <Blurhash hash={blurhash} className='compose-form__upload__preview' />
         )}
-        {!sensitive && isAnimatedGif && (
-          <video
-            className='compose-form__upload__video'
-            src={mediaUrl}
-            poster={preview_url ?? undefined}
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload='metadata'
-            aria-hidden='true'
-          />
-        )}
-        {!sensitive && !preview_url && !isAnimatedGif && (
+        {!sensitive && !preview_url && (
           <div className='compose-form__upload__visualizer'>
             <AudioVisualizer poster={userAvatar} />
             <Icon id='sound' icon={SoundIcon} />

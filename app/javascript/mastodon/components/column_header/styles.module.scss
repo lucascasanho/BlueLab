@@ -91,6 +91,7 @@
     width: 100%;
     padding: 0;
     border: none;
+    color: inherit;
     font: inherit;
     color: inherit;
     background: transparent;
@@ -118,6 +119,8 @@
 .extraStickyContent {
   background: var(--color-bg-primary);
 }
+
+
 
 // Mastodon 5 uses rounded column surfaces from the navigation redesign preview.
 // Keep this override strictly scoped to the theme so other themes retain their

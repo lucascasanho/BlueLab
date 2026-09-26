@@ -32,6 +32,7 @@ body[data-theme='blue-2'] {
   }
 }
 
+
 /*
  * Favourite icon refinement for the Blue 2 timeline.
  *
@@ -40,8 +41,10 @@ body[data-theme='blue-2'] {
  * own native button sizing.
  */
 body[data-theme='blue-2'] {
-  .status__action-bar button.star-icon .favourite-animation-target,
-  .status__action-bar button.star-icon .favourite-animation-target > .icon {
+  .status__action-bar button.star-icon
+    .favourite-animation-target,
+  .status__action-bar button.star-icon
+    .favourite-animation-target > .icon {
     width: 18px;
     height: 18px;
     min-width: 18px;
@@ -50,13 +53,10 @@ body[data-theme='blue-2'] {
   }
 
   .status__action-bar button.star-icon[aria-pressed='true'],
-  .status__action-bar
-    button.star-icon[aria-pressed='true']
+  .status__action-bar button.star-icon[aria-pressed='true']
     .favourite-animation-target,
-  .status__action-bar
-    button.star-icon[aria-pressed='true']
-    .favourite-animation-target
-    > .icon {
+  .status__action-bar button.star-icon[aria-pressed='true']
+    .favourite-animation-target > .icon {
     color: var(--color-yellow) !important;
   }
 }

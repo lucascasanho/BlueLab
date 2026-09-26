@@ -31,35 +31,27 @@ describe('direct conversation grouping', () => {
     ]);
   });
 
-  test('groups separate native records when they represent the same participants', () => {
+  test('does not merge separate native conversations with the same participants', () => {
     const first = conversation('1', '100', ['alice'], '10');
     const second = conversation('2', '200', ['alice'], '20');
 
     expect(groupConversations(ImmutableList([first, second]))).toEqual([
-      [first, second],
+      [first],
+      [second],
     ]);
   });
 
-  test('uses participants only for legacy records without a conversation id', () => {
+  test('does not merge legacy records that have no native conversation id', () => {
     const first = conversation('1', null, ['alice'], '10');
     const second = conversation('2', null, ['alice'], '20');
 
     expect(groupConversations(ImmutableList([first, second]))).toEqual([
-      [first, second],
+      [first],
+      [second],
     ]);
   });
 
-  test('connects participant and native-thread changes into one chat group', () => {
-    const first = conversation('1', '100', ['alice'], '10');
-    const second = conversation('2', '100', ['alice', 'carol'], '20');
-    const third = conversation('3', '200', ['alice', 'carol'], '30');
-
-    expect(groupConversations(ImmutableList([first, second, third]))).toEqual([
-      [first, second, third],
-    ]);
-  });
-
-  test('keeps every participant on the grouped representative', () => {
+  test('keeps every participant on the grouped representative for one thread', () => {
     const first = conversation('1', '100', ['alice'], '10');
     const second = conversation('2', '100', ['alice', 'carol'], '20', true);
 

@@ -55,7 +55,6 @@ Enquanto uma alteração estiver sendo testada ou ainda não estiver aprovada, `
 Quando o usuário confirmar explicitamente que o lote foi aprovado para produção, `bluelab promover` deve promover o mesmo SHA efetivamente testado no Blue para `BlueLab`.
 
 A promoção deve continuar protegida contra:
-
 - checkout local diferente de `BlueLab-Test`;
 - SHA não registrado como implantado/testado;
 - divergência entre os canais;
@@ -72,7 +71,6 @@ O repositório upstream oficial é:
 Somente o **Blue** verifica automaticamente se existe candidato upstream mais novo.
 
 No Blue, `bluelab` pode:
-
 1. consultar `mastodon/mastodon`;
 2. detectar uma versão upstream mais nova;
 3. simular a integração e detectar conflitos;

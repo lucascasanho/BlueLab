@@ -371,7 +371,7 @@ export const ColumnsAreaRedesign: React.FC<{
               onTouchStart={handleBlue2RailSwipeStart}
               onTouchEnd={handleBlue2RailSwipeEnd}
             >
-              <Blue2RightRail variant='mobile' />
+              <Blue2RightRail />
             </aside>
           </div>
         )}

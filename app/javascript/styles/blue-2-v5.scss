@@ -108,6 +108,8 @@ body[data-theme='blue-2'] {
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7.41 4 9.8 6.39 8.39 7.8 7 6.41V16h6v2H5V6.41L3.61 7.8 2.2 6.39 4.59 4 6 2.59 7.41 4ZM19 6v11.59l1.39-1.39 1.41 1.41L19.41 20 18 21.41 16.59 20l-2.39-2.39 1.41-1.41L17 17.59V8h-6V6h8Z'/%3E%3C/svg%3E");
   }
 
+
+
   /* Admin/settings: neutral surfaces, actions aligned to the end, tabs on their own row. */
   &.admin .content__heading {
     display: block !important;

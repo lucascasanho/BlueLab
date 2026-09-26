@@ -17,11 +17,11 @@
 .rootBlue2 {
   margin: var(--space-4);
   margin-top: auto;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--blue2-border-soft, #17232c);
+  border-radius: 14px;
   display: block;
-  background: transparent;
+  background: var(--blue2-surface-raised, #101820);
   color: var(--blue2-muted, #9aa8b4);
   font-size: 13px;
   line-height: 1.45;
@@ -56,37 +56,33 @@
   align-items: baseline;
   gap: var(--space-2);
 
-  a,
-  .bugReportButton {
+  a {
     color: var(--color-text-secondary);
     text-decoration: underline;
-  }
 
-  .bugReportButton {
-    appearance: none;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    line-height: inherit;
-    cursor: pointer;
-    white-space: nowrap;
-  }
+    &[aria-current='page'] {
+      color: var(--color-text-primary);
+      text-decoration: none;
+    }
 
-  a,
-  .bugReportButton {
     &:hover,
     &:focus,
-    &:active,
-    &:focus-visible {
+    &:active {
       text-decoration: none;
     }
   }
+}
 
-  a[aria-current='page'] {
-    color: var(--color-text-primary);
-    text-decoration: none;
-  }
+
+.bugReportButton {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  cursor: pointer;
+  white-space: nowrap;
 }

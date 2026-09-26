@@ -60,29 +60,20 @@
   box-shadow: none;
 }
 
-.content
-  :global(.columns-area--mobile)
-  > :global(.column)
-  > :global(.scrollable),
+.content :global(.columns-area--mobile) > :global(.column) > :global(.scrollable),
 .advancedContent :global(.column) > :global(.scrollable) {
   border: 0;
   border-radius: 0;
   background: var(--m5-surface, var(--color-bg-secondary));
 }
 
-.content
-  :global(.columns-area--mobile)
-  > :global(.column)
-  :global(.column-header),
+.content :global(.columns-area--mobile) > :global(.column) :global(.column-header),
 .advancedContent :global(.column) :global(.column-header) {
   background: var(--m5-surface, var(--color-bg-secondary));
   border: 0;
 }
 
-.content
-  :global(.columns-area--mobile)
-  > :global(.column)
-  :global(.column-header),
+.content :global(.columns-area--mobile) > :global(.column) :global(.column-header),
 .advancedContent :global(.column) :global(.column-header) {
   border-radius: 16px 16px 0 0;
 }
@@ -100,56 +91,6 @@
   right: 24px;
   bottom: 24px;
   z-index: 50;
-}
-
-.desktopFooter {
-  position: fixed;
-  inset-inline-end: 24px;
-  inset-block-end: 88px;
-  z-index: 45;
-  max-width: min(620px, calc(100vw - 120px));
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding: 2px 0;
-  background: transparent;
-  color: var(--m5-muted, var(--color-text-secondary));
-  font-size: 12px;
-  line-height: 1.3;
-  text-align: end;
-  pointer-events: auto;
-
-  a,
-  button {
-    color: inherit;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-
-  button {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    font: inherit;
-    cursor: pointer;
-  }
-
-  a:hover,
-  a:focus-visible,
-  button:hover,
-  button:focus-visible {
-    color: var(--color-text-brand);
-    text-decoration: underline;
-    outline: none;
-  }
-
-  @media (width <= 1000px) {
-    max-width: calc(100vw - 120px);
-    font-size: 11px;
-  }
 }
 
 .advancedRoot {
@@ -345,8 +286,7 @@
 .content :global(.status),
 .content :global(.notification),
 .content :global(.notification-group) {
-  border-bottom: 1px solid
-    color-mix(in srgb, var(--m5-bg) 84%, var(--color-black) 16%);
+  border-bottom: 1px solid color-mix(in srgb, var(--m5-bg) 84%, var(--color-black) 16%);
   background: var(--m5-surface, var(--color-bg-secondary));
 }
 
@@ -618,10 +558,6 @@
     color: var(--color-text-brand) !important;
   }
 
-  .desktopFooter {
-    display: none;
-  }
-
   .mobileComposerLauncher {
     position: fixed;
     right: 16px;
@@ -704,10 +640,7 @@
     border-radius: 0;
   }
 
-  .content
-    :global(.columns-area--mobile)
-    > :global(.column)
-    :global(.column-header),
+  .content :global(.columns-area--mobile) > :global(.column) :global(.column-header),
   .advancedContent :global(.column) :global(.column-header) {
     border-radius: 0;
   }

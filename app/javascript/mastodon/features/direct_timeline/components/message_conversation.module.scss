@@ -68,16 +68,15 @@
   width: 100%;
   margin-block-end: var(--space-2xs);
   padding: var(--space-2xs) var(--space-xs);
-  border: 0;
-  border-inline-start: 2px solid var(--color-border-brand);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  border: 1px solid var(--color-border-primary);
+  border-inline-start: 3px solid var(--color-border-brand);
+  border-radius: var(--radius-sm);
   background: var(--color-bg-tertiary);
   color: var(--color-text-secondary);
-  font-size: 0.85em;
+  font-size: 0.82em;
   line-height: 1.35;
   text-align: start;
   overflow: hidden;
-  text-overflow: ellipsis;
   cursor: pointer;
 }
 
@@ -85,6 +84,71 @@
 .replyContext:focus-visible {
   background: var(--color-bg-secondary);
   color: var(--color-text-primary);
+}
+
+.replyContextHeader {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-3xs);
+  color: var(--color-text-secondary);
+  font-size: 0.95em;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.replyContextIcon {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  color: var(--color-text-brand);
+}
+
+.replyContextText {
+  display: -webkit-box;
+  margin-block-start: var(--space-3xs);
+  color: var(--color-text-primary);
+  line-height: 1.35;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+:global(body[data-theme='blue-2']) .message {
+  background: var(--blue2-surface-raised);
+  border-color: var(--blue2-border-soft);
+  color: var(--blue2-text);
+}
+
+:global(body[data-theme='blue-2']) .message[data-own-message='true'] {
+  background: var(--color-bg-brand-soft);
+}
+
+:global(body[data-theme='blue-2']) .replyContext {
+  border-color: var(--blue2-border-soft);
+  border-inline-start-color: var(--blue2-blue);
+  background: var(--blue2-search);
+  color: var(--blue2-muted);
+}
+
+:global(body[data-theme='blue-2']) .replyContext:hover,
+:global(body[data-theme='blue-2']) .replyContext:focus-visible {
+  background: var(--blue2-hover);
+  color: var(--blue2-text);
+}
+
+:global(body[data-theme='blue-2']) .replyContextHeader {
+  color: var(--blue2-muted);
+}
+
+:global(body[data-theme='blue-2']) .replyContextText {
+  color: var(--blue2-text);
+}
+
+:global(body[data-theme='blue-2']) .messageBody :global(.status__content),
+:global(body[data-theme='blue-2']) .messageBody :global(.status__content p) {
+  color: var(--blue2-text) !important;
 }
 
 .replyButton {

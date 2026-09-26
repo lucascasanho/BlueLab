@@ -102,9 +102,9 @@ export const PopoverMenuCard = <As extends React.ElementType>({
   strategy,
   matchReferenceWidth,
   closeOnClickOutside,
+  mobilePresentation = 'bottom-sheet',
   constrainToViewport,
   scrollable,
-  mobilePresentation = 'bottom-sheet',
   children,
   className,
   ...props
@@ -120,11 +120,7 @@ export const PopoverMenuCard = <As extends React.ElementType>({
       </BottomSheet>
     );
 
-    return container === null ? (
-      sheet
-    ) : (
-      <Portal container={container}>{sheet}</Portal>
-    );
+    return container === null ? sheet : <Portal container={container}>{sheet}</Portal>;
   }
 
   return (

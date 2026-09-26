@@ -38,8 +38,6 @@ import type { StatusShape } from '@/mastodon/models/status';
 import { makeGetStatus } from '@/mastodon/selectors';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
-import { groupConversations } from '../conversation_grouping';
-
 import classes from './message_conversation.module.scss';
 
 const messages = defineMessages({
@@ -73,20 +71,29 @@ export const MessageConversation: React.FC = () => {
     [conversationItems, id],
   );
 
-  const conversationGroup = useMemo(() => {
+  const nativeConversationId = conversation?.get('conversation_id') as
+    | string
+    | null
+    | undefined;
+
+  const threadConversations = useMemo(() => {
     if (!conversation) return [];
 
-    return (
-      groupConversations(conversationItems).find((group) =>
-        group.some((item) => item.get('id') === conversation.get('id')),
-      ) ?? []
-    );
-  }, [conversation, conversationItems]);
+    if (nativeConversationId) {
+      return conversationItems.filter(
+        (item) => item.get('conversation_id') === nativeConversationId,
+      ).toArray();
+    }
+
+    return conversationItems
+      .filter((item) => item.get('id') === conversation.get('id'))
+      .toArray();
+  }, [conversation, conversationItems, nativeConversationId]);
 
   const participantIds = useMemo(() => {
     const ids = new Set<string>();
 
-    conversationGroup.forEach((item) => {
+    threadConversations.forEach((item) => {
       const accounts = item.get('accounts');
 
       if (!Immutable.List.isList(accounts)) return;
@@ -99,7 +106,7 @@ export const MessageConversation: React.FC = () => {
     });
 
     return [...ids].sort();
-  }, [conversationGroup]);
+  }, [threadConversations]);
 
   const accounts = useAppSelector((state) => state.accounts);
 
@@ -147,9 +154,9 @@ export const MessageConversation: React.FC = () => {
     };
   }, [dispatch, id]);
 
-  const latestMatchingStatusId = useMemo(
+  const latestThreadStatusId = useMemo(
     () =>
-      conversationGroup.reduce<string | null>((latest, item) => {
+      threadConversations.reduce<string | null>((latest, item) => {
         const statusId = item.get('last_status') as string | null;
 
         if (!statusId) return latest;
@@ -157,20 +164,20 @@ export const MessageConversation: React.FC = () => {
 
         return latest;
       }, null),
-    [conversationGroup],
+    [threadConversations],
   );
 
   useEffect(() => {
-    if (!id || !latestMatchingStatusId) return;
+    if (!id || !latestThreadStatusId) return;
 
     setMessageStatusIds((current) =>
-      current.includes(latestMatchingStatusId)
+      current.includes(latestThreadStatusId)
         ? current
-        : [...current, latestMatchingStatusId].sort(compareId),
+        : [...current, latestThreadStatusId].sort(compareId),
     );
 
     void loadMessages();
-  }, [id, latestMatchingStatusId, loadMessages]);
+  }, [id, latestThreadStatusId, loadMessages]);
 
   useEffect(() => {
     if (id) {
@@ -301,26 +308,43 @@ export const MessageConversation: React.FC = () => {
                   <button
                     type='button'
                     className={classes.replyContext}
+                    aria-label={intl.formatMessage(
+                      {
+                        id: 'messages.conversation.replying_to',
+                        defaultMessage: 'Replying to {name}',
+                      },
+                      {
+                        name: replyTarget.getIn(['account', 'display_name']) ||
+                          replyTarget.getIn(['account', 'username']),
+                      },
+                    )}
                     onClick={() =>
                       document
                         .getElementById(`message-${replyTargetId}`)
                         ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
                     }
                   >
-                    <FormattedMessage
-                      id='messages.conversation.replying_to'
-                      defaultMessage='Replying to {name}: {text}'
-                      values={{
-                        name: (
-                          <DisplayNameSimple
-                            account={replyTarget.get('account')}
-                          />
-                        ),
-                        text:
-                          replyTargetText.slice(0, 80) +
-                          (replyTargetText.length > 80 ? '…' : ''),
-                      }}
-                    />
+                    <span className={classes.replyContextHeader}>
+                      <ReplyIcon
+                        className={classes.replyContextIcon}
+                        aria-hidden='true'
+                      />
+                      <FormattedMessage
+                        id='messages.conversation.replying_to'
+                        defaultMessage='Replying to {name}'
+                        values={{
+                          name: (
+                            <DisplayNameSimple
+                              account={replyTarget.get('account')}
+                            />
+                          ),
+                        }}
+                      />
+                    </span>
+                    <span className={classes.replyContextText}>
+                      {replyTargetText.slice(0, 120) +
+                        (replyTargetText.length > 120 ? '…' : '')}
+                    </span>
                   </button>
                 )}
 

@@ -13,7 +13,6 @@ import UnfoldLessIcon from '@/material-icons/400-24px/unfold_less.svg?react';
 import UnfoldMoreIcon from '@/material-icons/400-24px/unfold_more.svg?react';
 import type { IconProp } from 'mastodon/components/icon';
 import { Icon } from 'mastodon/components/icon';
-import { useBlue2ColumnPinning } from 'mastodon/features/ui/util/blue2_column_pinning';
 import { RenderIntoTabsBarPortal } from 'mastodon/features/ui/util/columns_context';
 import { useIdentity } from 'mastodon/identity_context';
 
@@ -22,6 +21,7 @@ import { NavigationFocusTarget } from '../navigation_focus_target';
 import { useAppHistory } from '../router';
 
 import { useColumn, useColumnIndexContext } from './context';
+import { useBlue2ColumnPinning } from 'mastodon/features/ui/util/blue2_column_pinning';
 
 export const messages = defineMessages({
   show: { id: 'column_header.show_settings', defaultMessage: 'Show settings' },
@@ -117,16 +117,13 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   const { signedIn } = useIdentity();
   const history = useAppHistory();
   const blue2ColumnPinning = useBlue2ColumnPinning();
-  const blue2EffectiveMultiColumn = blue2ColumnPinning.active
-    ? true
-    : multiColumn;
+  const blue2EffectiveMultiColumn = blue2ColumnPinning.active ? true : multiColumn;
   const effectivePinned =
     pinned ?? (blue2ColumnPinning.canPin ? blue2ColumnPinning.pinned : false);
   const effectiveOnPin =
     onPin ?? (blue2ColumnPinning.canPin ? blue2ColumnPinning.onPin : undefined);
   const effectiveOnMove =
-    onMove ??
-    (blue2ColumnPinning.canPin ? blue2ColumnPinning.onMove : undefined);
+    onMove ?? (blue2ColumnPinning.canPin ? blue2ColumnPinning.onMove : undefined);
   const [collapsed, setCollapsed] = useState(true);
   const [animating, setAnimating] = useState(false);
 

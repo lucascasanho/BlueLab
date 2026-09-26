@@ -8,7 +8,7 @@
   /blocks
   /bookmarks
   /collections/(*any)
-  /conversations/(*any)
+  /conversations
   /deck/(*any)
   /directory
   /domain_blocks

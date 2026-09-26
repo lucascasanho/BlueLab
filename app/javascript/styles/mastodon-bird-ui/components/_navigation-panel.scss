@@ -358,7 +358,6 @@
     height: 24px;
     width: 24px;
   }
-
   // Bird UI shell order: logo -> menu -> compose -> flexible space ->
   // profile -> footer. These are direct children of the navigation panel,
   // while navigation-ordering.scss already assigns orders to logo/menu/spacer.
@@ -406,6 +405,7 @@
     margin: 0 0 52px;
   }
 
+
   // Bird UI owns this navigation menu. Keep the DOM/source order instead of
   // inheriting the legacy <li> ordering rules that were written for the old
   // flat menu structure.
@@ -434,4 +434,5 @@
     min-width: 0;
     overflow: visible;
   }
+
 }

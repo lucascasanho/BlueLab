@@ -124,15 +124,10 @@ export default function api(withAuthorization = true) {
       const status = error.response?.status;
       const url = error.config?.url;
 
-      if (
-        url !== '/api/v1/bug_reports' &&
-        (status === undefined || status >= 500 || status === 429)
-      ) {
+      if (url !== '/api/v1/bug_reports' && (status === undefined || status >= 500 || status === 429)) {
         recordClientError({
           type: 'api',
-          message: status
-            ? `API request failed with HTTP ${status}`
-            : 'API request failed without a response',
+          message: status ? `API request failed with HTTP ${status}` : 'API request failed without a response',
           status,
           method: error.config?.method,
           url,

@@ -5,12 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 
-import {
-  CaretRightIcon,
-  HouseIcon,
-  StackIcon,
-  StarIcon,
-} from '@phosphor-icons/react';
+import { CaretRightIcon, StackIcon, StarIcon } from '@phosphor-icons/react';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import { useAccount } from '@/mastodon/hooks/useAccount';
@@ -150,12 +145,6 @@ export const Blue2Navigation: React.FC<{
       {signedIn && <Blue2AccountMenu compact={compact && !expanded} />}
 
       <div className={classes.items}>
-        {compact && (
-          <Item to='/home' icon={HouseIcon} exact>
-            <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
-          </Item>
-        )}
-
         <Item to='/explore' icon={Blue2SearchIcon}>
           <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
         </Item>

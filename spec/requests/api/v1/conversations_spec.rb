@@ -126,20 +126,40 @@ RSpec.describe 'API V1 Conversations' do
         .to contain_exactly(first.id.to_s, second.id.to_s)
     end
 
-    it 'returns all messages for matching participants' do
-      first = PostStatusService.new.call(other.account, text: 'First @alice', visibility: 'direct')
-      second = PostStatusService.new.call(other.account, text: 'Second @alice', visibility: 'direct')
+    it 'does not mix statuses from another thread with the same participants' do
+      first = PostStatusService.new.call(
+        other.account,
+        text: 'First @alice',
+        visibility: :direct,
+      )
+      second = PostStatusService.new.call(
+        other.account,
+        text: 'Second @alice',
+        visibility: :direct,
+      )
 
-      conversation = AccountConversation.where(account: user.account).find do |item|
-        item.participant_account_ids.include?(other.account.id)
-      end
+      conversation = AccountConversation.where(
+        account: user.account,
+        conversation_id: first.conversation_id,
+      ).first
 
       expect(conversation).to be_present
+
+      alternate_thread = Conversation.create!
+      AccountConversation.create!(
+        account: user.account,
+        conversation: alternate_thread,
+        participant_account_ids: [other.account.id],
+        status_ids: [second.id],
+        unread: false,
+      )
+
+      conversation.update!(status_ids: [first.id])
 
       get "/api/v1/conversations/#{conversation.id}/messages", headers: headers
 
       expect(response).to have_http_status(200)
-      expect(response.parsed_body.map { |status| status[:id] }).to eq([first.id.to_s, second.id.to_s])
+      expect(response.parsed_body.map { |status| status[:id] }).to eq([first.id.to_s])
     end
   end
 end

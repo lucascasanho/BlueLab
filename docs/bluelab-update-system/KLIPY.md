@@ -1,11 +1,11 @@
-# KLIPY no BlueLab-Test
+# KLIPY
 
-O picker de GIF do compositor novo é opcional e fica ativo quando
-`VITE_KLIPY_API_KEY` existe no ambiente de produção usado pelo build Vite.
+O picker de GIF do compositor novo usa a API da KLIPY e fica disponível quando
+`VITE_KLIPY_API_KEY` está configurada durante o build do frontend.
 
-## Instalação do comando
+## Comando
 
-Depois de atualizar a cópia local para a branch `BlueLab-Test`, instale o comando uma vez:
+Instale o comando uma vez:
 
 ```bash
 cd ~/blue
@@ -14,46 +14,26 @@ mkdir -p ~/.local/bin
 install -m 0755 bin/klippy ~/.local/bin/klippy
 ```
 
-Verifique:
-
-```bash
-command -v klippy
-```
-
-## Ativação
-
-Execute:
+Depois execute-o de dentro da árvore Git da instância:
 
 ```bash
 klippy
 ```
 
-O comando:
+O comando identifica automaticamente a árvore da instalação e procura os serviços
+systemd de web, Sidekiq e streaming cujo `WorkingDirectory` ou comando de
+execução aponta para essa mesma árvore. Ele não depende de nomes como
+`blue-web` ou `espelunca-web`.
 
-1. confirma que está na branch `BlueLab-Test`;
-2. pede a chave Test da KLIPY no terminal sem mostrar os caracteres;
-3. grava a chave somente em `.env.production`;
-4. executa `yarn build:production`;
-5. só reinicia o Blue se o build terminar com sucesso;
-6. verifica se `blue-web.service` ficou ativo.
+A chave é validada primeiro contra `/v2/featured` da KLIPY. Somente depois de
+uma resposta válida o comando atualiza `.env.production`, executa
+`yarn build:production` e reinicia os serviços detectados. Se o build falhar,
+nenhum serviço é reiniciado.
 
-A chave não deve ser commitada ou publicada no GitHub.
-
-## Desativação
-
-Para remover o recurso do build local:
-
-```bash
-cd ~/blue
-sed -i '/^VITE_KLIPY_API_KEY=/d' .env.production
-yarn build:production
-blue-reiniciar
-```
-
-## Observação sobre a chave
-
-A integração usa a chave no cliente porque o Vite incorpora `VITE_*` ao bundle. Portanto a chave Test não deve ser tratada como segredo de servidor.
+A chave não deve ser commitada no Git. Como é uma variável `VITE_*`, ela entra
+no bundle do navegador durante a compilação.
 
 Fontes:
 - https://docs.klipy.com/
 - https://docs.klipy.com/stickers-api
+- https://www.freedesktop.org/software/systemd/man/systemctl.html

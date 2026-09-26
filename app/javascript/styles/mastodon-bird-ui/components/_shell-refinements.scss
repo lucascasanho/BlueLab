@@ -88,6 +88,7 @@ body[data-theme='mastodon-bird-ui-auto'] {
   }
 }
 
+
 // Bird UI desktop right rail: reuse the BlueLab rail without affecting
 // mobile/tablet layouts that do not have enough horizontal space.
 .bird-ui-right-rail {
@@ -99,13 +100,13 @@ body[data-theme='mastodon-bird-ui-auto'] {
   min-height: 0;
 }
 
-@media screen and (width <= 1279px) {
+@media screen and (max-width: 1279px) {
   .bird-ui-right-rail {
     display: none;
   }
 }
 
-@media screen and (width >= 1280px) {
+@media screen and (min-width: 1280px) {
   // The legacy compositional pane is only a mobile compose host. Bird UI
   // now has its compose action in the right rail, so do not reserve an
   // empty desktop flex item for the old host.

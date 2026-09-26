@@ -8,10 +8,6 @@ import { debounce } from 'lodash';
 import { expandConversations } from 'mastodon/actions/conversations';
 import ScrollableList from 'mastodon/components/scrollable_list';
 
-import {
-  groupedConversationRepresentatives,
-} from '../conversation_grouping';
-
 import { Conversation } from './conversation';
 
 export const ConversationsList = ({ scrollKey, ...other }) => {
@@ -21,14 +17,50 @@ export const ConversationsList = ({ scrollKey, ...other }) => {
   const hasMore = useSelector(state => state.getIn(['conversations', 'hasMore'], false));
   const dispatch = useDispatch();
 
-  const groupedConversations = useMemo(
-    () => groupedConversationRepresentatives(conversations),
-    [conversations],
-  );
+  const groupedConversations = useMemo(() => {
+    const groups = new Map();
 
-  // Immutable.List uses .last(), while Array.prototype.at() is not available
-  // in all runtime paths used by the Mastodon web bundle.
-  const lastStatusId = conversations.last()?.get('last_status');
+    conversations.forEach(conversation => {
+      const accountIds = conversation
+        .get('accounts')
+        .sort()
+        .join(',');
+
+      if (!groups.has(accountIds)) {
+        groups.set(accountIds, conversation);
+        return;
+      }
+
+      const current = groups.get(accountIds);
+      const currentStatusId = current.get('last_status');
+      const nextStatusId = conversation.get('last_status');
+
+      if (
+        nextStatusId &&
+        (!currentStatusId || nextStatusId.localeCompare(currentStatusId) > 0)
+      ) {
+        groups.set(accountIds, conversation.set(
+          'unread',
+          current.get('unread') || conversation.get('unread'),
+        ));
+      } else if (conversation.get('unread') && !current.get('unread')) {
+        groups.set(accountIds, current.set('unread', true));
+      }
+    });
+
+    return Array.from(groups.values()).sort((a, b) => {
+      const aStatusId = a.get('last_status');
+      const bStatusId = b.get('last_status');
+
+      if (!aStatusId || !bStatusId) {
+        return 0;
+      }
+
+      return bStatusId.localeCompare(aStatusId);
+    });
+  }, [conversations]);
+
+  const lastStatusId = groupedConversations.at(-1)?.get('last_status');
 
   const debouncedLoadMore = useMemo(() => debounce(id => {
     dispatch(expandConversations({ maxId: id }));
