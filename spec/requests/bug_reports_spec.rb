@@ -3,6 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe 'Public bug reports' do
+  it 'serves the public form directly' do
+    get '/bug_reports/new'
+
+    expect(response).to have_http_status(:ok)
+    expect(response).to include('bug-report-form')
+  end
   describe 'GET /bug_reports/new' do
     it 'renders for anonymous visitors' do
       get '/bug_reports/new'
