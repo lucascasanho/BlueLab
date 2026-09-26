@@ -134,7 +134,11 @@ export const MessageConversation: React.FC = () => {
     if (!id) return Promise.resolve([]);
 
     return dispatch(fetchConversationMessages(id)).then((statuses) => {
-      setMessageStatusIds(statuses.map((status) => status.id));
+      const fetchedStatusIds = statuses.map((status) => status.id);
+
+      setMessageStatusIds((current) =>
+        [...new Set([...current, ...fetchedStatusIds])].sort(compareId),
+      );
       return statuses;
     });
   }, [dispatch, id]);
