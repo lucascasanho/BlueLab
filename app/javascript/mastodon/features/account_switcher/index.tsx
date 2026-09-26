@@ -7,7 +7,7 @@ import { MenuItemGroup } from '@/mastodon/components/menu';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
-  getAccountSwitcherToken,
+  getAccountSwitcherSessionId,
   registrationsOpen,
 } from '@/mastodon/initial_state';
 
@@ -20,11 +20,11 @@ export interface StoredAccount {
   displayName: string;
   avatar: string;
   url: string;
-  token: string;
+  sessionId: string;
   lastUsedAt: number;
 }
 
-const STORAGE_KEY = 'mastodon_bluelab_account_switcher';
+const STORAGE_KEY = 'mastodon_bluelab_account_switcher_v2';
 const MAX_STORED_ACCOUNTS = 10;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -38,7 +38,7 @@ const isStoredAccount = (value: unknown): value is StoredAccount =>
   typeof value.displayName === 'string' &&
   typeof value.avatar === 'string' &&
   typeof value.url === 'string' &&
-  typeof value.token === 'string' &&
+  typeof value.sessionId === 'string' &&
   typeof value.lastUsedAt === 'number';
 
 export const readStoredAccounts = (): StoredAccount[] => {
@@ -94,7 +94,7 @@ export const removeStoredAccount = (accountId: string): StoredAccount[] => {
 
 const switchToStoredAccount = async (account: StoredAccount) => {
   await api(false).post('/auth/account_switcher/switch', {
-    token: account.token,
+    session_id: account.sessionId,
   });
 
   window.location.assign(window.location.href);
@@ -113,10 +113,10 @@ interface AccountSwitcherState {
 const useCurrentAccountSession = () => {
   const { signedIn, accountId } = useIdentity();
   const account = useAccount(accountId);
-  const accountSwitcherToken = getAccountSwitcherToken();
+  const accountSwitcherSessionId = getAccountSwitcherSessionId();
 
   useEffect(() => {
-    if (!signedIn || !account || !accountId || !accountSwitcherToken) {
+    if (!signedIn || !account || !accountId || !accountSwitcherSessionId) {
       return;
     }
 
@@ -127,10 +127,10 @@ const useCurrentAccountSession = () => {
       displayName: account.display_name.trim() || account.username,
       avatar: account.avatar,
       url: account.url ?? '',
-      token: accountSwitcherToken,
+      sessionId: accountSwitcherSessionId,
       lastUsedAt: Date.now(),
     });
-  }, [account, accountId, accountSwitcherToken, signedIn]);
+  }, [account, accountId, accountSwitcherSessionId, signedIn]);
 
   return { signedIn, accountId };
 };
