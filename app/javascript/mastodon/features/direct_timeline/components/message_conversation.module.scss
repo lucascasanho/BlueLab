@@ -373,7 +373,7 @@
   min-width: 0;
   min-height: 100%;
   margin-top: auto;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 :global(body[data-theme='blue-2']) .replyComposer {
@@ -399,6 +399,10 @@
 }
 
 @media (width <= 1174px) {
+  // Keep the message column as a self-contained viewport. The bottom
+  // navigation remains outside it, so the composer stays in normal flex flow
+  // exactly above the navigation and moves to the viewport bottom when the
+  // navigation chrome is hidden.
   :global(body[data-theme='blue-2']) .column {
     height: calc(
       100dvh -
@@ -412,27 +416,11 @@
     );
   }
 
-  :global(body[data-theme='blue-2']) .messageList {
-    padding-bottom: calc(88px + var(--space-md));
-    scroll-padding-bottom: calc(88px + var(--space-md));
-  }
-
-  :global(body[data-theme='blue-2'])
-    .replyComposer[data-bluelab-composer-compact='true'] {
-    position: fixed;
-    inset-inline: 0;
-    bottom: calc(var(--mobile-bottom-nav-height, 64px));
-    width: 100vw;
-    max-width: none;
-    margin: 0;
-    padding: var(--space-sm);
-    box-sizing: border-box;
-  }
-
   :global(body[data-theme='blue-2'])
     :global(.ui--mobile-chrome-hidden)
-    .replyComposer[data-bluelab-composer-compact='true'] {
-    bottom: 0;
+    .column {
+    height: calc(100dvh - 56px);
+    max-height: calc(100dvh - 56px);
   }
 
   :global(body[data-theme='blue-2'])
@@ -447,7 +435,6 @@
     max-height: 7rem;
   }
 }
-
 @media (width >= 1175px) {
   :global(body[data-theme='blue-2']) .advancedColumn {
     height: 100dvh;
