@@ -77,6 +77,15 @@ export interface PopoverProps {
    */
   closeOnClickOutside?: boolean;
   /**
+   * Constrain the popover to the available viewport space.
+   */
+  constrainToViewport?: boolean;
+  /**
+   * Make the popover element vertically scrollable when its content exceeds
+   * the available viewport space.
+   */
+  scrollable?: boolean;
+  /**
    * Render prop that must return the popover element.
    */
   children: (value: {
@@ -119,6 +128,8 @@ export const Popover: React.FC<PopoverProps> = ({
   container,
   matchReferenceWidth = false,
   closeOnClickOutside = true,
+  constrainToViewport = false,
+  scrollable = false,
   children,
 }) => {
   const {
@@ -141,12 +152,27 @@ export const Popover: React.FC<PopoverProps> = ({
       inline(),
       shift(),
       flip ? flipMiddleware() : null,
-      matchReferenceWidth
+      matchReferenceWidth || constrainToViewport
         ? size({
-            apply({ rects, elements }) {
-              Object.assign(elements.floating.style, {
-                minWidth: `${rects.reference.width}px`,
-              });
+            apply({ rects, elements, availableHeight }) {
+              const styles: Record<string, string> = {};
+
+              if (matchReferenceWidth) {
+                styles.minWidth = `${rects.reference.width}px`;
+              }
+
+              if (constrainToViewport) {
+                styles.maxHeight = `${Math.max(0, availableHeight - 16)}px`;
+              }
+
+              if (scrollable) {
+                styles.overflowY = 'auto';
+                styles.overflowX = 'hidden';
+                styles.overscrollBehavior = 'contain';
+                styles.touchAction = 'pan-y';
+              }
+
+              Object.assign(elements.floating.style, styles);
             },
           })
         : null,
