@@ -195,6 +195,7 @@ export function replyComposeInline(status) {
     dispatch({
       type: COMPOSE_REPLY,
       status,
+      inline: true,
     });
 
     if (isRedesignEnabled()) {
@@ -288,6 +289,7 @@ export function directComposeInline(account) {
   return {
     type: COMPOSE_DIRECT,
     account,
+    inline: true,
   };
 }
 
