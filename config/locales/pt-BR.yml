@@ -2128,7 +2128,7 @@ pt-BR:
     nickname_hint: Por exemplo, iPhone, Windows Hello ou YubiKey
     not_supported: Este navegador não oferece suporte a passkeys.
     registered_on: Adicionada em %{date}
-    sign_in: Entrar com uma passkey
+    sign_in: Chave de acesso
     title: Passkeys
   polls:
     errors:
