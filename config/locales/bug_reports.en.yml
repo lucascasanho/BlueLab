@@ -9,6 +9,8 @@ en:
       id: ID
       reported_by: Reported by
       created_at: Created
+      anonymous: Anonymous
+      error_page: Error page
       status: Status
       assigned_to: Assigned to
       attachments: Attachments
