@@ -12,30 +12,25 @@
 - if @verification_requests.empty?
   = nothing_here 'nothing-here--under-tabs'
 - else
-  .table-wrapper
-    %table.table
-      %thead
-        %tr
-          %th= t('admin.verification_requests.id')
-          %th= t('admin.verification_requests.account')
-          %th= t('admin.verification_requests.requested_at')
-          %th= t('admin.verification_requests.explanation')
-          %th= t('admin.verification_requests.status')
-          %th
-      %tbody
-        - @verification_requests.each do |verification_request|
-          %tr
-            %td= verification_request.id
-            %td= admin_account_link_to verification_request.account
-            %td
-              %time.time-ago{ datetime: verification_request.created_at.iso8601, title: l(verification_request.created_at) }
-                = l(verification_request.created_at)
-            %td
-              .one-line= truncate(verification_request.explanation, length: 120)
-            %td= t("admin.verification_requests.status_#{verification_request.status}")
-            %td
-              = link_to t('admin.verification_requests.view'), admin_verification_request_path(verification_request)
-              - if verification_request.pending?
-                = button_to t('admin.verification_requests.approve'), approve_admin_verification_request_path(verification_request), method: :post, class: 'button button--compact', data: { confirm: t('admin.accounts.are_you_sure') }
-                = button_to t('admin.verification_requests.deny'), deny_admin_verification_request_path(verification_request), method: :post, class: 'button', data: { confirm: t('admin.accounts.are_you_sure') }
+  .announcements-list.verification-requests-list
+    - @verification_requests.each do |verification_request|
+      .announcements-list__item
+        = link_to admin_verification_request_path(verification_request), class: 'announcements-list__item__title' do
+          = t('admin.verification_requests.request_title', id: verification_request.id)
+
+        .announcements-list__item__action-bar.verification-request-action-bar
+          .announcements-list__item__meta
+            = admin_account_link_to verification_request.account
+            |
+            %time.time-ago{ datetime: verification_request.created_at.iso8601, title: l(verification_request.created_at) }
+              = l(verification_request.created_at)
+            |
+            = t("admin.verification_requests.status_#{verification_request.status}")
+
+          .announcements-list__item__actions.verification-request-actions
+            = link_to t('admin.verification_requests.view'), admin_verification_request_path(verification_request), class: 'button button-secondary button--compact'
+            - if verification_request.pending?
+              = button_to t('admin.verification_requests.approve'), approve_admin_verification_request_path(verification_request), method: :post, class: 'button button-secondary button--compact', data: { confirm: t('admin.accounts.are_you_sure') }
+              = button_to t('admin.verification_requests.deny'), deny_admin_verification_request_path(verification_request), method: :post, class: 'button button--dangerous button--compact', data: { confirm: t('admin.accounts.are_you_sure') }
+        
   = paginate @verification_requests
