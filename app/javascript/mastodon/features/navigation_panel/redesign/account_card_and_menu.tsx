@@ -92,7 +92,11 @@ export const NavigationAccountCardAndMenu: React.FC<{
           placement='top-end'
           strategy='fixed'
           offset={8}
+          constrainToViewport
+          scrollable
           maxWidth='min(280px, calc(100vw - 2 * var(--space-sm)))'
+          constrainToViewport
+          scrollable
           data-testid='account-menu'
         >
           <AccountMenuItems />
