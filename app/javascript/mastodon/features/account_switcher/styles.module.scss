@@ -1,0 +1,257 @@
+.section {
+  padding: 2px 0 4px;
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
+}
+
+
+.navigationSection {
+  margin: 0;
+  padding: 0;
+
+  > ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+.header {
+  min-height: 30px;
+  padding: 3px 8px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: none;
+}
+
+.count {
+  min-width: 20px;
+  min-height: 18px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--color-bg-secondary, var(--blue2-hover, currentColor));
+  color: var(--color-text-secondary, var(--blue2-muted, currentColor));
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.accounts {
+  display: grid;
+  gap: 2px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.accountRow,
+.navigationAccountRow {
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  list-style: none;
+}
+
+.accountButton,
+.navigationAccountButton {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 48px;
+  flex: 1 1 auto;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: var(--radius-sm, 8px);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: transparent;
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
+  text-align: start;
+  cursor: pointer;
+}
+
+.accountButton {
+  width: 100%;
+}
+
+.accountButton:hover:not(:disabled),
+.accountButton:focus-visible:not(:disabled),
+.navigationAccountButton:hover:not(:disabled),
+.navigationAccountButton:focus-visible:not(:disabled) {
+  background: var(--color-bg-highlight, var(--blue2-hover, rgb(127 127 127 / 12%)));
+  outline: none;
+}
+
+.accountButton[aria-current='page'],
+.navigationAccountButton[aria-current='page'] {
+  background: var(--color-bg-secondary, var(--blue2-hover, rgb(127 127 127 / 10%)));
+}
+
+.accountButton:disabled,
+.navigationAccountButton:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.avatar {
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  object-fit: cover;
+  background: var(--color-bg-secondary, var(--blue2-hover, rgb(127 127 127 / 12%)));
+}
+
+.accountText {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.accountText strong,
+.accountText > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.accountText strong {
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.accountText > span {
+  color: var(--color-text-secondary, var(--blue2-muted, currentColor));
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.current {
+  flex: 0 0 auto;
+  max-width: 58px;
+  overflow: hidden;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: var(--color-bg-secondary, var(--blue2-hover, rgb(127 127 127 / 10%)));
+  color: var(--color-text-secondary, var(--blue2-muted, currentColor));
+  font-size: 10px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.removeButton {
+  flex: 0 0 32px;
+  width: 32px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm, 8px);
+  background: transparent;
+  color: var(--color-text-secondary, var(--blue2-muted, currentColor));
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.removeButton:hover,
+.removeButton:focus-visible {
+  background: var(--color-bg-highlight, var(--blue2-hover, rgb(127 127 127 / 12%)));
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
+  outline: none;
+}
+
+.divider {
+  height: 1px;
+  margin: 6px 4px;
+  background: var(--color-border-primary, var(--blue2-border-soft, rgb(127 127 127 / 20%)));
+}
+
+.action,
+.navigationAction {
+  box-sizing: border-box;
+  min-height: 42px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm, 8px);
+  display: flex;
+  align-items: center;
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.action {
+  width: 100%;
+}
+
+.action:hover,
+.action:focus-visible,
+.navigationAction:hover,
+.navigationAction:focus-visible {
+  background: var(--color-bg-highlight, var(--blue2-hover, rgb(127 127 127 / 12%)));
+  color: var(--color-text-primary, var(--blue2-text, currentColor));
+  text-decoration: none;
+  outline: none;
+}
+
+.error,
+.navigationError {
+  margin: 6px 8px 4px;
+  color: var(--color-text-secondary, var(--blue2-muted, currentColor));
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.navigationError {
+  margin: 4px var(--space-sm) 6px;
+}
+
+.navigationAccountRow {
+  width: 100%;
+}
+
+.navigationAccountButton {
+  min-height: 50px;
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.navigationAction {
+  width: 100%;
+  text-decoration: none;
+}
+
+@media (width < 600px) {
+  .section {
+    padding-block-end: 2px;
+  }
+
+  .accountButton,
+  .navigationAccountButton {
+    min-height: 48px;
+  }
+
+  .action,
+  .navigationAction {
+    min-height: 46px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accountButton,
+  .navigationAccountButton,
+  .removeButton,
+  .action,
+  .navigationAction {
+    transition: none;
+  }
+}

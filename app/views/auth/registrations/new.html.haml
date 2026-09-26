@@ -1,8 +1,10 @@
+- account_switcher_flow = ActiveModel::Type::Boolean.new.cast(params[:account_switcher])
+
 - content_for :page_title do
-  = t('auth.register')
+  = account_switcher_flow ? t('auth.sign_up.another_account.title') : t('auth.register')
 
 - content_for :blue2_auth_title do
-  = t('auth.register')
+  = account_switcher_flow ? t('auth.sign_up.another_account.title') : t('auth.register')
 
 - content_for :blue2_auth_subtitle do
   = t('auth.sign_up.preamble', site_title: site_title)
@@ -10,7 +12,7 @@
 - content_for :header_tags do
   = render partial: 'shared/og', locals: { description: description_for_sign_up(@invite) }
 
-= simple_form_for(resource, as: resource_name, url: registration_path(resource_name), html: { novalidate: false }) do |f|
+= simple_form_for(resource, as: resource_name, url: registration_path(resource_name, account_switcher: account_switcher_flow ? '1' : nil), html: { novalidate: false }) do |f|
   = render 'auth/shared/progress', stage: 'details'
 
   %h1.title= t('auth.sign_up.title', domain: site_hostname)
@@ -90,3 +92,6 @@
 
   .actions
     = f.button :button, @invite&.bypass_approval? ? t('auth.register') : sign_up_message, type: :submit
+
+
+.form-footer= render 'auth/shared/links'

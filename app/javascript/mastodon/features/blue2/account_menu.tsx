@@ -19,6 +19,7 @@ import {
   UsersThreeIcon,
 } from '@phosphor-icons/react';
 
+import { AccountSwitcherMenuSection } from '@/mastodon/features/account_switcher';
 import { openModal } from '@/mastodon/actions/modal';
 import { Avatar } from '@/mastodon/components/avatar';
 import { VerifiedBadge } from '@/mastodon/components/display_name/verified_badge';
@@ -108,6 +109,8 @@ export const Blue2AccountMenu: React.FC<{
 
   const menuContent = (
     <>
+      <AccountSwitcherMenuSection variant='blue2' />
+      <div className={classes.menuDivider} role='separator' />
       <NavLink
         to='/profile/edit'
         className={classes.menuItem}

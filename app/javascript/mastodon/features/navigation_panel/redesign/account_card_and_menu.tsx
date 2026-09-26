@@ -19,6 +19,7 @@ import {
 } from '@phosphor-icons/react';
 
 import { openModal } from '@/mastodon/actions/modal';
+import { AccountSwitcherMenuSection } from '@/mastodon/features/account_switcher';
 import { Avatar } from '@/mastodon/components/avatar';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { DisplayName } from '@/mastodon/components/display_name';
@@ -304,6 +305,9 @@ export const AccountMenuItems: React.FC<{
 
   return (
     <>
+      <AccountSwitcherMenuSection variant='navigation' />
+      <MenuItemDivider />
+
       {context === 'mobile' && <ProfileMenuItem />}
 
       <MenuItemLink to='/profile/edit' icon={UserIcon}>
