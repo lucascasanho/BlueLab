@@ -40,7 +40,7 @@ class InitialStateSerializer < ActiveModel::Serializer
                                                 Setting.hide_status_character_counter
                                               end
       store[:wrapstodon] = wrapstodon
-      store[:account_switcher_token] = account_switcher_token
+      store[:account_switcher_token] = object.current_account.user.account_switcher_token
     else
       store[:auto_play_gif] = Setting.auto_play_gif
       store[:display_media] = Setting.display_media
