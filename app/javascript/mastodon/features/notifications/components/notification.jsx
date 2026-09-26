@@ -71,14 +71,22 @@ class Notification extends ImmutablePureComponent {
     cacheMediaWidth: PropTypes.func,
     cachedMediaWidth: PropTypes.number,
     unread: PropTypes.bool,
+    onOpenConversation: PropTypes.func.isRequired,
     ...WithRouterPropTypes,
   };
 
   handleOpen = () => {
-    const { notification } = this.props;
+    const { notification, status } = this.props;
 
     if (notification.get('status')) {
-      this.props.history.push(`/@${notification.getIn(['status', 'account', 'acct'])}/${notification.get('status')}`);
+      if (status?.get('visibility') === 'direct') {
+        this.props.onOpenConversation(status.get('id'));
+        return;
+      }
+
+      this.props.history.push(
+        `/@${notification.getIn(['status', 'account', 'acct'])}/${notification.get('status')}`,
+      );
     } else {
       this.handleOpenProfile();
     }
@@ -175,6 +183,7 @@ class Notification extends ImmutablePureComponent {
         cachedMediaWidth={this.props.cachedMediaWidth}
         cacheMediaWidth={this.props.cacheMediaWidth}
         unread={this.props.unread}
+        onOpen={this.handleOpen}
       />
     );
   }
