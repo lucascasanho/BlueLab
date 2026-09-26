@@ -5,8 +5,8 @@
   = link_to t('admin.verification_requests.back'), admin_verification_requests_path(status: 'pending'), class: 'button'
 
   - if @verification_request.pending?
-    = link_to t('admin.verification_requests.approve'), approve_admin_verification_request_path(@verification_request), method: :post, class: 'button', data: { confirm: t('admin.accounts.are_you_sure') }
-    = link_to t('admin.verification_requests.deny'), deny_admin_verification_request_path(@verification_request), method: :post, class: 'button', data: { confirm: t('admin.accounts.are_you_sure') }
+    = button_to t('admin.verification_requests.approve'), approve_admin_verification_request_path(@verification_request), method: :post, class: 'button', data: { confirm: t('admin.accounts.are_you_sure') }
+    = button_to t('admin.verification_requests.deny'), deny_admin_verification_request_path(@verification_request), method: :post, class: 'button', data: { confirm: t('admin.accounts.are_you_sure') }
 
 .report-header
   .report-header__card

@@ -126,6 +126,7 @@ export const VerificationRequestTrigger: FC = () => {
     (event: MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
       setError(false);
+      setTriggerElement(event.currentTarget);
       setOpen(true);
     },
     [],
@@ -138,7 +139,6 @@ export const VerificationRequestTrigger: FC = () => {
   return (
     <>
       <Button
-        ref={setTriggerElement}
         className={editClasses.editButton}
         type='button'
         aria-haspopup='dialog'
