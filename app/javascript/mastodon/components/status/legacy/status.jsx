@@ -7,7 +7,8 @@ import classNames from 'classnames';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { ImmutablePureComponent } from 'react-immutable-pure-component';
 
-import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
+import { ChatCircleDotsIcon } from '@phosphor-icons/react';
+import { VisibilityIcon } from '@/mastodon/components/visibility_icon';
 import RepeatIcon from '@/material-icons/400-24px/repeat.svg?react';
 import { Hotkeys } from '@/mastodon/components/hotkeys';
 import { Icon }  from '@/mastodon/components/icon';
@@ -456,7 +457,15 @@ class Status extends ImmutablePureComponent {
     } else if (status.get('visibility') === 'direct') {
       prepend = (
         <div className='status__prepend'>
-          <div className='status__prepend__icon'><Icon id='at' icon={AlternateEmailIcon} /></div>
+          <div className='status__prepend__icon'>
+            <Icon
+              id='message'
+              icon={ChatCircleDotsIcon}
+              width={18}
+              height={18}
+              aria-hidden='true'
+            />
+          </div>
           <FormattedMessage id='status.direct_indicator' defaultMessage='Private mention' tagName='span' />
         </div>
       );
