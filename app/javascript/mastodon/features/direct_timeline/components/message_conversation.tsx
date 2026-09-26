@@ -30,7 +30,6 @@ import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
 import { me } from '@/mastodon/initial_state';
 import type { StatusShape } from '@/mastodon/models/status';
 import { makeGetStatus } from '@/mastodon/selectors';
-import { importFetchedStatus } from '@/mastodon/actions/importer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import classes from './message_conversation.module.scss';
