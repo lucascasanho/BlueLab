@@ -6,6 +6,29 @@
   color: var(--blue2-text, #f7f7f8);
 }
 
+// The DirectTimeline component receives these classes from the React shell.
+// Keep their geometry local to BlueLab messages so no generic Mastodon column
+// sizing is changed.
+.column {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.advancedColumn {
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.conversationColumn {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .header {
   min-height: 58px;
   padding: 0 16px;
