@@ -55,13 +55,13 @@ export const NavigationFooterLinks: React.FC<{
           </NavLink>
         </li>
         <li>
-            <button
+          <button
               type='button'
               className={classes.bugReportButton}
               onClick={openBugReport}
             >
               <BugReportLabel />
-            </button>
+          </button>
         </li>
         {termsOfServiceEnabled && (
           <li>
