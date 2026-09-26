@@ -7,8 +7,7 @@ import classNames from 'classnames';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { ImmutablePureComponent } from 'react-immutable-pure-component';
 
-import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
-import { ChatCircleDotsIcon } from '@phosphor-icons/react';
+import { VisibilityIcon } from '@/mastodon/components/visibility_icon';
 import RepeatIcon from '@/material-icons/400-24px/repeat.svg?react';
 import { Hotkeys } from '@/mastodon/components/hotkeys';
 import { Icon }  from '@/mastodon/components/icon';
@@ -424,8 +423,6 @@ class Status extends ImmutablePureComponent {
       onTranslate: this.handleTranslate,
     };
 
-    const isBlue2 = typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
-
     let media, prepend, rebloggedByText;
 
     const connectUp = previousId && previousId === status.get('in_reply_to_id');
@@ -460,13 +457,7 @@ class Status extends ImmutablePureComponent {
       prepend = (
         <div className='status__prepend'>
           <div className='status__prepend__icon'>
-            <Icon
-              id={isBlue2 ? 'message' : 'at'}
-              icon={isBlue2 ? ChatCircleDotsIcon : AlternateEmailIcon}
-              width={18}
-              height={18}
-              aria-hidden='true'
-            />
+            <VisibilityIcon visibility='direct' />
           </div>
           <FormattedMessage id='status.direct_indicator' defaultMessage='Private mention' tagName='span' />
         </div>
