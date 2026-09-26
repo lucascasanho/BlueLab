@@ -16,6 +16,7 @@ import { directCompose, replyCompose, resetCompose } from '@/mastodon/actions/co
 import { connectDirectStream } from '@/mastodon/actions/streaming';
 import {
   expandConversations,
+  fetchConversation,
   fetchConversationMessages,
   markConversationRead,
   mountConversations,
@@ -127,11 +128,15 @@ export const MessageConversation: React.FC = () => {
     dispatch(expandConversations());
     const disconnect = dispatch(connectDirectStream());
 
+    if (id) {
+      dispatch(fetchConversation(id)).catch(() => undefined);
+    }
+
     return () => {
       dispatch(unmountConversations());
       disconnect();
     };
-  }, [dispatch]);
+  }, [dispatch, id]);
 
   const latestMatchingStatusId = useMemo(
     () =>
