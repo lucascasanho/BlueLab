@@ -47,6 +47,7 @@ module Admin
           if user.role.verified_by_instance?
             @verification_request.resolve!(current_account, status: :approved)
           elsif user.role.position > verified_role.position
+            user.errors.add(:role_id, :elevated)
             raise ActiveRecord::RecordInvalid.new(user)
           else
             user.current_account = current_account
