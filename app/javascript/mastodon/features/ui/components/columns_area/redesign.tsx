@@ -93,6 +93,14 @@ export const ColumnsAreaRedesign: React.FC<{
   const isBlue2Search = isBlue2 && blue2Pathname === '/search';
   const isBlue2FeedPage =
     (isBlue2Home || isBlue2Global) && !isBlue2MessagesPage;
+  const blue2FeedTitle = isBlue2Home
+    ? intl.formatMessage({
+        id: 'account.following',
+        defaultMessage: 'Following',
+      })
+    : isBlue2Global
+      ? blue2Text(intl.locale, 'global')
+      : null;
   const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
 
   useEffect(() => {
@@ -238,6 +246,7 @@ export const ColumnsAreaRedesign: React.FC<{
             classes.main,
             classes.blue2Main,
             isBlue2MessagesPage && classes.blue2MessagesMain,
+            isBlue2FeedPage && classes.blue2Feed,
             isBlue2FeedPage && classes.blue2Home,
           )}
           onTouchStart={handleSwipeStart}
@@ -317,6 +326,11 @@ export const ColumnsAreaRedesign: React.FC<{
 
           {isBlue2FeedPage && (
             <>
+              {!isBlue2MobileLayout && blue2FeedTitle && (
+                <div className={classes.blue2FeedTitle}>
+                  {blue2FeedTitle}
+                </div>
+              )}
               <header
                 className={classNames(
                   classes.blue2Topbar,
