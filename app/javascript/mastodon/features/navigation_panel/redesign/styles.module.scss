@@ -64,3 +64,10 @@
 .callout {
   margin-inline: var(--space-4);
 }
+
+// Mastodon 5.0 keeps the redesigned navigation, but its footer should sit
+// slightly closer to the bottom edge. This selector is theme-gated so no
+// other theme inherits the spacing adjustment.
+:global(body[data-theme='mastodon-5']) .footer {
+  padding-bottom: var(--space-4);
+}
