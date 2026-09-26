@@ -108,10 +108,18 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
   end
 
   def generator
+    application = object.application
+    name = application&.name
+    name = Setting.site_title if application.nil? || name == 'Web'
+    website = application&.website.presence
+
+    return if name.blank?
+
     {
       type: 'Application',
-      name: Setting.site_title,
-    }
+      name: name,
+      url: website,
+    }.compact
   end
 
   def published
