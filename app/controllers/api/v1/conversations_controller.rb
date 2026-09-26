@@ -6,7 +6,7 @@ class Api::V1::ConversationsController < Api::BaseController
   before_action -> { doorkeeper_authorize! :read, :'read:statuses' }, only: [:index, :messages]
   before_action -> { doorkeeper_authorize! :write, :'write:conversations' }, except: [:index, :messages]
   before_action :require_user!
-  before_action :set_conversation, except: :index
+  before_action :set_conversation, except: [:index, :by_status]
   after_action :insert_pagination_headers, only: :index
 
   def index
@@ -27,6 +27,17 @@ class Api::V1::ConversationsController < Api::BaseController
     render json: @conversation, serializer: REST::ConversationSerializer
   end
 
+  def by_status
+    conversation = AccountConversation.where(account: current_account)
+      .where('? = ANY(status_ids)', params[:status_id].to_i)
+      .order(last_status_id: :desc)
+      .first
+
+    return head :not_found unless conversation
+
+    render json: { id: conversation.id.to_s }
+  end
+
   def unread
     @conversation.update!(unread: true)
     render json: @conversation, serializer: REST::ConversationSerializer
@@ -44,10 +55,14 @@ class Api::V1::ConversationsController < Api::BaseController
   end
 
   def matching_conversations
-    AccountConversation.where(
-      account: current_account,
-      participant_account_ids: @conversation.participant_account_ids
-    )
+    AccountConversation.where(account: current_account)
+      .where(conversation_id: @conversation.conversation_id)
+      .or(
+        AccountConversation.where(
+          account: current_account,
+          participant_account_ids: @conversation.participant_account_ids,
+        ),
+      )
   end
 
   def conversation_statuses
