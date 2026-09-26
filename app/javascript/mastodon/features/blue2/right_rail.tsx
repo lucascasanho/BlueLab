@@ -193,7 +193,7 @@ export const Blue2RightRail: React.FC<{ variant?: 'birdUi' }> = ({ variant }) =>
         >
           <BugReportLabel />
         </button>
-        </footer>
+      </footer>
       )}
 
       {trendMenuOpen && (
