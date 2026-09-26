@@ -24,6 +24,10 @@ RSpec.describe 'Auth Account Switcher' do
       expect(response.cookies['_session_id']).to be_present
       expect(current_user.session_activations).to be_present
       expect(target_user.session_activations).to be_present
+
+      get root_path
+
+      expect(controller.current_user).to eq target_user
     end
 
     it 'rejects an invalid token' do
@@ -53,10 +57,14 @@ RSpec.describe 'Auth Account Switcher' do
       @original_session_id = original_session_id
     end
 
-    it 'keeps the previous session activation while signing into another account' do
+    it 'signs into the requested account and keeps the previous session activation' do
       expect(response).to have_http_status(:redirect)
       expect(SessionActivation.find_by(session_id: @original_session_id, user_id: current_user.id)).to be_present
       expect(target_user.session_activations).to be_present
+
+      get root_path
+
+      expect(controller.current_user).to eq target_user
     end
   end
 
