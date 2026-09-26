@@ -10,10 +10,11 @@ class Auth::AccountSwitcherController < ApplicationController
     return head :forbidden unless user.active_for_authentication?
     return head :forbidden unless user.functional?
 
-    # A previously created web session may have been removed since the
-    # account was last used. The account-switcher credential is tied to the
-    # account's OAuth access token, so issue a fresh browser session instead of
-    # depending on an old SessionActivation record.
+    # Preserve the currently active SessionActivation while replacing the
+    # Warden user and browser session with the target account.
+    session[:account_switcher] = true
+    warden.logout(:user) if warden.authenticated?(:user)
+
     session_id = user.activate_session(request)
 
     cookies.signed['_session_id'] = {
@@ -22,6 +23,9 @@ class Auth::AccountSwitcherController < ApplicationController
       httponly: true,
       same_site: :lax,
     }
+
+    warden.set_user(user, scope: :user)
+    session.delete(:account_switcher)
 
     render json: {
       ok: true,
@@ -37,6 +41,7 @@ class Auth::AccountSwitcherController < ApplicationController
 
     access_token = Doorkeeper::AccessToken.find_by(token: token)
     return if access_token.nil? || access_token.revoked_at.present?
+    return unless access_token.application&.superapp?
 
     access_token.resource_owner
   end
