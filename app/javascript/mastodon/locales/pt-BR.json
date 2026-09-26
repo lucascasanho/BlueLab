@@ -1534,5 +1534,6 @@
   "compose.reply_private.title.edit": "Editar mensagem direta",
   "messages.conversation.title": "Conversa",
   "messages.conversation.participants": "{count, plural, one {Mensagem} other {Conversa}}",
+  "messages.conversation.replying_to": "Respondendo a {name}",
   "messages.conversation.empty": "Conversa indisponível"
 }
