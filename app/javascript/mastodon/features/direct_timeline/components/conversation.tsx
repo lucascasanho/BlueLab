@@ -84,7 +84,8 @@ interface Conversation {
 export const Conversation: React.FC<{
   conversation: ImmutableRecord<Conversation>;
   scrollKey: string;
-}> = ({ conversation, scrollKey }) => {
+  onOpenConversation?: (conversationId: string) => void;
+}> = ({ conversation, scrollKey, onOpenConversation }) => {
   const id = conversation.get('id');
   const unread = conversation.get('unread');
   const lastStatusId = conversation.get('last_status');
@@ -102,6 +103,11 @@ export const Conversation: React.FC<{
   const accounts = useAppSelector((state) => getAccounts(state, accountIds));
 
   const handleClick = useCallback(() => {
+    if (onOpenConversation) {
+      onOpenConversation(id);
+      return;
+    }
+
     if (unread) {
       dispatch(markConversationRead(id));
     }
@@ -120,7 +126,7 @@ export const Conversation: React.FC<{
         );
       }
     }
-  }, [dispatch, history, unread, id, lastStatus]);
+  }, [dispatch, history, unread, id, lastStatus, onOpenConversation]);
 
   const handleMarkAsRead = useCallback(() => {
     dispatch(markConversationRead(id));
