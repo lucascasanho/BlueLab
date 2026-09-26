@@ -161,9 +161,9 @@ export const ComposeFooter: React.FC<{
           >
             {current > max && <WarningCircleIcon weight='fill' />}
             <FormattedMessage
-              id='compose.counter'
-              defaultMessage='{current, number}/{max, number}'
-              values={{ current, max }}
+              id='compose.counter_remaining'
+              defaultMessage='{remaining, number}'
+              values={{ remaining: max - current }}
             />
           </span>
         )}
