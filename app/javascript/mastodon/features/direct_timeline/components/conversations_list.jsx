@@ -26,7 +26,9 @@ export const ConversationsList = ({ scrollKey, ...other }) => {
     [conversations],
   );
 
-  const lastStatusId = conversations.at(-1)?.get('last_status');
+  // Immutable.List uses .last(), while Array.prototype.at() is not available
+  // in all runtime paths used by the Mastodon web bundle.
+  const lastStatusId = conversations.last()?.get('last_status');
 
   const debouncedLoadMore = useMemo(() => debounce(id => {
     dispatch(expandConversations({ maxId: id }));
