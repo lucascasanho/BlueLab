@@ -9,6 +9,7 @@ import LinkHeader from 'http-link-header';
 
 import { getAccessToken } from './initial_state';
 import ready from './ready';
+import { recordClientError } from './features/bug_report/diagnostics';
 
 export const getLinks = (response: AxiosResponse) => {
   const value = response.headers.link as string | undefined;
@@ -120,6 +121,20 @@ export default function api(withAuthorization = true) {
       return response;
     },
     (error: AxiosError) => {
+      const status = error.response?.status;
+      const url = error.config?.url;
+
+      if (url !== '/api/v1/bug_reports' && (status === undefined || status >= 500 || status === 429)) {
+        recordClientError({
+          type: 'api',
+          message: status ? `API request failed with HTTP ${status}` : 'API request failed without a response',
+          status,
+          method: error.config?.method,
+          url,
+          request_id: error.response?.headers?.['x-request-id'],
+        });
+      }
+
       return Promise.reject(error);
     },
   );
