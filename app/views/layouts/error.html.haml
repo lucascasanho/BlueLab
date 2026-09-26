@@ -47,4 +47,4 @@
           %h1= yield :content
           .dialog__actions
             %a{ class: 'button button-secondary', href: '/' }= t('errors.go_home')
-            %a.button.button-secondary.error-page__report{ href: "/bug_reports/new?error_page=#{response.status}&current_path=#{ERB::Util.url_encode(request.path)}", target: '_self' }= t('bug_reports.link')
+            %a.button.button-secondary.error-page__report{ href: "/bug_reports/new?error_page=#{response.status}&current_path=#{ERB::Util.url_encode(request.path)}", target: '_self', data: { turbo: false } }= t('bug_reports.link')
