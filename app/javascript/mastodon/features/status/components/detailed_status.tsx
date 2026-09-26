@@ -18,7 +18,6 @@ import type { StatusLike } from '@/mastodon/components/status/legacy/hashtag_bar
 import { getHashtagBarForStatus } from '@/mastodon/components/status/legacy/hashtag_bar';
 import { PictureInPicturePlaceholder } from '@/mastodon/components/status/legacy/picture_in_picture_placeholder';
 import { QuotedStatus } from '@/mastodon/components/status/legacy/quoted';
-import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
 import { AnimatedNumber } from 'mastodon/components/animated_number';
 import { Avatar } from 'mastodon/components/avatar';
 import { DisplayName } from 'mastodon/components/display_name';
@@ -83,10 +82,6 @@ export const DetailedStatus: React.FC<{
   const nodeRef = useRef<HTMLDivElement>(null);
 
   const { signedIn } = useIdentity();
-
-  const isBlue2 =
-    typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'blue-2';
 
   const handleOpenVideo = useCallback(
     (options: VideoModalOptions) => {
@@ -431,11 +426,7 @@ export const DetailedStatus: React.FC<{
         {status.get('visibility') === 'direct' && (
           <div className='status__prepend'>
             <div className='status__prepend-icon-wrapper'>
-              <Icon
-                id={isBlue2 ? 'message' : 'at'}
-                icon={isBlue2 ? ChatCircleDotsIcon : AlternateEmailIcon}
-                className='status__prepend-icon'
-              />
+              <VisibilityIcon visibility='direct' />
             </div>
             <FormattedMessage
               id='status.direct_indicator'
