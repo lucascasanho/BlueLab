@@ -7,6 +7,8 @@ import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { MenuItemGroup } from '@/mastodon/components/menu';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
+import type { ApiInstanceVerificationJSON } from '@/mastodon/api_types/accounts';
+import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
 import type { CustomEmojiShape } from '@/mastodon/models/custom_emoji';
 import {
   getAccountSwitcherSessionId,
@@ -25,6 +27,7 @@ export interface StoredAccount {
   sessionId: string;
   lastUsedAt: number;
   emojis?: CustomEmojiShape[];
+  instanceVerification?: ApiInstanceVerificationJSON | null;
 }
 
 const STORAGE_KEY = 'mastodon_bluelab_account_switcher_v2';
@@ -32,6 +35,23 @@ const MAX_STORED_ACCOUNTS = 10;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const isStoredInstanceVerification = (
+  value: unknown,
+): value is ApiInstanceVerificationJSON =>
+  isRecord(value) &&
+  typeof value.issuer === 'string' &&
+  typeof value.issuer_domain === 'string' &&
+  (!('verified_at' in value) ||
+    value.verified_at === null ||
+    typeof value.verified_at === 'string') &&
+  (!('badge' in value) ||
+    value.badge === null ||
+    (isRecord(value.badge) &&
+      typeof value.badge.view_box === 'string' &&
+      typeof value.badge.path === 'string' &&
+      Array.isArray(value.badge.colors) &&
+      value.badge.colors.every((color) => typeof color === 'string')));
 
 const isStoredAccount = (value: unknown): value is StoredAccount =>
   isRecord(value) &&
@@ -51,7 +71,10 @@ const isStoredAccount = (value: unknown): value is StoredAccount =>
           typeof emoji.shortcode === 'string' &&
           typeof emoji.static_url === 'string' &&
           typeof emoji.url === 'string',
-      )));
+      ))) &&
+  (!('instanceVerification' in value) ||
+    value.instanceVerification === null ||
+    isStoredInstanceVerification(value.instanceVerification));
 
 export const readStoredAccounts = (): StoredAccount[] => {
   if (typeof localStorage === 'undefined') {
@@ -142,6 +165,7 @@ const useCurrentAccountSession = () => {
       sessionId: accountSwitcherSessionId,
       lastUsedAt: Date.now(),
       emojis: account.emojis.toJS(),
+      instanceVerification: account.instance_verification,
     });
   }, [account, accountId, accountSwitcherSessionId, signedIn]);
 
@@ -255,12 +279,25 @@ const AccountList: React.FC<{
                 className={classes.avatar}
               />
               <span className={classes.accountText}>
-                <EmojiHTML
-                  as='strong'
-                  htmlString={storedAccount.displayName || storedAccount.username}
-                  extraEmojis={storedAccount.emojis}
-                />
-                <span>@{storedAccount.acct}</span>
+                <span className={classes.accountName}>
+                  <EmojiHTML
+                    as='strong'
+                    htmlString={storedAccount.displayName || storedAccount.username}
+                    extraEmojis={storedAccount.emojis}
+                  />
+                  {storedAccount.instanceVerification?.badge && (
+                    <span
+                      className={classes.verificationBadge}
+                      aria-hidden='true'
+                    >
+                      <VerifiedMark
+                        className={classes.verificationIcon}
+                        remoteBadge={storedAccount.instanceVerification.badge}
+                      />
+                    </span>
+                  )}
+                </span>
+                <span className={classes.handle}>@{storedAccount.acct}</span>
               </span>
               {active && (
                 <span className={classes.current}>
