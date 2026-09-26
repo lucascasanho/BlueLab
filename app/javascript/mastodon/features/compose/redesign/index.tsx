@@ -145,6 +145,7 @@ export const RedesignComposeForm: React.FC<
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={autoFocus}
         onSubmit={onSubmit}
+        messageToolbar={isMessage && embedded}
       >
         <ComposeAttachments className={classes.attachments} />
       </RichComposeEditor>
