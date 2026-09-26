@@ -101,7 +101,10 @@ export const MessageConversation: React.FC = () => {
     () =>
       participantIds
         .map((accountId) => accounts.get(accountId))
-        .filter(Boolean),
+        .filter(
+          (account): account is NonNullable<typeof account> =>
+            account !== undefined && account !== null,
+        ),
     [accounts, participantIds],
   );
 
