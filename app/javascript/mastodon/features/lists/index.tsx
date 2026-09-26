@@ -46,9 +46,7 @@ const ListItem: React.FC<{
   title: string;
 }> = ({ id, title }) => {
   const dispatch = useAppDispatch();
-  const intl = useIntl(); 
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const intl = useIntl();
 
   const handleDeleteClick = useCallback(() => {
     dispatch(
@@ -104,7 +102,7 @@ const Lists: React.FC<{
   const emptyMessage = (
     <>
       {isRedesignEnabled() || isBlue2 ? (
-        <span
+        <span>
           <FormattedMessage
             id='custom_feeds.no_custom_feeds_yet'
             defaultMessage='No custom feeds yet.'
