@@ -440,7 +440,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     return renderShell(
       <>
         <ColumnHeader
-          withBackButton={!inline}
+          withBackButton
           onBackButtonClick={onBack}
           title={intl.formatMessage(messages.title)}
         />
@@ -470,7 +470,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   return renderShell(
     <>
       <ColumnHeader
-        withBackButton={!inline}
+        withBackButton
         onBackButtonClick={onBack}
         title={
           <div className={classes.headerTitle}>
@@ -653,7 +653,6 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         {participantAccounts.length > 0 && (
           <RedesignComposeForm
             className={classes.replyComposer}
-            compact
             embedded
             autoFocus
             onSuccess={(status: ApiStatusJSON) => {
