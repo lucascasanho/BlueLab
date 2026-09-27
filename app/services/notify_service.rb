@@ -213,13 +213,14 @@ class NotifyService < BaseService
     end
   end
 
-  def call(recipient, type, activity, **options)
+  def call(recipient, type, activity, from_account: nil, from_account_id: nil, **options)
     return if recipient.user.nil?
 
     @options      = options
     @recipient    = recipient
     @activity     = activity
-    @notification = Notification.new(account: @recipient, type: type, activity: @activity)
+    @sender       = from_account || Account.find_by(id: from_account_id)
+    @notification = Notification.new(account: @recipient, from_account: @sender, type: type, activity: @activity)
 
     # For certain conditions we don't need to create a notification at all
     return if drop?
