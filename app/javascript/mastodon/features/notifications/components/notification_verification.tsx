@@ -41,10 +41,9 @@ export const NotificationVerification: React.FC<{
           )}
         </p>
 
-        <RelativeTimestamp
-          timestamp={timestamp}
-          className={classes.timestamp}
-        />
+        <span className={classes.timestamp}>
+          <RelativeTimestamp timestamp={timestamp} />
+        </span>
       </div>
     </div>
   );
