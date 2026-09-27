@@ -1558,7 +1558,7 @@
   "account_edit.verification.popover.submit": "Enviar solicitação",
   "account_edit.verification.popover.cancel": "Cancelar",
   "account_edit.verification.popover.error": "Não foi possível enviar sua solicitação de verificação. Tente novamente.",
-  "notification.admin.verification_request": "{name} solicitou um selo de verificado",
+  "notification.admin.verification_request": "{name} solicitou a verificação de perfil",
   "account_edit.verification.popover.success_title": "Solicitação enviada",
   "account_edit.verification.popover.success_message": "Sua solicitação foi enviada para análise da moderação.",
   "account_edit.verification.popover.close": "Fechar",
