@@ -181,7 +181,6 @@ export const VerificationRequestTrigger: FC = () => {
         placement='bottom-end'
         offset={8}
         constrainToViewport
-        scrollable
       >
         {({ props }) => (
           <div
@@ -215,65 +214,67 @@ export const VerificationRequestTrigger: FC = () => {
               </button>
             </div>
 
-            {submitted ? (
-              <div className={classes.success}>
-                <p className={classes.successMessage}>
-                  <FormattedMessage {...messages.successMessage} />
-                </p>
-              </div>
-            ) : (
-              <>
-                <p className={classes.description}>
-                  <FormattedMessage
-                    {...messages.description}
-                    values={{ instanceName: resolvedInstanceTitle }}
-                  />
-                </p>
-                <p className={classes.notice}>
-                  <FormattedMessage {...messages.free} />
-                </p>
-                <p className={classes.notice}>
-                  <FormattedMessage {...messages.criteria} />
-                </p>
-                <p className={classes.notice}>
-                  <FormattedMessage
-                    {...messages.federation}
-                    values={{ instanceName: resolvedInstanceTitle }}
-                  />
-                </p>
-                <p className={classes.notice}>
-                  <FormattedMessage {...messages.disclaimer} />
-                </p>
+            <div className={classes.body}>
+              {submitted ? (
+                <div className={classes.success}>
+                  <p className={classes.successMessage}>
+                    <FormattedMessage {...messages.successMessage} />
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className={classes.description}>
+                    <FormattedMessage
+                      {...messages.description}
+                      values={{ instanceName: resolvedInstanceTitle }}
+                    />
+                  </p>
+                  <p className={classes.notice}>
+                    <FormattedMessage {...messages.free} />
+                  </p>
+                  <p className={classes.notice}>
+                    <FormattedMessage {...messages.criteria} />
+                  </p>
+                  <p className={classes.notice}>
+                    <FormattedMessage
+                      {...messages.federation}
+                      values={{ instanceName: resolvedInstanceTitle }}
+                    />
+                  </p>
+                  <p className={classes.notice}>
+                    <FormattedMessage {...messages.disclaimer} />
+                  </p>
 
-                <form className={classes.form} onSubmit={handleSubmit}>
-                  <TextAreaField
-                    id={popoverId + '-explanation'}
-                    label={intl.formatMessage(messages.explanationLabel)}
-                    hint={intl.formatMessage(messages.explanationHint)}
-                    value={explanation}
-                    maxLength={5_000}
-                    rows={6}
-                    required={false}
-                    onChange={(event) => setExplanation(event.target.value)}
-                  />
+                  <form className={classes.form} onSubmit={handleSubmit}>
+                    <TextAreaField
+                      id={popoverId + '-explanation'}
+                      label={intl.formatMessage(messages.explanationLabel)}
+                      hint={intl.formatMessage(messages.explanationHint)}
+                      value={explanation}
+                      maxLength={5_000}
+                      rows={6}
+                      required={false}
+                      onChange={(event) => setExplanation(event.target.value)}
+                    />
 
-                  {error && (
-                    <p className={classes.error} role='alert'>
-                      <FormattedMessage {...messages.error} />
-                    </p>
-                  )}
+                    {error && (
+                      <p className={classes.error} role='alert'>
+                        <FormattedMessage {...messages.error} />
+                      </p>
+                    )}
 
-                  <div className={classes.actions}>
-                    <Button type='button' secondary onClick={handleClose}>
-                      <FormattedMessage {...messages.cancel} />
-                    </Button>
-                    <Button type='submit' loading={submitting}>
-                      <FormattedMessage {...messages.submit} />
-                    </Button>
-                  </div>
-                </form>
-              </>
-            )}
+                    <div className={classes.actions}>
+                      <Button type='button' secondary onClick={handleClose}>
+                        <FormattedMessage {...messages.cancel} />
+                      </Button>
+                      <Button type='submit' loading={submitting}>
+                        <FormattedMessage {...messages.submit} />
+                      </Button>
+                    </div>
+                  </form>
+                </>
+              )}
+            </div>
           </div>
         )}
       </Popover>
