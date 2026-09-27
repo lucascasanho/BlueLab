@@ -43,7 +43,6 @@
   font-size: 14px;
 }
 
-
 .triggerButton {
   display: inline-flex;
   width: max-content;
@@ -101,18 +100,7 @@
 }
 
 .success {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   margin-top: 2px;
-}
-
-.successBadge {
-  display: block;
-  flex: 0 0 auto;
-  width: 32px;
-  height: 32px;
-  overflow: visible;
 }
 
 .successMessage {
