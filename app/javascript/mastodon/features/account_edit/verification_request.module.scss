@@ -49,13 +49,22 @@
   width: max-content;
   max-width: 100%;
   min-width: 0;
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
   flex: 0 0 auto;
   align-self: flex-start;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
   box-sizing: border-box;
-  padding: 8px 12px;
+  overflow: hidden;
+  padding: 6px 12px;
+  line-height: 20px;
+}
+
+.triggerButton :global(svg) {
+  display: none;
 }
 
 .titleRow {
