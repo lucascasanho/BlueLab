@@ -33,7 +33,7 @@ RSpec.describe 'Admin Verification Requests' do
         post approve_admin_verification_request_path(verification_request)
       end
 
-      expect(response).to have_http_status(:see_other)
+      expect(response).to have_http_status(:found)
       expect(response).to redirect_to(admin_verification_requests_path(status: 'pending'))
       expect(verification_request.reload.status).to eq('approved')
       expect(account.user.reload.role.name).to eq('Verified')
