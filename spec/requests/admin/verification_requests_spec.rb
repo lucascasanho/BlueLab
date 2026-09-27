@@ -47,7 +47,7 @@ RSpec.describe 'Admin Verification Requests' do
 
       post deny_admin_verification_request_path(verification_request)
 
-      expect(response).to have_http_status(:see_other)
+      expect(response).to have_http_status(:found)
       expect(response).to redirect_to(admin_verification_requests_path(status: 'pending'))
       expect(verification_request.reload.status).to eq('denied')
       expect(account.user.reload.role).to eq(original_role)
