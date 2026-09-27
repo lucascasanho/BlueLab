@@ -1541,7 +1541,8 @@
   "visibility_modal.quote_label": "Autoriser les citations pour",
   "visibility_modal.quote_nobody": "Juste moi",
   "visibility_modal.quote_public": "Tout le monde",
-  "visibility_modal.save": "Sauvegarder",
+  "visibility_modal.save": "Sauvegarder"
+,
   "account_edit.verification.request_button": "Demander le badge de vérification",
   "account_edit.verification.toggle_show": "Afficher le badge de vérification",
   "account_edit.verification.toggle_hide": "Masquer le badge de vérification",
