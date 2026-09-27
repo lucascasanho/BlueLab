@@ -113,12 +113,6 @@ preservar_local() {
 instalar_comando_atual() {
   executar mkdir -p "$DIR_INSTALACAO"
   executar install -m 0755 "$REPO/bin/bluelab" "$COMANDO_INSTALADO"
-
-  # Utilitários auxiliares versionados no repositório também são instalados
-  # no mesmo diretório de comandos do atualizador.
-  if [[ -f "$REPO/bin/klippy" ]]; then
-    executar install -m 0755 "$REPO/bin/klippy" "$DIR_INSTALACAO/klippy"
-  fi
 }
 
 capturar_configuracoes() {
@@ -412,15 +406,15 @@ atualizar() {
 promover() {
   [[ "$ALVO" == blue ]] || falhar "promoção só pode ser executada no mastodon.blue"
   preparar_git
-  local teste_atual teste estavel local_head implantado merge_base tree_estavel tree_base promovido
+  local teste_atual teste estavel local_head implantado promovido merge_base
   teste_atual="$(git rev-parse "$REMOTO/$CANAL_TESTE")"
   estavel="$(git rev-parse "$REMOTO/$CANAL_ESTAVEL")"
   local_head="$(git rev-parse HEAD)"
   implantado="$(cat "$DIR_ESTADO/ultimo-implantado-blue.sha" 2>/dev/null || true)"
 
   # O SHA registrado como último implantado/testado é a fonte de verdade para
-  # promoção. Isso permite que GitHub avance a BlueLab-Test sem promover
-  # acidentalmente commits que ainda não passaram pelo teste no Blue.
+  # promoção. Isso evita promover commits que entraram no canal de teste depois
+  # do último teste realizado no Blue.
   if [[ -n "$implantado" ]] &&
      git cat-file -e "$implantado^{commit}" 2>/dev/null &&
      git merge-base --is-ancestor "$implantado" "$teste_atual" 2>/dev/null; then
@@ -450,39 +444,83 @@ promover() {
   if git merge-base --is-ancestor "$estavel" "$teste" 2>/dev/null; then
     promovido="$teste"
     echo "BlueLab-Test contém o canal estável; promoção fast-forward."
+  elif git merge-base --is-ancestor "$teste" "$estavel" 2>/dev/null; then
+    echo "O SHA testado já está contido no canal estável."
+    echo "Nenhuma promoção é necessária."
+    return 0
   else
     merge_base="$(git merge-base "$estavel" "$teste" 2>/dev/null || true)"
     [[ -n "$merge_base" ]] || falhar "não foi possível determinar uma base comum entre os canais"
 
-    tree_estavel="$(git rev-parse "$estavel^{tree}")"
-    tree_base="$(git rev-parse "$merge_base^{tree}")"
+    # Quando os históricos divergem, a forma segura de promover o estado
+    # realmente testado é fazer uma mesclagem de três vias:
+    # - o canal estável continua sendo o primeiro pai;
+    # - o SHA realmente testado é o segundo pai;
+    # - alterações não conflitantes do estável são preservadas;
+    # - em conflitos de conteúdo, a versão do SHA testado prevalece;
+    # - conflitos que o Git não conseguir resolver automaticamente abortam
+    # a promoção antes de qualquer push.
+    echo
+    echo "Os canais possuem histórico divergente."
+    echo "  Canal estável : $estavel"
+    echo "  SHA testado   : $teste"
+    echo "  Base comum    : $merge_base"
+    echo "A promoção será feita por mesclagem de três vias."
+    echo "Alterações do estável sem conflito serão preservadas."
+    echo "Em conflitos, prevalecerá o conteúdo do SHA testado."
 
-    if [[ "$tree_estavel" != "$tree_base" ]]; then
+    local tmp
+    tmp="$(mktemp -d "${TMPDIR:-/tmp}/bluelab-promote.XXXXXX")"
+
+    limpar_worktree_promocao() {
+      git worktree remove --force "$tmp" >/dev/null 2>&1 || true
+    }
+
+    trap limpar_worktree_promocao RETURN
+
+    executar git worktree add --detach "$tmp" "$estavel" >/dev/null
+
+    if ! git -C "$tmp" merge --no-ff --no-commit -X theirs "$teste" >/dev/null 2>&1; then
+      mapfile -t conflitos < <(git -C "$tmp" diff --name-only --diff-filter=U)
+
       echo
-      echo "Os canais realmente divergiram em conteúdo:"
-      echo "  Canal estável : $estavel"
-      echo "  Canal de teste: $teste"
-      echo "  Base comum    : $merge_base"
-      falhar "o canal estável contém alterações que não fazem parte do canal testado; integração manual é necessária"
+      if ((${#conflitos[@]} > 0)); then
+        echo "Conflitos que o Git não conseguiu resolver automaticamente:"
+        printf '  - %s\n' "${conflitos[@]}"
+      else
+        echo "A mesclagem do SHA testado falhou sem produzir conflitos de arquivo identificáveis."
+      fi
+
+      git -C "$tmp" merge --abort >/dev/null 2>&1 || true
+      falhar "integração necessária para promover o SHA testado; nenhum commit foi enviado ao canal estável"
     fi
 
-    echo "Os canais possuem histórico divergente, mas o canal estável conserva exatamente a árvore da base comum."
-    echo "Será criado um commit de promoção com os dois históricos, sem descartar o histórico do canal estável."
+    executar git -C "$tmp" diff --check
 
-    if ! promovido="$(
-      GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-BlueLab Promotor}" \
-      GIT_AUTHOR_EMAIL="${GIT_AUTHOR_EMAIL:-bluelab-promotor@localhost}" \
-      GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-BlueLab Promotor}" \
-      GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-bluelab-promotor@localhost}" \
-      git commit-tree "$(git rev-parse "$teste^{tree}")" \
-        -p "$estavel" \
-        -p "$teste" \
-        -m "promote: BlueLab-Test -> BlueLab"
-    )"; then
-      falhar "não foi possível criar o commit de promoção"
+    local mensagem_promocao
+    mensagem_promocao="promote: BlueLab-Test -> BlueLab (SHA testado $teste)"
+
+    if ! GIT_COMMITTER_NAME="${GIT_COMMITTER_NAME:-BlueLab Promotor}" \
+         GIT_COMMITTER_EMAIL="${GIT_COMMITTER_EMAIL:-bluelab-promotor@localhost}" \
+         git -C "$tmp" commit --no-edit -m "$mensagem_promocao" >/dev/null; then
+      git -C "$tmp" merge --abort >/dev/null 2>&1 || true
+      falhar "não foi possível criar o commit de promoção; nenhum commit foi enviado ao canal estável"
     fi
 
-    echo "Commit de promoção criado: $promovido"
+    promovido="$(git -C "$tmp" rev-parse HEAD)"
+
+    # Confirma que o commit promovido realmente tem como segundo pai o SHA
+    # que foi testado no Blue, sem usar a ponta mais recente do canal de teste.
+    local pai_teste
+    pai_teste="$(git -C "$tmp" rev-parse HEAD^2 2>/dev/null || true)"
+    [[ "$pai_teste" == "$teste" ]] || falhar "o commit de promoção não referencia exatamente o SHA testado"
+
+    git worktree remove --force "$tmp" >/dev/null 2>&1 || true
+    trap - RETURN
+
+    [[ "$promovido" != "$estavel" ]] || falhar "nenhum novo commit foi produzido para promover"
+    echo "Promoção por merge preparada: $estavel -> $promovido"
+
   fi
 
   executar git push "$REMOTO" "$promovido:refs/heads/$CANAL_ESTAVEL"
@@ -503,11 +541,12 @@ promover() {
   } >"$DIR_ESTADO/promocao-pronta.txt"
 
   echo "Promoção concluída."
-  echo "$CANAL_ESTAVEL agora contém exatamente o código testado em $teste."
+  echo "$CANAL_ESTAVEL agora recebeu os patches do SHA testado $teste."
   echo "SHA promovido: $promovido"
   echo "A Espelunca já pode executar 'bluelab' para receber esta versão."
   echo "Registro: $DIR_ESTADO/promocao-pronta.txt"
 }
+
 estado() {
   preparar_git
   printf '%-16s %s\n' "$CANAL_ESTAVEL" "$(git rev-parse "$REMOTO/$CANAL_ESTAVEL")"

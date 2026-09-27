@@ -11,6 +11,7 @@ import { NotificationAdminSignUp } from './notification_admin_sign_up';
 import { NotificationAdminVerificationRequest } from './notification_admin_verification_request';
 import { NotificationAnnualReport } from './notification_annual_report';
 import { NotificationCollection } from './notification_collection';
+import { NotificationVerification } from 'mastodon/features/notifications/components/notification_verification';
 import { NotificationFavourite } from './notification_favourite';
 import { NotificationFollow } from './notification_follow';
 import { NotificationFollowRequest } from './notification_follow_request';
@@ -147,6 +148,16 @@ export const NotificationGroup: React.FC<{
         <NotificationAdminVerificationRequest
           unread={unread}
           notification={notificationGroup}
+        />
+      );
+      break;
+    case 'verification_request':
+    case 'verification_approved':
+      content = (
+        <NotificationVerification
+          unread={unread}
+          approved={notificationGroup.type === 'verification_approved'}
+          timestamp={notificationGroup.latest_page_notification_at}
         />
       );
       break;

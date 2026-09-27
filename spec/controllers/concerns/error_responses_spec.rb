@@ -20,7 +20,8 @@ RSpec.describe ErrorResponses do
         .to have_css('body.error--bluelab[data-theme="blue-2"]')
         .and have_css('.error-page__code', text: code.to_s)
         .and have_css('h1', text: error_content(code))
-        .and have_css('a.error-page__report[href^="/bug_reports/new"]')
+        .and have_css('form.error-page__report-form[action^="/bug_reports/new"]')
+        .and have_css('button.error-page__report', text: I18n.t('bug_reports.link'))
     end
 
     def error_content(code)
@@ -154,6 +155,30 @@ RSpec.describe ErrorResponses do
         .and have_no_css('body.error--bluelab')
         .and have_no_css('.error-page')
         .and have_css('.dialog')
+    end
+  end
+
+  context 'when the BlueLab error layout is rendered with a 200 response' do
+    controller(ApplicationController) do
+      def show
+        render 'errors/500', layout: 'error', formats: [:html], status: :ok
+      end
+    end
+
+    before do
+      Setting.theme = 'blue-2'
+      routes.draw { get 'show' => 'anonymous#show' }
+    end
+
+    it 'keeps the bug-report shortcut as a native GET form' do
+      get 'show'
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body)
+        .to have_css('body.error--bluelab[data-theme="blue-2"]')
+        .and have_css('.error-page__code', text: '200')
+        .and have_css('form.error-page__report-form[action*="error_page=200"]')
+        .and have_css('button.error-page__report', text: I18n.t('bug_reports.link'))
     end
   end
 end

@@ -243,7 +243,12 @@ class User < ApplicationRecord
     !approved?
   end
 
+  # Signing in is intentionally allowed before e-mail confirmation and
+  # administrator approval. Access to protected functionality is handled
+  # separately by require_functional!.
   def active_for_authentication?
+    return true if unconfirmed? || pending?
+
     !account.memorial?
   end
 

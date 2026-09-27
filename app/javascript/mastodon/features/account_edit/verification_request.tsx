@@ -3,14 +3,18 @@ import type { FC, FormEvent, MouseEvent } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { domain, title as instanceTitle } from '@/mastodon/initial_state';
-
-import { apiGetVerificationRequestStatus, apiSubmitVerificationRequest } from '@/mastodon/api/verification';
 import { Button } from '@/mastodon/components/button';
 import { TextAreaField } from '@/mastodon/components/form_fields';
+import { Icon } from '@/mastodon/components/icon';
 import { Popover } from '@/mastodon/components/popover';
+import { domain, title as instanceTitle } from '@/mastodon/initial_state';
+import CloseIcon from '@/material-icons/400-24px/close.svg?react';
 
-import editClasses from './styles.module.scss';
+import {
+  apiGetVerificationRequestStatus,
+  apiSubmitVerificationRequest,
+} from '@/mastodon/api/verification';
+
 import classes from './verification_request.module.scss';
 
 const messages = defineMessages({
@@ -69,6 +73,19 @@ const messages = defineMessages({
     defaultMessage:
       'We could not send your verification request. Please try again.',
   },
+  successTitle: {
+    id: 'account_edit.verification.popover.success_title',
+    defaultMessage: 'Request sent',
+  },
+  successMessage: {
+    id: 'account_edit.verification.popover.success_message',
+    defaultMessage:
+      'Your request was sent to the moderation team for review.',
+  },
+  close: {
+    id: 'account_edit.verification.popover.close',
+    defaultMessage: 'Close',
+  },
 });
 
 export const VerificationRequestTrigger: FC = () => {
@@ -76,6 +93,7 @@ export const VerificationRequestTrigger: FC = () => {
   const [canRequest, setCanRequest] = useState<boolean | null>(null);
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [explanation, setExplanation] = useState('');
   const [error, setError] = useState(false);
   const [triggerElement, setTriggerElement] =
@@ -98,10 +116,11 @@ export const VerificationRequestTrigger: FC = () => {
   }, [loadEligibility]);
 
   const handleClose = useCallback(() => {
-    if (!submitting) {
-      setOpen(false);
-      setError(false);
-    }
+    if (submitting) return;
+
+    setOpen(false);
+    setError(false);
+    setSubmitted(false);
   }, [submitting]);
 
   const handleSubmit = useCallback(
@@ -114,7 +133,7 @@ export const VerificationRequestTrigger: FC = () => {
         await apiSubmitVerificationRequest(explanation);
         setCanRequest(false);
         setExplanation('');
-        setOpen(false);
+        setSubmitted(true);
       } catch {
         setError(true);
       } finally {
@@ -128,6 +147,7 @@ export const VerificationRequestTrigger: FC = () => {
     (event: MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
       setError(false);
+      setSubmitted(false);
       setTriggerElement(event.currentTarget);
       setOpen(true);
     },
@@ -136,19 +156,20 @@ export const VerificationRequestTrigger: FC = () => {
 
   const resolvedInstanceTitle = instanceTitle ?? domain ?? 'this server';
 
-  if (!canRequest) {
+  if (canRequest !== true && !submitted) {
     return null;
   }
 
   return (
     <>
       <Button
-        className={editClasses.editButton}
+        className={classes.triggerButton}
         type='button'
         aria-haspopup='dialog'
         aria-expanded={open}
         aria-controls={popoverId}
         onClick={handleTrigger}
+        disabled={submitted}
       >
         {intl.formatMessage(messages.trigger)}
       </Button>
@@ -160,7 +181,6 @@ export const VerificationRequestTrigger: FC = () => {
         placement='bottom-end'
         offset={8}
         constrainToViewport
-        scrollable
       >
         {({ props }) => (
           <div
@@ -168,60 +188,93 @@ export const VerificationRequestTrigger: FC = () => {
             id={popoverId}
             role='dialog'
             aria-labelledby={popoverId + '-title'}
-            className={'dropdown-animation ' + classes.popover}
+            className={
+              'dropdown-animation ' +
+              classes.popover +
+              (submitted ? ' ' + classes.popoverSuccess : '')
+            }
           >
-            <h3 id={popoverId + '-title'} className={classes.title}>
-              <FormattedMessage {...messages.title} />
-            </h3>
-            <p className={classes.description}>
-              <FormattedMessage
-                {...messages.description}
-                values={{ instanceName: resolvedInstanceTitle }}
-              />
-            </p>
-            <p className={classes.notice}>
-              <FormattedMessage {...messages.free} />
-            </p>
-            <p className={classes.notice}>
-              <FormattedMessage {...messages.criteria} />
-            </p>
-            <p className={classes.notice}>
-              <FormattedMessage
-                {...messages.federation}
-                values={{ instanceName: resolvedInstanceTitle }}
-              />
-            </p>
-            <p className={classes.notice}>
-              <FormattedMessage {...messages.disclaimer} />
-            </p>
+            <div className={classes.titleRow}>
+              <h3 id={popoverId + '-title'} className={classes.title}>
+                {submitted ? (
+                  <FormattedMessage {...messages.successTitle} />
+                ) : (
+                  <FormattedMessage {...messages.title} />
+                )}
+              </h3>
 
-            <form className={classes.form} onSubmit={handleSubmit}>
-              <TextAreaField
-                id={popoverId + '-explanation'}
-                label={intl.formatMessage(messages.explanationLabel)}
-                hint={intl.formatMessage(messages.explanationHint)}
-                value={explanation}
-                maxLength={5_000}
-                rows={6}
-                required={false}
-                onChange={(event) => setExplanation(event.target.value)}
-              />
+              <button
+                type='button'
+                className={classes.closeButton}
+                aria-label={intl.formatMessage(messages.close)}
+                title={intl.formatMessage(messages.close)}
+                onClick={handleClose}
+              >
+                <Icon id='close' icon={CloseIcon} />
+              </button>
+            </div>
 
-              {error && (
-                <p className={classes.error} role='alert'>
-                  <FormattedMessage {...messages.error} />
-                </p>
+            <div className={classes.body}>
+              {submitted ? (
+                <div className={classes.success}>
+                  <p className={classes.successMessage}>
+                    <FormattedMessage {...messages.successMessage} />
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className={classes.description}>
+                    <FormattedMessage
+                      {...messages.description}
+                      values={{ instanceName: resolvedInstanceTitle }}
+                    />
+                  </p>
+                  <p className={classes.notice}>
+                    <FormattedMessage {...messages.free} />
+                  </p>
+                  <p className={classes.notice}>
+                    <FormattedMessage {...messages.criteria} />
+                  </p>
+                  <p className={classes.notice}>
+                    <FormattedMessage
+                      {...messages.federation}
+                      values={{ instanceName: resolvedInstanceTitle }}
+                    />
+                  </p>
+                  <p className={classes.notice}>
+                    <FormattedMessage {...messages.disclaimer} />
+                  </p>
+
+                  <form className={classes.form} onSubmit={handleSubmit}>
+                    <TextAreaField
+                      id={popoverId + '-explanation'}
+                      label={intl.formatMessage(messages.explanationLabel)}
+                      hint={intl.formatMessage(messages.explanationHint)}
+                      value={explanation}
+                      maxLength={5_000}
+                      rows={6}
+                      required={false}
+                      onChange={(event) => setExplanation(event.target.value)}
+                    />
+
+                    {error && (
+                      <p className={classes.error} role='alert'>
+                        <FormattedMessage {...messages.error} />
+                      </p>
+                    )}
+
+                    <div className={classes.actions}>
+                      <Button type='button' secondary onClick={handleClose}>
+                        <FormattedMessage {...messages.cancel} />
+                      </Button>
+                      <Button type='submit' loading={submitting}>
+                        <FormattedMessage {...messages.submit} />
+                      </Button>
+                    </div>
+                  </form>
+                </>
               )}
-
-              <div className={classes.actions}>
-                <Button type='button' secondary onClick={handleClose}>
-                  <FormattedMessage {...messages.cancel} />
-                </Button>
-                <Button type='submit' loading={submitting}>
-                  <FormattedMessage {...messages.submit} />
-                </Button>
-              </div>
-            </form>
+            </div>
           </div>
         )}
       </Popover>

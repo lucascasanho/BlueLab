@@ -3,12 +3,12 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 
 import { DisplayName } from '@/mastodon/components/display_name';
-import ShieldQuestionIcon from '@/material-icons/400-24px/shield_question.svg?react';
-import { Icon } from 'mastodon/components/icon';
-import { RelativeTimestamp } from 'mastodon/components/relative_timestamp';
-
+import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
+import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
 import type { NotificationGroup } from 'mastodon/models/notification_group';
 import { useAppSelector } from 'mastodon/store';
+
+import classes from 'mastodon/features/notifications/components/notification_verification.module.scss';
 
 export const NotificationAdminVerificationRequest: React.FC<{
   notification: NotificationGroup;
@@ -27,28 +27,35 @@ export const NotificationAdminVerificationRequest: React.FC<{
       rel='noopener noreferrer'
       className={classNames(
         'notification-group notification-group--link notification-group--admin-verification-request focusable',
-        { 'notification-group--unread': unread },
+        classes.card,
+        { 'notification-group--unread': unread, [classes.unread]: unread },
       )}
     >
       <div className='notification-group__icon'>
-        <Icon id='shield-question' icon={ShieldQuestionIcon} />
+        <VerifiedMark className={classes.icon} />
       </div>
 
-      <div className='notification-group__main'>
-        <div className='notification-group__main__header'>
-          <h2 className='notification-group__main__header__label'>
-            <FormattedMessage
-              id='notification.admin.verification_request'
-              defaultMessage='{name} requested a verification badge'
-              values={{
-                name: <DisplayName account={account} variant='simple' />,
-              }}
-            />
-            <RelativeTimestamp
-              timestamp={notification.latest_page_notification_at}
-            />
-          </h2>
+      <div className={classes.content}>
+        <div
+          className={classNames(
+            classes.message,
+            'notification-group__main__header__label',
+          )}
+        >
+          <FormattedMessage
+            id='notification.admin.verification_request'
+            defaultMessage='{name} requested a verification badge'
+            values={{
+              name: <DisplayName account={account} variant='simple' />,
+            }}
+          />
         </div>
+
+        <span className={classes.timestamp}>
+          <RelativeTimestamp
+            timestamp={notification.latest_page_notification_at}
+          />
+        </span>
       </div>
     </a>
   );

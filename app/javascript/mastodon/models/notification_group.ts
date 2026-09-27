@@ -50,6 +50,7 @@ export type NotificationGroupQuotedUpdate =
 export type NotificationGroupFollow = BaseNotification<'follow'>;
 export type NotificationGroupFollowRequest = BaseNotification<'follow_request'>;
 export type NotificationGroupAdminSignUp = BaseNotification<'admin.sign_up'>;
+export type NotificationGroupVerification = BaseNotification<'verification_request' | 'verification_approved'>;
 
 export type AccountWarningAction =
   | 'none'
@@ -113,6 +114,7 @@ export type NotificationGroup =
   | NotificationGroupSeveredRelationships
   | NotificationGroupAdminSignUp
   | NotificationGroupAdminReport
+  | NotificationGroupVerification
   | NotificationGroupAnnualReport
   | NotificationGroupAddedToCollection
   | NotificationGroupCollectionUpdate;

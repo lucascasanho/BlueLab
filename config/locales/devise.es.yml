@@ -9,10 +9,10 @@ es:
       already_authenticated: Usted ya está registrado.
       closed_registrations: Su intento de registro ha sido bloqueado debido a una política de red. Si cree que esto es un error, póngase en contacto con %{email}.
       inactive: Su cuenta no ha sido activada aún.
-      invalid: "%{authentication_keys} o contraseña inválida."
+      invalid: "Correo electrónico o contraseña incorrectos."
       last_attempt: Tiene un intento más antes de que tu cuenta sea bloqueada.
       locked: Tu cuenta está bloqueada.
-      not_found_in_database: Incorrecto %{authentication_keys} o contraseña.
+      not_found_in_database: "Correo electrónico o contraseña incorrectos."
       omniauth_user_creation_failure: Error al crear una cuenta para esta identidad.
       pending: Su cuenta aún se encuentra bajo revisión.
       timeout: Tu sesión expiró. Por favor, inicia sesión nuevamente para continuar.

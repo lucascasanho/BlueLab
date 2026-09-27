@@ -210,6 +210,15 @@ body.error--bluelab {
     pointer-events: auto;
   }
 
+  /*
+   * The report shortcut is a native GET form. Keep the form itself invisible
+   * in the flex row and make the button visually identical to the prior link.
+   */
+  .error-page__report-form {
+    display: inline-flex;
+    margin: 0;
+  }
+
   .error-page__report {
     position: relative;
     z-index: 6;
@@ -217,6 +226,9 @@ body.error--bluelab {
     padding-inline: 22px;
     border-radius: 999px;
     pointer-events: auto;
+    appearance: none;
+    font: inherit;
+    cursor: pointer;
   }
 
   @media (width <= 759px) {

@@ -1,19 +1,43 @@
 .popover {
+  display: flex;
+  flex-direction: column;
   width: min(420px, calc(100vw - 32px));
-  padding: 16px;
+  max-height: inherit;
+  padding: 0;
   border: 1px solid var(--color-border-primary);
   border-radius: 12px;
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
   box-shadow: var(--dropdown-shadow);
   box-sizing: border-box;
+  overflow: hidden;
   z-index: 1000;
 }
 
 .title {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 17px;
   font-weight: 600;
+}
+
+.titleRow {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.body {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  padding: 16px;
 }
 
 .description {
@@ -41,4 +65,65 @@
   margin: 8px 0 0;
   color: var(--color-text-error);
   font-size: 14px;
+}
+
+.triggerButton {
+  display: inline-flex;
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
+  flex: 0 0 auto;
+  align-self: flex-start;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 6px 12px;
+  line-height: 20px;
+}
+
+.triggerButton :global(svg) {
+  display: none;
+}
+
+.closeButton {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.closeButton:hover,
+.closeButton:focus-visible {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.popoverSuccess {
+  width: min(340px, calc(100vw - 24px));
+  padding-bottom: 0;
+}
+
+.success {
+  margin-top: 2px;
+}
+
+.successMessage {
+  min-width: 0;
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  line-height: 20px;
 }

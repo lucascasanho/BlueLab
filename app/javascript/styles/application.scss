@@ -29,3 +29,35 @@
 html {
   @include legacy_tokens.apply;
 }
+
+/*
+ * Public bug-report shortcuts are rendered as native GET forms so they keep
+ * working even when the page does not load the React application shell.
+ */
+.bug-report-shortcut {
+  display: inline;
+  margin: 0;
+}
+
+.bug-report-shortcut__button {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-brand, var(--color-accent));
+  font: inherit;
+  line-height: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.bug-report-shortcut__button:hover,
+.bug-report-shortcut__button:focus-visible {
+  text-decoration: underline;
+}
+
+.bug-report-shortcut__button:focus-visible {
+  outline: 2px solid var(--color-border-brand, var(--color-accent));
+  outline-offset: 3px;
+}

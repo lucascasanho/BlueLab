@@ -3,35 +3,54 @@
 require 'rails_helper'
 
 RSpec.describe 'Admin Verification Requests' do
-  describe 'POST /admin/verification_requests/:id/approve' do
-    it 'allows approval when the moderator and verification role have equal positions' do
-      moderator_role = UserRole.create!(
-        name: 'Verification moderator',
-        permissions: UserRole::FLAGS[:manage_roles],
-        position: 0
-      )
-      verified_role = UserRole.create!(
-        name: UserRole::VERIFIED_ROLE_NAME,
-        permissions: UserRole::Flags::NONE,
-        position: 0
-      )
-      current_user = Fabricate(:user, role: moderator_role)
-      target_user = Fabricate(:user)
-      verification_request = VerificationRequest.create!(
-        account: target_user.account,
-        explanation: ''
-      )
+  let(:admin) { Fabricate(:admin_user) }
+  let(:account) { Fabricate(:account) }
+  let(:verification_request) { VerificationRequest.create!(account: account, explanation: 'Please review my account.') }
 
-      sign_in current_user
+  before { sign_in admin }
 
-      expect do
+  describe 'badge visibility' do
+    it 'keeps the badge visible by default' do
+      expect(account.reload.verified_badge_visible).to be(true)
+    end
+  end
+
+  describe 'GET /admin/verification_requests' do
+    it 'shows pending requests by default' do
+      get admin_verification_requests_path
+
+      expect(response).to have_http_status(200)
+      expect(response.body).to include('Please review my account.')
+    end
+  end
+
+  describe 'POST approve' do
+    it 'grants the Verificado role and resolves the request' do
+      Fabricate(:user_role, name: UserRole::VERIFIED_ROLE_NAME)
+      Fabricate(:user_role, name: 'Verified')
+
+      I18n.with_locale(:en) do
         post approve_admin_verification_request_path(verification_request)
-      end.to change { target_user.reload.role_id }.from(target_user.role_id).to(verified_role.id)
+      end
 
-      expect(response)
-        .to have_http_status(303)
-      expect(verification_request.reload)
-        .to be_approved
+      expect(response).to have_http_status(:found)
+      expect(response).to redirect_to(admin_verification_requests_path(status: 'pending'))
+      expect(verification_request.reload.status).to eq('approved')
+      expect(account.user.reload.role.name).to eq('Verified')
+      expect(account.reload.verified_by_role_since).to be_present
+    end
+  end
+
+  describe 'POST deny' do
+    it 'resolves the request without changing the role' do
+      original_role = account.user.role
+
+      post deny_admin_verification_request_path(verification_request)
+
+      expect(response).to have_http_status(:found)
+      expect(response).to redirect_to(admin_verification_requests_path(status: 'pending'))
+      expect(verification_request.reload.status).to eq('denied')
+      expect(account.user.reload.role).to eq(original_role)
     end
   end
 end

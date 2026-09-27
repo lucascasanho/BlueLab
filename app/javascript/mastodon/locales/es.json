@@ -1558,5 +1558,10 @@
   "account_edit.verification.popover.submit": "Enviar solicitud",
   "account_edit.verification.popover.cancel": "Cancelar",
   "account_edit.verification.popover.error": "No se pudo enviar tu solicitud de verificación. Inténtalo de nuevo.",
-  "notification.admin.verification_request": "{name} solicitó un sello de verificación"
+  "notification.admin.verification_request": "{name} solicitó la verificación de perfil",
+  "account_edit.verification.popover.success_title": "Solicitud enviada",
+  "account_edit.verification.popover.success_message": "Tu solicitud fue enviada al equipo de moderación para su revisión.",
+  "account_edit.verification.popover.close": "Cerrar",
+  "notification.verification.request": "Tu cuenta está siendo analizada por la moderación para su verificación.",
+  "notification.verification.approved": "Tu cuenta recibió el sello de verificación por parte de la moderación."
 }

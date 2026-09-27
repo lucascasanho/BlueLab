@@ -1615,5 +1615,10 @@
   "account_edit.verification.popover.submit": "Submit request",
   "account_edit.verification.popover.cancel": "Cancel",
   "account_edit.verification.popover.error": "We could not send your verification request. Please try again.",
-  "notification.admin.verification_request": "{name} requested a verification badge"
+  "notification.admin.verification_request": "{name} requested profile verification",
+  "account_edit.verification.popover.success_title": "Request sent",
+  "account_edit.verification.popover.success_message": "Your request was sent to the moderation team for review.",
+  "account_edit.verification.popover.close": "Close",
+  "notification.verification.request": "Your account is being reviewed by the moderation team for verification.",
+  "notification.verification.approved": "Your account has received a verification badge from the moderation team."
 }
