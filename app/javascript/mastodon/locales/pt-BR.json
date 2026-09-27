@@ -1542,8 +1542,7 @@
   "messages.conversation.title": "Conversa",
   "messages.conversation.participants": "{count, plural, one {Mensagem} other {Conversa}}",
   "messages.conversation.replying_to": "Respondendo a {name}",
-  "messages.conversation.empty": "Conversa indisponível"
-,
+  "messages.conversation.empty": "Conversa indisponível",
   "account_edit.verification.request_button": "Solicitar selo de verificado",
   "account_edit.verification.toggle_show": "Exibir selo de verificado",
   "account_edit.verification.toggle_hide": "Ocultar selo de verificado",
@@ -1558,5 +1557,10 @@
   "account_edit.verification.popover.submit": "Enviar solicitação",
   "account_edit.verification.popover.cancel": "Cancelar",
   "account_edit.verification.popover.error": "Não foi possível enviar sua solicitação de verificação. Tente novamente.",
-  "notification.admin.verification_request": "{name} solicitou um selo de verificado"
+  "notification.admin.verification_request": "{name} solicitou um selo de verificado",
+  "account_edit.verification.popover.success_title": "Solicitação enviada",
+  "account_edit.verification.popover.success_message": "Sua solicitação foi enviada para análise da moderação.",
+  "account_edit.verification.popover.close": "Fechar",
+  "notification.verification.request": "Sua conta está sendo analisada pela moderação para a verificação.",
+  "notification.verification.approved": "Sua conta recebeu o selo de verificação pela moderação."
 }
