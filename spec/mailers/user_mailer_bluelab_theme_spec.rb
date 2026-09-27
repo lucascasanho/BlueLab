@@ -18,15 +18,11 @@ RSpec.describe UserMailer do
   end
 
   it 'inherits the instance palette for the complete email design' do
-    html = described_class.welcome(receiver).html_part.body.decoded
+    html = mail.html_part.body.decoded
 
-    expect(html).to include('#2b8fcd', '#f7f9fa', '#ffffff', '#0f1419', '#000000', '#16181c', '#f7f9f9')
-    expect(html).to include('@media (prefers-color-scheme: dark)', '[data-ogsc]', '[data-ogsb]')
-    expect(html).to include('color-scheme: light dark', '-webkit-text-fill-color: #ffffff')
-    expect(html).to include('background-image: url(')
-    expect(html).to include('apple-mail-implicit-dark-support')
-    expect(html).to include('.email-card-table .email-body-table td:not(.email-btn-td):not(.email-header-card-banner-td)')
-    expect(html).to include('-webkit-text-fill-color: #f7f9f9 !important')
+    expect(html).to include('#2b8fcd', '#f7f9fa', '#ffffff', '#0f1419')
+    expect(html).to include('color-scheme: light', 'supported-color-schemes: light')
+    expect(html).to_not include('prefers-color-scheme: dark', '[data-ogsc]', '[data-ogsb]', '#000000', '#16181c', '#f7f9f9')
   end
 
   it 'ignores legacy email-specific palette settings' do
@@ -60,14 +56,6 @@ RSpec.describe UserMailer do
 
     expect(html).to_not include('images/mailer/logo.png')
     expect(html).to include('Example Social')
-  end
-
-  it 'renders the instance cover as a content image for Apple Mail' do
-    html = described_class.welcome(receiver).html_part.body.decoded
-
-    expect(html).to include('email-header-card-banner-img')
-    expect(html).to include('width="100%"', 'height="80"')
-    expect(html).to include('width: 100%; height: 80px;')
   end
 
   it 'uses the instance title instead of Mastodon in branded subjects' do
