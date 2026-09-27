@@ -23,6 +23,8 @@ RSpec.describe UserMailer do
     expect(html).to include('#2b8fcd', '#f7f9fa', '#ffffff', '#0f1419', '#000000', '#16181c', '#f7f9f9')
     expect(html).to include('@media (prefers-color-scheme: dark)', '[data-ogsc]', '[data-ogsb]')
     expect(html).to include('color-scheme: light dark', '-webkit-text-fill-color: #ffffff')
+    expect(html).to include('background-image: url(')
+    expect(html).to include('-webkit-text-fill-color: #f7f9f9 !important')
   end
 
   it 'ignores legacy email-specific palette settings' do
@@ -56,6 +58,14 @@ RSpec.describe UserMailer do
 
     expect(html).to_not include('images/mailer/logo.png')
     expect(html).to include('Example Social')
+  end
+
+  it 'keeps content images as explicit background images for Apple Mail' do
+    html = mail.html_part.body.decoded
+
+    expect(html).to include('background-image: url(')
+    expect(html).to include('background-position: center')
+    expect(html).to include('background-size: cover')
   end
 
   it 'uses the instance title instead of Mastodon in branded subjects' do
