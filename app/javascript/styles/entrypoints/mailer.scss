@@ -397,6 +397,16 @@ table + p {
   background-size: cover !important;
 }
 
+.email-header-card-banner-img {
+  display: block;
+  width: 236px;
+  height: 80px;
+  max-width: 100%;
+  border: 0;
+  border-radius: 12px 12px 0 0;
+  object-fit: cover;
+}
+
 .email-header-card-body-td {
   padding: 12px;
 
