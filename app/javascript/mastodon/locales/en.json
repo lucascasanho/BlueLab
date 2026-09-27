@@ -1599,8 +1599,7 @@
   "account_switcher.create": "Create another account",
   "account_switcher.remove": "Remove {account} from this device",
   "account_switcher.error": "This account session is no longer available. Sign in again to add it.",
-  "messages.conversation.replying_to": "Replying to {name}"
-,
+  "messages.conversation.replying_to": "Replying to {name}",
   "account_edit.verification.request_button": "Request verification badge",
   "account_edit.verification.toggle_show": "Show verification badge",
   "account_edit.verification.toggle_hide": "Hide verification badge",
@@ -1615,5 +1614,10 @@
   "account_edit.verification.popover.submit": "Submit request",
   "account_edit.verification.popover.cancel": "Cancel",
   "account_edit.verification.popover.error": "We could not send your verification request. Please try again.",
-  "notification.admin.verification_request": "{name} requested a verification badge"
+  "notification.admin.verification_request": "{name} requested a verification badge",
+  "account_edit.verification.popover.success_title": "Request sent",
+  "account_edit.verification.popover.success_message": "Your request was sent to the moderation team for review.",
+  "account_edit.verification.popover.close": "Close",
+  "notification.verification.request": "Your account is being reviewed by the moderation team for verification.",
+  "notification.verification.approved": "Your account has received a verification badge from the moderation team."
 }
