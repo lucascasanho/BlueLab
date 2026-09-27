@@ -29,7 +29,7 @@ RSpec.describe 'Public bug reports' do
 
   describe 'auth page shortcuts' do
     shared_examples 'an auth page with a bug-report shortcut' do |path|
-      it "exposes the native bug-report shortcut on #{path}" do
+      it "exposes the direct bug-report link on #{path}" do
         get path
 
         expect(response).to have_http_status(:ok)
