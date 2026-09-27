@@ -1,7 +1,6 @@
 %table.email-w-full.email-account-banner-table{ cellspacing: 0, cellpadding: 0, border: 0, role: 'presentation' }
   %tr
-    - account_header_url = full_asset_url(account.header.url)
-    %td.email-account-banner-td{ height: 140, background: account_header_url, style: "background-image: url('#{account_header_url}'); background-position: center; background-size: cover; background-repeat: no-repeat;" }
+    %td.email-account-banner-td{ height: 140, background: full_asset_url(account.header.url) }
       %table.email-w-full{ cellspacing: 0, cellpadding: 0, border: 0, role: 'presentation' }
         %tr
           %td.email-account-banner-inner-td
