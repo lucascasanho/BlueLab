@@ -26,7 +26,7 @@ module Admin
                            alert: I18n.t('admin.verification_requests.verified_role_missing')
       end
 
-      unless current_user.user_role.overrides?(verified_role)
+      unless current_account.user_role.overrides?(verified_role)
         return redirect_to admin_verification_request_path(@verification_request),
                            alert: I18n.t('admin.verification_requests.role_not_assignable')
       end
