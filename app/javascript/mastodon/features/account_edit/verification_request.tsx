@@ -10,9 +10,11 @@ import { Popover } from '@/mastodon/components/popover';
 import { domain, title as instanceTitle } from '@/mastodon/initial_state';
 import CloseIcon from '@/material-icons/400-24px/close.svg?react';
 
-import { apiGetVerificationRequestStatus, apiSubmitVerificationRequest } from '@/mastodon/api/verification';
+import {
+  apiGetVerificationRequestStatus,
+  apiSubmitVerificationRequest,
+} from '@/mastodon/api/verification';
 
-import editClasses from './styles.module.scss';
 import classes from './verification_request.module.scss';
 
 const messages = defineMessages({
@@ -169,7 +171,7 @@ export const VerificationRequestTrigger: FC = () => {
         onClick={handleTrigger}
         disabled={submitted}
       >
-{intl.formatMessage(messages.trigger)}
+        {intl.formatMessage(messages.trigger)}
       </Button>
 
       <Popover
@@ -215,7 +217,6 @@ export const VerificationRequestTrigger: FC = () => {
 
             {submitted ? (
               <div className={classes.success}>
-                <VerifiedMark className={classes.successBadge} />
                 <p className={classes.successMessage}>
                   <FormattedMessage {...messages.successMessage} />
                 </p>
