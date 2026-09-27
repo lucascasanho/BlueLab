@@ -4,11 +4,11 @@ import classNames from 'classnames';
 
 import { DisplayName } from '@/mastodon/components/display_name';
 import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
-import { RelativeTimestamp } from 'mastodon/components/relative_timestamp';
-
+import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
 import type { NotificationGroup } from 'mastodon/models/notification_group';
-import classes from 'mastodon/features/notifications/components/notification_verification.module.scss';
 import { useAppSelector } from 'mastodon/store';
+
+import classes from 'mastodon/features/notifications/components/notification_verification.module.scss';
 
 export const NotificationAdminVerificationRequest: React.FC<{
   notification: NotificationGroup;
@@ -26,8 +26,9 @@ export const NotificationAdminVerificationRequest: React.FC<{
       target='_blank'
       rel='noopener noreferrer'
       className={classNames(
-        'notification-group notification-group--link notification-group--admin-verification-request notification-group--verification focusable',
-        { 'notification-group--unread': unread },
+        'notification-group notification-group--link notification-group--admin-verification-request focusable',
+        classes.card,
+        { 'notification-group--unread': unread, [classes.unread]: unread },
       )}
     >
       <div className='notification-group__icon'>
