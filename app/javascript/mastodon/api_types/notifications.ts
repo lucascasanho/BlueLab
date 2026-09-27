@@ -21,6 +21,8 @@ export const allNotificationTypes: NotificationType[] = [
   'admin.sign_up',
   'admin.report',
   'admin.verification_request',
+  'verification_request',
+  'verification_approved',
   'moderation_warning',
   'severed_relationships',
   'annual_report',
@@ -47,6 +49,8 @@ export type NotificationType =
   | 'admin.sign_up'
   | 'admin.report'
   | 'admin.verification_request'
+  | 'verification_request'
+  | 'verification_approved'
   | 'annual_report'
   | 'added_to_collection'
   | 'collection_update';
@@ -110,7 +114,7 @@ interface CollectionUpdateNotificationJSON extends BaseNotificationJSON {
   collection: ApiCollectionJSON | null;
 }
 
-type SimpleNotificationTypes = 'follow' | 'follow_request' | 'admin.sign_up' | 'admin.verification_request';
+type SimpleNotificationTypes = 'follow' | 'follow_request' | 'admin.sign_up' | 'admin.verification_request' | 'verification_request' | 'verification_approved';
 interface SimpleNotificationGroupJSON extends BaseNotificationGroupJSON {
   type: SimpleNotificationTypes;
 }
