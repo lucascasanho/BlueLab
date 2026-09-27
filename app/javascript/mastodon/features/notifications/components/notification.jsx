@@ -19,6 +19,7 @@ import RepeatIcon from '@/material-icons/400-24px/repeat.svg?react';
 import StarIcon from '@/material-icons/400-24px/star-fill.svg?react';
 import { Account } from 'mastodon/components/account';
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
+import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
 import { Icon }  from 'mastodon/components/icon';
 import { injectIntl } from '@/mastodon/components/intl';
 import { Hotkeys } from 'mastodon/components/hotkeys';
@@ -32,7 +33,7 @@ import FollowRequestContainer from '../containers/follow_request_container';
 import { ModerationWarning } from './moderation_warning';
 import { RelationshipsSeveranceEvent } from './relationships_severance_event';
 import Report from './report';
-import { NotificationVerification } from './notification_verification';
+import notificationVerificationClasses from './notification_verification.module.scss';
 
 const messages = defineMessages({
   favourite: { id: 'notification.favourite', defaultMessage: '{name} favorited your post' },
@@ -502,6 +503,16 @@ class Notification extends ImmutablePureComponent {
     );
   }
 
+  renderVerification (notification) {
+    return (
+      <NotificationVerification
+        unread={this.props.unread}
+        approved={notification.get('type') === 'verification_approved'}
+        timestamp={notification.get('created_at')}
+      />
+    );
+  }
+
   renderAdminVerificationRequest (notification, account) {
     const { intl, unread } = this.props;
     const message = intl.formatMessage(messages.adminVerificationRequest, { name: account.get('acct') });
@@ -510,25 +521,23 @@ class Notification extends ImmutablePureComponent {
     return (
       <a
         href='/admin/verification_requests'
-        className={classNames('notification notification-admin-verification-request notification-group--verification focusable', { unread })}
+        className={classNames(
+          'notification notification-admin-verification-request notification-group--verification focusable',
+          notificationVerificationClasses.card,
+          { unread, [notificationVerificationClasses.unread]: unread },
+        )}
         tabIndex={0}
         aria-label={screenReaderMessage}
       >
-        <div className='notification__message'>
-          <NotificationVerification
-            unread={unread}
-            approved={false}
-            timestamp={notification.get('created_at')}
+        <VerifiedMark className={notificationVerificationClasses.icon} />
+        <span title={notification.get('created_at')}>
+          <FormattedMessage
+            {...messages.adminVerificationRequest}
+            values={{
+              name: <LinkedDisplayName className='notification__display-name' displayProps={{ account, variant: 'simple' }} />,
+            }}
           />
-          <span title={notification.get('created_at')}>
-            <FormattedMessage
-              {...messages.adminVerificationRequest}
-              values={{
-                name: <LinkedDisplayName className='notification__display-name' displayProps={{ account, variant: 'simple' }} />,
-              }}
-            />
-          </span>
-        </div>
+        </span>
       </a>
     );
   }
