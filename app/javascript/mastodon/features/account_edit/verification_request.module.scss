@@ -45,10 +45,16 @@
 
 
 .triggerButton {
+  display: inline-flex;
   width: fit-content;
   max-width: 100%;
+  min-width: 0;
   flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
   white-space: nowrap;
+  box-sizing: border-box;
+  padding: 8px 12px;
 }
 
 .titleRow {
