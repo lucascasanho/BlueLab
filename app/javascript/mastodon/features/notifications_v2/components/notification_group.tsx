@@ -9,6 +9,7 @@ import { useAppSelector, useAppDispatch } from 'mastodon/store';
 import { NotificationAdminReport } from './notification_admin_report';
 import { NotificationAdminSignUp } from './notification_admin_sign_up';
 import { NotificationAdminVerificationRequest } from './notification_admin_verification_request';
+import { NotificationVerification } from 'mastodon/features/notifications/components/notification_verification';
 import { NotificationAnnualReport } from './notification_annual_report';
 import { NotificationCollection } from './notification_collection';
 import { NotificationFavourite } from './notification_favourite';
@@ -145,6 +146,15 @@ export const NotificationGroup: React.FC<{
     case 'admin.verification_request':
       content = (
         <NotificationAdminVerificationRequest
+          unread={unread}
+          notification={notificationGroup}
+        />
+      );
+      break;
+    case 'verification_request':
+    case 'verification_approved':
+      content = (
+        <NotificationVerification
           unread={unread}
           notification={notificationGroup}
         />
