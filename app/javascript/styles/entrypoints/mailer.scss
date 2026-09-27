@@ -375,6 +375,7 @@ table + p {
 
 .email-header-card-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: separate;
   overflow: hidden;
   border-radius: 12px;
@@ -390,9 +391,7 @@ table + p {
 }
 
 .email-header-card-banner-td {
-  display: block;
   width: 100%;
-  min-width: 0;
   border-radius: 12px 12px 0 0;
   height: 80px;
   background-color: #f3f2f5 !important;
@@ -403,7 +402,6 @@ table + p {
 .email-header-card-banner-img {
   display: block !important;
   width: 100% !important;
-  min-width: 0;
   height: 80px !important;
   max-width: 100%;
   border: 0;
@@ -1087,6 +1085,10 @@ table + p {
     width: 240px;
     margin-inline-start: auto;
     align-self: flex-start;
+  }
+
+  .email-header-card-banner-td {
+    width: 236px;
   }
 
   .email-desktop-column {
