@@ -25,6 +25,7 @@ RSpec.describe UserMailer do
     expect(html).to include('color-scheme: light dark', '-webkit-text-fill-color: #ffffff')
     expect(html).to include('background-image: url(')
     expect(html).to include('apple-mail-implicit-dark-support')
+    expect(html).to include('.email-card-table .email-body-table td:not(.email-btn-td):not(.email-header-card-banner-td)')
     expect(html).to include('-webkit-text-fill-color: #f7f9f9 !important')
   end
 
