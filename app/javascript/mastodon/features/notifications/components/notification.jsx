@@ -33,6 +33,7 @@ import FollowRequestContainer from '../containers/follow_request_container';
 import { ModerationWarning } from './moderation_warning';
 import { RelationshipsSeveranceEvent } from './relationships_severance_event';
 import Report from './report';
+import { NotificationVerification } from './notification_verification';
 import notificationVerificationClasses from './notification_verification.module.scss';
 
 const messages = defineMessages({
@@ -503,15 +504,6 @@ class Notification extends ImmutablePureComponent {
     );
   }
 
-  renderVerification (notification) {
-    return (
-      <NotificationVerification
-        unread={this.props.unread}
-        approved={notification.get('type') === 'verification_approved'}
-        timestamp={notification.get('created_at')}
-      />
-    );
-  }
 
   renderAdminVerificationRequest (notification, account) {
     const { intl, unread } = this.props;
