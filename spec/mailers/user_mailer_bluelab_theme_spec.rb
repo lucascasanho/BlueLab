@@ -60,12 +60,11 @@ RSpec.describe UserMailer do
     expect(html).to include('Example Social')
   end
 
-  it 'keeps content images as explicit background images for Apple Mail' do
+  it 'renders the instance cover as a content image for Apple Mail' do
     html = described_class.welcome(receiver).html_part.body.decoded
 
-    expect(html).to include('background-image: url(')
-    expect(html).to include('background-position: center')
-    expect(html).to include('background-size: cover')
+    expect(html).to include('email-header-card-banner-img')
+    expect(html).to include('width="236"', 'height="80"')
   end
 
   it 'uses the instance title instead of Mastodon in branded subjects' do
