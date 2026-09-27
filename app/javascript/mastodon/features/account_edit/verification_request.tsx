@@ -161,19 +161,18 @@ export const VerificationRequestTrigger: FC = () => {
 
   return (
     <>
-      {!submitted && (
-        <Button
+      <Button
           className={editClasses.editButton}
           type='button'
           aria-haspopup='dialog'
-          aria-expanded={open}
-          aria-controls={popoverId}
-          onClick={handleTrigger}
-        >
-          <VerifiedMark className={classes.triggerBadge} />
-          {intl.formatMessage(messages.trigger)}
-        </Button>
-      )}
+        aria-expanded={open}
+        aria-controls={popoverId}
+        onClick={handleTrigger}
+        disabled={submitted}
+      >
+        <VerifiedMark className={classes.triggerBadge} />
+        {intl.formatMessage(messages.trigger)}
+      </Button>
 
       <Popover
         isOpen={open}
