@@ -20,8 +20,7 @@ RSpec.describe ErrorResponses do
         .to have_css('body.error--bluelab[data-theme="blue-2"]')
         .and have_css('.error-page__code', text: code.to_s)
         .and have_css('h1', text: error_content(code))
-        .and have_css('form.error-page__report-form[action^="/bug_reports/new"]')
-        .and have_css('button.error-page__report', text: I18n.t('bug_reports.link'))
+        .and have_css('a.error-page__report[href^="/bug_reports/new"]', text: I18n.t('bug_reports.link'))
     end
 
     def error_content(code)
@@ -170,15 +169,14 @@ RSpec.describe ErrorResponses do
       routes.draw { get 'show' => 'anonymous#show' }
     end
 
-    it 'keeps the bug-report shortcut as a native GET form' do
+    it 'keeps the bug-report shortcut as a direct link' do
       get 'show'
 
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body)
         .to have_css('body.error--bluelab[data-theme="blue-2"]')
         .and have_css('.error-page__code', text: '200')
-        .and have_css('form.error-page__report-form[action*="error_page=200"]')
-        .and have_css('button.error-page__report', text: I18n.t('bug_reports.link'))
+        .and have_css('a.error-page__report[href*="error_page=200"]', text: I18n.t('bug_reports.link'))
     end
   end
 end
