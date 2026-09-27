@@ -514,22 +514,25 @@ class Notification extends ImmutablePureComponent {
       <a
         href='/admin/verification_requests'
         className={classNames(
-          'notification notification-admin-verification-request notification-group--verification focusable',
-          notificationVerificationClasses.card,
-          { unread, [notificationVerificationClasses.unread]: unread },
+          'notification notification-admin-verification-request focusable',
+          notificationVerificationClasses.notification,
+          { unread },
         )}
         tabIndex={0}
         aria-label={screenReaderMessage}
       >
-        <VerifiedMark className={notificationVerificationClasses.icon} />
-        <span title={notification.get('created_at')}>
-          <FormattedMessage
-            {...messages.adminVerificationRequest}
-            values={{
-              name: <LinkedDisplayName className='notification__display-name' displayProps={{ account, variant: 'simple' }} />,
-            }}
-          />
-        </span>
+        <div className='notification__message'>
+          <VerifiedMark className={notificationVerificationClasses.icon} />
+
+          <span title={notification.get('created_at')}>
+            <FormattedMessage
+              {...messages.adminVerificationRequest}
+              values={{
+                name: <LinkedDisplayName className='notification__display-name' displayProps={{ account, variant: 'simple' }} />,
+              }}
+            />
+          </span>
+        </div>
       </a>
     );
   }
