@@ -18,7 +18,7 @@ RSpec.describe UserMailer do
   end
 
   it 'inherits the instance palette for the complete email design' do
-    html = mail.html_part.body.decoded
+    html = described_class.welcome(receiver).html_part.body.decoded
 
     expect(html).to include('#2b8fcd', '#f7f9fa', '#ffffff', '#0f1419', '#000000', '#16181c', '#f7f9f9')
     expect(html).to include('@media (prefers-color-scheme: dark)', '[data-ogsc]', '[data-ogsb]')
@@ -61,7 +61,7 @@ RSpec.describe UserMailer do
   end
 
   it 'keeps content images as explicit background images for Apple Mail' do
-    html = mail.html_part.body.decoded
+    html = described_class.welcome(receiver).html_part.body.decoded
 
     expect(html).to include('background-image: url(')
     expect(html).to include('background-position: center')
