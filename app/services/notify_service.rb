@@ -215,9 +215,10 @@ class NotifyService < BaseService
     end
   end
 
-  def call(recipient, type, activity, from_account: nil, from_account_id: nil, **options)
+  def call(recipient, type, activity, options = {}, from_account: nil, from_account_id: nil, **keyword_options)
     return if recipient.user.nil?
 
+    options = options.merge(keyword_options)
     @options      = options
     @recipient    = recipient
     @activity     = activity
