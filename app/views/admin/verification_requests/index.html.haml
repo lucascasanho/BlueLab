@@ -1,6 +1,14 @@
 - content_for :page_title do
   = t('admin.verification_requests.title')
 
+- content_for :heading_actions do
+  .verification-request-heading-actions
+    = link_to t('admin.verification_requests.back'), admin_verification_requests_path(status: 'pending'), class: 'button button-secondary button--compact'
+
+    - if @verification_request.pending?
+      = link_to t('admin.verification_requests.approve'), approve_admin_verification_request_path(@verification_request), method: :post, class: 'button button-secondary button--compact', data: { confirm: t('admin.accounts.are_you_sure') }
+      = link_to t('admin.verification_requests.deny'), deny_admin_verification_request_path(@verification_request), method: :post, class: 'button button--dangerous button--compact', data: { confirm: t('admin.accounts.are_you_sure') }
+
 .filters
   .filter-subset
     %strong= t('admin.verification_requests.status')
@@ -30,7 +38,7 @@
           .announcements-list__item__actions.verification-request-actions
             = link_to t('admin.verification_requests.view'), admin_verification_request_path(verification_request), class: 'button button-secondary button--compact'
             - if verification_request.pending?
-              = button_to t('admin.verification_requests.approve'), approve_admin_verification_request_path(verification_request), method: :post, class: 'button button-secondary button--compact', data: { confirm: t('admin.accounts.are_you_sure') }
-              = button_to t('admin.verification_requests.deny'), deny_admin_verification_request_path(verification_request), method: :post, class: 'button button--dangerous button--compact', data: { confirm: t('admin.accounts.are_you_sure') }
+              = link_to t('admin.verification_requests.approve'), approve_admin_verification_request_path(verification_request), method: :post, class: 'button button-secondary button--compact', data: { confirm: t('admin.accounts.are_you_sure') }
+              = link_to t('admin.verification_requests.deny'), deny_admin_verification_request_path(verification_request), method: :post, class: 'button button--dangerous button--compact', data: { confirm: t('admin.accounts.are_you_sure') }
         
   = paginate @verification_requests
