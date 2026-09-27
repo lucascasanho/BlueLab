@@ -3,11 +3,11 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 
 import { DisplayName } from '@/mastodon/components/display_name';
-import ShieldQuestionIcon from '@/material-icons/400-24px/shield_question.svg?react';
-import { Icon } from 'mastodon/components/icon';
+import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
 import { RelativeTimestamp } from 'mastodon/components/relative_timestamp';
 
 import type { NotificationGroup } from 'mastodon/models/notification_group';
+import classes from 'mastodon/features/notifications/components/notification_verification.module.scss';
 import { useAppSelector } from 'mastodon/store';
 
 export const NotificationAdminVerificationRequest: React.FC<{
@@ -26,12 +26,12 @@ export const NotificationAdminVerificationRequest: React.FC<{
       target='_blank'
       rel='noopener noreferrer'
       className={classNames(
-        'notification-group notification-group--link notification-group--admin-verification-request focusable',
+        'notification-group notification-group--link notification-group--admin-verification-request notification-group--verification focusable',
         { 'notification-group--unread': unread },
       )}
     >
       <div className='notification-group__icon'>
-        <Icon id='shield-question' icon={ShieldQuestionIcon} />
+        <VerifiedMark className={classes.icon} />
       </div>
 
       <div className='notification-group__main'>
