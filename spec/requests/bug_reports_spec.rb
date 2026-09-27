@@ -27,6 +27,28 @@ RSpec.describe 'Public bug reports' do
     end
   end
 
+  describe 'auth page shortcuts' do
+    shared_examples 'an auth page with a bug-report shortcut' do |path|
+      it "exposes the native bug-report shortcut on #{path}" do
+        get path
+
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body)
+          .to have_css('form.bug-report-shortcut[action^="/bug_reports/new"]')
+          .and have_css('button.bug-report-shortcut__button', text: I18n.t('bug_reports.link'))
+      end
+    end
+
+    before do
+      Setting.registrations_mode = 'open'
+    end
+
+    include_examples 'an auth page with a bug-report shortcut', '/auth/sign_in'
+    include_examples 'an auth page with a bug-report shortcut', '/auth/password/new'
+    include_examples 'an auth page with a bug-report shortcut', '/auth/confirmation/new'
+    include_examples 'an auth page with a bug-report shortcut', '/auth/sign_up'
+  end
+
   describe 'POST /bug_reports' do
     let(:params) do
       {
