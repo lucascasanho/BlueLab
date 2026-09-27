@@ -4,7 +4,6 @@ import type { FC, FormEvent, MouseEvent } from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { Button } from '@/mastodon/components/button';
-import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
 import { TextAreaField } from '@/mastodon/components/form_fields';
 import { Icon } from '@/mastodon/components/icon';
 import { Popover } from '@/mastodon/components/popover';
@@ -170,8 +169,7 @@ export const VerificationRequestTrigger: FC = () => {
         onClick={handleTrigger}
         disabled={submitted}
       >
-        <VerifiedMark className={classes.triggerBadge} />
-        {intl.formatMessage(messages.trigger)}
+{intl.formatMessage(messages.trigger)}
       </Button>
 
       <Popover
