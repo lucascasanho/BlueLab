@@ -56,14 +56,8 @@ module Admin
             user.current_account = current_account
             previously_verified = user.role.verified_by_instance?
 
-            # Verification roles are intentionally assignable even when their
-            # position matches the moderator's role. The request has already been
-            # authorized and higher roles are rejected above, so bypass the generic
-            # role-elevation validation used by the administration role editor.
-            user.update_columns(
-              role_id: verified_role.id,
-              updated_at: Time.current
-            )
+            # Keep the same role-update path used by the native administration UI.
+            user.update!(role_id: verified_role.id)
             user.association(:role).reset
 
             sync_verification_timestamp(user, previously_verified)
