@@ -8,6 +8,8 @@ class NotifyService < BaseService
     admin.report
     admin.sign_up
     admin.verification_request
+    verification_request
+    verification_approved
     update
     quoted_update
     poll
