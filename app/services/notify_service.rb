@@ -221,8 +221,13 @@ class NotifyService < BaseService
     @options      = options
     @recipient    = recipient
     @activity     = activity
-    @sender       = from_account || Account.find_by(id: from_account_id)
-    @notification = Notification.new(account: @recipient, from_account: @sender, type: type, activity: @activity)
+    @notification = Notification.new(
+      account: @recipient,
+      from_account: from_account || Account.find_by(id: from_account_id),
+      type: type,
+      activity: @activity
+    )
+    @sender       = @notification.from_account
 
     # For certain conditions we don't need to create a notification at all
     return if drop?
