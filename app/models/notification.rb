@@ -91,6 +91,14 @@ class Notification < ApplicationRecord
       filterable: false,
       baseline: false,
     }.freeze,
+    verification_request: {
+      filterable: false,
+      baseline: false,
+    }.freeze,
+    verification_approved: {
+      filterable: false,
+      baseline: false,
+    }.freeze,
     quote: {
       filterable: true,
       baseline: true,
