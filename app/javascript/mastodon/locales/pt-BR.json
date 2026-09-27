@@ -1542,7 +1542,8 @@
   "messages.conversation.title": "Conversa",
   "messages.conversation.participants": "{count, plural, one {Mensagem} other {Conversa}}",
   "messages.conversation.replying_to": "Respondendo a {name}",
-  "messages.conversation.empty": "Conversa indisponível",
+  "messages.conversation.empty": "Conversa indisponível"
+,
   "account_edit.verification.request_button": "Solicitar selo de verificado",
   "account_edit.verification.toggle_show": "Exibir selo de verificado",
   "account_edit.verification.toggle_hide": "Ocultar selo de verificado",
