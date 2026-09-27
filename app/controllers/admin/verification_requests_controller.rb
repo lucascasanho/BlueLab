@@ -23,21 +23,18 @@ module Admin
                                .first
       unless verified_role
         return redirect_to admin_verification_request_path(@verification_request),
-                           alert: I18n.t('admin.verification_requests.verified_role_missing'),
-                           status: :see_other
+                           alert: I18n.t('admin.verification_requests.verified_role_missing')
       end
 
       unless current_user.user_role.overrides?(verified_role)
         return redirect_to admin_verification_request_path(@verification_request),
-                           alert: I18n.t('admin.verification_requests.role_not_assignable'),
-                           status: :see_other
+                           alert: I18n.t('admin.verification_requests.role_not_assignable')
       end
 
       user = @verification_request.account.user
       if user.nil?
         return redirect_to admin_verification_request_path(@verification_request),
-                           alert: I18n.t('admin.verification_requests.account_unavailable'),
-                           status: :see_other
+                           alert: I18n.t('admin.verification_requests.account_unavailable')
       end
 
       role_changed = false
@@ -69,25 +66,20 @@ module Admin
 
       log_action :change_role, user if role_changed
       redirect_to admin_verification_requests_path(status: 'pending'),
-                  notice: I18n.t('admin.verification_requests.approved_msg'),
-                  status: :see_other
+                  notice: I18n.t('admin.verification_requests.approved_msg')
     rescue ActiveRecord::RecordNotFound
       redirect_to admin_verification_request_path(@verification_request),
-                  alert: I18n.t('admin.verification_requests.already_resolved'),
-                  status: :see_other
+                  alert: I18n.t('admin.verification_requests.already_resolved')
     rescue ActiveRecord::RecordInvalid => e
       if e.record.errors.added?(:role_id, :elevated)
         redirect_to admin_verification_request_path(@verification_request),
-                    alert: I18n.t('admin.verification_requests.role_would_be_downgraded'),
-                    status: :see_other
+                    alert: I18n.t('admin.verification_requests.role_would_be_downgraded')
       elsif e.record.errors.added?(:role, :elevated)
         redirect_to admin_verification_request_path(@verification_request),
-                    alert: I18n.t('admin.verification_requests.role_would_be_downgraded'),
-                    status: :see_other
+                    alert: I18n.t('admin.verification_requests.role_would_be_downgraded')
       else
         redirect_to admin_verification_request_path(@verification_request),
-                    alert: e.record.errors.full_messages.to_sentence,
-                    status: :see_other
+                    alert: e.record.errors.full_messages.to_sentence
       end
     end
 
@@ -102,16 +94,13 @@ module Admin
       end
 
       redirect_to admin_verification_requests_path(status: 'pending'),
-                  notice: I18n.t('admin.verification_requests.denied_msg'),
-                  status: :see_other
+                  notice: I18n.t('admin.verification_requests.denied_msg')
     rescue ActiveRecord::RecordNotFound
       redirect_to admin_verification_request_path(@verification_request),
-                  alert: I18n.t('admin.verification_requests.already_resolved'),
-                  status: :see_other
+                  alert: I18n.t('admin.verification_requests.already_resolved')
     rescue ActiveRecord::RecordInvalid => e
       redirect_to admin_verification_request_path(@verification_request),
-                  alert: e.record.errors.full_messages.to_sentence,
-                  status: :see_other
+                  alert: e.record.errors.full_messages.to_sentence
     end
 
     private
