@@ -44,13 +44,11 @@
 }
 
 
-.triggerBadge {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  margin-inline-end: 6px;
-  overflow: visible;
-  vertical-align: -0.12em;
+.triggerButton {
+  width: fit-content;
+  max-width: 100%;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .titleRow {
