@@ -231,6 +231,10 @@ RSpec.describe Auth::SessionsController do
           expect(response).to redirect_to(root_path)
           expect(controller.current_user).to eq unconfirmed_pending_user
         end
+
+        it 'treats the account as active for authentication' do
+          expect(unconfirmed_pending_user.active_for_authentication?).to be(true)
+        end
       end
 
       context 'when using an unconfirmed password' do
