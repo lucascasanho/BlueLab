@@ -1557,5 +1557,10 @@
   "account_edit.verification.popover.submit": "Envoyer la demande",
   "account_edit.verification.popover.cancel": "Annuler",
   "account_edit.verification.popover.error": "Impossible d’envoyer votre demande de vérification. Réessayez.",
-  "notification.admin.verification_request": "{name} a demandé un badge de vérification"
+  "notification.admin.verification_request": "{name} a demandé un badge de vérification",
+  "account_edit.verification.popover.success_title": "Demande envoyée",
+  "account_edit.verification.popover.success_message": "Votre demande a été envoyée à l’équipe de modération pour examen.",
+  "account_edit.verification.popover.close": "Fermer",
+  "notification.verification.request": "Votre compte est en cours d’examen par la modération pour être vérifié.",
+  "notification.verification.approved": "Votre compte a reçu le badge de vérification de la part de la modération."
 }
