@@ -35,21 +35,27 @@ export const NotificationAdminVerificationRequest: React.FC<{
         <VerifiedMark className={classes.icon} />
       </div>
 
-      <div className='notification-group__main'>
-        <div className='notification-group__main__header'>
-          <h2 className='notification-group__main__header__label'>
-            <FormattedMessage
-              id='notification.admin.verification_request'
-              defaultMessage='{name} requested a verification badge'
-              values={{
-                name: <DisplayName account={account} variant='simple' />,
-              }}
-            />
-            <RelativeTimestamp
-              timestamp={notification.latest_page_notification_at}
-            />
-          </h2>
+      <div className={classes.content}>
+        <div
+          className={classNames(
+            classes.message,
+            'notification-group__main__header__label',
+          )}
+        >
+          <FormattedMessage
+            id='notification.admin.verification_request'
+            defaultMessage='{name} requested a verification badge'
+            values={{
+              name: <DisplayName account={account} variant='simple' />,
+            }}
+          />
         </div>
+
+        <span className={classes.timestamp}>
+          <RelativeTimestamp
+            timestamp={notification.latest_page_notification_at}
+          />
+        </span>
       </div>
     </a>
   );
