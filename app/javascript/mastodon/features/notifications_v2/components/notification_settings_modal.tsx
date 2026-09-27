@@ -13,6 +13,8 @@ import { useAppDispatch } from '@/mastodon/store';
 
 import NotificationSettings from '../../notifications/containers/column_settings_container';
 
+import classes from './notification_settings_modal.module.scss';
+
 const NotificationSettingsModal: React.FC = () => {
   const dispatch = useAppDispatch();
 
@@ -23,15 +25,19 @@ const NotificationSettingsModal: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <ModalShell className='bluelab-notification-settings-modal'>
+    <ModalShell className={classes.modal}>
       <ModalTitle onClose={handleCloseModal}>
         <FormattedMessage
           id='notifications.settings'
           defaultMessage='Notification Settings'
         />
       </ModalTitle>
-      <NotificationSettings />
-      <ModalActions>
+
+      <div className={classes.body}>
+        <NotificationSettings />
+      </div>
+
+      <ModalActions className={classes.actions}>
         <Button variant='solid' color='accent' onClick={handleCloseModal}>
           <FormattedMessage id='alt_text_modal.done' defaultMessage='Done' />
         </Button>
