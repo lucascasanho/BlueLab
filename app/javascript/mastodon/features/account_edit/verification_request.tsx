@@ -3,6 +3,8 @@ import type { FC, FormEvent, MouseEvent } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { domain, title as instanceTitle } from '@/mastodon/initial_state';
+
 import { apiGetVerificationRequestStatus, apiSubmitVerificationRequest } from '@/mastodon/api/verification';
 import { Button } from '@/mastodon/components/button';
 import { TextAreaField } from '@/mastodon/components/form_fields';
@@ -23,7 +25,7 @@ const messages = defineMessages({
   description: {
     id: 'account_edit.verification.popover.description',
     defaultMessage:
-      'The BlueLab verification badge is granted according to internal criteria defined by moderation.',
+      'The {instanceName} verification badge is granted according to internal criteria defined by moderation.',
   },
   free: {
     id: 'account_edit.verification.popover.free',
@@ -38,7 +40,7 @@ const messages = defineMessages({
   federation: {
     id: 'account_edit.verification.popover.federation',
     defaultMessage:
-      'The badge is not compatible with all federation setups or Mastodon client apps. It is limited to instances using the BlueLab fork and to the web version.',
+      'The badge is not compatible with all federation setups or Mastodon client apps. It is limited to instances using the {instanceName} fork and to the web version.',
   },
   disclaimer: {
     id: 'account_edit.verification.popover.disclaimer',
@@ -132,6 +134,8 @@ export const VerificationRequestTrigger: FC = () => {
     [],
   );
 
+  const resolvedInstanceTitle = instanceTitle ?? domain ?? 'this server';
+
   if (!canRequest) {
     return null;
   }
@@ -170,7 +174,10 @@ export const VerificationRequestTrigger: FC = () => {
               <FormattedMessage {...messages.title} />
             </h3>
             <p className={classes.description}>
-              <FormattedMessage {...messages.description} />
+              <FormattedMessage
+                {...messages.description}
+                values={{ instanceName: resolvedInstanceTitle }}
+              />
             </p>
             <p className={classes.notice}>
               <FormattedMessage {...messages.free} />
@@ -179,7 +186,10 @@ export const VerificationRequestTrigger: FC = () => {
               <FormattedMessage {...messages.criteria} />
             </p>
             <p className={classes.notice}>
-              <FormattedMessage {...messages.federation} />
+              <FormattedMessage
+                {...messages.federation}
+                values={{ instanceName: resolvedInstanceTitle }}
+              />
             </p>
             <p className={classes.notice}>
               <FormattedMessage {...messages.disclaimer} />
