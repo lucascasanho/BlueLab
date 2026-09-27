@@ -20,7 +20,8 @@ class VerificationRequest < ApplicationRecord
   validates :explanation, length: { maximum: EXPLANATION_LENGTH_LIMIT }
 
   before_validation :normalize_explanation, on: :create
-  after_create_commit :notify_moderators
+  after_create_commit :notify_staff_and_requester
+  after_update_commit :notify_approved_user, if: :just_approved?
 
   scope :recent, -> { order(created_at: :desc) }
   scope :unresolved, -> { pending }
@@ -73,14 +74,39 @@ class VerificationRequest < ApplicationRecord
     self.explanation = explanation.to_s.strip
   end
 
-  def notify_moderators
+  def notify_staff_and_requester
+    notification_options = { 'from_account_id' => account_id }
+
     User.those_who_can(:manage_roles).includes(:account).find_each do |user|
       LocalNotificationWorker.perform_async(
         user.account_id,
         id,
         'VerificationRequest',
-        'admin.verification_request'
+        'admin.verification_request',
+        notification_options
       )
     end
+
+    LocalNotificationWorker.perform_async(
+      account_id,
+      id,
+      'VerificationRequest',
+      'verification_request',
+      notification_options
+    )
+  end
+
+  def notify_approved_user
+    LocalNotificationWorker.perform_async(
+      account_id,
+      id,
+      'VerificationRequest',
+      'verification_approved',
+      { 'from_account_id' => account_id }
+    )
+  end
+
+  def just_approved?
+    saved_change_to_status? && approved?
   end
 end
