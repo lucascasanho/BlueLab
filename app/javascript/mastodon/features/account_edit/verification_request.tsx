@@ -161,7 +161,7 @@ export const VerificationRequestTrigger: FC = () => {
   return (
     <>
       <Button
-        className={editClasses.editButton + ' ' + classes.triggerButton}
+        className={classes.triggerButton}
         type='button'
         aria-haspopup='dialog'
         aria-expanded={open}
