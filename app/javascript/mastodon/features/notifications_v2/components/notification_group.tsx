@@ -156,7 +156,8 @@ export const NotificationGroup: React.FC<{
       content = (
         <NotificationVerification
           unread={unread}
-          notification={notificationGroup}
+          approved={notificationGroup.type === 'verification_approved'}
+          timestamp={notificationGroup.latest_page_notification_at}
         />
       );
       break;
