@@ -27,7 +27,7 @@ module Admin
                            status: :see_other
       end
 
-      if current_user.user_role.position < verified_role.position
+      if current_account.user_role.position < verified_role.position
         return redirect_to admin_verification_request_path(@verification_request),
                            alert: I18n.t('admin.verification_requests.role_not_assignable'),
                            status: :see_other
