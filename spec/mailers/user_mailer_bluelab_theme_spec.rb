@@ -24,6 +24,7 @@ RSpec.describe UserMailer do
     expect(html).to include('@media (prefers-color-scheme: dark)', '[data-ogsc]', '[data-ogsb]')
     expect(html).to include('color-scheme: light dark', '-webkit-text-fill-color: #ffffff')
     expect(html).to include('background-image: url(')
+    expect(html).to include('apple-mail-implicit-dark-support')
     expect(html).to include('-webkit-text-fill-color: #f7f9f9 !important')
   end
 
@@ -64,7 +65,8 @@ RSpec.describe UserMailer do
     html = described_class.welcome(receiver).html_part.body.decoded
 
     expect(html).to include('email-header-card-banner-img')
-    expect(html).to include('width="236"', 'height="80"')
+    expect(html).to include('width="100%"', 'height="80"')
+    expect(html).to include('width: 100%; height: 80px;')
   end
 
   it 'uses the instance title instead of Mastodon in branded subjects' do
