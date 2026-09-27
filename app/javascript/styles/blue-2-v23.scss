@@ -216,11 +216,7 @@ body.error--bluelab {
     min-height: 42px;
     padding-inline: 22px;
     border-radius: 999px;
-    pointer-events: auto;
-    appearance: none;
-    font: inherit;
-    cursor: pointer;
-  }
+    pointer-events: auto;  }
 
   @media (width <= 759px) {
     .error-page {
