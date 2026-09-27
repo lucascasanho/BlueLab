@@ -211,6 +211,28 @@ RSpec.describe Auth::SessionsController do
         end
       end
 
+      context 'when using valid credentials for an unconfirmed pending account' do
+        let(:unconfirmed_pending_user) do
+          user.tap do |account_user|
+            account_user.update!(confirmed_at: nil, approved: false)
+          end
+        end
+
+        before do
+          post :create, params: {
+            user: {
+              email: unconfirmed_pending_user.email,
+              password: unconfirmed_pending_user.password,
+            },
+          }
+        end
+
+        it 'authenticates the user before confirmation and approval' do
+          expect(response).to redirect_to(root_path)
+          expect(controller.current_user).to eq unconfirmed_pending_user
+        end
+      end
+
       context 'when using an unconfirmed password' do
         before do
           request.headers['Accept-Language'] = accept_language
