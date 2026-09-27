@@ -3,15 +3,15 @@ import type { FC, FormEvent, MouseEvent } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { Button } from '@/mastodon/components/button';
+import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
+import { TextAreaField } from '@/mastodon/components/form_fields';
+import { Icon } from '@/mastodon/components/icon';
+import { Popover } from '@/mastodon/components/popover';
 import { domain, title as instanceTitle } from '@/mastodon/initial_state';
 import CloseIcon from '@/material-icons/400-24px/close.svg?react';
 
 import { apiGetVerificationRequestStatus, apiSubmitVerificationRequest } from '@/mastodon/api/verification';
-import { Button } from '@/mastodon/components/button';
-import { TextAreaField } from '@/mastodon/components/form_fields';
-import { Icon } from '@/mastodon/components/icon';
-import { Popover } from '@/mastodon/components/popover';
-import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
 
 import editClasses from './styles.module.scss';
 import classes from './verification_request.module.scss';
@@ -78,7 +78,8 @@ const messages = defineMessages({
   },
   successMessage: {
     id: 'account_edit.verification.popover.success_message',
-    defaultMessage: 'Your request was sent to the moderation team for review.',
+    defaultMessage:
+      'Your request was sent to the moderation team for review.',
   },
   close: {
     id: 'account_edit.verification.popover.close',
@@ -114,11 +115,11 @@ export const VerificationRequestTrigger: FC = () => {
   }, [loadEligibility]);
 
   const handleClose = useCallback(() => {
-    if (!submitting) {
-      setOpen(false);
-      setError(false);
-      setSubmitted(false);
-    }
+    if (submitting) return;
+
+    setOpen(false);
+    setError(false);
+    setSubmitted(false);
   }, [submitting]);
 
   const handleSubmit = useCallback(
@@ -160,17 +161,19 @@ export const VerificationRequestTrigger: FC = () => {
 
   return (
     <>
-      <Button
-        className={editClasses.editButton}
-        type='button'
-        aria-haspopup='dialog'
-        aria-expanded={open}
-        aria-controls={popoverId}
-        onClick={handleTrigger}
-      >
-        <VerifiedMark className={classes.triggerBadge} />
-        {intl.formatMessage(messages.trigger)}
-      </Button>
+      {!submitted && (
+        <Button
+          className={editClasses.editButton}
+          type='button'
+          aria-haspopup='dialog'
+          aria-expanded={open}
+          aria-controls={popoverId}
+          onClick={handleTrigger}
+        >
+          <VerifiedMark className={classes.triggerBadge} />
+          {intl.formatMessage(messages.trigger)}
+        </Button>
+      )}
 
       <Popover
         isOpen={open}
@@ -181,6 +184,7 @@ export const VerificationRequestTrigger: FC = () => {
         constrainToViewport
         scrollable
       >
+        {({ props }) => (
           <div
             {...props}
             id={popoverId}
@@ -200,6 +204,7 @@ export const VerificationRequestTrigger: FC = () => {
                   <FormattedMessage {...messages.title} />
                 )}
               </h3>
+
               <button
                 type='button'
                 className={classes.closeButton}
