@@ -1542,7 +1542,8 @@
   "visibility_modal.quote_label": "Quién puede citar",
   "visibility_modal.quote_nobody": "Solo yo",
   "visibility_modal.quote_public": "Cualquiera",
-  "visibility_modal.save": "Guardar",
+  "visibility_modal.save": "Guardar"
+,
   "account_edit.verification.request_button": "Solicitar sello de verificación",
   "account_edit.verification.toggle_show": "Mostrar sello de verificación",
   "account_edit.verification.toggle_hide": "Ocultar sello de verificación",
