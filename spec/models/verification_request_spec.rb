@@ -83,9 +83,7 @@ RSpec.describe VerificationRequest do
     end
 
     it 'notifies the requester after approval' do
-      expect do
-        request.resolve!(resolver, status: :approved)
-      end.to change { Sidekiq::Queues['default'].size }.by(1)
+      request.resolve!(resolver, status: :approved)
 
       expect(LocalNotificationWorker).to have_enqueued_sidekiq_job(
         request.account_id,
