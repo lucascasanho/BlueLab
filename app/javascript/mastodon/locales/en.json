@@ -1599,7 +1599,8 @@
   "account_switcher.create": "Create another account",
   "account_switcher.remove": "Remove {account} from this device",
   "account_switcher.error": "This account session is no longer available. Sign in again to add it.",
-  "messages.conversation.replying_to": "Replying to {name}",
+  "messages.conversation.replying_to": "Replying to {name}"
+,
   "account_edit.verification.request_button": "Request verification badge",
   "account_edit.verification.toggle_show": "Show verification badge",
   "account_edit.verification.toggle_hide": "Hide verification badge",
