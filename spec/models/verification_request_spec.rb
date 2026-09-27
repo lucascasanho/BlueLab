@@ -39,15 +39,25 @@ RSpec.describe VerificationRequest do
       expect(next_request_at).to be > Time.current
     end
 
-    it 'notifies users who can manage roles' do
+    it 'notifies users who can manage roles and the requester' do
       moderator = Fabricate(:user, role: Fabricate(:user_role, permissions: UserRole::FLAGS[:manage_roles]))
       request = described_class.create!(account: account, explanation: '')
+      notification_options = { 'from_account_id' => account.id }
 
       expect(LocalNotificationWorker).to have_enqueued_sidekiq_job(
         moderator.account_id,
         request.id,
         'VerificationRequest',
-        'admin.verification_request'
+        'admin.verification_request',
+        notification_options
+      )
+
+      expect(LocalNotificationWorker).to have_enqueued_sidekiq_job(
+        account.id,
+        request.id,
+        'VerificationRequest',
+        'verification_request',
+        notification_options
       )
     end
   end
@@ -70,6 +80,20 @@ RSpec.describe VerificationRequest do
       request.resolve!(resolver, status: :denied)
 
       expect(request.reload.status).to eq('denied')
+    end
+
+    it 'notifies the requester after approval' do
+      expect do
+        request.resolve!(resolver, status: :approved)
+      end.to change { Sidekiq::Queues['default'].size }.by(1)
+
+      expect(LocalNotificationWorker).to have_enqueued_sidekiq_job(
+        request.account_id,
+        request.id,
+        'VerificationRequest',
+        'verification_approved',
+        { 'from_account_id' => request.account_id }
+      )
     end
   end
 end
