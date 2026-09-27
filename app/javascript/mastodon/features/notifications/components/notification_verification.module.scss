@@ -11,7 +11,7 @@
   border-radius: var(--radius-md, 10px);
   background: color-mix(
     in srgb,
-    var(--color-bg-brand-base, var(--color-text-brand)) 14%,
+    var(--color-text-brand) 14%,
     var(--color-bg-primary)
   );
   color: var(--color-text-primary);
@@ -21,7 +21,7 @@
 .card:focus-visible {
   background: color-mix(
     in srgb,
-    var(--color-bg-brand-base, var(--color-text-brand)) 18%,
+    var(--color-text-brand) 18%,
     var(--color-bg-primary)
   );
 }
