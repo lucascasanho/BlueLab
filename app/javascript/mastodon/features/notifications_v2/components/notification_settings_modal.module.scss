@@ -1,0 +1,35 @@
+.modal {
+  min-height: 0;
+  max-height: calc(100dvh - 32px);
+  gap: 0;
+  padding: 0;
+}
+
+.modal :global(header) {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  flex: 0 0 auto;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border-primary);
+  background: var(--color-bg-primary);
+}
+
+.body {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding: 0 var(--space-4) var(--space-4);
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+
+.actions {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border-primary);
+  background: var(--color-bg-primary);
+}
