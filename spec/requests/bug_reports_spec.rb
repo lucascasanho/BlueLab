@@ -9,6 +9,7 @@ RSpec.describe 'Public bug reports' do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('bug-report-form')
+      expect(response.body).to include('data-turbo="false"')
     end
 
     it 'renders with error-page context when reached from an error page' do
