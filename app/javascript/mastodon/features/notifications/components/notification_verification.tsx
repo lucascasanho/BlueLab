@@ -5,15 +5,13 @@ import classNames from 'classnames';
 import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
 import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
 
-import type { NotificationGroupVerification } from 'mastodon/models/notification_group';
-
 import classes from './notification_verification.module.scss';
 
 export const NotificationVerification: React.FC<{
-  notification: NotificationGroupVerification;
+  approved: boolean;
+  timestamp: string;
   unread?: boolean;
-}> = ({ notification, unread = false }) => {
-  const approved = notification.type === 'verification_approved';
+}> = ({ approved, timestamp, unread = false }) => {
 
   return (
     <div
@@ -44,7 +42,7 @@ export const NotificationVerification: React.FC<{
         </p>
 
         <RelativeTimestamp
-          timestamp={notification.latest_page_notification_at}
+          timestamp={timestamp}
           className={classes.timestamp}
         />
       </div>
