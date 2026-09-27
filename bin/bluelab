@@ -530,6 +530,15 @@ promover() {
   confirmado="$(git rev-parse "$REMOTO/$CANAL_ESTAVEL")"
   [[ "$confirmado" == "$promovido" ]] || falhar "o GitHub não confirmou $CANAL_ESTAVEL no commit promovido"
 
+  # Quando o SHA promovido é exatamente a ponta testada, o canal de teste
+  # também avança para o commit de promoção. Assim, após uma promoção bem
+  # sucedida, os dois canais permanecem sincronizados e a próxima promoção
+  # pode ser um fast-forward simples.
+  if [[ "$teste" == "$teste_atual" && "$promovido" != "$teste" ]]; then
+    executar git push "$REMOTO" "$promovido:refs/heads/$CANAL_TESTE"
+    executar git fetch --prune "$REMOTO" "+refs/heads/$CANAL_TESTE:refs/remotes/$REMOTO/$CANAL_TESTE"
+  fi
+
   executar mkdir -p "$DIR_ESTADO"
   {
     echo "SHA_TESTADO=$teste"
