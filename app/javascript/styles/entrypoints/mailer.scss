@@ -385,6 +385,8 @@ table + p {
 
 .email-header-card {
   position: relative;
+  height: auto;
+  min-height: 0;
 }
 
 .email-header-card-banner-td {
@@ -1084,6 +1086,7 @@ table + p {
   .email-header-right {
     width: 240px;
     margin-inline-start: auto;
+    align-self: flex-start;
   }
 
   .email-desktop-column {
