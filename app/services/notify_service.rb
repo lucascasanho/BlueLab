@@ -107,7 +107,7 @@ class NotifyService < BaseService
   class DropCondition < BaseCondition
     def drop?
       blocked   = @recipient.unavailable?
-      blocked ||= from_self? && %i(poll severed_relationships moderation_warning annual_report).exclude?(@notification.type)
+      blocked ||= from_self? && %i(poll severed_relationships moderation_warning annual_report verification_request verification_approved).exclude?(@notification.type)
 
       return blocked if message? && from_staff?
 
