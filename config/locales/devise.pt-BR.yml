@@ -9,7 +9,7 @@ pt-BR:
       already_authenticated: Você entrou na sua conta.
       closed_registrations: Sua tentativa de registro foi bloqueada devido a uma política de rede. Se você acredita que isso é um erro, entre em contato com %{email}.
       inactive: Sua conta não foi confirmada ainda.
-      invalid: "E-mail ou senha incorretos."
+      invalid: "E-mail ou senha inválidos."
       last_attempt: Você tem mais uma tentativa antes de sua conta ser bloqueada.
       locked: Sua conta está bloqueada.
       not_found_in_database: "E-mail ou senha incorretos."
