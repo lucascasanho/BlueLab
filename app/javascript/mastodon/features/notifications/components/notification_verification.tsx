@@ -12,7 +12,6 @@ export const NotificationVerification: React.FC<{
   timestamp: string;
   unread?: boolean;
 }> = ({ approved, timestamp, unread = false }) => {
-
   return (
     <div
       className={classNames(
