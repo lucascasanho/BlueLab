@@ -11,6 +11,7 @@ import { HashIcon } from '@phosphor-icons/react';
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import { openNavigation } from '@/mastodon/actions/navigation';
 import { Blue2Announcements } from '@/mastodon/features/blue2/announcements';
+import { Blue2HomeFeedTitleBar } from '@/mastodon/features/blue2/feed_header';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
 import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
@@ -326,7 +327,24 @@ export const ColumnsAreaRedesign: React.FC<{
 
           {isBlue2FeedPage && (
             <>
-              {!isBlue2MobileLayout && blue2FeedTitle && (
+              {!isBlue2MobileLayout && isBlue2Home && (
+                <div className={classes.blue2HomeBrandBar}>
+                  <img
+                    src={blue2Brand}
+                    alt=''
+                    className={classes.blue2HomeBrand}
+                  />
+                </div>
+              )}
+              {!isBlue2MobileLayout && isBlue2Home && blue2FeedTitle && (
+                <Blue2HomeFeedTitleBar title={blue2FeedTitle}>
+                  <>
+                    {announcementsButton}
+                    <HomeColumnSettings />
+                  </>
+                </Blue2HomeFeedTitleBar>
+              )}
+              {!isBlue2MobileLayout && !isBlue2Home && blue2FeedTitle && (
                 <div className={classes.blue2FeedTitle}>
                   {blue2FeedTitle}
                 </div>
@@ -334,10 +352,17 @@ export const ColumnsAreaRedesign: React.FC<{
               <header
                 className={classNames(
                   classes.blue2Topbar,
+                  isBlue2Home && classes.blue2HomeTopbar,
                   isBlue2MobileLayout && mobileChromeClasses.feedTopBar,
                 )}
               >
-                <img src={blue2Brand} alt='' className={classes.blue2Brand} />
+                {!isBlue2Home && (
+                  <img
+                    src={blue2Brand}
+                    alt=''
+                    className={classes.blue2Brand}
+                  />
+                )}
 
                 <Link
                   className={

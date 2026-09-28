@@ -95,12 +95,16 @@ export const Emoji: FC<EmojiProps> = ({
     unicodeHex: state.code,
     ...appState,
   });
+  const isBlue2 =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'blue-2';
 
   return (
     <img
       src={src}
       alt={state.data.unicode}
-      title={state.data.label}
+      aria-label={isBlue2 ? state.data.label : undefined}
+      title={isBlue2 ? undefined : state.data.label}
       className={classNames('emojione', inversionClass)}
       loading='lazy'
     />

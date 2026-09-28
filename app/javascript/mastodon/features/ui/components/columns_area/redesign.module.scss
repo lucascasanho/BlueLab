@@ -226,6 +226,22 @@
   }
 }
 
+.blue2HomeBrandBar {
+  box-sizing: border-box;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--blue2-bg, #000);
+  border-bottom: 1px solid var(--blue2-border-soft, #17232c);
+}
+
+.blue2HomeBrand {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
 .blue2FeedTitle {
   box-sizing: border-box;
   min-height: 48px;
@@ -254,6 +270,10 @@
   -webkit-backdrop-filter: none;
   border-bottom: 1px solid var(--blue2-border-soft, #17232c);
   isolation: isolate;
+}
+
+.blue2HomeTopbar {
+  height: 50px;
 }
 
 .blue2Brand {
