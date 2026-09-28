@@ -12,6 +12,8 @@ import { blue2Text } from '@/bluelab/i18n/blue2';
 import { openNavigation } from '@/mastodon/actions/navigation';
 import { Blue2Announcements } from '@/mastodon/features/blue2/announcements';
 import { Blue2HomeFeedTitleBar } from '@/mastodon/features/blue2/feed_header';
+import { ColumnSettingsMenu } from '@/mastodon/components/column_header';
+import { FeedColumnSettings } from '@/mastodon/features/public_timeline/components/feed_column_settings';
 import { HomeColumnSettings } from '@/mastodon/features/home_timeline/components/column_settings_redesign';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
 import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
@@ -328,7 +330,7 @@ export const ColumnsAreaRedesign: React.FC<{
 
           {isBlue2FeedPage && (
             <>
-              {!isBlue2MobileLayout && isBlue2Home && (
+              {!isBlue2MobileLayout && (
                 <Link
                   to='/home'
                   className={classes.blue2HomeBrandBar}
@@ -344,12 +346,21 @@ export const ColumnsAreaRedesign: React.FC<{
                   />
                 </Link>
               )}
-              {!isBlue2MobileLayout && isBlue2Home && blue2FeedTitle && (
+              {!isBlue2MobileLayout && blue2FeedTitle && (
                 <Blue2HomeFeedTitleBar title={blue2FeedTitle}>
-                  <>
-                    <Blue2Announcements variant='mobile' />
-                    <HomeColumnSettings />
-                  </>
+                  {isBlue2Home ? (
+                    <>
+                      <Blue2Announcements variant='mobile' />
+                      <HomeColumnSettings />
+                    </>
+                  ) : (
+                    <>
+                      <Blue2Announcements variant='mobile' />
+                      <ColumnSettingsMenu labelPrefix={blue2FeedTitle}>
+                        <FeedColumnSettings columnId={undefined} />
+                      </ColumnSettingsMenu>
+                    </>
+                  )}
                 </Blue2HomeFeedTitleBar>
               )}
               {!isBlue2MobileLayout && !isBlue2Home && blue2FeedTitle && (
@@ -392,7 +403,7 @@ export const ColumnsAreaRedesign: React.FC<{
                   {blue2Text(intl.locale, 'global')}
                 </Link>
               </header>
-              {isBlue2Home && !isBlue2MobileLayout && <Blue2ComposeLauncher />}
+              {!isBlue2MobileLayout && <Blue2ComposeLauncher />}
             </>
           )}
 

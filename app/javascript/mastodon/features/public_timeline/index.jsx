@@ -148,7 +148,7 @@ class PublicTimeline extends PureComponent {
 
     return (
       <Column bindToDocument={!multiColumn} label={title}>
-        {isRedesignEnabled() || isBlue2 ? (
+        {isBlue2 && !multiColumn ? null : isRedesignEnabled() || isBlue2 ? (
           <ColumnHeader
             title={title}
             withUnreadMarker={hasUnread}
