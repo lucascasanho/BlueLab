@@ -363,11 +363,6 @@ export const ColumnsAreaRedesign: React.FC<{
                   )}
                 </Blue2HomeFeedTitleBar>
               )}
-              {!isBlue2MobileLayout && !isBlue2Home && blue2FeedTitle && (
-                <div className={classes.blue2FeedTitle}>
-                  {blue2FeedTitle}
-                </div>
-              )}
               <header
                 className={classNames(
                   classes.blue2Topbar,
@@ -375,14 +370,6 @@ export const ColumnsAreaRedesign: React.FC<{
                   isBlue2MobileLayout && mobileChromeClasses.feedTopBar,
                 )}
               >
-                {!isBlue2Home && (
-                  <img
-                    src={blue2Brand}
-                    alt=''
-                    className={classes.blue2Brand}
-                  />
-                )}
-
                 <Link
                   className={
                     isBlue2Home ? classes.blue2TabActive : classes.blue2Tab
