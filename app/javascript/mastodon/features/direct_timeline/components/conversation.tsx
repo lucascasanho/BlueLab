@@ -102,8 +102,6 @@ export const Conversation: React.FC<{
   );
   const accounts = useAppSelector((state) => getAccounts(state, accountIds));
 
-  const pointerActivationRef = useRef<number | null>(null);
-
   const handleClick = useCallback(() => {
     if (onOpenConversation) {
       onOpenConversation(id);
@@ -228,28 +226,7 @@ export const Conversation: React.FC<{
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         role='button'
-        onPointerDown={(event) => {
-          if (
-            (event.target as HTMLElement).closest(
-              '.status__action-bar, button, [role="menuitem"]',
-            )
-          ) {
-            return;
-          }
-
-          pointerActivationRef.current = Date.now();
-          handleClick();
-        }}
         onClick={(event) => {
-          const pointerActivatedAt = pointerActivationRef.current;
-          if (
-            pointerActivatedAt !== null &&
-            Date.now() - pointerActivatedAt < 500
-          ) {
-            return;
-          }
-          pointerActivationRef.current = null;
-
           if (
             (event.target as HTMLElement).closest(
               '.status__action-bar, button, [role="menuitem"]',
