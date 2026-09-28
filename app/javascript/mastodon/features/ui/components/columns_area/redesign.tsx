@@ -12,6 +12,7 @@ import { blue2Text } from '@/bluelab/i18n/blue2';
 import { openNavigation } from '@/mastodon/actions/navigation';
 import { Blue2Announcements } from '@/mastodon/features/blue2/announcements';
 import { Blue2HomeFeedTitleBar } from '@/mastodon/features/blue2/feed_header';
+import { HomeColumnSettings } from '@/mastodon/features/home_timeline/components/column_settings_redesign';
 import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
 import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
