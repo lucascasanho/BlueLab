@@ -232,7 +232,8 @@
   display: grid;
   place-items: center;
   background: var(--blue2-bg, #000);
-  border-bottom: 1px solid var(--blue2-border-soft, #17232c);
+  border-bottom: 0;
+  text-decoration: none;
 }
 
 .blue2HomeBrand {
@@ -274,6 +275,7 @@
 
 .blue2HomeTopbar {
   height: 50px;
+  border-bottom: 0;
 }
 
 .blue2Brand {

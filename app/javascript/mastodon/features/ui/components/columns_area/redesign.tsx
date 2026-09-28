@@ -329,13 +329,20 @@ export const ColumnsAreaRedesign: React.FC<{
           {isBlue2FeedPage && (
             <>
               {!isBlue2MobileLayout && isBlue2Home && (
-                <div className={classes.blue2HomeBrandBar}>
+                <Link
+                  to='/home'
+                  className={classes.blue2HomeBrandBar}
+                  aria-label={intl.formatMessage({
+                    id: 'tabs_bar.home',
+                    defaultMessage: 'Home',
+                  })}
+                >
                   <img
                     src={blue2Brand}
                     alt=''
                     className={classes.blue2HomeBrand}
                   />
-                </div>
+                </Link>
               )}
               {!isBlue2MobileLayout && isBlue2Home && blue2FeedTitle && (
                 <Blue2HomeFeedTitleBar title={blue2FeedTitle}>
