@@ -408,6 +408,12 @@
     max-height: 100%;
   }
 
+  // Reserve the mobile navigation's occupied height inside the message page
+  // so the fixed bottom bar cannot overlap the composer.
+  :global(body[data-theme='blue-2']) .page {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  }
+
   :global(body[data-theme='blue-2'])
     .replyComposer[data-bluelab-composer-compact='true']
     [data-compose-scroll-container] {
