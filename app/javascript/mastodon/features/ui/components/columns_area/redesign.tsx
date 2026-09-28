@@ -340,7 +340,7 @@ export const ColumnsAreaRedesign: React.FC<{
               {!isBlue2MobileLayout && isBlue2Home && blue2FeedTitle && (
                 <Blue2HomeFeedTitleBar title={blue2FeedTitle}>
                   <>
-                    {announcementsButton}
+                    <Blue2Announcements variant='mobile' />
                     <HomeColumnSettings />
                   </>
                 </Blue2HomeFeedTitleBar>
