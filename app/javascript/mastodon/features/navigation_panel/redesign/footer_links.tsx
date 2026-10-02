@@ -25,6 +25,7 @@ export const NavigationFooterLinks: React.FC<{
   siteName = domain,
   multiColumn,
   variant = 'default',
+  withVersionInfo,
 }) => {
   const openBugReport = useOpenBugReport();
   const multiColumnLinkAttrs = multiColumn
