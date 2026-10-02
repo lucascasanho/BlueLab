@@ -95,6 +95,11 @@ import { WrappedSwitch, WrappedRoute } from './util/react_router_helpers';
 import { CustomHomepage } from 'mastodon/features/custom_homepage';
 import 'mastodon/features/bug_report/diagnostics';
 
+// Dummy import, to make sure that <Status /> ends up in the application bundle.
+// Without this it ends up in ~8 very commonly used bundles.
+import '../../components/status/legacy/status';
+import { getNavigationSkipLinkId, SkipLinks } from './components/skip_links';
+
 const isRedesignEnabled = () => {
   if (initialState?.features.includes('redesign')) {
     return true;
@@ -106,11 +111,6 @@ const isRedesignEnabled = () => {
     return false;
   }
 };
-
-// Dummy import, to make sure that <Status /> ends up in the application bundle.
-// Without this it ends up in ~8 very commonly used bundles.
-import '../../components/status/legacy/status';
-import { getNavigationSkipLinkId, SkipLinks } from './components/skip_links';
 
 const messages = defineMessages({
   beforeUnload: { id: 'ui.beforeunload', defaultMessage: 'Your draft will be lost if you leave Mastodon.' },
