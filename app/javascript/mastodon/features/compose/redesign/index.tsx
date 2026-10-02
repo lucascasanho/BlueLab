@@ -1,6 +1,8 @@
 import type React from 'react';
 import { useCallback, useEffect, useId, useState } from 'react';
 
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+
 import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
@@ -61,6 +63,13 @@ interface RedesignComposeFormProps {
   onSuccess?: (status: ApiStatusJSON) => void;
 }
 
+const messages = defineMessages({
+  sensitiveText: {
+    id: 'compose.sensitive.text',
+    defaultMessage: 'Sensitive content description',
+  },
+});
+
 type ThreadItem = ImmutableMap<string, unknown>;
 
 export const RedesignComposeForm: React.FC<
@@ -100,6 +109,7 @@ export const RedesignComposeForm: React.FC<
     useComposeHandlers(redirectOnSuccess, activeThreadItemId, onSuccess);
 
   const titleId = useId();
+  const intl = useIntl();
   const sensitiveIcon = useIconWeight(PepperIcon, sensitive && 'fill');
 
   const handleWheelCapture: React.WheelEventHandler<HTMLFormElement> =
