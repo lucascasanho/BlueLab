@@ -23,6 +23,7 @@ import { Hotkeys } from 'mastodon/components/hotkeys';
 import { Status } from 'mastodon/components/status';
 import { FOCUS_TARGET } from 'mastodon/components/navigation_focus_target';
 import { me } from 'mastodon/initial_state';
+import { isRedesignEnabled } from 'mastodon/utils/environment';
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 
 import FollowRequestContainer from '../containers/follow_request_container';
