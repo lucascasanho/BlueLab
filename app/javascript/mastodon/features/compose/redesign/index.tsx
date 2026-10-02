@@ -436,5 +436,7 @@ function useComposeHandlers(
   return {
     onSubmit,
     onEmojiPick,
+    onSensitiveChange,
+    onSensitiveTextChange,
   };
 }
