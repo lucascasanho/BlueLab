@@ -101,9 +101,7 @@ export const shouldHideBlue2GlobalTrigger = (
 export const ComposerBackdrop: React.FC<{ onMinimize: () => void }> = ({
   onMinimize,
 }) => (
-  <button
-    type='button'
-    tabIndex={-1}
+  <div
     aria-hidden='true'
     className={classes.composerBackdrop}
     data-bluelab-composer-backdrop
