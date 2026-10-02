@@ -23,7 +23,6 @@ import { PictureInPicture } from 'mastodon/features/picture_in_picture';
 import { identityContextPropShape, withIdentity } from 'mastodon/identity_context';
 import { layoutFromWindow, transientSingleColumn } from 'mastodon/is_mobile';
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
-import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import { checkAnnualReport } from '@/mastodon/reducers/slices/annual_report';
 import { openNewComposer, openPreferredComposer } from '@/mastodon/reducers/slices/composer';
 
@@ -33,6 +32,18 @@ import { fetchServer, fetchServerTranslationLanguages } from '../../actions/serv
 import { expandHomeTimeline } from '../../actions/timelines';
 import { addColumn, removeColumn } from '../../actions/columns';
 import { initialState, forceSingleColumn, me, owner, singleUserMode, trendsEnabled, landingPage, localLiveFeedAccess, disableHoverCards, domain } from '../../initial_state';
+
+const isRedesignEnabled = () => {
+  if (initialState?.features.includes('redesign')) {
+    return true;
+  }
+
+  try {
+    return window.localStorage.getItem('experiments')?.split(',').includes('redesign') ?? false;
+  } catch {
+    return false;
+  }
+};
 
 import { BundleColumnError } from './components/bundle_column_error';
 import { NavigationBar } from './components/navigation_bar';
