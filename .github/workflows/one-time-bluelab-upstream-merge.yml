@@ -69,12 +69,26 @@ jobs:
             git commit -m "Merge current Mastodon upstream into BlueLab-Test; prefer BlueLab on conflicts"
           fi
 
+          # The GitHub Actions token used here cannot push changes to workflow files.
+          # Therefore keep every BlueLab workflow exactly as it existed before the merge.
+          mapfile -t workflow_paths < <(git diff --name-only --no-renames HEAD^1 HEAD -- .github/workflows)
+
+          for path in "${workflow_paths[@]}"; do
+            if git cat-file -e "HEAD^1:$path" 2>/dev/null; then
+              git checkout HEAD^1 -- "$path"
+            else
+              git rm -f -- "$path"
+            fi
+          done
+
+          # Remove only the non-workflow trigger; the temporary workflow itself is
+          # removed afterward through the GitHub repository API, outside Actions.
+          git rm -f "$trigger"
+
+          git diff --check
+          git merge-base --is-ancestor upstream/main HEAD
+          git commit -m "chore: preserve BlueLab CI workflows after upstream sync"
           git diff --check
           git merge-base --is-ancestor upstream/main HEAD
 
-          git rm -f "$trigger" .github/workflows/one-time-bluelab-upstream-merge.yml
-          git commit -m "chore: remove one-time upstream merge controls"
-
-          git diff --check
-          git merge-base --is-ancestor upstream/main HEAD
           git push origin "HEAD:codex/20261001-mastodon-upstream-test"
