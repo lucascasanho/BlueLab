@@ -35,6 +35,7 @@ import { Video } from 'mastodon/features/video';
 import { useIdentity } from 'mastodon/identity_context';
 import type { CollectionAttachment } from 'mastodon/models/status';
 import { compareUrls } from 'mastodon/utils/compare_urls';
+import { isRedesignEnabled } from 'mastodon/utils/environment';
 
 import Card from './card';
 
