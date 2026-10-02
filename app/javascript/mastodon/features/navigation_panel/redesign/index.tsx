@@ -2,6 +2,8 @@ import { useCallback, useEffect } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import { Link } from 'react-router-dom';
+
 import type { Map as ImmutableMap } from 'immutable';
 
 import {
