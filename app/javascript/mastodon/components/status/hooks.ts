@@ -56,7 +56,7 @@ import type { OnElementHandler } from '@/mastodon/utils/html';
 
 import { FOCUS_TARGET } from '../navigation_focus_target';
 
-import { quoteItemState } from './boost_button_utils';
+import { boostItemState, quoteItemState } from './boost_button_utils';
 import { useElementHandledLink } from './handled_link';
 import {
   StatusBookmarkActiveIcon,
@@ -77,6 +77,23 @@ export const StatusContext = createContext<{
 
 export function useStatusContext() {
   return use(StatusContext);
+}
+
+export function useStatusInteractionFactory(
+  statusId?: string,
+  contextTypeArg?: StatusContextType,
+) {
+  const statusContext = useStatusContext();
+  const contextType = contextTypeArg ?? statusContext.contextType;
+  const dispatch = useAppDispatch();
+  return useCallback(
+    (intent: StatusInteractionIntent) => {
+      return () => {
+        dispatch(statusInteraction({ statusId, intent, contextType }));
+      };
+    },
+    [contextType, dispatch, statusId],
+  );
 }
 
 export function useStatusHandlers({
