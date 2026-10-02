@@ -195,9 +195,11 @@ export const RedesignComposeForm: React.FC<
             <LanguageButton activeThreadItemId={activeThreadItemId} />
 
             <ToggleButton
+              type='button'
               size='sm'
               active={sensitive}
               onClick={onSensitiveChange}
+              onMouseDown={(event) => event.preventDefault()}
               leadingIcon={sensitiveIcon}
             >
               <FormattedMessage
