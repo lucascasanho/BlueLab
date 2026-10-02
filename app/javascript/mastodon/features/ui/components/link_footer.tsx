@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { BugReportLabel } from 'mastodon/features/bug_report/bug_report_label';
 import { useOpenBugReport } from 'mastodon/features/bug_report/use_bug_report';
 import { domain, version } from 'mastodon/initial_state';
+import { isRedesignEnabled } from 'mastodon/utils/environment';
 
 import classes from './link_footer.module.scss';
 
