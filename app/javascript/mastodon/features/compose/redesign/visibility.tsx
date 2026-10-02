@@ -1,11 +1,14 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { FormattedMessage } from 'react-intl';
+
+import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import {
   ChatCircleDotsIcon,
+  EyeIcon,
   MagnifyingGlassIcon,
   NewspaperIcon,
   QuotesIcon,
@@ -32,9 +35,10 @@ import {
   MenuItemCheckbox,
 } from '@/mastodon/components/menu';
 import { Tooltip } from '@/mastodon/components/tooltip';
+import { selectPlainAccount } from '@/mastodon/selectors/accounts';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
-import { selectComposePrivacy } from './selectors';
+import { selectComposeMentions, selectComposePrivacy } from './selectors';
 import classes from './styles.module.scss';
 
 const isBlue2ThemeActive = () =>
