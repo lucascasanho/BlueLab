@@ -21,6 +21,7 @@ import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trig
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
 import { invokeVirtualIosKeyboard } from '@/mastodon/utils/invoke_virtual_ios_keyboard';
 
 import { RedesignNavigationPanel } from '.';
