@@ -99,18 +99,7 @@ import 'mastodon/features/bug_report/diagnostics';
 // Without this it ends up in ~8 very commonly used bundles.
 import '../../components/status/legacy/status';
 import { getNavigationSkipLinkId, SkipLinks } from './components/skip_links';
-
-const isRedesignEnabled = () => {
-  if (initialState?.features.includes('redesign')) {
-    return true;
-  }
-
-  try {
-    return window.localStorage.getItem('experiments')?.split(',').includes('redesign') ?? false;
-  } catch {
-    return false;
-  }
-};
+import { isRedesignEnabled } from '@/mastodon/utils/environment';
 
 const messages = defineMessages({
   beforeUnload: { id: 'ui.beforeunload', defaultMessage: 'Your draft will be lost if you leave Mastodon.' },
