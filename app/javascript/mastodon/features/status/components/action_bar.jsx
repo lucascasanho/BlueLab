@@ -3,6 +3,8 @@ import { PureComponent } from 'react';
 
 import { defineMessages } from 'react-intl';
 
+import { isRedesignEnabled } from '@/mastodon/utils/environment';
+
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 
@@ -18,6 +20,14 @@ import { PERMISSION_MANAGE_USERS, PERMISSION_MANAGE_FEDERATION } from 'mastodon/
 import { IconButton } from '../../../components/icon_button';
 import { Dropdown } from 'mastodon/components/dropdown_menu';
 import { me, quickBoosting } from '../../../initial_state';
+import {
+  StatusBookmarkActiveIcon,
+  StatusBookmarkIcon,
+  StatusLikeActiveIcon,
+  StatusLikeIcon,
+  StatusReplyAllIcon,
+  StatusReplyIcon,
+} from '@/mastodon/components/status/icons';
 
 const baseMessages = defineMessages({
   delete: { id: 'status.delete', defaultMessage: 'Delete' },
