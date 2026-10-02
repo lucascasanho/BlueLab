@@ -5,13 +5,22 @@ import { NavLink } from 'react-router-dom';
 
 import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
 import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
-import { domain, termsOfServiceEnabled } from '@/mastodon/initial_state';
+import {
+  domain,
+  profile_directory as canViewProfileDirectory,
+  source_url,
+  statusPageUrl,
+  termsOfServiceEnabled,
+  version,
+} from '@/mastodon/initial_state';
 
 import classes from './footer_links.module.scss';
 
 export const NavigationFooterLinks: React.FC<{
   multiColumn?: boolean;
+  siteName?: string;
   variant?: 'default' | 'blue2';
+  withVersionInfo?: boolean;
 }> = ({
   siteName = domain,
   multiColumn,
