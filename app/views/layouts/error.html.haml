@@ -38,7 +38,10 @@
             = link_to root_path, class: 'button error-page__home' do
               = material_symbol('home', whitespace: false)
               = t('errors.go_home')
-            %a.button.button-secondary.error-page__report{ href: "/bug_reports/new?error_page=#{response.status}&current_path=#{ERB::Util.url_encode(request.path)}", target: '_self', data: { turbo: false } }= t('bug_reports.link')
+            = form_tag new_bug_report_path(error_page: response.status, current_path: request.path.presence || '/'), method: :get, class: 'error-page__report-form', data: { turbo: false } do
+              = hidden_field_tag :error_page, response.status
+              = hidden_field_tag :current_path, request.path.presence || '/'
+              = button_tag t('bug_reports.link'), type: 'submit', class: 'button button-secondary error-page__report'
     - else
       %main.dialog
         .dialog__illustration
@@ -47,4 +50,7 @@
           %h1= yield :content
           .dialog__actions
             %a{ class: 'button button-secondary', href: '/' }= t('errors.go_home')
-            %a.button.button-secondary.error-page__report{ href: "/bug_reports/new?error_page=#{response.status}&current_path=#{ERB::Util.url_encode(request.path)}", target: '_self', data: { turbo: false } }= t('bug_reports.link')
+            = form_tag new_bug_report_path(error_page: response.status, current_path: request.path.presence || '/'), method: :get, class: 'error-page__report-form', data: { turbo: false } do
+              = hidden_field_tag :error_page, response.status
+              = hidden_field_tag :current_path, request.path.presence || '/'
+              = button_tag t('bug_reports.link'), type: 'submit', class: 'button button-secondary error-page__report'
