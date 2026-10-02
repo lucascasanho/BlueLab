@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# CI validation only; this branch is never promoted.
 
 require 'rails_helper'
 
