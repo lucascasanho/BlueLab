@@ -539,6 +539,7 @@
   "compose.language.search": "Pesquisar idiomas...",
   "compose.message.direct.followers": "{name} {count, plural, =0 {} one {+ # outra pessoa} other {+ # outras pessoas}}",
   "compose.message.notice": "Mensagens não são criptografadas de ponta a ponta",
+  "compose.privacy.direct.hint": "Visível para todas as pessoas mencionadas. Não é criptografado.",
   "compose.message.placeholder": "Adicione os destinatários e escreva sua mensagem.",
   "compose.message.publish": "Enviar",
   "compose.message.published.body": "Mensagem enviada",
