@@ -6,6 +6,7 @@ on:
     branches:
       - 'main'
       - 'stable-*'
+      - 'codex/20261001-upstream-ci-run'
     paths:
       - 'Gemfile*'
       - '.ruby-version'
