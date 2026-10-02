@@ -59,6 +59,7 @@ export const Announcement: FC<AnnouncementProps> = ({
         <span>
           {' · '}
           <Timestamp announcement={announcement} />
+          {!isVisuallyRead && <span className='announcements__unread' />}
         </span>
       </strong>
 
@@ -71,8 +72,6 @@ export const Announcement: FC<AnnouncementProps> = ({
       <MediaAttachments media={announcement.media_attachments} />
 
       <ReactionsBar reactions={announcement.reactions} id={announcement.id} />
-
-      {!isVisuallyRead && <span className='announcements__unread' />}
     </AnimateEmojiProvider>
   );
 };

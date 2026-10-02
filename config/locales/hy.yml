@@ -508,7 +508,6 @@ hy:
   deletes:
     challenge_not_passed: Մուտքագրուած տեղեկութիւնը ստոյգ չէ
     confirm_password: Նոյնականացման համար մուտքագրիր ծածկագիրդ
-    confirm_username: Մուտքագրիր օգտանունդ գործողութիւնը հաստատելու համար
     proceed: Ջնջել հաշիվը
     success_msg: Հաշիւդ բարեյաջող ջնջուեց
     warning:

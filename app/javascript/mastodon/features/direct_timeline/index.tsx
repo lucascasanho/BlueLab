@@ -225,6 +225,7 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
               <ColumnHeaderButton
                 showTextOnDesktop
                 variant='solid'
+                color='accent'
                 icon={PlusIcon}
                 onClick={composeNewMessage}
               >
@@ -261,10 +262,17 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
         trackScroll={!pinned}
         scrollKey={`direct_timeline-${columnId}`}
         emptyMessage={
-          <FormattedMessage
-            id='empty_column.direct'
-            defaultMessage="You don't have any private mentions yet. When you send or receive one, it will show up here."
-          />
+          isRedesignEnabled() ? (
+            <FormattedMessage
+              id='empty_column.messages'
+              defaultMessage="You don't have any messages yet. When you send or receive one, it will show up here."
+            />
+          ) : (
+            <FormattedMessage
+              id='empty_column.direct'
+              defaultMessage="You don't have any private mentions yet. When you send or receive one, it will show up here."
+            />
+          )
         }
         bindToDocument={!multiColumn}
         prepend={

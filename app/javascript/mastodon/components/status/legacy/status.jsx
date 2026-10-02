@@ -35,6 +35,7 @@ import { getHashtagBarForStatus } from './hashtag_bar';
 import StatusActionBar from './action_bar';
 import StatusContent from './content';
 import { StatusThreadLabel } from './thread_label';
+import { StatusBoostIcon } from '../icons';
 
 const domParser = new DOMParser();
 
@@ -60,7 +61,7 @@ export const textForScreenReader = ({intl, status, rebloggedByText = false, isQu
     isQuote ? intl.formatMessage(messages.quote_noun) : undefined,
     displayName.length === 0 ? status.getIn(['account', 'acct']).split('@')[0] : displayName,
     spoilerText && status.get('hidden') ? spoilerText : contentText,
-    !!status.get('quote') ? intl.formatMessage(messages.contains_quote) : undefined,
+    status.get('quote') ? intl.formatMessage(messages.contains_quote) : undefined,
     intl.formatDate(status.get('created_at'), { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
     status.getIn(['account', 'acct']),
     rebloggedByText,
@@ -464,7 +465,7 @@ class Status extends ImmutablePureComponent {
 
       prepend = (
         <div className='status__prepend'>
-          <div className='status__prepend__icon'><Icon id='retweet' icon={RepeatIcon} /></div>
+          <div className='status__prepend__icon'><Icon id='retweet' icon={StatusBoostIcon} /></div>
           <FormattedMessage id='status.reblogged_by' defaultMessage='{name} boosted' values={{ name }} tagName='span' />
         </div>
       );

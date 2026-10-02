@@ -391,18 +391,33 @@ export const DetailedStatus: React.FC<{
       to={`/@${status.getIn(['account', 'acct'])}/${status.get('id')}/favourites`}
       className='detailed-status__link'
     >
-      <FormattedMessage
-        id='status.favourites_count'
-        defaultMessage='{count, plural, one {{counter} favorite} other {{counter} favorites}}'
-        values={{
-          count: status.get('favourites_count'),
-          counter: (
-            <span className='detailed-status__favorites'>
-              <AnimatedNumber value={status.get('favourites_count')} />
-            </span>
-          ),
-        }}
-      />
+      {isRedesignEnabled() ? (
+        <FormattedMessage
+          id='status.likes_count'
+          defaultMessage='{count, plural, one {{counter} like} other {{counter} likes}}'
+          values={{
+            count: status.get('favourites_count'),
+            counter: (
+              <span className='detailed-status__favorites'>
+                <AnimatedNumber value={status.get('favourites_count')} />
+              </span>
+            ),
+          }}
+        />
+      ) : (
+        <FormattedMessage
+          id='status.favourites_count'
+          defaultMessage='{count, plural, one {{counter} favorite} other {{counter} favorites}}'
+          values={{
+            count: status.get('favourites_count'),
+            counter: (
+              <span className='detailed-status__favorites'>
+                <AnimatedNumber value={status.get('favourites_count')} />
+              </span>
+            ),
+          }}
+        />
+      )}
     </Link>
   );
 

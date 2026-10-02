@@ -16,6 +16,8 @@ import {
 
 import { getNavigationSkipLinkId } from '../../ui/components/skip_links';
 
+import { getNavigationSkipLinkId } from '../../ui/components/skip_links';
+
 import classes from './header.module.scss';
 
 export const NavigationHeader: React.FC<{

@@ -53,7 +53,7 @@ export const LanguageButton: React.FC<{
 
   return (
     <Menu>
-      <MenuTrigger size='sm' trailingIcon={CaretIcon}>
+      <MenuTrigger size='sm' leadingIcon={TranslateIcon}>
         {langCode.toLocaleUpperCase()}
       </MenuTrigger>
 

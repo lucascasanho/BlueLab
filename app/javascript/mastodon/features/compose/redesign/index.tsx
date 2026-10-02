@@ -1,8 +1,6 @@
 import type React from 'react';
 import { useCallback, useEffect, useId, useState } from 'react';
 
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-
 import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
@@ -53,13 +51,6 @@ import threadClasses from './thread.module.scss';
 import { ComposeThreadFormattingToolbar } from './thread_formatting_toolbar';
 import { ComposeVisibility } from './visibility';
 
-const messages = defineMessages({
-  sensitiveText: {
-    id: 'compose.sensitive.text',
-    defaultMessage: 'Sensitive content description',
-  },
-});
-
 interface RedesignComposeFormProps {
   autoFocus?: boolean;
   className?: string;
@@ -108,7 +99,6 @@ export const RedesignComposeForm: React.FC<
   const { onSensitiveChange, onSensitiveTextChange, onEmojiPick, onSubmit } =
     useComposeHandlers(redirectOnSuccess, activeThreadItemId, onSuccess);
 
-  const intl = useIntl();
   const titleId = useId();
   const sensitiveIcon = useIconWeight(PepperIcon, sensitive && 'fill');
 
@@ -412,11 +402,10 @@ function useComposeHandlers(
   );
 
   // Submit status
-  const canSubmit = useAppSelector(selectComposeCanSubmit);
   const onSubmit = useCallback(
     (event?: React.SubmitEvent) => {
-      if (!canSubmit || event?.defaultPrevented) {
-        return;
+      if (event?.defaultPrevented) {
+        return false;
       }
       dispatch(
         submitComposer({
@@ -425,9 +414,8 @@ function useComposeHandlers(
         }),
       );
 
-      if (event) {
-        event.preventDefault();
-      }
+      event?.preventDefault();
+      return false;
     },
     [canSubmit, dispatch, onSuccess, redirectOnSuccess],
   );
@@ -435,7 +423,5 @@ function useComposeHandlers(
   return {
     onSubmit,
     onEmojiPick,
-    onSensitiveChange,
-    onSensitiveTextChange,
   };
 }

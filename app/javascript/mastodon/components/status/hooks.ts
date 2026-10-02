@@ -58,6 +58,16 @@ import { FOCUS_TARGET } from '../navigation_focus_target';
 
 import { quoteItemState } from './boost_button_utils';
 import { useElementHandledLink } from './handled_link';
+import {
+  StatusBookmarkActiveIcon,
+  StatusBookmarkIcon,
+  StatusBoostActiveIcon,
+  StatusBoostIcon,
+  StatusLikeActiveIcon,
+  StatusLikeIcon,
+  StatusReplyAllIcon,
+  StatusReplyIcon,
+} from './icons';
 import type { StatusContextType } from './types';
 
 export const StatusContext = createContext<{
@@ -101,14 +111,7 @@ export function useStatusHandlers({
   }, [dispatch, filterAction, onFilterToggle, showDespiteFilter, status]);
 
   // Interaction handlers
-  const handlerFactory = useCallback(
-    (intent: StatusInteractionIntent) => {
-      return () => {
-        dispatch(statusInteraction({ statusId, intent, contextType }));
-      };
-    },
-    [contextType, dispatch, statusId],
-  );
+  const handlerFactory = useStatusInteractionFactory(statusId, contextType);
 
   const accountId = status?.account.id;
   const onMention = useCallback(() => {
@@ -140,6 +143,15 @@ export function useStatusHandlers({
 
   const onOpenClick: React.MouseEventHandler = useCallback(
     (event) => {
+      const target = event.target;
+      if (
+        !(target instanceof HTMLElement) ||
+        target.closest('a, button') ||
+        contextType === 'detailed' ||
+        window.getSelection()?.type === 'Range'
+      ) {
+        return;
+      }
       event.preventDefault();
 
       if (event.button === 0 && !(event.ctrlKey || event.metaKey)) {
@@ -151,7 +163,7 @@ export function useStatusHandlers({
         onOpenCallback(true);
       }
     },
-    [onOpenCallback],
+    [contextType, onOpenCallback],
   );
 
   const acct = status?.account.acct;
@@ -202,7 +214,7 @@ export function useStatusHandlers({
       onOpenClick,
       onFilterToggle,
       onMention,
-      onOpen: () => {
+      onOpenCallback: () => {
         onOpenCallback();
       },
       onOpenMedia,
@@ -263,8 +275,18 @@ export function useTextForScreenReader({
 
     const spoilerText = status.translation?.spoiler_text ?? status.spoiler_text;
     const contentHtml = status.translation?.contentHtml ?? status.contentHtml;
-    const contentText = domParser.parseFromString(contentHtml, 'text/html')
-      .documentElement.textContent;
+    let contentText = spoilerText;
+    if (!status.hidden) {
+      contentText = '';
+      for (const paragraph of domParser
+        .parseFromString(contentHtml, 'text/html')
+        .querySelectorAll('p')) {
+        const text = paragraph.textContent.trim();
+        if (text) {
+          contentText += ` ${text}`;
+        }
+      }
+    }
 
     const values = [
       isQuote ? intl.formatMessage(screenReaderMessages.quote_noun) : undefined,

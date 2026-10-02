@@ -43,7 +43,6 @@ import { ComposeEmojiButton } from './emoji';
 import { ComposeSchedule } from './schedule';
 import {
   selectComposeAttachments,
-  selectComposeCanSubmit,
   selectComposeCharsCount,
   isMessageComposeType,
   selectComposeHasAttachments,

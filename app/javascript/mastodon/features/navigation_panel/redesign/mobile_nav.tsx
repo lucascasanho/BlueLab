@@ -20,8 +20,8 @@ import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
-import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import { invokeVirtualIosKeyboard } from '@/mastodon/utils/invoke_virtual_ios_keyboard';
 
 import { RedesignNavigationPanel } from '.';
 import classes from './mobile_nav.module.scss';

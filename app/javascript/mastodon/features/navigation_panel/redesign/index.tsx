@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { Link } from 'react-router-dom';
+import type { Map as ImmutableMap } from 'immutable';
 
 import {
   PenNibIcon,
@@ -14,6 +14,7 @@ import {
   BookmarkSimpleIcon,
   StarIcon,
   PlusIcon,
+  InfoIcon,
 } from '@phosphor-icons/react';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
@@ -25,19 +26,29 @@ import {
 import { connectDirectStream } from '@/mastodon/actions/streaming';
 import { groupedConversationRepresentatives } from '@/mastodon/features/direct_timeline/conversation_grouping';
 import FediIcon from '@/images/icons/icon_fediverse.svg?react';
+import { fetchFollowRequests } from '@/mastodon/actions/accounts';
 import { fetchLists } from '@/mastodon/actions/lists';
 import { closeNavigation } from '@/mastodon/actions/navigation';
 import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
+import { Button } from '@/mastodon/components/button/redesign';
 import { Callout } from '@/mastodon/components/callout/redesign';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 import { useScrollSensor } from '@/mastodon/hooks/useScrollSensor';
 import { useIdentity } from '@/mastodon/identity_context';
-import { disabledAccountId } from '@/mastodon/initial_state';
+import {
+  disabledAccountId,
+  localLiveFeedAccess,
+  remoteLiveFeedAccess,
+} from '@/mastodon/initial_state';
 import { transientSingleColumn } from '@/mastodon/is_mobile';
+import { canViewFeed } from '@/mastodon/permissions';
 import { openNewComposer } from '@/mastodon/reducers/slices/composer';
 import { getOrderedLists } from '@/mastodon/selectors/lists';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import { invokeVirtualIosKeyboard } from '@/mastodon/utils/invoke_virtual_ios_keyboard';
+
+import { useHasAnnouncements } from '../../announcements/hooks';
 
 import { Blue2ComposeIcon } from '../../blue2/icons';
 
@@ -86,6 +97,42 @@ function useFollowedHashtags() {
   }, [dispatch, stale, signedIn]);
 
   return { followedHashtags: tags };
+}
+
+export function useFollowRequestsCount({
+  fetch = true,
+}: { fetch?: boolean } = {}) {
+  const followRequestsCount = useAppSelector(
+    (state) =>
+      (
+        state.user_lists.getIn(['follow_requests', 'items']) as
+          | ImmutableMap<string, unknown>
+          | undefined
+      )?.size ?? 0,
+  );
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (fetch) {
+      dispatch(fetchFollowRequests());
+    }
+  }, [dispatch, fetch]);
+
+  return followRequestsCount;
+}
+
+export function useNotificationsCount() {
+  const unreadNotificationsCount = useAppSelector(
+    selectUnreadNotificationGroupsCount,
+  );
+  const { signedIn } = useIdentity();
+  const followRequestsCount = useFollowRequestsCount({ fetch: signedIn });
+
+  const { unreadAnnouncementCount } = useHasAnnouncements({ fetch: signedIn });
+
+  return (
+    unreadNotificationsCount + followRequestsCount + unreadAnnouncementCount
+  );
 }
 
 const isFediverseFeedsLinkActive = (
@@ -385,6 +432,62 @@ export const RedesignNavigationPanel: React.FC<{
       )}
       {bottomSensor}
     </nav>
+  );
+};
+
+const ExploreLink: React.FC = () => {
+  return (
+    <NavigationLink
+      to={{
+        pathname: '/explore',
+        state: { focusTarget: FOCUS_TARGET.SEARCH },
+      }}
+      iconComponent={MagnifyingGlassIcon}
+      onClick={invokeVirtualIosKeyboard}
+    >
+      <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
+    </NavigationLink>
+  );
+};
+
+const PublicFeedsLink: React.FC = () => {
+  const { signedIn, permissions } = useIdentity();
+
+  const canViewLocalFeed = canViewFeed(
+    signedIn,
+    permissions,
+    localLiveFeedAccess,
+  );
+  const canViewRemoteFeed = canViewFeed(
+    signedIn,
+    permissions,
+    remoteLiveFeedAccess,
+  );
+
+  if (!canViewLocalFeed && !canViewRemoteFeed) {
+    return null;
+  }
+
+  const canViewOnlyOneFeed = canViewLocalFeed !== canViewRemoteFeed;
+
+  return (
+    <NavigationLink
+      to={canViewLocalFeed ? '/public/local' : '/public/remote'}
+      iconComponent={FediIcon}
+      isActive={isFediverseFeedsLinkActive}
+    >
+      {canViewOnlyOneFeed ? (
+        <FormattedMessage
+          id='tabs_bar.public_feed'
+          defaultMessage='Public Feed'
+        />
+      ) : (
+        <FormattedMessage
+          id='tabs_bar.public_feeds'
+          defaultMessage='Public Feeds'
+        />
+      )}
+    </NavigationLink>
   );
 };
 
