@@ -35,6 +35,7 @@ defaults: &defaults
   allow_referrer_origin: false
   landing_page: 'trends'
   wrapstodon: true
+  status_page_url: ''
   # Instance customization. Keep these defaults in sync with the
   # upstream constants they replace so an unset setting preserves behaviour.
   status_character_limit: 500
