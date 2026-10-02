@@ -5,6 +5,7 @@ on:
     branches:
       - 'main'
       - 'stable-*'
+      - 'BlueLab-Test'
     paths:
       - 'package.json'
       - 'yarn.lock'
