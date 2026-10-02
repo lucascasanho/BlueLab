@@ -25,7 +25,7 @@ import { statusInteraction } from '@/mastodon/actions/interactions_typed';
 import { openModal } from '@/mastodon/actions/modal';
 import { toggleStatusSpoilers } from '@/mastodon/actions/statuses';
 import { useRelationship } from '@/mastodon/hooks/useRelationship';
-import { useExpandedStatus } from '@/mastodon/hooks/useStatus';
+import { useExpandedStatus, useStatus } from '@/mastodon/hooks/useStatus';
 import { useToggle } from '@/mastodon/hooks/useToggle';
 import { useIdentity } from '@/mastodon/identity_context';
 import { quickBoosting } from '@/mastodon/initial_state';
@@ -241,6 +241,120 @@ export function useStatusHandlers({
   );
 }
 export type StatusHandlers = ReturnType<typeof useStatusHandlers>;
+
+interface StatusIcon {
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  title: string;
+  meta?: string;
+  counter?: number;
+  active?: boolean;
+  action: () => void;
+  disabled: boolean;
+}
+
+const iconMessages = defineMessages({
+  reply: { id: 'status.reply', defaultMessage: 'Reply' },
+  replyAll: { id: 'status.replyAll', defaultMessage: 'Reply to thread' },
+  favourite: { id: 'status.favourite', defaultMessage: 'Favorite' },
+  removeFavourite: {
+    id: 'status.remove_favourite',
+    defaultMessage: 'Remove from favorites',
+  },
+  like: { id: 'status.like', defaultMessage: 'Like' },
+  removeLike: {
+    id: 'status.unlike',
+    defaultMessage: 'Unlike',
+  },
+  bookmark: { id: 'status.save', defaultMessage: 'Save post' },
+  removeBookmark: {
+    id: 'status.remove_from_saved',
+    defaultMessage: 'Remove from Saved',
+  },
+});
+
+export function useStatusIcons(statusId: string) {
+  const intl = useIntl();
+  const conditions = useAppSelector((state) =>
+    selectStatusConditions(state, statusId),
+  );
+  const status = useStatus(statusId);
+  const interactions = useAppSelector((state) =>
+    selectStatusInteractionsAllowed(state, statusId),
+  );
+  const interactionFactory = useStatusInteractionFactory(statusId);
+  const isRedesign = isRedesignEnabled();
+
+  const isReplyAll = !!status?.in_reply_to_id;
+  const reply: StatusIcon = {
+    icon: isReplyAll ? StatusReplyAllIcon : StatusReplyIcon,
+    title: intl.formatMessage(
+      isReplyAll ? iconMessages.replyAll : iconMessages.reply,
+    ),
+    counter: status?.replies_count,
+    action: interactionFactory('reply'),
+    disabled: interactions.reply,
+  };
+
+  const boostState = boostItemState(conditions);
+  const boost: StatusIcon = {
+    icon: boostState.iconComponent,
+    title: intl.formatMessage(boostState.title),
+    meta: boostState.meta ? intl.formatMessage(boostState.meta) : undefined,
+    counter: status?.reblogs_count,
+    active: status?.reblogged ?? false,
+    action: interactionFactory('reblog'),
+    disabled: boostState.disabled ?? false,
+  };
+  if (isRedesign) {
+    boost.icon = status?.reblogged ? StatusBoostActiveIcon : StatusBoostIcon;
+  }
+
+  const quoteState = quoteItemState(conditions);
+  const quote: StatusIcon = {
+    icon: quoteState.iconComponent,
+    title: intl.formatMessage(quoteState.title),
+    meta: quoteState.meta ? intl.formatMessage(quoteState.meta) : undefined,
+    counter: status?.quotes_count,
+    action: interactionFactory('quote'),
+    disabled: quoteState.disabled ?? false,
+  };
+
+  const isLiked = !!status?.favourited;
+  const like: StatusIcon = {
+    icon: isLiked ? StatusLikeActiveIcon : StatusLikeIcon,
+    title: intl.formatMessage(
+      isLiked ? iconMessages.removeFavourite : iconMessages.favourite,
+    ),
+    counter: status?.favourites_count ?? 0,
+    active: isLiked,
+    action: interactionFactory('favourite'),
+    disabled: interactions.favourite,
+  };
+  if (isRedesign) {
+    like.title = intl.formatMessage(
+      isLiked ? iconMessages.removeLike : iconMessages.like,
+    );
+  }
+
+  const isBookmarked = !!status?.bookmarked;
+  const bookmark: StatusIcon = {
+    icon: isBookmarked ? StatusBookmarkActiveIcon : StatusBookmarkIcon,
+    title: intl.formatMessage(
+      isBookmarked ? iconMessages.removeBookmark : iconMessages.bookmark,
+    ),
+    active: isBookmarked,
+    action: interactionFactory('bookmark'),
+    disabled: interactions.bookmark,
+  };
+
+  return {
+    reply,
+    boost,
+    quote,
+    like,
+    bookmark,
+  } as const;
+}
 
 const screenReaderMessages = defineMessages({
   quote_noun: {
