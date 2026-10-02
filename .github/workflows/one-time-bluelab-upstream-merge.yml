@@ -1,0 +1,74 @@
+name: One-time BlueLab upstream merge
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  merge-upstream:
+    if: >-
+      github.event.pull_request.head.repo.full_name == 'mastodon/mastodon' &&
+      github.event.pull_request.head.ref == 'main' &&
+      github.event.pull_request.base.ref == 'codex/20261001-mastodon-upstream-test'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout BlueLab base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 0
+
+      - name: Merge upstream and prefer BlueLab on conflicts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git remote add upstream https://github.com/mastodon/mastodon.git
+          git fetch upstream main --no-tags --prune
+
+          set +e
+          git merge --no-edit -X ours upstream/main
+          merge_status=$?
+          set -e
+
+          if [ "$merge_status" -ne 0 ]; then
+            echo "Git merge reported unresolved conflicts. Resolving every remaining conflict in favor of BlueLab."
+
+            mapfile -d '' conflicted < <(git diff --name-only --diff-filter=U -z)
+
+            if [ "${#conflicted[@]}" -eq 0 ]; then
+              echo "Merge failed without producing conflict markers."
+              git merge --abort || true
+              exit "$merge_status"
+            fi
+
+            for path in "${conflicted[@]}"; do
+              git checkout --ours -- "$path"
+              git add -- "$path"
+            done
+
+            if git diff --name-only --diff-filter=U | grep -q .; then
+              echo "Unresolved conflicts remain after BlueLab-side resolution."
+              git status --short
+              git merge --abort || true
+              exit 1
+            fi
+
+            git commit -m "Merge current Mastodon upstream into BlueLab-Test; prefer BlueLab on conflicts"
+          fi
+
+          # The workflow is temporary and must not become part of BlueLab's final tree.
+          git rm .github/workflows/one-time-bluelab-upstream-merge.yml
+          git commit -m "chore: remove temporary upstream merge workflow"
+
+          git diff --check
+          git merge-base --is-ancestor upstream/main HEAD
+
+          git push origin "HEAD:${{ github.event.pull_request.base.ref }}"
