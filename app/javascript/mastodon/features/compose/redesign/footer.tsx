@@ -47,6 +47,7 @@ import {
   isMessageComposeType,
   selectComposeHasAttachments,
   selectComposeType,
+  selectComposeCanSubmit,
 } from './selectors';
 import classes from './styles.module.scss';
 
