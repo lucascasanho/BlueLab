@@ -23,7 +23,17 @@ import { BoostButton } from '../boost_button';
 import { RemoveQuoteHint } from './remove_quote_hint';
 import { quoteItemState } from '../../boost_button_utils';
 import { selectStatusConditions } from '@/mastodon/selectors/statuses';
+import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import { buildMediaDownloadMenuItems } from './media_downloads';
+
+import {
+  StatusBookmarkActiveIcon,
+  StatusBookmarkIcon,
+  StatusLikeActiveIcon,
+  StatusLikeIcon,
+  StatusReplyAllIcon,
+  StatusReplyIcon,
+} from '../../icons';
 
 
 const baseMessages = defineMessages({
