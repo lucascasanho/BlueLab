@@ -7,8 +7,8 @@ import type { List, Map } from 'immutable';
 
 import { fetchAnnouncements } from '@/mastodon/actions/announcements';
 import { CustomEmojiProvider } from '@/mastodon/components/emoji/context';
-import type { IAnnouncement } from '@/mastodon/features/home_timeline/components/announcements/announcement';
-import { Announcement } from '@/mastodon/features/home_timeline/components/announcements/announcement';
+import type { IAnnouncement } from '@/mastodon/features/announcements/announcement';
+import { Announcement } from '@/mastodon/features/announcements/announcement';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import { domain, title as instanceTitle } from '@/mastodon/initial_state';
 import {
