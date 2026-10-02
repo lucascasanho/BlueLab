@@ -296,6 +296,7 @@ function useComposeHandlers(
     : text;
 
   const dispatch = useAppDispatch();
+  const canSubmit = useAppSelector(selectComposeCanSubmit);
 
   // Sensitive / CW handling follows the post that currently owns focus.
   const rootSensitive = useAppSelector(
