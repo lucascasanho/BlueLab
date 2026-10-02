@@ -1,0 +1,70 @@
+name: Refresh package lockfiles
+
+on:
+  push:
+    branches:
+      - codex/20261001-refresh-package-locks
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: codex/20261001-refresh-package-locks
+          fetch-depth: 0
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '4.0.7'
+          bundler-cache: true
+
+      - name: Refresh Yarn checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          corepack enable
+          YARN_CHECKSUM_BEHAVIOR=update yarn install
+
+      - name: Normalize Bundler platforms
+        shell: bash
+        run: |
+          set -euo pipefail
+          bundle lock --normalize-platforms
+
+      - name: Validate changed files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          changed="$(git diff --name-only)"
+          printf '%s
+' "$changed"
+
+          for path in $changed; do
+            case "$path" in
+              yarn.lock|Gemfile.lock) ;;
+              *)
+                echo "Unexpected modified file: $path"
+                exit 1
+                ;;
+            esac
+          done
+
+          git diff --exit-code -- package.json Gemfile
+
+      - name: Commit lockfile fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add yarn.lock Gemfile.lock
+          git diff --cached --check
+          git commit -m "fix: refresh package lockfiles after upstream sync"
+          git push origin HEAD:codex/20261001-refresh-package-locks
