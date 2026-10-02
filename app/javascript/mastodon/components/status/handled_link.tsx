@@ -15,6 +15,7 @@ import {
   resolveFederatedLink,
 } from '@/mastodon/utils/federated_links';
 import type { OnElementHandler } from '@/mastodon/utils/html';
+import { isRedesignEnabled } from '@/mastodon/utils/environment';
 
 import { HashtagMenu } from '../hashtag_menu';
 import { MenuTrigger } from '../menu';
