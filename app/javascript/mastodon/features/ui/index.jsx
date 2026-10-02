@@ -33,18 +33,6 @@ import { expandHomeTimeline } from '../../actions/timelines';
 import { addColumn, removeColumn } from '../../actions/columns';
 import { initialState, forceSingleColumn, me, owner, singleUserMode, trendsEnabled, landingPage, localLiveFeedAccess, disableHoverCards, domain } from '../../initial_state';
 
-const isRedesignEnabled = () => {
-  if (initialState?.features.includes('redesign')) {
-    return true;
-  }
-
-  try {
-    return window.localStorage.getItem('experiments')?.split(',').includes('redesign') ?? false;
-  } catch {
-    return false;
-  }
-};
-
 import { BundleColumnError } from './components/bundle_column_error';
 import { NavigationBar } from './components/navigation_bar';
 import { UploadArea } from './components/upload_area';
@@ -106,6 +94,18 @@ import { createMobileChromeScrollState, updateMobileChromeScrollState } from './
 import { WrappedSwitch, WrappedRoute } from './util/react_router_helpers';
 import { CustomHomepage } from 'mastodon/features/custom_homepage';
 import 'mastodon/features/bug_report/diagnostics';
+
+const isRedesignEnabled = () => {
+  if (initialState?.features.includes('redesign')) {
+    return true;
+  }
+
+  try {
+    return window.localStorage.getItem('experiments')?.split(',').includes('redesign') ?? false;
+  } catch {
+    return false;
+  }
+};
 
 // Dummy import, to make sure that <Status /> ends up in the application bundle.
 // Without this it ends up in ~8 very commonly used bundles.
