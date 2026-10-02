@@ -1,3 +1,4 @@
+// CI validation only; this branch is never promoted.
 import PropTypes from 'prop-types';
 import { lazy, PureComponent, Suspense } from 'react';
 
