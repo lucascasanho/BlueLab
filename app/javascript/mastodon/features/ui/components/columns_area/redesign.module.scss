@@ -313,30 +313,6 @@
   will-change: transform;
 }
 
-@media (pointer: coarse) {
-  .blue2TabScroller {
-    display: block;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
-    overscroll-behavior-x: contain;
-
-    &::-webkit-scrollbar {
-      width: 0 !important;
-      height: 0 !important;
-      display: none !important;
-      background: transparent !important;
-    }
-  }
-
-  .blue2TabTrack {
-    transform: none !important;
-  }
-}
-
 .blue2HomeTopbar {
   height: 50px;
 }
@@ -463,6 +439,7 @@
     border-bottom: 0 !important;
     padding-bottom: var(--mobile-bottom-nav-height);
     background: var(--blue2-bg, #000);
+    touch-action: auto;
   }
 
   .blue2MessagesMain {
