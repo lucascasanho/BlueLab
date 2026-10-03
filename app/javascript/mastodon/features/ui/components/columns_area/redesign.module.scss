@@ -297,6 +297,7 @@
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
   scrollbar-width: none;
   -ms-overflow-style: none;
   touch-action: auto;
@@ -313,11 +314,11 @@
 }
 
 .blue2TabTrack {
-  display: block;
   width: max-content;
   min-width: max-content;
   height: 100%;
-  white-space: nowrap;
+  display: flex;
+  align-items: stretch;
 }
 
 .blue2HomeTopbar {
@@ -344,8 +345,7 @@
   min-width: 140px;
   width: max-content;
   z-index: 1;
-  display: inline-flex;
-  vertical-align: bottom;
+  display: flex;
   align-items: end;
   justify-content: center;
   box-sizing: border-box;
