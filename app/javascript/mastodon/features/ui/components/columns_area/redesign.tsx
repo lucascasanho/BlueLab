@@ -515,15 +515,17 @@ export const ColumnsAreaRedesign: React.FC<{
           )}
 
           <div className='columns-area columns-area--mobile'>
-            {selectedFeedKey === null ? (
-              children
-            ) : selectedFeedKey === 'global' ? (
-              <Blue2InternalFeed type='global' />
-            ) : selectedPinnedFeed ? (
-              <Blue2InternalFeed
-                type={selectedPinnedFeed.type}
-                id={selectedPinnedFeed.id}
-              />
+            {isBlue2FeedPage ? (
+              selectedFeedKey === 'global' ? (
+                <Blue2InternalFeed type='global' />
+              ) : selectedPinnedFeed ? (
+                <Blue2InternalFeed
+                  type={selectedPinnedFeed.type}
+                  id={selectedPinnedFeed.id}
+                />
+              ) : (
+                <Blue2InternalFeed type='home' />
+              )
             ) : (
               children
             )}
