@@ -179,6 +179,15 @@ export const ColumnsAreaRedesign: React.FC<{
     [],
   );
 
+  const selectFeedTab = useCallback((key: string | null) => {
+    if (suppressFeedTabsClickRef.current) {
+      suppressFeedTabsClickRef.current = false;
+      return;
+    }
+
+    setSelectedFeedKey(key);
+  }, []);
+
   const handleFeedTabsPointerEnd = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       const drag = feedTabsDragRef.current;
@@ -200,16 +209,7 @@ export const ColumnsAreaRedesign: React.FC<{
     [],
   );
 
-  const handleFeedTabsClick = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      if (suppressFeedTabsClickRef.current) {
-        event.preventDefault();
-        event.stopPropagation();
-        suppressFeedTabsClickRef.current = false;
-      }
-    },
-    [],
-  );
+
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -477,7 +477,6 @@ export const ColumnsAreaRedesign: React.FC<{
                   onPointerMove={handleFeedTabsPointerMove}
                   onPointerUp={handleFeedTabsPointerEnd}
                   onPointerCancel={handleFeedTabsPointerEnd}
-                  onClick={handleFeedTabsClick}
                 >
                   <button
                     type='button'
@@ -486,7 +485,7 @@ export const ColumnsAreaRedesign: React.FC<{
                         ? classes.blue2TabActive
                         : classes.blue2Tab
                     }
-                    onClick={() => setSelectedFeedKey(null)}
+                    onClick={() => selectFeedTab(null)}
                   >
                     <FormattedMessage
                       id='account.following'
@@ -500,13 +499,13 @@ export const ColumnsAreaRedesign: React.FC<{
                         ? classes.blue2TabActive
                         : classes.blue2Tab
                     }
-                    onClick={() => setSelectedFeedKey('global')}
+                    onClick={() => selectFeedTab('global')}
                   >
                     {blue2Text(intl.locale, 'global')}
                   </button>
                   <Blue2PinnedFeedTabs
                     activeKey={selectedFeedKey}
-                    onSelect={setSelectedFeedKey}
+                    onSelect={selectFeedTab}
                   />
                 </div>
                 <Blue2PinnedFeedMenu />
