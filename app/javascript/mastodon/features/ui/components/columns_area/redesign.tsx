@@ -144,9 +144,7 @@ export const ColumnsAreaRedesign: React.FC<{
   const suppressFeedTabsClickRef = useRef(false);
   const [feedTabsOffset, setFeedTabsOffset] = useState(0);
   const [feedTabsDragging, setFeedTabsDragging] = useState(false);
-  const isCoarsePointer =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(pointer: coarse)').matches;
+
 
   const getFeedTabsMaxOffset = useCallback(() => {
     const scroller = feedTabsRef.current;
@@ -557,30 +555,14 @@ export const ColumnsAreaRedesign: React.FC<{
                   ref={feedTabsRef}
                   className={classes.blue2TabScroller}
                   data-dragging={feedTabsDragging ? 'true' : undefined}
-                  onPointerDown={
-                    isCoarsePointer ? undefined : handleFeedTabsPointerDown
-                  }
-                  onPointerMove={
-                    isCoarsePointer ? undefined : handleFeedTabsPointerMove
-                  }
-                  onPointerUp={
-                    isCoarsePointer ? undefined : handleFeedTabsPointerEnd
-                  }
-                  onPointerCancel={
-                    isCoarsePointer ? undefined : handleFeedTabsPointerEnd
-                  }
-                  onTouchStart={
-                    isCoarsePointer ? undefined : handleFeedTabsTouchStart
-                  }
-                  onTouchMove={
-                    isCoarsePointer ? undefined : handleFeedTabsTouchMove
-                  }
-                  onTouchEnd={
-                    isCoarsePointer ? undefined : handleFeedTabsTouchEnd
-                  }
-                  onTouchCancel={
-                    isCoarsePointer ? undefined : handleFeedTabsTouchEnd
-                  }
+                  onPointerDown={handleFeedTabsPointerDown}
+                  onPointerMove={handleFeedTabsPointerMove}
+                  onPointerUp={handleFeedTabsPointerEnd}
+                  onPointerCancel={handleFeedTabsPointerEnd}
+                  onTouchStart={handleFeedTabsTouchStart}
+                  onTouchMove={handleFeedTabsTouchMove}
+                  onTouchEnd={handleFeedTabsTouchEnd}
+                  onTouchCancel={handleFeedTabsTouchEnd}
                 >
                   <div
                     ref={feedTabsTrackRef}
