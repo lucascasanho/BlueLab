@@ -12,7 +12,7 @@ import { useIdentity } from '@/mastodon/identity_context';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
-import { RssSimpleIcon } from '@phosphor-icons/react';
+import { HashIcon, RssSimpleIcon } from '@phosphor-icons/react';
 
 import { Blue2HomeIcon } from './icons';
 import { useBlue2PinnedFeeds } from './pinned_feeds';
@@ -140,7 +140,11 @@ export const Blue2RightRail: React.FC<{
                 to={feed.path}
               >
                 <span className={classes.feedIcon}>
-                  {feed.type === 'list' && <RssSimpleIcon size={18} />}
+                  {feed.type === 'list' ? (
+                    <RssSimpleIcon size={18} />
+                  ) : (
+                    <HashIcon size={18} />
+                  )}
                 </span>
                 <span>{feed.title}</span>
               </NavLink>
