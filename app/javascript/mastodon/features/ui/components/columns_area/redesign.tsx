@@ -136,11 +136,6 @@ export const ColumnsAreaRedesign: React.FC<{
     startOffset: number;
     moved: boolean;
   } | null>(null);
-  const feedTabsTouchRef = useRef<{
-    startX: number;
-    startOffset: number;
-    moved: boolean;
-  } | null>(null);
   const suppressFeedTabsClickRef = useRef(false);
   const [feedTabsOffset, setFeedTabsOffset] = useState(0);
   const [feedTabsDragging, setFeedTabsDragging] = useState(false);
@@ -213,64 +208,6 @@ export const ColumnsAreaRedesign: React.FC<{
       }
 
       feedTabsDragRef.current = null;
-      setFeedTabsDragging(false);
-    },
-    [],
-  );
-
-  const handleFeedTabsTouchStart = useCallback(
-    (event: React.TouchEvent<HTMLDivElement>) => {
-      const touch = event.touches[0];
-      if (!touch) return;
-
-      event.stopPropagation();
-      feedTabsTouchRef.current = {
-        startX: touch.clientX,
-        startOffset: feedTabsOffset,
-        moved: false,
-      };
-      setFeedTabsDragging(false);
-    },
-    [feedTabsOffset],
-  );
-
-  const handleFeedTabsTouchMove = useCallback(
-    (event: React.TouchEvent<HTMLDivElement>) => {
-      const touch = event.touches[0];
-      const drag = feedTabsTouchRef.current;
-
-      if (!touch || !drag) return;
-
-      event.stopPropagation();
-
-      const deltaX = touch.clientX - drag.startX;
-      if (Math.abs(deltaX) > 5) {
-        drag.moved = true;
-        suppressFeedTabsClickRef.current = true;
-        setFeedTabsDragging(true);
-        event.preventDefault();
-      }
-
-      if (drag.moved) {
-        setFeedTabsOffset(clampFeedTabsOffset(drag.startOffset - deltaX));
-      }
-    },
-    [clampFeedTabsOffset],
-  );
-
-  const handleFeedTabsTouchEnd = useCallback(
-    (event: React.TouchEvent<HTMLDivElement>) => {
-      event.stopPropagation();
-
-      const drag = feedTabsTouchRef.current;
-      if (drag?.moved) {
-        suppressFeedTabsClickRef.current = true;
-        window.setTimeout(() => {
-          suppressFeedTabsClickRef.current = false;
-        }, 80);
-      }
-
-      feedTabsTouchRef.current = null;
       setFeedTabsDragging(false);
     },
     [],
@@ -559,10 +496,6 @@ export const ColumnsAreaRedesign: React.FC<{
                   onPointerMove={handleFeedTabsPointerMove}
                   onPointerUp={handleFeedTabsPointerEnd}
                   onPointerCancel={handleFeedTabsPointerEnd}
-                  onTouchStart={handleFeedTabsTouchStart}
-                  onTouchMove={handleFeedTabsTouchMove}
-                  onTouchEnd={handleFeedTabsTouchEnd}
-                  onTouchCancel={handleFeedTabsTouchEnd}
                 >
                   <div
                     ref={feedTabsTrackRef}
