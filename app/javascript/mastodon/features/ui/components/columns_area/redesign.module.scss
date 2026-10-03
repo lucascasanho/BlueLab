@@ -291,36 +291,26 @@
 .blue2TabScroller {
   min-width: 0;
   flex: 1 1 auto;
-  display: flex;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  scrollbar-color: transparent transparent;
+  height: 50px;
+  display: block;
+  overflow: hidden;
   cursor: grab;
   touch-action: pan-y;
   overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
-
-  &::-webkit-scrollbar {
-    width: 0 !important;
-    height: 0 !important;
-    background: transparent !important;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent !important;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: transparent !important;
-    border: 0 !important;
-  }
 
   &[data-dragging='true'] {
     cursor: grabbing;
     user-select: none;
   }
+}
+
+.blue2TabTrack {
+  width: max-content;
+  min-width: max-content;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+  will-change: transform;
 }
 
 .blue2HomeTopbar {
