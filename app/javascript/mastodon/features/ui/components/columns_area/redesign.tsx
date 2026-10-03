@@ -231,6 +231,72 @@ export const ColumnsAreaRedesign: React.FC<{
     [],
   );
 
+  const feedTabsTouchRef = useRef<{
+    startX: number;
+    startOffset: number;
+    moved: boolean;
+  } | null>(null);
+
+  const handleFeedTabsTouchStart = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      const touch = event.touches[0];
+      if (!touch) return;
+
+      feedTabsTouchRef.current = {
+        startX: touch.clientX,
+        startOffset: feedTabsOffset,
+        moved: false,
+      };
+
+      event.stopPropagation();
+    },
+    [feedTabsOffset],
+  );
+
+  const handleFeedTabsTouchMove = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      const drag = feedTabsTouchRef.current;
+      const touch = event.touches[0];
+
+      if (!drag || !touch) return;
+
+      const deltaX = touch.clientX - drag.startX;
+
+      if (Math.abs(deltaX) > 5) {
+        drag.moved = true;
+        suppressFeedTabsClickRef.current = true;
+        setFeedTabsDragging(true);
+        event.preventDefault();
+      }
+
+      if (drag.moved) {
+        setFeedTabsOffset(clampFeedTabsOffset(drag.startOffset - deltaX));
+      }
+
+      event.stopPropagation();
+    },
+    [clampFeedTabsOffset],
+  );
+
+  const handleFeedTabsTouchEnd = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      const drag = feedTabsTouchRef.current;
+      if (!drag) return;
+
+      if (drag.moved) {
+        suppressFeedTabsClickRef.current = true;
+        window.setTimeout(() => {
+          suppressFeedTabsClickRef.current = false;
+        }, 300);
+      }
+
+      feedTabsTouchRef.current = null;
+      setFeedTabsDragging(false);
+      event.stopPropagation();
+    },
+    [],
+  );
+
   const selectFeedTab = useCallback((key: string | null) => {
     setSelectedFeedKey(key);
   }, []);
@@ -514,6 +580,10 @@ export const ColumnsAreaRedesign: React.FC<{
                   onPointerMove={handleFeedTabsPointerMove}
                   onPointerUp={handleFeedTabsPointerEnd}
                   onPointerCancel={handleFeedTabsPointerEnd}
+                  onTouchStart={handleFeedTabsTouchStart}
+                  onTouchMove={handleFeedTabsTouchMove}
+                  onTouchEnd={handleFeedTabsTouchEnd}
+                  onTouchCancel={handleFeedTabsTouchEnd}
                   onClickCapture={handleFeedTabsClickCapture}
                 >
                   <div
