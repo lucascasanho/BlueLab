@@ -5,7 +5,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { HashIcon, PlusIcon, RssSimpleIcon } from '@phosphor-icons/react';
 
 import { fetchLists } from '@/mastodon/actions/lists';
-import { IconButton } from '@/mastodon/components/button/redesign';
+import { Button } from '@/mastodon/components/button/redesign';
 import {
   Menu,
   MenuItem,
@@ -212,20 +212,25 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
   return (
     <Menu noFocus>
       <MenuTrigger
-        as={IconButton}
-        icon={PlusIcon}
+        leadingIcon={PlusIcon}
         variant='ghost'
         color='neutral'
         size='sm'
         className={classes.addButton}
+        aria-label={intl.formatMessage({
+          id: 'blue2.pinned_feeds.add',
+          defaultMessage: 'Add pinned timeline',
+        })}
       >
-        <FormattedMessage
-          id='blue2.pinned_feeds.add'
-          defaultMessage='Add pinned timeline'
-        />
+        <span className='sr-only'>
+          <FormattedMessage
+            id='blue2.pinned_feeds.add'
+            defaultMessage='Add pinned timeline'
+          />
+        </span>
       </MenuTrigger>
 
-      <MenuList placement='bottom-end' maxWidth={300}>
+      <MenuList portal placement='bottom-end' maxWidth={300}>
         <MenuItemGroup
           label={
             <FormattedMessage
