@@ -538,6 +538,17 @@
     max-width: 100%;
   }
 
+  // On Safari/iOS keep the scrolling element block-level and use a grid
+  // track so every pinned tab becomes a real horizontal grid column.
+  .blue2TabTrack {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    align-items: stretch;
+    width: max-content;
+    min-width: max-content;
+  }
+
   .blue2Brand {
     display: none;
   }
