@@ -501,6 +501,7 @@ export const ColumnsAreaRedesign: React.FC<{
                     onSelect={selectFeedTab}
                     tabClassName={classes.blue2Tab}
                     activeTabClassName={classes.blue2TabActive}
+                    showIcons={false}
                   />
                 </div>
                 <Blue2PinnedFeedMenu />
