@@ -231,7 +231,12 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
         </span>
       </MenuTrigger>
 
-      <MenuList portal placement='bottom-end' maxWidth={300}>
+      <MenuList
+        portal
+        placement='bottom-end'
+        maxWidth={300}
+        mobilePresentation='popover'
+      >
         <MenuItemGroup
           label={
             <FormattedMessage
