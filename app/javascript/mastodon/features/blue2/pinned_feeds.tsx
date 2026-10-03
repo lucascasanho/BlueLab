@@ -2,8 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { NavLink } from 'react-router-dom';
-
 import { HashIcon, PlusIcon, RssSimpleIcon } from '@phosphor-icons/react';
 
 import { fetchLists } from '@/mastodon/actions/lists';
@@ -320,22 +318,25 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
   );
 };
 
-export const Blue2PinnedFeedTabs: React.FC = () => {
+export const Blue2PinnedFeedTabs: React.FC<{
+  activeKey: string | null;
+  onSelect: (key: string) => void;
+}> = ({ activeKey, onSelect }) => {
   const { feeds } = useBlue2PinnedFeeds();
 
   return (
     <>
       {feeds.map((feed) => (
-        <NavLink
+        <button
           key={feed.key}
+          type='button'
           className={classes.tab}
-          activeClassName={classes.tabActive}
-          exact
-          to={feed.path}
+          data-active={activeKey === feed.key ? 'true' : undefined}
+          onClick={() => onSelect(feed.key)}
         >
           {feed.type === 'list' && <RssSimpleIcon size={15} />}
           <span>{feed.title}</span>
-        </NavLink>
+        </button>
       ))}
     </>
   );
