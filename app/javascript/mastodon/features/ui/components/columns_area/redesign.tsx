@@ -104,7 +104,6 @@ export const ColumnsAreaRedesign: React.FC<{
   const isBlue2Search = isBlue2 && blue2Pathname === '/search';
   const isBlue2FeedPage =
     (isBlue2Home || isBlue2Global) && !isBlue2MessagesPage;
-  const blue2FeedTitle = isBlue2FeedPage ? activeFeedTitle : null;
   const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
   const { feeds: pinnedFeeds } = useBlue2PinnedFeeds();
   const [selectedFeedKey, setSelectedFeedKey] = useState<string | null>(
@@ -128,6 +127,7 @@ export const ColumnsAreaRedesign: React.FC<{
           id: 'account.following',
           defaultMessage: 'Following',
         });
+  const blue2FeedTitle = isBlue2FeedPage ? activeFeedTitle : null;
   const feedTabsRef = useRef<HTMLDivElement>(null);
   const feedTabsDragRef = useRef<{
     pointerId: number;
