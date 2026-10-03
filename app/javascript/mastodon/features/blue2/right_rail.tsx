@@ -140,11 +140,7 @@ export const Blue2RightRail: React.FC<{
                 to={feed.path}
               >
                 <span className={classes.feedIcon}>
-                  {feed.type === 'list' ? (
-                    <RssSimpleIcon size={18} />
-                  ) : (
-                    <HashIcon size={18} />
-                  )}
+                  {feed.type === 'list' && <RssSimpleIcon size={18} />}
                 </span>
                 <span>{feed.title}</span>
               </NavLink>
