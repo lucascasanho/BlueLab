@@ -333,7 +333,7 @@ export const Blue2PinnedFeedTabs: React.FC = () => {
           exact
           to={feed.path}
         >
-          {feed.type === 'list' ? <RssSimpleIcon size={15} /> : <HashIcon size={15} />}
+          {feed.type === 'list' && <RssSimpleIcon size={15} />}
           <span>{feed.title}</span>
         </NavLink>
       ))}
