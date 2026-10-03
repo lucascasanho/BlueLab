@@ -296,23 +296,28 @@
   height: 50px;
   display: block;
   box-sizing: border-box;
-  overflow: hidden;
-  cursor: grab;
-  touch-action: none;
-  overscroll-behavior: contain;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: none;
+  touch-action: pan-x;
+  white-space: nowrap;
 
-  &[data-dragging='true'] {
-    cursor: grabbing;
-    user-select: none;
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 }
 
 .blue2TabTrack {
-  flex: 0 0 auto;
   width: max-content;
   min-width: max-content;
   height: 100%;
-  display: flex;
+  display: inline-flex;
   align-items: stretch;
 }
 
