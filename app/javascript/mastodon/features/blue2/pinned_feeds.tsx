@@ -212,6 +212,7 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
   return (
     <Menu noFocus>
       <MenuTrigger
+        as={Button}
         leadingIcon={PlusIcon}
         variant='ghost'
         color='neutral'
