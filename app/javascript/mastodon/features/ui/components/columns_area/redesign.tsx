@@ -147,7 +147,10 @@ export const ColumnsAreaRedesign: React.FC<{
 
     if (!scroller || !track) return 0;
 
-    return Math.max(0, track.scrollWidth - scroller.clientWidth);
+    const scrollerWidth = scroller.getBoundingClientRect().width;
+    const trackWidth = track.getBoundingClientRect().width;
+
+    return Math.max(0, Math.ceil(trackWidth - scrollerWidth));
   }, []);
 
   const clampFeedTabsOffset = useCallback(
@@ -306,13 +309,25 @@ export const ColumnsAreaRedesign: React.FC<{
       setFeedTabsOffset((current) => clampFeedTabsOffset(current));
     };
 
-    update();
+    const frame = window.requestAnimationFrame(update);
     window.addEventListener('resize', update);
 
+    const scroller = feedTabsRef.current;
+    const track = feedTabsTrackRef.current;
+
+    let observer: ResizeObserver | undefined;
+    if (scroller && track && typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(update);
+      observer.observe(scroller);
+      observer.observe(track);
+    }
+
     return () => {
+      window.cancelAnimationFrame(frame);
       window.removeEventListener('resize', update);
+      observer?.disconnect();
     };
-  }, [clampFeedTabsOffset]);
+  }, [clampFeedTabsOffset, pinnedFeeds.length]);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
