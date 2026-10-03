@@ -295,8 +295,8 @@
   display: block;
   overflow: hidden;
   cursor: grab;
-  touch-action: pan-y;
-  overscroll-behavior-x: contain;
+  touch-action: none;
+  overscroll-behavior: contain;
 
   &[data-dragging='true'] {
     cursor: grabbing;
