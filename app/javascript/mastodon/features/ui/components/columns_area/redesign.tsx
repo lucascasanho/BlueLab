@@ -108,6 +108,86 @@ export const ColumnsAreaRedesign: React.FC<{
       ? blue2Text(intl.locale, 'global')
       : null;
   const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
+  const feedTabsRef = useRef<HTMLDivElement>(null);
+  const feedTabsDragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startScrollLeft: number;
+    moved: boolean;
+    suppressClick: boolean;
+  } | null>(null);
+  const [feedTabsDragging, setFeedTabsDragging] = useState(false);
+
+  const handleFeedTabsPointerDown = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+      const scroller = feedTabsRef.current;
+      if (!scroller) return;
+
+      feedTabsDragRef.current = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startScrollLeft: scroller.scrollLeft,
+        moved: false,
+        suppressClick: false,
+      };
+
+      scroller.setPointerCapture(event.pointerId);
+    },
+    [],
+  );
+
+  const handleFeedTabsPointerMove = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      const drag = feedTabsDragRef.current;
+      const scroller = feedTabsRef.current;
+
+      if (!drag || drag.pointerId !== event.pointerId || !scroller) return;
+
+      const deltaX = event.clientX - drag.startX;
+      if (Math.abs(deltaX) > 5) {
+        drag.moved = true;
+        drag.suppressClick = true;
+        setFeedTabsDragging(true);
+        event.preventDefault();
+      }
+
+      if (drag.moved) {
+        scroller.scrollLeft = drag.startScrollLeft - deltaX;
+      }
+    },
+    [],
+  );
+
+  const handleFeedTabsPointerEnd = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      const drag = feedTabsDragRef.current;
+      const scroller = feedTabsRef.current;
+
+      if (!drag || drag.pointerId !== event.pointerId) return;
+
+      if (scroller?.hasPointerCapture(event.pointerId)) {
+        scroller.releasePointerCapture(event.pointerId);
+      }
+
+      feedTabsDragRef.current = null;
+      setFeedTabsDragging(false);
+    },
+    [],
+  );
+
+  const handleFeedTabsClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      const drag = feedTabsDragRef.current;
+      if (drag?.suppressClick) {
+        event.preventDefault();
+        event.stopPropagation();
+        drag.suppressClick = false;
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -372,7 +452,16 @@ export const ColumnsAreaRedesign: React.FC<{
                   isBlue2MobileLayout && mobileChromeClasses.feedTopBar,
                 )}
               >
-                <div className={classes.blue2TabScroller}>
+                <div
+                  ref={feedTabsRef}
+                  className={classes.blue2TabScroller}
+                  data-dragging={feedTabsDragging ? 'true' : undefined}
+                  onPointerDown={handleFeedTabsPointerDown}
+                  onPointerMove={handleFeedTabsPointerMove}
+                  onPointerUp={handleFeedTabsPointerEnd}
+                  onPointerCancel={handleFeedTabsPointerEnd}
+                  onClick={handleFeedTabsClick}
+                >
                   <Link
                     className={
                       isBlue2Home ? classes.blue2TabActive : classes.blue2Tab
