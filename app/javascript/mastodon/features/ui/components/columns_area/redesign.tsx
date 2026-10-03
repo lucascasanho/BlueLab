@@ -135,6 +135,13 @@ export const ColumnsAreaRedesign: React.FC<{
     setSelectedFeedKey(key);
   }, []);
 
+  const stopFeedTabsTouchPropagation = useCallback(
+    (event: React.TouchEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+    },
+    [],
+  );
+
   useEffect(() => {
     const update = () => {
       const scroller = feedTabsRef.current;
@@ -416,6 +423,10 @@ export const ColumnsAreaRedesign: React.FC<{
                 <div
                   ref={feedTabsRef}
                   className={classes.blue2TabScroller}
+                  onTouchStart={stopFeedTabsTouchPropagation}
+                  onTouchMove={stopFeedTabsTouchPropagation}
+                  onTouchEnd={stopFeedTabsTouchPropagation}
+                  onTouchCancel={stopFeedTabsTouchPropagation}
                 >
                   <div
                     ref={feedTabsTrackRef}
