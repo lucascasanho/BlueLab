@@ -7,7 +7,12 @@ import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import { HashIcon } from '@phosphor-icons/react';
 
-import { Blue2PinnedFeedMenu, Blue2PinnedFeedTabs } from '@/mastodon/features/blue2/pinned_feeds';
+import {
+  Blue2PinnedFeedMenu,
+  Blue2PinnedFeedTabs,
+  useBlue2PinnedFeeds,
+} from '@/mastodon/features/blue2/pinned_feeds';
+import { Blue2InternalFeed } from '@/mastodon/features/blue2/internal_feed';
 
 // BLUELAB_INTEGRATION: optional BlueLab shell widgets and localized labels.
 import { blue2Text } from '@/bluelab/i18n/blue2';
@@ -99,15 +104,30 @@ export const ColumnsAreaRedesign: React.FC<{
   const isBlue2Search = isBlue2 && blue2Pathname === '/search';
   const isBlue2FeedPage =
     (isBlue2Home || isBlue2Global) && !isBlue2MessagesPage;
-  const blue2FeedTitle = isBlue2Home
-    ? intl.formatMessage({
-        id: 'account.following',
-        defaultMessage: 'Following',
-      })
-    : isBlue2Global
-      ? blue2Text(intl.locale, 'global')
-      : null;
+  const blue2FeedTitle = isBlue2FeedPage ? activeFeedTitle : null;
   const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
+  const { feeds: pinnedFeeds } = useBlue2PinnedFeeds();
+  const [selectedFeedKey, setSelectedFeedKey] = useState<string | null>(
+    () => (location.pathname === '/public' ? 'global' : null),
+  );
+
+  useEffect(() => {
+    setSelectedFeedKey(location.pathname === '/public' ? 'global' : null);
+  }, [location.pathname]);
+
+  const selectedPinnedFeed =
+    selectedFeedKey && selectedFeedKey !== 'global'
+      ? pinnedFeeds.find((feed) => feed.key === selectedFeedKey)
+      : undefined;
+
+  const activeFeedTitle =
+    selectedFeedKey === 'global'
+      ? blue2Text(intl.locale, 'global')
+      : selectedPinnedFeed?.title ??
+        intl.formatMessage({
+          id: 'account.following',
+          defaultMessage: 'Following',
+        });
   const feedTabsRef = useRef<HTMLDivElement>(null);
   const feedTabsDragRef = useRef<{
     pointerId: number;
@@ -464,26 +484,35 @@ export const ColumnsAreaRedesign: React.FC<{
                   onPointerCancel={handleFeedTabsPointerEnd}
                   onClick={handleFeedTabsClick}
                 >
-                  <Link
+                  <button
+                    type='button'
                     className={
-                      isBlue2Home ? classes.blue2TabActive : classes.blue2Tab
+                      selectedFeedKey === null
+                        ? classes.blue2TabActive
+                        : classes.blue2Tab
                     }
-                    to='/home'
+                    onClick={() => setSelectedFeedKey(null)}
                   >
                     <FormattedMessage
                       id='account.following'
                       defaultMessage='Following'
                     />
-                  </Link>
-                  <Link
+                  </button>
+                  <button
+                    type='button'
                     className={
-                      isBlue2Global ? classes.blue2TabActive : classes.blue2Tab
+                      selectedFeedKey === 'global'
+                        ? classes.blue2TabActive
+                        : classes.blue2Tab
                     }
-                    to='/public'
+                    onClick={() => setSelectedFeedKey('global')}
                   >
                     {blue2Text(intl.locale, 'global')}
-                  </Link>
-                  <Blue2PinnedFeedTabs />
+                  </button>
+                  <Blue2PinnedFeedTabs
+                    activeKey={selectedFeedKey}
+                    onSelect={setSelectedFeedKey}
+                  />
                 </div>
                 <Blue2PinnedFeedMenu />
               </header>
@@ -491,7 +520,20 @@ export const ColumnsAreaRedesign: React.FC<{
             </>
           )}
 
-          <div className='columns-area columns-area--mobile'>{children}</div>
+          <div className='columns-area columns-area--mobile'>
+            {selectedFeedKey === null ? (
+              children
+            ) : selectedFeedKey === 'global' ? (
+              <Blue2InternalFeed type='global' />
+            ) : selectedPinnedFeed ? (
+              <Blue2InternalFeed
+                type={selectedPinnedFeed.type}
+                id={selectedPinnedFeed.id}
+              />
+            ) : (
+              children
+            )}
+          </div>
         </main>
 
         {!isBlue2MobileLayout && (
