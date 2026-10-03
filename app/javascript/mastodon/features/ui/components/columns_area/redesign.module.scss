@@ -278,9 +278,7 @@
   top: 0;
   z-index: 8;
   height: 50px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: stretch;
+  display: block;
   overflow: hidden;
   background: var(--blue2-bg, #000);
   backdrop-filter: none;
@@ -294,16 +292,12 @@
   width: 100%;
   max-width: 100%;
   height: 50px;
-  display: block;
+  display: flex;
   box-sizing: border-box;
-  overflow-x: auto;
+  overflow-x: scroll;
   overflow-y: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
-  overscroll-behavior-y: none;
-  touch-action: pan-x;
   white-space: nowrap;
 
   &::-webkit-scrollbar {
@@ -314,10 +308,11 @@
 }
 
 .blue2TabTrack {
+  flex: 0 0 auto;
   width: max-content;
   min-width: max-content;
   height: 100%;
-  display: inline-flex;
+  display: flex;
   align-items: stretch;
 }
 
@@ -523,13 +518,13 @@
   // the 56px utility bar. Additional pinned timelines are hard-clipped to the
   // available width so WebKit cannot paint the max-content track outside it.
   .blue2Topbar {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    display: block;
     top: 56px;
   }
 
   .blue2TabScroller {
     min-width: 0;
+    width: 100%;
   }
 
   .blue2Brand {
