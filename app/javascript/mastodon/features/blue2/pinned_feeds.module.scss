@@ -6,9 +6,10 @@
   margin: 6px 6px 6px 2px;
 }
 
-.tab {
-  min-width: 0;
-  overflow: hidden;
+ .tab {
+  flex: 0 0 auto;
+  width: max-content;
+  max-width: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -21,16 +22,13 @@
   font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
-  text-overflow: ellipsis;
 
   svg {
     flex: 0 0 auto;
   }
 
   span {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    flex: 0 0 auto;
   }
 
   &:hover,
