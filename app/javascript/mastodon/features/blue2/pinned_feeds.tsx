@@ -17,7 +17,7 @@ import {
   MenuTrigger,
 } from '@/mastodon/components/menu';
 import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
-import { useAccountId } from '@/mastodon/hooks/useAccountId';
+import { useCurrentAccountId } from '@/mastodon/hooks/useAccountId';
 import { useIdentity } from '@/mastodon/identity_context';
 import { getOrderedLists } from '@/mastodon/selectors/lists';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
@@ -85,7 +85,7 @@ const persistPinnedFeeds = (
 
 export const useBlue2PinnedFeeds = () => {
   const { signedIn } = useIdentity();
-  const accountId = useAccountId();
+  const accountId = useCurrentAccountId();
   const [feeds, setFeeds] = useState<Blue2PinnedFeed[]>(() =>
     readPinnedFeeds(accountId),
   );
