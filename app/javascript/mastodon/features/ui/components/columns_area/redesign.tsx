@@ -227,7 +227,9 @@ export const ColumnsAreaRedesign: React.FC<{
     return () => {
       window.removeEventListener('resize', update);
     };
-  }, [clampFeedTabsOffset]);  useEffect(() => {
+  }, [clampFeedTabsOffset]);
+
+  useEffect(() => {
     const frame = requestAnimationFrame(() => {
       setIsBlue2MobileRailOpen(false);
       setIsBlue2AdvancedNavigationExpanded(false);
