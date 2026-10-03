@@ -292,19 +292,29 @@
   min-width: 0;
   flex: 1 1 auto;
   display: flex;
-  overflow-x: scroll;
+  overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  scrollbar-color: transparent transparent;
   cursor: grab;
   touch-action: pan-y;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: transparent !important;
+    border: 0 !important;
   }
 
   &[data-dragging='true'] {
