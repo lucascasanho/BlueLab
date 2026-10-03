@@ -7,6 +7,8 @@ import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import { HashIcon } from '@phosphor-icons/react';
 
+import { Blue2PinnedFeedMenu, Blue2PinnedFeedTabs } from '@/mastodon/features/blue2/pinned_feeds';
+
 // BLUELAB_INTEGRATION: optional BlueLab shell widgets and localized labels.
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import { openNavigation } from '@/mastodon/actions/navigation';
@@ -370,25 +372,29 @@ export const ColumnsAreaRedesign: React.FC<{
                   isBlue2MobileLayout && mobileChromeClasses.feedTopBar,
                 )}
               >
-                <Link
-                  className={
-                    isBlue2Home ? classes.blue2TabActive : classes.blue2Tab
-                  }
-                  to='/home'
-                >
-                  <FormattedMessage
-                    id='account.following'
-                    defaultMessage='Following'
-                  />
-                </Link>
-                <Link
-                  className={
-                    isBlue2Global ? classes.blue2TabActive : classes.blue2Tab
-                  }
-                  to='/public'
-                >
-                  {blue2Text(intl.locale, 'global')}
-                </Link>
+                <div className={classes.blue2TabScroller}>
+                  <Link
+                    className={
+                      isBlue2Home ? classes.blue2TabActive : classes.blue2Tab
+                    }
+                    to='/home'
+                  >
+                    <FormattedMessage
+                      id='account.following'
+                      defaultMessage='Following'
+                    />
+                  </Link>
+                  <Link
+                    className={
+                      isBlue2Global ? classes.blue2TabActive : classes.blue2Tab
+                    }
+                    to='/public'
+                  >
+                    {blue2Text(intl.locale, 'global')}
+                  </Link>
+                  <Blue2PinnedFeedTabs />
+                </div>
+                <Blue2PinnedFeedMenu />
               </header>
               {!isBlue2MobileLayout && <Blue2ComposeLauncher />}
             </>
