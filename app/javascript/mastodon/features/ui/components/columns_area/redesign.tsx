@@ -114,8 +114,8 @@ export const ColumnsAreaRedesign: React.FC<{
     startX: number;
     startScrollLeft: number;
     moved: boolean;
-    suppressClick: boolean;
   } | null>(null);
+  const suppressFeedTabsClickRef = useRef(false);
   const [feedTabsDragging, setFeedTabsDragging] = useState(false);
 
   const handleFeedTabsPointerDown = useCallback(
@@ -130,7 +130,6 @@ export const ColumnsAreaRedesign: React.FC<{
         startX: event.clientX,
         startScrollLeft: scroller.scrollLeft,
         moved: false,
-        suppressClick: false,
       };
 
       scroller.setPointerCapture(event.pointerId);
@@ -148,7 +147,7 @@ export const ColumnsAreaRedesign: React.FC<{
       const deltaX = event.clientX - drag.startX;
       if (Math.abs(deltaX) > 5) {
         drag.moved = true;
-        drag.suppressClick = true;
+        suppressFeedTabsClickRef.current = true;
         setFeedTabsDragging(true);
         event.preventDefault();
       }
@@ -171,6 +170,10 @@ export const ColumnsAreaRedesign: React.FC<{
         scroller.releasePointerCapture(event.pointerId);
       }
 
+      if (drag.moved) {
+        suppressFeedTabsClickRef.current = true;
+      }
+
       feedTabsDragRef.current = null;
       setFeedTabsDragging(false);
     },
@@ -179,11 +182,10 @@ export const ColumnsAreaRedesign: React.FC<{
 
   const handleFeedTabsClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      const drag = feedTabsDragRef.current;
-      if (drag?.suppressClick) {
+      if (suppressFeedTabsClickRef.current) {
         event.preventDefault();
         event.stopPropagation();
-        drag.suppressClick = false;
+        suppressFeedTabsClickRef.current = false;
       }
     },
     [],
