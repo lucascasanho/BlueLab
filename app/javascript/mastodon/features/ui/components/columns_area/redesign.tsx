@@ -169,7 +169,6 @@ export const ColumnsAreaRedesign: React.FC<{
         moved: false,
       };
 
-      event.currentTarget.setPointerCapture(event.pointerId);
       setFeedTabsDragging(false);
     },
     [feedTabsOffset],
@@ -183,6 +182,9 @@ export const ColumnsAreaRedesign: React.FC<{
       const deltaX = event.clientX - drag.startX;
 
       if (Math.abs(deltaX) > 5) {
+        if (!drag.moved) {
+          feedTabsRef.current?.setPointerCapture(event.pointerId);
+        }
         drag.moved = true;
         suppressFeedTabsClickRef.current = true;
         setFeedTabsDragging(true);
