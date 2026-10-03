@@ -313,6 +313,30 @@
   will-change: transform;
 }
 
+@media (pointer: coarse) {
+  .blue2TabScroller {
+    display: block;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
+
+    &::-webkit-scrollbar {
+      width: 0 !important;
+      height: 0 !important;
+      display: none !important;
+      background: transparent !important;
+    }
+  }
+
+  .blue2TabTrack {
+    transform: none !important;
+  }
+}
+
 .blue2HomeTopbar {
   height: 50px;
 }
