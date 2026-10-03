@@ -452,19 +452,14 @@ export const ColumnsAreaRedesign: React.FC<{
               )}
               {!isBlue2MobileLayout && blue2FeedTitle && (
                 <Blue2HomeFeedTitleBar title={blue2FeedTitle}>
-                  {isBlue2Home ? (
-                    <>
-                      <Blue2Announcements variant='mobile' />
-                      <HomeColumnSettings />
-                    </>
-                  ) : (
-                    <>
-                      <Blue2Announcements variant='mobile' />
-                      <ColumnSettingsMenu labelPrefix={blue2FeedTitle}>
-                        <FeedColumnSettings columnId={undefined} />
-                      </ColumnSettingsMenu>
-                    </>
-                  )}
+                  <Blue2Announcements variant='mobile' />
+                  {selectedFeedKey === null ? (
+                    <HomeColumnSettings />
+                  ) : selectedFeedKey === 'global' ? (
+                    <ColumnSettingsMenu labelPrefix={blue2FeedTitle}>
+                      <FeedColumnSettings columnId={undefined} />
+                    </ColumnSettingsMenu>
+                  ) : null}
                 </Blue2HomeFeedTitleBar>
               )}
               <header
