@@ -7,9 +7,11 @@ import {
   connectHashtagStream,
   connectListStream,
   connectPublicStream,
+  connectUserStream,
 } from '@/mastodon/actions/streaming';
 import {
   expandHashtagTimeline,
+  expandHomeTimeline,
   expandListTimeline,
   expandPublicTimeline,
 } from '@/mastodon/actions/timelines';
@@ -18,7 +20,7 @@ import StatusListContainer from '@/mastodon/features/ui/containers/status_list_c
 import { useAppDispatch } from '@/mastodon/store';
 
 export interface Blue2InternalFeedProps {
-  type: 'global' | 'list' | 'hashtag';
+  type: 'home' | 'global' | 'list' | 'hashtag';
   id?: string;
 }
 
@@ -29,13 +31,20 @@ export const Blue2InternalFeed: React.FC<Blue2InternalFeedProps> = ({
   const dispatch = useAppDispatch();
 
   const timelineId =
-    type === 'global'
-      ? 'public'
-      : type === 'list'
-        ? `list:${id ?? ''}`
-        : `hashtag:${id ?? ''}`;
+    type === 'home'
+      ? 'home'
+      : type === 'global'
+        ? 'public'
+        : type === 'list'
+          ? `list:${id ?? ''}`
+          : `hashtag:${id ?? ''}`;
 
   useEffect(() => {
+    if (type === 'home') {
+      dispatch(expandHomeTimeline());
+      return dispatch(connectUserStream());
+    }
+
     if (type === 'global') {
       dispatch(expandPublicTimeline());
       return dispatch(connectPublicStream());
@@ -57,6 +66,8 @@ export const Blue2InternalFeed: React.FC<Blue2InternalFeedProps> = ({
   const handleLoadMore = (maxId: number) => {
     if (type === 'global') {
       dispatch(expandPublicTimeline({ maxId }));
+    } else if (type === 'home') {
+      dispatch(expandHomeTimeline({ maxId }));
     } else if (type === 'list' && id) {
       dispatch(expandListTimeline(id, { maxId }));
     } else if (type === 'hashtag' && id) {
@@ -72,7 +83,12 @@ export const Blue2InternalFeed: React.FC<Blue2InternalFeedProps> = ({
         timelineId={timelineId}
         onLoadMore={handleLoadMore}
         emptyMessage={
-          type === 'global' ? (
+          type === 'home' ? (
+            <FormattedMessage
+              id='empty_column.home'
+              defaultMessage='Your home timeline is empty!'
+            />
+          ) : type === 'global' ? (
             <FormattedMessage
               id='empty_column.public'
               defaultMessage='The global timeline is empty!'
