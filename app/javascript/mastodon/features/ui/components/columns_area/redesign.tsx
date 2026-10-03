@@ -169,6 +169,7 @@ export const ColumnsAreaRedesign: React.FC<{
         moved: false,
       };
 
+      event.currentTarget.setPointerCapture(event.pointerId);
       setFeedTabsDragging(false);
     },
     [feedTabsOffset],
@@ -200,15 +201,30 @@ export const ColumnsAreaRedesign: React.FC<{
       const drag = feedTabsDragRef.current;
       if (!drag || drag.pointerId !== event.pointerId) return;
 
+      if (feedTabsRef.current?.hasPointerCapture(event.pointerId)) {
+        feedTabsRef.current.releasePointerCapture(event.pointerId);
+      }
+
       if (drag.moved) {
         suppressFeedTabsClickRef.current = true;
         window.setTimeout(() => {
           suppressFeedTabsClickRef.current = false;
-        }, 80);
+        }, 300);
       }
 
       feedTabsDragRef.current = null;
       setFeedTabsDragging(false);
+    },
+    [],
+  );
+
+  const handleFeedTabsClickCapture = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (suppressFeedTabsClickRef.current) {
+        event.preventDefault();
+        event.stopPropagation();
+        suppressFeedTabsClickRef.current = false;
+      }
     },
     [],
   );
@@ -496,6 +512,7 @@ export const ColumnsAreaRedesign: React.FC<{
                   onPointerMove={handleFeedTabsPointerMove}
                   onPointerUp={handleFeedTabsPointerEnd}
                   onPointerCancel={handleFeedTabsPointerEnd}
+                  onClickCapture={handleFeedTabsClickCapture}
                 >
                   <div
                     ref={feedTabsTrackRef}
