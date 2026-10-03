@@ -130,175 +130,6 @@ export const ColumnsAreaRedesign: React.FC<{
   const blue2FeedTitle = isBlue2FeedPage ? activeFeedTitle : null;
   const feedTabsRef = useRef<HTMLDivElement>(null);
   const feedTabsTrackRef = useRef<HTMLDivElement>(null);
-  const feedTabsDragRef = useRef<{
-    pointerId: number;
-    startX: number;
-    startOffset: number;
-    moved: boolean;
-  } | null>(null);
-  const suppressFeedTabsClickRef = useRef(false);
-  const [feedTabsOffset, setFeedTabsOffset] = useState(0);
-  const [feedTabsDragging, setFeedTabsDragging] = useState(false);
-
-
-  const getFeedTabsMaxOffset = useCallback(() => {
-    const scroller = feedTabsRef.current;
-    const track = feedTabsTrackRef.current;
-
-    if (!scroller || !track) return 0;
-
-    const scrollerWidth = scroller.getBoundingClientRect().width;
-    const trackWidth = track.getBoundingClientRect().width;
-
-    return Math.max(0, Math.ceil(trackWidth - scrollerWidth));
-  }, []);
-
-  const clampFeedTabsOffset = useCallback(
-    (value: number) => Math.min(getFeedTabsMaxOffset(), Math.max(0, value)),
-    [getFeedTabsMaxOffset],
-  );
-
-  const handleFeedTabsPointerDown = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
-      if (event.pointerType === 'mouse' && event.button !== 0) return;
-
-      const scroller = feedTabsRef.current;
-      if (!scroller) return;
-
-      feedTabsDragRef.current = {
-        pointerId: event.pointerId,
-        startX: event.clientX,
-        startOffset: feedTabsOffset,
-        moved: false,
-      };
-
-      setFeedTabsDragging(false);
-    },
-    [feedTabsOffset],
-  );
-
-  const handleFeedTabsPointerMove = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
-      const drag = feedTabsDragRef.current;
-      if (!drag || drag.pointerId !== event.pointerId) return;
-
-      const deltaX = event.clientX - drag.startX;
-
-      if (Math.abs(deltaX) > 5) {
-        if (!drag.moved) {
-          feedTabsRef.current?.setPointerCapture(event.pointerId);
-        }
-        drag.moved = true;
-        suppressFeedTabsClickRef.current = true;
-        setFeedTabsDragging(true);
-        event.preventDefault();
-      }
-
-      if (drag.moved) {
-        setFeedTabsOffset(clampFeedTabsOffset(drag.startOffset - deltaX));
-      }
-    },
-    [clampFeedTabsOffset],
-  );
-
-  const handleFeedTabsPointerEnd = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
-      const drag = feedTabsDragRef.current;
-      if (!drag || drag.pointerId !== event.pointerId) return;
-
-      if (feedTabsRef.current?.hasPointerCapture(event.pointerId)) {
-        feedTabsRef.current.releasePointerCapture(event.pointerId);
-      }
-
-      if (drag.moved) {
-        suppressFeedTabsClickRef.current = true;
-        window.setTimeout(() => {
-          suppressFeedTabsClickRef.current = false;
-        }, 300);
-      }
-
-      feedTabsDragRef.current = null;
-      setFeedTabsDragging(false);
-    },
-    [],
-  );
-
-  const handleFeedTabsClickCapture = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      if (suppressFeedTabsClickRef.current) {
-        event.preventDefault();
-        event.stopPropagation();
-        suppressFeedTabsClickRef.current = false;
-      }
-    },
-    [],
-  );
-
-  const feedTabsTouchRef = useRef<{
-    startX: number;
-    startOffset: number;
-    moved: boolean;
-  } | null>(null);
-
-  const handleFeedTabsTouchStart = useCallback(
-    (event: React.TouchEvent<HTMLDivElement>) => {
-      const touch = event.touches[0];
-      if (!touch) return;
-
-      feedTabsTouchRef.current = {
-        startX: touch.clientX,
-        startOffset: feedTabsOffset,
-        moved: false,
-      };
-
-      event.stopPropagation();
-    },
-    [feedTabsOffset],
-  );
-
-  const handleFeedTabsTouchMove = useCallback(
-    (event: React.TouchEvent<HTMLDivElement>) => {
-      const drag = feedTabsTouchRef.current;
-      const touch = event.touches[0];
-
-      if (!drag || !touch) return;
-
-      const deltaX = touch.clientX - drag.startX;
-
-      if (Math.abs(deltaX) > 5) {
-        drag.moved = true;
-        suppressFeedTabsClickRef.current = true;
-        setFeedTabsDragging(true);
-        event.preventDefault();
-      }
-
-      if (drag.moved) {
-        setFeedTabsOffset(clampFeedTabsOffset(drag.startOffset - deltaX));
-      }
-
-      event.stopPropagation();
-    },
-    [clampFeedTabsOffset],
-  );
-
-  const handleFeedTabsTouchEnd = useCallback(
-    (event: React.TouchEvent<HTMLDivElement>) => {
-      const drag = feedTabsTouchRef.current;
-      if (!drag) return;
-
-      if (drag.moved) {
-        suppressFeedTabsClickRef.current = true;
-        window.setTimeout(() => {
-          suppressFeedTabsClickRef.current = false;
-        }, 300);
-      }
-
-      feedTabsTouchRef.current = null;
-      setFeedTabsDragging(false);
-      event.stopPropagation();
-    },
-    [],
-  );
 
   const selectFeedTab = useCallback((key: string | null) => {
     setSelectedFeedKey(key);
@@ -306,28 +137,23 @@ export const ColumnsAreaRedesign: React.FC<{
 
   useEffect(() => {
     const update = () => {
-      setFeedTabsOffset((current) => clampFeedTabsOffset(current));
+      const scroller = feedTabsRef.current;
+      if (!scroller) return;
+
+      scroller.scrollLeft = Math.max(
+        0,
+        Math.min(scroller.scrollLeft, scroller.scrollWidth - scroller.clientWidth),
+      );
     };
 
     const frame = window.requestAnimationFrame(update);
     window.addEventListener('resize', update);
 
-    const scroller = feedTabsRef.current;
-    const track = feedTabsTrackRef.current;
-
-    let observer: ResizeObserver | undefined;
-    if (scroller && track && typeof ResizeObserver !== 'undefined') {
-      observer = new ResizeObserver(update);
-      observer.observe(scroller);
-      observer.observe(track);
-    }
-
     return () => {
       window.cancelAnimationFrame(frame);
       window.removeEventListener('resize', update);
-      observer?.disconnect();
     };
-  }, [clampFeedTabsOffset, pinnedFeeds.length]);
+  }, []);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -590,21 +416,10 @@ export const ColumnsAreaRedesign: React.FC<{
                 <div
                   ref={feedTabsRef}
                   className={classes.blue2TabScroller}
-                  data-dragging={feedTabsDragging ? 'true' : undefined}
-                  onPointerDown={handleFeedTabsPointerDown}
-                  onPointerMove={handleFeedTabsPointerMove}
-                  onPointerUp={handleFeedTabsPointerEnd}
-                  onPointerCancel={handleFeedTabsPointerEnd}
-                  onTouchStart={handleFeedTabsTouchStart}
-                  onTouchMove={handleFeedTabsTouchMove}
-                  onTouchEnd={handleFeedTabsTouchEnd}
-                  onTouchCancel={handleFeedTabsTouchEnd}
-                  onClickCapture={handleFeedTabsClickCapture}
                 >
                   <div
                     ref={feedTabsTrackRef}
                     className={classes.blue2TabTrack}
-                    style={{ transform: `translate3d(-${feedTabsOffset}px, 0, 0)` }}
                   >
                     <button
                     type='button'
