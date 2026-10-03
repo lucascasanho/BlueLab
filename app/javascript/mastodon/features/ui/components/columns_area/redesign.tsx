@@ -129,14 +129,30 @@ export const ColumnsAreaRedesign: React.FC<{
         });
   const blue2FeedTitle = isBlue2FeedPage ? activeFeedTitle : null;
   const feedTabsRef = useRef<HTMLDivElement>(null);
+  const feedTabsTrackRef = useRef<HTMLDivElement>(null);
   const feedTabsDragRef = useRef<{
     pointerId: number;
     startX: number;
-    startScrollLeft: number;
+    startOffset: number;
     moved: boolean;
   } | null>(null);
   const suppressFeedTabsClickRef = useRef(false);
+  const [feedTabsOffset, setFeedTabsOffset] = useState(0);
   const [feedTabsDragging, setFeedTabsDragging] = useState(false);
+
+  const getFeedTabsMaxOffset = useCallback(() => {
+    const scroller = feedTabsRef.current;
+    const track = feedTabsTrackRef.current;
+
+    if (!scroller || !track) return 0;
+
+    return Math.max(0, track.scrollWidth - scroller.clientWidth);
+  }, []);
+
+  const clampFeedTabsOffset = useCallback(
+    (value: number) => Math.min(getFeedTabsMaxOffset(), Math.max(0, value)),
+    [getFeedTabsMaxOffset],
+  );
 
   const handleFeedTabsPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
@@ -148,22 +164,22 @@ export const ColumnsAreaRedesign: React.FC<{
       feedTabsDragRef.current = {
         pointerId: event.pointerId,
         startX: event.clientX,
-        startScrollLeft: scroller.scrollLeft,
+        startOffset: feedTabsOffset,
         moved: false,
       };
 
+      setFeedTabsDragging(false);
     },
-    [],
+    [feedTabsOffset],
   );
 
   const handleFeedTabsPointerMove = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       const drag = feedTabsDragRef.current;
-      const scroller = feedTabsRef.current;
-
-      if (!drag || drag.pointerId !== event.pointerId || !scroller) return;
+      if (!drag || drag.pointerId !== event.pointerId) return;
 
       const deltaX = event.clientX - drag.startX;
+
       if (Math.abs(deltaX) > 5) {
         drag.moved = true;
         suppressFeedTabsClickRef.current = true;
@@ -172,21 +188,15 @@ export const ColumnsAreaRedesign: React.FC<{
       }
 
       if (drag.moved) {
-        scroller.scrollLeft = drag.startScrollLeft - deltaX;
+        setFeedTabsOffset(clampFeedTabsOffset(drag.startOffset - deltaX));
       }
     },
-    [],
+    [clampFeedTabsOffset],
   );
-
-  const selectFeedTab = useCallback((key: string | null) => {
-    setSelectedFeedKey(key);
-  }, []);
 
   const handleFeedTabsPointerEnd = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       const drag = feedTabsDragRef.current;
-      const scroller = feedTabsRef.current;
-
       if (!drag || drag.pointerId !== event.pointerId) return;
 
       if (drag.moved) {
@@ -202,9 +212,22 @@ export const ColumnsAreaRedesign: React.FC<{
     [],
   );
 
-
+  const selectFeedTab = useCallback((key: string | null) => {
+    setSelectedFeedKey(key);
+  }, []);
 
   useEffect(() => {
+    const update = () => {
+      setFeedTabsOffset((current) => clampFeedTabsOffset(current));
+    };
+
+    update();
+    window.addEventListener('resize', update);
+
+    return () => {
+      window.removeEventListener('resize', update);
+    };
+  }, [clampFeedTabsOffset]);  useEffect(() => {
     const frame = requestAnimationFrame(() => {
       setIsBlue2MobileRailOpen(false);
       setIsBlue2AdvancedNavigationExpanded(false);
@@ -471,7 +494,12 @@ export const ColumnsAreaRedesign: React.FC<{
                   onPointerUp={handleFeedTabsPointerEnd}
                   onPointerCancel={handleFeedTabsPointerEnd}
                 >
-                  <button
+                  <div
+                    ref={feedTabsTrackRef}
+                    className={classes.blue2TabTrack}
+                    style={{ transform: `translate3d(-${feedTabsOffset}px, 0, 0)` }}
+                  >
+                    <button
                     type='button'
                     className={
                       selectedFeedKey === null
@@ -503,6 +531,7 @@ export const ColumnsAreaRedesign: React.FC<{
                     activeTabClassName={classes.blue2TabActive}
                     showIcons={false}
                   />
+                  </div>
                 </div>
                 <Blue2PinnedFeedMenu />
               </header>
