@@ -323,7 +323,14 @@ export const Blue2PinnedFeedTabs: React.FC<{
   onSelect: (key: string) => void;
   tabClassName: string;
   activeTabClassName: string;
-}> = ({ activeKey, onSelect, tabClassName, activeTabClassName }) => {
+  showIcons?: boolean;
+}> = ({
+  activeKey,
+  onSelect,
+  tabClassName,
+  activeTabClassName,
+  showIcons = true,
+}) => {
   const { feeds } = useBlue2PinnedFeeds();
 
   return (
@@ -337,7 +344,9 @@ export const Blue2PinnedFeedTabs: React.FC<{
           }
           onClick={() => onSelect(feed.key)}
         >
-          {feed.type === 'list' && <RssSimpleIcon size={15} />}
+          {showIcons && feed.type === 'list' && (
+            <RssSimpleIcon size={15} />
+          )}
           {feed.title}
         </button>
       ))}
