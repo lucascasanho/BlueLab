@@ -152,7 +152,6 @@ export const ColumnsAreaRedesign: React.FC<{
         moved: false,
       };
 
-      scroller.setPointerCapture(event.pointerId);
     },
     [],
   );
@@ -180,11 +179,6 @@ export const ColumnsAreaRedesign: React.FC<{
   );
 
   const selectFeedTab = useCallback((key: string | null) => {
-    if (suppressFeedTabsClickRef.current) {
-      suppressFeedTabsClickRef.current = false;
-      return;
-    }
-
     setSelectedFeedKey(key);
   }, []);
 
@@ -195,12 +189,11 @@ export const ColumnsAreaRedesign: React.FC<{
 
       if (!drag || drag.pointerId !== event.pointerId) return;
 
-      if (scroller?.hasPointerCapture(event.pointerId)) {
-        scroller.releasePointerCapture(event.pointerId);
-      }
-
       if (drag.moved) {
         suppressFeedTabsClickRef.current = true;
+        window.setTimeout(() => {
+          suppressFeedTabsClickRef.current = false;
+        }, 80);
       }
 
       feedTabsDragRef.current = null;
