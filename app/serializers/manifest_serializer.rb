@@ -61,7 +61,7 @@ class ManifestSerializer < ActiveModel::Serializer
         src: src || frontend_asset_url("icons/android-chrome-#{size}x#{size}.png"),
         sizes: "#{size}x#{size}",
         type: 'image/png',
-        purpose: 'any maskable',
+        purpose: 'any',
       }
     end
   end
@@ -101,18 +101,23 @@ class ManifestSerializer < ActiveModel::Serializer
   end
 
   def shortcuts
+    shortcut_icon = app_icon_path(96) || frontend_asset_url('icons/android-chrome-96x96.png')
+
     [
       {
         name: 'Compose new post',
         url: '/publish',
+        icons: [{ src: shortcut_icon, sizes: '96x96', type: 'image/png' }],
       },
       {
         name: 'Notifications',
         url: '/notifications',
+        icons: [{ src: shortcut_icon, sizes: '96x96', type: 'image/png' }],
       },
       {
         name: 'Explore',
         url: '/explore',
+        icons: [{ src: shortcut_icon, sizes: '96x96', type: 'image/png' }],
       },
     ]
   end
