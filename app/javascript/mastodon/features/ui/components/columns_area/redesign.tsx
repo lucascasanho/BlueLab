@@ -129,6 +129,7 @@ export const ColumnsAreaRedesign: React.FC<{
         });
   const blue2FeedTitle = isBlue2FeedPage ? activeFeedTitle : null;
   const feedTabsRef = useRef<HTMLDivElement>(null);
+  const feedTabsTrackRef = useRef<HTMLDivElement>(null);
   const feedTabsDragRef = useRef<{
     pointerId: number;
     startX: number;
