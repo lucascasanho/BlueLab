@@ -9,7 +9,7 @@ class ManifestSerializer < ActiveModel::Serializer
              :description, :lang, :dir, :categories,
              :orientation, :screenshots,
              :icons, :theme_color, :background_color,
-             :display, :start_url, :scope,
+             :display, :display_override, :start_url, :scope,
              :protocol_handlers, :share_target, :shortcuts,
              :prefer_related_applications, :related_applications
 
@@ -102,6 +102,10 @@ class ManifestSerializer < ActiveModel::Serializer
     'standalone'
   end
 
+  def display_override
+    ['standalone', 'window-controls-overlay']
+  end
+
   def start_url
     '/'
   end
@@ -145,7 +149,7 @@ class ManifestSerializer < ActiveModel::Serializer
       {
         name: 'Notifications',
         url: '/notifications',
-        icons: [{ src: shortcut_icon, sizes: '96x96', type: 'image/png' }],
+        icons: [{ src: shortcut_icon, sizes: '96x96', type: 'image/png', purpose: 'any' }],
       },
       {
         name: 'Explore',
