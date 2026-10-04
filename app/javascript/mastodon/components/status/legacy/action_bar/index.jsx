@@ -9,6 +9,7 @@ import { ImmutablePureComponent } from 'react-immutable-pure-component';
 import { connect } from 'react-redux';
 
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
+import ReplyAllLegacyIcon from '@/material-icons/400-24px/reply_all.svg?react';
 import { identityContextPropShape, withIdentity } from 'mastodon/identity_context';
 import { PERMISSION_MANAGE_USERS, PERMISSION_MANAGE_FEDERATION } from 'mastodon/permissions';
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
@@ -31,7 +32,6 @@ import {
   StatusBookmarkIcon,
   StatusLikeActiveIcon,
   StatusLikeIcon,
-  StatusReplyAllIcon,
   StatusReplyIcon,
 } from '../../icons';
 
@@ -415,7 +415,9 @@ class StatusActionBar extends ImmutablePureComponent {
       replyTitle = intl.formatMessage(messages.reply);
     } else {
       replyIcon = 'reply-all';
-      replyIconComponent = StatusReplyAllIcon;
+      replyIconComponent = isRedesignEnabled()
+        ? StatusReplyIcon
+        : ReplyAllLegacyIcon;
       replyTitle = intl.formatMessage(messages.replyAll);
     }
 
