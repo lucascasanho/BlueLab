@@ -17,6 +17,10 @@ RSpec.describe ManifestSerializer do
 
       expect(sizes).to include('192x192', '512x512')
     end
+
+    it 'uses the any purpose for the general app icons' do
+      expect(serializer.icons).to all(include(purpose: 'any'))
+    end
   end
 
   describe 'rich installation metadata' do
@@ -34,6 +38,12 @@ RSpec.describe ManifestSerializer do
       screenshots = described_class.new(instance).screenshots
 
       expect(screenshots.pluck(:src)).to all(include('espelunca-social'))
+    end
+  end
+
+  describe '#shortcuts' do
+    it 'provides a 96x96 icon for every shortcut' do
+      expect(serializer.shortcuts).to all(include(icons: [include(sizes: '96x96', type: 'image/png')]))
     end
   end
 
