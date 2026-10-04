@@ -4,6 +4,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { HashIcon, PlusIcon, RssSimpleIcon } from '@phosphor-icons/react';
 
+import { changeSetting } from '@/mastodon/actions/settings';
 import { fetchLists } from '@/mastodon/actions/lists';
 import { Button } from '@/mastodon/components/button/redesign';
 import {
@@ -67,55 +68,83 @@ const readPinnedFeeds = (
   }
 };
 
-const persistPinnedFeeds = (
-  accountId: string | null | undefined,
-  feeds: Blue2PinnedFeed[],
-) => {
-  if (typeof window === 'undefined') return;
+const parsePinnedFeeds = (value: unknown): Blue2PinnedFeed[] => {
+  let parsed: unknown = value;
 
-  try {
-    window.localStorage.setItem(getStorageKey(accountId), JSON.stringify(feeds));
-    window.dispatchEvent(new Event('bluelab-blue2-pinned-feeds-change'));
-  } catch {
-    // Local persistence is optional; the in-memory state still works.
+  if (
+    parsed &&
+    typeof parsed === 'object' &&
+    'toJS' in parsed &&
+    typeof parsed.toJS === 'function'
+  ) {
+    parsed = parsed.toJS();
   }
+
+  if (!Array.isArray(parsed)) return [];
+
+  return parsed.filter(
+    (feed): feed is Blue2PinnedFeed =>
+      !!feed &&
+      typeof feed === 'object' &&
+      'key' in feed &&
+      'type' in feed &&
+      'id' in feed &&
+      'title' in feed &&
+      'path' in feed &&
+      (feed.type === 'list' || feed.type === 'hashtag') &&
+      typeof feed.key === 'string' &&
+      typeof feed.id === 'string' &&
+      typeof feed.title === 'string' &&
+      typeof feed.path === 'string',
+  );
 };
+
 
 export const useBlue2PinnedFeeds = () => {
   const { signedIn } = useIdentity();
   const accountId = useCurrentAccountId();
-  const [feeds, setFeeds] = useState<Blue2PinnedFeed[]>(() =>
+  const dispatch = useAppDispatch();
+  const serverPinnedFeeds = useAppSelector((state) =>
+    state.settings.getIn(['blue2', 'pinned_feeds']),
+  );
+
+  const [legacyFeeds, setLegacyFeeds] = useState<Blue2PinnedFeed[]>(() =>
     readPinnedFeeds(accountId),
   );
 
   useEffect(() => {
-    setFeeds(readPinnedFeeds(accountId));
+    setLegacyFeeds(readPinnedFeeds(accountId));
   }, [accountId]);
+
+  const serverValueExists =
+    serverPinnedFeeds !== undefined && serverPinnedFeeds !== null;
+
+  const feeds = serverValueExists
+    ? parsePinnedFeeds(serverPinnedFeeds)
+    : legacyFeeds;
 
   useEffect(() => {
-    const handleChange = () => {
-      setFeeds(readPinnedFeeds(accountId));
-    };
+    if (!signedIn || !accountId || serverValueExists || legacyFeeds.length === 0) {
+      return;
+    }
 
-    window.addEventListener(
-      'bluelab-blue2-pinned-feeds-change',
-      handleChange,
-    );
-
-    return () => {
-      window.removeEventListener(
-        'bluelab-blue2-pinned-feeds-change',
-        handleChange,
-      );
-    };
-  }, [accountId]);
+    // The first device that already has the old localStorage-based pins
+    // migrates them into Mastodon's per-user Web::Setting. Subsequent devices
+    // receive the same list from the server.
+    dispatch(changeSetting(['blue2', 'pinned_feeds'], legacyFeeds));
+  }, [
+    accountId,
+    dispatch,
+    legacyFeeds,
+    serverValueExists,
+    signedIn,
+  ]);
 
   const updateFeeds = useCallback(
     (next: Blue2PinnedFeed[]) => {
-      setFeeds(next);
-      persistPinnedFeeds(accountId, next);
+      dispatch(changeSetting(['blue2', 'pinned_feeds'], next));
     },
-    [accountId],
+    [dispatch],
   );
 
   const addFeed = useCallback(
@@ -139,7 +168,6 @@ export const useBlue2PinnedFeeds = () => {
     removeFeed,
   };
 };
-
 export const createPinnedListFeed = (
   id: string,
   title: string,
