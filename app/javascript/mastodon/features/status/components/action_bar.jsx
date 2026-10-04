@@ -25,9 +25,9 @@ import {
   StatusBookmarkIcon,
   StatusLikeActiveIcon,
   StatusLikeIcon,
-  StatusReplyAllIcon,
   StatusReplyIcon,
 } from '@/mastodon/components/status/icons';
+import ReplyAllLegacyIcon from '@/material-icons/400-24px/reply_all.svg?react';
 
 const baseMessages = defineMessages({
   delete: { id: 'status.delete', defaultMessage: 'Delete' },
@@ -345,7 +345,9 @@ class ActionBar extends PureComponent {
       replyIconComponent = StatusReplyIcon;
     } else {
       replyIcon = 'reply-all';
-      replyIconComponent = StatusReplyAllIcon;
+      replyIconComponent = isRedesignEnabled()
+        ? StatusReplyIcon
+        : ReplyAllLegacyIcon;
     }
 
     const bookmarkTitle = intl.formatMessage(status.get('bookmarked') ? messages.removeBookmark : messages.bookmark);
