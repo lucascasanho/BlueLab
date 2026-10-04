@@ -323,6 +323,17 @@
   }
 }
 
+.blue2TabScroller[data-ios-safari='true'] {
+  overflow: hidden;
+  touch-action: none;
+  -webkit-overflow-scrolling: auto;
+  cursor: grab;
+}
+
+.blue2TabScroller[data-ios-safari='true'] .blue2TabTrack {
+  will-change: transform;
+}
+
 .blue2TabTrack {
   display: flex;
   flex-wrap: nowrap;
