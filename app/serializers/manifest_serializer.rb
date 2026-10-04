@@ -154,7 +154,7 @@ class ManifestSerializer < ActiveModel::Serializer
       {
         name: 'Explore',
         url: '/explore',
-        icons: [{ src: shortcut_icon, sizes: '96x96', type: 'image/png' }],
+        icons: [{ src: shortcut_icon, sizes: '96x96', type: 'image/png', purpose: 'any' }],
       },
     ]
   end
