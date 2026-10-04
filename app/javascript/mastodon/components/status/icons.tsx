@@ -12,7 +12,6 @@ import BookmarkBorderLegacyIcon from '@/material-icons/400-24px/bookmark.svg?rea
 import QuoteLegacyIcon from '@/material-icons/400-24px/format_quote-fill.svg?react';
 import BoostLegacyIcon from '@/material-icons/400-24px/repeat.svg?react';
 import ReplyLegacyIcon from '@/material-icons/400-24px/reply.svg?react';
-import ReplyAllLegacyIcon from '@/material-icons/400-24px/reply_all.svg?react';
 import StarLegacyIcon from '@/material-icons/400-24px/star-fill.svg?react';
 import StarBorderLegacyIcon from '@/material-icons/400-24px/star.svg?react';
 import BoostActiveIcon from '@/svg-icons/boost_active.svg?react';
@@ -23,9 +22,6 @@ import { iconWeight } from '../icon';
 export const StatusReplyIcon = isRedesignEnabled()
   ? ChatCircleIcon
   : ReplyLegacyIcon;
-export const StatusReplyAllIcon = isRedesignEnabled()
-  ? StatusReplyIcon
-  : ReplyAllLegacyIcon;
 export const StatusQuoteIcon = isRedesignEnabled()
   ? QuoteLegacyIcon
   : QuotesIcon;
