@@ -63,7 +63,7 @@ export const CustomHomepage: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (!isBlue2 || signedIn || !showBlue2Welcome) {
+    if (!isBlue2 || signedIn || !showBlue2Welcome || !isAboutRoute) {
       return;
     }
 
@@ -72,7 +72,7 @@ export const CustomHomepage: React.FC = () => {
     return () => {
       document.documentElement.classList.remove('has-blue2-welcome-modal');
     };
-  }, [isBlue2, signedIn, showBlue2Welcome]);
+  }, [isAboutRoute, isBlue2, signedIn, showBlue2Welcome]);
 
   const closeBlue2Welcome = useCallback(() => {
     setShowBlue2Welcome(false);
