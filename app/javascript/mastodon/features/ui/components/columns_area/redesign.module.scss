@@ -299,11 +299,17 @@
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-x;
+  touch-action: pan-y;
   overscroll-behavior-x: contain;
   overscroll-behavior-y: none;
   scrollbar-width: none !important;
   -ms-overflow-style: none;
+  cursor: grab;
+  user-select: none;
+
+  &:active {
+    cursor: grabbing;
+  }
 
   &::-webkit-scrollbar,
   &::-webkit-scrollbar-track,
@@ -318,11 +324,12 @@
 }
 
 .blue2TabTrack {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
   width: max-content;
   min-width: max-content;
   height: 100%;
-  display: flex;
-  align-items: stretch;
 }
 
 .blue2HomeTopbar {
