@@ -137,6 +137,15 @@ export const ColumnsAreaRedesign: React.FC<{
     moved: boolean;
   } | null>(null);
   const suppressFeedTabsClickRef = useRef(false);
+  const iosFeedTabsTouchRef = useRef<{
+    startX: number;
+    startOffset: number;
+    moved: boolean;
+  } | null>(null);
+  const iosFeedTabsOffsetRef = useRef(0);
+  const [isIosSafari, setIsIosSafari] = useState(false);
+  const [iosFeedTabsOffset, setIosFeedTabsOffset] = useState(0);
+
 
   const selectFeedTab = useCallback((key: string | null) => {
     setSelectedFeedKey(key);
@@ -151,6 +160,21 @@ export const ColumnsAreaRedesign: React.FC<{
       Math.min(value, scroller.scrollWidth - scroller.clientWidth),
     );
   }, []);
+
+  const getIosFeedTabsMaxOffset = useCallback(() => {
+    const scroller = feedTabsRef.current;
+    const track = feedTabsTrackRef.current;
+
+    if (!scroller || !track) return 0;
+
+    return Math.max(0, track.scrollWidth - scroller.clientWidth);
+  }, []);
+
+  const clampIosFeedTabsOffset = useCallback(
+    (value: number) =>
+      Math.min(getIosFeedTabsMaxOffset(), Math.max(0, value)),
+    [getIosFeedTabsMaxOffset],
+  );
 
   const handleFeedTabsPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
@@ -229,6 +253,88 @@ export const ColumnsAreaRedesign: React.FC<{
     },
     [],
   );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const ua = window.navigator.userAgent;
+    const platform = window.navigator.platform;
+    const ios =
+      /iPad|iPhone|iPod/.test(ua) ||
+      (platform === 'MacIntel' && window.navigator.maxTouchPoints > 1);
+
+    setIsIosSafari(
+      ios && /Safari\//.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua),
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!isIosSafari) return;
+
+    const scroller = feedTabsRef.current;
+    if (!scroller) return;
+
+    const handleTouchStart = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      if (!touch) return;
+
+      iosFeedTabsTouchRef.current = {
+        startX: touch.clientX,
+        startOffset: iosFeedTabsOffsetRef.current,
+        moved: false,
+      };
+      event.stopPropagation();
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      const drag = iosFeedTabsTouchRef.current;
+      const touch = event.touches[0];
+      if (!drag || !touch) return;
+
+      const deltaX = touch.clientX - drag.startX;
+
+      if (Math.abs(deltaX) > 6) {
+        drag.moved = true;
+        suppressFeedTabsClickRef.current = true;
+        event.preventDefault();
+      }
+
+      if (drag.moved) {
+        const nextOffset = clampIosFeedTabsOffset(
+          drag.startOffset - deltaX,
+        );
+        iosFeedTabsOffsetRef.current = nextOffset;
+        setIosFeedTabsOffset(nextOffset);
+      }
+
+      event.stopPropagation();
+    };
+
+    const handleTouchEnd = (event: TouchEvent) => {
+      const drag = iosFeedTabsTouchRef.current;
+      iosFeedTabsTouchRef.current = null;
+
+      if (drag?.moved) {
+        window.setTimeout(() => {
+          suppressFeedTabsClickRef.current = false;
+        }, 200);
+      }
+
+      event.stopPropagation();
+    };
+
+    scroller.addEventListener('touchstart', handleTouchStart, { passive: true });
+    scroller.addEventListener('touchmove', handleTouchMove, { passive: false });
+    scroller.addEventListener('touchend', handleTouchEnd, { passive: true });
+    scroller.addEventListener('touchcancel', handleTouchEnd, { passive: true });
+
+    return () => {
+      scroller.removeEventListener('touchstart', handleTouchStart);
+      scroller.removeEventListener('touchmove', handleTouchMove);
+      scroller.removeEventListener('touchend', handleTouchEnd);
+      scroller.removeEventListener('touchcancel', handleTouchEnd);
+    };
+  }, [clampIosFeedTabsOffset, isIosSafari]);
 
   useEffect(() => {
     const update = () => {
@@ -508,6 +614,7 @@ export const ColumnsAreaRedesign: React.FC<{
                 <div
                   ref={feedTabsRef}
                   className={classes.blue2TabScroller}
+                  data-ios-safari={isIosSafari ? 'true' : undefined}
                   onPointerDown={handleFeedTabsPointerDown}
                   onPointerMove={handleFeedTabsPointerMove}
                   onPointerUp={handleFeedTabsPointerEnd}
@@ -517,6 +624,16 @@ export const ColumnsAreaRedesign: React.FC<{
                   <div
                     ref={feedTabsTrackRef}
                     className={classes.blue2TabTrack}
+                    style={
+                      isIosSafari
+                        ? {
+                            transform:
+                              'translate3d(-' +
+                              iosFeedTabsOffset +
+                              'px, 0, 0)',
+                          }
+                        : undefined
+                    }
                   >
                     <button
                     type='button'
