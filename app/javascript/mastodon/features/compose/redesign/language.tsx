@@ -5,7 +5,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
-import { MagnifyingGlassIcon } from '@phosphor-icons/react';
+import { MagnifyingGlassIcon, TranslateIcon } from '@phosphor-icons/react';
 
 import {
   changeComposeLanguage,
@@ -53,7 +53,7 @@ export const LanguageButton: React.FC<{
 
   return (
     <Menu>
-      <MenuTrigger size='sm' trailingIcon={CaretIcon}>
+      <MenuTrigger size='sm' leadingIcon={TranslateIcon}>
         {langCode.toLocaleUpperCase()}
       </MenuTrigger>
 

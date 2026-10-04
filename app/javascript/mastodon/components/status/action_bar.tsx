@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 
@@ -31,14 +31,12 @@ import {
   ToggleButton,
   ToggleIconButton,
 } from '../button/redesign';
-import { iconWeight, useIconWeight } from '../icon';
 import {
   Menu,
   MenuItem,
-  MenuItemDivider,
-  MenuItemLink,
   MenuList,
   MenuTrigger,
+  LegacyDropdownMenuItems,
 } from '../menu';
 
 import { boostItemState, quoteItemState } from './boost_button_utils';
@@ -108,9 +106,6 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
       dispatch(statusInteraction({ statusId, intent: 'copy', contextType }));
     }
   }, [contextType, dispatch, statusId, statusUrl]);
-  const handleBookmarkClick = useCallback(() => {
-    dispatch(statusInteraction({ statusId, intent: 'bookmark', contextType }));
-  }, [contextType, dispatch, statusId]);
 
   const intl = useIntl();
   const favouriteIcon = useIconWeight(StarIcon, status?.favourited && 'fill');
@@ -126,10 +121,6 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   const isPublic =
     status.visibility === 'public' || status.visibility === 'unlisted';
 
-  const favouriteTitle = intl.formatMessage(
-    status.favourited ? messages.removeFavourite : messages.favourite,
-  );
-
   const isQuotingMe = quotedAccountId === currentAccountId;
   const shouldShowQuoteRemovalHint =
     isQuotingMe && contextType === 'notifications';
@@ -140,11 +131,11 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
         size='sm'
         clipPadding
         variant='ghost'
-        title={intl.formatMessage(messages.replyAll)}
-        leadingIcon={ChatCircleIcon}
-        onClick={handleReplyClick}
+        leadingIcon={reply.icon}
+        onClick={reply.action}
+        tooltip={{ type: 'label', text: reply.title }}
       >
-        {withCounters && status.replies_count}
+        {withCounters && reply.counter}
       </Button>
 
       <StatusReblogButton statusId={statusId}>
@@ -165,7 +156,7 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
           !onlyResponses && classes.actionsButtonGap,
         )}
       >
-        {withCounters && status.favourites_count}
+        {withCounters && like.counter}
       </ToggleButton>
     </>
   );
@@ -196,14 +187,7 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
         icon={bookmarkIcon}
         onClick={handleBookmarkClick}
       >
-        {!status.bookmarked ? (
-          <FormattedMessage id='status.bookmark' defaultMessage='Bookmark' />
-        ) : (
-          <FormattedMessage
-            id='status.remove_bookmark'
-            defaultMessage='Remove bookmark'
-          />
-        )}
+        {bookmark.title}
       </ToggleIconButton>
 
       <RemoveQuoteHint
@@ -225,32 +209,21 @@ const StatusReblogButton: React.FC<{
   statusId: string;
   children: React.ReactNode;
 }> = ({ statusId, children }) => {
-  const conditions = useAppSelector((state) =>
-    selectStatusConditions(state, statusId),
-  );
-  const { isBoosted } = conditions;
-
-  const boostState = boostItemState(conditions);
-  const quoteState = quoteItemState(conditions);
-  const intl = useIntl();
-
-  const dispatch = useAppDispatch();
-  const onReblog = useCallback(() => {
-    dispatch(statusInteraction({ statusId, intent: 'reblog' }));
-  }, [dispatch, statusId]);
-  const onQuote = useCallback(() => {
-    dispatch(statusInteraction({ statusId, intent: 'quote' }));
-  }, [dispatch, statusId]);
+  const { boost, quote } = useStatusIcons(statusId);
 
   if (quickBoosting) {
     return (
       <ToggleButton
         size='sm'
         variant='ghost'
-        active={isBoosted}
-        leadingIcon={ArrowsClockwiseIcon}
-        onClick={onReblog}
-        disabled={boostState.disabled}
+        active={boost.active}
+        tooltip={{
+          type: 'label',
+          text: boost.title,
+        }}
+        leadingIcon={boost.icon}
+        disabled={boost.disabled}
+        onClick={boost.action}
       >
         {children}
       </ToggleButton>
@@ -263,35 +236,42 @@ const StatusReblogButton: React.FC<{
         as={ToggleButton}
         size='sm'
         variant='ghost'
-        active={isBoosted}
-        leadingIcon={ArrowsClockwiseIcon}
+        active={boost.active}
+        tooltip={{
+          type: 'label',
+          text: (
+            <FormattedMessage
+              id='status.reblog_or_quote'
+              defaultMessage='Boost or quote'
+            />
+          ),
+        }}
+        leadingIcon={boost.icon}
       >
         {children}
       </MenuTrigger>
 
       <MenuList placement='bottom' maxWidth={180}>
         <MenuItem
-          onClick={onReblog}
-          icon={ArrowsClockwiseIcon}
-          disabled={boostState.disabled}
-          description={boostState.meta && intl.formatMessage(boostState.meta)}
+          onClick={boost.action}
+          icon={boost.icon}
+          disabled={boost.disabled}
+          description={boost.meta}
         >
-          {intl.formatMessage(boostState.title)}
+          {boost.title}
         </MenuItem>
         <MenuItem
-          onClick={onQuote}
-          icon={QuotesFilledIcon}
-          disabled={quoteState.disabled}
-          description={quoteState.meta && intl.formatMessage(quoteState.meta)}
+          onClick={quote.action}
+          icon={quote.icon}
+          disabled={quote.disabled}
+          description={quote.meta}
         >
-          {intl.formatMessage(quoteState.title)}
+          {quote.title}
         </MenuItem>
       </MenuList>
     </Menu>
   );
 };
-
-const QuotesFilledIcon = iconWeight(QuotesIcon, 'fill');
 
 const StatusActionMenu: React.FC<{
   dismissQuoteHint: () => void;
@@ -326,9 +306,7 @@ const StatusActionMenu: React.FC<{
       </MenuTrigger>
 
       <MenuList placement='top-end'>
-        {menu.map((item, index) => (
-          <StatusActionItem key={index} item={item} />
-        ))}
+        <LegacyDropdownMenuItems items={menu} />
       </MenuList>
     </Menu>
   );

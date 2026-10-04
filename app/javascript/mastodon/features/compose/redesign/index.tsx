@@ -53,13 +53,6 @@ import threadClasses from './thread.module.scss';
 import { ComposeThreadFormattingToolbar } from './thread_formatting_toolbar';
 import { ComposeVisibility } from './visibility';
 
-const messages = defineMessages({
-  sensitiveText: {
-    id: 'compose.sensitive.text',
-    defaultMessage: 'Sensitive content description',
-  },
-});
-
 interface RedesignComposeFormProps {
   autoFocus?: boolean;
   className?: string;
@@ -69,6 +62,13 @@ interface RedesignComposeFormProps {
   redirectOnSuccess?: boolean;
   onSuccess?: (status: ApiStatusJSON) => void;
 }
+
+const messages = defineMessages({
+  sensitiveText: {
+    id: 'compose.sensitive.text',
+    defaultMessage: 'Sensitive content description',
+  },
+});
 
 type ThreadItem = ImmutableMap<string, unknown>;
 
@@ -108,8 +108,8 @@ export const RedesignComposeForm: React.FC<
   const { onSensitiveChange, onSensitiveTextChange, onEmojiPick, onSubmit } =
     useComposeHandlers(redirectOnSuccess, activeThreadItemId, onSuccess);
 
-  const intl = useIntl();
   const titleId = useId();
+  const intl = useIntl();
   const sensitiveIcon = useIconWeight(PepperIcon, sensitive && 'fill');
 
   const handleWheelCapture: React.WheelEventHandler<HTMLFormElement> =
@@ -195,9 +195,11 @@ export const RedesignComposeForm: React.FC<
             <LanguageButton activeThreadItemId={activeThreadItemId} />
 
             <ToggleButton
+              type='button'
               size='sm'
               active={sensitive}
               onClick={onSensitiveChange}
+              onMouseDown={(event) => event.preventDefault()}
               leadingIcon={sensitiveIcon}
             >
               <FormattedMessage
@@ -306,6 +308,7 @@ function useComposeHandlers(
     : text;
 
   const dispatch = useAppDispatch();
+  const canSubmit = useAppSelector(selectComposeCanSubmit);
 
   // Sensitive / CW handling follows the post that currently owns focus.
   const rootSensitive = useAppSelector(
@@ -412,11 +415,10 @@ function useComposeHandlers(
   );
 
   // Submit status
-  const canSubmit = useAppSelector(selectComposeCanSubmit);
   const onSubmit = useCallback(
     (event?: React.SubmitEvent) => {
-      if (!canSubmit || event?.defaultPrevented) {
-        return;
+      if (event?.defaultPrevented) {
+        return false;
       }
       dispatch(
         submitComposer({
@@ -425,9 +427,8 @@ function useComposeHandlers(
         }),
       );
 
-      if (event) {
-        event.preventDefault();
-      }
+      event?.preventDefault();
+      return false;
     },
     [canSubmit, dispatch, onSuccess, redirectOnSuccess],
   );

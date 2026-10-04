@@ -948,7 +948,6 @@ sco:
   deletes:
     challenge_not_passed: The information ye pit in wisnae correct
     confirm_password: Pit in yer current passwird fir tae verify yer identity
-    confirm_username: Pit in yer uisernemm fir tae confirm the procedure
     proceed: Delete accoont
     success_msg: Yer accoont wis successfully deletit
     warning:

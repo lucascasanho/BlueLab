@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { BugReportLabel } from 'mastodon/features/bug_report/bug_report_label';
 import { useOpenBugReport } from 'mastodon/features/bug_report/use_bug_report';
 import { domain, version } from 'mastodon/initial_state';
+import { isRedesignEnabled } from 'mastodon/utils/environment';
 
 import classes from './link_footer.module.scss';
 
@@ -16,7 +17,11 @@ export const LinkFooter: React.FC<{
   const displayVersion = version?.match(/^\d+\.\d+\.\d+/)?.[0] ?? version ?? '';
 
   return (
-    <footer className={classes.wrapper} data-context={context}>
+    <footer
+      className={classes.wrapper}
+      data-context={context}
+      data-redesign={isRedesignEnabled()}
+    >
       <section>
         <ul className={classes.list}>
           <li>

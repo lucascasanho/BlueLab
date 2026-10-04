@@ -283,6 +283,7 @@ export const CustomHomepage: React.FC = () => {
                 showTextOnDesktop
                 icon={SignInIcon}
                 variant='solid'
+                color='accent'
               >
                 <FormattedMessage
                   id='sign_in_banner.sign_in'

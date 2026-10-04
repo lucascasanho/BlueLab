@@ -121,6 +121,24 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     </Menu>
   ) : null;
 
+  const handleHeaderClick = useCallback<React.MouseEventHandler>(
+    (e) => {
+      // Only scroll to top when clicking outside
+      // of the leftButton/rightButtons containers
+      if (
+        e.target instanceof Element &&
+        !e.target.matches(`
+          .${classes.leftButton},
+          .${classes.leftButton} *,
+          .${classes.rightButtons},
+          .${classes.rightButtons} *`)
+      ) {
+        scrollTop();
+      }
+    },
+    [scrollTop],
+  );
+
   return (
     <header
       {...props}

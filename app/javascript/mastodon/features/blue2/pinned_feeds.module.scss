@@ -1,0 +1,25 @@
+.addButton {
+  z-index: 4;
+  justify-self: center;
+  align-self: center;
+  flex: none;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0 !important;
+  pointer-events: auto;
+}
+
+.emptyItem {
+  padding: 8px 16px;
+  color: var(--blue2-muted, #9aa8b4);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+@media (max-width: 700px) {
+  .addButton {
+    margin-inline-end: 4px;
+  }
+}

@@ -1,6 +1,8 @@
 import { createSlice, isAction } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
+import { length } from 'stringz';
+
 import {
   changeCompose,
   clearComposeSuggestions,
@@ -87,6 +89,7 @@ interface ComposerState {
   origin: ComposerOrigin | null;
   closeOnSubmitSuccess: boolean;
   pendingFocus: PendingFocus | null;
+  publishErrors: ComposerPublishError[];
 }
 
 const initialState: ComposerState = {
@@ -94,6 +97,7 @@ const initialState: ComposerState = {
   origin: null,
   closeOnSubmitSuccess: false,
   pendingFocus: null,
+  publishErrors: [],
 };
 
 const composerSlice = createSlice({
@@ -132,6 +136,14 @@ const composerSlice = createSlice({
     clearPendingFocus(state) {
       state.pendingFocus = null;
     },
+    addError(state, action: PayloadAction<ComposerPublishError>) {
+      if (!state.publishErrors.includes(action.payload)) {
+        state.publishErrors.push(action.payload);
+      }
+    },
+    clearErrors(state) {
+      state.publishErrors = [];
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(COMPOSE_SUBMIT_SUCCESS, (state) => {
@@ -166,6 +178,7 @@ export const showRestoredComposer = composerSlice.actions.showRestoredComposer;
 export const {
   requestFocus: requestComposerFocus,
   clearPendingFocus: clearComposerFocusRequest,
+  clearErrors: clearComposerErrors,
 } = composerSlice.actions;
 
 export const minimizeComposerToggle = createAppThunk(
@@ -264,6 +277,7 @@ export const openNewComposer = createAppThunk(
     }
 
     dispatch(resetCompose());
+    dispatch(composerSlice.actions.clearErrors());
     if (payload.type === 'message') {
       const account =
         !!payload.toAccountId && getState().accounts.get(payload.toAccountId);
@@ -306,6 +320,7 @@ export const resumeComposer = createAppThunk(
 
 export const resetComposer = createAppThunk((_arg, { dispatch }) => {
   dispatch(composerSlice.actions.hideComposer());
+  dispatch(composerSlice.actions.clearErrors());
   dispatch(resetCompose());
   dispatch(clearComposeSuggestions());
 });
@@ -369,7 +384,19 @@ export const submitComposer = createAppThunk(
       dispatch(changeCompose(textareaValue));
     }
 
-    const { compose, meta, statuses, settings } = getState();
+    const { compose, meta, statuses, server, settings } = getState();
+
+    const maxChars =
+      server.server.item?.configuration.statuses.max_characters ?? 500;
+    const textLength = length(compose.get('text') as string);
+    if (textLength === 0) {
+      dispatch(composerSlice.actions.addError('empty'));
+      return;
+    } else if (textLength > maxChars) {
+      dispatch(composerSlice.actions.addError('too-long'));
+      return;
+    }
+
     const privacy = compose.get('privacy') as StatusVisibility;
     const missingAltText = (
       compose.get('media_attachments') as unknown as Immutable.List<
@@ -411,6 +438,15 @@ export const submitComposer = createAppThunk(
         openModal({
           modalType: 'CONFIRM_PRIVATE_QUOTE_NOTIFY',
           modalProps: {},
+        }),
+      );
+    } else if (!!compose.get('spoiler') && !compose.get('spoiler_text')) {
+      dispatch(
+        openModal({
+          modalType: 'COMPOSER_ADD_CONTENT_WARNING',
+          modalProps: {
+            redirectOnSuccess,
+          },
         }),
       );
     } else {

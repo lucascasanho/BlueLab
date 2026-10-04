@@ -7,6 +7,13 @@ import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import { HashIcon } from '@phosphor-icons/react';
 
+import {
+  Blue2PinnedFeedMenu,
+  Blue2PinnedFeedTabs,
+  useBlue2PinnedFeeds,
+} from '@/mastodon/features/blue2/pinned_feeds';
+import { Blue2InternalFeed } from '@/mastodon/features/blue2/internal_feed';
+
 // BLUELAB_INTEGRATION: optional BlueLab shell widgets and localized labels.
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import { openNavigation } from '@/mastodon/actions/navigation';
@@ -37,6 +44,22 @@ import searchPortalClasses from './blue2_search_portal.module.scss';
 import { MultiColumnContent } from './multi_column_content';
 import classes from './redesign.module.scss';
 import multiColClasses from './redesign_multicol.module.scss';
+
+const isIosSafariBrowser = () => {
+  if (typeof window === 'undefined') return false;
+
+  const ua = window.navigator.userAgent;
+  const platform = window.navigator.platform;
+  const ios =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (platform === 'MacIntel' && window.navigator.maxTouchPoints > 1);
+
+  return (
+    ios &&
+    /Safari\//.test(ua) &&
+    !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua)
+  );
+};
 
 const TabsBarPortal: React.FC<React.ComponentProps<'div'>> = (props) => {
   const { setTabsBarElement } = useColumnsContext();
@@ -97,15 +120,181 @@ export const ColumnsAreaRedesign: React.FC<{
   const isBlue2Search = isBlue2 && blue2Pathname === '/search';
   const isBlue2FeedPage =
     (isBlue2Home || isBlue2Global) && !isBlue2MessagesPage;
-  const blue2FeedTitle = isBlue2Home
-    ? intl.formatMessage({
-        id: 'account.following',
-        defaultMessage: 'Following',
-      })
-    : isBlue2Global
-      ? blue2Text(intl.locale, 'global')
-      : null;
   const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
+  const { feeds: pinnedFeeds } = useBlue2PinnedFeeds();
+  const [selectedFeedKey, setSelectedFeedKey] = useState<string | null>(
+    () => (location.pathname === '/public' ? 'global' : null),
+  );
+
+  useEffect(() => {
+    setSelectedFeedKey(location.pathname === '/public' ? 'global' : null);
+  }, [location.pathname]);
+
+  const selectedPinnedFeed =
+    selectedFeedKey && selectedFeedKey !== 'global'
+      ? pinnedFeeds.find((feed) => feed.key === selectedFeedKey)
+      : undefined;
+
+  const activeFeedTitle =
+    selectedFeedKey === 'global'
+      ? blue2Text(intl.locale, 'global')
+      : selectedPinnedFeed?.title ??
+        intl.formatMessage({
+          id: 'account.following',
+          defaultMessage: 'Following',
+        });
+  const blue2FeedTitle = isBlue2FeedPage ? activeFeedTitle : null;
+  const feedTabsRef = useRef<HTMLDivElement>(null);
+  const feedTabsTrackRef = useRef<HTMLDivElement>(null);
+  const feedTabsDragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startScrollLeft: number;
+    startIosOffset: number;
+    moved: boolean;
+  } | null>(null);
+  const suppressFeedTabsClickRef = useRef(false);
+  const [isIosSafari] = useState(isIosSafariBrowser);
+  const [iosFeedTabsOffset, setIosFeedTabsOffset] = useState(0);
+
+  const selectFeedTab = useCallback((key: string | null) => {
+    setSelectedFeedKey(key);
+  }, []);
+
+  const clampFeedTabsScroll = useCallback((value: number) => {
+    const scroller = feedTabsRef.current;
+    if (!scroller) return 0;
+
+    return Math.max(
+      0,
+      Math.min(value, scroller.scrollWidth - scroller.clientWidth),
+    );
+  }, []);
+
+  const getIosFeedTabsMaxOffset = useCallback(() => {
+    const scroller = feedTabsRef.current;
+    const track = feedTabsTrackRef.current;
+
+    if (!scroller || !track) return 0;
+
+    return Math.max(0, track.scrollWidth - scroller.clientWidth);
+  }, []);
+
+  const handleFeedTabsPointerDown = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+      const scroller = feedTabsRef.current;
+      if (!scroller) return;
+
+      if (isIosSafari) {
+        scroller.setPointerCapture(event.pointerId);
+      }
+
+      feedTabsDragRef.current = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startScrollLeft: scroller.scrollLeft,
+        startIosOffset: iosFeedTabsOffset,
+        moved: false,
+      };
+    },
+    [iosFeedTabsOffset, isIosSafari],
+  );
+
+  const handleFeedTabsPointerMove = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      const drag = feedTabsDragRef.current;
+      const scroller = feedTabsRef.current;
+
+      if (!drag || !scroller || drag.pointerId !== event.pointerId) return;
+
+      const deltaX = event.clientX - drag.startX;
+
+      if (Math.abs(deltaX) > 6) {
+        drag.moved = true;
+        suppressFeedTabsClickRef.current = true;
+        event.preventDefault();
+      }
+
+      if (!drag.moved) return;
+
+      if (isIosSafari) {
+        const maxOffset = getIosFeedTabsMaxOffset();
+        const nextOffset = Math.min(
+          maxOffset,
+          Math.max(0, drag.startIosOffset - deltaX),
+        );
+        setIosFeedTabsOffset(nextOffset);
+      } else {
+        scroller.scrollLeft = clampFeedTabsScroll(
+          drag.startScrollLeft - deltaX,
+        );
+      }
+    },
+    [clampFeedTabsScroll, getIosFeedTabsMaxOffset, isIosSafari],
+  );
+
+  const handleFeedTabsPointerEnd = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      const drag = feedTabsDragRef.current;
+
+      if (!drag || drag.pointerId !== event.pointerId) return;
+
+      const scroller = feedTabsRef.current;
+      if (scroller?.hasPointerCapture(event.pointerId)) {
+        scroller.releasePointerCapture(event.pointerId);
+      }
+
+      if (drag.moved) {
+        window.setTimeout(() => {
+          suppressFeedTabsClickRef.current = false;
+        }, 150);
+      }
+
+      feedTabsDragRef.current = null;
+    },
+    [],
+  );
+
+  const handleFeedTabsClickCapture = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (!suppressFeedTabsClickRef.current) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      suppressFeedTabsClickRef.current = false;
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const update = () => {
+      const scroller = feedTabsRef.current;
+      if (!scroller) return;
+
+      if (isIosSafari) {
+        setIosFeedTabsOffset((current) =>
+          Math.min(getIosFeedTabsMaxOffset(), Math.max(0, current)),
+        );
+      } else {
+        scroller.scrollLeft = clampFeedTabsScroll(scroller.scrollLeft);
+      }
+    };
+
+    const frame = window.requestAnimationFrame(update);
+    window.addEventListener('resize', update);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('resize', update);
+    };
+  }, [
+    clampFeedTabsScroll,
+    getIosFeedTabsMaxOffset,
+    isIosSafari,
+    pinnedFeeds.length,
+  ]);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -348,19 +537,14 @@ export const ColumnsAreaRedesign: React.FC<{
               )}
               {!isBlue2MobileLayout && blue2FeedTitle && (
                 <Blue2HomeFeedTitleBar title={blue2FeedTitle}>
-                  {isBlue2Home ? (
-                    <>
-                      <Blue2Announcements variant='mobile' />
-                      <HomeColumnSettings />
-                    </>
-                  ) : (
-                    <>
-                      <Blue2Announcements variant='mobile' />
-                      <ColumnSettingsMenu labelPrefix={blue2FeedTitle}>
-                        <FeedColumnSettings columnId={undefined} />
-                      </ColumnSettingsMenu>
-                    </>
-                  )}
+                  <Blue2Announcements variant='mobile' />
+                  {selectedFeedKey === null ? (
+                    <HomeColumnSettings />
+                  ) : selectedFeedKey === 'global' ? (
+                    <ColumnSettingsMenu labelPrefix={blue2FeedTitle}>
+                      <FeedColumnSettings columnId={undefined} />
+                    </ColumnSettingsMenu>
+                  ) : null}
                 </Blue2HomeFeedTitleBar>
               )}
               <header
@@ -370,31 +554,85 @@ export const ColumnsAreaRedesign: React.FC<{
                   isBlue2MobileLayout && mobileChromeClasses.feedTopBar,
                 )}
               >
-                <Link
-                  className={
-                    isBlue2Home ? classes.blue2TabActive : classes.blue2Tab
-                  }
-                  to='/home'
+                <div
+                  ref={feedTabsRef}
+                  className={classes.blue2TabScroller}
+                  data-ios-safari={isIosSafari ? 'true' : undefined}
+                  onPointerDown={handleFeedTabsPointerDown}
+                  onPointerMove={handleFeedTabsPointerMove}
+                  onPointerUp={handleFeedTabsPointerEnd}
+                  onPointerCancel={handleFeedTabsPointerEnd}
+                  onClickCapture={handleFeedTabsClickCapture}
                 >
-                  <FormattedMessage
-                    id='account.following'
-                    defaultMessage='Following'
+                  <div
+                    ref={feedTabsTrackRef}
+                    className={classes.blue2TabTrack}
+                    style={
+                      isIosSafari
+                        ? {
+                            transform:
+                              'translate3d(-' +
+                              iosFeedTabsOffset +
+                              'px, 0, 0)',
+                          }
+                        : undefined
+                    }
+                  >                    <button
+                    type='button'
+                    className={
+                      selectedFeedKey === null
+                        ? classes.blue2TabActive
+                        : classes.blue2Tab
+                    }
+                    onClick={() => selectFeedTab(null)}
+                  >
+                    <FormattedMessage
+                      id='account.following'
+                      defaultMessage='Following'
+                    />
+                  </button>
+                  <button
+                    type='button'
+                    className={
+                      selectedFeedKey === 'global'
+                        ? classes.blue2TabActive
+                        : classes.blue2Tab
+                    }
+                    onClick={() => selectFeedTab('global')}
+                  >
+                    {blue2Text(intl.locale, 'global')}
+                  </button>
+                  <Blue2PinnedFeedTabs
+                    activeKey={selectedFeedKey}
+                    onSelect={selectFeedTab}
+                    tabClassName={classes.blue2Tab}
+                    activeTabClassName={classes.blue2TabActive}
+                    showIcons={false}
                   />
-                </Link>
-                <Link
-                  className={
-                    isBlue2Global ? classes.blue2TabActive : classes.blue2Tab
-                  }
-                  to='/public'
-                >
-                  {blue2Text(intl.locale, 'global')}
-                </Link>
+                  </div>
+                </div>
+                <Blue2PinnedFeedMenu />
               </header>
               {!isBlue2MobileLayout && <Blue2ComposeLauncher />}
             </>
           )}
 
-          <div className='columns-area columns-area--mobile'>{children}</div>
+          <div className='columns-area columns-area--mobile'>
+            {isBlue2FeedPage ? (
+              selectedFeedKey === 'global' ? (
+                <Blue2InternalFeed type='global' />
+              ) : selectedPinnedFeed ? (
+                <Blue2InternalFeed
+                  type={selectedPinnedFeed.type}
+                  id={selectedPinnedFeed.id}
+                />
+              ) : (
+                <Blue2InternalFeed type='home' />
+              )
+            ) : (
+              children
+            )}
+          </div>
         </main>
 
         {!isBlue2MobileLayout && (

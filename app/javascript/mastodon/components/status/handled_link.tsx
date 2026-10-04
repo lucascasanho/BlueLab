@@ -15,6 +15,12 @@ import {
   resolveFederatedLink,
 } from '@/mastodon/utils/federated_links';
 import type { OnElementHandler } from '@/mastodon/utils/html';
+import { isRedesignEnabled } from '@/mastodon/utils/environment';
+
+import { HashtagMenu } from '../hashtag_menu';
+import { MenuTrigger } from '../menu';
+
+import classes from './handled_link.module.scss';
 
 export interface HandledLinkProps {
   href: string;
@@ -70,6 +76,16 @@ export const HandledLink: FC<HandledLinkProps & ComponentProps<'a'>> = ({
     !text.includes('%')
   ) {
     const hashtag = text.slice(1).trim();
+
+    if (isRedesignEnabled()) {
+      return (
+        <HashtagMenu tagId={hashtag} accountId={hashtagAccountId}>
+          <MenuTrigger as='button' className={classes.hashtag}>
+            {children}
+          </MenuTrigger>
+        </HashtagMenu>
+      );
+    }
 
     return (
       <Link

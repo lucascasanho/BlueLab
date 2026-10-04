@@ -368,7 +368,6 @@ kk:
   deletes:
     challenge_not_passed: Сіз енгізген ақпарат дұрыс емес
     confirm_password: Қазіргі құпиясөзіңізді жазыңыз
-    confirm_username: Процедураны растау үшін логинді енгізіңіз
     proceed: Аккаунт өшіру
     success_msg: Аккаунтыңыз сәтті өшірілді
     warning:

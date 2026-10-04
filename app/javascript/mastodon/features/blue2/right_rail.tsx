@@ -12,8 +12,10 @@ import { useIdentity } from '@/mastodon/identity_context';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
+import { HashIcon, RssSimpleIcon } from '@phosphor-icons/react';
 
 import { Blue2HomeIcon } from './icons';
+import { useBlue2PinnedFeeds } from './pinned_feeds';
 import classes from './right_rail.module.scss';
 
 interface TrendTag {
@@ -31,6 +33,7 @@ export const Blue2RightRail: React.FC<{
   const [tags, setTags] = useState<TrendTag[]>([]);
   const [trendMenuOpen, setTrendMenuOpen] = useState(false);
   const [trendsHidden, setTrendsHidden] = useState(false);
+  const { feeds: pinnedFeeds } = useBlue2PinnedFeeds();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -127,6 +130,25 @@ export const Blue2RightRail: React.FC<{
               </span>
               <span>{blue2Text(intl.locale, 'global')}</span>
             </NavLink>
+
+            {pinnedFeeds.map((feed) => (
+              <NavLink
+                key={feed.key}
+                className={classes.feedShortcut}
+                activeClassName={classes.feedShortcutActive}
+                exact
+                to={feed.path}
+              >
+                <span className={classes.feedIcon}>
+                  {feed.type === 'list' ? (
+                    <RssSimpleIcon size={18} />
+                  ) : (
+                    <HashIcon size={18} />
+                  )}
+                </span>
+                <span>{feed.title}</span>
+              </NavLink>
+            ))}
           </nav>
         )}
 

@@ -5,18 +5,27 @@ import { NavLink } from 'react-router-dom';
 
 import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
 import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
-import { domain, termsOfServiceEnabled } from '@/mastodon/initial_state';
+import {
+  domain,
+  profile_directory as canViewProfileDirectory,
+  source_url,
+  statusPageUrl,
+  termsOfServiceEnabled,
+  version,
+} from '@/mastodon/initial_state';
 
 import classes from './footer_links.module.scss';
 
 export const NavigationFooterLinks: React.FC<{
-  siteName?: string;
   multiColumn?: boolean;
+  siteName?: string;
   variant?: 'default' | 'blue2';
+  withVersionInfo?: boolean;
 }> = ({
   siteName = domain,
   multiColumn,
   variant = 'default',
+  withVersionInfo,
 }) => {
   const openBugReport = useOpenBugReport();
   const multiColumnLinkAttrs = multiColumn
@@ -79,7 +88,47 @@ export const NavigationFooterLinks: React.FC<{
             </NavLink>
           </li>
         )}
+        <li>
+          <NavLink
+            to='/privacy-policy'
+            rel='privacy-policy'
+            {...multiColumnLinkAttrs}
+          >
+            <FormattedMessage
+              id='footer.privacy_policy_short'
+              defaultMessage='Privacy'
+            />
+          </NavLink>
+        </li>
+        {statusPageUrl && (
+          <li>
+            <a href={statusPageUrl} target='_blank' rel='noopener'>
+              <FormattedMessage id='footer.status' defaultMessage='Status' />
+            </a>
+          </li>
+        )}
+        {canViewProfileDirectory && (
+          <li>
+            <NavLink to='/directory'>
+              <FormattedMessage
+                id='footer.directory_short'
+                defaultMessage='Directory'
+              />
+            </NavLink>
+          </li>
+        )}
       </ul>
+      {withVersionInfo && (
+        <p>
+          {`Mastodon v${version} `}&nbsp;
+          <a href={source_url} rel='noopener' target='_blank'>
+            <FormattedMessage
+              id='footer.source_code'
+              defaultMessage='View source code'
+            />
+          </a>
+        </p>
+      )}
     </div>
   );
 };

@@ -43,11 +43,11 @@ import { ComposeEmojiButton } from './emoji';
 import { ComposeSchedule } from './schedule';
 import {
   selectComposeAttachments,
-  selectComposeCanSubmit,
   selectComposeCharsCount,
   isMessageComposeType,
   selectComposeHasAttachments,
   selectComposeType,
+  selectComposeCanSubmit,
 } from './selectors';
 import classes from './styles.module.scss';
 

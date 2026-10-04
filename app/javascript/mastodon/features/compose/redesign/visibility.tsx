@@ -2,10 +2,13 @@ import { useCallback, useState } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
+import classNames from 'classnames';
+
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import {
   ChatCircleDotsIcon,
+  EyeIcon,
   MagnifyingGlassIcon,
   NewspaperIcon,
   QuotesIcon,
@@ -20,7 +23,7 @@ import { openModal } from '@/mastodon/actions/modal';
 import type { ApiQuotePolicy } from '@/mastodon/api_types/quotes';
 import type { StatusVisibility } from '@/mastodon/api_types/statuses';
 import { Button, CaretIcon } from '@/mastodon/components/button/redesign';
-import { DisplayNameSimple } from '@/mastodon/components/display_name/simple';
+import { Icon } from '@/mastodon/components/icon';
 import {
   Menu,
   MenuList,
@@ -31,10 +34,12 @@ import {
   MenuItemRadio,
   MenuItemCheckbox,
 } from '@/mastodon/components/menu';
+import { Tooltip } from '@/mastodon/components/tooltip';
 import { selectPlainAccount } from '@/mastodon/selectors/accounts';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { selectComposeMentions, selectComposePrivacy } from './selectors';
+import classes from './styles.module.scss';
 
 const isBlue2ThemeActive = () =>
   typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
@@ -62,13 +67,37 @@ export const ComposeVisibility: React.FC<{
   const privacy = useThreadPrivacy(activeThreadItemId);
   const isEditing = useAppSelector((state) => !!state.compose.get('id'));
 
+  if (privacy === 'direct') return null;
+
+  if (isEditing) {
+    return (
+      <div className={className}>
+        <Tooltip
+          renderTextWhenClosed
+          text={
+            <FormattedMessage
+              id='compose.privacy.editing'
+              defaultMessage='Visibility can’t be edited after a post has been published.'
+            />
+          }
+        >
+          {({ getTooltipProps, tooltipId }) => (
+            <Button
+              {...getTooltipProps()}
+              size='sm'
+              aria-disabled
+              aria-describedby={tooltipId}
+            >
+              <ComposeVisibilityButtonText privacy={privacy} />
+            </Button>
+          )}
+        </Tooltip>
+      </div>
+    );
+  }
+
   return (
     <div className={className}>
-      <FormattedMessage
-        id='compose.post.to'
-        defaultMessage='To:'
-        description='Before button that indicates who a post is for (Public, Followers, mentioned people)'
-      />
       <Menu>
         <MenuTrigger
           as={Button}
@@ -106,25 +135,18 @@ const ComposeVisibilityButtonText: React.FC<{
     return (
       <FormattedMessage id='privacy.public.short' defaultMessage='Public' />
     );
+  } else if (privacy === 'unlisted') {
+    return (
+      <FormattedMessage
+        id='compose.privacy.unlisted'
+        defaultMessage='Public, hidden from search'
+      />
+    );
   } else if (privacy === 'private') {
     return (
       <FormattedMessage
-        id='compose.post.privacy.followers'
-        defaultMessage='Followers {count, plural, =0 {} one {+ # other} other {+ # others}}'
-        description='Count is # of other people mentioned in the post. If zero, just output "Followers".'
-        values={{ count: mentions.length }}
-      />
-    );
-  } else if (mentions.length > 0) {
-    return (
-      <FormattedMessage
-        id='compose.message.direct.followers'
-        defaultMessage='{name} {count, plural, =0 {} one {+ # other} other {+ # others}}'
-        description='Name is the primary display name, count is # of other people mentioned in the post'
-        values={{
-          name: <DisplayNameSimple account={firstMentionedAccount} />,
-          count: mentions.length - 1,
-        }}
+        id='compose.privacy.followers'
+        defaultMessage='Followers (+ mentions)'
       />
     );
   }
@@ -246,8 +268,8 @@ const ComposeVisibilityMenu: React.FC<{
           keepMenuOpenOnClick
         >
           <FormattedMessage
-            id='privacy.private.short'
-            defaultMessage='Followers'
+            id='compose.privacy.followers'
+            defaultMessage='Followers (+ mentions)'
           />
         </MenuItemRadio>
 
@@ -256,9 +278,8 @@ const ComposeVisibilityMenu: React.FC<{
         <MenuItemCheckbox
           value='unlisted'
           disabled={privacy === 'private'}
-          checked={privacy === 'public'}
+          checked={privacy === 'unlisted' || privacy === 'private'}
           onChange={handlePrivacyChange}
-          icon={MagnifyingGlassIcon}
           keepMenuOpenOnClick
         >
           <FormattedMessage
@@ -334,7 +355,7 @@ const ComposeVisibilityMenu: React.FC<{
         ) : (
           <FormattedMessage
             id='compose.post.to_message'
-            defaultMessage='Compose a message instead'
+            defaultMessage='Convert to private message'
             description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
           />
         )}

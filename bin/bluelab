@@ -217,7 +217,45 @@ instalar_dependencias() {
   # Instala/atualiza as gems antes de qualquer comando Rails.
   executar bundle install --jobs "${BLUELAB_BUNDLE_JOBS:-1}" --retry 3
   executar bundle check
+
+  # O Yarn usa checksums dos arquivos armazenados no cache. Um pacote npm pode
+  # ser republicado com o mesmo número de versão, deixando o checksum gravado
+  # no lockfile incompatível com o arquivo atualmente servido pelo registry.
+  # O caminho normal continua estrito. Só em caso de falha do immutable,
+  # atualizamos os checksums do yarn.lock, verificamos novamente em modo
+  # immutable e persistimos somente essa alteração no canal de teste.
+  if yarn install --immutable; then
+    return 0
+  fi
+
+  echo
+  echo "Yarn encontrou checksums divergentes. Atualizando somente os checksums do yarn.lock..."
+  YARN_CHECKSUM_BEHAVIOR=update executar yarn install --no-immutable
+
+  local alterados
+  alterados="$(git diff --name-only)"
+  if [[ -n "$alterados" && "$alterados" != "yarn.lock" ]]; then
+    echo "Arquivos modificados inesperadamente durante a correção do Yarn:"
+    printf '  - %s\n' $alterados
+    falhar "a atualização do Yarn alterou arquivos além de yarn.lock"
+  fi
+
+  executar git diff --check
   executar yarn install --immutable
+
+  if ! git diff --quiet -- yarn.lock; then
+    executar git add yarn.lock
+    executar git commit -m "chore: refresh Yarn checksums for current package archives"
+    executar git push "$REMOTO" "HEAD:refs/heads/$CANAL"
+    executar git fetch --prune "$REMOTO" "+refs/heads/$CANAL:refs/remotes/$REMOTO/$CANAL"
+
+    local remoto_confirmado
+    remoto_confirmado="$(git rev-parse "$REMOTO/$CANAL")"
+    [[ "$remoto_confirmado" == "$(git rev-parse HEAD)" ]] ||
+      falhar "o GitHub não confirmou o commit atualizado de yarn.lock"
+  fi
+
+  echo "Yarn: checksums atualizados e instalação immutable validada."
 }
 
 aplicar_migrations() {
