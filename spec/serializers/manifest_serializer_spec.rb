@@ -19,7 +19,16 @@ RSpec.describe ManifestSerializer do
     end
 
     it 'uses the any purpose for the general app icons' do
-      expect(serializer.icons).to all(include(purpose: 'any'))
+      general_icons = serializer.icons.reject { |icon| icon[:purpose] == 'maskable' }
+
+      expect(general_icons).to all(include(purpose: 'any'))
+    end
+
+    it 'keeps maskable icons separate from general icons' do
+      maskable = serializer.icons.select { |icon| icon[:purpose] == 'maskable' }
+
+      expect(maskable.pluck(:sizes)).to contain_exactly('192x192', '512x512')
+      expect(serializer.icons).not_to include(include(purpose: 'any maskable'))
     end
   end
 
@@ -42,14 +51,25 @@ RSpec.describe ManifestSerializer do
   end
 
   describe '#shortcuts' do
-    it 'provides a 96x96 icon for every shortcut' do
-      expect(serializer.shortcuts).to all(include(icons: [include(sizes: '96x96', type: 'image/png')]))
+    it 'provides a 96x96 icon with general purpose for every shortcut' do
+      expect(serializer.shortcuts).to all(include(icons: [include(sizes: '96x96', type: 'image/png', purpose: 'any')]))
+    end
+  end
+
+  describe '#protocol_handlers' do
+    it 'registers the Mastodon web protocol through the in-scope intent route' do
+      expect(serializer.protocol_handlers).to contain_exactly(
+        protocol: 'web+mastodon',
+        url: '/intent?uri=%s'
+      )
     end
   end
 
   describe 'install navigation metadata' do
     it 'opens as a standalone app within the instance scope' do
       expect(serializer.display).to eq('standalone')
+      expect(serializer.display_override).to contain_exactly('standalone', 'window-controls-overlay')
+      expect(serializer.display_override.first).to eq('standalone')
       expect(serializer.start_url).to eq('/')
       expect(serializer.scope).to eq('/')
     end
