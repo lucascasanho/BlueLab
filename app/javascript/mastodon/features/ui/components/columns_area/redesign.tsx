@@ -154,15 +154,8 @@ export const ColumnsAreaRedesign: React.FC<{
     moved: boolean;
   } | null>(null);
   const suppressFeedTabsClickRef = useRef(false);
-  const iosFeedTabsTouchRef = useRef<{
-    startX: number;
-    startOffset: number;
-    moved: boolean;
-  } | null>(null);
-  const iosFeedTabsOffsetRef = useRef(0);
   const [isIosSafari] = useState(isIosSafariBrowser);
   const [iosFeedTabsOffset, setIosFeedTabsOffset] = useState(0);
-
 
   const selectFeedTab = useCallback((key: string | null) => {
     setSelectedFeedKey(key);
@@ -187,12 +180,6 @@ export const ColumnsAreaRedesign: React.FC<{
     return Math.max(0, track.scrollWidth - scroller.clientWidth);
   }, []);
 
-  const clampIosFeedTabsOffset = useCallback(
-    (value: number) =>
-      Math.min(getIosFeedTabsMaxOffset(), Math.max(0, value)),
-    [getIosFeedTabsMaxOffset],
-  );
-
   const handleFeedTabsPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
@@ -212,7 +199,7 @@ export const ColumnsAreaRedesign: React.FC<{
         moved: false,
       };
     },
-    [isIosSafari, iosFeedTabsOffset],
+    [iosFeedTabsOffset, isIosSafari],
   );
 
   const handleFeedTabsPointerMove = useCallback(
@@ -225,38 +212,27 @@ export const ColumnsAreaRedesign: React.FC<{
       const deltaX = event.clientX - drag.startX;
 
       if (Math.abs(deltaX) > 6) {
-        if (!drag.moved) {
-          drag.moved = true;
-          scroller.setPointerCapture(event.pointerId);
-        }
-
+        drag.moved = true;
         suppressFeedTabsClickRef.current = true;
         event.preventDefault();
       }
 
-      if (drag.moved) {
-        if (isIosSafari) {
-          const nextOffset = Math.min(
-            Math.max(
-              0,
-              drag.startIosOffset - deltaX,
-            ),
-            Math.max(
-              0,
-              (feedTabsTrackRef.current?.scrollWidth ?? 0) -
-                scroller.clientWidth,
-            ),
-          );
+      if (!drag.moved) return;
 
-          setIosFeedTabsOffset(nextOffset);
-        } else {
-          scroller.scrollLeft = clampFeedTabsScroll(
-            drag.startScrollLeft - deltaX,
-          );
-        }
+      if (isIosSafari) {
+        const maxOffset = getIosFeedTabsMaxOffset();
+        const nextOffset = Math.min(
+          maxOffset,
+          Math.max(0, drag.startIosOffset - deltaX),
+        );
+        setIosFeedTabsOffset(nextOffset);
+      } else {
+        scroller.scrollLeft = clampFeedTabsScroll(
+          drag.startScrollLeft - deltaX,
+        );
       }
     },
-    [clampFeedTabsScroll, isIosSafari],
+    [clampFeedTabsScroll, getIosFeedTabsMaxOffset, isIosSafari],
   );
 
   const handleFeedTabsPointerEnd = useCallback(
@@ -297,7 +273,13 @@ export const ColumnsAreaRedesign: React.FC<{
       const scroller = feedTabsRef.current;
       if (!scroller) return;
 
-      scroller.scrollLeft = clampFeedTabsScroll(scroller.scrollLeft);
+      if (isIosSafari) {
+        setIosFeedTabsOffset((current) =>
+          Math.min(getIosFeedTabsMaxOffset(), Math.max(0, current)),
+        );
+      } else {
+        scroller.scrollLeft = clampFeedTabsScroll(scroller.scrollLeft);
+      }
     };
 
     const frame = window.requestAnimationFrame(update);
@@ -307,7 +289,12 @@ export const ColumnsAreaRedesign: React.FC<{
       window.cancelAnimationFrame(frame);
       window.removeEventListener('resize', update);
     };
-  }, [clampFeedTabsScroll, pinnedFeeds.length]);
+  }, [
+    clampFeedTabsScroll,
+    getIosFeedTabsMaxOffset,
+    isIosSafari,
+    pinnedFeeds.length,
+  ]);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -590,8 +577,7 @@ export const ColumnsAreaRedesign: React.FC<{
                           }
                         : undefined
                     }
-                  >
-                    <button
+                  >                    <button
                     type='button'
                     className={
                       selectedFeedKey === null
