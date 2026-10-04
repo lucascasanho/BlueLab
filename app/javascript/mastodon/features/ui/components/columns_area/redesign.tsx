@@ -129,15 +129,102 @@ export const ColumnsAreaRedesign: React.FC<{
         });
   const blue2FeedTitle = isBlue2FeedPage ? activeFeedTitle : null;
   const feedTabsRef = useRef<HTMLDivElement>(null);
-  const feedTabsTrackRef = useRef<HTMLDivElement>(null);
+  const feedTabsDragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startScrollLeft: number;
+    moved: boolean;
+  } | null>(null);
+  const suppressFeedTabsClickRef = useRef(false);
 
   const selectFeedTab = useCallback((key: string | null) => {
     setSelectedFeedKey(key);
   }, []);
 
-  const stopFeedTabsTouchPropagation = useCallback(
-    (event: React.TouchEvent<HTMLDivElement>) => {
+  const clampFeedTabsScroll = useCallback((value: number) => {
+    const scroller = feedTabsRef.current;
+    if (!scroller) return 0;
+
+    return Math.max(
+      0,
+      Math.min(value, scroller.scrollWidth - scroller.clientWidth),
+    );
+  }, []);
+
+  const handleFeedTabsPointerDown = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+      const scroller = feedTabsRef.current;
+      if (!scroller) return;
+
+      feedTabsDragRef.current = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startScrollLeft: scroller.scrollLeft,
+        moved: false,
+      };
+    },
+    [],
+  );
+
+  const handleFeedTabsPointerMove = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      const drag = feedTabsDragRef.current;
+      const scroller = feedTabsRef.current;
+
+      if (!drag || !scroller || drag.pointerId !== event.pointerId) return;
+
+      const deltaX = event.clientX - drag.startX;
+
+      if (Math.abs(deltaX) > 6) {
+        if (!drag.moved) {
+          drag.moved = true;
+          scroller.setPointerCapture(event.pointerId);
+        }
+
+        suppressFeedTabsClickRef.current = true;
+        event.preventDefault();
+      }
+
+      if (drag.moved) {
+        scroller.scrollLeft = clampFeedTabsScroll(
+          drag.startScrollLeft - deltaX,
+        );
+      }
+    },
+    [clampFeedTabsScroll],
+  );
+
+  const handleFeedTabsPointerEnd = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      const drag = feedTabsDragRef.current;
+
+      if (!drag || drag.pointerId !== event.pointerId) return;
+
+      const scroller = feedTabsRef.current;
+      if (scroller?.hasPointerCapture(event.pointerId)) {
+        scroller.releasePointerCapture(event.pointerId);
+      }
+
+      if (drag.moved) {
+        window.setTimeout(() => {
+          suppressFeedTabsClickRef.current = false;
+        }, 150);
+      }
+
+      feedTabsDragRef.current = null;
+    },
+    [],
+  );
+
+  const handleFeedTabsClickCapture = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (!suppressFeedTabsClickRef.current) return;
+
+      event.preventDefault();
       event.stopPropagation();
+      suppressFeedTabsClickRef.current = false;
     },
     [],
   );
@@ -147,10 +234,7 @@ export const ColumnsAreaRedesign: React.FC<{
       const scroller = feedTabsRef.current;
       if (!scroller) return;
 
-      scroller.scrollLeft = Math.max(
-        0,
-        Math.min(scroller.scrollLeft, scroller.scrollWidth - scroller.clientWidth),
-      );
+      scroller.scrollLeft = clampFeedTabsScroll(scroller.scrollLeft);
     };
 
     const frame = window.requestAnimationFrame(update);
@@ -160,7 +244,7 @@ export const ColumnsAreaRedesign: React.FC<{
       window.cancelAnimationFrame(frame);
       window.removeEventListener('resize', update);
     };
-  }, []);
+  }, [clampFeedTabsScroll, pinnedFeeds.length]);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -423,10 +507,11 @@ export const ColumnsAreaRedesign: React.FC<{
                 <div
                   ref={feedTabsRef}
                   className={classes.blue2TabScroller}
-                  onTouchStart={stopFeedTabsTouchPropagation}
-                  onTouchMove={stopFeedTabsTouchPropagation}
-                  onTouchEnd={stopFeedTabsTouchPropagation}
-                  onTouchCancel={stopFeedTabsTouchPropagation}
+                  onPointerDown={handleFeedTabsPointerDown}
+                  onPointerMove={handleFeedTabsPointerMove}
+                  onPointerUp={handleFeedTabsPointerEnd}
+                  onPointerCancel={handleFeedTabsPointerEnd}
+                  onClickCapture={handleFeedTabsClickCapture}
                 >
                   <div
                     ref={feedTabsTrackRef}
