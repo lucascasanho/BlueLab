@@ -58,10 +58,12 @@ RSpec.describe ManifestSerializer do
 
   describe '#protocol_handlers' do
     it 'registers the Mastodon web protocol through the in-scope intent route' do
-      expect(serializer.protocol_handlers).to contain_exactly(
-        protocol: 'web+mastodon',
-        url: '/intent?uri=%s'
-      )
+      expect(serializer.protocol_handlers).to eq([
+        {
+          protocol: 'web+mastodon',
+          url: '/intent?uri=%s',
+        },
+      ])
     end
   end
 
