@@ -65,9 +65,9 @@ import {
   StatusBoostIcon,
   StatusLikeActiveIcon,
   StatusLikeIcon,
-  StatusReplyAllIcon,
   StatusReplyIcon,
 } from './icons';
+import ReplyAllLegacyIcon from '@/material-icons/400-24px/reply_all.svg?react';
 import type { StatusContextType } from './types';
 
 export const StatusContext = createContext<{
@@ -303,7 +303,11 @@ export function useStatusIcons(statusId: string) {
 
   const isReplyAll = !!status?.in_reply_to_id;
   const reply: StatusIcon = {
-    icon: isReplyAll ? StatusReplyAllIcon : StatusReplyIcon,
+    icon: isReplyAll
+      ? isRedesign
+        ? StatusReplyIcon
+        : ReplyAllLegacyIcon
+      : StatusReplyIcon,
     title: intl.formatMessage(
       isReplyAll ? iconMessages.replyAll : iconMessages.reply,
     ),
