@@ -45,6 +45,22 @@ import { MultiColumnContent } from './multi_column_content';
 import classes from './redesign.module.scss';
 import multiColClasses from './redesign_multicol.module.scss';
 
+const isIosSafariBrowser = () => {
+  if (typeof window === 'undefined') return false;
+
+  const ua = window.navigator.userAgent;
+  const platform = window.navigator.platform;
+  const ios =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (platform === 'MacIntel' && window.navigator.maxTouchPoints > 1);
+
+  return (
+    ios &&
+    /Safari\//.test(ua) &&
+    !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua)
+  );
+};
+
 const TabsBarPortal: React.FC<React.ComponentProps<'div'>> = (props) => {
   const { setTabsBarElement } = useColumnsContext();
 
@@ -134,6 +150,7 @@ export const ColumnsAreaRedesign: React.FC<{
     pointerId: number;
     startX: number;
     startScrollLeft: number;
+    startIosOffset: number;
     moved: boolean;
   } | null>(null);
   const suppressFeedTabsClickRef = useRef(false);
@@ -143,7 +160,7 @@ export const ColumnsAreaRedesign: React.FC<{
     moved: boolean;
   } | null>(null);
   const iosFeedTabsOffsetRef = useRef(0);
-  const [isIosSafari, setIsIosSafari] = useState(false);
+  const [isIosSafari] = useState(isIosSafariBrowser);
   const [iosFeedTabsOffset, setIosFeedTabsOffset] = useState(0);
 
 
@@ -183,14 +200,19 @@ export const ColumnsAreaRedesign: React.FC<{
       const scroller = feedTabsRef.current;
       if (!scroller) return;
 
+      if (isIosSafari) {
+        scroller.setPointerCapture(event.pointerId);
+      }
+
       feedTabsDragRef.current = {
         pointerId: event.pointerId,
         startX: event.clientX,
         startScrollLeft: scroller.scrollLeft,
+        startIosOffset: iosFeedTabsOffset,
         moved: false,
       };
     },
-    [],
+    [isIosSafari, iosFeedTabsOffset],
   );
 
   const handleFeedTabsPointerMove = useCallback(
@@ -213,12 +235,28 @@ export const ColumnsAreaRedesign: React.FC<{
       }
 
       if (drag.moved) {
-        scroller.scrollLeft = clampFeedTabsScroll(
-          drag.startScrollLeft - deltaX,
-        );
+        if (isIosSafari) {
+          const nextOffset = Math.min(
+            Math.max(
+              0,
+              drag.startIosOffset - deltaX,
+            ),
+            Math.max(
+              0,
+              (feedTabsTrackRef.current?.scrollWidth ?? 0) -
+                scroller.clientWidth,
+            ),
+          );
+
+          setIosFeedTabsOffset(nextOffset);
+        } else {
+          scroller.scrollLeft = clampFeedTabsScroll(
+            drag.startScrollLeft - deltaX,
+          );
+        }
       }
     },
-    [clampFeedTabsScroll],
+    [clampFeedTabsScroll, isIosSafari],
   );
 
   const handleFeedTabsPointerEnd = useCallback(
@@ -253,88 +291,6 @@ export const ColumnsAreaRedesign: React.FC<{
     },
     [],
   );
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const ua = window.navigator.userAgent;
-    const platform = window.navigator.platform;
-    const ios =
-      /iPad|iPhone|iPod/.test(ua) ||
-      (platform === 'MacIntel' && window.navigator.maxTouchPoints > 1);
-
-    setIsIosSafari(
-      ios && /Safari\//.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua),
-    );
-  }, []);
-
-  useEffect(() => {
-    if (!isIosSafari) return;
-
-    const scroller = feedTabsRef.current;
-    if (!scroller) return;
-
-    const handleTouchStart = (event: TouchEvent) => {
-      const touch = event.touches[0];
-      if (!touch) return;
-
-      iosFeedTabsTouchRef.current = {
-        startX: touch.clientX,
-        startOffset: iosFeedTabsOffsetRef.current,
-        moved: false,
-      };
-      event.stopPropagation();
-    };
-
-    const handleTouchMove = (event: TouchEvent) => {
-      const drag = iosFeedTabsTouchRef.current;
-      const touch = event.touches[0];
-      if (!drag || !touch) return;
-
-      const deltaX = touch.clientX - drag.startX;
-
-      if (Math.abs(deltaX) > 6) {
-        drag.moved = true;
-        suppressFeedTabsClickRef.current = true;
-        event.preventDefault();
-      }
-
-      if (drag.moved) {
-        const nextOffset = clampIosFeedTabsOffset(
-          drag.startOffset - deltaX,
-        );
-        iosFeedTabsOffsetRef.current = nextOffset;
-        setIosFeedTabsOffset(nextOffset);
-      }
-
-      event.stopPropagation();
-    };
-
-    const handleTouchEnd = (event: TouchEvent) => {
-      const drag = iosFeedTabsTouchRef.current;
-      iosFeedTabsTouchRef.current = null;
-
-      if (drag?.moved) {
-        window.setTimeout(() => {
-          suppressFeedTabsClickRef.current = false;
-        }, 200);
-      }
-
-      event.stopPropagation();
-    };
-
-    scroller.addEventListener('touchstart', handleTouchStart, { passive: true });
-    scroller.addEventListener('touchmove', handleTouchMove, { passive: false });
-    scroller.addEventListener('touchend', handleTouchEnd, { passive: true });
-    scroller.addEventListener('touchcancel', handleTouchEnd, { passive: true });
-
-    return () => {
-      scroller.removeEventListener('touchstart', handleTouchStart);
-      scroller.removeEventListener('touchmove', handleTouchMove);
-      scroller.removeEventListener('touchend', handleTouchEnd);
-      scroller.removeEventListener('touchcancel', handleTouchEnd);
-    };
-  }, [clampIosFeedTabsOffset, isIosSafari]);
 
   useEffect(() => {
     const update = () => {
