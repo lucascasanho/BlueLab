@@ -6,10 +6,11 @@ class ManifestSerializer < ActiveModel::Serializer
   include ActionView::Helpers::TextHelper
 
   attributes :id, :name, :short_name,
-             :description, :screenshots,
+             :description, :lang, :dir, :categories,
+             :orientation, :screenshots,
              :icons, :theme_color, :background_color,
              :display, :start_url, :scope,
-             :share_target, :shortcuts,
+             :protocol_handlers, :share_target, :shortcuts,
              :prefer_related_applications, :related_applications
 
   def id
@@ -25,6 +26,22 @@ class ManifestSerializer < ActiveModel::Serializer
 
   def short_name
     object.title
+  end
+
+  def lang
+    I18n.default_locale.to_s.tr('_', '-')
+  end
+
+  def dir
+    'ltr'
+  end
+
+  def categories
+    %w[social communication]
+  end
+
+  def orientation
+    'any'
   end
 
   def description
@@ -53,16 +70,23 @@ class ManifestSerializer < ActiveModel::Serializer
   end
 
   def icons
-    SiteUpload::ANDROID_ICON_SIZES.map do |size|
+    SiteUpload::ANDROID_ICON_SIZES.flat_map do |size|
       src = app_icon_path(size.to_i)
       src = URI.join(root_url, src).to_s if src.present?
+      src ||= frontend_asset_url("icons/android-chrome-#{size}x#{size}.png")
 
-      {
-        src: src || frontend_asset_url("icons/android-chrome-#{size}x#{size}.png"),
+      icon = {
+        src: src,
         sizes: "#{size}x#{size}",
         type: 'image/png',
         purpose: 'any',
       }
+
+      # Keep general and maskable purposes separate. Chromium warns about the
+      # combined `any maskable` value and may render it incorrectly on Android.
+      maskable_icon = icon.merge(purpose: 'maskable') if [192, 512].include?(size.to_i)
+
+      maskable_icon ? [icon, maskable_icon] : [icon]
     end
   end
 
@@ -86,6 +110,15 @@ class ManifestSerializer < ActiveModel::Serializer
     '/'
   end
 
+  def protocol_handlers
+    [
+      {
+        protocol: 'web+mastodon',
+        url: '/intent?uri=%s',
+      },
+    ]
+  end
+
   def share_target
     {
       url_template: 'share?title={title}&text={text}&url={url}',
@@ -107,7 +140,7 @@ class ManifestSerializer < ActiveModel::Serializer
       {
         name: 'Compose new post',
         url: '/publish',
-        icons: [{ src: shortcut_icon, sizes: '96x96', type: 'image/png' }],
+        icons: [{ src: shortcut_icon, sizes: '96x96', type: 'image/png', purpose: 'any' }],
       },
       {
         name: 'Notifications',
