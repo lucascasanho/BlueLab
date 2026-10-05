@@ -5,12 +5,13 @@ import { initializeComposeEmojiImageFallback } from 'mastodon/utils/compose_emoj
 import { initializeEmojiHoverZoom } from 'mastodon/utils/emoji_hover_zoom';
 import { setupPwaInstallability } from 'mastodon/pwa_install';
 
+setupPwaInstallability();
+
 loadPolyfills()
   .then(loadLocale)
   .then(() => {
     initializeComposeEmojiImageFallback();
     initializeEmojiHoverZoom();
-    setupPwaInstallability();
     return main();
   })
   .catch((e: unknown) => {
