@@ -5,6 +5,8 @@ class ManifestSerializer < ActiveModel::Serializer
   include RoutingHelper
   include ActionView::Helpers::TextHelper
 
+  MASKABLE_ICON_SIZES = [192, 512].freeze
+
   attributes :id, :name, :short_name,
              :description, :lang, :dir, :categories,
              :orientation, :screenshots,
@@ -37,7 +39,7 @@ class ManifestSerializer < ActiveModel::Serializer
   end
 
   def categories
-    %w[social communication]
+    %w(social communication)
   end
 
   def orientation
@@ -54,14 +56,14 @@ class ManifestSerializer < ActiveModel::Serializer
     [
       {
         src: "/pwa-screenshots/#{screenshot_set}-narrow.png",
-        sizes: '720x1280',
+        sizes: '473x936',
         type: 'image/png',
         form_factor: 'narrow',
         label: "Tela de entrada de #{object.title} em celular",
       },
       {
         src: "/pwa-screenshots/#{screenshot_set}-wide.png",
-        sizes: '1280x720',
+        sizes: '1891x936',
         type: 'image/png',
         form_factor: 'wide',
         label: "Tela de entrada de #{object.title} em computador",
@@ -84,7 +86,7 @@ class ManifestSerializer < ActiveModel::Serializer
 
       # Keep general and maskable purposes separate. Chromium warns about the
       # combined `any maskable` value and may render it incorrectly on Android.
-      maskable_icon = icon.merge(purpose: 'maskable') if [192, 512].include?(size.to_i)
+      maskable_icon = icon.merge(purpose: 'maskable') if MASKABLE_ICON_SIZES.include?(size.to_i)
 
       maskable_icon ? [icon, maskable_icon] : [icon]
     end

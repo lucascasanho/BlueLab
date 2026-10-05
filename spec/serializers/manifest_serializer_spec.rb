@@ -28,7 +28,7 @@ RSpec.describe ManifestSerializer do
       maskable = serializer.icons.select { |icon| icon[:purpose] == 'maskable' }
 
       expect(maskable.pluck(:sizes)).to contain_exactly('192x192', '512x512')
-      expect(serializer.icons).not_to include(include(purpose: 'any maskable'))
+      expect(serializer.icons).to_not include(include(purpose: 'any maskable'))
     end
   end
 
@@ -36,8 +36,8 @@ RSpec.describe ManifestSerializer do
     it 'includes a description and screenshots for mobile and desktop' do
       expect(serializer.description).to be_present
       expect(serializer.screenshots).to contain_exactly(
-        include(sizes: '720x1280', type: 'image/png', form_factor: 'narrow'),
-        include(sizes: '1280x720', type: 'image/png', form_factor: 'wide')
+        include(sizes: '473x936', type: 'image/png', form_factor: 'narrow'),
+        include(sizes: '1891x936', type: 'image/png', form_factor: 'wide')
       )
     end
 
@@ -59,11 +59,11 @@ RSpec.describe ManifestSerializer do
   describe '#protocol_handlers' do
     it 'registers the Mastodon web protocol through the in-scope intent route' do
       expect(serializer.protocol_handlers).to eq([
-        {
-          protocol: 'web+mastodon',
-          url: '/intent?uri=%s',
-        },
-      ])
+                                                   {
+                                                     protocol: 'web+mastodon',
+                                                     url: '/intent?uri=%s',
+                                                   },
+                                                 ])
     end
   end
 
