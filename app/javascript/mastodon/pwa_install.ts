@@ -10,6 +10,12 @@ interface BeforeInstallPromptEvent extends Event {
 const INSTALL_PROMOTION_ID = 'pwa-install-promotion';
 const MOBILE_MEDIA_QUERY = '(width <= 767px)';
 
+interface WindowWithInstallPrompt extends Window {
+  __mastodonBeforeInstallPrompt?: BeforeInstallPromptEvent | null;
+}
+
+const installWindow = window as WindowWithInstallPrompt;
+
 let isSetup = false;
 let deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
 let installPromotion: HTMLElement | null = null;
@@ -122,6 +128,7 @@ function showInstallPromotion() {
     if (!promptEvent) return;
 
     deferredInstallPrompt = null;
+    installWindow.__mastodonBeforeInstallPrompt = null;
     removeInstallPromotion();
 
     void promptEvent.prompt().catch(() => undefined);
@@ -129,6 +136,7 @@ function showInstallPromotion() {
 
   dismissButton.addEventListener('click', () => {
     deferredInstallPrompt = null;
+    installWindow.__mastodonBeforeInstallPrompt = null;
     removeInstallPromotion();
   });
 
@@ -160,8 +168,13 @@ export function setupPwaInstallability() {
   window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
   window.addEventListener('appinstalled', () => {
     deferredInstallPrompt = null;
+    installWindow.__mastodonBeforeInstallPrompt = null;
     removeInstallPromotion();
   });
+
+  deferredInstallPrompt = installWindow.__mastodonBeforeInstallPrompt ?? null;
+  installWindow.__mastodonBeforeInstallPrompt = null;
+  showInstallPromotion();
 
   registerServiceWorker();
 }
