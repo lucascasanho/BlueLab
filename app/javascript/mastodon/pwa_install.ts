@@ -78,8 +78,7 @@ function showInstallPromotion() {
     !deferredInstallPrompt ||
     !isMobileViewport() ||
     isStandalone() ||
-    installPromotion ||
-    !document.body
+    installPromotion
   ) {
     return;
   }
@@ -117,7 +116,7 @@ function showInstallPromotion() {
   dismissButton.type = 'button';
   dismissButton.textContent = copy.dismiss;
 
-  installButton.addEventListener('click', async () => {
+  installButton.addEventListener('click', () => {
     const promptEvent = deferredInstallPrompt;
 
     if (!promptEvent) return;
@@ -125,12 +124,7 @@ function showInstallPromotion() {
     deferredInstallPrompt = null;
     removeInstallPromotion();
 
-    try {
-      await promptEvent.prompt();
-    } catch {
-      // The browser owns the install prompt lifecycle. There is nothing else
-      // to do when the prompt cannot be shown.
-    }
+    void promptEvent.prompt().catch(() => undefined);
   });
 
   dismissButton.addEventListener('click', () => {
@@ -154,14 +148,7 @@ function handleBeforeInstallPrompt(event: Event) {
 
   installEvent.preventDefault();
   deferredInstallPrompt = installEvent;
-
-  if (document.body) {
-    showInstallPromotion();
-  } else {
-    document.addEventListener('DOMContentLoaded', showInstallPromotion, {
-      once: true,
-    });
-  }
+  showInstallPromotion();
 }
 
 export function setupPwaInstallability() {
