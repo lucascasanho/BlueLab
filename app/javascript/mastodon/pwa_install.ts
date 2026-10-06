@@ -58,6 +58,12 @@ function configureInstanceInstallColors() {
   }
 }
 
+function getInstanceInstallName() {
+  return window.location.hostname === 'espelunca.social'
+    ? 'Espelunca'
+    : window.location.hostname;
+}
+
 function removeInstallPromotion() {
   installPromotion?.remove();
   installPromotion = null;
@@ -65,20 +71,19 @@ function removeInstallPromotion() {
 
 function getInstallCopy() {
   const language = document.documentElement.lang.toLowerCase();
+  const instanceName = getInstanceInstallName();
 
   if (language.startsWith('es')) {
     return {
-      title: 'Instala Espelunca como aplicación',
-      message: 'Acesse rapidamente a Espelunca pela tela inicial.',
+      message: `Instala ${instanceName} como aplicación para acceder rápidamente desde tu pantalla de inicio.`,
       install: 'Instalar',
-      dismiss: 'Agora não',
+      dismiss: 'Ahora no',
     };
   }
 
   if (language.startsWith('fr')) {
     return {
-      title: 'Installez Espelunca comme application',
-      message: 'Acesse rapidement a Espelunca pela tela inicial.',
+      message: `Installez ${instanceName} comme application pour y accéder rapidement depuis votre écran d’accueil.`,
       install: 'Installer',
       dismiss: 'Pas maintenant',
     };
@@ -86,16 +91,14 @@ function getInstallCopy() {
 
   if (language.startsWith('en')) {
     return {
-      title: 'Install Espelunca as an app',
-      message: 'Get quick access to Espelunca from your home screen.',
+      message: `Install ${instanceName} as an app for quick access from your home screen.`,
       install: 'Install',
       dismiss: 'Not now',
     };
   }
 
   return {
-    title: 'Instale a Espelunca como aplicativo',
-    message: 'Tenha acesso rápido à Espelunca pela tela inicial.',
+    message: `Instale ${instanceName} como aplicativo para ter acesso rápido pela tela inicial.`,
     install: 'Instalar',
     dismiss: 'Agora não',
   };
