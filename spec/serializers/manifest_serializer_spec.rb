@@ -12,10 +12,15 @@ RSpec.describe ManifestSerializer do
   end
 
   describe '#icons' do
-    it 'includes the icon sizes required by Chromium install promotion' do
-      sizes = serializer.icons.pluck(:sizes)
+    it 'includes separate general and maskable icons' do
+      icons = serializer.icons
 
-      expect(sizes).to include('192x192', '512x512')
+      expect(icons.pluck(:sizes)).to include('192x192', '512x512')
+      expect(icons).to include(include(sizes: '192x192', purpose: 'any'))
+      expect(icons).to include(include(sizes: '192x192', purpose: 'maskable'))
+      expect(icons).to include(include(sizes: '512x512', purpose: 'any'))
+      expect(icons).to include(include(sizes: '512x512', purpose: 'maskable'))
+      expect(icons).not_to include(include(purpose: 'any maskable'))
     end
   end
 
@@ -23,8 +28,8 @@ RSpec.describe ManifestSerializer do
     it 'includes a description and screenshots for mobile and desktop' do
       expect(serializer.description).to be_present
       expect(serializer.screenshots).to contain_exactly(
-        include(sizes: '720x1280', type: 'image/png', form_factor: 'narrow'),
-        include(sizes: '1280x720', type: 'image/png', form_factor: 'wide')
+        include(sizes: '471x939', type: 'image/png', form_factor: 'narrow'),
+        include(sizes: '1890x940', type: 'image/png', form_factor: 'wide')
       )
     end
 
@@ -38,10 +43,21 @@ RSpec.describe ManifestSerializer do
   end
 
   describe 'install navigation metadata' do
-    it 'opens as a standalone app within the instance scope' do
+    it 'opens as a standalone app and supports Window Controls Overlay' do
       expect(serializer.display).to eq('standalone')
+      expect(serializer.display_override).to eq(['standalone', 'window-controls-overlay'])
       expect(serializer.start_url).to eq('/')
       expect(serializer.scope).to eq('/')
+      expect(serializer.protocol_handlers).to include(
+        protocol: 'web+mastodon',
+        url: '/intent?uri=%s',
+      )
+    end
+
+    it 'provides 96x96 icons for all shortcuts' do
+      expect(serializer.shortcuts).to all(
+        include(icons: contain_exactly(include(sizes: '96x96', type: 'image/png', purpose: 'any')))
+      )
     end
   end
 end
