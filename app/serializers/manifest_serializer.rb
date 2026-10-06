@@ -5,11 +5,14 @@ class ManifestSerializer < ActiveModel::Serializer
   include RoutingHelper
   include ActionView::Helpers::TextHelper
 
+  MASKABLE_ICON_SIZES = [192, 512].freeze
+
   attributes :id, :name, :short_name,
-             :description, :screenshots,
+             :description, :lang, :dir, :categories,
+             :orientation, :screenshots,
              :icons, :theme_color, :background_color,
-             :display, :start_url, :scope,
-             :share_target, :shortcuts,
+             :display, :display_override, :start_url, :scope,
+             :protocol_handlers, :share_target, :shortcuts,
              :prefer_related_applications, :related_applications
 
   def id
@@ -27,6 +30,22 @@ class ManifestSerializer < ActiveModel::Serializer
     object.title
   end
 
+  def lang
+    I18n.default_locale.to_s.tr('_', '-')
+  end
+
+  def dir
+    'ltr'
+  end
+
+  def categories
+    %w(social communication)
+  end
+
+  def orientation
+    'any'
+  end
+
   def description
     object.description.presence || "#{object.title} na web e como aplicativo."
   end
@@ -37,14 +56,14 @@ class ManifestSerializer < ActiveModel::Serializer
     [
       {
         src: "/pwa-screenshots/#{screenshot_set}-narrow.png",
-        sizes: '720x1280',
+        sizes: '471x939',
         type: 'image/png',
         form_factor: 'narrow',
         label: "Tela de entrada de #{object.title} em celular",
       },
       {
         src: "/pwa-screenshots/#{screenshot_set}-wide.png",
-        sizes: '1280x720',
+        sizes: '1890x940',
         type: 'image/png',
         form_factor: 'wide',
         label: "Tela de entrada de #{object.title} em computador",
@@ -53,16 +72,23 @@ class ManifestSerializer < ActiveModel::Serializer
   end
 
   def icons
-    SiteUpload::ANDROID_ICON_SIZES.map do |size|
+    SiteUpload::ANDROID_ICON_SIZES.flat_map do |size|
       src = app_icon_path(size.to_i)
       src = URI.join(root_url, src).to_s if src.present?
+      src ||= frontend_asset_url("icons/android-chrome-#{size}x#{size}.png")
 
-      {
-        src: src || frontend_asset_url("icons/android-chrome-#{size}x#{size}.png"),
+      icon = {
+        src: src,
         sizes: "#{size}x#{size}",
         type: 'image/png',
-        purpose: 'any maskable',
+        purpose: 'any',
       }
+
+      # Keep general and maskable purposes separate. Chromium warns about the
+      # combined `any maskable` value and may render it incorrectly on Android.
+      maskable_icon = icon.merge(purpose: 'maskable') if MASKABLE_ICON_SIZES.include?(size.to_i)
+
+      maskable_icon ? [icon, maskable_icon] : [icon]
     end
   end
 
@@ -78,12 +104,25 @@ class ManifestSerializer < ActiveModel::Serializer
     'standalone'
   end
 
+  def display_override
+    ['standalone', 'window-controls-overlay']
+  end
+
   def start_url
     '/'
   end
 
   def scope
     '/'
+  end
+
+  def protocol_handlers
+    [
+      {
+        protocol: 'web+mastodon',
+        url: '/intent?uri=%s',
+      },
+    ]
   end
 
   def share_target
@@ -101,18 +140,23 @@ class ManifestSerializer < ActiveModel::Serializer
   end
 
   def shortcuts
+    shortcut_icon = app_icon_path(96) || frontend_asset_url('icons/android-chrome-96x96.png')
+
     [
       {
         name: 'Compose new post',
         url: '/publish',
+        icons: [{ src: shortcut_icon, sizes: '96x96', type: 'image/png', purpose: 'any' }],
       },
       {
         name: 'Notifications',
         url: '/notifications',
+        icons: [{ src: shortcut_icon, sizes: '96x96', type: 'image/png', purpose: 'any' }],
       },
       {
         name: 'Explore',
         url: '/explore',
+        icons: [{ src: shortcut_icon, sizes: '96x96', type: 'image/png', purpose: 'any' }],
       },
     ]
   end
