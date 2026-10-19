@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - ops/merge-mastodon-5.0.0-alpha.1-20261019
-  pull_request:
+  pull_request_target:
     types: [opened, reopened]
     branches:
       - BlueLab-Test
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   merge-upstream:
-    if: ${{ (github.event_name == 'push' && github.event.head_commit.message == 'trigger: merge upstream Mastodon 5.0.0-alpha.1 into BlueLab-Test') || (github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened') && github.event.pull_request.base.ref == 'BlueLab-Test') }}
+    if: ${{ (github.event_name == 'push' && github.event.head_commit.message == 'trigger: merge upstream Mastodon 5.0.0-alpha.1 into BlueLab-Test') || (github.event_name == 'pull_request_target' && (github.event.action == 'opened' || github.event.action == 'reopened') && github.event.pull_request.base.ref == 'BlueLab-Test') }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out BlueLab-Test
