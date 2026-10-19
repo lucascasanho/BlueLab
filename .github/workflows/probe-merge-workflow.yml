@@ -36,6 +36,9 @@ jobs:
           set -Eeuo pipefail
           corepack enable
           yarn install
+          env -u YARN_ENABLE_IMMUTABLE_INSTALLS yarn install --immutable
+          yarn build:production
+          yarn test:js run
 
           git diff --check
           git diff --exit-code -- package.json streaming/package.json
