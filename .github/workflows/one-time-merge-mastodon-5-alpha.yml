@@ -40,6 +40,9 @@ jobs:
 
       - name: Merge official Mastodon 5.0.0-alpha.1 source
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -Eeuo pipefail
           log_file=/tmp/upstream-merge.log
@@ -117,3 +120,11 @@ jobs:
           git status --short
           git commit -m "chore: merge upstream Mastodon 5.0.0-alpha.1 preserving BlueLab customizations"
           git push origin HEAD:refs/heads/BlueLab-Test
+
+      - name: Report successful merge
+        if: ${{ success() && github.event_name == 'pull_request_target' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" -f body="The merge completed and was pushed only to BlueLab-Test. Version metadata and git diff --check passed. CI must still be reviewed before testing."
