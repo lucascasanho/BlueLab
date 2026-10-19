@@ -80,11 +80,11 @@ jobs:
           from pathlib import Path
           source = Path("lib/mastodon/version.rb").read_text()
           for method, value in (("major", 5), ("minor", 0), ("patch", 0)):
-              if not re.search(rf"def {method}\\s+{value}\\s+end", source):
+              if not re.search(rf"def {method}\s+{value}\s+end", source):
                   raise SystemExit(f"Expected Mastodon 5.0.0 version component: {method}={value}")
-          if not re.search(r"def default_prerelease\\s+'alpha\\.1'", source):
+          if not re.search(r"def default_prerelease\s+'alpha\\.1'", source):
               raise SystemExit("Expected upstream prerelease alpha.1")
-          if not re.search(r"mastodon:\\s*12", source):
+          if not re.search(r"mastodon:\s*12", source):
               raise SystemExit("Expected Mastodon API version 12")
           print("Verified version 5.0.0-alpha.1 and API version 12")
           PY
