@@ -116,6 +116,7 @@ jobs:
           print("Verified version 5.0.0-alpha.1 and API version 12")
           PY
 
+          git rm -f .github/workflows/one-time-merge-mastodon-5-alpha.yml
           git diff --check
           git status --short
           git commit -m "chore: merge upstream Mastodon 5.0.0-alpha.1 preserving BlueLab customizations"
