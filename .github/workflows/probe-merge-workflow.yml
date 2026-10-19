@@ -1,4 +1,4 @@
-name: One-time upstream Mastodon 5.0 alpha integration
+name: Regenerate merged BlueLab lockfile
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  merge-upstream:
+  regenerate-lock:
     runs-on: ubuntu-latest
     steps:
       - name: Check out BlueLab-Test
@@ -19,98 +19,32 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
       - name: Configure Git
-        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Merge official Mastodon main, preserving BlueLab changes
-        shell: bash
+      - name: Regenerate Yarn lockfile for the merged package manifests
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: "false"
         run: |
           set -Eeuo pipefail
-          git remote add upstream https://github.com/mastodon/mastodon.git
-          git fetch upstream main --no-tags
-
-          echo "BlueLab-Test HEAD:"
-          git log -1 --oneline HEAD
-          echo "Upstream HEAD:"
-          git log -1 --oneline upstream/main
-
-          if ! git merge-base HEAD upstream/main >/tmp/merge-base.txt; then
-            echo "::error::No common ancestor detected between BlueLab-Test and upstream main. Aborting without changing BlueLab-Test."
-            exit 1
-          fi
-          echo "Common ancestor:"
-          cat /tmp/merge-base.txt
-
-          set +e
-          git merge --no-ff --no-commit -X ours upstream/main
-          merge_status=$?
-          set -e
-
-          if [ "$merge_status" -ne 0 ]; then
-            mapfile -d '' -t conflicts < <(git diff --name-only --diff-filter=U -z)
-            if [ "${#conflicts[@]}" -eq 0 ]; then
-              echo "::error::Merge failed without file conflicts that can be safely resolved."
-              git merge --abort || true
-              exit "$merge_status"
-            fi
-
-            echo "Resolving ${#conflicts[@]} remaining conflicts in favor of BlueLab-Test:"
-            for path in "${conflicts[@]}"; do
-              printf ' - %s\n' "$path"
-              if git cat-file -e ":2:$path" 2>/dev/null; then
-                git checkout --ours -- "$path"
-                git add -- "$path"
-              else
-                git rm --ignore-unmatch -- "$path"
-              fi
-            done
-          fi
-
-          if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
-            echo "::error::Unresolved conflicts remain."
-            exit 1
-          fi
-
-          # Preserve the BlueLab branch's existing GitHub Actions workflows.
-          # The runner token cannot publish workflow-file changes; this also avoids
-          # replacing the custom test/deployment pipeline with upstream CI changes.
-          while IFS= read -r path; do
-            if ! git cat-file -e "HEAD:$path" 2>/dev/null; then
-              git rm -f -- "$path"
-            fi
-          done < <(git diff --cached --name-only HEAD -- .github/workflows)
-          git checkout HEAD -- .github/workflows
-          if ! git diff --cached --quiet HEAD -- .github/workflows; then
-            echo "::error::BlueLab workflows were not fully preserved."
-            exit 1
-          fi
-
-          # The version file differs only in version/API metadata. Take the
-          # upstream version module so new API versions are represented correctly.
-          git checkout upstream/main -- lib/mastodon/version.rb
-          git add lib/mastodon/version.rb
-
-          python3 - <<'PY'
-          import re
-          from pathlib import Path
-          source = Path("lib/mastodon/version.rb").read_text()
-          expected = [
-              (r"def major\s+5\s+end", "major version 5"),
-              (r"def minor\s+0\s+end", "minor version 0"),
-              (r"def patch\s+0\s+end", "patch version 0"),
-              (r"def default_prerelease\s+'alpha[.]1'", "prerelease alpha.1"),
-              (r"mastodon:\s*12", "Mastodon REST API version 12"),
-          ]
-          for pattern, label in expected:
-              if not re.search(pattern, source):
-                  raise SystemExit(f"Version verification failed: {label}")
-          print("Verified Mastodon 5.0.0-alpha.1 and API version 12")
-          PY
+          corepack enable
+          yarn install --mode=update-lockfile
 
           git diff --check
-          git status --short
-          git commit -m "chore: merge upstream Mastodon 5.0.0-alpha.1 preserving BlueLab customizations"
+          git diff --exit-code -- package.json streaming/package.json
+          changed="$(git diff --name-only)"
+          if [ "$changed" != "yarn.lock" ]; then
+            echo "::error::Expected only yarn.lock to change, found: $changed"
+            exit 1
+          fi
+
+          git add yarn.lock
+          git commit -m "fix: regenerate Yarn lockfile after Mastodon 5 alpha merge"
           git push origin HEAD:refs/heads/BlueLab-Test
