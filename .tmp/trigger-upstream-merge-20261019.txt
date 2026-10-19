@@ -1,0 +1,1 @@
+Temporary PR trigger for the one-time Mastodon 5.0.0-alpha.1 merge. This file must never be merged.
