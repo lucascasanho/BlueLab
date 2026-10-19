@@ -40,6 +40,11 @@ jobs:
           git diff --check
           git diff --exit-code -- package.json streaming/package.json
           changed="$(git diff --name-only)"
+          if [ -z "$changed" ]; then
+            echo "The merged Yarn lockfile is already consistent with a full install."
+            exit 0
+          fi
+
           if [ "$changed" != "yarn.lock" ]; then
             echo "::error::Expected only yarn.lock to change after full install, found: $changed"
             exit 1
