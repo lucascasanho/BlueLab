@@ -33,7 +33,6 @@ import { expandHomeTimeline } from '../../actions/timelines';
 import { addColumn, removeColumn } from '../../actions/columns';
 import { initialState, forceSingleColumn, me, owner, singleUserMode, trendsEnabled, landingPage, localLiveFeedAccess, disableHoverCards, domain } from '../../initial_state';
 
-import { openNewComposer } from '@/mastodon/reducers/slices/composer';
 
 import { BundleColumnError } from './components/bundle_column_error';
 import { NavigationBar } from './components/navigation_bar';
