@@ -6,15 +6,22 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { StackIcon } from '@phosphor-icons/react';
 
 import HomeIcon from '@/material-icons/400-24px/home-fill.svg?react';
+import ReplyAllLegacyIcon from '@/material-icons/400-24px/reply_all.svg?react';
 import InsertChartIcon from '@/material-icons/400-24px/insert_chart.svg?react';
 import PersonAddIcon from '@/material-icons/400-24px/person_add.svg?react';
 import { setNotificationsFilter } from 'mastodon/actions/notification_groups';
+import {
+  StatusBoostIcon,
+  StatusLikeIcon,
+  StatusReplyIcon,
+} from 'mastodon/components/status/icons';
 import { Icon } from 'mastodon/components/icon';
 import {
   selectSettingsNotificationsQuickFilterActive,
   selectSettingsNotificationsQuickFilterAdvanced,
 } from 'mastodon/selectors/settings';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
+import { isRedesignEnabled } from 'mastodon/utils/environment';
 
 const tooltips = defineMessages({
   mentions: { id: 'notifications.filter.mentions', defaultMessage: 'Mentions' },
@@ -85,7 +92,10 @@ export const FilterBar: React.FC = () => {
           key='mention'
           title={intl.formatMessage(tooltips.mentions)}
         >
-          <Icon id='reply-all' icon={StatusReplyAllIcon} />
+          <Icon
+            id='reply-all'
+            icon={isRedesignEnabled() ? StatusReplyIcon : ReplyAllLegacyIcon}
+          />
         </BarButton>
         <BarButton
           selectedFilter={selectedFilter}
