@@ -29,19 +29,19 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Regenerate Yarn lockfile for the merged package manifests
+      - name: Fully install merged JavaScript workspaces and regenerate Yarn lockfile
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: "false"
         run: |
           set -Eeuo pipefail
           corepack enable
-          yarn install --mode=update-lockfile
+          yarn install
 
           git diff --check
           git diff --exit-code -- package.json streaming/package.json
           changed="$(git diff --name-only)"
           if [ "$changed" != "yarn.lock" ]; then
-            echo "::error::Expected only yarn.lock to change, found: $changed"
+            echo "::error::Expected only yarn.lock to change after full install, found: $changed"
             exit 1
           fi
 
