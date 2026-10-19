@@ -1,0 +1,131 @@
+name: One-time merge of Mastodon 5.0.0-alpha.1 into BlueLab-Test
+
+on:
+  push:
+    branches:
+      - ops/merge-mastodon-5.0.0-alpha.1-20261019
+  pull_request_target:
+    types: [opened, reopened]
+    branches:
+      - BlueLab-Test
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  merge-upstream:
+    if: ${{ github.event_name == 'pull_request_target' || (github.event_name == 'push' && github.event.head_commit.message == 'trigger: merge upstream Mastodon 5.0.0-alpha.1 into BlueLab-Test') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Announce isolated merge attempt
+        if: github.event_name == 'pull_request_target'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" -f body="The one-time upstream merge workflow started. It targets BlueLab-Test only and will preserve BlueLab on conflicting paths. Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+      - name: Check out BlueLab-Test
+        uses: actions/checkout@v4
+        with:
+          ref: BlueLab-Test
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure merge identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge official Mastodon 5.0.0-alpha.1 source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -Eeuo pipefail
+          log_file=/tmp/upstream-merge.log
+          exec > >(tee -a "$log_file") 2>&1
+          report_failure() {
+            status=$?
+            if [ "$status" -ne 0 ] && [ -n "${PR_NUMBER:-}" ]; then
+              tail_text=$(tail -n 24 "$log_file" || true)
+              body=$(printf 'The upstream merge workflow failed (exit %s). No success is claimed. Last log lines:\n\n%s' "$status" "$tail_text")
+              gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" -f body="$body" || true
+            fi
+          }
+          trap report_failure EXIT
+          git remote add upstream https://github.com/mastodon/mastodon.git
+          git fetch upstream main --no-tags
+          echo "Upstream version:"
+          grep -A 3 -E '^    def (major|minor|patch|default_prerelease)$' <(git show upstream/main:lib/mastodon/version.rb) || true
+
+          if ! git merge-base HEAD upstream/main >/dev/null; then
+            echo "::error::No common Git ancestor between BlueLab-Test and mastodon/mastodon main; refusing an unsafe tree replacement."
+            exit 1
+          fi
+
+          set +e
+          git merge --no-ff --no-commit -X ours upstream/main
+          merge_status=$?
+          set -e
+
+          if [ "$merge_status" -ne 0 ]; then
+            mapfile -d '' -t conflicts < <(git diff --name-only --diff-filter=U -z)
+            if [ "${#conflicts[@]}" -eq 0 ]; then
+              echo "::error::Git merge failed without resolvable file conflicts."
+              git merge --abort || true
+              exit "$merge_status"
+            fi
+
+            echo "Resolving ${#conflicts[@]} remaining conflicts in favor of BlueLab-Test:"
+            for path in "${conflicts[@]}"; do
+              printf ' - %s\n' "$path"
+              if git cat-file -e ":2:$path" 2>/dev/null; then
+                git checkout --ours -- "$path"
+                git add -- "$path"
+              else
+                # BlueLab-Test deleted this path; preserve that deletion.
+                git rm --ignore-unmatch -- "$path"
+              fi
+            done
+          fi
+
+          # The version metadata must advance to the upstream 5.0 alpha API version.
+          # This file only differs from upstream in version/API numbers on BlueLab-Test.
+          git checkout upstream/main -- lib/mastodon/version.rb
+          git add lib/mastodon/version.rb
+
+          if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
+            echo "::error::Unresolved conflicts remain."
+            exit 1
+          fi
+
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          source = Path("lib/mastodon/version.rb").read_text()
+          for method, value in (("major", 5), ("minor", 0), ("patch", 0)):
+              if not re.search(rf"def {method}\s+{value}\s+end", source):
+                  raise SystemExit(f"Expected Mastodon 5.0.0 version component: {method}={value}")
+          if not re.search(r"def default_prerelease\s+'alpha\\.1'", source):
+              raise SystemExit("Expected upstream prerelease alpha.1")
+          if not re.search(r"mastodon:\s*12", source):
+              raise SystemExit("Expected Mastodon API version 12")
+          print("Verified version 5.0.0-alpha.1 and API version 12")
+          PY
+
+          git rm -f .github/workflows/one-time-merge-mastodon-5-alpha.yml
+          git diff --check
+          git status --short
+          git commit -m "chore: merge upstream Mastodon 5.0.0-alpha.1 preserving BlueLab customizations"
+          git push origin HEAD:refs/heads/BlueLab-Test
+
+      - name: Report successful merge
+        if: ${{ success() && github.event_name == 'pull_request_target' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" -f body="The merge completed and was pushed only to BlueLab-Test. Version metadata and git diff --check passed. CI must still be reviewed before testing."
