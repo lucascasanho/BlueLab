@@ -11,12 +11,21 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   merge-upstream:
-    if: ${{ (github.event_name == 'push' && github.event.head_commit.message == 'trigger: merge upstream Mastodon 5.0.0-alpha.1 into BlueLab-Test') || (github.event_name == 'pull_request_target' && (github.event.action == 'opened' || github.event.action == 'reopened') && github.event.pull_request.base.ref == 'BlueLab-Test') }}
+    if: ${{ github.event_name == 'pull_request_target' || (github.event_name == 'push' && github.event.head_commit.message == 'trigger: merge upstream Mastodon 5.0.0-alpha.1 into BlueLab-Test') }}
     runs-on: ubuntu-latest
     steps:
+      - name: Announce isolated merge attempt
+        if: github.event_name == 'pull_request_target'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" -f body="The one-time upstream merge workflow started. It targets BlueLab-Test only and will preserve BlueLab on conflicting paths. Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
       - name: Check out BlueLab-Test
         uses: actions/checkout@v4
         with:
@@ -32,7 +41,18 @@ jobs:
       - name: Merge official Mastodon 5.0.0-alpha.1 source
         shell: bash
         run: |
-          set -euo pipefail
+          set -Eeuo pipefail
+          log_file=/tmp/upstream-merge.log
+          exec > >(tee -a "$log_file") 2>&1
+          report_failure() {
+            status=$?
+            if [ "$status" -ne 0 ] && [ -n "${PR_NUMBER:-}" ]; then
+              tail_text=$(tail -n 24 "$log_file" || true)
+              body=$(printf 'The upstream merge workflow failed (exit %s). No success is claimed. Last log lines:\n\n%s' "$status" "$tail_text")
+              gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" -f body="$body" || true
+            fi
+          }
+          trap report_failure EXIT
           git remote add upstream https://github.com/mastodon/mastodon.git
           git fetch upstream main --no-tags
           echo "Upstream version:"
