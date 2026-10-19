@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import type {
   ReferenceType,
   Placement,
   OffsetOptions,
   Strategy,
+  MiddlewareState,
 } from '@floating-ui/react-dom';
 import {
   useFloating,
@@ -132,6 +133,33 @@ export const Popover: React.FC<PopoverProps> = ({
   scrollable = false,
   children,
 }) => {
+  const applySizeModifier = useCallback(
+    ({
+      availableWidth,
+      availableHeight,
+      rects,
+      elements,
+    }: MiddlewareState & {
+      availableWidth: number;
+      availableHeight: number;
+    }) => {
+      elements.floating.style.setProperty(
+        '--popover-width-available',
+        `${Math.max(0, availableWidth)}px`,
+      );
+      elements.floating.style.setProperty(
+        '--popover-height-available',
+        `${Math.max(0, availableHeight)}px`,
+      );
+      if (matchReferenceWidth) {
+        Object.assign(elements.floating.style, {
+          minWidth: `${rects.reference.width}px`,
+        });
+      }
+    },
+    [matchReferenceWidth],
+  );
+
   const {
     placement: computedPlacement,
     update,

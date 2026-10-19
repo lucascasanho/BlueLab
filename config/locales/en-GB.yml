@@ -888,9 +888,6 @@ en-GB:
         all: To everyone
         disabled: To no one
         users: To logged-in local users
-      external:
-        preamble: Control how much information about your server gets shared with other services and how discoverable your server should be.
-        title: External Discovery
       feed_access:
         modes:
           authenticated: Authenticated users only
@@ -1160,9 +1157,6 @@ en-GB:
     warning_presets:
       add_new: Add new
       delete: Delete
-      edit_preset: Edit warning preset
-      empty: You haven't defined any warning presets yet.
-      title: Warning presets
     webhooks:
       add_new: Add endpoint
       delete: Delete

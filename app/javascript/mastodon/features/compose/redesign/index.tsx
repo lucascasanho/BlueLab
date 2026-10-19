@@ -55,6 +55,7 @@ import { ComposeVisibility } from './visibility';
 
 interface RedesignComposeFormProps {
   autoFocus?: boolean;
+  headless?: boolean;
   className?: string;
   embedded?: boolean;
   compact?: boolean;
@@ -164,7 +165,11 @@ export const RedesignComposeForm: React.FC<
       onSubmit={onSubmit}
       onWheelCapture={handleWheelCapture}
       aria-labelledby={titleId}
-      className={classNames(className, classes.root)}
+      className={classNames(
+        className,
+        classes.root,
+        headless && classes.headless,
+      )}
     >
       {isMessage && (
         <div className={classes.background} />

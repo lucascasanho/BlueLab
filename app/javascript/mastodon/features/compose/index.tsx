@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, Suspense, lazy } from 'react';
 
 import { useIntl, defineMessages } from 'react-intl';
 
@@ -251,6 +251,12 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
     </Column>
   );
 };
+
+const ComposeLazyForm = lazy(() =>
+  import('./redesign/index').then(({ RedesignComposeForm }) => ({
+    default: RedesignComposeForm,
+  })),
+);
 
 // eslint-disable-next-line import/no-default-export
 export default Compose;

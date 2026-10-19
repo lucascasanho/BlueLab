@@ -9,7 +9,7 @@ import { Blurhash } from '@/mastodon/components/blurhash';
 import { GIFV } from '@/mastodon/components/gifv';
 import type { MediaAttachmentShape } from '@/mastodon/models/status';
 
-import classes from './styles.module.scss';
+import classes from './content.module.scss';
 
 type StatusImageAttachmentJSON =
   | ApiImageAttachmentJSON
@@ -28,8 +28,8 @@ export const StatusImage: React.FC<
 > = ({ attachment, children, sensitive, animateGifv = false, className, style, ...props }) => {
   let x = 50;
   let y = 50;
-  const focusX = attachment.meta.focus?.x;
-  const focusY = attachment.meta.focus?.y;
+  const focusX = attachment.meta?.focus?.x;
+  const focusY = attachment.meta?.focus?.y;
   if (focusX && focusY) {
     x = (focusX / 2 + 0.5) * 100;
     y = (focusY / -2 + 0.5) * 100;
@@ -41,14 +41,16 @@ export const StatusImage: React.FC<
         ? `url(${attachment.preview_url})`
         : undefined,
     backgroundPosition: `${x}% ${y}%`,
-    '--aspect': `${attachment.meta.original.width} / ${attachment.meta.original.height}`,
+    '--aspect': attachment.meta
+      ? `${attachment.meta.original.width} / ${attachment.meta.original.height}`
+      : undefined,
     ...style,
   };
 
   return (
     <div
       {...props}
-      className={classNames(classes.contentImage, className)}
+      className={classNames(classes.image, className)}
       style={imgStyle}
       data-color-scheme='dark'
     >
@@ -59,10 +61,7 @@ export const StatusImage: React.FC<
       )}
 
       {sensitive && attachment.blurhash && (
-        <Blurhash
-          hash={attachment.blurhash}
-          className={classes.contentBlurHash}
-        />
+        <Blurhash hash={attachment.blurhash} className={classes.blurHash} />
       )}
 
       {children}

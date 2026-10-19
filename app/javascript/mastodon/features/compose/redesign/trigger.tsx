@@ -290,6 +290,11 @@ export const ComposeRedesignButton: React.FC<{
     );
   }
 
+  // Pass the viewport height as a CSS variable so it's only used for mobile.
+  const style = {
+    '--viewport-height': viewportHeight ? `${viewportHeight}px` : undefined,
+  } as React.CSSProperties;
+
   if (displayState === 'minimized') {
     if (isBlue2) {
       // Keep the minimized launcher inside RedesignMobileNavigation instead of

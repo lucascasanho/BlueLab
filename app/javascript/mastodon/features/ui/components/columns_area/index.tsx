@@ -62,15 +62,10 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
 
   if (minimalShell) {
     return (
-      <div className='columns-area__panels'>
-        <div className='columns-area__panels__main'>
-          <Header />
-
-          <div className='tabs-bar__wrapper'>
-            <TabsBarPortal />
-          </div>
-
-          <div className='columns-area columns-area--mobile'>{children}</div>
+      <div ref={ref} className={classNames(classes.root, classes.rootMinimal)}>
+        {isMobile && <RedesignMobileNavigation />}
+        <div className={classes.main}>
+          <div>{children}</div>
 
           <Footer />
         </div>
@@ -89,6 +84,7 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
             <RedirectToMobileComposeIfNeeded />
           </div>
         </div>
+        {isMobile ? <RedesignMobileNavigation /> : <ComposeRedesignButton />}
 
         {isBirdUi ? (
           <ComposeRedesignButton hostOnly />
@@ -117,11 +113,11 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
   }
 
   return (
-    <main
-      className={classNames('columns-area', { unscrollable: isModalOpen })}
-      ref={ref}
-      tabIndex={isModalOpen ? undefined : 0}
-    >
+    <main ref={ref} className={multiColClasses.root}>
+      <div className={multiColClasses.navigationWrapper}>
+        <RedesignNavigationPanel multiColumn />
+      </div>
+      <ComposeRedesignButton />
       <MultiColumnContent>{children}</MultiColumnContent>
       {/* Bird UI advanced interface intentionally has no scroll-to-top control. */}
     </main>

@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useId, useMemo, useState } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -51,14 +51,38 @@ export const LanguageButton: React.FC<{
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
-  return (
-    <Menu>
-      <MenuTrigger size='sm' leadingIcon={TranslateIcon}>
-        {langCode.toLocaleUpperCase()}
-      </MenuTrigger>
+  const [isOpen, { onToggle: toggle, onFalse: close }] = useToggle(false);
+  const [triggerElement, setTriggerElement] =
+    useState<HTMLButtonElement | null>(null);
 
-      <MenuList
+  return (
+    <>
+      <Button
+        ref={setTriggerElement}
+        size='sm'
+        leadingIcon={TranslateIcon}
+        aria-expanded={isOpen}
+        tooltip={{
+          type: 'description',
+          text: (
+            <FormattedMessage
+              id='compose.language.change'
+              defaultMessage='Change language'
+            />
+          ),
+        }}
+        onClick={toggle}
+      >
+        {langCode.toLocaleUpperCase()}
+        <span className='sr-only'>({getLanguageNameFromCode(langCode)})</span>
+      </Button>
+
+      <PopoverMenuCard
+        isOpen={isOpen}
         placement='bottom-end'
+        strategy='fixed'
+        reference={triggerElement}
+        container={null}
         className={classes.languageMenu}
         maxWidth={280}
         portal={isBlue2}
@@ -100,38 +124,56 @@ export const LanguageDropdown: React.FC<{
   const intl = useIntl();
   const handleSearch: React.ChangeEventHandler<HTMLInputElement> = useCallback(
     (event) => {
+      setInputValue(event.target.value);
       onSearch(event.target.value);
     },
     [onSearch],
   );
+  const handleSelectLanguage = useCallback(
+    ({ code }: LanguageObject) => {
+      if (code) {
+        dispatch(changeComposeLanguage(code));
+        onClose();
+      }
+    },
+    [dispatch, onClose],
+  );
+
+  const uniqueId = useId();
+  const languageObjects = useMemo(
+    () =>
+      languages.map(([code, name, localName]) => ({
+        id: `${uniqueId}-${code}`,
+        code,
+        name,
+        localName,
+      })),
+    [languages, uniqueId],
+  );
 
   return (
-    <>
-      <TextInput
-        type='search'
-        onChange={handleSearch}
-        placeholder={intl.formatMessage(messages.searchPlaceholder)}
-        icon={MagnifyingGlassIcon}
-      />
-      <div className={classes.languageList}>
-        {languages.map((lang) => (
-          <MenuItem
-            key={lang[0]}
-            onClick={handleChange}
-            data-language={lang[0]}
-            className={classes.languageItem}
-          >
-            <strong>{lang[2]}</strong>&nbsp;<span>({lang[1]})</span>
-          </MenuItem>
-        ))}
-
-        {languages.length === 0 && (
-          <FormattedMessage
-            id='compose.language.not-found'
-            defaultMessage='No language found'
-          />
-        )}
-      </div>
-    </>
+    <Combobox
+      autoFocus
+      listBoxType='in-place'
+      value={inputValue}
+      onChange={handleSearch}
+      placeholder={intl.formatMessage(messages.searchPlaceholder)}
+      icon={MagnifyingGlassIcon}
+      items={languageObjects}
+      renderItem={renderLanguageItem}
+      onSelectItem={handleSelectLanguage}
+      wrapperClassName={classes.languageComboboxWrapper}
+      listBoxClassName={classes.languageListBox}
+    />
   );
 };
+
+function renderLanguageItem({ code, name, localName }: LanguageObject) {
+  return (
+    <ComboboxMenuItem>
+      <span>
+        <strong lang={code}>{localName}</strong> ({name})
+      </span>
+    </ComboboxMenuItem>
+  );
+}

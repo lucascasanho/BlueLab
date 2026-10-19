@@ -41,6 +41,7 @@ import {
   disabledAccountId,
   localLiveFeedAccess,
   remoteLiveFeedAccess,
+  trendsEnabled,
 } from '@/mastodon/initial_state';
 import { transientSingleColumn } from '@/mastodon/is_mobile';
 import { canViewFeed } from '@/mastodon/permissions';
@@ -51,11 +52,11 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { invokeVirtualIosKeyboard } from '@/mastodon/utils/invoke_virtual_ios_keyboard';
 
 import { useHasAnnouncements } from '../../announcements/hooks';
+import { FooterLinks } from '../../discovery_panel/footer_links';
 
 import { Blue2ComposeIcon } from '../../blue2/icons';
 
 import { NavigationAccountCardAndMenu } from './account_card_and_menu';
-import { NavigationFooterLinks } from './footer_links';
 import { NavigationHeader } from './header';
 import { ListSection } from './list_section';
 import { DisabledAccountBanner, LoggedOutInfo } from './logged_out_info';
@@ -195,9 +196,7 @@ export const RedesignNavigationPanel: React.FC<{
 
   const { sensor: topSensor, isInViewport: isScrolledToTop } = useScrollSensor({
     placement: 'top',
-    // Only show overlay fade after a bit of scrolling, as the nav header has
-    // a bit of bottom spacing where the fade isn't needed yet
-    tolerance: 36,
+    tolerance: 2,
   });
   const { sensor: bottomSensor, isInViewport: isScrolledToBottom } =
     useScrollSensor({
@@ -360,6 +359,7 @@ export const RedesignNavigationPanel: React.FC<{
               </ListSection>
             )}
           </ul>
+
           <footer className={classes.footer} data-stuck={!isScrolledToBottom}>
             <ul className={classes.footerNav}>
               <NavigationLink
@@ -441,16 +441,39 @@ const ExploreLink: React.FC = () => {
   return (
     <NavigationLink
       to={{
-        pathname: '/explore',
+        pathname: trendsEnabled ? '/explore' : '/search',
         state: { focusTarget: FOCUS_TARGET.SEARCH },
       }}
       iconComponent={MagnifyingGlassIcon}
-      onClick={invokeVirtualIosKeyboard}
+      onClick={handleSearchLinkClick}
     >
-      <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
+      {trendsEnabled ? (
+        <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
+      ) : (
+        <FormattedMessage id='navigation_bar.search' defaultMessage='Search' />
+      )}
     </NavigationLink>
   );
 };
+
+export function handleSearchLinkClick() {
+  const mainSearchInput = document.querySelector<HTMLInputElement>(
+    '[data-column-root] input[data-main-search]',
+  );
+
+  // Focus the main search input if we're already on the search page
+  if (mainSearchInput) {
+    mainSearchInput.focus();
+    return;
+  }
+
+  // Otherwise, the search element is not on screen yet and
+  // the page needs to be rendered first. In this case, we use
+  // `invokeVirtualIosKeyboard` to work around an iOS quirk that
+  // prevents the virtual keyboard from opening when an element wasn't
+  // focused synchronously.
+  invokeVirtualIosKeyboard();
+}
 
 const PublicFeedsLink: React.FC = () => {
   const { signedIn, permissions } = useIdentity();

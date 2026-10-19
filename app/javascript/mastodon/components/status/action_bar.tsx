@@ -46,10 +46,9 @@ import classes from './styles.module.scss';
 
 interface StatusActionBarProps {
   statusId: string;
+  reblogId: string | undefined;
   withDismiss?: boolean;
   withCounters?: boolean;
-  /** Only show methods to respond (reply, boost, like) and not sharing, bookmarking, and the overflow menu. */
-  onlyResponses?: boolean;
 }
 
 const messages = defineMessages({
@@ -63,11 +62,12 @@ const messages = defineMessages({
 
 export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   statusId,
+  reblogId,
   withDismiss,
   withCounters,
-  onlyResponses,
 }) => {
   const status = useAccountStatus(statusId);
+  const reblogStatus = useAccountStatus(reblogId);
   const quotedAccountId = useAppSelector(
     (state) =>
       state.statuses.getIn([status?.quote?.quoted_status, 'account']) ?? null,
@@ -125,8 +125,8 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   const shouldShowQuoteRemovalHint =
     isQuotingMe && contextType === 'notifications';
 
-  const responseButtons = (
-    <>
+  return (
+    <div className={classes.actions}>
       <Button
         size='sm'
         clipPadding
@@ -158,16 +158,6 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
       >
         {withCounters && like.counter}
       </ToggleButton>
-    </>
-  );
-
-  if (onlyResponses) {
-    return <div className={classes.actions}>{responseButtons}</div>;
-  }
-
-  return (
-    <div className={classes.actions}>
-      {responseButtons}
 
       {isPublic && (
         <IconButton
@@ -198,6 +188,7 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
           <StatusActionMenu
             dismissQuoteHint={dismissQuoteHint}
             status={status}
+            reblogStatus={reblogStatus}
             withDismiss={withDismiss}
           />
         )}
@@ -210,6 +201,16 @@ const StatusReblogButton: React.FC<{
   children: React.ReactNode;
 }> = ({ statusId, children }) => {
   const { boost, quote } = useStatusIcons(statusId);
+
+  const handleShiftClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.shiftKey) {
+        e.preventDefault();
+        boost.action();
+      }
+    },
+    [boost],
+  );
 
   if (quickBoosting) {
     return (
@@ -247,6 +248,7 @@ const StatusReblogButton: React.FC<{
           ),
         }}
         leadingIcon={boost.icon}
+        onClick={handleShiftClick}
       >
         {children}
       </MenuTrigger>
@@ -276,12 +278,18 @@ const StatusReblogButton: React.FC<{
 const StatusActionMenu: React.FC<{
   dismissQuoteHint: () => void;
   status: AccountStatusShape;
+  reblogStatus: AccountStatusShape | null;
   withDismiss?: boolean;
-}> = ({ status, dismissQuoteHint, withDismiss }) => {
+}> = ({ status, reblogStatus, dismissQuoteHint, withDismiss }) => {
   const { contextType } = useStatusContext();
   const dispatch = useAppDispatch();
 
-  const menu = useStatusMenuActions({ status, contextType, withDismiss });
+  const menu = useStatusMenuActions({
+    status,
+    reblogStatus,
+    contextType,
+    withDismiss,
+  });
 
   const onOpen = useCallback(() => {
     // Replicates needsStatusRefresh of the Dropdown component.

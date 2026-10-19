@@ -11,6 +11,7 @@ import type {
   Record as ImmutableRecord,
 } from 'immutable';
 
+import { replyComposeById } from '@/mastodon/actions/compose_typed';
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
 import { AnimateEmojiProvider } from '@/mastodon/components/emoji/context';
 import { StatusReplyIcon } from '@/mastodon/components/status/icons';
@@ -23,13 +24,11 @@ import {
   useAppSelector,
 } from '@/mastodon/store';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
-import { replyCompose } from 'mastodon/actions/compose';
 import {
   markConversationRead,
   deleteConversation,
   openConversationForStatus,
 } from 'mastodon/actions/conversations';
-import { openModal } from 'mastodon/actions/modal';
 import {
   muteStatus,
   unmuteStatus,
@@ -133,22 +132,7 @@ export const Conversation: React.FC<{
   }, [dispatch, id]);
 
   const handleReply = useCallback(() => {
-    dispatch((_, getState) => {
-      const state = getState();
-      const composeText = state.compose.get('text');
-      const text = typeof composeText === 'string' ? composeText.trim() : '';
-
-      if (text.length !== 0) {
-        dispatch(
-          openModal({
-            modalType: 'CONFIRM_REPLY',
-            modalProps: { status: lastStatus },
-          }),
-        );
-      } else {
-        dispatch(replyCompose(lastStatus));
-      }
-    });
+    dispatch(replyComposeById({ statusId: lastStatus?.get('id') }));
   }, [dispatch, lastStatus]);
 
   const handleDelete = useCallback(() => {

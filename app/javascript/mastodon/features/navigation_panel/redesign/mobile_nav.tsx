@@ -20,6 +20,11 @@ import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
+import {
+  registrationsOpen,
+  sso_redirect,
+  trendsEnabled,
+} from '@/mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
 import { invokeVirtualIosKeyboard } from '@/mastodon/utils/invoke_virtual_ios_keyboard';
@@ -52,6 +57,14 @@ export const RedesignMobileNavigation: React.FC = () => {
   if (!signedIn) {
     return <SlideOutNavigation />;
   }
+
+  // Hide the mobile sign-up button if registrations are closed or
+  // SSO is used (as there's not much room for a detailed label)
+  const hasSignUpButton = !sso_redirect && !registrationsOpen;
+
+  const signupUrl = useAppSelector(
+    (state) => state.server.server.item?.registrations.url ?? '/auth/sign_up',
+  );
 
   return (
     <>

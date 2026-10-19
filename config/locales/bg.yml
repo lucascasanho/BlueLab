@@ -820,10 +820,8 @@ bg:
         title: По подразбиране изключете индексирането от търсачки за вашите потребители
       discovery:
         follow_recommendations: Препоръки за следване
-        privacy: Поверителност
         profile_directory: Указател на профила
         public_timelines: Публични хронологии
-        publish_statistics: Публикуване на статистиката
         title: Откриване
         trends: Изгряващи
       domain_blocks:
@@ -1095,9 +1093,6 @@ bg:
     warning_presets:
       add_new: Добавяне на ново
       delete: Изтриване
-      edit_preset: Редакция на предварителните настройки
-      empty: Все още няма предварителни настройки за предупрежденията.
-      title: Предупредителни образци
     webhooks:
       add_new: Добавяне на крайна точка
       delete: Изтриване

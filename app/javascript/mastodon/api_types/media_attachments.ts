@@ -24,7 +24,7 @@ export interface BaseApiMediaAttachmentJSON {
 
 export interface ApiImageAttachmentJSON extends BaseApiMediaAttachmentJSON {
   type: 'image';
-  meta: {
+  meta?: {
     original: ApiImageAttachmentMetaJSON;
     small: ApiImageAttachmentMetaJSON;
     focus?: ApiFocusAttachmentMetaJSON;
@@ -33,7 +33,7 @@ export interface ApiImageAttachmentJSON extends BaseApiMediaAttachmentJSON {
 
 export interface ApiAudioAttachmentJSON extends BaseApiMediaAttachmentJSON {
   type: 'audio';
-  meta: {
+  meta?: {
     colors?: ApiColorsAttachmentMetaJSON;
     original: ApiVideoAttachmentMetaJSON;
     small: ApiImageAttachmentMetaJSON;
@@ -42,7 +42,7 @@ export interface ApiAudioAttachmentJSON extends BaseApiMediaAttachmentJSON {
 
 export interface ApiVideoAttachmentJSON extends BaseApiMediaAttachmentJSON {
   type: 'video';
-  meta: {
+  meta?: {
     colors?: ApiColorsAttachmentMetaJSON;
     original: ApiVideoAttachmentMetaJSON;
     small: ApiImageAttachmentMetaJSON;
@@ -52,7 +52,7 @@ export interface ApiVideoAttachmentJSON extends BaseApiMediaAttachmentJSON {
 
 export interface ApiGifvAttachmentJSON extends BaseApiMediaAttachmentJSON {
   type: 'gifv';
-  meta: {
+  meta?: {
     original: ApiVideoAttachmentMetaJSON;
     small: ApiImageAttachmentMetaJSON;
     focus?: ApiFocusAttachmentMetaJSON;
@@ -61,7 +61,7 @@ export interface ApiGifvAttachmentJSON extends BaseApiMediaAttachmentJSON {
 
 export interface ApiUnknownAttachmentJSON extends BaseApiMediaAttachmentJSON {
   type: 'unknown';
-  meta: Record<string, unknown>;
+  meta?: Record<string, unknown>;
 }
 
 export type ApiMediaAttachmentJSON =

@@ -785,10 +785,8 @@ th:
         title: เลือกให้ผู้ใช้ไม่รับการทำดัชนีโดยเครื่องมือค้นหาเป็นค่าเริ่มต้น
       discovery:
         follow_recommendations: คำแนะนำการติดตาม
-        privacy: ความเป็นส่วนตัว
         profile_directory: ไดเรกทอรีโปรไฟล์
         public_timelines: เส้นเวลาสาธารณะ
-        publish_statistics: เผยแพร่สถิติ
         title: การค้นพบ
         trends: แนวโน้ม
       domain_blocks:
@@ -1034,9 +1032,6 @@ th:
     warning_presets:
       add_new: เพิ่มใหม่
       delete: ลบ
-      edit_preset: แก้ไขค่าคำเตือนที่ตั้งไว้ล่วงหน้า
-      empty: คุณยังไม่ได้กำหนดค่าคำเตือนที่ตั้งไว้ล่วงหน้าใด ๆ
-      title: ค่าคำเตือนที่ตั้งไว้ล่วงหน้า
     webhooks:
       add_new: เพิ่มปลายทาง
       delete: ลบ

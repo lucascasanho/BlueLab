@@ -121,6 +121,17 @@ export const ComposeFooter: React.FC<{
     dispatch(addComposeThreadItem());
   }, [dispatch]);
 
+  let publishText = (
+    <FormattedMessage id='compose.publish' defaultMessage='Publish' />
+  );
+  if (isEditing) {
+    publishText = <FormattedMessage id='compose.save' defaultMessage='Save' />;
+  } else if (type === 'message' || type === 'replyPrivate') {
+    publishText = (
+      <FormattedMessage id='compose.message.publish' defaultMessage='Send' />
+    );
+  }
+
   return (
     <footer className={classes.footer} data-bluelab-compose-footer>
       <ComposeUploadButton

@@ -1,23 +1,14 @@
 import { useEffect, useCallback, useState } from 'react';
 
-import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Helmet } from '@unhead/react/helmet';
 
-import { Column } from '@/mastodon/components/column';
-import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';
-import { ColumnHeader } from '@/mastodon/components/column_header';
-import { isRedesignEnabled } from '@/mastodon/utils/environment';
-import BlockIcon from '@/material-icons/400-24px/block-fill.svg?react';
 import { apiGetDomainBlocks } from 'mastodon/api/domain_blocks';
 import { Domain } from 'mastodon/components/domain';
 import ScrollableList from 'mastodon/components/scrollable_list';
 
-const messages = defineMessages({
-  heading: { id: 'column.domain_blocks', defaultMessage: 'Blocked domains' },
-});
-
-const Blocks: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
+const DomainBlocks: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   const intl = useIntl();
   const [domains, setDomains] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,7 +90,12 @@ const Blocks: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
         hasMore={hasMore}
         isLoading={loading}
         showLoading={loading && domains.length === 0}
-        emptyMessage={emptyMessage}
+        emptyMessage={
+          <FormattedMessage
+            id='empty_column.domain_blocks'
+            defaultMessage="You haven't blocked any domains yet."
+          />
+        }
         trackScroll={!multiColumn}
         bindToDocument={!multiColumn}
       >
@@ -109,12 +105,17 @@ const Blocks: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
       </ScrollableList>
 
       <Helmet>
-        <title>{intl.formatMessage(messages.heading)}</title>
+        <title>
+          {intl.formatMessage({
+            id: 'column.domain_blocks',
+            defaultMessage: 'Blocked Domains',
+          })}
+        </title>
         <meta name='robots' content='noindex' />
       </Helmet>
-    </Column>
+    </>
   );
 };
 
 // eslint-disable-next-line import/no-default-export
-export default Blocks;
+export default DomainBlocks;

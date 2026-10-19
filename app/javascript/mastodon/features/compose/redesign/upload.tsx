@@ -5,20 +5,17 @@ import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 
-import { DotsThreeIcon, TrashIcon } from '@phosphor-icons/react';
+import {
+  ArrowsLeftRightIcon,
+  PencilSimpleIcon,
+  TrashIcon,
+} from '@phosphor-icons/react';
 
 import { undoUploadCompose } from '@/mastodon/actions/compose';
 import { openModal } from '@/mastodon/actions/modal';
 import type { ApiAudioAttachmentJSON } from '@/mastodon/api_types/media_attachments';
 import { Blurhash } from '@/mastodon/components/blurhash';
-import { IconButton } from '@/mastodon/components/button/redesign';
-import {
-  Menu,
-  MenuTrigger,
-  MenuItem,
-  MenuItemDivider,
-  MenuList,
-} from '@/mastodon/components/menu';
+import { Button, IconButton } from '@/mastodon/components/button/redesign';
 import { StatusImage } from '@/mastodon/components/status/image';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
@@ -42,6 +39,22 @@ export const ComposeUpload: React.FC<{
         openModal({ modalType: 'FOCAL_POINT', modalProps: { mediaId: id } }),
       );
     }
+  }, [dispatch, id]);
+
+  const dispatch = useAppDispatch();
+
+  const handleAltEdit = useCallback(() => {
+    dispatch(
+      openModal({ modalType: 'FOCAL_POINT', modalProps: { mediaId: id } }),
+    );
+  }, [dispatch, id]);
+
+  const handleRearrange = useCallback(() => {
+    dispatch(openModal({ modalType: 'COMPOSER_REARRANGE', modalProps: {} }));
+  }, [dispatch]);
+
+  const handleDelete = useCallback(() => {
+    dispatch(undoUploadCompose(id));
   }, [dispatch, id]);
 
   if (!attachment || attachment.type === 'unknown') {
@@ -82,11 +95,11 @@ export const ComposeUpload: React.FC<{
           icon={DotsThreeIcon}
           size='sm'
           variant='solid'
-          className={classes.mediaMenuButton}
+          tooltipPlacement='top'
         >
           <FormattedMessage
-            id='compose.upload.menu'
-            defaultMessage='Add alt text or remove the image'
+            id='compose.upload.menu.delete'
+            defaultMessage='Remove image'
           />
         </MenuTrigger>
 

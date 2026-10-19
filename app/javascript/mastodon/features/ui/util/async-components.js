@@ -70,10 +70,6 @@ export function Status () {
   return import('../../status');
 }
 
-export function GettingStarted () {
-  return import('../../getting_started');
-}
-
 export function KeyboardShortcuts () {
   return import('../../keyboard_shortcuts');
 }
@@ -142,10 +138,6 @@ export function ScheduledPublications () {
 
 export function Blocks () {
   return import('../../blocks');
-}
-
-export function DomainBlocks () {
-  return import('../../domain_blocks');
 }
 
 export function Mutes () {

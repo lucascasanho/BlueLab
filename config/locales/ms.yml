@@ -712,7 +712,6 @@ ms:
         follow_recommendations: Ikut cadangan
         profile_directory: Direktori profil
         public_timelines: Garis masa awam
-        publish_statistics: Terbitkan statistik
         title: Penemuan
         trends: Sohor kini
       domain_blocks:
@@ -886,8 +885,6 @@ ms:
     warning_presets:
       add_new: Tambah baharu
       delete: Padam
-      edit_preset: Edit pratetap amaran
-      empty: Anda belum menentukan sebarang pratetap amaran lagi.
     webhooks:
       add_new: Tambah titik akhir
       delete: Padam

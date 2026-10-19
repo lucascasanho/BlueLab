@@ -6,7 +6,6 @@ import { StackIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
 import { Column } from '@/mastodon/components/column';
-import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';
 import { ColumnHeader } from '@/mastodon/components/column_header';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import FindInPageIcon from '@/material-icons/400-24px/find_in_page.svg?react';
@@ -26,12 +25,12 @@ import type { Hashtag as HashtagType } from 'mastodon/models/tags';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
 import { CollectionListItem } from '../collections/components/collection_list_item';
-import exploreRedesignClasses from '../explore/redesign.module.scss';
 
 import { SearchSection } from './components/search_section';
 
 const messages = defineMessages({
-  title: { id: 'search_results.title', defaultMessage: 'Search for "{q}"' },
+  searchFor: { id: 'search_results.title', defaultMessage: 'Search for "{q}"' },
+  search: { id: 'navigation_bar.search', defaultMessage: 'Search' },
 });
 
 const INITIAL_PAGE_LIMIT = 10;
@@ -142,7 +141,7 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
                   key='accounts'
                   title={
                     <>
-                      <Icon id='users' icon={PeopleIcon} />
+                      <Icon id='users' icon={UsersIcon} />
                       <FormattedMessage
                         id='search_results.accounts'
                         defaultMessage='Profiles'
@@ -188,7 +187,7 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
                   key='hashtags'
                   title={
                     <>
-                      <Icon id='hashtag' icon={TagIcon} />
+                      <Icon id='hashtag' icon={HashIcon} />
                       <FormattedMessage
                         id='search_results.hashtags'
                         defaultMessage='Hashtags'
@@ -208,7 +207,7 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
                   key='statuses'
                   title={
                     <>
-                      <Icon id='quote-right' icon={FindInPageIcon} />
+                      <Icon id='quote-right' icon={FileMagnifyingGlassIcon} />
                       <FormattedMessage
                         id='search_results.statuses'
                         defaultMessage='Posts'
@@ -241,12 +240,7 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
 
   const extraStickyHeaderContent = (
     <>
-      <div
-        className={classNames(
-          'explore__search-header',
-          isRedesignEnabled() && exploreRedesignClasses.searchHeader,
-        )}
-      >
+      <div className='explore__search-header'>
         <Search singleColumn initialValue={trimmedValue} key={trimmedValue} />
       </div>
 
@@ -314,7 +308,7 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
         />
       )}
 
-      <div className='explore__search-results' data-nosnippet>
+      <Scrollable data-nosnippet>
         <ScrollableList
           scrollKey='search-results'
           isLoading={isLoading}
@@ -338,7 +332,7 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
         >
           {filteredResults}
         </ScrollableList>
-      </div>
+      </Scrollable>
 
       <Helmet>
         <title>{pageTitle}</title>

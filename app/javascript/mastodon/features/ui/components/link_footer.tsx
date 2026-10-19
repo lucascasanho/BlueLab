@@ -17,11 +17,7 @@ export const LinkFooter: React.FC<{
   const displayVersion = version?.match(/^\d+\.\d+\.\d+/)?.[0] ?? version ?? '';
 
   return (
-    <footer
-      className={classes.wrapper}
-      data-context={context}
-      data-redesign={isRedesignEnabled()}
-    >
+    <footer className={classes.wrapper} data-context={context}>
       <section>
         <ul className={classes.list}>
           <li>
@@ -84,7 +80,7 @@ export const LinkFooter: React.FC<{
             >
               <FormattedMessage
                 id='footer.source_code'
-                defaultMessage='View source code'
+                defaultMessage='Source Code'
               />
             </a>
           </li>

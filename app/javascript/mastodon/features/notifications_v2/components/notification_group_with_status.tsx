@@ -3,6 +3,7 @@ import type { JSX } from 'react';
 
 import classNames from 'classnames';
 
+import { replyComposeById } from '@/mastodon/actions/compose_typed';
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
 import { replyComposeById } from 'mastodon/actions/compose';
 import { openConversationForStatus } from 'mastodon/actions/conversations';
@@ -15,8 +16,6 @@ import { Icon } from 'mastodon/components/icon';
 import { RelativeTimestamp } from 'mastodon/components/relative_timestamp';
 import { NOTIFICATIONS_GROUP_MAX_AVATARS } from 'mastodon/models/notification_group';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
-
-import { EmbeddedStatus } from './embedded_status';
 
 const AVATAR_SIZE = 28;
 
@@ -103,7 +102,7 @@ export const NotificationGroupWithStatus: React.FC<{
       },
 
       reply: () => {
-        dispatch(replyComposeById(statusId));
+        dispatch(replyComposeById({ statusId }));
       },
     }),
     [dispatch, isPrivateMention, statusId],

@@ -25,7 +25,7 @@ RSpec.describe 'NewStatuses', :inline_jobs, :js, :streaming do
     end
 
     expect(page)
-      .to have_css('.status__content__text', text: status_text)
+      .to have_css('article[data-id]', text: status_text)
   end
 
   def visit_homepage

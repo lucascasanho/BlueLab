@@ -2,6 +2,7 @@
 @use '@/styles/mastodon/variables';
 
 .root {
+  box-sizing: border-box;
   container-type: inline-size;
   background: var(--color-bg-primary);
   display: flex;
@@ -18,6 +19,23 @@
     border-radius: var(--radius-xl);
     overflow: hidden;
   }
+}
+
+.headless {
+  border: 0;
+  box-shadow: none;
+  flex-grow: 1;
+  border-radius: 0;
+  padding-block-start: 0;
+}
+
+:global(.compose-standalone) .headless {
+  min-height: 200px;
+
+  // 138px = header, 235px = footer, 8px padding
+  height: calc(100vh - (138px + 235px + var(--space-2)));
+  max-width: 400px;
+  margin-inline: auto;
 }
 
 .background {
@@ -148,6 +166,11 @@
   &[data-scroll-down='true']::after {
     opacity: 1;
   }
+}
+
+.sensitive {
+  outline-offset: -2px;
+  margin-block-end: var(--space-4);
 }
 
 .textarea,
@@ -633,9 +656,10 @@ textarea.textarea {
   }
 }
 
-.languageList {
-  max-height: 350px;
-  overflow-y: auto;
+.languageComboboxWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 @media screen and (width <= 759px) {
@@ -710,6 +734,7 @@ textarea.textarea {
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-rows: auto auto;
+  margin-block-end: var(--space-4);
 
   &::before {
     border-block-start: 2px solid var(--color-border-primary);

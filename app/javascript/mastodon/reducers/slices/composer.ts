@@ -12,14 +12,15 @@ import {
   COMPOSE_MENTION,
   COMPOSE_REPLY,
   COMPOSE_SET_STATUS,
+  COMPOSE_UPLOAD_REQUEST,
   directCompose,
-  replyComposeById,
   resetCompose,
   submitCompose,
 } from '@/mastodon/actions/compose';
 import {
   changeComposeVisibility,
   PRIVATE_QUOTE_MODAL_ID,
+  replyComposeById,
 } from '@/mastodon/actions/compose_typed';
 import { openModal } from '@/mastodon/actions/modal';
 import { REDRAFT } from '@/mastodon/actions/statuses';
@@ -163,6 +164,7 @@ const composerSlice = createSlice({
           COMPOSE_MENTION,
           COMPOSE_DIRECT,
           COMPOSE_SET_STATUS,
+          COMPOSE_UPLOAD_REQUEST,
           REDRAFT,
         ].includes(action.type),
       (state) => {
@@ -260,7 +262,7 @@ export const composerOriginFromElement = (element: Element): ComposerOrigin => {
 };
 
 export const openNewComposer = createAppThunk(
-  (payload: ComposeNewPayload, { dispatch, getState }) => {
+  (payload: ComposeNewPayload | undefined = {}, { dispatch, getState }) => {
     // Always show the composer if it is closed or minimized.
     dispatch(composerSlice.actions.showComposer());
 
@@ -288,7 +290,7 @@ export const openNewComposer = createAppThunk(
         dispatch(requestComposerFocus());
       }
     } else if (payload.type === 'reply') {
-      dispatch(replyComposeById(payload.toStatusId));
+      dispatch(replyComposeById({ statusId: payload.toStatusId }));
     } else {
       dispatch(requestComposerFocus());
     }
@@ -386,13 +388,20 @@ export const submitComposer = createAppThunk(
 
     const { compose, meta, statuses, server, settings } = getState();
 
-    const maxChars =
-      server.server.item?.configuration.statuses.max_characters ?? 500;
-    const textLength = length(compose.get('text') as string);
-    if (textLength === 0) {
+    if (!selectComposerIsChanged(getState())) {
       dispatch(composerSlice.actions.addError('empty'));
       return;
-    } else if (textLength > maxChars) {
+    }
+
+    const maxChars =
+      server.server.item?.configuration.statuses.max_characters ?? 500;
+    let text = compose.get('text') as string;
+    const spoilerText = compose.get('spoiler_text');
+    if (compose.get('spoiler') && typeof spoilerText === 'string') {
+      text += spoilerText;
+    }
+    const textLength = length(countableText(text));
+    if (textLength > maxChars) {
       dispatch(composerSlice.actions.addError('too-long'));
       return;
     }
@@ -458,8 +467,7 @@ export const submitComposer = createAppThunk(
             window.location.assign(status.url);
           }
 
-          // Hide composer on successful publish
-          dispatch(composerSlice.actions.hideComposer());
+          dispatch(resetComposer());
         }),
       );
     }
