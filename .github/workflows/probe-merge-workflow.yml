@@ -1,0 +1,16 @@
+name: Temporary BlueLab merge workflow validation
+
+on:
+  push:
+    branches:
+      - ops/merge-mastodon-5.0.0-alpha.1-20261019
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm the workflow can run
+        run: echo "Temporary branch workflow is executing."
