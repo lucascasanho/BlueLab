@@ -19,6 +19,16 @@ Arquivo: `app/javascript/styles/application.scss`
 - Os aliases agora ficam limitados a `body[data-theme='blue-2']` e `body[data-theme='mastodon-bird-ui-auto']`, os temas customizados que podem depender da camada de compatibilidade.
 - Vanilla (`default`) deixa de receber esses aliases globais e usa os tokens originais do Mastodon.
 
+## Referência do upstream consultada
+Branch oficial: `mastodon/mastodon:main`
+HEAD observado durante a investigação: `6d91199483995984904171089a3cfa3b25a6050e`
+Commits recentes de redesign observados:
+- `e1ce504c20f8d3ed7c40aceb16b2f0cd5931f6e1` — reformulação da ação de boost.
+- `005d48ff79e3bf7999b357393479c9f032f4eb18` — ajuste do espaçamento do cabeçalho de colunas.
+- `ba40995d49d47e74c14d8b725325e445087fca87` — ajuste de hover em botões.
+- `f40067d31b07ffc29ad6c8bf4b56d2655635f8de` — espaçamento entre itens de menu.
+Esses commits mostram que o redesenho oficial continuou recebendo refinamentos após a base que o BlueLab já tinha. Os commits foram identificados, mas ainda não foram integrados seletivamente.
+
 ## Etapa 2 — sincronização com o upstream 5.0 atual (pendente)
 - Comparar o código da branch de teste com o upstream oficial atual, incluindo os commits recentes do redesenho.
 - Identificar e integrar os arquivos upstream que ainda não chegaram ao BlueLab, sem sobrescrever personalizações próprias.
