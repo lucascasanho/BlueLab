@@ -859,7 +859,6 @@ export const RichComposeEditor: React.FC<{
                 type='button'
                 size='sm'
                 icon={icon as IconProp}
-                title={label}
                 data-command={command}
                 data-value={value}
                 color={active ? 'accent' : 'neutral'}
@@ -877,7 +876,6 @@ export const RichComposeEditor: React.FC<{
               type='button'
               size='sm'
               icon={LinkIcon}
-              title={intl.formatMessage(messages.link)}
               color={activeFormats.has('link') ? 'accent' : 'neutral'}
               aria-pressed={activeFormats.has('link')}
               onMouseDown={preventToolbarFocus}
