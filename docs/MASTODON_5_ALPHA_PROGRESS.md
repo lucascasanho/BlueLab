@@ -4,7 +4,7 @@ Atualizado em: 2026-10-20 (UTC)
 Repositório: [lucascasanho/BlueLab](https://github.com/lucascasanho/BlueLab)  
 Canal de trabalho: `BlueLab-Test`  
 SHA auditado no início desta retomada: `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea`  
-Estado: **em correção e validação; não considerar pronto para aprovação**.
+Estado: **em correção e validação; não considerar pronto para aprovação**. HEAD conferido em `cc4f1ef3876e7840ac4af36a9cbbc55c3ca9ab6f`; os jobs desse SHA estão em execução/na fila.
 
 ## Escopo e proteções
 
@@ -104,13 +104,22 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 | 2026-10-20 | 27 | Adicionado o modelo interno `NotificationGroupAdminVerificationRequest` e incluído na união `NotificationGroup`. | Corrige incompatibilidade entre `NotificationType` da API e a união do modelo; validação pendente. | `8466ddc3ba50ff9027d7a08c1aef8088396e9f5a` |
 | 2026-10-20 | 28 | Adicionada a chave `explore` à tipagem e aos 13 idiomas já existentes no dicionário BlueLab, preservando a tradução específica do item de navegação. | Patch publicado; typecheck e revisão de traduções pendentes. | `90157e1c1ee1f627bb36c605425ebb0ed080d5e0` |
 
+| 2026-10-20 | 29 | Restaurada a prop `withSpaceAfter` ausente no `NavigationLink` do Mastodon 5 e criado modificador CSS para manter espaçamento intencional dos links BlueLab. | Corrige incompatibilidades de props no painel de navegação; CI do novo SHA pendente. | `79ed64ac8a19caa0a99618b2a31d08a0c3ecb0d8` / `7ca229338560f5e11a459b42dcbcd7f855c1050e` |
+| 2026-10-20 | 30 | Removidos atributos `title` não suportados nos `IconButton` do editor rico; os filhos já fornecem o texto acessível do tooltip. | Correção publicada; lint/typecheck pendentes. | `95ada28b14b2089392b8e106f5312f60bcfbbfcf` |
+| 2026-10-20 | 31 | Removido `title` não suportado do botão de agendamento; a legenda interna alimenta o tooltip. | Correção publicada; lint/typecheck pendentes. | `96b4f864c1373225b34136a7ef30bbad198d2c80` |
+| 2026-10-20 | 32 | Removidos atributos `title` não suportados dos botões de remover item/mídia do compositor por thread. | Correção publicada; lint/typecheck pendentes. | `e72d708f7e181890284787dd23ed655f3bdc4636` |
+| 2026-10-20 | 33 | Removidos dois atributos `title` não suportados na barra de formatação, usando o texto de filhos como tooltip acessível. | Correção publicada; lint/typecheck pendentes. | `88e4e85624b9cc44c982cddf1140c09fea11f501` |
+| 2026-10-20 | 34 | Removido `title` não suportado do botão de adicionar item à thread. | Correção publicada; lint/typecheck pendentes. | `13ba3a8d332e2e11e2a9ca773bbe0d2c5603c6be` |
+| 2026-10-20 | 35 | Migrados quatro controles da barra de ações para o componente `Tooltip` oficial, substituindo a prop obsoleta `tooltip` e preservando rótulos acessíveis. | Patch publicado; aguardar TypeScript, ESLint e testes de interface. | `0af6db5804d27e96bf48b4b4c795dddf42b68759` |
+| 2026-10-20 | 36 | Removido `title` não suportado do botão de favorito na página de status; o filho fornece o texto do tooltip. | Correção publicada no HEAD `cc4f1ef3876e7840ac4af36a9cbbc55c3ca9ab6f`; CI iniciada e ainda pendente. | `cc4f1ef3876e7840ac4af36a9cbbc55c3ca9ab6f` |
+
 ## Referências da execução
 
 - Branch de teste: [BlueLab-Test](https://github.com/lucascasanho/BlueLab/tree/BlueLab-Test)
 - PR de validação (não mesclar): [#201 — QA only: validate Mastodon 5.0.0-alpha.1 merge on BlueLab-Test](https://github.com/lucascasanho/BlueLab/pull/201)
-- CI atual do ESLint: [JavaScript Linting](https://github.com/lucascasanho/BlueLab/actions/runs/39374581250)
-- CI atual de JavaScript: [JavaScript Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39374581407)
-- CI atual de formatação: [Check formatting](https://github.com/lucascasanho/BlueLab/actions/runs/39374581442)
-- CI atual das migrações históricas: [Historical data migration test](https://github.com/lucascasanho/BlueLab/actions/runs/39374581255)
-- CI atual de RSpec/E2E: [Ruby Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39374581317)
-- CI atual da imagem de teste: [Test container image build](https://github.com/lucascasanho/BlueLab/actions/runs/39374581343)
+- CI do HEAD `cc4f1ef`: [JavaScript Linting](https://github.com/lucascasanho/BlueLab/actions/runs/39379647711)
+- CI de testes JavaScript: [JavaScript Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39379647822)
+- CI de formatação: [Check formatting](https://github.com/lucascasanho/BlueLab/actions/runs/39379647706)
+- CI das migrações históricas: [Historical data migration test](https://github.com/lucascasanho/BlueLab/actions/runs/39379647722)
+- CI de RSpec/E2E: [Ruby Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39379647707)
+- CI da imagem de teste: [Test container image build](https://github.com/lucascasanho/BlueLab/actions/runs/39379647710)
