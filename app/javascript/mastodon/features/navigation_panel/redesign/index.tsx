@@ -52,7 +52,7 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { invokeVirtualIosKeyboard } from '@/mastodon/utils/invoke_virtual_ios_keyboard';
 
 import { useHasAnnouncements } from '../../announcements/hooks';
-import { FooterLinks } from '../../discovery_panel/footer_links';
+import { NavigationFooterLinks } from './footer_links';
 
 import { Blue2ComposeIcon } from '../../blue2/icons';
 
