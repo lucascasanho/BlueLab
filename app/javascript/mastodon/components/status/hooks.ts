@@ -31,6 +31,7 @@ import { useExpandedStatus, useStatus } from '@/mastodon/hooks/useStatus';
 import { useToggle } from '@/mastodon/hooks/useToggle';
 import { useIdentity } from '@/mastodon/identity_context';
 import { quickBoosting } from '@/mastodon/initial_state';
+import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import type { MenuItem as DropdownItem } from '@/mastodon/models/dropdown_menu';
 import type { Relationship } from '@/mastodon/models/relationship';
 import type {
@@ -325,7 +326,7 @@ export function useStatusIcons(statusId: string) {
   const isReplyAll = !!status?.in_reply_to_id;
   const reply: StatusIcon = {
     icon: isReplyAll
-      ? isRedesign
+      ? isRedesignEnabled()
         ? StatusReplyIcon
         : ReplyAllLegacyIcon
       : StatusReplyIcon,
