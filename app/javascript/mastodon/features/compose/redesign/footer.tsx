@@ -189,7 +189,6 @@ export const ComposeFooter: React.FC<{
               size='sm'
               icon={PlusIcon}
               className={classes.threadAddButton}
-              title={intl.formatMessage(messages.addThreadItem)}
               disabled={threadItemCount >= 24 || hasPublishedThreadItems}
               onClick={handleAddThreadItem}
             >
