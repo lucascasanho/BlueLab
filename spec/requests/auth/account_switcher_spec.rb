@@ -65,7 +65,7 @@ RSpec.describe 'Auth Account Switcher' do
       }
 
       expect(response).to redirect_to(new_user_session_path(account_switcher: '1'))
-expect(SessionActivation.find_by(session_id: original_session.session_id, user: current_user)).to be_present
+      expect(SessionActivation.find_by(session_id: original_session.session_id, user: current_user)).to be_present
     end
   end
 
@@ -111,7 +111,7 @@ expect(SessionActivation.find_by(session_id: original_session.session_id, user: 
 
       expect(response).to have_http_status(200)
 
-expect(controller.send(:current_session)).to have_attributes(user: current_user)
+      expect(controller.send(:current_session)).to have_attributes(user: current_user)
     end
   end
 end
