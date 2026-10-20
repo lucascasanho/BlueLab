@@ -235,7 +235,9 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
 
   const handleDescriptionChange = useCallback<
     React.ChangeEventHandler<HTMLTextAreaElement>
-  >((event) => { setDescription(event.target.value); }, []);
+  >((event) => {
+    setDescription(event.target.value);
+  }, []);
 
   const handleDragOver = useCallback<React.DragEventHandler<HTMLDivElement>>(
     (event) => {
@@ -246,7 +248,9 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
   );
 
   const handleDragLeave = useCallback<React.DragEventHandler<HTMLDivElement>>(
-    () => { setDragging(false); },
+    () => {
+      setDragging(false);
+    },
     [],
   );
 
