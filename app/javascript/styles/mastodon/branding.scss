@@ -97,3 +97,30 @@ svg.logo {
     }
   }
 }
+
+
+.instance-wordmark-brand {
+  align-items: center;
+  color: var(--color-text-primary);
+  display: inline-flex;
+  font-family: var(--font-heading);
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 600;
+  gap: 0.65rem;
+  line-height: 1.2;
+  max-width: 100%;
+  text-decoration: none;
+
+  img {
+    display: block;
+    flex: 0 0 auto;
+    height: 2.75rem;
+    object-fit: contain;
+    width: 2.75rem;
+  }
+
+  span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
