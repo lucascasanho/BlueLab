@@ -4,7 +4,7 @@ Atualizado em: 2026-10-20 (UTC)
 Repositório: [lucascasanho/BlueLab](https://github.com/lucascasanho/BlueLab)  
 Canal de trabalho: `BlueLab-Test`  
 SHA auditado no início desta retomada: `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea`  
-Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código auditado antes desta correção: `4c22a20b692fb8b1cacdc1007e9d231c463e214f`. Na CI desse SHA, build de produção, JS lint/testes, Ruby lint, formatação, CSS/Haml, audit, migrações históricas, imagem de teste e integrações OpenSearch passaram; o E2E ficou em 28/29 exemplos, com a localização do botão de conta no logout como única falha. A suíte Ruby completa ainda estava em execução.
+Estado: **em correção e validação; não considerar pronto para aprovação**. A correção E2E de logout está no commit `52941f4ea40ac96b5a451200ee38104488e32616`, aguardando nova CI. No SHA anterior `4c22a20`, build de produção, JS lint/testes, Ruby lint, CSS/Haml, audit, migrações históricas, imagem de teste e integrações OpenSearch passaram; o E2E ficou em 28/29 exemplos, com a localização do botão de conta no logout como única falha. O `Check formatting` da rodada `52941f4` indicou espaços finais em uma referência deste próprio documento; eles foram removidos neste checkpoint e a formatação precisa ser confirmada pela próxima CI.
 
 ## Escopo e proteções
 
@@ -163,7 +163,7 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 | 2026-10-20 | 61 | Corrigidos specs de UI/E2E para refletir o compositor redesign atual; o último commit ajusta os testes do composer sem alterar o canal estável. | No SHA `d0a8ab0`, JS/Ruby lint, JS Testing, formatação, CSS/Haml, audit, migrações históricas, build e integrações de busca passaram, mas 3 E2E de sistema falharam. O branch estável segue em `ce1269b9c3751a90a9214a1fab1aafbceb09e522`; não houve promoção. | `d0a8ab004b77ae552c2e3c691ce4d82513fd4763` |
 | 2026-10-20 | 62 | Ajustados três specs E2E para refletir os fluxos atuais do Blue2: após publicar, abrir o status pela ação “Open”; usar OCR diretamente no editor de mídia Blue2 sem upload duplicado; e acionar o menu de conta fora do `nav` antes de sair. | Alterações de testes apenas. A nova execução de CI precisa confirmar os seletores, a publicação e o fluxo de OCR/logout. O teste de publicação continua verificando o conteúdo do status persistido, não apenas a notificação. | `edcdad5fe6ee710e56c5c9f990f45e618c7de5fb` |
 
-| 2026-10-20 | 63 | Corrigido o seletor E2E de logout: usa o botão Blue2 por `aria-label` quando presente, com fallback para o botão de texto do shell padrão. | O log do SHA `4c22a20` mostrou 28/29 exemplos E2E passando; a falha única era `Capybara::ElementNotFound` para “Account settings”. Nova CI ainda pendente para validar o ajuste. | SHA deste commit |
+| 2026-10-20 | 63 | Corrigido o seletor E2E de logout: usa o botão Blue2 por `aria-label` quando presente, com fallback para o botão de texto do shell padrão. | O log do SHA `4c22a20` mostrou 28/29 exemplos E2E passando; a falha única era `Capybara::ElementNotFound` para “Account settings”. Nova CI ainda pendente para validar o ajuste. | `52941f4ea40ac96b5a451200ee38104488e32616` |
 
 ## Referências da execução
 
@@ -175,7 +175,7 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 - Ruby Linting: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818340) (sucesso)
 - Migrações históricas: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818352) (sucesso)
 - Imagem de teste: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818367) (sucesso)
-- Ruby Testing: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818366) (integrações de busca passaram; E2E falhou em 3 exemplos; corrigidos os specs nas etapas 62–63)  
+- Ruby Testing: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818366) (integrações de busca passaram; E2E falhou em 3 exemplos; corrigidos os specs nas etapas 62–63)
 - E2E mais recente antes da etapa 63: [run `39392623781`](https://github.com/lucascasanho/BlueLab/actions/runs/39392623781) (28/29 exemplos passaram; falha única do acionador de logout identificada e corrigida no checkpoint seguinte)
 - Ruby Linting que identificou os offenses de indentação: [SHA `fc62e7c`](https://github.com/lucascasanho/BlueLab/actions/runs/39386147557) (falhou antes das correções de specs)
 - Migrações históricas: [SHA `fc62e7c`](https://github.com/lucascasanho/BlueLab/actions/runs/39386147589) (sucesso; repetir no SHA consolidado)
