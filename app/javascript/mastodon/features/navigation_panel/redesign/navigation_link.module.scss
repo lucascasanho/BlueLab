@@ -5,6 +5,10 @@
   padding-bottom: var(--space-1);
 }
 
+.wrapperSpaced {
+  padding-bottom: var(--space-3);
+}
+
 @mixin link-base {
   --icon-size: 20px;
   --border-radius: var(--radius-3);
