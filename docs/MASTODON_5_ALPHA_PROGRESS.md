@@ -49,13 +49,13 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 - [x] Comparar migrações customizadas, modelos, schema exportado e testes.
 - [x] Corrigir no schema as colunas ausentes confirmadas: `accounts.verified_badge_visible` e `account_conversations.last_read_status_id`.
 - [x] Confirmar pela migração `20260925094651_create_fasp_capabilities.rb` que `fasp_providers.capabilities` é removida intencionalmente e que a fonte de verdade final é `fasp_capabilities`; não manter a coluna removida no schema.
-- [ ] Rodar o teste de migrações e testes focados do recurso de verificação; confirmar os demais campos/tabelas pela CI.
-- [x] Registrar o commit de schema; resultados de teste ainda pendentes.
+- [ ] Rodar o teste de migrações e testes focados do recurso de verificação após a correção final do schema.
+- [x] Registrar o commit de schema; resultados do commit final ainda pendentes.
 
 ### Etapa 4 — lint e formatação
 
 - [x] Corrigir manualmente os dois blocos de função com formatação divergente em `bug_report_modal.tsx`, sem alterar o comportamento.
-- [ ] Confirmar a formatação com o job oficial de `yarn format:check` (correção publicada; CI do novo SHA pendente).
+- [ ] Confirmar a formatação com o job oficial `Check formatting` no SHA mais recente (o job passou no SHA `9d73006`; a verificação do SHA mais recente está em execução).
 - [ ] Resolver erros ESLint/TypeScript concretos no código atual; não suprimir regras globalmente para mascarar problemas.
 - [ ] Rodar os comandos focados e o conjunto de lint JS.
 - [ ] Registrar quantidade de erros antes/depois e quaisquer bloqueios remanescentes.
@@ -80,12 +80,18 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 | 2026-10-20 | 4 | Corrigida a formatação dos dois blocos de callback em `bug_report_modal.tsx`, único arquivo indicado pelo `yarn format:check`. | Alteração publicada; `yarn format:check` será confirmado na CI do commit seguinte. | `fa3f21e7871f15a1b4ea13257b70ed62ca7124d4` |
 | 2026-10-20 | 5 | Corrigidos problemas TypeScript/React em componentes de navegação, feeds, compositor e conversas diretas; restaurado import `countableText` do upstream. | JavaScript Testing passou no SHA `967b741`; lint e demais verificações ainda pendentes. | `8e4c64eee01adb26913b46c0c5d2a77597bf0440` / `15bbff53101a2abb9fbae64d60126eb0dc2458dd` |
 | 2026-10-20 | 6 | Aplicada nova rodada de formatação em `column_header`, `account_edit`, `pinned_feeds`, `bug_report_modal` e `gif_picker`. | CI do SHA `967b741` ainda apontou 7 arquivos; esta rodada corrige visibilidade, conversa, import do composer e o próprio registro. | `967b741ea52d005e15418214f4a6632ac3e0e8db` |
-| 2026-10-20 | 7 | Corrigidos os dois erros restantes do ESLint em `message_conversation.tsx`; a nova CI começou em `0efcc484`. Revertida a inclusão indevida de `fasp_providers.capabilities` em `db/schema.rb`, pois a migração de setembro remove essa coluna ao migrar os dados para `fasp_capabilities`. | A CI do commit `0efcc484` está em execução; ainda não marcar ESLint/RSpec/E2E como aprovados até concluir. O teste histórico anterior passou antes desta correção final de schema. | `0efcc484d162da4f49e0aea9dab077cfc3b5da1f` / correção atual pendente de commit |
+| 2026-10-20 | 7 | Primeira correção dos dois findings restantes em `message_conversation.tsx` no commit `0efcc484`. | A CI revelou que a assinatura genérica escolhida para `useAppSelector` estava errada e elevou o ESLint a 77 erros; esta tentativa não foi considerada validada. | `0efcc484d162da4f49e0aea9dab077cfc3b5da1f` |
+| 2026-10-20 | 8 | Reconciliado o schema com a migração FASP: a coluna `fasp_providers.capabilities` não deve existir após a migração, pois os dados são transferidos para `fasp_capabilities`; mantidas as duas colunas realmente ausentes adicionadas anteriormente. | Correção de `db/schema.rb` publicada; o teste histórico foi reiniciado para confirmar o resultado. | `b4ab81f9bef14a7b27cb002cc4412ea3a31c4e33` |
+| 2026-10-20 | 9 | Removidos os quatro workflows temporários de autocorreção ESLint, formatação e RuboCop, que tinham permissões de escrita e não devem ficar permanentes no repositório. | Exclusão aplicada em um único commit; o branch volta a não conter essas automações auxiliares. | `7cb2283839dafbf0d0b37d801944aeb7c830b4cf` |
+| 2026-10-20 | 10 | Corrigido o hook selector usando os dois genéricos necessários (`RootState` e tipo selecionado), e trocada a flag local mutável por um objeto `current` para evitar a falsa condição de cancelamento detectada pelo ESLint. | Nova execução completa da CI iniciada no SHA atual; resultados de ESLint, testes Ruby/E2E e migrações ainda precisam ser confirmados antes da validação. | `0aa9cbe36c65a2576b855fb5c3f1a7244586db94` |
 
 ## Referências da execução
 
 - Branch de teste: [BlueLab-Test](https://github.com/lucascasanho/BlueLab/tree/BlueLab-Test)
 - PR de validação (não mesclar): [#201 — QA only: validate Mastodon 5.0.0-alpha.1 merge on BlueLab-Test](https://github.com/lucascasanho/BlueLab/pull/201)
-- Run de formatação: [Check formatting](https://github.com/lucascasanho/BlueLab/actions/runs/39368429828)
-- Run do ESLint: [JavaScript Linting](https://github.com/lucascasanho/BlueLab/actions/runs/39368429790)
-- Run geral de testes: [test workflows](https://github.com/lucascasanho/BlueLab/actions/runs/39368429779)
+- CI atual do ESLint: [JavaScript Linting](https://github.com/lucascasanho/BlueLab/actions/runs/39374581250)
+- CI atual de JavaScript: [JavaScript Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39374581407)
+- CI atual de formatação: [Check formatting](https://github.com/lucascasanho/BlueLab/actions/runs/39374581442)
+- CI atual das migrações históricas: [Historical data migration test](https://github.com/lucascasanho/BlueLab/actions/runs/39374581255)
+- CI atual de RSpec/E2E: [Ruby Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39374581317)
+- CI atual da imagem de teste: [Test container image build](https://github.com/lucascasanho/BlueLab/actions/runs/39374581343)
