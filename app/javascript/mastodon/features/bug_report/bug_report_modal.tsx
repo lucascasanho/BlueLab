@@ -136,7 +136,7 @@ const isCopyLocale = (locale: string): locale is keyof typeof COPY =>
 const getCopy = (locale: string): Copy => {
   const normalized = locale.toLowerCase();
 
-if (isCopyLocale(locale)) return COPY[locale];
+  if (isCopyLocale(locale)) return COPY[locale];
   if (normalized.startsWith('pt')) return COPY['pt-BR'];
   if (normalized.startsWith('es')) return COPY.es;
   if (normalized.startsWith('fr')) return COPY.fr;
