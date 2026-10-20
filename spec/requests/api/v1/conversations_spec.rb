@@ -283,7 +283,7 @@ RSpec.describe 'API V1 Conversations' do
       get "/api/v1/conversations/#{conversation.id}/messages", headers: headers
 
       expect(response).to have_http_status(200)
-      expect(response.parsed_body.map { |status| status[:id] })
+      expect(response.parsed_body.pluck(:id))
         .to contain_exactly(received.id.to_s, sent.id.to_s)
     end
 
@@ -310,7 +310,7 @@ RSpec.describe 'API V1 Conversations' do
       get "/api/v1/conversations/#{conversation.id}/messages", headers: headers
 
       expect(response).to have_http_status(200)
-      expect(response.parsed_body.map { |status| status[:id] })
+      expect(response.parsed_body.pluck(:id))
         .to eq([first.id.to_s])
       expect(second).to be_present
     end

@@ -70,12 +70,13 @@ RSpec.describe 'Auth Account Switcher' do
   describe 'POST /auth/account_switcher/switch' do
     before do
       sign_in current_user
-      @target_session_id = target_user.activate_session(request)
     end
+
+    let(:target_session_id) { target_user.activate_session(request) }
 
     it 'switches to the stored session without destroying either account session' do
       post auth_account_switcher_switch_path, params: {
-        session_id: @target_session_id,
+        session_id: target_session_id,
       }
 
       expect(response).to have_http_status(200)
@@ -88,7 +89,7 @@ RSpec.describe 'Auth Account Switcher' do
       get root_path
 
       expect(controller.current_user).to eq target_user
-      expect(SessionActivation.find_by(session_id: @target_session_id, user: target_user)).to be_present
+      expect(SessionActivation.find_by(session_id: target_session_id, user: target_user)).to be_present
       expect(current_user.session_activations).to be_present
     end
 
