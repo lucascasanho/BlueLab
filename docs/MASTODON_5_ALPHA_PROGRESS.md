@@ -4,7 +4,7 @@ Atualizado em: 2026-10-20 (UTC)
 Repositório: [lucascasanho/BlueLab](https://github.com/lucascasanho/BlueLab)  
 Canal de trabalho: `BlueLab-Test`  
 SHA auditado no início desta retomada: `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea`  
-Estado: **em correção e validação; não considerar pronto para aprovação**. HEAD conferido em `cc4f1ef3876e7840ac4af36a9cbbc55c3ca9ab6f`; os jobs desse SHA estão em execução/na fila.
+Estado: **em correção e validação; não considerar pronto para aprovação**. HEAD conferido em `44d49d2414f4d086b7c6a4b8692d66fd784f7314`; jobs do commit de código `b03a6fa3b6a9833b34176ea165860672b488f53a` ainda estão na fila.
 
 ## Escopo e proteções
 
@@ -113,13 +113,17 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 | 2026-10-20 | 35 | Migrados quatro controles da barra de ações para o componente `Tooltip` oficial, substituindo a prop obsoleta `tooltip` e preservando rótulos acessíveis. | Patch publicado; aguardar TypeScript, ESLint e testes de interface. | `0af6db5804d27e96bf48b4b4c795dddf42b68759` |
 | 2026-10-20 | 36 | Removido `title` não suportado do botão de favorito na página de status; o filho fornece o texto do tooltip. | Correção publicada no HEAD `cc4f1ef3876e7840ac4af36a9cbbc55c3ca9ab6f`; CI iniciada e ainda pendente. | `cc4f1ef3876e7840ac4af36a9cbbc55c3ca9ab6f` |
 
+| 2026-10-20 | 37 | Corrigida a renderização de mensagens diretas para consumir `content` do modelo de status, estreitar as contas ao tipo adequado, tratar anexos/menções do estado imutável legado e evitar chaves CSS computadas opcionais. | Patch publicado; aguarda validação TypeScript e de runtime. | `c35292e1f7e15be30f85ea82987818f8f4f7d58e` |
+| 2026-10-20 | 38 | Removido cast local para o estado de navegação e adotado `location.state?.statusId`, depois de ampliar `MastodonLocationState` com `statusId?: string` documentado para recuperação da conversa de origem. | Corrige incompatibilidade do tipo de estado em `browserHistory.replace`; CI pendente. | `eb8595da33c8a07130cb77a4e545671cee4e372f` / `b03a6fa3b6a9833b34176ea165860672b488f53a` |
+| 2026-10-20 | 39 | Protegido o teste de agrupamento de conversas contra representante ausente com erro explícito, eliminando acessos não estreitados a `undefined`. | Correção de teste publicada; JavaScript Testing e TypeScript do SHA mais recente ainda pendentes. | `44d49d2414f4d086b7c6a4b8692d66fd784f7314` |
+
 ## Referências da execução
 
 - Branch de teste: [BlueLab-Test](https://github.com/lucascasanho/BlueLab/tree/BlueLab-Test)
 - PR de validação (não mesclar): [#201 — QA only: validate Mastodon 5.0.0-alpha.1 merge on BlueLab-Test](https://github.com/lucascasanho/BlueLab/pull/201)
-- CI do HEAD `cc4f1ef`: [JavaScript Linting](https://github.com/lucascasanho/BlueLab/actions/runs/39379647711)
-- CI de testes JavaScript: [JavaScript Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39379647822)
-- CI de formatação: [Check formatting](https://github.com/lucascasanho/BlueLab/actions/runs/39379647706)
-- CI das migrações históricas: [Historical data migration test](https://github.com/lucascasanho/BlueLab/actions/runs/39379647722)
-- CI de RSpec/E2E: [Ruby Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39379647707)
-- CI da imagem de teste: [Test container image build](https://github.com/lucascasanho/BlueLab/actions/runs/39379647710)
+- CI de TypeScript/ESLint após correções de conversas: [JavaScript Linting](https://github.com/lucascasanho/BlueLab/actions/runs/39379908168)
+- CI de testes JavaScript: [JavaScript Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39379908125)
+- CI de formatação: [Check formatting](https://github.com/lucascasanho/BlueLab/actions/runs/39379908189)
+- CI das migrações históricas: [Historical data migration test](https://github.com/lucascasanho/BlueLab/actions/runs/39379908164)
+- CI de RSpec/E2E: [Ruby Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39379908180)
+- CI da imagem de teste: [Test container image build](https://github.com/lucascasanho/BlueLab/actions/runs/39379908239)
