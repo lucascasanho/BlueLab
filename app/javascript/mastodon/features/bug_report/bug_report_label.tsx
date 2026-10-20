@@ -1,15 +1,20 @@
 import { useIntl } from 'react-intl';
 
-const labels: Partial<Record<string, string>> & { en: string } = {
-  en: 'Report a bug',
-  pt: 'Relatar bug',
-  es: 'Informar un error',
-  fr: 'Signaler un bug',
+const labelForLocale = (locale: string): string => {
+  switch (locale.split('-')[0]) {
+    case 'pt':
+      return 'Relatar bug';
+    case 'es':
+      return 'Informar un error';
+    case 'fr':
+      return 'Signaler un bug';
+    default:
+      return 'Report a bug';
+  }
 };
 
 export const BugReportLabel = () => {
   const intl = useIntl();
-  const locale = intl.locale.toLowerCase();
 
-  return labels[locale] ?? labels[locale.split('-')[0]] ?? labels.en;
+  return labelForLocale(intl.locale.toLowerCase());
 };

@@ -205,7 +205,7 @@ const ComposeGifDropdown: React.FC<
       const items = (payload.results ?? []).filter((item) => {
         const formats = item.media_formats;
         return Boolean(
-          item.id && formats && formats.gif?.url && formats.tinygif?.url,
+          item.id && formats?.gif?.url && formats?.tinygif?.url,
         );
       });
 

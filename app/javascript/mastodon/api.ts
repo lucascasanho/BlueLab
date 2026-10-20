@@ -128,7 +128,9 @@ export default function api(withAuthorization = true) {
         url !== '/api/v1/bug_reports' &&
         (status === undefined || status >= 500 || status === 429)
       ) {
-        const requestId = error.response?.headers.get('x-request-id');
+        const requestIdValue: unknown = error.response?.headers.get('x-request-id');
+        const requestId =
+          typeof requestIdValue === 'string' ? requestIdValue : undefined;
 
         recordClientError({
           type: 'api',
@@ -138,7 +140,7 @@ export default function api(withAuthorization = true) {
           status,
           method: error.config?.method,
           url,
-          request_id: typeof requestId === 'string' ? requestId : undefined,
+          request_id: requestId,
         });
       }
 

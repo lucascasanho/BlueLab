@@ -42,7 +42,6 @@ import { RichComposeEditor } from './rich_editor';
 import { resolveComposeScrollTarget } from './scroll';
 import {
   isMessageComposeType,
-  selectComposeCanSubmit,
   selectComposeSensitive,
   selectComposeType,
 } from './selectors';
@@ -315,7 +314,6 @@ function useComposeHandlers(
     : text;
 
   const dispatch = useAppDispatch();
-  const canSubmit = useAppSelector(selectComposeCanSubmit);
 
   // Sensitive / CW handling follows the post that currently owns focus.
   const rootSensitive = useAppSelector(
