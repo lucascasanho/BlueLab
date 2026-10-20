@@ -21,4 +21,10 @@ class Themes
   def selectable_names
     names & USER_SELECTABLE_NAMES
   end
+
+  def available_theme_colors(theme)
+    return [] unless @conf[theme].is_a?(Hash) && @conf[theme]['colors'].present?
+
+    @conf[theme]['colors']
+  end
 end

@@ -100,6 +100,12 @@ RSpec.describe ThemeHelper do
     end
   end
 
+  describe '#available_theme_colors' do
+    it 'returns the configured color palette for the BlueLab theme' do
+      expect(helper.available_theme_colors('blue-2')).to eq(%w(indigo lime pink orange cyan))
+    end
+  end
+
   describe '#current_theme' do
     subject { helper.current_theme }
 
