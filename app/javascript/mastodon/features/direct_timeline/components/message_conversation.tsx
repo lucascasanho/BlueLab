@@ -283,16 +283,14 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     return [...messageStatusIds, latestThreadStatusId].sort(compareId);
   }, [latestThreadStatusId, messageStatusIds]);
 
-  const statuses = useAppSelector<
-    RootState,
-    ImmutableRecord<StatusShape>[]
-  >((state) =>
-    effectiveMessageStatusIds
-      .map(
-        (statusId) =>
-          getStatus(state, { id: statusId }) as ImmutableRecord<StatusShape>,
-      )
-      .filter(Boolean),
+  const statuses = useAppSelector<RootState, ImmutableRecord<StatusShape>[]>(
+    (state) =>
+      effectiveMessageStatusIds
+        .map(
+          (statusId) =>
+            getStatus(state, { id: statusId }) as ImmutableRecord<StatusShape>,
+        )
+        .filter(Boolean),
   );
 
   const initialLoadConversationIdRef = useRef<string | null>(null);

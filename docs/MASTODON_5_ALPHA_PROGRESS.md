@@ -23,7 +23,7 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 
 - **Passou:** build de produção; JavaScript Testing; Ruby Linting; CSS Linting; Haml Linting; Bundler Audit; Historical data migration test; Test container image build.
 - **Falhou no SHA inicial:** JavaScript Linting, formatação, Ruby/RSpec e E2E. As correções subsequentes estão sendo verificadas por novos workflows; consultar o histórico abaixo e não tratar a integração como validada enquanto os jobs atuais não passarem.
-- Os E2E em Ruby 4.0 também mostraram erro de servidor: `ThemeHelper#available_theme_colors` chama `Themes.instance.available_theme_colors`, método que não existe na classe atual `Themes`. Esse erro provoca HTTP 500 em páginas e faz falhar vários testes de navegador.
+- O primeiro bloqueio E2E (`Themes#available_theme_colors` ausente e `config/themes.yml` no formato antigo) foi corrigido na etapa 2 pelo commit `b573c59c`. Uma rodada posterior identificou `User#setting_theme_color` ausente no helper de tema; o accessor e um teste unitário foram adicionados no commit `1440c38c`. A correção precisa ser confirmada por uma nova rodada E2E.
 - Também há evidência de discrepância entre migrações e `db/schema.rb`: o modelo/testes de selo de verificação usam `verified_badge_visible`, coluna ausente do schema exportado, apesar de existir a migração `db/migrate/20260926151300_add_verified_badge_visible_to_accounts.rb`.
 - O commit `8b2c6e8281065a0bd968d9134920bc36ff78b3da` já tentou incluir tabelas BlueLab no schema, mas a execução atual demonstra que é necessário conferir a cobertura de colunas/tabelas customizadas, não apenas o nome do commit.
 - O PR #201 usa `qa/mastodon-5-alpha-validation-20261019` como base e `BlueLab-Test` como head, foi criado exclusivamente para disparar CI e **não deve ser mesclado**.
@@ -55,15 +55,15 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 ### Etapa 4 — lint e formatação
 
 - [x] Corrigir manualmente os dois blocos de função com formatação divergente em `bug_report_modal.tsx`, sem alterar o comportamento.
-- [ ] Confirmar a formatação com o job oficial `Check formatting` no SHA mais recente (o job passou no SHA `9d73006`; a verificação do SHA mais recente está em execução).
+- [ ] Confirmar a formatação com o job oficial `Check formatting` após restaurar o comando original `yarn format:check`; Oxfmt reportou o diff real em `message_conversation.tsx`, já aplicado nesta revisão.
 - [ ] Resolver erros ESLint/TypeScript concretos no código atual; não suprimir regras globalmente para mascarar problemas.
 - [ ] Rodar os comandos focados e o conjunto de lint JS.
 - [ ] Registrar quantidade de erros antes/depois e quaisquer bloqueios remanescentes.
 
 ### Etapa 5 — matriz Ruby, testes completos e validação do canal
 
-- [ ] Confirmar a versão Ruby exigida por `.ruby-version`, `Gemfile` e workflow upstream do alpha.
-- [ ] Distinguir incompatibilidade da matriz CI de falhas reais; alterar workflow somente após confirmar as versões oficialmente visadas.
+- [x] Confirmar a versão Ruby exigida por `.ruby-version` e `Gemfile`: Ruby 4.0.7.
+- [x] Distinguir incompatibilidade da matriz CI de falhas reais; workflow ajustado com base no upstream atual, que testa apenas a versão de `.ruby-version`.
 - [ ] Reexecutar CI, testes de migração, RSpec/E2E, build e lint; não marcar como pronto enquanto houver falhas relevantes sem explicação.
 - [ ] Verificar diff total para garantir que nenhum recurso BlueLab foi removido acidentalmente pelo merge upstream.
 - [ ] Aplicar a atualização apenas no mastodon.blue pelo fluxo normal do ambiente de teste quando o commit estiver coerente, e confirmar health/serviços e fluxos principais. Estado do deploy não foi presumido nesta auditoria.
@@ -83,11 +83,12 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 | 2026-10-20 | 7 | Primeira correção dos dois findings restantes em `message_conversation.tsx` no commit `0efcc484`. | A CI revelou que a assinatura genérica escolhida para `useAppSelector` estava errada e elevou o ESLint a 77 erros; esta tentativa não foi considerada validada. | `0efcc484d162da4f49e0aea9dab077cfc3b5da1f` |
 | 2026-10-20 | 8 | Reconciliado o schema com a migração FASP: a coluna `fasp_providers.capabilities` não deve existir após a migração, pois os dados são transferidos para `fasp_capabilities`; mantidas as duas colunas realmente ausentes adicionadas anteriormente. | Correção de `db/schema.rb` publicada; o teste histórico foi reiniciado para confirmar o resultado. | `b4ab81f9bef14a7b27cb002cc4412ea3a31c4e33` |
 | 2026-10-20 | 9 | Removidos os quatro workflows temporários de autocorreção ESLint, formatação e RuboCop, que tinham permissões de escrita e não devem ficar permanentes no repositório. | Exclusão aplicada em um único commit; o branch volta a não conter essas automações auxiliares. | `7cb2283839dafbf0d0b37d801944aeb7c830b4cf` |
-| 2026-10-20 | 10 | Corrigido o hook selector usando os dois genéricos necessários (`RootState` e tipo selecionado), e trocada a flag local mutável por um objeto `current` para evitar a falsa condição de cancelamento detectada pelo ESLint. | Nova execução completa da CI iniciada no SHA atual; resultados de ESLint, testes Ruby/E2E e migrações ainda precisam ser confirmados antes da validação. | `0aa9cbe36c65a2576b855fb5c3f1a7244586db94` |
-
-| Data (UTC) | Etapa | Alteração | Validação | SHA |
-|---|---|---|---|---|
-| 2026-10-20 | 11 | Restaurado o accessor `User#setting_theme_color` em `User::HasSettings` e adicionado teste unitário para assegurar que a preferência `web.theme_color` é exposta ao helper. | Correção publicada no canal de teste; a nova CI precisa confirmar o fim dos HTTP 500 de E2E, junto com ESLint, formatação, Ruby e migrações. | SHA pendente de CI |
+| 2026-10-20 | 10 | Corrigido o hook selector para usar os dois genéricos necessários (`RootState` e tipo selecionado). A tentativa com apenas um genérico foi descartada após a CI reportar 77 erros; a correção de tipos foi aplicada depois. | A CI do SHA inicial `0aa9cbe` ainda precisa ser distinguida dos resultados da revisão mais recente. | `0aa9cbe36c65a2576b855fb5c3f1a7244586db94` |
+| 2026-10-20 | 11 | Restaurado o accessor `User#setting_theme_color` em `User::HasSettings` e adicionado teste unitário que verifica a leitura de `web.theme_color`. | Corrige a causa confirmada de HTTP 500 em E2E; ainda depende de uma nova execução Ruby/E2E. | `1440c38caa507c27f030caee01375b7971700fa4` |
+| 2026-10-20 | 12 | Alinhada a matriz de Ruby de `test-ruby.yml` à versão declarada pelo projeto: removidos os jobs incompatíveis Ruby 3.3/3.4 e mantidas as três combinações de pesquisa na Ruby `.ruby-version` (4.0.7). | Comparado com `mastodon/mastodon/.github/workflows/test-ruby.yml` no commit upstream `55090c5ac5ca4d1c94c3e7de573e4ea90b731e54`. Nova CI ainda pendente. | `8546a9b75201d0ef5d061965de99276510b9e43c` |
+| 2026-10-20 | 13 | Temporariamente alterado o workflow de formatação para executar Oxfmt sem gravação no repositório e imprimir o diff no log. Isso foi usado apenas para obter a formatação oficial de `message_conversation.tsx`; o workflow será restaurado antes de terminar. | Oxfmt identificou um único ajuste no formato do seletor `statuses`; diff aplicado nesta revisão. | `980023f78c538d90187bc847c1cc32e91e07b447` |
+| 2026-10-20 | 14 | Tornada dinâmica a verificação de cancelamento em `message_conversation.tsx` para corrigir o último erro `no-unnecessary-condition` do ESLint. | O lint do commit anterior ainda falhava nessa condição; a CI precisa confirmar a correção no SHA final. | `9619a6618ed39a849ef889a488fcce6187b2f026` |
+| 2026-10-20 | 15 | Aplicado o diff exato gerado pelo Oxfmt ao seletor de mensagens diretas e consolidada a tabela de progresso em uma única tabela ignorada pelo formatador. | A CI final de formatação e lint será iniciada depois da restauração do workflow original. | SHA desta revisão a registrar no checkpoint final |
 
 ## Referências da execução
 
