@@ -81,3 +81,21 @@ Três refinamentos visuais do upstream foram integrados seletivamente no canal d
 - Tokens legados nos estilos do seletor de conta, conversas diretas e publicações agendadas foram trocados pelos tokens nativos do Mastodon. Na folha do Bird UI foi corrigido o único alias de raio encontrado na auditoria das 117 folhas SCSS.
 - Adicionada regressão RSpec garantindo que os tokens globais carreguem apenas o logotipo e que a paleta de instância fique limitada aos temas alternativos.
 - Arquivos preparados exclusivamente para `BlueLab-Test`; branch estável não alterada nem promovida. Build, RSpec e inspeção visual ainda dependem das verificações após commit.
+
+
+## Etapa 8 — isolamento do Vanilla por componentes upstream
+
+- Fonte usada para a implementação original: `mastodon/mastodon` no commit `5204e8ab940f870dbf13863ee92c48febfc4eedb` (base Mastodon 5.0 alpha.1). Referência: https://github.com/mastodon/mastodon/commit/5204e8ab940f870dbf13863ee92c48febfc4eedb
+- `app/javascript/styles/application.scss` foi verificado byte a byte contra essa referência upstream. `app/javascript/styles/mastodon/tokens/index.scss` também permanece idêntico ao upstream. Os aliases legados de espaçamento/raio continuam definidos somente em `body[data-theme='blue-2']` em `styles/blue-2-v23.scss`.
+- Foi adicionado `ColumnsAreaVanilla` em `features/ui/components/columns_area/index.tsx`, com roteamento explícito: `blue-2` usa a interface BlueLab, `mastodon-5` usa sua área dedicada, Bird UI mantém o fluxo próprio e o tema `default` usa a área Vanilla.
+- O Vanilla agora usa `vanilla_multi_column_content.tsx`, copiado do upstream, em vez do renderizador que contém integrações extras do BlueLab.
+- Foi copiada a pasta `features/compose/redesign` upstream para `features/compose/vanilla_redesign` (28 arquivos), preservando os imports relativos dentro do pacote. O Vanilla usa seu compositor React e SCSS próprios; o BlueLab continua usando `features/compose/redesign`.
+- A navegação Vanilla usa cópias upstream independentes dos componentes e folhas de estilo de painel, navegação móvel, cabeçalho, links, seção de listas, estado deslogado e menu de conta, dentro de `features/navigation_panel/redesign/vanilla_*`. A navegação móvel Vanilla aponta ao painel Vanilla e ao compositor Vanilla, sem importar o painel nem o compositor do BlueLab.
+- A seleção de tema e os arquivos de estilo foram rechecados; os novos arquivos Vanilla não contêm referências de runtime a BlueLab/Blue2. O bloco de layout BlueLab em `mastodon/components.scss` permanece isolado sob `body[data-theme='blue-2']`.
+
+### Validação desta etapa
+
+- Branch: `BlueLab-Test`; não houve alteração nem promoção para `BlueLab` (estável).
+- Commit de roteamento final até este checkpoint: `bd6a03170d081caabeff79a4a0b43f6d55f9e98e`.
+- As execuções GitHub Actions desse commit estavam em fila no momento do registro; por isso não considero lint, testes, build de produção nem comparação visual no navegador aprovados ainda. Os checks anteriores haviam apontado erros de formatação/CSS lint e expectativas de teste incompatíveis; os problemas encontrados foram corrigidos, mas a aprovação precisa ser confirmada em nova execução.
+- A validação visual em desktop/mobile e esquemas claro/escuro ainda é necessária. Não promover para estável até confirmar CI e teste manual do Vanilla, BlueLab e Bird UI.
