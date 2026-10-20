@@ -44,11 +44,17 @@ export const RedesignMobileNavigation: React.FC = () => {
     selectUnreadNotificationGroupsCount,
   );
   const unreadMessagesCount = useAppSelector((state) => {
-    const conversations = state.conversations.get('items') as ImmutableList<
+    const conversationsState = state.conversations as unknown as ImmutableMap<
+      string,
+      unknown
+    >;
+    const conversations = conversationsState.get('items') as ImmutableList<
       ImmutableMap<string, unknown>
     >;
 
-    return conversations.some((conversation) => conversation.get('unread'));
+    return conversations.some(
+      (conversation) => conversation.get('unread') === true,
+    );
   });
 
   if (!signedIn) {

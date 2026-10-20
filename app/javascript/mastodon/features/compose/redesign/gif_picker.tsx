@@ -104,8 +104,8 @@ export const ComposeGifButton: React.FC<{
         aria-expanded={open}
       >
         <FormattedMessage
-          id={messages.button.id}
-          defaultMessage={messages.button.defaultMessage}
+          id='gif_button.label'
+          defaultMessage='Insert GIF'
         />
       </IconButton>
 
@@ -204,7 +204,7 @@ const ComposeGifDropdown: React.FC<
       const payload = (await response.json()) as KlipyResponse;
       const items = (payload.results ?? []).filter((item) => {
         const formats = item.media_formats;
-        return Boolean(item.id && formats?.gif?.url && formats?.tinygif?.url);
+        return Boolean(item.id && formats && formats.gif?.url && formats.tinygif?.url);
       });
 
       setResults((current) => (isMore ? [...current, ...items] : items));
@@ -308,6 +308,13 @@ const ComposeGifDropdown: React.FC<
     [dispatch, onClose, registerShare, selectingId],
   );
 
+  const createGifPickHandler = useCallback(
+    (gif: KlipyGif) => () => {
+      void handleGifPick(gif);
+    },
+    [handleGifPick],
+  );
+
   const handleLoadMore = useCallback(() => {
     if (next) {
       void load(query.trim(), next);
@@ -331,8 +338,8 @@ const ComposeGifDropdown: React.FC<
         <div className={classes.titleRow}>
           <strong>
             <FormattedMessage
-              id={messages.title.id}
-              defaultMessage={messages.title.defaultMessage}
+              id='gif_button.title'
+              defaultMessage='GIFs'
             />
           </strong>
           <a
@@ -396,7 +403,7 @@ const ComposeGifDropdown: React.FC<
                   type='button'
                   className={classes.item}
                   disabled={!!selectingId}
-                  onClick={() => void handleGifPick(gif)}
+                  onClick={createGifPickHandler(gif)}
                   aria-label={title}
                 >
                   <img
@@ -433,8 +440,8 @@ const ComposeGifDropdown: React.FC<
               <CircularProgress size={18} strokeWidth={2} role='status' />
             ) : (
               <FormattedMessage
-                id={messages.loadMore.id}
-                defaultMessage={messages.loadMore.defaultMessage}
+                id='gif_button.load_more'
+                defaultMessage='Load more'
               />
             )}
           </button>
