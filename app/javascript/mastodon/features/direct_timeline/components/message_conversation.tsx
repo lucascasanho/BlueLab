@@ -664,16 +664,18 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           <div className={classes.messageListContent}>
             {statuses.map((status) => {
               const isMine = status.getIn(['account', 'id']) === me;
-              const displayAccount = status.get('account') as unknown as Account;
-              const mediaAttachments = status.get('media_attachments') as unknown as ImmutableList<
-                ImmutableMap<string, unknown>
-              >;
+              const displayAccount = status.get(
+                'account',
+              ) as unknown as Account;
+              const mediaAttachments = status.get(
+                'media_attachments',
+              ) as unknown as ImmutableList<ImmutableMap<string, unknown>>;
               const rawStatusText = status.get<'content'>('content');
               const statusText =
                 typeof rawStatusText === 'string' ? rawStatusText : '';
-              const mentions = status.get('mentions') as unknown as ImmutableList<
-                ImmutableMap<string, unknown>
-              >;
+              const mentions = status.get(
+                'mentions',
+              ) as unknown as ImmutableList<ImmutableMap<string, unknown>>;
               const trimmedText = statusText.trimStart();
               const showSenderName =
                 mentions.size > 1 ||
@@ -702,9 +704,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                 typeof rawReplyTargetText === 'string'
                   ? rawReplyTargetText
                   : '';
-              const replyTargetAccount = replyTarget?.get('account') as unknown as
-                | Account
-                | undefined;
+              const replyTargetAccount = replyTarget?.get(
+                'account',
+              ) as unknown as Account | undefined;
 
               return (
                 <article
@@ -756,9 +758,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                           defaultMessage='Replying to {name}'
                           values={{
                             name: (
-                              <DisplayNameSimple
-                                account={replyTargetAccount}
-                              />
+                              <DisplayNameSimple account={replyTargetAccount} />
                             ),
                           }}
                         />

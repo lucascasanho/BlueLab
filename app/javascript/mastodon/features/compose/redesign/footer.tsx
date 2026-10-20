@@ -1,11 +1,7 @@
 import type React from 'react';
 import { useCallback, useRef, useState } from 'react';
 
-import {
-  defineMessages,
-  FormattedMessage,
-  FormattedNumber,
-} from 'react-intl';
+import { defineMessages, FormattedMessage, FormattedNumber } from 'react-intl';
 
 import classNames from 'classnames';
 
