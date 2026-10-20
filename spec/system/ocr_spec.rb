@@ -24,8 +24,7 @@ RSpec.describe 'OCR', :attachment_processing, :inline_jobs, :js, :streaming do
         click_button frontend_translations('compose.upload.edit')
       end
 
-      # The image is already attached in Blue2, so use the editor's OCR action.
-      click_on(frontend_translations('alt_text_modal.add_text_from_image'))
+      # The image is already attached in Blue2; the shared OCR action runs below.
     else
       within('nav') do
         click_on frontend_translations('tabs_bar.publish')
@@ -36,11 +35,11 @@ RSpec.describe 'OCR', :attachment_processing, :inline_jobs, :js, :streaming do
           click_on(frontend_translations('upload_button.label'))
         end
 
-        click_on(frontend_translations('alt_text_badge.label'))
+          click_on(frontend_translations('alt_text_badge.label'))
       end
-
-      click_on(frontend_translations('alt_text_modal.add_text_from_image'))
     end
+
+    click_on(frontend_translations('alt_text_modal.add_text_from_image'))
 
     expect(page).to have_css('#description', text: /Hello Mastodon\s*/, wait: 20)
   end
