@@ -173,7 +173,7 @@ RSpec.describe ThemeHelper do
 
       it 'uses BlueLab as the default user theme' do
         expect(subject).to eq('blue-2')
-        expect(Setting.theme).to eq('mastodon-5')
+        expect(Setting.theme).to eq('mastodon-bird-ui-auto')
       end
     end
   end
