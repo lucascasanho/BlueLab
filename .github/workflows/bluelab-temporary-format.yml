@@ -1,0 +1,47 @@
+name: Temporary BlueLab format pass
+on:
+  push:
+    branches:
+      - BlueLab-Test
+    paths:
+      - '.github/workflows/bluelab-temporary-format.yml'
+permissions:
+  contents: write
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Set up JavaScript
+        uses: ./.github/actions/setup-javascript
+      - name: Record format base
+        run: echo "FORMAT_BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Run repository formatter
+        run: yarn format
+      - name: Commit formatter changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet; then
+            git add -u
+            HUSKY=0 LEFTHOOK=0 git -c core.hooksPath=/dev/null commit -m "style: format alpha merge fixes"
+            git push origin HEAD:refs/heads/BlueLab-Test
+          fi
+      - name: Export formatter diff if push fails
+        if: always()
+        run: |
+          git diff --binary "$FORMAT_BASE_SHA" > /tmp/bluelab-format.patch
+          git diff --stat "$FORMAT_BASE_SHA" > /tmp/bluelab-format-stat.txt
+          cat /tmp/bluelab-format-stat.txt
+      - name: Upload formatter diff
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: bluelab-format-diff
+          path: |
+            /tmp/bluelab-format.patch
+            /tmp/bluelab-format-stat.txt
+          if-no-files-found: error
+          retention-days: 1
