@@ -56,13 +56,6 @@ const DomainBlocks: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
-  const emptyMessage = (
-    <FormattedMessage
-      id='empty_column.domain_blocks'
-      defaultMessage='There are no blocked domains yet.'
-    />
-  );
-
   return (
     <Column
       bindToDocument={!multiColumn}
@@ -113,7 +106,7 @@ const DomainBlocks: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
         </title>
         <meta name='robots' content='noindex' />
       </Helmet>
-    </>
+    </Column>
   );
 };
 
