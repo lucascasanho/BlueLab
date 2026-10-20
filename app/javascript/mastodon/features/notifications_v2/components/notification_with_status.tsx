@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import { replyComposeById } from '@/mastodon/actions/compose_typed';
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
-import { replyComposeById } from 'mastodon/actions/compose';
 import { openConversationForStatus } from 'mastodon/actions/conversations';
 import { toggleReblog, toggleFavourite } from 'mastodon/actions/interactions';
 import {
