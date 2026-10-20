@@ -206,6 +206,7 @@ const StatusReblogButton: React.FC<{
   children: React.ReactNode;
 }> = ({ statusId, children }) => {
   const { boost, quote } = useStatusIcons(statusId);
+  const intl = useIntl();
 
   const handleShiftClick = useCallback(
     (e: React.MouseEvent) => {

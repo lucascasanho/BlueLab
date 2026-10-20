@@ -81,7 +81,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 }) => {
   const { id: routeId } = useParams<{ id: string }>();
   const id = conversationId ?? routeId;
-  const location = useLocation();
+  const location = useLocation<{ statusId?: string }>();
   const sourceStatusId = location.state?.statusId;
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -668,10 +668,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
               const mediaAttachments = status.get('media_attachments') as unknown as ImmutableList<
                 ImmutableMap<string, unknown>
               >;
+              const rawStatusText = status.get<'content'>('content');
               const statusText =
-                typeof status.get('content') === 'string'
-                  ? (status.get('content') as string)
-                  : '';
+                typeof rawStatusText === 'string' ? rawStatusText : '';
               const mentions = status.get('mentions') as unknown as ImmutableList<
                 ImmutableMap<string, unknown>
               >;
@@ -698,9 +697,10 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                     (candidate) => candidate.get('id') === replyTargetId,
                   )
                 : undefined;
+              const rawReplyTargetText = replyTarget?.get<'content'>('content');
               const replyTargetText =
-                replyTarget && typeof replyTarget.get('content') === 'string'
-                  ? (replyTarget.get('content') as string)
+                typeof rawReplyTargetText === 'string'
+                  ? rawReplyTargetText
                   : '';
               const replyTargetAccount = replyTarget?.get('account') as unknown as
                 | Account
@@ -739,8 +739,8 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                         },
                         {
                           name:
-                            replyTargetAccount?.display_name ||
-                            replyTargetAccount?.username ||
+                            replyTargetAccount?.display_name ??
+                            replyTargetAccount?.username ??
                             '',
                         },
                       )}
@@ -757,7 +757,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                           values={{
                             name: (
                               <DisplayNameSimple
-                                account={replyTargetAccount as Account}
+                                account={replyTargetAccount}
                               />
                             ),
                           }}
