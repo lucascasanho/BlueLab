@@ -21,20 +21,41 @@ jobs:
       - name: Set up JavaScript environment
         uses: ./.github/actions/setup-javascript
 
-      - name: Format only the changed isolation files
+      - name: Format only the Vanilla isolation files
         run: |
           yarn format \
             app/javascript/mastodon/components/account_header/styles.module.scss \
+            app/javascript/mastodon/components/button/vanilla_redesign.tsx \
+            app/javascript/mastodon/components/button/vanilla_redesign.module.scss \
             app/javascript/mastodon/components/form_fields/emoji_text_field.module.scss \
             app/javascript/mastodon/features/account_edit/styles.module.scss \
+            app/javascript/mastodon/features/compose/vanilla_redesign/emoji.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/footer.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/header.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/language.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/modal_cancel.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/modal_quote.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/modal_rearrange.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/modal_sensitive.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/modal_switch.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/poll.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/settings.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/trigger.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/upload.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/visibility.tsx \
             app/javascript/mastodon/features/navigation_panel/redesign/account_card_and_menu.module.scss \
+            app/javascript/mastodon/features/navigation_panel/redesign/vanilla_account_card_and_menu.tsx \
+            app/javascript/mastodon/features/navigation_panel/redesign/vanilla_logged_out_info.tsx \
             app/javascript/mastodon/features/navigation_panel/redesign/vanilla_mobile_nav.tsx \
+            app/javascript/mastodon/features/navigation_panel/redesign/vanilla_navigation_panel.tsx \
             app/javascript/mastodon/features/ui/components/columns_area/index.tsx \
             app/javascript/mastodon/features/ui/components/link_footer.module.scss \
             docs/bluelab-update-system/CHECKPOINT-2026-10-20-disposable-feed.md \
             docs/progress/mastodon-5-vanilla-visual-parity-2026-10-20.md
 
       - name: Commit formatting changes on the test branch
+        env:
+          HUSKY: 0
         run: |
           if git diff --quiet; then
             echo "The selected files are already formatted."
@@ -43,15 +64,9 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -u
           git add \
-            app/javascript/mastodon/components/account_header/styles.module.scss \
-            app/javascript/mastodon/components/form_fields/emoji_text_field.module.scss \
-            app/javascript/mastodon/features/account_edit/styles.module.scss \
-            app/javascript/mastodon/features/navigation_panel/redesign/account_card_and_menu.module.scss \
-            app/javascript/mastodon/features/navigation_panel/redesign/vanilla_mobile_nav.tsx \
-            app/javascript/mastodon/features/ui/components/columns_area/index.tsx \
-            app/javascript/mastodon/features/ui/components/link_footer.module.scss \
-            docs/bluelab-update-system/CHECKPOINT-2026-10-20-disposable-feed.md \
-            docs/progress/mastodon-5-vanilla-visual-parity-2026-10-20.md
+            app/javascript/mastodon/components/button/vanilla_redesign.tsx \
+            app/javascript/mastodon/components/button/vanilla_redesign.module.scss
           git commit -m "style: format Vanilla isolation patch"
           git push origin "HEAD:${GITHUB_REF_NAME}"
