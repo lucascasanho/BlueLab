@@ -316,7 +316,7 @@ function useTrackColumnHeaderHeight() {
   }, []);
 
   const headerRef = useCallback(
-    (node: HTMLDivElement | null) => {
+    (node: HTMLElement | null) => {
       const isMultiColumnLayout = !!document.querySelector(
         'body.layout-multiple-columns',
       );

@@ -233,18 +233,7 @@ export const RedesignNavigationPanel: React.FC<{
             <NavigationLink to='/home' iconComponent={HouseIcon}>
               <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
             </NavigationLink>
-            <NavigationLink
-              to={{
-                pathname: '/explore',
-                state: { focusTarget: FOCUS_TARGET.SEARCH },
-              }}
-              iconComponent={MagnifyingGlassIcon}
-            >
-              <FormattedMessage
-                id='tabs_bar.explore'
-                defaultMessage='Explore'
-              />
-            </NavigationLink>
+            <ExploreLink isBlue2={isBlue2} />
             {mode === 'slide-out' && isBlue2 && (
               <NavigationLink to='/favourites' iconComponent={StarIcon}>
                 <FormattedMessage
@@ -253,21 +242,7 @@ export const RedesignNavigationPanel: React.FC<{
                 />
               </NavigationLink>
             )}
-            <NavigationLink
-              withSpaceAfter
-              to='/public/local'
-              iconComponent={FediIcon}
-              isActive={isFediverseFeedsLinkActive}
-            >
-              {isBlue2 ? (
-                blue2Text(intl.locale, 'fediverseFeeds')
-              ) : (
-                <FormattedMessage
-                  id='tabs_bar.fediverse_feeds'
-                  defaultMessage='Fediverse Feeds'
-                />
-              )}
-            </NavigationLink>
+            <PublicFeedsLink isBlue2={isBlue2} />
             <ListSection
               id='custom-feeds'
               title={
@@ -436,7 +411,9 @@ export const RedesignNavigationPanel: React.FC<{
   );
 };
 
-const ExploreLink: React.FC = () => {
+const ExploreLink: React.FC<{ isBlue2: boolean }> = ({ isBlue2 }) => {
+  const intl = useIntl();
+
   return (
     <NavigationLink
       to={{
@@ -446,7 +423,9 @@ const ExploreLink: React.FC = () => {
       iconComponent={MagnifyingGlassIcon}
       onClick={handleSearchLinkClick}
     >
-      {trendsEnabled ? (
+      {isBlue2 ? (
+        blue2Text(intl.locale, 'explore')
+      ) : trendsEnabled ? (
         <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
       ) : (
         <FormattedMessage id='navigation_bar.search' defaultMessage='Search' />
@@ -474,7 +453,8 @@ export function handleSearchLinkClick() {
   invokeVirtualIosKeyboard();
 }
 
-const PublicFeedsLink: React.FC = () => {
+const PublicFeedsLink: React.FC<{ isBlue2: boolean }> = ({ isBlue2 }) => {
+  const intl = useIntl();
   const { signedIn, permissions } = useIdentity();
 
   const canViewLocalFeed = canViewFeed(
@@ -496,11 +476,14 @@ const PublicFeedsLink: React.FC = () => {
 
   return (
     <NavigationLink
+      withSpaceAfter
       to={canViewLocalFeed ? '/public/local' : '/public/remote'}
       iconComponent={FediIcon}
       isActive={isFediverseFeedsLinkActive}
     >
-      {canViewOnlyOneFeed ? (
+      {isBlue2 ? (
+        blue2Text(intl.locale, 'fediverseFeeds')
+      ) : canViewOnlyOneFeed ? (
         <FormattedMessage
           id='tabs_bar.public_feed'
           defaultMessage='Public Feed'
