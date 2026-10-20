@@ -99,3 +99,10 @@ Três refinamentos visuais do upstream foram integrados seletivamente no canal d
 - Commit de roteamento final até este checkpoint: `bd6a03170d081caabeff79a4a0b43f6d55f9e98e`.
 - As execuções GitHub Actions desse commit estavam em fila no momento do registro; por isso não considero lint, testes, build de produção nem comparação visual no navegador aprovados ainda. Os checks anteriores haviam apontado erros de formatação/CSS lint e expectativas de teste incompatíveis; os problemas encontrados foram corrigidos, mas a aprovação precisa ser confirmada em nova execução.
 - A validação visual em desktop/mobile e esquemas claro/escuro ainda é necessária. Não promover para estável até confirmar CI e teste manual do Vanilla, BlueLab e Bird UI.
+
+
+## Etapa 9 — isolamento adicional do contêiner de colunas
+
+- As folhas de estilo `styles.module.scss` e `styles_multi_column.module.scss` do contêiner de colunas também foram copiadas do commit upstream `5204e8ab940f870dbf13863ee92c48febfc4eedb` para `vanilla_styles.module.scss` e `vanilla_styles_multi_column.module.scss`.
+- `ColumnsAreaVanilla` usa agora exclusivamente essas folhas Vanilla e `vanilla_multi_column_content.tsx`. Assim, a área Vanilla não importa as classes CSS-module estendidas usadas pelo layout BlueLab/Bird UI.
+- Último commit de código desta sequência: `0e0a43fbffac21ba36f794d6ff642abe16839122`. Os workflows para esse commit foram criados no GitHub, mas ainda estavam em `queued`/`pending` durante a checagem. Não há aprovação automatizada comprovada nem teste visual concluído.
