@@ -46,11 +46,8 @@ import { me } from '@/mastodon/initial_state';
 import type { StatusShape } from '@/mastodon/models/status';
 import { dismissComposer } from '@/mastodon/reducers/slices/composer';
 import { makeGetStatus } from '@/mastodon/selectors';
-import {
-  useAppDispatch,
-  useAppSelector,
-  type RootState,
-} from '@/mastodon/store';
+import type { RootState } from '@/mastodon/store';
+import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import ReplyIcon from '@/material-icons/400-24px/reply.svg?react';
 import StarIcon from '@/material-icons/400-24px/star-fill.svg?react';
 import StarBorderIcon from '@/material-icons/400-24px/star.svg?react';
@@ -224,7 +221,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
     const disconnect = inline ? undefined : dispatch(connectDirectStream());
 
-    const cancelled = { current: false };
+    const cancelled: { current: boolean } = { current: false };
 
     if (id) {
       const requestedId = id;
