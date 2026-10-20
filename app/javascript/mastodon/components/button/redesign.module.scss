@@ -313,13 +313,7 @@ a.base {
     }
   }
   
-  @mixin active {
-    &:active,
-    &[aria-pressed='true']:not(.noActiveHighlight),
-    &[aria-expanded='true']:not(.noActiveHighlight) {
-      @content;
-    }
-  }
+
   
   // Sizes
   
