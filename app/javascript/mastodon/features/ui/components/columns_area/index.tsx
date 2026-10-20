@@ -146,7 +146,12 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
 
   if (minimalShell) {
     return (
-      <div ref={ref} className={classNames(vanillaClasses.root, vanillaClasses.rootMinimal)}>
+      <div
+        ref={ref}
+        className={classNames(
+          vanillaClasses.root,
+          vanillaClasses.rootMinimal,
+        )}
         {isMobile && <VanillaMobileNavigation />}
         <div className={vanillaClasses.main}>
           <div>{children}</div>
@@ -162,7 +167,11 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
         <div className={vanillaClasses.navigationWrapper}>
           <VanillaNavigationPanel />
         </div>
-        {isMobile ? <VanillaMobileNavigation /> : <VanillaComposeRedesignButton />}
+        {isMobile ? (
+          <VanillaMobileNavigation />
+        ) : (
+          <VanillaComposeRedesignButton />
+        )}
 
         <main className={vanillaClasses.main}>{children}</main>
 
