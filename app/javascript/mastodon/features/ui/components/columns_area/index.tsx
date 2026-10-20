@@ -152,6 +152,7 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
           vanillaClasses.root,
           vanillaClasses.rootMinimal,
         )}
+      >
         {isMobile && <VanillaMobileNavigation />}
         <div className={vanillaClasses.main}>
           <div>{children}</div>
