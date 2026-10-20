@@ -68,7 +68,7 @@ RSpec.describe ThemeHelper do
       root_tokens = css.match(/:root\s*\{([^}]*)\}/m)&.captures&.first
 
       expect(root_tokens).to include('--instance-logo:')
-      expect(root_tokens).not_to include('--color-bg-brand-base')
+      expect(root_tokens).to_not include('--color-bg-brand-base')
       expect(css).to include('html:has(body[data-theme=blue-2])')
       expect(css).to include('html:has(body[data-theme=mastodon-bird-ui-auto])')
       expect(css).to include('html[data-color-scheme=dark]:has(body[data-theme=blue-2])')
@@ -125,7 +125,7 @@ RSpec.describe ThemeHelper do
     subject { helper.current_theme }
 
     before do
-      allow(Themes.instance).to receive(:names).and_return %w(default blue-2 mastodon-5)
+      allow(Themes.instance).to receive(:names).and_return %w(default blue-2 mastodon-bird-ui-auto)
     end
 
     context 'when the administrator selected BlueLab' do
@@ -135,16 +135,16 @@ RSpec.describe ThemeHelper do
     end
 
     context 'when the administrator selected another selectable theme' do
-      before { Setting.theme = 'mastodon-5' }
+      before { Setting.theme = 'mastodon-bird-ui-auto' }
 
-      it { is_expected.to eq('mastodon-5') }
+      it { is_expected.to eq('mastodon-bird-ui-auto') }
     end
 
     context 'when the administrator theme is invalid' do
       before { Setting.theme = 'missing-theme' }
 
-      it 'falls back to BlueLab' do
-        expect(subject).to eq('blue-2')
+      it 'falls back to Vanilla' do
+        expect(subject).to eq('default')
       end
     end
 
@@ -153,12 +153,12 @@ RSpec.describe ThemeHelper do
 
       before do
         allow(helper).to receive(:current_user).and_return(current_user)
-        current_user.settings.update(bluelab_theme: 'mastodon-5', noindex: false)
+        current_user.settings.update(bluelab_theme: 'mastodon-bird-ui-auto', noindex: false)
         Setting.theme = 'blue-2'
       end
 
       it 'uses the personal preference without changing the administrator theme' do
-        expect(subject).to eq('mastodon-5')
+        expect(subject).to eq('mastodon-bird-ui-auto')
         expect(Setting.theme).to eq('blue-2')
       end
     end
@@ -168,7 +168,7 @@ RSpec.describe ThemeHelper do
 
       before do
         allow(helper).to receive(:current_user).and_return(current_user)
-        Setting.theme = 'mastodon-5'
+        Setting.theme = 'mastodon-bird-ui-auto'
       end
 
       it 'uses BlueLab as the default user theme' do
