@@ -4,7 +4,7 @@ Atualizado em: 2026-10-20 (UTC)
 Repositório: [lucascasanho/BlueLab](https://github.com/lucascasanho/BlueLab)  
 Canal de trabalho: `BlueLab-Test`  
 SHA auditado no início desta retomada: `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea`  
-Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código conferido: `551d3188bcb26f4ccd85aeb7545c412fe5c8f339`; jobs de validação ainda estão na fila.
+Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código: `75ff3a9e54c74a7ea0c569ce75424f171452e47e`; os jobs de CI dos SHAs anteriores ainda aguardam execução e uma nova rodada foi disparada.
 
 ## Escopo e proteções
 
@@ -27,6 +27,17 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 - Também há evidência de discrepância entre migrações e `db/schema.rb`: o modelo/testes de selo de verificação usam `verified_badge_visible`, coluna ausente do schema exportado, apesar de existir a migração `db/migrate/20260926151300_add_verified_badge_visible_to_accounts.rb`.
 - O commit `8b2c6e8281065a0bd968d9134920bc36ff78b3da` já tentou incluir tabelas BlueLab no schema, mas a execução atual demonstra que é necessário conferir a cobertura de colunas/tabelas customizadas, não apenas o nome do commit.
 - O PR #201 usa `qa/mastodon-5-alpha-validation-20261019` como base e `BlueLab-Test` como head, foi criado exclusivamente para disparar CI e **não deve ser mesclado**.
+
+## Auditoria de divergência com o canal estável
+
+Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos os lados; o branch de teste contém a base Mastodon 5 alpha e não pode receber um merge geral do estável sem revisão. Foram comparados os arquivos dos commits estáveis recentes relacionados a PWA, ícones de resposta e layout:
+
+- A tela de instalação PWA de `BlueLab-Test` já contém a estrutura com título, mensagem e ações separadas; o código e SCSS no teste são mais completos que os arquivos estáveis antigos. Mantida a versão do teste.
+- `app/serializers/manifest_serializer.rb` no teste escolhe as dimensões de screenshots conforme a instância (`mastodon-blue`: 473x936 e 1891x936; `espelunca-social`: 471x939 e 1890x940). A versão estável analisada possuía dimensões hard-coded para Espelunca. Mantida a versão do teste.
+- Os screenshots `espelunca-social-narrow.png` e `espelunca-social-wide.png` têm os mesmos blobs em ambos os branches; os screenshots `mastodon-blue-narrow.png` e `mastodon-blue-wide.png` do teste são mais recentes e foram preservados.
+- As correções de ícones de resposta no componente legado e no componente de status estão presentes no teste; o filtro de notificações já tinha a mesma lógica de escolher `StatusReplyIcon`/ícone legado conforme o redesign.
+- Portadas seletivamente as diferenças confirmadas: remover a regra CSS antiga que deslocava o botão de voltar ao topo, e restaurar a ação de política de citação só para o menu legado. Não foi feito merge nem cherry-pick cego do histórico estável.
+
 
 ## Etapas
 
@@ -119,6 +130,9 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 
 | 2026-10-20 | 40 | Feito narrowing explícito do tipo de conta da resposta relacionada, evitando converter diretamente uma string do modelo de status no tipo de conta esperado pelo componente. | Correção publicada; TypeScript/ESLint ainda pendentes. | `0e76a843327d8deb1647e5c6c45c84edfdff2de7` |
 | 2026-10-20 | 41 | Evitada navegação para conversa inexistente ao validar IDs recuperados; o scroll pendente agora é associado ao ID da conversa e deixa de ser apagado sincronamente dentro de um efeito. | Correção funcional publicada; lint, testes JS e E2E pendentes. | `551d3188bcb26f4ccd85aeb7545c412fe5c8f339` |
+
+| 2026-10-20 | 42 | Portada do estável a correção do scroll-to-top: removido o override desktop antigo que alterava `left` no tema BlueLab, preservando o posicionamento responsivo atual. | Patch aplicado em `BlueLab-Test`; CI ainda pendente. | `45d1a9f0c706acaaa823c006d123e14a1aa9bda8` |
+| 2026-10-20 | 43 | Restaurada a ação de mudança de política de citação no menu da interface legada, condicionada a `!isRedesignEnabled()`, sem expô-la no redesign. | Portado seletivamente do estável após comparação de arquivos; CI pendente. | `75ff3a9e54c74a7ea0c569ce75424f171452e47e` |
 
 ## Referências da execução
 
