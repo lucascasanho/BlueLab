@@ -35,14 +35,14 @@ const pathOnly = (value: unknown) => {
   if (!raw) return '';
 
   if (typeof window === 'undefined') {
-    return raw.split('?')[0].slice(0, 500);
+    return (raw.split('?')[0] ?? '').slice(0, 500);
   }
 
   try {
     const url = new URL(raw, window.location.origin);
     return url.pathname;
   } catch {
-    return raw.split('?')[0].slice(0, 500);
+    return (raw.split('?')[0] ?? '').slice(0, 500);
   }
 };
 
