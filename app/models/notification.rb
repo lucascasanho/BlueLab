@@ -254,7 +254,7 @@ class Notification < ApplicationRecord
     case activity_type
     when 'Status'
       self.from_account_id = type == :quoted_update ? activity&.quote&.quoted_account_id : activity&.account_id
-    when 'Follow', 'Favourite', 'FollowRequest', 'Poll', 'Report', 'Quote', 'Collection'
+    when 'Follow', 'Favourite', 'FollowRequest', 'Poll', 'Report', 'Quote', 'Collection', 'VerificationRequest'
       self.from_account_id = activity&.account_id
     when 'CollectionItem'
       self.from_account_id = activity&.collection&.account_id
@@ -262,8 +262,6 @@ class Notification < ApplicationRecord
       self.from_account_id = activity&.status&.account_id
     when 'Account'
       self.from_account_id = activity&.id
-    when 'VerificationRequest'
-      self.from_account_id = activity&.account_id
     when 'AccountRelationshipSeveranceEvent', 'AccountWarning', 'GeneratedAnnualReport'
       # These do not really have an originating account, but this is mandatory
       # in the data model, and the recipient's account will by definition

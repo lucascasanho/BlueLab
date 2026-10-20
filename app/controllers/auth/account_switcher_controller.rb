@@ -30,7 +30,7 @@ class Auth::AccountSwitcherController < ApplicationController
     end
 
     activate_account_session(target_user)
-    set_warden_user(target_user)
+    assign_warden_user(target_user)
     redirect_to root_path
   end
 
@@ -60,7 +60,7 @@ class Auth::AccountSwitcherController < ApplicationController
       same_site: :lax,
     }
 
-    set_warden_user(activation.user)
+    assign_warden_user(activation.user)
 
     render json: {
       ok: true,
@@ -122,7 +122,7 @@ class Auth::AccountSwitcherController < ApplicationController
     session.delete(:account_switcher_attempt_user_updated_at)
 
     activate_account_session(user)
-    set_warden_user(user)
+    assign_warden_user(user)
     redirect_to root_path
   rescue OpenSSL::Cipher::CipherError
     redirect_to auth_account_switcher_two_factor_path, alert: I18n.t('users.invalid_otp_token')
@@ -139,7 +139,7 @@ class Auth::AccountSwitcherController < ApplicationController
     }
   end
 
-  def set_warden_user(user)
+  def assign_warden_user(user)
     warden.set_user(user, scope: :user)
   end
 end

@@ -27,7 +27,7 @@ class Api::V1::ConversationsController < Api::BaseController
 
     conversation.participant_accounts = matching_conversations
       .flat_map(&:participant_accounts)
-      .uniq { |account| account.id }
+      .uniq(&:id)
 
     render json: conversation,
            serializer: REST::ConversationSerializer,
