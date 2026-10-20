@@ -19,7 +19,7 @@ jobs:
       - name: Record ESLint base
         run: echo "ESLINT_BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Apply ESLint autocorrections
-        run: yarn eslint --cache --report-unused-disable-directives --fix
+        run: yarn eslint --cache --report-unused-disable-directives --fix || true
       - name: Commit safe corrections
         run: |
           git config user.name "github-actions[bot]"
