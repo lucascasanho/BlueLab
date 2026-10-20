@@ -4,7 +4,7 @@ Atualizado em: 2026-10-20 (UTC)
 Repositório: [lucascasanho/BlueLab](https://github.com/lucascasanho/BlueLab)  
 Canal de trabalho: `BlueLab-Test`  
 SHA auditado no início desta retomada: `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea`  
-Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código registrado: `edcdad5fe6ee710e56c5c9f990f45e618c7de5fb`. No SHA anterior `d0a8ab0`, lint JavaScript/Ruby, JS Testing, formatação, CSS/Haml, audit, migrações históricas, build de produção e imagem de teste passaram, mas o E2E falhou em três exemplos. Os specs foram atualizados e aguardam nova CI.
+Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código auditado antes desta correção: `4c22a20b692fb8b1cacdc1007e9d231c463e214f`. Na CI desse SHA, build de produção, JS lint/testes, Ruby lint, formatação, CSS/Haml, audit, migrações históricas, imagem de teste e integrações OpenSearch passaram; o E2E ficou em 28/29 exemplos, com a localização do botão de conta no logout como única falha. A suíte Ruby completa ainda estava em execução.
 
 ## Escopo e proteções
 
@@ -22,7 +22,7 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 ### CI do SHA anterior `d0a8ab004b77ae552c2e3c691ce4d82513fd4763`
 
 - **Passou no SHA `d0a8ab0`:** build de produção; JavaScript Linting; JavaScript Testing; `Check formatting`; Ruby Linting; CSS Linting; Haml Linting; Bundler Audit; Historical data migration test; Test container image build.
-- **Falhou no E2E do SHA `d0a8ab0`:** três casos (`new_statuses_spec.rb`, `ocr_spec.rb`, `log_out_spec.rb`). A publicação retornou HTTP 200, mas o teste esperava encontrar o post na timeline Seguindo vazia; o teste OCR tentava repetir o upload enquanto o editor da mídia já estava aberto; o teste de logout procurava o acionador de configurações dentro do elemento `nav`, embora ele esteja fora desse contêiner no shell redesign. O RSpec completo foi cancelado pelo workflow depois da falha E2E, então ainda é necessário uma execução integral.
+- **Falhou no E2E do SHA `d0a8ab0`:** três casos (`new_statuses_spec.rb`, `ocr_spec.rb`, `log_out_spec.rb`). A publicação retornou HTTP 200, mas o teste esperava encontrar o post na timeline Seguindo vazia; o teste OCR tentava repetir o upload enquanto o editor da mídia já estava aberto; o teste de logout procurava o acionador de configurações dentro do elemento `nav`, embora ele esteja fora desse contêiner no shell redesign. As correções da etapa 62 fizeram publicação e OCR passarem na rodada seguinte. No SHA `4c22a20`, o E2E passou 28/29: a falha restante foi o teste de logout usando `click_button` pelo texto em um acionador Blue2 icon-only cujo nome acessível vem de `aria-label`. O seletor foi ajustado na etapa 63. A suíte Ruby completa ainda não havia terminado.
 - O primeiro bloqueio E2E (`Themes#available_theme_colors` ausente e `config/themes.yml` no formato antigo) foi corrigido na etapa 2 pelo commit `b573c59c`. Uma rodada posterior identificou `User#setting_theme_color` ausente no helper de tema; o accessor e um teste unitário foram adicionados no commit `1440c38c`. A correção precisa ser confirmada por uma nova rodada E2E.
 - A CI Ruby do SHA `bc5bbed` revelou que `BugReportsController#sanitize_path` chamava `truncate` sobre `nil` quando `current_path` era uma string vazia (`''.split('?').first`); esse cenário já é coberto pelo spec de relato iniciado numa página de erro. A correção em `007ddc85` transforma a primeira parte ausente em string vazia antes de truncar.
 - Os specs também confirmaram que o seletor de tema do site para papéis com `manage_settings` estava ausente da tela de aparência, apesar de as traduções e os exemplos já estarem no repositório. A UI e a persistência via `Setting.theme` foram restauradas no commit `e203d9ae`; a segurança do update é verificada pela permissão do papel e pela lista de temas existente.
@@ -163,6 +163,8 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 | 2026-10-20 | 61 | Corrigidos specs de UI/E2E para refletir o compositor redesign atual; o último commit ajusta os testes do composer sem alterar o canal estável. | No SHA `d0a8ab0`, JS/Ruby lint, JS Testing, formatação, CSS/Haml, audit, migrações históricas, build e integrações de busca passaram, mas 3 E2E de sistema falharam. O branch estável segue em `ce1269b9c3751a90a9214a1fab1aafbceb09e522`; não houve promoção. | `d0a8ab004b77ae552c2e3c691ce4d82513fd4763` |
 | 2026-10-20 | 62 | Ajustados três specs E2E para refletir os fluxos atuais do Blue2: após publicar, abrir o status pela ação “Open”; usar OCR diretamente no editor de mídia Blue2 sem upload duplicado; e acionar o menu de conta fora do `nav` antes de sair. | Alterações de testes apenas. A nova execução de CI precisa confirmar os seletores, a publicação e o fluxo de OCR/logout. O teste de publicação continua verificando o conteúdo do status persistido, não apenas a notificação. | `edcdad5fe6ee710e56c5c9f990f45e618c7de5fb` |
 
+| 2026-10-20 | 63 | Corrigido o seletor E2E de logout: usa o botão Blue2 por `aria-label` quando presente, com fallback para o botão de texto do shell padrão. | O log do SHA `4c22a20` mostrou 28/29 exemplos E2E passando; a falha única era `Capybara::ElementNotFound` para “Account settings”. Nova CI ainda pendente para validar o ajuste. | SHA deste commit |
+
 ## Referências da execução
 
 - Branch de teste: [BlueLab-Test](https://github.com/lucascasanho/BlueLab/tree/BlueLab-Test)
@@ -173,7 +175,8 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 - Ruby Linting: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818340) (sucesso)
 - Migrações históricas: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818352) (sucesso)
 - Imagem de teste: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818367) (sucesso)
-- Ruby Testing: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818366) (integrações de busca passaram; E2E falhou em 3 exemplos e a suíte Ruby foi cancelada; nova rodada pendente)
+- Ruby Testing: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818366) (integrações de busca passaram; E2E falhou em 3 exemplos; corrigidos os specs nas etapas 62–63)  
+- E2E mais recente antes da etapa 63: [run `39392623781`](https://github.com/lucascasanho/BlueLab/actions/runs/39392623781) (28/29 exemplos passaram; falha única do acionador de logout identificada e corrigida no checkpoint seguinte)
 - Ruby Linting que identificou os offenses de indentação: [SHA `fc62e7c`](https://github.com/lucascasanho/BlueLab/actions/runs/39386147557) (falhou antes das correções de specs)
 - Migrações históricas: [SHA `fc62e7c`](https://github.com/lucascasanho/BlueLab/actions/runs/39386147589) (sucesso; repetir no SHA consolidado)
 - PR de validação: [#201 — QA only: validate Mastodon 5.0.0-alpha.1 merge on BlueLab-Test](https://github.com/lucascasanho/BlueLab/pull/201); não mesclar

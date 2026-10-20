@@ -34,8 +34,14 @@ RSpec.describe 'Log out' do
       expect(page)
         .to have_css('body', class: 'app-body')
 
-      # The account-settings trigger lives outside the main nav in the redesigned shell.
-      click_button frontend_translations('tabs_bar.account_settings')
+      # In Blue2 the account menu is an icon-only button named via aria-label.
+      # The default redesigned shell exposes the label as visible button text.
+      account_settings_selector = 'button[aria-label="Account settings"]'
+      if page.has_css?(account_settings_selector)
+        find(account_settings_selector).click
+      else
+        click_button frontend_translations('tabs_bar.account_settings')
+      end
       click_on frontend_translations('navigation_bar.logout')
       click_on frontend_translations('confirmations.logout.confirm')
 
