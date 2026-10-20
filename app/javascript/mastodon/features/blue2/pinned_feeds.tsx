@@ -23,6 +23,17 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import classes from './pinned_feeds.module.scss';
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  !!value && typeof value === 'object';
+
+const isBlue2PinnedFeed = (value: unknown): value is Blue2PinnedFeed =>
+  isRecord(value) &&
+  typeof value.key === 'string' &&
+  (value.type === 'list' || value.type === 'hashtag') &&
+  typeof value.id === 'string' &&
+  typeof value.title === 'string' &&
+  typeof value.path === 'string';
+
 export interface Blue2PinnedFeed {
   key: string;
   type: 'list' | 'hashtag';
@@ -48,21 +59,7 @@ const readPinnedFeeds = (
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
 
-    return parsed.filter(
-      (feed): feed is Blue2PinnedFeed =>
-        !!feed &&
-        typeof feed === 'object' &&
-        'key' in feed &&
-        'type' in feed &&
-        'id' in feed &&
-        'title' in feed &&
-        'path' in feed &&
-        (feed.type === 'list' || feed.type === 'hashtag') &&
-        typeof feed.key === 'string' &&
-        typeof feed.id === 'string' &&
-        typeof feed.title === 'string' &&
-        typeof feed.path === 'string',
-    );
+    return parsed.filter(isBlue2PinnedFeed);
   } catch {
     return [];
   }
@@ -71,32 +68,13 @@ const readPinnedFeeds = (
 const parsePinnedFeeds = (value: unknown): Blue2PinnedFeed[] => {
   let parsed: unknown = value;
 
-  if (
-    parsed &&
-    typeof parsed === 'object' &&
-    'toJS' in parsed &&
-    typeof parsed.toJS === 'function'
-  ) {
-    parsed = parsed.toJS();
+  if (isRecord(parsed) && typeof parsed.toJS === 'function') {
+    parsed = (parsed.toJS as () => unknown).call(parsed);
   }
 
   if (!Array.isArray(parsed)) return [];
 
-  return parsed.filter(
-    (feed): feed is Blue2PinnedFeed =>
-      !!feed &&
-      typeof feed === 'object' &&
-      'key' in feed &&
-      'type' in feed &&
-      'id' in feed &&
-      'title' in feed &&
-      'path' in feed &&
-      (feed.type === 'list' || feed.type === 'hashtag') &&
-      typeof feed.key === 'string' &&
-      typeof feed.id === 'string' &&
-      typeof feed.title === 'string' &&
-      typeof feed.path === 'string',
-  );
+  return parsed.filter(isBlue2PinnedFeed);
 };
 
 export const useBlue2PinnedFeeds = () => {
