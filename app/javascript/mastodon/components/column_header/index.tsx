@@ -5,7 +5,12 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { useLocation } from 'react-router';
 
-import { ArrowLeftIcon, ArrowUpIcon, DotsThreeIcon, ListIcon } from '@phosphor-icons/react';
+import {
+  ArrowLeftIcon,
+  ArrowUpIcon,
+  DotsThreeIcon,
+  ListIcon,
+} from '@phosphor-icons/react';
 import type { DistributedOmit } from 'type-fest';
 
 import { openNavigation } from '@/mastodon/actions/navigation';

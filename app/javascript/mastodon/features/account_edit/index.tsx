@@ -132,12 +132,14 @@ export const AccountEdit: FC = () => {
 
   const { profile, isPending } = useAppSelector((state) => state.profileEdit);
   const [badgeVisibilitySaving, setBadgeVisibilitySaving] = useState(false);
-  const [badgeVisibleOverride, setBadgeVisibleOverride] = useState<boolean | null>(null);
-  const badgeVisible = badgeVisibleOverride ?? (account?.verified_badge_visible !== false);
+  const [badgeVisibleOverride, setBadgeVisibleOverride] = useState<
+    boolean | null
+  >(null);
+  const badgeVisible =
+    badgeVisibleOverride ?? (account?.verified_badge_visible !== false);
   useEffect(() => {
     void dispatch(fetchProfile());
   }, [dispatch]);
-
 
   const maxFieldCount = useAppSelector(
     (state) =>

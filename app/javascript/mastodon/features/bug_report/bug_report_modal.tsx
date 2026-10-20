@@ -233,11 +233,11 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
     }
   }, [copy, description, files, intl.locale]);
 
-  const handleDescriptionChange = useCallback<
-    React.ChangeEventHandler<HTMLTextAreaElement>
-  >((event) => {
-    setDescription(event.target.value);
-  }, []);
+  const handleDescriptionChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) =>
+      setDescription(event.target.value),
+    [],
+  );
 
   const handleDragOver = useCallback<React.DragEventHandler<HTMLDivElement>>(
     (event) => {
@@ -247,12 +247,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
     [],
   );
 
-  const handleDragLeave = useCallback<React.DragEventHandler<HTMLDivElement>>(
-    () => {
-      setDragging(false);
-    },
-    [],
-  );
+  const handleDragLeave = useCallback(() => setDragging(false), []);
 
   const handleDrop = useCallback<React.DragEventHandler<HTMLDivElement>>(
     (event) => {

@@ -85,10 +85,7 @@ export const useBlue2PinnedFeeds = () => {
     state.settings.getIn(['blue2', 'pinned_feeds']),
   );
 
-  const legacyFeeds = useMemo(
-    () => readPinnedFeeds(accountId),
-    [accountId],
-  );
+  const legacyFeeds = useMemo(() => readPinnedFeeds(accountId), [accountId]);
 
   const serverValueExists =
     serverPinnedFeeds !== undefined && serverPinnedFeeds !== null;
