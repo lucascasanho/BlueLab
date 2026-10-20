@@ -32,18 +32,18 @@ import {
 } from '@/mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
+import { AccountMenuItems } from './vanilla_account_card_and_menu';
+import classes from './vanilla_mobile_nav.module.scss';
+import { LogoLockup } from './vanilla_navigation_header';
+import {
+  MobileNavLink,
+  MobileNavProfileButton,
+} from './vanilla_navigation_link';
 import {
   RedesignNavigationPanel,
   useNotificationsCount,
   handleSearchLinkClick,
 } from './vanilla_navigation_panel';
-import { AccountMenuItems } from './vanilla_account_card_and_menu';
-import { LogoLockup } from './vanilla_navigation_header';
-import classes from './vanilla_mobile_nav.module.scss';
-import {
-  MobileNavLink,
-  MobileNavProfileButton,
-} from './vanilla_navigation_link';
 
 export const RedesignMobileNavigation: React.FC = () => {
   const dispatch = useAppDispatch();
