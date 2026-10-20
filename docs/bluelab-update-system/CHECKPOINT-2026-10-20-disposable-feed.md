@@ -56,25 +56,24 @@ Data: 2026-10-20 Canal autorizado: `BlueLab-Test`
 ## Problemas identificados
 
 -A página `Aparência da conta` renderizava o seletor `instance_theme` para
- administradores junto do seletor individual `bluelab_theme`. Isso misturava a
- preferência pessoal com a configuração global da instância.
+administradores junto do seletor individual `bluelab_theme`. Isso misturava a
+preferência pessoal com a configuração global da instância.
 -`Themes::USER_SELECTABLE_NAMES` já permitia `default` (Vanilla), mas a
- definição `UserSettings` ainda permitia `mastodon-5` e rejeitava `default`.
- Essa divergência fazia a gravação da preferência Vanilla falhar.
+definição `UserSettings` ainda permitia `mastodon-5` e rejeitava `default`. Essa
+divergência fazia a gravação da preferência Vanilla falhar.
 
 ## Correções publicadas em BlueLab-Test
 
 -`5d8bb8320779370e1cc74939883fb3c3a375da6b`: remove o tratamento de
- `instance_theme` do controller de preferências; a página de conta não altera
- mais `Setting.theme` global.
--`876494014dd7ff17f9f5af58cd1ad7b1b7953864`: remove o seletor administrativo da
- página pessoal; a configuração global permanece na tela administrativa própria.
--`bb36873ae49eeee53f9a9cb06e6f6e388aaa1315`: alinha os valores válidos de
- `bluelab_theme` com os temas selecionáveis, incluindo `default`/Vanilla e
- removendo o identificador obsoleto `mastodon-5`.
+`instance_theme` do controller de preferências; a página de conta não altera
+mais `Setting.theme` global. -`876494014dd7ff17f9f5af58cd1ad7b1b7953864`: remove
+o seletor administrativo da página pessoal; a configuração global permanece na
+tela administrativa própria. -`bb36873ae49eeee53f9a9cb06e6f6e388aaa1315`: alinha
+os valores válidos de `bluelab_theme` com os temas selecionáveis, incluindo
+`default`/Vanilla e removendo o identificador obsoleto `mastodon-5`.
 -`f9350c1ffce88677777eeed126119214543268c6`: adiciona testes de requisição para
- o único seletor individual, salvamento de Vanilla sem alterar o tema global, e
- rejeição de valores desconhecidos.
+o único seletor individual, salvamento de Vanilla sem alterar o tema global, e
+rejeição de valores desconhecidos.
 
 ## Validação pendente
 
@@ -99,17 +98,15 @@ Data: 2026-10-20 Canal autorizado: `BlueLab-Test`
 ## Escopo da alteração
 
 -O layout de autenticação usa a logo carregada da instância (com fallback para
- favicon da instância) e o nome configurado, inclusive nos fluxos em que antes
- era mostrado o wordmark Mastodon.
--O layout administrativo usa um cabeçalho de instância consistente em desktop e
- mobile, incluindo preferências, administração e moderação.
--O helper `render_logo` deixa de apontar diretamente para a arte estática do
- Mastodon.
--A folha de estilos global injeta a logo da instância nas variantes SVG de logo
- da aplicação sem alterar os tamanhos intrínsecos dos elementos; a variável CSS
- usa a logo de autenticação ou o favicon como fallback.
+favicon da instância) e o nome configurado, inclusive nos fluxos em que antes
+era mostrado o wordmark Mastodon. -O layout administrativo usa um cabeçalho de
+instância consistente em desktop e mobile, incluindo preferências, administração
+e moderação. -O helper `render_logo` deixa de apontar diretamente para a arte
+estática do Mastodon. -A folha de estilos global injeta a logo da instância nas
+variantes SVG de logo da aplicação sem alterar os tamanhos intrínsecos dos
+elementos; a variável CSS usa a logo de autenticação ou o favicon como fallback.
 -A estilização do cabeçalho usa a fonte de título do tema, respeita o nome
- configurado e permite quebra de nomes longos para evitar transbordamento.
+configurado e permite quebra de nomes longos para evitar transbordamento.
 
 ## Validação pendente
 
