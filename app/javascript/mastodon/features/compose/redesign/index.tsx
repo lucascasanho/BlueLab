@@ -77,6 +77,7 @@ export const RedesignComposeForm: React.FC<
 > = ({
   autoFocus,
   className,
+  headless = false,
   embedded = false,
   compact = false,
   noMinimize,
@@ -436,7 +437,7 @@ function useComposeHandlers(
       event?.preventDefault();
       return false;
     },
-    [canSubmit, dispatch, onSuccess, redirectOnSuccess],
+    [dispatch, onSuccess, redirectOnSuccess],
   );
 
   return {
