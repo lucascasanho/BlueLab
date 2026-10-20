@@ -146,6 +146,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   return (
     <header
       {...props}
+      onClick={handleHeaderClick}
       ref={headerRef}
       className={classNames(
         className,
@@ -314,8 +315,6 @@ function useTrackColumnHeaderHeight() {
     }
   }, []);
 
-  const observer = useResizeObserver(onResize);
-
   const headerRef = useCallback(
     (node: HTMLDivElement | null) => {
       const isMultiColumnLayout = !!document.querySelector(
@@ -325,14 +324,15 @@ function useTrackColumnHeaderHeight() {
         return;
       }
 
+      const observer = new ResizeObserver(onResize);
       observer.observe(node);
       updateHeaderHeightCssVariable(node);
 
       return () => {
-        observer.unobserve(node);
+        observer.disconnect();
       };
     },
-    [observer],
+    [onResize],
   );
 
   return headerRef;

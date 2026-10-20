@@ -2,21 +2,22 @@ import { useCallback, useEffect } from 'react';
 
 import { useIntl, defineMessages, FormattedMessage } from 'react-intl';
 
-import { StackIcon } from '@phosphor-icons/react';
+import {
+  FileMagnifyingGlassIcon,
+  HashIcon,
+  StackIcon,
+  UsersIcon,
+} from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
-import { isRedesignEnabled } from '@/mastodon/utils/environment';
-import FindInPageIcon from '@/material-icons/400-24px/find_in_page.svg?react';
-import PeopleIcon from '@/material-icons/400-24px/group.svg?react';
-import SearchIcon from '@/material-icons/400-24px/search.svg?react';
-import TagIcon from '@/material-icons/400-24px/tag.svg?react';
 import { submitSearch, expandSearch } from 'mastodon/actions/search';
 import type { ApiSearchType } from 'mastodon/api_types/search';
 import { Account } from 'mastodon/components/account';
 import { CompatibilityHashtag as Hashtag } from 'mastodon/components/hashtag';
 import { Icon } from 'mastodon/components/icon';
+import { Scrollable } from '@/mastodon/components/scrollable_list/components';
 import ScrollableList from 'mastodon/components/scrollable_list';
 import { Status } from 'mastodon/components/status';
 import { Search } from 'mastodon/features/compose/components/search';
@@ -287,26 +288,14 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
   );
 
   const pageTitle = intl.formatMessage(messages.title, { q });
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   return (
     <Column bindToDocument={!multiColumn} label={pageTitle}>
-      {isRedesignEnabled() || isBlue2 ? (
-        <ColumnHeader
-          title={pageTitle}
-          extraStickyContent={extraStickyHeaderContent}
-        />
-      ) : (
-        <LegacyColumnHeader
-          icon={'search'}
-          iconComponent={SearchIcon}
-          title={pageTitle}
-          multiColumn={multiColumn}
-          scrollTopOnClick
-          appendContent={extraStickyHeaderContent}
-        />
-      )}
+      <ColumnHeader
+        withBackButton={multiColumn && 'auto'}
+        title={pageTitle}
+        extraStickyContent={extraStickyHeaderContent}
+      />
 
       <Scrollable data-nosnippet>
         <ScrollableList

@@ -6,7 +6,6 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useParams } from 'react-router';
 
-import { BookmarkSimpleIcon, StarIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
 import { statusInteraction } from '@/mastodon/actions/interactions_typed';
@@ -30,8 +29,11 @@ import {
 import {
   StatusBookmarkActiveIcon,
   StatusBookmarkIcon,
+  StatusLikeActiveIcon,
+  StatusLikeIcon,
 } from '@/mastodon/components/status/icons';
 import { StatusRedesign as Status } from '@/mastodon/components/status/status';
+import { Scrollable } from '@/mastodon/components/scrollable_list/components';
 import { ScrollContainer } from '@/mastodon/containers/scroll_container';
 import type { ShouldUpdateScrollFn } from '@/mastodon/containers/scroll_container/default_should_update_scroll';
 import { useExpandedStatus } from '@/mastodon/hooks/useStatus';
@@ -165,11 +167,9 @@ export const StatusPage: React.FC = () => {
     );
   }, [dispatch, statusId]);
 
-  const favouriteIcon = useIconWeight(StarIcon, status?.favourited && 'fill');
-  const bookmarkIcon = useIconWeight(
-    BookmarkSimpleIcon,
-    status?.bookmarked && 'fill',
-  );
+  const favouriteIcon = status?.favourited
+    ? StatusLikeActiveIcon
+    : StatusLikeIcon;
 
   if (isLoading) {
     return (
