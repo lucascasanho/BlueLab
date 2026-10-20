@@ -4,7 +4,7 @@ Atualizado em: 2026-10-20 (UTC)
 Repositório: [lucascasanho/BlueLab](https://github.com/lucascasanho/BlueLab)  
 Canal de trabalho: `BlueLab-Test`  
 SHA auditado no início desta retomada: `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea`  
-Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código: `3868256066ef1a53460c5619d8ebe6ffdeca46bf`; a CI continua na fila no GitHub e as validações ainda não foram confirmadas.
+Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código auditado neste checkpoint: `4dd73682bdf83f7226ae5aad7af4a11123aac317`; as validações automatizadas desse conjunto de correções ainda estão pendentes.
 
 ## Escopo e proteções
 
@@ -24,9 +24,14 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 - **Passou:** build de produção; JavaScript Testing; Ruby Linting; CSS Linting; Haml Linting; Bundler Audit; Historical data migration test; Test container image build.
 - **Falhou no SHA inicial:** JavaScript Linting, formatação, Ruby/RSpec e E2E. As correções subsequentes estão sendo verificadas por novos workflows; consultar o histórico abaixo e não tratar a integração como validada enquanto os jobs atuais não passarem.
 - O primeiro bloqueio E2E (`Themes#available_theme_colors` ausente e `config/themes.yml` no formato antigo) foi corrigido na etapa 2 pelo commit `b573c59c`. Uma rodada posterior identificou `User#setting_theme_color` ausente no helper de tema; o accessor e um teste unitário foram adicionados no commit `1440c38c`. A correção precisa ser confirmada por uma nova rodada E2E.
+- A CI Ruby do SHA `bc5bbed` revelou que `BugReportsController#sanitize_path` chamava `truncate` sobre `nil` quando `current_path` era uma string vazia (`''.split('?').first`); esse cenário já é coberto pelo spec de relato iniciado numa página de erro. A correção em `007ddc85` transforma a primeira parte ausente em string vazia antes de truncar.
 - Também há evidência de discrepância entre migrações e `db/schema.rb`: o modelo/testes de selo de verificação usam `verified_badge_visible`, coluna ausente do schema exportado, apesar de existir a migração `db/migrate/20260926151300_add_verified_badge_visible_to_accounts.rb`.
 - O commit `8b2c6e8281065a0bd968d9134920bc36ff78b3da` já tentou incluir tabelas BlueLab no schema, mas a execução atual demonstra que é necessário conferir a cobertura de colunas/tabelas customizadas, não apenas o nome do commit.
 - O PR #201 usa `qa/mastodon-5-alpha-validation-20261019` como base e `BlueLab-Test` como head, foi criado exclusivamente para disparar CI e **não deve ser mesclado**.
+
+## Diagnóstico de formatação temporário
+
+Um workflow de diagnóstico `.github/workflows/format-diff-debug.yml`, com permissão somente de leitura (`contents: read`), foi usado para executar `yarn format` em um checkout descartável e imprimir o diff exato. O workflow temporário foi removido após o uso; não teve permissão para gravar arquivos e não realizou commit automático.
 
 ## Auditoria de divergência com o canal estável
 
@@ -38,7 +43,6 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 - Os screenshots `espelunca-social-narrow.png` e `espelunca-social-wide.png` têm os mesmos blobs em ambos os branches; os screenshots `mastodon-blue-narrow.png` e `mastodon-blue-wide.png` do teste são mais recentes e foram preservados.
 - As correções de ícones de resposta no componente legado e no componente de status estão presentes no teste; o filtro de notificações já tinha a mesma lógica de escolher `StatusReplyIcon`/ícone legado conforme o redesign.
 - Portadas seletivamente as diferenças confirmadas: remover a regra CSS antiga que deslocava o botão de voltar ao topo, e restaurar a ação de política de citação só para o menu legado. Não foi feito merge nem cherry-pick cego do histórico estável.
-
 
 ## Etapas
 
@@ -67,7 +71,7 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 ### Etapa 4 — lint e formatação
 
 - [x] Corrigir manualmente os dois blocos de função com formatação divergente em `bug_report_modal.tsx`, sem alterar o comportamento.
-- [ ] Confirmar a formatação com o job oficial `Check formatting` após restaurar o comando original `yarn format:check`; Oxfmt reportou o diff real em `message_conversation.tsx`, já aplicado nesta revisão.
+- [ ] Confirmar a formatação com o job oficial `Check formatting`; o diff exato de `yarn format` foi aplicado aos arquivos de código apontados e ao checkpoint. O workflow original `yarn format:check` permaneceu intacto.
 - [ ] Resolver erros ESLint/TypeScript concretos no código atual; não suprimir regras globalmente para mascarar problemas.
 - [ ] Rodar os comandos focados e o conjunto de lint JS.
 - [ ] Registrar quantidade de erros antes/depois e quaisquer bloqueios remanescentes.
@@ -136,6 +140,10 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 | 2026-10-20 | 43 | Restaurada a ação de mudança de política de citação no menu da interface legada, condicionada a `!isRedesignEnabled()`, sem expô-la no redesign. | Portado seletivamente do estável após comparação de arquivos; CI pendente. | `75ff3a9e54c74a7ea0c569ce75424f171452e47e` |
 
 | 2026-10-20 | 44 | Estreitado o tipo da classe CSS opcional `headless` no compositor redesign para evitar argumento de tipo de erro no `classNames`. | Correção publicada; confirmar no TypeScript/ESLint da rodada atual. | `3868256066ef1a53460c5619d8ebe6ffdeca46bf` |
+| 2026-10-20 | 45 | Corrigidos os 13 diagnósticos ESLint restantes no SHA `bc5bbed`: escopo de `useIntl`, remoção de cast redundante e tipagem do estado de navegação/conteúdo na conversa direta. | Correções publicadas; lint, Ruby e E2E da nova rodada ainda pendentes. | `b9c4d96e5989c11a51b1bb543d87a0e42fe6f0d7` |
+| 2026-10-20 | 46 | Corrigido o caminho vazio no sanitizador de relatos e aplicado o primeiro conjunto de alterações exatas reportadas pelo Oxfmt. | O spec de erro iniciado com `current_path: ''` cobre a regressão; confirmar no RSpec. | `007ddc85983b0cb26a13ddc0634eafbf14c18725` |
+| 2026-10-20 | 47 | Aplicada a formatação oficial em imports e casts do compositor e da conversa direta, conforme o diff do Oxfmt. | Formatação corrigida no branch de teste; confirmação oficial pendente. | `d4385cc3bdaffcd08f1c74f4f4e7b8d30c0af2a6` |
+| 2026-10-20 | 48 | Aplicadas as últimas correções Oxfmt em navegação, página de status e tipos de grupos de notificação. | Formatação corrigida no branch de teste; confirmação oficial pendente. | `4dd73682bdf83f7226ae5aad7af4a11123aac317` |
 
 ## Referências da execução
 
