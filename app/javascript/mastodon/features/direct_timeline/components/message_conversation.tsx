@@ -29,7 +29,7 @@ import { importFetchedStatus } from '@/mastodon/actions/importer';
 import { toggleFavourite } from '@/mastodon/actions/interactions';
 import { fetchStatus } from '@/mastodon/actions/statuses';
 import { connectDirectStream } from '@/mastodon/actions/streaming';
-import type { ApiMentionJSON, ApiStatusJSON } from '@/mastodon/api_types/statuses';
+import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
 import { compareId } from '@/mastodon/compare_id';
 import AttachmentList from '@/mastodon/components/attachment_list';
 import { Avatar } from '@/mastodon/components/avatar';
@@ -82,8 +82,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   const { id: routeId } = useParams<{ id: string }>();
   const id = conversationId ?? routeId;
   const location = useLocation();
-  const sourceStatusId = (location.state as { statusId?: string } | undefined)
-    ?.statusId;
+  const sourceStatusId = location.state?.statusId;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [messageStatusIds, setMessageStatusIds] = useState<string[]>([]);
