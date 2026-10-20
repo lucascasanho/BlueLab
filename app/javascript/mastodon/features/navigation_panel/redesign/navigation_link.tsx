@@ -40,7 +40,12 @@ export const NavigationLink: React.FC<NavigationLinkProps> = ({
   );
 
   return (
-    <li className={classNames(classes.wrapper, withSpaceAfter && classes.wrapperSpaced)}>
+    <li
+      className={classNames(
+        classes.wrapper,
+        withSpaceAfter && classes.wrapperSpaced,
+      )}
+    >
       <Comp
         {...otherProps}
         type={as === 'button' ? 'button' : undefined}

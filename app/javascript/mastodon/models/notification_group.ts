@@ -50,7 +50,8 @@ export type NotificationGroupQuotedUpdate =
 export type NotificationGroupFollow = BaseNotification<'follow'>;
 export type NotificationGroupFollowRequest = BaseNotification<'follow_request'>;
 export type NotificationGroupAdminSignUp = BaseNotification<'admin.sign_up'>;
-export type NotificationGroupAdminVerificationRequest = BaseNotification<'admin.verification_request'>;
+export type NotificationGroupAdminVerificationRequest =
+  BaseNotification<'admin.verification_request'>;
 export type NotificationGroupVerification = BaseNotification<
   'verification_request' | 'verification_approved'
 >;
