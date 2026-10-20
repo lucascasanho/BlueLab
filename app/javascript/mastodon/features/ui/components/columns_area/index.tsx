@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { DiscoveryPanel } from '@/mastodon/features/discovery_panel';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
 import { CollapsibleNavigationPanel } from '@/mastodon/features/navigation_panel';
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
@@ -129,6 +130,54 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
   );
 };
 
+const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
+  children,
+  minimalShell,
+  singleColumn,
+  ref,
+}) => {
+  const isMobile = useBreakpoint('openable');
+
+  if (minimalShell) {
+    return (
+      <div ref={ref} className={classNames(classes.root, classes.rootMinimal)}>
+        {isMobile && <RedesignMobileNavigation />}
+        <div className={classes.main}>
+          <div>{children}</div>
+          <Footer />
+        </div>
+      </div>
+    );
+  }
+
+  if (singleColumn) {
+    return (
+      <div ref={ref} className={classes.root}>
+        <div className={classes.navigationWrapper}>
+          <RedesignNavigationPanel />
+        </div>
+        {isMobile ? <RedesignMobileNavigation /> : <ComposeRedesignButton />}
+
+        <main className={classes.main}>{children}</main>
+
+        <div className={classes.discoveryWrapper}>
+          <DiscoveryPanel />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <main ref={ref} className={multiColClasses.root}>
+      <div className={multiColClasses.navigationWrapper}>
+        <RedesignNavigationPanel multiColumn />
+      </div>
+      <ComposeRedesignButton />
+      <MultiColumnContent>{children}</MultiColumnContent>
+    </main>
+  );
+};
+
 export const ColumnsArea: React.FC<ColumnsAreaProps> = (props) => {
   const theme =
     typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
@@ -141,5 +190,9 @@ export const ColumnsArea: React.FC<ColumnsAreaProps> = (props) => {
     return <ColumnsAreaMastodon5 {...props} />;
   }
 
-  return <ColumnsAreaLegacy {...props} />;
+  if (theme === 'mastodon-bird-ui-auto') {
+    return <ColumnsAreaLegacy {...props} />;
+  }
+
+  return <ColumnsAreaVanilla {...props} />;
 };
