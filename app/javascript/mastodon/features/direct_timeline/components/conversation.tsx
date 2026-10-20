@@ -155,6 +155,34 @@ export const Conversation: React.FC<{
     }
   }, [dispatch, lastStatus]);
 
+  const handleConversationCardClick = useCallback<
+    React.MouseEventHandler<HTMLDivElement>
+  >(
+    (event) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest('.status__action-bar, button, [role="menuitem"]')
+      ) {
+        return;
+      }
+
+      handleClick();
+    },
+    [handleClick],
+  );
+
+  const handleConversationCardKeyDown = useCallback<
+    React.KeyboardEventHandler<HTMLDivElement>
+  >(
+    (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+
+      event.preventDefault();
+      handleClick();
+    },
+    [handleClick],
+  );
+
   if (!lastStatus) {
     return null;
   }
@@ -196,34 +224,6 @@ export const Conversation: React.FC<{
     )
     .filter(Boolean)
     .reduce((prev, cur) => [prev, ', ', cur]);
-
-  const handleConversationCardClick = useCallback<
-    React.MouseEventHandler<HTMLDivElement>
-  >(
-    (event) => {
-      if (
-        event.target instanceof Element &&
-        event.target.closest('.status__action-bar, button, [role="menuitem"]')
-      ) {
-        return;
-      }
-
-      handleClick();
-    },
-    [handleClick],
-  );
-
-  const handleConversationCardKeyDown = useCallback<
-    React.KeyboardEventHandler<HTMLDivElement>
-  >(
-    (event) => {
-      if (event.key !== 'Enter' && event.key !== ' ') return;
-
-      event.preventDefault();
-      handleClick();
-    },
-    [handleClick],
-  );
 
   const handlers = {
     reply: handleReply,

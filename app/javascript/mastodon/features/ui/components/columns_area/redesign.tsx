@@ -117,13 +117,19 @@ export const ColumnsAreaRedesign: React.FC<{
     (isBlue2Home || isBlue2Global) && !isBlue2MessagesPage;
   const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
   const { feeds: pinnedFeeds } = useBlue2PinnedFeeds();
-  const [selectedFeedKey, setSelectedFeedKey] = useState<string | null>(() =>
-    location.pathname === '/public' ? 'global' : null,
-  );
+  const [selectedFeedState, setSelectedFeedState] = useState(() => ({
+    pathname: location.pathname,
+    key: location.pathname === '/public' ? 'global' : null,
+  }));
 
-  useEffect(() => {
-    setSelectedFeedKey(location.pathname === '/public' ? 'global' : null);
-  }, [location.pathname]);
+  if (selectedFeedState.pathname !== location.pathname) {
+    setSelectedFeedState({
+      pathname: location.pathname,
+      key: location.pathname === '/public' ? 'global' : null,
+    });
+  }
+
+  const selectedFeedKey = selectedFeedState.key;
 
   const selectedPinnedFeed =
     selectedFeedKey && selectedFeedKey !== 'global'
@@ -152,9 +158,21 @@ export const ColumnsAreaRedesign: React.FC<{
   const [isIosSafari] = useState(isIosSafariBrowser);
   const [iosFeedTabsOffset, setIosFeedTabsOffset] = useState(0);
 
-  const selectFeedTab = useCallback((key: string | null) => {
-    setSelectedFeedKey(key);
-  }, []);
+  const selectFeedTab = useCallback(
+    (key: string | null) => {
+      setSelectedFeedState({ pathname: location.pathname, key });
+    },
+    [location.pathname],
+  );
+
+  const handleSelectFollowing = useCallback(
+    () => selectFeedTab(null),
+    [selectFeedTab],
+  );
+  const handleSelectGlobal = useCallback(
+    () => selectFeedTab('global'),
+    [selectFeedTab],
+  );
 
   const clampFeedTabsScroll = useCallback((value: number) => {
     const scroller = feedTabsRef.current;
@@ -234,7 +252,7 @@ export const ColumnsAreaRedesign: React.FC<{
     (event: React.PointerEvent<HTMLDivElement>) => {
       const drag = feedTabsDragRef.current;
 
-      if (!drag || drag.pointerId !== event.pointerId) return;
+      if (drag?.pointerId !== event.pointerId) return;
 
       const scroller = feedTabsRef.current;
       if (scroller?.hasPointerCapture(event.pointerId)) {
@@ -566,7 +584,7 @@ export const ColumnsAreaRedesign: React.FC<{
                       isIosSafari
                         ? {
                             transform:
-                              'translate3d(-' + iosFeedTabsOffset + 'px, 0, 0)',
+                              `translate3d(-${iosFeedTabsOffset}px, 0, 0)`,
                           }
                         : undefined
                     }
@@ -579,9 +597,7 @@ export const ColumnsAreaRedesign: React.FC<{
                           ? classes.blue2TabActive
                           : classes.blue2Tab
                       }
-                      onClick={() => {
-                        selectFeedTab(null);
-                      }}
+                      onClick={handleSelectFollowing}
                     >
                       <FormattedMessage
                         id='account.following'
@@ -595,9 +611,7 @@ export const ColumnsAreaRedesign: React.FC<{
                           ? classes.blue2TabActive
                           : classes.blue2Tab
                       }
-                      onClick={() => {
-                        selectFeedTab('global');
-                      }}
+                      onClick={handleSelectGlobal}
                     >
                       {blue2Text(intl.locale, 'global')}
                     </button>
