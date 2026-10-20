@@ -4,7 +4,7 @@ Atualizado em: 2026-10-20 (UTC)
 Repositório: [lucascasanho/BlueLab](https://github.com/lucascasanho/BlueLab)  
 Canal de trabalho: `BlueLab-Test`  
 SHA auditado no início desta retomada: `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea`  
-Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código auditado neste checkpoint: `8a0e2d5f4ead2cc46644eb410622b89d6425245f`; a validação automatizada dessa rodada segue pendente.
+Estado: **em validação; não considerar pronto para aprovação**. Último commit de código auditado: `d0a8ab004b77ae552c2e3c691ce4d82513fd4763`. A CI deste SHA passou em JavaScript Linting, JavaScript Testing, Check formatting, Ruby Linting, CSS/Haml, Bundler Audit, migrações históricas e build da imagem de teste. A suíte Ruby completa (RSpec, E2E e integração de busca) ainda está em execução.
 
 ## Escopo e proteções
 
@@ -19,10 +19,10 @@ Estado: **em correção e validação; não considerar pronto para aprovação**
 
 A integração do alpha já está presente em `BlueLab-Test`; houve alterações de compatibilidade, lint, schema e CSS/TS nas últimas dezenas de commits. Esta retomada não recria o merge nem aplica um novo merge cegamente: corrige os bloqueios que a CI identificou.
 
-### CI do SHA auditado
+### CI do SHA consolidado `d0a8ab004b77ae552c2e3c691ce4d82513fd4763`
 
-- **Passou:** build de produção; JavaScript Testing; Ruby Linting; CSS Linting; Haml Linting; Bundler Audit; Historical data migration test; Test container image build.
-- **Falhou no SHA inicial:** JavaScript Linting, formatação, Ruby/RSpec e E2E. As correções subsequentes estão sendo verificadas por novos workflows; consultar o histórico abaixo e não tratar a integração como validada enquanto os jobs atuais não passarem.
+- **Passou no SHA `d0a8ab0`:** build de produção; JavaScript Linting; JavaScript Testing; `Check formatting`; Ruby Linting; CSS Linting; Haml Linting; Bundler Audit; Historical data migration test; Test container image build.
+- **Pendente no SHA `d0a8ab0`:** terminar Ruby Testing. No último estado observado, ainda rodavam `bin/flatware rspec`, E2E (`spec/system --tag streaming --tag js`) e os testes de integração de busca. Não há conclusão final desses jobs no momento deste registro; consultar [o workflow Ruby Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39388818366).
 - O primeiro bloqueio E2E (`Themes#available_theme_colors` ausente e `config/themes.yml` no formato antigo) foi corrigido na etapa 2 pelo commit `b573c59c`. Uma rodada posterior identificou `User#setting_theme_color` ausente no helper de tema; o accessor e um teste unitário foram adicionados no commit `1440c38c`. A correção precisa ser confirmada por uma nova rodada E2E.
 - A CI Ruby do SHA `bc5bbed` revelou que `BugReportsController#sanitize_path` chamava `truncate` sobre `nil` quando `current_path` era uma string vazia (`''.split('?').first`); esse cenário já é coberto pelo spec de relato iniciado numa página de erro. A correção em `007ddc85` transforma a primeira parte ausente em string vazia antes de truncar.
 - Os specs também confirmaram que o seletor de tema do site para papéis com `manage_settings` estava ausente da tela de aparência, apesar de as traduções e os exemplos já estarem no repositório. A UI e a persistência via `Setting.theme` foram restauradas no commit `e203d9ae`; a segurança do update é verificada pela permissão do papel e pela lista de temas existente.
@@ -59,31 +59,33 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 - [x] Inspecionar os usos de `available_theme_colors` e a configuração atual de temas do Mastodon 5.
 - [x] Corrigir a chamada obsoleta preservando a intenção visual BlueLab, usando o contrato atual do upstream.
 - [x] Adicionar teste focado para a paleta configurada do tema BlueLab.
-- [ ] Aguardar os testes focados de helper/layout, build do Vite e CI do novo SHA; confirmar também que a preferência de cor não ficou vazia.
+- [ ] Confirmar nos resultados finais do Ruby Testing os testes de helper/layout e o estado da preferência de cor; o build de produção no SHA `d0a8ab0` passou.
 
 ### Etapa 3 — schema e migrações BlueLab
 
 - [x] Comparar migrações customizadas, modelos, schema exportado e testes.
 - [x] Corrigir no schema as colunas ausentes confirmadas: `accounts.verified_badge_visible` e `account_conversations.last_read_status_id`.
 - [x] Confirmar pela migração `20260925094651_create_fasp_capabilities.rb` que `fasp_providers.capabilities` é removida intencionalmente e que a fonte de verdade final é `fasp_capabilities`; não manter a coluna removida no schema.
-- [ ] Rodar o teste de migrações e testes focados do recurso de verificação após a correção final do schema.
+- [x] Confirmar o teste de migrações históricas após a correção final do schema: passou no SHA `d0a8ab0`.
+- [ ] Confirmar nos resultados do RSpec os testes focados do recurso de verificação.
 - [x] Registrar o commit de schema; resultados do commit final ainda pendentes.
 
 ### Etapa 4 — lint e formatação
 
 - [x] Corrigir manualmente os dois blocos de função com formatação divergente em `bug_report_modal.tsx`, sem alterar o comportamento.
-- [x] Corrigir a formatação identificada pelo Oxfmt: `Check formatting` passou no SHA `c2a5f1b`; repetir a verificação no SHA consolidado após as últimas alterações de specs e checkpoint.
-- [x] Resolver os erros ESLint/TypeScript concretos sem suprimir regras globalmente. `JavaScript Linting` e `JavaScript Testing` passaram no SHA `fc62e7c`; os commits posteriores alteraram apenas formatação e specs Ruby/workflow de diagnóstico.
+- [x] Corrigir a formatação identificada pelo Oxfmt: `Check formatting` passou novamente no SHA consolidado `d0a8ab0`.
+- [x] Resolver os erros ESLint/TypeScript concretos sem suprimir regras globalmente. `JavaScript Linting` e `JavaScript Testing` passaram novamente no SHA consolidado `d0a8ab0`.
 - [x] Remover o workflow temporário de diagnóstico; `.github/workflows/format-diff-debug.yml` não existe no branch atual.
-- [ ] Confirmar JavaScript Linting, JavaScript Testing e `Check formatting` no SHA consolidado.
+- [x] Confirmar JavaScript Linting, JavaScript Testing e `Check formatting` no SHA consolidado `d0a8ab0`.
 - [ ] Registrar resultados completos da CI no SHA consolidado e quaisquer bloqueios remanescentes.
 
 ### Etapa 5 — matriz Ruby, testes completos e validação do canal
 
 - [x] Confirmar a versão Ruby exigida por `.ruby-version` e `Gemfile`: Ruby 4.0.7.
 - [x] Distinguir incompatibilidade da matriz CI de falhas reais; workflow ajustado com base no upstream atual, que testa apenas a versão de `.ruby-version`.
-- [ ] Reexecutar CI, testes de migração, RSpec/E2E, build e lint; as migrações históricas passaram no SHA `fc62e7c`, mas a suíte Ruby completa foi cancelada durante correções rápidas. Não marcar como pronto enquanto houver falhas relevantes sem explicação.
-- [ ] Verificar diff total para garantir que nenhum recurso BlueLab foi removido acidentalmente pelo merge upstream.
+- [x] Reexecutar CI, migrações históricas, build e lint no SHA `d0a8ab0`; todos esses checks passaram.
+- [ ] Aguardar RSpec/E2E e integração de busca da suíte Ruby em [Ruby Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39388818366). Só finalizar após ler os resultados; não marcar como pronto enquanto houver falhas relevantes sem explicação.
+- [ ] Concluir a revisão integral do diff entre `BlueLab-Test` e a base do Mastodon 5 alpha. A auditoria de presença confirmou que módulos centrais existem tanto no canal estável quanto no teste: temas, shell Blue2 (feed fixado, navegação, anúncios, lançador de composição, coluna lateral e voltar ao topo), PWA, relato de bugs, verificação e threads agendadas. Essa checagem de presença não substitui a revisão funcional completa.
 - [ ] Aplicar a atualização apenas no mastodon.blue pelo fluxo normal do ambiente de teste quando o commit estiver coerente, e confirmar health/serviços e fluxos principais. Estado do deploy não foi presumido nesta auditoria.
 - [ ] Solicitar ao usuário os testes manuais de interface necessários antes de considerar a etapa concluída.
 
@@ -158,14 +160,19 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 | 2026-10-20 | 58 | Removido `.github/workflows/format-diff-debug.yml` após concluir o diagnóstico, mantendo apenas workflows permanentes de CI. | A ausência do caminho foi confirmada no branch atual; o workflow temporário não tem permissão de escrita e não permanece no repositório. | `6963e2ad36f575ccc6e4f6a0792b7e0ed3355163` |
 | 2026-10-20 | 59 | Corrigida a indentação das expectations nos specs `user_mailer_bluelab_theme_spec.rb` e `user_mailer_spec.rb`. | O RuboCop do SHA `fc62e7c` identificou `Layout/IndentationConsistency` e `Layout/BlockAlignment`; faltava corrigir o spec de troca de conta, ajustado na etapa seguinte. | `9c7668aafcd90fdbdbb4ef1052f16ea550f822cf` |
 | 2026-10-20 | 60 | Corrigida a indentação de duas expectations em `account_switcher_spec.rb`, concluindo os ajustes de estilo identificados pelo RuboCop. | Patch publicado; a CI da consolidação deve confirmar RuboCop e Ruby Testing. | `51a31b43c25be85a2266184b525289f92ad0327e` |
+| 2026-10-20 | 61 | Corrigidos specs de UI/E2E para refletir o compositor redesign atual; o último commit ajusta os testes do composer sem alterar o canal estável. | No SHA `d0a8ab0`, JavaScript Linting, JavaScript Testing, Check formatting, Ruby Linting, CSS/Haml, Bundler Audit, migrações históricas e build de imagem passaram. Ruby Testing ainda estava executando RSpec, E2E e busca. O branch estável segue em `ce1269b9c3751a90a9214a1fab1aafbceb09e522`; não houve promoção. | `d0a8ab004b77ae552c2e3c691ce4d82513fd4763` |
 
 ## Referências da execução
 
 - Branch de teste: [BlueLab-Test](https://github.com/lucascasanho/BlueLab/tree/BlueLab-Test)
 - PR de validação (não mesclar): [#201 — QA only: validate Mastodon 5.0.0-alpha.1 merge on BlueLab-Test](https://github.com/lucascasanho/BlueLab/pull/201)
-- JavaScript Linting: [SHA `fc62e7c`](https://github.com/lucascasanho/BlueLab/actions/runs/39386147521) (sucesso; repetir no SHA consolidado)
-- JavaScript Testing: [SHA `fc62e7c`](https://github.com/lucascasanho/BlueLab/actions/runs/39386147381) (sucesso; repetir no SHA consolidado)
-- Check formatting após correção Oxfmt: [SHA `c2a5f1b`](https://github.com/lucascasanho/BlueLab/actions/runs/39386441278) (sucesso; repetir no SHA consolidado)
+- JavaScript Linting: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818362) (sucesso)
+- JavaScript Testing: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818327) (sucesso)
+- Check formatting: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818325) (sucesso)
+- Ruby Linting: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818340) (sucesso)
+- Migrações históricas: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818352) (sucesso)
+- Imagem de teste: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818367) (sucesso)
+- Ruby Testing: [SHA `d0a8ab0`](https://github.com/lucascasanho/BlueLab/actions/runs/39388818366) (RSpec/E2E/busca ainda em execução no último levantamento)
 - Ruby Linting que identificou os offenses de indentação: [SHA `fc62e7c`](https://github.com/lucascasanho/BlueLab/actions/runs/39386147557) (falhou antes das correções de specs)
 - Migrações históricas: [SHA `fc62e7c`](https://github.com/lucascasanho/BlueLab/actions/runs/39386147589) (sucesso; repetir no SHA consolidado)
 - PR de validação: [#201 — QA only: validate Mastodon 5.0.0-alpha.1 merge on BlueLab-Test](https://github.com/lucascasanho/BlueLab/pull/201); não mesclar
