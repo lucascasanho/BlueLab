@@ -97,9 +97,12 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   const [highlightedStatusId, setHighlightedStatusId] = useState<string | null>(
     null,
   );
-  const [pendingScrollStatusId, setPendingScrollStatusId] = useState<
-    string | null
-  >(null);
+  const [pendingScroll, setPendingScroll] = useState<{
+    conversationId: string;
+    statusId: string;
+  } | null>(null);
+  const pendingScrollStatusId =
+    pendingScroll?.conversationId === id ? pendingScroll.statusId : null;
 
   const conversationItems = useAppSelector((state) => {
     const conversationsState = state.conversations as unknown as ImmutableMap<
@@ -200,9 +203,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
         const recoveredId = (await dispatch(
           findConversationForStatus(sourceStatusId),
-        )) as string;
+        )) as string | null | undefined;
 
-        if (recoveredId === id) throw error;
+        if (!recoveredId || recoveredId === id) throw error;
 
         browserHistory.replace(`/conversations/${recoveredId}`, {
           statusId: sourceStatusId,
@@ -234,9 +237,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           try {
             const recoveredId = (await dispatch(
               findConversationForStatus(sourceStatusId),
-            )) as string;
+            )) as string | null | undefined;
 
-            if (!isCancelled() && recoveredId !== id) {
+            if (!isCancelled() && recoveredId && recoveredId !== id) {
               browserHistory.replace(`/conversations/${recoveredId}`, {
                 statusId: sourceStatusId,
               });
@@ -308,7 +311,6 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
     initialLoadConversationIdRef.current = id;
     observedThreadStatusIdRef.current = null;
-    setPendingScrollStatusId(null);
 
     let cancelled = false;
     void loadMessages()
@@ -453,7 +455,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           ? current
           : [...current, statusId].sort(compareId),
       );
-      setPendingScrollStatusId(statusId);
+      setPendingScroll({ conversationId: id, statusId });
       dispatch(
         fetchStatus(statusId, {
           forceFetch: true,
@@ -461,7 +463,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         }),
       );
     },
-    [dispatch, highlightStatus],
+    [dispatch, highlightStatus, id],
   );
 
   useEffect(() => {
@@ -484,7 +486,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         block: 'center',
       });
       highlightStatus(pendingScrollStatusId);
-      setPendingScrollStatusId(null);
+      setPendingScroll(null);
     });
 
     return () => {
