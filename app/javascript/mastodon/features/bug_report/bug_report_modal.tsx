@@ -233,6 +233,58 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
     }
   }, [copy, description, files, intl.locale]);
 
+  const handleDescriptionChange = useCallback<React.ChangeEventHandler<HTMLTextAreaElement>>(
+    (event) => setDescription(event.target.value),
+    [],
+  );
+
+  const handleDragOver = useCallback<React.DragEventHandler<HTMLDivElement>>(
+    (event) => {
+      event.preventDefault();
+      setDragging(true);
+    },
+    [],
+  );
+
+  const handleDragLeave = useCallback<React.DragEventHandler<HTMLDivElement>>(
+    () => setDragging(false),
+    [],
+  );
+
+  const handleDrop = useCallback<React.DragEventHandler<HTMLDivElement>>(
+    (event) => {
+      event.preventDefault();
+      setDragging(false);
+      addFiles(event.dataTransfer.files);
+    },
+    [addFiles],
+  );
+
+  const handleChooseFiles = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileInputChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    (event) => {
+      if (event.target.files) addFiles(event.target.files);
+      event.target.value = '';
+    },
+    [addFiles],
+  );
+
+  const createRemoveFileHandler = useCallback(
+    (fileIndex: number) => () => {
+      setFiles((current) =>
+        current.filter((_, currentIndex) => currentIndex !== fileIndex),
+      );
+    },
+    [],
+  );
+
+  const handleSubmitClick = useCallback(() => {
+    void handleSubmit();
+  }, [handleSubmit]);
+
   if (submitted) {
     return (
       <div className={`modal-root__modal ${classes.root}`}>
@@ -265,9 +317,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
           className={classes.textarea}
           value={description}
           maxLength={5000}
-          onChange={(event) => {
-            setDescription(event.target.value);
-          }}
+          onChange={handleDescriptionChange}
           placeholder={copy.placeholder}
           autoFocus
           rows={8}
@@ -283,20 +333,11 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
 
           <div
             className={`${classes.dropZone} ${dragging ? classes.dropZoneActive : ''}`}
-            onDragOver={(event) => {
-              event.preventDefault();
-              setDragging(true);
-            }}
-            onDragLeave={() => {
-              setDragging(false);
-            }}
-            onDrop={(event) => {
-              event.preventDefault();
-              setDragging(false);
-              addFiles(event.dataTransfer.files);
-            }}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
           >
-            <Button type='button' onClick={() => fileInputRef.current?.click()}>
+            <Button type='button' onClick={handleChooseFiles}>
               {copy.chooseFiles}
             </Button>
             <span>{copy.dropFiles}</span>
@@ -306,10 +347,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
               type='file'
               accept='image/*,video/*,audio/*'
               multiple
-              onChange={(event) => {
-                if (event.target.files) addFiles(event.target.files);
-                event.target.value = '';
-              }}
+              onChange={handleFileInputChange}
             />
           </div>
 
@@ -319,11 +357,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
                 <Preview
                   key={`${file.name}-${file.lastModified}-${index}`}
                   file={file}
-                  onRemove={() => {
-                    setFiles((current) =>
-                      current.filter((_, fileIndex) => fileIndex !== index),
-                    );
-                  }}
+                  onRemove={createRemoveFileHandler(index)}
                   removeLabel={copy.remove}
                 />
               ))}
@@ -341,7 +375,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
         </Button>
         <Button
           type='button'
-          onClick={handleSubmit}
+          onClick={handleSubmitClick}
           disabled={sending || description.trim().length === 0}
         >
           {sending ? copy.sending : copy.submit}
