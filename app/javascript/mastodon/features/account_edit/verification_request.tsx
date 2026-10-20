@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useId, useState } from 'react';
-import type { FC, FormEvent, MouseEvent } from 'react';
+import type { ChangeEvent, FC, FormEvent, MouseEvent } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+
+import classNames from 'classnames';
 
 import {
   apiGetVerificationRequestStatus,
@@ -97,8 +99,7 @@ export const VerificationRequestTrigger: FC = () => {
   const [triggerElement, setTriggerElement] =
     useState<HTMLButtonElement | null>(null);
   const uniqueId = useId();
-  const popoverId =
-    'bluelab-verification-request-' + uniqueId.replace(/:/g, '');
+  const popoverId = `bluelab-verification-request-${uniqueId.replace(/:/g, '')}`;
 
   const loadEligibility = useCallback(async () => {
     try {
@@ -139,6 +140,20 @@ export const VerificationRequestTrigger: FC = () => {
       }
     },
     [explanation],
+  );
+
+  const handleFormSubmit = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      void handleSubmit(event);
+    },
+    [handleSubmit],
+  );
+
+  const handleExplanationChange = useCallback(
+    (event: ChangeEvent<HTMLTextAreaElement>) => {
+      setExplanation(event.target.value);
+    },
+    [],
   );
 
   const handleTrigger = useCallback((event: MouseEvent<HTMLButtonElement>) => {
@@ -182,15 +197,15 @@ export const VerificationRequestTrigger: FC = () => {
             {...props}
             id={popoverId}
             role='dialog'
-            aria-labelledby={popoverId + '-title'}
-            className={
-              'dropdown-animation ' +
-              classes.popover +
-              (submitted ? ' ' + classes.popoverSuccess : '')
-            }
+            aria-labelledby={`${popoverId}-title`}
+            className={classNames(
+              'dropdown-animation',
+              classes.popover,
+              submitted && classes.popoverSuccess,
+            )}
           >
             <div className={classes.titleRow}>
-              <h3 id={popoverId + '-title'} className={classes.title}>
+              <h3 id={`${popoverId}-title`} className={classes.title}>
                 {submitted ? (
                   <FormattedMessage {...messages.successTitle} />
                 ) : (
@@ -240,18 +255,16 @@ export const VerificationRequestTrigger: FC = () => {
                     <FormattedMessage {...messages.disclaimer} />
                   </p>
 
-                  <form className={classes.form} onSubmit={handleSubmit}>
+                  <form className={classes.form} onSubmit={handleFormSubmit}>
                     <TextAreaField
-                      id={popoverId + '-explanation'}
+                      id={`${popoverId}-explanation`}
                       label={intl.formatMessage(messages.explanationLabel)}
                       hint={intl.formatMessage(messages.explanationHint)}
                       value={explanation}
                       maxLength={5_000}
                       rows={6}
                       required={false}
-                      onChange={(event) => {
-                        setExplanation(event.target.value);
-                      }}
+                      onChange={handleExplanationChange}
                     />
 
                     {error && (

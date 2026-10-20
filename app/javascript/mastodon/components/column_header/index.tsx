@@ -140,13 +140,31 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     [scrollTop],
   );
 
+  const handleHeaderKeyDown = useCallback<React.KeyboardEventHandler>(
+    (event) => {
+      if (
+        event.target !== event.currentTarget ||
+        (event.key !== 'Enter' && event.key !== ' ')
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      scrollTop();
+    },
+    [scrollTop],
+  );
+
   const hasScrollToTopButton = !isScrolledToTop && withUnreadMarker;
   const headerRef = useTrackColumnHeaderHeight();
 
   return (
     <header
       {...props}
+      role='button'
+      tabIndex={0}
       onClick={handleHeaderClick}
+      onKeyDown={handleHeaderKeyDown}
       ref={headerRef}
       className={classNames(
         className,

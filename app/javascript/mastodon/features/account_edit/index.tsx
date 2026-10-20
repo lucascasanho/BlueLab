@@ -183,6 +183,10 @@ export const AccountEdit: FC = () => {
     handleOpenModal('ACCOUNT_EDIT_PROFILE_DISPLAY');
   }, [handleOpenModal]);
 
+  const handleBadgeVisibilityToggleClick = useCallback(() => {
+    void handleBadgeVisibilityToggle();
+  }, [handleBadgeVisibilityToggle]);
+
   const history = useHistory();
   const handleFeaturedTagsEdit = useCallback(() => {
     history.push('/profile/featured_tags');
@@ -266,7 +270,7 @@ export const AccountEdit: FC = () => {
               {hasVerifiedRole(account) ? (
                 <Button
                   className={classes.editButton}
-                  onClick={handleBadgeVisibilityToggle}
+                  onClick={handleBadgeVisibilityToggleClick}
                   loading={badgeVisibilitySaving}
                   aria-pressed={badgeVisible}
                 >
