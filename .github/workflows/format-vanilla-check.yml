@@ -1,0 +1,57 @@
+name: Format Vanilla isolation patch
+
+on:
+  push:
+    branches:
+      - BlueLab-Test
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Set up JavaScript environment
+        uses: ./.github/actions/setup-javascript
+
+      - name: Format only the changed isolation files
+        run: |
+          yarn format \
+            app/javascript/mastodon/components/account_header/styles.module.scss \
+            app/javascript/mastodon/components/form_fields/emoji_text_field.module.scss \
+            app/javascript/mastodon/features/account_edit/styles.module.scss \
+            app/javascript/mastodon/features/navigation_panel/redesign/account_card_and_menu.module.scss \
+            app/javascript/mastodon/features/navigation_panel/redesign/vanilla_mobile_nav.tsx \
+            app/javascript/mastodon/features/ui/components/columns_area/index.tsx \
+            app/javascript/mastodon/features/ui/components/link_footer.module.scss \
+            docs/bluelab-update-system/CHECKPOINT-2026-10-20-disposable-feed.md \
+            docs/progress/mastodon-5-vanilla-visual-parity-2026-10-20.md
+
+      - name: Commit formatting changes on the test branch
+        run: |
+          if git diff --quiet; then
+            echo "The selected files are already formatted."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            app/javascript/mastodon/components/account_header/styles.module.scss \
+            app/javascript/mastodon/components/form_fields/emoji_text_field.module.scss \
+            app/javascript/mastodon/features/account_edit/styles.module.scss \
+            app/javascript/mastodon/features/navigation_panel/redesign/account_card_and_menu.module.scss \
+            app/javascript/mastodon/features/navigation_panel/redesign/vanilla_mobile_nav.tsx \
+            app/javascript/mastodon/features/ui/components/columns_area/index.tsx \
+            app/javascript/mastodon/features/ui/components/link_footer.module.scss \
+            docs/bluelab-update-system/CHECKPOINT-2026-10-20-disposable-feed.md \
+            docs/progress/mastodon-5-vanilla-visual-parity-2026-10-20.md
+          git commit -m "style: format Vanilla isolation patch"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
