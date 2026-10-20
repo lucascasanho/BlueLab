@@ -22,7 +22,7 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 ### CI do SHA auditado
 
 - **Passou:** build de produção; JavaScript Testing; Ruby Linting; CSS Linting; Haml Linting; Bundler Audit; Historical data migration test; Test container image build.
-- **Falhou:** JavaScript Linting (`app/javascript`, diversos erros TypeScript/ESLint); Check formatting (apontou `app/javascript/mastodon/features/bug_report/bug_report_modal.tsx`); testes Ruby/RSpec e E2E. Parte da matriz Ruby 3.3/3.4 falhou durante setup/instalação do Bundler; ainda é preciso validar se o workflow dessa versão alpha é coerente com as versões de Ruby suportadas.
+- **Falhou no SHA inicial:** JavaScript Linting, formatação, Ruby/RSpec e E2E. As correções subsequentes estão sendo verificadas por novos workflows; consultar o histórico abaixo e não tratar a integração como validada enquanto os jobs atuais não passarem.
 - Os E2E em Ruby 4.0 também mostraram erro de servidor: `ThemeHelper#available_theme_colors` chama `Themes.instance.available_theme_colors`, método que não existe na classe atual `Themes`. Esse erro provoca HTTP 500 em páginas e faz falhar vários testes de navegador.
 - Também há evidência de discrepância entre migrações e `db/schema.rb`: o modelo/testes de selo de verificação usam `verified_badge_visible`, coluna ausente do schema exportado, apesar de existir a migração `db/migrate/20260926151300_add_verified_badge_visible_to_accounts.rb`.
 - O commit `8b2c6e8281065a0bd968d9134920bc36ff78b3da` já tentou incluir tabelas BlueLab no schema, mas a execução atual demonstra que é necessário conferir a cobertura de colunas/tabelas customizadas, não apenas o nome do commit.
@@ -70,12 +70,16 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 
 ## Histórico de alterações desta atualização
 
+<!-- prettier-ignore -->
+
 | Data (UTC) | Etapa | Alteração | Validação | SHA |
 |---|---|---|---|---|
 | 2026-10-20 | 1 | Criado checkpoint com estado inicial, escopo, CI e plano de correção. | Estado inicial auditado; CI do SHA `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea` consultada. | `0a9c63a1c6392e04cfa512890d7d59cfc1db9efb` |
 | 2026-10-20 | 2 | Restaurado o contrato `Themes#available_theme_colors`, atualizado `config/themes.yml` para o formato `path`/`colors` aceito pelo Mastodon atual, e adicionado teste para a paleta BlueLab. | Correção publicada no canal de teste. Testes e CI do novo SHA ainda pendentes; não declarar a etapa validada antes dos resultados. | `b573c59cf1c994d5cbc73febd10115afa54193df` |
 | 2026-10-20 | 3 | Corrigido `db/schema.rb` para incluir as colunas existentes nas migrações e que faltavam no schema: `last_read_status_id`, `verified_badge_visible` e `fasp_providers.capabilities`. | Diff aplicado no canal de teste; execução de migrações, RSpec e CI do novo SHA ainda pendentes. | `dbd20c5ff56eb4b641cde8e2de643c99d27790c9` |
 | 2026-10-20 | 4 | Corrigida a formatação dos dois blocos de callback em `bug_report_modal.tsx`, único arquivo indicado pelo `yarn format:check`. | Alteração publicada; `yarn format:check` será confirmado na CI do commit seguinte. | `fa3f21e7871f15a1b4ea13257b70ed62ca7124d4` |
+| 2026-10-20 | 5 | Corrigidos problemas TypeScript/React em componentes de navegação, feeds, compositor e conversas diretas; restaurado import `countableText` do upstream. | JavaScript Testing passou no SHA `967b741`; lint e demais verificações ainda pendentes. | `8e4c64eee01adb26913b46c0c5d2a77597bf0440` / `15bbff53101a2abb9fbae64d60126eb0dc2458dd` |
+| 2026-10-20 | 6 | Aplicada nova rodada de formatação em `column_header`, `account_edit`, `pinned_feeds`, `bug_report_modal` e `gif_picker`. | CI do SHA `967b741` ainda apontou 7 arquivos; esta rodada corrige visibilidade, conversa, import do composer e o próprio registro. | `967b741ea52d005e15418214f4a6632ac3e0e8db`
 
 ## Referências da execução
 

@@ -98,9 +98,7 @@ export const ComposeVisibility: React.FC<{
           trailingIcon={CaretIcon}
           disabled={isEditing}
         >
-          <ComposeVisibilityButtonText
-            privacy={privacy}
-          />
+          <ComposeVisibilityButtonText privacy={privacy} />
         </MenuTrigger>
 
         {privacy !== 'direct' ? (

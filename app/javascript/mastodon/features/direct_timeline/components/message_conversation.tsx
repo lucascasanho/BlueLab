@@ -91,7 +91,8 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   const [messageStatusIds, setMessageStatusIds] = useState<string[]>([]);
   const [conversationResolvedId, setConversationResolvedId] =
     useState<string | null>(null);
-  const [messagesResolvedId, setMessagesResolvedId] = useState<string | null>(null);
+  const [messagesResolvedId, setMessagesResolvedId] =
+    useState<string | null>(null);
   const conversationResolved = !id || conversationResolvedId === id;
   const messagesResolved = !id || messagesResolvedId === id;
   const [highlightedStatusId, setHighlightedStatusId] = useState<string | null>(

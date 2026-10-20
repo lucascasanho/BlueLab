@@ -28,8 +28,8 @@ import type {
   ApiStatusJSON,
   StatusVisibility,
 } from '@/mastodon/api_types/statuses';
-import { countableText } from '@/mastodon/features/compose/util/counter';
 import { browserHistory } from '@/mastodon/components/router';
+import { countableText } from '@/mastodon/features/compose/util/counter';
 import {
   createAppSelector,
   createAppThunk,
