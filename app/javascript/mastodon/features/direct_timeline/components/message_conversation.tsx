@@ -46,7 +46,11 @@ import { me } from '@/mastodon/initial_state';
 import type { StatusShape } from '@/mastodon/models/status';
 import { dismissComposer } from '@/mastodon/reducers/slices/composer';
 import { makeGetStatus } from '@/mastodon/selectors';
-import { useAppDispatch, useAppSelector, type RootState } from '@/mastodon/store';
+import {
+  useAppDispatch,
+  useAppSelector,
+  type RootState,
+} from '@/mastodon/store';
 import ReplyIcon from '@/material-icons/400-24px/reply.svg?react';
 import StarIcon from '@/material-icons/400-24px/star-fill.svg?react';
 import StarBorderIcon from '@/material-icons/400-24px/star.svg?react';
@@ -281,7 +285,10 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     return [...messageStatusIds, latestThreadStatusId].sort(compareId);
   }, [latestThreadStatusId, messageStatusIds]);
 
-  const statuses = useAppSelector<RootState, ImmutableRecord<StatusShape>[]>((state) =>
+  const statuses = useAppSelector<
+    RootState,
+    ImmutableRecord<StatusShape>[]
+  >((state) =>
     effectiveMessageStatusIds
       .map(
         (statusId) =>
