@@ -24,6 +24,7 @@ import {
 } from '../compose_panel';
 
 import { MultiColumnContent } from './multi_column_content';
+import { MultiColumnContent as VanillaMultiColumnContent } from './vanilla_multi_column_content';
 import { ColumnsAreaRedesign } from './redesign';
 import classes from './styles.module.scss';
 import multiColClasses from './styles_multi_column.module.scss';
@@ -176,7 +177,7 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
         <VanillaNavigationPanel multiColumn />
       </div>
       <VanillaComposeRedesignButton />
-      <MultiColumnContent>{children}</MultiColumnContent>
+      <VanillaMultiColumnContent>{children}</VanillaMultiColumnContent>
     </main>
   );
 };
