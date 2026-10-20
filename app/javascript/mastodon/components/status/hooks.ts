@@ -787,6 +787,13 @@ function getMenuItems({
     menu.push(null);
   }
 
+  if (interactions.editQuotePolicy && !isRedesignEnabled()) {
+    menu.push({
+      text: intl.formatMessage(menuMessages.quotePolicyChange),
+      action: onStatusInteraction('editQuotePolicy'),
+    });
+  }
+
   if (interactions.edit && interactions.delete && interactions.redraft) {
     menu.push({
       text: intl.formatMessage(menuMessages.edit),
