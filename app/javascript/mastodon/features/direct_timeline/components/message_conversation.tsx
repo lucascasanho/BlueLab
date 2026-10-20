@@ -458,7 +458,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       setPendingScrollStatusId(null);
     });
 
-    return () => { window.cancelAnimationFrame(frame); };
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
   }, [highlightStatus, pendingScrollStatusId, statuses]);
 
   const initialScrollConversationIdRef = useRef<string | null>(null);
@@ -666,7 +668,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                             replyTarget.getIn(['account', 'username']),
                         },
                       )}
-                      onClick={() => { scrollToStatus(replyTargetId); }}
+                      onClick={() => {
+                        scrollToStatus(replyTargetId);
+                      }}
                     >
                       <span className={classes.replyContextHeader}>
                         <ReplyIcon
@@ -716,7 +720,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                       })}
                       icon='reply'
                       iconComponent={ReplyIcon}
-                      onClick={() => { handleReply(status); }}
+                      onClick={() => {
+                        handleReply(status);
+                      }}
                     />
                     <IconButton
                       className={
@@ -742,8 +748,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                       iconComponent={
                         status.get('favourited') ? StarIcon : StarBorderIcon
                       }
-                      onClick={() => { dispatch(toggleFavourite(status.get('id') as string)); }
-                      }
+                      onClick={() => {
+                        dispatch(toggleFavourite(status.get('id') as string));
+                      }}
                     />
                   </div>
                 </article>

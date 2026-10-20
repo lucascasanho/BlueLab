@@ -160,7 +160,9 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
-  const handleBlue2CardClick = useCallback<React.MouseEventHandler<HTMLElement>>(
+  const handleBlue2CardClick = useCallback<
+    React.MouseEventHandler<HTMLElement>
+  >(
     (event) => {
       if (!isBlue2 || event.defaultPrevented) {
         return;

@@ -327,7 +327,9 @@ const AccountList: React.FC<{
                   },
                   { account: label },
                 )}
-                onClick={(event) => { removeAccount(event, storedAccount.id); }}
+                onClick={(event) => {
+                  removeAccount(event, storedAccount.id);
+                }}
               >
                 ×
               </button>

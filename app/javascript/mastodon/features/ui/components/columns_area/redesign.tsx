@@ -579,7 +579,9 @@ export const ColumnsAreaRedesign: React.FC<{
                           ? classes.blue2TabActive
                           : classes.blue2Tab
                       }
-                      onClick={() => { selectFeedTab(null); }}
+                      onClick={() => {
+                        selectFeedTab(null);
+                      }}
                     >
                       <FormattedMessage
                         id='account.following'
@@ -593,7 +595,9 @@ export const ColumnsAreaRedesign: React.FC<{
                           ? classes.blue2TabActive
                           : classes.blue2Tab
                       }
-                      onClick={() => { selectFeedTab('global'); }}
+                      onClick={() => {
+                        selectFeedTab('global');
+                      }}
                     >
                       {blue2Text(intl.locale, 'global')}
                     </button>

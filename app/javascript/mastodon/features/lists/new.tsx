@@ -312,7 +312,11 @@ const NewListWrapper: React.FC<{
         <ColumnHeader
           withBackButton
           {...(isBlue2
-            ? { onBackButtonClick: () => { history.push('/lists'); } }
+            ? {
+                onBackButtonClick: () => {
+                  history.push('/lists');
+                },
+              }
             : {})}
           title={title}
         />

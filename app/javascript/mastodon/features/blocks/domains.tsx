@@ -6,7 +6,6 @@ import { Helmet } from '@unhead/react/helmet';
 
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
-
 import { apiGetDomainBlocks } from 'mastodon/api/domain_blocks';
 import { Domain } from 'mastodon/components/domain';
 import ScrollableList from 'mastodon/components/scrollable_list';
@@ -59,11 +58,17 @@ const DomainBlocks: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   return (
     <Column
       bindToDocument={!multiColumn}
-      label={intl.formatMessage({ id: 'column.domain_blocks', defaultMessage: 'Blocked Domains' })}
+      label={intl.formatMessage({
+        id: 'column.domain_blocks',
+        defaultMessage: 'Blocked Domains',
+      })}
     >
       <ColumnHeader
         withBackButton={multiColumn && 'auto'}
-        title={intl.formatMessage({ id: 'column.domain_blocks', defaultMessage: 'Blocked Domains' })}
+        title={intl.formatMessage({
+          id: 'column.domain_blocks',
+          defaultMessage: 'Blocked Domains',
+        })}
       />
 
       <ScrollableList

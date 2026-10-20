@@ -32,7 +32,11 @@ import {
   LegacyDropdownMenuItems,
 } from '../menu';
 
-import { useStatusContext, useStatusIcons, useStatusMenuActions } from './hooks';
+import {
+  useStatusContext,
+  useStatusIcons,
+  useStatusMenuActions,
+} from './hooks';
 import { RemoveQuoteHint } from './legacy/action_bar/remove_quote_hint';
 import classes from './styles.module.scss';
 

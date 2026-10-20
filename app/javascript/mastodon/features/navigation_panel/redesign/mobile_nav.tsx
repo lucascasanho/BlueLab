@@ -3,9 +3,9 @@ import { useCallback, useEffect, useRef } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
+import { useLocation } from 'react-router';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
-import { useLocation } from 'react-router';
 
 import {
   BellIcon,
@@ -44,9 +44,9 @@ export const RedesignMobileNavigation: React.FC = () => {
     selectUnreadNotificationGroupsCount,
   );
   const unreadMessagesCount = useAppSelector((state) => {
-    const conversations = state.conversations.get(
-      'items',
-    ) as ImmutableList<ImmutableMap<string, unknown>>;
+    const conversations = state.conversations.get('items') as ImmutableList<
+      ImmutableMap<string, unknown>
+    >;
 
     return conversations.some((conversation) => conversation.get('unread'));
   });

@@ -63,17 +63,20 @@ export const Blue2InternalFeed: React.FC<Blue2InternalFeedProps> = ({
     return dispatch(connectHashtagStream(id, id, false));
   }, [dispatch, id, type]);
 
-  const handleLoadMore = useCallback((maxId: number) => {
-    if (type === 'global') {
-      void dispatch(expandPublicTimeline({ maxId }));
-    } else if (type === 'home') {
-      void dispatch(expandHomeTimeline({ maxId }));
-    } else if (type === 'list' && id) {
-      void dispatch(expandListTimeline(id, { maxId }));
-    } else if (type === 'hashtag' && id) {
-      void dispatch(expandHashtagTimeline(id, { maxId, local: false }));
-    }
-  }, [dispatch, id, type]);
+  const handleLoadMore = useCallback(
+    (maxId: number) => {
+      if (type === 'global') {
+        void dispatch(expandPublicTimeline({ maxId }));
+      } else if (type === 'home') {
+        void dispatch(expandHomeTimeline({ maxId }));
+      } else if (type === 'list' && id) {
+        void dispatch(expandListTimeline(id, { maxId }));
+      } else if (type === 'hashtag' && id) {
+        void dispatch(expandHashtagTimeline(id, { maxId, local: false }));
+      }
+    },
+    [dispatch, id, type],
+  );
 
   return (
     <Column bindToDocument>

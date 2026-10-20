@@ -1,10 +1,9 @@
 import {
   readStoredAccounts,
   removeStoredAccount,
-  upsertStoredAccount
-  
+  upsertStoredAccount,
 } from './index';
-import type {StoredAccount} from './index';
+import type { StoredAccount } from './index';
 
 const account = (id: string, lastUsedAt = 0): StoredAccount => ({
   id,

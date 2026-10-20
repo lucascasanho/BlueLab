@@ -13,9 +13,6 @@ import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useColumnsContext } from '@/mastodon/features/ui/util/columns_context';
 import { useAppSelector } from '@/mastodon/store';
 
-import classes from './styles.module.scss';
-import multiColClasses from './styles_multi_column.module.scss';
-
 import { ColumnsAreaMastodon5 } from '../../../mastodon5';
 import {
   ComposePanel,
@@ -24,6 +21,8 @@ import {
 
 import { MultiColumnContent } from './multi_column_content';
 import { ColumnsAreaRedesign } from './redesign';
+import classes from './styles.module.scss';
+import multiColClasses from './styles_multi_column.module.scss';
 
 const TabsBarPortal = () => {
   const { setTabsBarElement } = useColumnsContext();
@@ -86,7 +85,11 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
             <RedirectToMobileComposeIfNeeded />
           </div>
         </div>
-        {isMobileViewport ? <RedesignMobileNavigation /> : <ComposeRedesignButton />}
+        {isMobileViewport ? (
+          <RedesignMobileNavigation />
+        ) : (
+          <ComposeRedesignButton />
+        )}
 
         {isBirdUi ? (
           <ComposeRedesignButton hostOnly />

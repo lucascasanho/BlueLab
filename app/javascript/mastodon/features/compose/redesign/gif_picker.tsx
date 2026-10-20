@@ -341,7 +341,9 @@ const ComposeGifDropdown: React.FC<
             value={query}
             placeholder={intl.formatMessage(messages.search)}
             aria-label={intl.formatMessage(messages.search)}
-            onChange={(event) => { setQuery(event.target.value); }}
+            onChange={(event) => {
+              setQuery(event.target.value);
+            }}
           />
         </div>
       </div>

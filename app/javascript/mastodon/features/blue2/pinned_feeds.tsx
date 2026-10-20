@@ -254,8 +254,9 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
               <MenuItem
                 key={list.id}
                 icon={RssSimpleIcon}
-                onClick={() => { addFeed(createPinnedListFeed(list.id, list.title)); }
-                }
+                onClick={() => {
+                  addFeed(createPinnedListFeed(list.id, list.title));
+                }}
               >
                 {list.title}
               </MenuItem>
@@ -285,7 +286,9 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
               <MenuItem
                 key={tag.name}
                 icon={HashIcon}
-                onClick={() => { addFeed(createPinnedHashtagFeed(tag.name)); }}
+                onClick={() => {
+                  addFeed(createPinnedHashtagFeed(tag.name));
+                }}
               >
                 #{tag.name}
               </MenuItem>
@@ -321,7 +324,9 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
               {feeds.map((feed) => (
                 <MenuItem
                   key={`remove:${feed.key}`}
-                  onClick={() => { removeFeed(feed.key); }}
+                  onClick={() => {
+                    removeFeed(feed.key);
+                  }}
                 >
                   {feed.title}
                 </MenuItem>
@@ -356,7 +361,9 @@ export const Blue2PinnedFeedTabs: React.FC<{
           key={feed.key}
           type='button'
           className={activeKey === feed.key ? activeTabClassName : tabClassName}
-          onClick={() => { onSelect(feed.key); }}
+          onClick={() => {
+            onSelect(feed.key);
+          }}
         >
           {showIcons && feed.type === 'list' && <RssSimpleIcon size={15} />}
           {feed.title}

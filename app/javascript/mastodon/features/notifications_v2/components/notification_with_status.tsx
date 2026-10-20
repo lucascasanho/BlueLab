@@ -63,18 +63,25 @@ export const NotificationWithStatus: React.FC<{
       getStatusHidden(state, { id: statusId, contextType: 'notifications' }),
   );
 
-  const handleCardClick = useCallback((event: MouseEvent<HTMLDivElement>) => {
-    if (!(event.target instanceof Element)) return;
-    if (event.target.closest('a,button,input,textarea,select,[role="link"],[role="button"],.status'))
-      return;
-    if (!statusId) return;
+  const handleCardClick = useCallback(
+    (event: MouseEvent<HTMLDivElement>) => {
+      if (!(event.target instanceof Element)) return;
+      if (
+        event.target.closest(
+          'a,button,input,textarea,select,[role="link"],[role="button"],.status',
+        )
+      )
+        return;
+      if (!statusId) return;
 
-    if (isPrivateMention) {
-      dispatch(openConversationForStatus(statusId));
-    } else {
-      dispatch(navigateToStatus(statusId));
-    }
-  }, [dispatch, isPrivateMention, statusId]);
+      if (isPrivateMention) {
+        dispatch(openConversationForStatus(statusId));
+      } else {
+        dispatch(navigateToStatus(statusId));
+      }
+    },
+    [dispatch, isPrivateMention, statusId],
+  );
 
   const handlers = useMemo(
     () => ({

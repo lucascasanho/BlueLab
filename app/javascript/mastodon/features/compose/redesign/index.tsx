@@ -142,7 +142,6 @@ export const RedesignComposeForm: React.FC<
   const mainEditor = (
     <ComposeAutocomplete>
       <RichComposeEditor
-         
         autoFocus={autoFocus}
         onSubmit={onSubmit}
         messageToolbar={isMessage && embedded}
@@ -201,7 +200,9 @@ export const RedesignComposeForm: React.FC<
               size='sm'
               active={sensitive}
               onClick={onSensitiveChange}
-              onMouseDown={(event) => { event.preventDefault(); }}
+              onMouseDown={(event) => {
+                event.preventDefault();
+              }}
               leadingIcon={sensitiveIcon}
             >
               <FormattedMessage
@@ -228,7 +229,7 @@ export const RedesignComposeForm: React.FC<
             label={intl.formatMessage(messages.sensitiveText)}
             value={sensitiveText}
             onChange={onSensitiveTextChange}
-             
+
             autoFocus
           />
         )}

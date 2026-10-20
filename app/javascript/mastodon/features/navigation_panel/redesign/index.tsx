@@ -160,9 +160,9 @@ export const RedesignNavigationPanel: React.FC<{
     selectUnreadNotificationGroupsCount,
   );
   const unreadMessagesCount = useAppSelector((state) => {
-    const conversations = state.conversations.get(
-      'items',
-    ) as ImmutableList<ImmutableMap<string, unknown>>;
+    const conversations = state.conversations.get('items') as ImmutableList<
+      ImmutableMap<string, unknown>
+    >;
 
     return groupedConversationRepresentatives(conversations).filter(
       (conversation) => conversation.get('unread'),

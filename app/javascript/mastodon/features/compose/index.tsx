@@ -232,14 +232,14 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
         {useBlueLabComposer ? (
           <RedesignComposeForm
             // This is a dedicated compose view.
-             
+
             autoFocus
             embedded
           />
         ) : (
           <ComposeFormContainer
             // This is fine on this single-purpose view
-             
+
             autoFocus
           />
         )}

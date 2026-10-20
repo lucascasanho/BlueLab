@@ -249,7 +249,9 @@ export const VerificationRequestTrigger: FC = () => {
                       maxLength={5_000}
                       rows={6}
                       required={false}
-                      onChange={(event) => { setExplanation(event.target.value); }}
+                      onChange={(event) => {
+                        setExplanation(event.target.value);
+                      }}
                     />
 
                     {error && (

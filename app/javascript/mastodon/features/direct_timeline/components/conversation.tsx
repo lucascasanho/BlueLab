@@ -207,7 +207,7 @@ export const Conversation: React.FC<{
     <Hotkeys handlers={handlers}>
       <div
         className={classNames('conversation focusable muted', { unread })}
-         
+
         tabIndex={0}
         role='button'
         onClick={(event) => {
