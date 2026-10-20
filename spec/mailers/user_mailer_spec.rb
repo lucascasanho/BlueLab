@@ -65,7 +65,7 @@ RSpec.describe UserMailer do
         .and match(Rails.configuration.x.local_domain)
     end
 
-it 'uses customized light colors and keeps the HTML layout light-only' do
+    it 'uses customized light colors and keeps the HTML layout light-only' do
       Setting.instance_light_background_color = '#123456'
       Setting.instance_light_surface_color = '#234567'
       Setting.instance_light_text_color = '#345678'
@@ -75,8 +75,8 @@ it 'uses customized light colors and keeps the HTML layout light-only' do
 
       html = mail.html_part.body.decoded
 
-expect(html).to include('#123456', '#234567', '#345678')
-expect(html).to include('color-scheme: light', 'supported-color-schemes: light')
+      expect(html).to include('#123456', '#234567', '#345678')
+      expect(html).to include('color-scheme: light', 'supported-color-schemes: light')
       expect(html).to_not include('#102030', '#203040', '#f0f1f2', 'prefers-color-scheme: dark')
     end
 
