@@ -252,7 +252,6 @@ export const ComposeSchedule: React.FC = () => {
         icon={CalendarDotsIcon}
         color={scheduledAt ? 'accent' : 'neutral'}
         aria-expanded={open}
-        title={intl.formatMessage(messages.schedule)}
         disabled={hasPublishedThreadItems}
         onClick={toggle}
       >
