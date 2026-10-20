@@ -240,7 +240,6 @@ export const StatusPage: React.FC = () => {
               icon={favouriteIcon}
               onClick={handleFavouriteClick}
               className='star-icon'
-              title={favouriteTitle}
             >
               {favouriteTitle}
             </ToggleIconButton>
@@ -423,3 +422,4 @@ function useNewReplies({
 
   return newReplyIds;
 }
+
