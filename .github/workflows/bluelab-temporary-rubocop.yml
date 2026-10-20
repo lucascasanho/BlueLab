@@ -1,4 +1,5 @@
 name: Temporary BlueLab RuboCop autocorrect
+# Run safe autofixes after the latest formatter pass.
 on:
   push:
     branches:
