@@ -61,7 +61,10 @@ export const StatusRedesignHeader: React.FC<StatusRedesignHeaderProps> = ({
         values={{ author: displayName, count: status.mentions.length }}
       />
     );
-  } else if (status.visibility === 'direct') {
+  } else if (
+    status.visibility === 'direct' &&
+    status.account.id !== currentAccountId
+  ) {
     displayName = (
       <FormattedMessage
         id='status.header.message_to_me'

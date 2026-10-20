@@ -160,25 +160,26 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
-  const handleBlue2CardClick: React.MouseEventHandler<HTMLElement> = (
-    event,
-  ) => {
-    if (!isBlue2 || event.defaultPrevented) {
-      return;
-    }
+  const handleBlue2CardClick = useCallback<React.MouseEventHandler<HTMLElement>>(
+    (event) => {
+      if (!isBlue2 || event.defaultPrevented) {
+        return;
+      }
 
-    const target = event.target;
-    if (
-      target instanceof Element &&
-      target.closest(
-        'a, button, input, textarea, select, option, video, audio, iframe, [role="button"], [role="checkbox"], [role="switch"], [role="slider"], [contenteditable="true"], .media-gallery, .video-player, .audio-player, .status-card',
-      )
-    ) {
-      return;
-    }
+      const target = event.target;
+      if (
+        target instanceof Element &&
+        target.closest(
+          'a, button, input, textarea, select, option, video, audio, iframe, [role="button"], [role="checkbox"], [role="switch"], [role="slider"], [contenteditable="true"], .media-gallery, .video-player, .audio-player, .status-card',
+        )
+      ) {
+        return;
+      }
 
-    handlers.onOpenClick(event);
-  };
+      onOpenClick(event);
+    },
+    [isBlue2, onOpenClick],
+  );
 
   if (hidden) {
     return (
