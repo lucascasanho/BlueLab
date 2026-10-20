@@ -2,9 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 
+import classNames from 'classnames';
 import { useLocation, useParams } from 'react-router-dom';
 
-import { List as ImmutableList } from 'immutable';
+import {
+  List as ImmutableList,
+  Map as ImmutableMap,
+  Record as ImmutableRecord,
+} from 'immutable';
 
 import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
@@ -28,6 +33,7 @@ import { toggleFavourite } from '@/mastodon/actions/interactions';
 import { fetchStatus } from '@/mastodon/actions/statuses';
 import { connectDirectStream } from '@/mastodon/actions/streaming';
 import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
+import type { Account } from '@/mastodon/models/account';
 import { compareId } from '@/mastodon/compare_id';
 import AttachmentList from '@/mastodon/components/attachment_list';
 import { Avatar } from '@/mastodon/components/avatar';
@@ -83,8 +89,11 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [messageStatusIds, setMessageStatusIds] = useState<string[]>([]);
-  const [conversationResolved, setConversationResolved] = useState(false);
-  const [messagesResolved, setMessagesResolved] = useState(false);
+  const [conversationResolvedId, setConversationResolvedId] =
+    useState<string | null>(null);
+  const [messagesResolvedId, setMessagesResolvedId] = useState<string | null>(null);
+  const conversationResolved = !id || conversationResolvedId === id;
+  const messagesResolved = !id || messagesResolvedId === id;
   const [highlightedStatusId, setHighlightedStatusId] = useState<string | null>(
     null,
   );
@@ -92,12 +101,16 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     string | null
   >(null);
 
-  const conversationItems = useAppSelector(
-    (state) =>
-      state.conversations.get('items') as Immutable.List<
-        Immutable.Map<string, unknown>
-      >,
-  );
+  const conversationItems = useAppSelector((state) => {
+    const conversationsState = state.conversations as unknown as ImmutableMap<
+      string,
+      unknown
+    >;
+
+    return conversationsState.get('items') as ImmutableList<
+      ImmutableMap<string, unknown>
+    >;
+  });
 
   const conversation = useMemo(
     () => conversationItems.find((item) => item.get('id') === id),
@@ -113,13 +126,13 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     if (!conversation) return [];
 
     const targetParticipants = conversation.get('accounts') as
-      | Immutable.List<string>
+      | ImmutableList<string>
       | undefined;
 
     return conversationItems
       .filter((item) => {
         const itemParticipants = item.get('accounts') as
-          | Immutable.List<string>
+          | ImmutableList<string>
           | undefined;
         const sameParticipants =
           ImmutableList.isList(itemParticipants) &&
@@ -153,7 +166,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     return [...ids].sort();
   }, [threadConversations]);
 
-  const accounts = useAppSelector((state) => state.accounts);
+  const accounts = useAppSelector(
+    (state) => state.accounts as unknown as ImmutableMap<string, Account>,
+  );
 
   const participantAccounts = useMemo(
     () =>
@@ -165,15 +180,6 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         ),
     [accounts, participantIds],
   );
-
-  const statuses = useAppSelector((state) =>
-    messageStatusIds
-      .map((statusId) =>
-        // @ts-expect-error Legacy selector is not typed yet.
-        getStatus(state, { id: statusId }),
-      )
-      .filter(Boolean),
-  ) as Immutable.Record<StatusShape>[];
 
   const loadMessages = useCallback(() => {
     if (!id) return Promise.resolve([]);
@@ -187,9 +193,14 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       return statuses;
     };
 
-    return dispatch(fetchConversationMessages(id))
+    const fetchMessages = (conversationId: string) =>
+      dispatch(
+        fetchConversationMessages(conversationId),
+      ) as unknown as Promise<{ id: string }[]>;
+
+    return fetchMessages(id)
       .then(applyStatuses)
-      .catch(async (error) => {
+      .catch(async (error: unknown) => {
         if (!sourceStatusId) throw error;
 
         const recoveredId = await dispatch(
@@ -202,7 +213,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           statusId: sourceStatusId,
         });
 
-        const statuses = await dispatch(fetchConversationMessages(recoveredId));
+        const statuses = await fetchMessages(recoveredId);
         return applyStatuses(statuses);
       });
   }, [dispatch, id, sourceStatusId]);
@@ -218,10 +229,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     let cancelled = false;
 
     if (id) {
-      setConversationResolved(false);
-      setMessagesResolved(false);
+      const requestedId = id;
 
-      void dispatch(fetchConversation(id))
+      void dispatch(fetchConversation(requestedId))
         .catch(async () => {
           if (!sourceStatusId || cancelled) return;
 
@@ -240,10 +250,8 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           }
         })
         .finally(() => {
-          if (!cancelled) setConversationResolved(true);
+          if (!cancelled) setConversationResolvedId(requestedId);
         });
-    } else {
-      setConversationResolved(true);
     }
 
     return () => {
@@ -253,7 +261,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         disconnect?.();
       }
     };
-  }, [dispatch, id, inline]);
+  }, [dispatch, id, inline, sourceStatusId]);
 
   const latestThreadStatusId = useMemo(
     () =>
@@ -266,6 +274,31 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         return latest;
       }, null),
     [threadConversations],
+  );
+
+  const effectiveMessageStatusIds = useMemo(() => {
+    if (
+      !latestThreadStatusId ||
+      messageStatusIds.includes(latestThreadStatusId)
+    ) {
+      return messageStatusIds;
+    }
+
+    return [...messageStatusIds, latestThreadStatusId].sort(compareId);
+  }, [latestThreadStatusId, messageStatusIds]);
+
+  const statuses = useAppSelector((state) =>
+    effectiveMessageStatusIds
+      .map(
+        (statusId) =>
+          getStatus(state, { id: statusId }) as unknown as
+            | ImmutableRecord<StatusShape>
+            | undefined,
+      )
+      .filter(
+        (status): status is ImmutableRecord<StatusShape> =>
+          status !== undefined && status !== null,
+      ),
   );
 
   const initialLoadConversationIdRef = useRef<string | null>(null);
@@ -282,7 +315,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     void loadMessages()
       .catch(() => undefined)
       .finally(() => {
-        if (!cancelled) setMessagesResolved(true);
+        if (!cancelled) setMessagesResolvedId(id);
       });
 
     return () => {
@@ -298,12 +331,6 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       observedThreadStatusIdRef.current !== latestThreadStatusId;
 
     observedThreadStatusIdRef.current = latestThreadStatusId;
-
-    setMessageStatusIds((current) =>
-      current.includes(latestThreadStatusId)
-        ? current
-        : [...current, latestThreadStatusId].sort(compareId),
-    );
 
     if (!isFirstObservedStatus && statusChanged) {
       void loadMessages();
@@ -360,7 +387,10 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
   const participantAccountIdsKey = participantIds.join(',');
   const participantAccountsRef = useRef(participantAccounts);
-  participantAccountsRef.current = participantAccounts;
+
+  useEffect(() => {
+    participantAccountsRef.current = participantAccounts;
+  }, [participantAccounts]);
 
   useEffect(() => {
     const recipients = participantAccountsRef.current;
@@ -531,8 +561,43 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   }, [conversation, conversationResolved, id, messagesResolved, statuses]);
 
   const handleReply = useCallback(
-    (status: Immutable.Record<StatusShape>) => {
+    (status: ImmutableRecord<StatusShape>) => {
       dispatch(replyComposeInline(status));
+    },
+    [dispatch],
+  );
+
+  const createScrollToStatusHandler = useCallback(
+    (statusId: string | null) => () => {
+      if (statusId) scrollToStatus(statusId);
+    },
+    [scrollToStatus],
+  );
+
+  const createReplyHandler = useCallback(
+    (status: ImmutableRecord<StatusShape>) => () => handleReply(status),
+    [handleReply],
+  );
+
+  const createFavouriteHandler = useCallback(
+    (statusId: string) => () => {
+      dispatch(toggleFavourite(statusId));
+    },
+    [dispatch],
+  );
+
+  const handleReplyComposeSuccess = useCallback(
+    (status: ApiStatusJSON) => {
+      dispatch(importFetchedStatus(status));
+      setMessageStatusIds((current) =>
+        current.includes(status.id)
+          ? current
+          : [...current, status.id].sort(compareId),
+      );
+
+      participantAccountsRef.current.forEach((account) => {
+        dispatch(directComposeInline(account));
+      });
     },
     [dispatch],
   );
@@ -601,13 +666,13 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                 typeof status.get('text') === 'string'
                   ? (status.get('text') as string)
                   : '';
-              const mentions = status.get('mentions') as Immutable.List<
-                Immutable.Map<string, unknown>
+              const mentions = status.get('mentions') as ImmutableList<
+                ImmutableMap<string, unknown>
               >;
               const trimmedText = statusText.trimStart();
               const showSenderName =
-                mentions?.size > 1 ||
-                mentions?.some((mention) => {
+                mentions.size > 1 ||
+                mentions.some((mention) => {
                   const acct = mention.get('acct');
                   const username = mention.get('username');
                   const startsWithMention =
@@ -634,13 +699,12 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
               return (
                 <article
-                  id={`message-${status.get('id') as string}`}
-                  key={status.get('id') as string}
-                  className={
-                    highlightedStatusId === (status.get('id') as string)
-                      ? classes.message + ' ' + classes.messageHighlighted
-                      : classes.message
-                  }
+                  id={`message-${status.get<'id'>('id')}`}
+                  key={status.get<'id'>('id')}
+                  className={classNames(classes.message, {
+                    [classes.messageHighlighted]:
+                      highlightedStatusId === status.get<'id'>('id'),
+                  })}
                   data-own-message={isMine ? 'true' : 'false'}
                 >
                   <div className={classes.messageMeta}>
@@ -668,9 +732,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                             replyTarget.getIn(['account', 'username']),
                         },
                       )}
-                      onClick={() => {
-                        scrollToStatus(replyTargetId);
-                      }}
+                      onClick={createScrollToStatusHandler(replyTargetId)}
                     >
                       <span className={classes.replyContextHeader}>
                         <ReplyIcon
@@ -720,9 +782,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                       })}
                       icon='reply'
                       iconComponent={ReplyIcon}
-                      onClick={() => {
-                        handleReply(status);
-                      }}
+                      onClick={createReplyHandler(status)}
                     />
                     <IconButton
                       className={
@@ -732,7 +792,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                         ' star-icon'
                       }
                       animate
-                      active={!!status.get('favourited')}
+                      active={status.get('favourited') === true}
                       title={intl.formatMessage(
                         status.get('favourited')
                           ? {
@@ -746,11 +806,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                       )}
                       icon='star'
                       iconComponent={
-                        status.get('favourited') ? StarIcon : StarBorderIcon
+                        status.get('favourited') === true ? StarIcon : StarBorderIcon
                       }
-                      onClick={() => {
-                        dispatch(toggleFavourite(status.get('id') as string));
-                      }}
+                      onClick={createFavouriteHandler(status.get<'id'>('id'))}
                     />
                   </div>
                 </article>
@@ -765,16 +823,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
             compact
             embedded
             autoFocus
-            onSuccess={(status: ApiStatusJSON) => {
-              dispatch(importFetchedStatus(status));
-              setMessageStatusIds((current) =>
-                current.includes(status.id) ? current : [...current, status.id],
-              );
-
-              participantAccountsRef.current.forEach((account) => {
-                dispatch(directComposeInline(account));
-              });
-            }}
+            onSuccess={handleReplyComposeSuccess}
           />
         )}
       </div>

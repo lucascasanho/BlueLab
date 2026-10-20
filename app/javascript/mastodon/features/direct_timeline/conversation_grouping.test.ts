@@ -65,7 +65,7 @@ describe('direct conversation grouping', () => {
 
     const [representative] = groupedConversationRepresentatives(
       ImmutableList([first, second]),
-    );
+    ) as unknown as ImmutableMap<string, unknown>[];
 
     expect(representative.get('id')).toBe('2');
     expect(representative.get('accounts')).toEqual(
