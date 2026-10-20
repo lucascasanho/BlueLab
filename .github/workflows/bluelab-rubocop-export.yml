@@ -1,0 +1,40 @@
+name: Temporary BlueLab RuboCop export
+on:
+  push:
+    branches:
+      - BlueLab-Test
+    paths:
+      - '.github/workflows/bluelab-rubocop-export.yml'
+permissions:
+  contents: read
+jobs:
+  rubocop-export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BUNDLE_ONLY: development
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@984c0c890880bbf811283d6f09c4607c62d210a4 # v1
+        with:
+          bundler-cache: true
+      - name: Apply safe RuboCop corrections
+        run: bin/rubocop -a --format simple || true
+      - name: Export RuboCop correction patch
+        run: |
+          git diff --binary > /tmp/bluelab-rubocop.patch
+          git diff --name-only > /tmp/bluelab-rubocop-files.txt
+          git diff --stat > /tmp/bluelab-rubocop-stat.txt
+          cat /tmp/bluelab-rubocop-stat.txt
+      - name: Upload RuboCop patch
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: bluelab-rubocop-patch
+          path: |
+            /tmp/bluelab-rubocop.patch
+            /tmp/bluelab-rubocop-files.txt
+            /tmp/bluelab-rubocop-stat.txt
+          if-no-files-found: error
+          retention-days: 1
