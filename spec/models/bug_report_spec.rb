@@ -7,7 +7,7 @@ RSpec.describe BugReport do
     it 'rejects descriptions longer than the limit' do
       report = Fabricate.build(:bug_report, description: 'a' * (described_class::MAX_DESCRIPTION_LENGTH + 1))
 
-      expect(report).not_to be_valid
+      expect(report).to_not be_valid
       expect(report.errors[:description]).to be_present
     end
 
