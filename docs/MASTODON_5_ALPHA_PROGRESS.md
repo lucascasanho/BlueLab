@@ -47,7 +47,8 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 ### Etapa 3 — schema e migrações BlueLab
 
 - [x] Comparar migrações customizadas, modelos, schema exportado e testes.
-- [x] Corrigir no schema as três colunas ausentes confirmadas na auditoria: `accounts.verified_badge_visible`, `account_conversations.last_read_status_id` e `fasp_providers.capabilities`.
+- [x] Corrigir no schema as colunas ausentes confirmadas: `accounts.verified_badge_visible` e `account_conversations.last_read_status_id`.
+- [x] Confirmar pela migração `20260925094651_create_fasp_capabilities.rb` que `fasp_providers.capabilities` é removida intencionalmente e que a fonte de verdade final é `fasp_capabilities`; não manter a coluna removida no schema.
 - [ ] Rodar o teste de migrações e testes focados do recurso de verificação; confirmar os demais campos/tabelas pela CI.
 - [x] Registrar o commit de schema; resultados de teste ainda pendentes.
 
@@ -78,7 +79,8 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 | 2026-10-20 | 3 | Corrigido `db/schema.rb` para incluir as colunas existentes nas migrações e que faltavam no schema: `last_read_status_id`, `verified_badge_visible` e `fasp_providers.capabilities`. | Diff aplicado no canal de teste; execução de migrações, RSpec e CI do novo SHA ainda pendentes. | `dbd20c5ff56eb4b641cde8e2de643c99d27790c9` |
 | 2026-10-20 | 4 | Corrigida a formatação dos dois blocos de callback em `bug_report_modal.tsx`, único arquivo indicado pelo `yarn format:check`. | Alteração publicada; `yarn format:check` será confirmado na CI do commit seguinte. | `fa3f21e7871f15a1b4ea13257b70ed62ca7124d4` |
 | 2026-10-20 | 5 | Corrigidos problemas TypeScript/React em componentes de navegação, feeds, compositor e conversas diretas; restaurado import `countableText` do upstream. | JavaScript Testing passou no SHA `967b741`; lint e demais verificações ainda pendentes. | `8e4c64eee01adb26913b46c0c5d2a77597bf0440` / `15bbff53101a2abb9fbae64d60126eb0dc2458dd` |
-| 2026-10-20 | 6 | Aplicada nova rodada de formatação em `column_header`, `account_edit`, `pinned_feeds`, `bug_report_modal` e `gif_picker`. | CI do SHA `967b741` ainda apontou 7 arquivos; esta rodada corrige visibilidade, conversa, import do composer e o próprio registro. | `967b741ea52d005e15418214f4a6632ac3e0e8db`
+| 2026-10-20 | 6 | Aplicada nova rodada de formatação em `column_header`, `account_edit`, `pinned_feeds`, `bug_report_modal` e `gif_picker`. | CI do SHA `967b741` ainda apontou 7 arquivos; esta rodada corrige visibilidade, conversa, import do composer e o próprio registro. | `967b741ea52d005e15418214f4a6632ac3e0e8db` |
+| 2026-10-20 | 7 | Corrigidos os dois erros restantes do ESLint em `message_conversation.tsx`; a nova CI começou em `0efcc484`. Revertida a inclusão indevida de `fasp_providers.capabilities` em `db/schema.rb`, pois a migração de setembro remove essa coluna ao migrar os dados para `fasp_capabilities`. | A CI do commit `0efcc484` está em execução; ainda não marcar ESLint/RSpec/E2E como aprovados até concluir. O teste histórico anterior passou antes desta correção final de schema. | `0efcc484d162da4f49e0aea9dab077cfc3b5da1f` / correção atual pendente de commit |
 
 ## Referências da execução
 
