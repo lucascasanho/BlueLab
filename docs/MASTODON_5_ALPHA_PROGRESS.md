@@ -53,7 +53,8 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 
 ### Etapa 4 — lint e formatação
 
-- [ ] Executar o formatter oficial para corrigir `bug_report_modal.tsx`, revisar diff e commitar a formatação.
+- [x] Corrigir manualmente os dois blocos de função com formatação divergente em `bug_report_modal.tsx`, sem alterar o comportamento.
+- [ ] Confirmar a formatação com o job oficial de `yarn format:check` (correção publicada; CI do novo SHA pendente).
 - [ ] Resolver erros ESLint/TypeScript concretos no código atual; não suprimir regras globalmente para mascarar problemas.
 - [ ] Rodar os comandos focados e o conjunto de lint JS.
 - [ ] Registrar quantidade de erros antes/depois e quaisquer bloqueios remanescentes.
@@ -74,6 +75,7 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 | 2026-10-20 | 1 | Criado checkpoint com estado inicial, escopo, CI e plano de correção. | Estado inicial auditado; CI do SHA `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea` consultada. | `0a9c63a1c6392e04cfa512890d7d59cfc1db9efb` |
 | 2026-10-20 | 2 | Restaurado o contrato `Themes#available_theme_colors`, atualizado `config/themes.yml` para o formato `path`/`colors` aceito pelo Mastodon atual, e adicionado teste para a paleta BlueLab. | Correção publicada no canal de teste. Testes e CI do novo SHA ainda pendentes; não declarar a etapa validada antes dos resultados. | `b573c59cf1c994d5cbc73febd10115afa54193df` |
 | 2026-10-20 | 3 | Corrigido `db/schema.rb` para incluir as colunas existentes nas migrações e que faltavam no schema: `last_read_status_id`, `verified_badge_visible` e `fasp_providers.capabilities`. | Diff aplicado no canal de teste; execução de migrações, RSpec e CI do novo SHA ainda pendentes. | `dbd20c5ff56eb4b641cde8e2de643c99d27790c9` |
+| 2026-10-20 | 4 | Corrigida a formatação dos dois blocos de callback em `bug_report_modal.tsx`, único arquivo indicado pelo `yarn format:check`. | Alteração publicada; `yarn format:check` será confirmado na CI do commit seguinte. | `fa3f21e7871f15a1b4ea13257b70ed62ca7124d4` |
 
 ## Referências da execução
 
