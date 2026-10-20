@@ -10,7 +10,7 @@ import type { EmojiData, EmojiSkin } from 'emoji-mart';
 
 import { emojiUse } from '@/mastodon/actions/emojis';
 import { changeSetting } from '@/mastodon/actions/settings';
-import { IconButton } from '@/mastodon/components/button/redesign';
+import { IconButton } from '@/mastodon/components/button/vanilla_redesign';
 import { CircularProgress } from '@/mastodon/components/circular_progress';
 import { MenuCard } from '@/mastodon/components/menu/card';
 import type { PopoverChildProps } from '@/mastodon/components/popover';
