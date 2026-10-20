@@ -130,9 +130,10 @@ const COPY: Record<string, Copy> = {
   },
 };
 
-const getCopy = (locale: string) => {
+const getCopy = (locale: string): Copy => {
   const normalized = locale.toLowerCase();
-  if (COPY[locale]) return COPY[locale];
+  const exactCopy = COPY[locale];
+  if (exactCopy) return exactCopy;
   if (normalized.startsWith('pt')) return COPY['pt-BR'];
   if (normalized.startsWith('es')) return COPY.es;
   if (normalized.startsWith('fr')) return COPY.fr;
