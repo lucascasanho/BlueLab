@@ -41,8 +41,6 @@ export const ComposeUpload: React.FC<{
     }
   }, [dispatch, id]);
 
-  const dispatch = useAppDispatch();
-
   const handleAltEdit = useCallback(() => {
     dispatch(
       openModal({ modalType: 'FOCAL_POINT', modalProps: { mediaId: id } }),

@@ -42,8 +42,8 @@ import { useColumnsContext } from '../../util/columns_context';
 import mobileChromeClasses from './blue2_mobile_chrome.module.scss';
 import searchPortalClasses from './blue2_search_portal.module.scss';
 import { MultiColumnContent } from './multi_column_content';
-import classes from './redesign.module.scss';
-import multiColClasses from './redesign_multicol.module.scss';
+import classes from './styles.module.scss';
+import multiColClasses from './styles_multi_column.module.scss';
 
 const isIosSafariBrowser = () => {
   if (typeof window === 'undefined') return false;

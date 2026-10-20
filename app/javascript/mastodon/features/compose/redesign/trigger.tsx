@@ -292,7 +292,7 @@ export const ComposeRedesignButton: React.FC<{
 
   // Pass the viewport height as a CSS variable so it's only used for mobile.
   const style = {
-    '--viewport-height': viewportHeight ? `${viewportHeight}px` : undefined,
+    '--viewport-height': viewport.height ? `${viewport.height}px` : undefined,
   } as React.CSSProperties;
 
   if (displayState === 'minimized') {

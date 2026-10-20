@@ -64,6 +64,7 @@ export const ComposeFooter: React.FC<{
 }> = ({ onEmojiPick, activeThreadItemId = null }) => {
   const intl = useIntl();
   const type = useAppSelector(selectComposeType);
+  const isEditing = useAppSelector((state) => !!state.compose.get('id'));
   const isMessage = isMessageComposeType(type);
   const rootCounter = useAppSelector(selectComposeCharsCount);
   const { hasPoll, quotedStatusId } = useAppSelector(
