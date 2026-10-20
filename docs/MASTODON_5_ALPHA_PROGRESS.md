@@ -32,7 +32,7 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 
 ## Diagnóstico de formatação temporário
 
-Um workflow de diagnóstico `.github/workflows/format-diff-debug.yml`, com permissão somente de leitura (`contents: read`), foi usado para executar `yarn format` em um checkout descartável e imprimir o diff exato. O workflow temporário foi removido após o uso; não teve permissão para gravar arquivos e não realizou commit automático.
+O workflow temporário `.github/workflows/format-diff-debug.yml` executou `yarn format` em um checkout descartável e identificou um único desvio: a indentação do `if (isCopyLocale(locale))` em `bug_report_modal.tsx`. A linha foi corrigida no commit `c2a5f1b`; o job oficial `Check formatting` passou nesse SHA. O workflow temporário foi removido em `6963e2ad` e não integra o branch atual.
 
 ## Auditoria de divergência com o canal estável
 
@@ -72,17 +72,17 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 ### Etapa 4 — lint e formatação
 
 - [x] Corrigir manualmente os dois blocos de função com formatação divergente em `bug_report_modal.tsx`, sem alterar o comportamento.
-- [ ] Confirmar a formatação com o job oficial `Check formatting`; o diff exato de `yarn format` foi aplicado aos arquivos de código apontados e ao checkpoint. O workflow original `yarn format:check` permaneceu intacto.
-- [x] Resolver os erros ESLint/TypeScript concretos reportados nas rodadas recentes sem suprimir regras globalmente; a rodada do SHA `09cf196` reduziu o lint a um único `no-unnecessary-condition` em `message_conversation.tsx`, corrigido em `a341efc8`.
-- [ ] Confirmar que a CI do SHA `a341efc8` passa em JavaScript Linting.
-- [ ] Rodar os comandos focados e o conjunto de lint JS.
-- [ ] Registrar quantidade de erros antes/depois e quaisquer bloqueios remanescentes.
+- [x] Corrigir a formatação identificada pelo Oxfmt: `Check formatting` passou no SHA `c2a5f1b`; repetir a verificação no SHA consolidado após as últimas alterações de specs e checkpoint.
+- [x] Resolver os erros ESLint/TypeScript concretos sem suprimir regras globalmente. `JavaScript Linting` e `JavaScript Testing` passaram no SHA `fc62e7c`; os commits posteriores alteraram apenas formatação e specs Ruby/workflow de diagnóstico.
+- [x] Remover o workflow temporário de diagnóstico; `.github/workflows/format-diff-debug.yml` não existe no branch atual.
+- [ ] Confirmar JavaScript Linting, JavaScript Testing e `Check formatting` no SHA consolidado.
+- [ ] Registrar resultados completos da CI no SHA consolidado e quaisquer bloqueios remanescentes.
 
 ### Etapa 5 — matriz Ruby, testes completos e validação do canal
 
 - [x] Confirmar a versão Ruby exigida por `.ruby-version` e `Gemfile`: Ruby 4.0.7.
 - [x] Distinguir incompatibilidade da matriz CI de falhas reais; workflow ajustado com base no upstream atual, que testa apenas a versão de `.ruby-version`.
-- [ ] Reexecutar CI, testes de migração, RSpec/E2E, build e lint; não marcar como pronto enquanto houver falhas relevantes sem explicação.
+- [ ] Reexecutar CI, testes de migração, RSpec/E2E, build e lint; as migrações históricas passaram no SHA `fc62e7c`, mas a suíte Ruby completa foi cancelada durante correções rápidas. Não marcar como pronto enquanto houver falhas relevantes sem explicação.
 - [ ] Verificar diff total para garantir que nenhum recurso BlueLab foi removido acidentalmente pelo merge upstream.
 - [ ] Aplicar a atualização apenas no mastodon.blue pelo fluxo normal do ambiente de teste quando o commit estiver coerente, e confirmar health/serviços e fluxos principais. Estado do deploy não foi presumido nesta auditoria.
 - [ ] Solicitar ao usuário os testes manuais de interface necessários antes de considerar a etapa concluída.
@@ -150,14 +150,22 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 | 2026-10-20 | 50 | Removida a optional chain redundante em `location.state.statusId`, após explicitar o tipo de estado do React Router na conversa direta. | A execução ESLint de `09cf196` apontou esse único erro restante; correção publicada para nova validação. | `a341efc8e734d941f6d7851f2678fe0826ee953a` |
 | 2026-10-20 | 51 | Restaurado o seletor administrativo de tema global em `settings/preferences/appearance`, com autorização `manage_settings`, validação contra temas conhecidos e gravação em `Setting.theme`; `user_params` ignora a antiga preferência por usuário `theme`. | Código e view publicados; Ruby Testing, Haml Linting e formatação do SHA seguinte devem confirmar o comportamento. | `e203d9ae998e81c4751e2a22d4abd8c284045a3c` |
 | 2026-10-20 | 52 | Corrigido o tipo da tabela `COPY` para idiomas suportados e restaurado `ComposerPublishError` ('empty' ou 'too-long') removido do reducer durante a integração. | Corrige diagnósticos TS2322 no modal de bug report e TS2304 no compositor reportados pela CI de `46d27a3`; validação no próximo job ainda pendente. | `8a0e2d5f4ead2cc46644eb410622b89d6425245f` |
+| 2026-10-20 | 53 | Atualizado o checkpoint da integração após a restauração da preferência administrativa de tema e a correção TS no compositor/modal de relatos. | Registro documental; a validação do código segue vinculada aos jobs atuais. | `fc41902913ea31cff21d5228aa776b58d73118f0` |
+| 2026-10-20 | 54 | Corrigidos dois offenses do RuboCop no controller de aparência: resposta explícita 403 e remoção de linha em branco extra. | RuboCop ainda identificou depois problemas de indentação em specs alterados em outra rodada; controller permanece corrigido. | `1c5fa5a169b6fe93ed2659c09419d964adaa896a` |
+| 2026-10-20 | 55 | Atualizados specs de locale/troca de conta e assertions de e-mail para refletir o layout exclusivamente claro e os fallbacks por locale. | `JavaScript Linting`, `JavaScript Testing` e migrações históricas passaram em `fc62e7c`; RuboCop apontou indentação perdida em três specs, corrigida nas etapas seguintes. | `fc62e7c6a84edd955cccd1beed19081ecabdfc5a` |
+| 2026-10-20 | 56 | Criado workflow temporário, somente de leitura, para executar Oxfmt num checkout descartável e expor o diff exato da falha de formatação. | Diagnóstico identificou apenas um ajuste de indentação em `bug_report_modal.tsx`; o workflow foi removido depois do uso. | `07bb001d3fe3e5d1d0994d25c0e25d0473d3a3ce` |
+| 2026-10-20 | 57 | Aplicado o ajuste exato de indentação em `bug_report_modal.tsx` apontado por Oxfmt. | `Check formatting` passou no SHA `c2a5f1b480fac13ac799524ba1692bdb1de39bb4`. | `c2a5f1b480fac13ac799524ba1692bdb1de39bb4` |
+| 2026-10-20 | 58 | Removido `.github/workflows/format-diff-debug.yml` após concluir o diagnóstico, mantendo apenas workflows permanentes de CI. | A ausência do caminho foi confirmada no branch atual; o workflow temporário não tem permissão de escrita e não permanece no repositório. | `6963e2ad36f575ccc6e4f6a0792b7e0ed3355163` |
+| 2026-10-20 | 59 | Corrigida a indentação das expectations nos specs `user_mailer_bluelab_theme_spec.rb` e `user_mailer_spec.rb`. | O RuboCop do SHA `fc62e7c` identificou `Layout/IndentationConsistency` e `Layout/BlockAlignment`; faltava corrigir o spec de troca de conta, ajustado na etapa seguinte. | `9c7668aafcd90fdbdbb4ef1052f16ea550f822cf` |
+| 2026-10-20 | 60 | Corrigida a indentação de duas expectations em `account_switcher_spec.rb`, concluindo os ajustes de estilo identificados pelo RuboCop. | Patch publicado; a CI da consolidação deve confirmar RuboCop e Ruby Testing. | `51a31b43c25be85a2266184b525289f92ad0327e` |
 
 ## Referências da execução
 
 - Branch de teste: [BlueLab-Test](https://github.com/lucascasanho/BlueLab/tree/BlueLab-Test)
 - PR de validação (não mesclar): [#201 — QA only: validate Mastodon 5.0.0-alpha.1 merge on BlueLab-Test](https://github.com/lucascasanho/BlueLab/pull/201)
-- CI de TypeScript/ESLint para validar a rodada de mensagens diretas: [JavaScript Linting](https://github.com/lucascasanho/BlueLab/actions/runs/39380051116)
-- CI de testes JavaScript: [JavaScript Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39380051045)
-- CI de formatação: [Check formatting](https://github.com/lucascasanho/BlueLab/actions/runs/39380051096)
-- CI das migrações históricas: [Historical data migration test](https://github.com/lucascasanho/BlueLab/actions/runs/39380051097)
-- CI de RSpec/E2E: [Ruby Testing](https://github.com/lucascasanho/BlueLab/actions/runs/39380051113)
-- CI da imagem de teste: [Test container image build](https://github.com/lucascasanho/BlueLab/actions/runs/39380051214)
+- JavaScript Linting: [SHA `fc62e7c`](https://github.com/lucascasanho/BlueLab/actions/runs/39386147521) (sucesso; repetir no SHA consolidado)
+- JavaScript Testing: [SHA `fc62e7c`](https://github.com/lucascasanho/BlueLab/actions/runs/39386147381) (sucesso; repetir no SHA consolidado)
+- Check formatting após correção Oxfmt: [SHA `c2a5f1b`](https://github.com/lucascasanho/BlueLab/actions/runs/39386441278) (sucesso; repetir no SHA consolidado)
+- Ruby Linting que identificou os offenses de indentação: [SHA `fc62e7c`](https://github.com/lucascasanho/BlueLab/actions/runs/39386147557) (falhou antes das correções de specs)
+- Migrações históricas: [SHA `fc62e7c`](https://github.com/lucascasanho/BlueLab/actions/runs/39386147589) (sucesso; repetir no SHA consolidado)
+- PR de validação: [#201 — QA only: validate Mastodon 5.0.0-alpha.1 merge on BlueLab-Test](https://github.com/lucascasanho/BlueLab/pull/201); não mesclar
