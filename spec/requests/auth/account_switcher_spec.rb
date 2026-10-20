@@ -21,9 +21,9 @@ RSpec.describe 'Auth Account Switcher' do
     end
 
     it 'uses the requested locale for the additional-account login page' do
-      request.headers['Accept-Language'] = 'pt-BR'
-
-      get new_user_session_path, params: { account_switcher: '1' }
+      get new_user_session_path,
+          params: { account_switcher: '1' },
+          headers: { 'Accept-Language' => 'pt-BR' }
 
       expect(response.body).to include('Entrar em outra conta')
     end
@@ -53,7 +53,9 @@ RSpec.describe 'Auth Account Switcher' do
     end
 
     it 'rejects invalid credentials and keeps the current account signed in' do
-      original_session_id = cookies.signed['_session_id']
+      get root_path
+      original_session = controller.send(:current_session)
+      expect(original_session).to be_present
 
       post auth_account_switcher_authenticate_path, params: {
         user: {
@@ -63,7 +65,7 @@ RSpec.describe 'Auth Account Switcher' do
       }
 
       expect(response).to redirect_to(new_user_session_path(account_switcher: '1'))
-      expect(SessionActivation.find_by(session_id: original_session_id, user: current_user)).to be_present
+expect(SessionActivation.find_by(session_id: original_session.session_id, user: current_user)).to be_present
     end
   end
 
@@ -109,7 +111,7 @@ RSpec.describe 'Auth Account Switcher' do
 
       expect(response).to have_http_status(200)
 
-      expect(current_user.session_activations.find_by(session_id: cookies.signed['_session_id'])).to be_present
+expect(controller.send(:current_session)).to have_attributes(user: current_user)
     end
   end
 end

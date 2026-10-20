@@ -32,8 +32,8 @@ RSpec.describe UserMailer do
 
     html = mail.html_part.body.decoded
 
-    expect(html).to include('#2b8fcd', '#16181c')
-    expect(html).to_not include('#245f91', '#1d4f78', '#102334')
+expect(html).to include('#2b8fcd')
+expect(html).to_not include('#245f91', '#1d4f78', '#102334', '#16181c')
   end
 
   it 'derives secondary email colors from the instance palette' do

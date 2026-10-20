@@ -130,10 +130,13 @@ const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr', Copy> = {
   },
 };
 
+const isCopyLocale = (locale: string): locale is keyof typeof COPY =>
+  Object.prototype.hasOwnProperty.call(COPY, locale);
+
 const getCopy = (locale: string): Copy => {
   const normalized = locale.toLowerCase();
-  const exactCopy = COPY[locale];
-  if (exactCopy) return exactCopy;
+
+if (isCopyLocale(locale)) return COPY[locale];
   if (normalized.startsWith('pt')) return COPY['pt-BR'];
   if (normalized.startsWith('es')) return COPY.es;
   if (normalized.startsWith('fr')) return COPY.fr;
