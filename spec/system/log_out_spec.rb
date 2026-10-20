@@ -5,6 +5,8 @@ require 'rails_helper'
 RSpec.describe 'Log out' do
   include ProfileStories
 
+  let(:finished_onboarding) { true }
+
   before do
     as_a_logged_in_user
   end

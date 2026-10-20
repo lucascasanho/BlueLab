@@ -19,6 +19,8 @@ RSpec.describe 'OCR', :attachment_processing, :inline_jobs, :js, :streaming do
     expect(page).to have_css('div.app-holder')
 
     if page.has_css?('body[data-theme="blue-2"]')
+      click_button frontend_translations('compose_form.placeholder')
+
       within('[data-bluelab-composer]') do
         find_field(type: 'file', visible: :all).attach_file(file_fixture('text.png'))
         click_button frontend_translations('compose.upload.edit')
