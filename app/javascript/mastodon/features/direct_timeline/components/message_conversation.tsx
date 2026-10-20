@@ -222,20 +222,21 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     const disconnect = inline ? undefined : dispatch(connectDirectStream());
 
     const cancelled: { current: boolean } = { current: false };
+    const isCancelled = (): boolean => cancelled.current;
 
     if (id) {
       const requestedId = id;
 
       void dispatch(fetchConversation(requestedId))
         .catch(async () => {
-          if (!sourceStatusId || cancelled.current) return;
+          if (!sourceStatusId || isCancelled()) return;
 
           try {
             const recoveredId = (await dispatch(
               findConversationForStatus(sourceStatusId),
             )) as string;
 
-            if (!cancelled.current && recoveredId !== id) {
+            if (!isCancelled() && recoveredId !== id) {
               browserHistory.replace(`/conversations/${recoveredId}`, {
                 statusId: sourceStatusId,
               });
@@ -245,7 +246,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           }
         })
         .finally(() => {
-          if (!cancelled.current) setConversationResolvedId(requestedId);
+          if (!isCancelled()) setConversationResolvedId(requestedId);
         });
     }
 
