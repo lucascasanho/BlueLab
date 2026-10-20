@@ -32,9 +32,6 @@ const meta = {
           'audio/mp3',
         ],
       },
-      compose: {
-        language: 'en',
-      },
     },
   },
 } satisfies Meta<typeof RedesignComposeForm>;
