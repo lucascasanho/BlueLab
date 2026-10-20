@@ -139,24 +139,6 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
     [],
   );
 
-  if (!status) {
-    return null; // loading state
-  }
-
-  const hotkeysProps = {
-    status,
-    onOpen,
-    muted,
-    unfocusable,
-    'data-id': id,
-    'data-variant': variant,
-    handlers: hotkeyHandlers,
-  };
-
-  const isHidden =
-    (!showDespiteFilter && isFiltered) ||
-    (!!status.spoiler_text && status.hidden);
-
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
@@ -182,6 +164,24 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
     },
     [isBlue2, onOpenClick],
   );
+
+  if (!status) {
+    return null; // loading state
+  }
+
+  const hotkeysProps = {
+    status,
+    onOpen,
+    muted,
+    unfocusable,
+    'data-id': id,
+    'data-variant': variant,
+    handlers: hotkeyHandlers,
+  };
+
+  const isHidden =
+    (!showDespiteFilter && isFiltered) ||
+    (!!status.spoiler_text && status.hidden);
 
   if (hidden) {
     return (

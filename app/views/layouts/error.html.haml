@@ -1,7 +1,7 @@
 :ruby
   bluelab_error = begin
     current_theme == 'blue-2'
-  rescue ActiveRecord::ConnectionNotEstablished, ActiveRecord::NoDatabaseError, PG::ConnectionBad
+  rescue ActiveRecord::ConnectionNotEstablished, ActiveRecord::NoDatabaseError, ActiveRecord::StatementInvalid, PG::ConnectionBad
     false
   end
 

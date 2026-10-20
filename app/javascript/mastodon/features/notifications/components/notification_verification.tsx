@@ -20,7 +20,6 @@ export const NotificationVerification: React.FC<{
         'notification-group--verification',
         { 'notification-group--unread': unread, [classes.unread]: unread },
       )}
-      tabIndex={0}
       role='status'
     >
       <VerifiedMark className={classes.icon} />

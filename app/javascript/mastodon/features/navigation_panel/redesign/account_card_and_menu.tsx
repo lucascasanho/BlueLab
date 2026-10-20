@@ -52,7 +52,6 @@ export const NavigationAccountCardAndMenu: React.FC<{
   inSlideOut?: boolean;
 }> = ({ inSlideOut = false }) => {
   const { accountId } = useIdentity();
-  const account = useAccount(accountId);
   if (!accountId) {
     return null;
   }
