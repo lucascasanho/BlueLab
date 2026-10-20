@@ -1,0 +1,36 @@
+name: Temporary BlueLab formatter export
+on:
+  push:
+    branches:
+      - BlueLab-Test
+    paths:
+      - '.github/workflows/bluelab-format-export.yml'
+permissions:
+  contents: read
+jobs:
+  format-export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Set up JavaScript environment
+        uses: ./.github/actions/setup-javascript
+      - name: Format repository files
+        run: yarn format
+      - name: Export formatter patch
+        run: |
+          git diff --binary > /tmp/bluelab-format.patch
+          git diff --name-only > /tmp/bluelab-format-files.txt
+          git diff --stat > /tmp/bluelab-format-stat.txt
+          cat /tmp/bluelab-format-stat.txt
+      - name: Upload format patch
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: bluelab-format-patch
+          path: |
+            /tmp/bluelab-format.patch
+            /tmp/bluelab-format-files.txt
+            /tmp/bluelab-format-stat.txt
+          if-no-files-found: error
+          retention-days: 1
