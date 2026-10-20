@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { changeComposeSpoilerness } from '@/mastodon/actions/compose';
 import { closeModal } from '@/mastodon/actions/modal';
-import { Button } from '@/mastodon/components/button/redesign';
+import { Button } from '@/mastodon/components/button/vanilla_redesign';
 import {
   ModalShell,
   ModalActions,
