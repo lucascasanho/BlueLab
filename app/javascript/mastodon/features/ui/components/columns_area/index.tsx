@@ -28,6 +28,8 @@ import { MultiColumnContent as VanillaMultiColumnContent } from './vanilla_multi
 import { ColumnsAreaRedesign } from './redesign';
 import classes from './styles.module.scss';
 import multiColClasses from './styles_multi_column.module.scss';
+import vanillaClasses from './vanilla_styles.module.scss';
+import vanillaMultiColClasses from './vanilla_styles_multi_column.module.scss';
 
 const TabsBarPortal = () => {
   const { setTabsBarElement } = useColumnsContext();
@@ -144,9 +146,9 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
 
   if (minimalShell) {
     return (
-      <div ref={ref} className={classNames(classes.root, classes.rootMinimal)}>
+      <div ref={ref} className={classNames(vanillaClasses.root, vanillaClasses.rootMinimal)}>
         {isMobile && <VanillaMobileNavigation />}
-        <div className={classes.main}>
+        <div className={vanillaClasses.main}>
           <div>{children}</div>
           <Footer />
         </div>
@@ -156,15 +158,15 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
 
   if (singleColumn) {
     return (
-      <div ref={ref} className={classes.root}>
-        <div className={classes.navigationWrapper}>
+      <div ref={ref} className={vanillaClasses.root}>
+        <div className={vanillaClasses.navigationWrapper}>
           <VanillaNavigationPanel />
         </div>
         {isMobile ? <VanillaMobileNavigation /> : <VanillaComposeRedesignButton />}
 
-        <main className={classes.main}>{children}</main>
+        <main className={vanillaClasses.main}>{children}</main>
 
-        <div className={classes.discoveryWrapper}>
+        <div className={vanillaClasses.discoveryWrapper}>
           <DiscoveryPanel />
         </div>
       </div>
@@ -172,8 +174,8 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
   }
 
   return (
-    <main ref={ref} className={multiColClasses.root}>
-      <div className={multiColClasses.navigationWrapper}>
+    <main ref={ref} className={vanillaMultiColClasses.root}>
+      <div className={vanillaMultiColClasses.navigationWrapper}>
         <VanillaNavigationPanel multiColumn />
       </div>
       <VanillaComposeRedesignButton />
