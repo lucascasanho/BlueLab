@@ -6,7 +6,7 @@ on:
     paths:
       - '.github/workflows/bluelab-rubocop-export.yml'
 permissions:
-  contents: read
+  contents: write
 jobs:
   rubocop-export:
     runs-on: ubuntu-latest
@@ -20,15 +20,28 @@ jobs:
         uses: ruby/setup-ruby@984c0c890880bbf811283d6f09c4607c62d210a4 # v1
         with:
           bundler-cache: true
+      - name: Record RuboCop base SHA
+        run: echo "RUBOCOP_BASE_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
       - name: Apply safe RuboCop corrections
         run: bin/rubocop -a --format simple || true
-      - name: Export RuboCop correction patch
+      - name: Commit safe RuboCop corrections to test branch
         run: |
-          git diff --binary > /tmp/bluelab-rubocop.patch
-          git diff --name-only > /tmp/bluelab-rubocop-files.txt
-          git diff --stat > /tmp/bluelab-rubocop-stat.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet; then
+            git add -u
+            HUSKY=0 LEFTHOOK=0 git -c core.hooksPath=/dev/null commit -m "style: apply safe RuboCop corrections to BlueLab alpha integration"
+            git push origin HEAD:refs/heads/BlueLab-Test || echo "::warning::Push failed; retaining RuboCop patch artifact"
+          fi
+      - name: Export RuboCop correction patch
+        if: always()
+        run: |
+          git diff --binary "$RUBOCOP_BASE_SHA" > /tmp/bluelab-rubocop.patch
+          git diff --name-only "$RUBOCOP_BASE_SHA" > /tmp/bluelab-rubocop-files.txt
+          git diff --stat "$RUBOCOP_BASE_SHA" > /tmp/bluelab-rubocop-stat.txt
           cat /tmp/bluelab-rubocop-stat.txt
       - name: Upload RuboCop patch
+        if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: bluelab-rubocop-patch
