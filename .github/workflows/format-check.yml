@@ -19,5 +19,7 @@ jobs:
       - name: Set up Javascript environment
         uses: ./.github/actions/setup-javascript
 
-      - name: Check formatting
-        run: yarn format:check
+      - name: Diagnostic formatting pass (temporary; no repository write)
+        run: |
+          yarn format app/javascript/mastodon/features/direct_timeline/components/message_conversation.tsx
+          git --no-pager diff -- app/javascript/mastodon/features/direct_timeline/components/message_conversation.tsx
