@@ -56,7 +56,18 @@ export const StatusMeta: React.FC<{
 
   return (
     <div className={classes.meta}>
-      <ol>
+      <ul className={classes.list}>
+        <li>
+          <StatusTimestampMeta
+            id={id}
+            created_at={created_at}
+            edited_at={edited_at}
+          />
+        </li>
+        {applicationDisplay && <li>{applicationDisplay}</li>}
+        <li>{visibility}</li>
+      </ul>
+      <ul className={classes.list}>
         <FormattedMessage
           id='status.replies_count'
           defaultMessage='{count, plural, one {{counter} reply} other {{counter} replies}}'
@@ -102,22 +113,7 @@ export const StatusMeta: React.FC<{
             />
           </Link>
         </li>
-      </ol>
-
-      <ol>
-        <li>
-          <FormattedDateWrapper
-            value={createdAt}
-            year='numeric'
-            month='short'
-            day='2-digit'
-            hour='2-digit'
-            minute='2-digit'
-          />
-        </li>
-        {applicationDisplay && <li>{applicationDisplay}</li>}
-        <li>{visibility}</li>
-      </ol>
+      </ul>
     </div>
   );
 };

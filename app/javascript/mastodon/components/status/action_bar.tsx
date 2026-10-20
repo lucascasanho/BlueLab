@@ -1,18 +1,10 @@
 import { useCallback } from 'react';
 
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import classNames from 'classnames';
 
-import {
-  ArrowsClockwiseIcon,
-  BookmarkSimpleIcon,
-  ChatCircleIcon,
-  DotsThreeIcon,
-  QuotesIcon,
-  ShareFatIcon,
-  StarIcon,
-} from '@phosphor-icons/react';
+import { DotsThreeIcon, ShareFatIcon } from '@phosphor-icons/react';
 
 import { statusInteraction } from '@/mastodon/actions/interactions';
 import { fetchStatus } from '@/mastodon/actions/statuses';
@@ -22,7 +14,6 @@ import { useAccountStatus } from '@/mastodon/hooks/useStatus';
 import { quickBoosting } from '@/mastodon/initial_state';
 import type { MenuItem as DropdownItem } from '@/mastodon/models/dropdown_menu';
 import type { AccountStatusShape } from '@/mastodon/models/status';
-import { selectStatusConditions } from '@/mastodon/selectors/statuses';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import {
@@ -34,13 +25,14 @@ import {
 import {
   Menu,
   MenuItem,
+  MenuItemDivider,
+  MenuItemLink,
   MenuList,
   MenuTrigger,
   LegacyDropdownMenuItems,
 } from '../menu';
 
-import { boostItemState, quoteItemState } from './boost_button_utils';
-import { useStatusContext, useStatusMenuActions } from './hooks';
+import { useStatusContext, useStatusIcons, useStatusMenuActions } from './hooks';
 import { RemoveQuoteHint } from './legacy/action_bar/remove_quote_hint';
 import classes from './styles.module.scss';
 
@@ -75,6 +67,11 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   const currentAccountId = useCurrentAccountId();
   const { contextType } = useStatusContext();
   const statusUrl = status?.url ?? status?.uri;
+  const { reply, like, bookmark } = useStatusIcons(statusId);
+  const intl = useIntl();
+  const favouriteTitle = intl.formatMessage(
+    status?.favourited ? messages.removeFavourite : messages.favourite,
+  );
 
   // Actions
   const dispatch = useAppDispatch();
@@ -107,13 +104,6 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
     }
   }, [contextType, dispatch, statusId, statusUrl]);
 
-  const intl = useIntl();
-  const favouriteIcon = useIconWeight(StarIcon, status?.favourited && 'fill');
-  const bookmarkIcon = useIconWeight(
-    BookmarkSimpleIcon,
-    status?.bookmarked && 'fill',
-  );
-
   if (!status) {
     return null;
   }
@@ -132,7 +122,7 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
         clipPadding
         variant='ghost'
         leadingIcon={reply.icon}
-        onClick={reply.action}
+        onClick={handleReplyClick}
         tooltip={{ type: 'label', text: reply.title }}
       >
         {withCounters && reply.counter}
@@ -147,13 +137,13 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
         variant='ghost'
         active={status.favourited}
         title={favouriteTitle}
-        leadingIcon={favouriteIcon}
+        leadingIcon={like.icon}
         leadingIconWrapperClassName='favourite-animation-target'
         onClick={handleFavouriteClick}
         className={classNames(
           classes.favouriteButton,
           'star-icon',
-          !onlyResponses && classes.actionsButtonGap,
+          classes.actionsButtonGap,
         )}
       >
         {withCounters && like.counter}
@@ -173,9 +163,9 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
       <ToggleIconButton
         size='sm'
         variant='ghost'
-        active={status.bookmarked}
-        icon={bookmarkIcon}
-        onClick={handleBookmarkClick}
+        active={bookmark.active}
+        icon={bookmark.icon}
+        onClick={bookmark.action}
       >
         {bookmark.title}
       </ToggleIconButton>
