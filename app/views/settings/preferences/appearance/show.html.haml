@@ -5,15 +5,6 @@
   = button_tag t('generic.save_changes'), class: 'button', form: 'edit_user'
 
 = simple_form_for current_user, url: settings_preferences_appearance_path, html: { id: :edit_user } do |f|
-  - if current_user.role&.can?(:manage_settings)
-    .fields-group
-      = label_tag :instance_theme, t('appearance.instance_theme')
-      = select_tag :instance_theme,
-                   options_for_select(Themes.instance.names.map { |theme| [I18n.t("themes.#{theme}", default: theme, site_title: site_title), theme] }, Setting.theme),
-                   id: 'instance_theme',
-                   class: 'select'
-      %p.hint= t('appearance.instance_theme_hint')
-
   .fields-row
     .fields-group.fields-row__column.fields-row__column-6
       = f.input :locale,
