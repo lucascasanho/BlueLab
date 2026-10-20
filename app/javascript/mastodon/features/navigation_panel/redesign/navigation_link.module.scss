@@ -142,41 +142,7 @@
     padding-bottom: var(--space-3);
   }
   
-  @mixin link-base {
-    --icon-size: 20px;
-    --border-radius: var(--radius-3);
-  
-    position: relative;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: var(--space-2);
-    column-gap: var(--space-2);
-    border-radius: var(--border-radius);
-    border: none;
-    color: var(--color-text-primary);
-    background-color: transparent;
-    transition: background-color 200ms;
-    text-decoration: none;
-    text-align: start;
-  
-    &:where(button, a):hover,
-    &:focus-visible,
-    &[aria-current='page'] {
-      background-color: var(--color-bg-highlight);
-      text-decoration: none;
-    }
-  
-    &:focus-visible {
-      outline: var(--outline-focus-default);
-    }
-  
-    &:focus {
-      // Override silly global focus style
-      border-radius: var(--border-radius);
-    }
-  }
+
   
   .link {
     @include link-base;
