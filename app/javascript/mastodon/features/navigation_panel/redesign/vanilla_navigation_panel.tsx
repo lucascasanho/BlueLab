@@ -46,7 +46,10 @@ import { FooterLinks } from '../../discovery_panel/footer_links';
 import { NavigationAccountCardAndMenu } from './vanilla_account_card_and_menu';
 import { NavigationHeader } from './vanilla_navigation_header';
 import { ListSection } from './vanilla_list_section';
-import { DisabledAccountBanner, LoggedOutInfo } from './vanilla_logged_out_info';
+import {
+  DisabledAccountBanner,
+  LoggedOutInfo,
+} from './vanilla_logged_out_info';
 import { NavigationLink } from './vanilla_navigation_link';
 import classes from './vanilla_navigation_panel.module.scss';
 
