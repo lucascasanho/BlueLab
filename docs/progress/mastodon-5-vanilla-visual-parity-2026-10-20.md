@@ -266,3 +266,21 @@ revisão e testes.
   checks de build, lint e testes ainda não haviam terminado. Não declarar a
   correção validada integralmente até CI concluir e haver teste visual em
   desktop e mobile, nos esquemas claro e escuro.
+
+## Etapa 11 — isolar a API do botão usado pelo Vanilla
+
+- A verificação TypeScript detectou que a cópia Vanilla do compositor ainda importava
+  o botão compartilhado do BlueLab. A API do BlueLab não aceita a propriedade
+  `tooltip` do upstream e a tipagem de `ref` diverge para `HTMLButtonElement`.
+- Criados `app/javascript/mastodon/components/button/vanilla_redesign.tsx` e
+  `vanilla_redesign.module.scss` usando a implementação oficial do Mastodon
+  `5204e8ab940f870dbf13863ee92c48febfc4eedb`.
+- As cópias Vanilla do compositor, painel de navegação, navegação móvel e estado
+  deslogado foram direcionadas ao novo botão e aos estilos correspondentes.
+  Isso evita alterar a API do botão compartilhado e mantém o BlueLab independente.
+- O fechamento JSX incorreto reportado pelo build foi corrigido. Os erros de tipo
+  do botão foram tratados, mas precisam ser confirmados por uma nova execução de
+  TypeScript/build; os checks de CI do branch seguem em fila.
+- Todo o trabalho permanece em `BlueLab-Test`. Nenhuma alteração foi promovida a
+  `BlueLab` (estável), e ainda falta validação visual manual nos dois temas
+  claro/escuro e em desktop/mobile.
