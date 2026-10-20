@@ -1,4 +1,5 @@
 name: Temporary BlueLab format pass
+# Run once after the latest alpha-merge fixes.
 on:
   push:
     branches:
