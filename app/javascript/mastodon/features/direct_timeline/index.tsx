@@ -261,6 +261,7 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
       )}
 
       <ConversationsList
+        onOpenConversation={undefined}
         trackScroll={!pinned}
         scrollKey={`direct_timeline-${columnId}`}
         emptyMessage={
