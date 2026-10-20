@@ -6,11 +6,15 @@ import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
-import { Header } from '@/mastodon/features/custom_homepage/components/header';
 import { CollapsibleNavigationPanel } from '@/mastodon/features/navigation_panel';
+import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
+import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useColumnsContext } from '@/mastodon/features/ui/util/columns_context';
 import { useAppSelector } from '@/mastodon/store';
+
+import classes from './styles.module.scss';
+import multiColClasses from './styles_multi_column.module.scss';
 
 import { ColumnsAreaMastodon5 } from '../../../mastodon5';
 import {
@@ -49,10 +53,8 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
   singleColumn,
   ref,
 }) => {
-  const renderComposePanel = !useBreakpoint('full');
-  const isModalOpen = useAppSelector(
-    (state) => !state.modal.get('stack').isEmpty(),
-  );
+  const isMobileViewport = !useBreakpoint('full');
+  const renderComposePanel = isMobileViewport;
   const useBlueLabComposer = useAppSelector(
     (state) => state.compose.get('composer_editor') !== 'mastodon',
   );
@@ -63,7 +65,7 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
   if (minimalShell) {
     return (
       <div ref={ref} className={classNames(classes.root, classes.rootMinimal)}>
-        {isMobile && <RedesignMobileNavigation />}
+        {isMobileViewport && <RedesignMobileNavigation />}
         <div className={classes.main}>
           <div>{children}</div>
 
@@ -84,7 +86,7 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
             <RedirectToMobileComposeIfNeeded />
           </div>
         </div>
-        {isMobile ? <RedesignMobileNavigation /> : <ComposeRedesignButton />}
+        {isMobileViewport ? <RedesignMobileNavigation /> : <ComposeRedesignButton />}
 
         {isBirdUi ? (
           <ComposeRedesignButton hostOnly />

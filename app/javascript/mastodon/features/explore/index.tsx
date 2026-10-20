@@ -23,7 +23,6 @@ const messages = defineMessages({
 const Explore: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   const { signedIn } = useIdentity();
   const intl = useIntl();
-  const logoRequired = useBreakpoint('full');
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
@@ -32,29 +31,12 @@ const Explore: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
       bindToDocument={!multiColumn}
       label={intl.formatMessage(messages.title)}
     >
-      {isRedesignEnabled() || isBlue2 ? (
-        <ColumnHeader
-          className='explore__column-header'
-          withBackButton={multiColumn && 'auto'}
-          title={intl.formatMessage(messages.titleRedesign)}
-        />
-      ) : (
-        <LegacyColumnHeader
-          className='explore__column-header'
-          icon={'explore'}
-          iconComponent={logoRequired ? SymbolLogo : TrendingUpIcon}
-          title={intl.formatMessage(messages.title)}
-          multiColumn={multiColumn}
-          scrollTopOnClick
-        />
-      )}
+      <ColumnHeader
+        withBackButton={multiColumn && 'auto'}
+        title={intl.formatMessage(messages.titleRedesign)}
+      />
 
-      <div
-        className={classNames(
-          'explore__search-header',
-          (isRedesignEnabled() || isBlue2) && redesignClasses.searchHeader,
-        )}
-      >
+      <div className='explore__search-header'>
         <Search singleColumn />
       </div>
 
