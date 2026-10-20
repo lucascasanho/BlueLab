@@ -149,6 +149,10 @@ export const ComposeRedesignButton: React.FC<{
     typeof composerOriginFromElement
   > | null>(null);
   const isBlue2 = useBlue2Theme();
+  const isMobile = useBreakpoint('openable');
+  const hasMobileFloatingActionButton = useHasMobileFloatingActionButton({
+    isMobile,
+  });
   const portalBlue2InlineOverlay = (content: React.ReactNode) =>
     isBlue2 && inline && typeof document !== 'undefined'
       ? createPortal(content, document.body)
@@ -289,10 +293,6 @@ export const ComposeRedesignButton: React.FC<{
     );
   }
 
-  // Pass the viewport height as a CSS variable so it's only used for mobile.
-  const style = {
-    '--viewport-height': viewport.height ? `${viewport.height}px` : undefined,
-  } as React.CSSProperties;
 
   if (displayState === 'minimized') {
     if (isBlue2) {
@@ -346,7 +346,9 @@ export const ComposeRedesignButton: React.FC<{
   return (
     <Menu>
       <MenuTrigger
-        as={IconButton}
+        as={FloatingActionButton}
+        inline={inline ?? false}
+        hidden={isMobile && !hasMobileFloatingActionButton}
         icon={isBlue2 ? Blue2ComposeIcon : ComposeIcon}
         variant='solid'
         color='accent'

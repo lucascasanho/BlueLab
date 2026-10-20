@@ -2,14 +2,10 @@ import { useCallback, useState } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
-import classNames from 'classnames';
-
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import {
   ChatCircleDotsIcon,
-  EyeIcon,
-  MagnifyingGlassIcon,
   NewspaperIcon,
   QuotesIcon,
 } from '@phosphor-icons/react';
@@ -35,11 +31,9 @@ import {
   MenuItemCheckbox,
 } from '@/mastodon/components/menu';
 import { Tooltip } from '@/mastodon/components/tooltip';
-import { selectPlainAccount } from '@/mastodon/selectors/accounts';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { selectComposeMentions, selectComposePrivacy } from './selectors';
-import classes from './styles.module.scss';
 
 const isBlue2ThemeActive = () =>
   typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
@@ -125,13 +119,7 @@ const ComposeVisibilityButtonText: React.FC<{
   privacy: StatusVisibility;
   activeThreadItemId: string | null;
 }> = ({ privacy, activeThreadItemId }) => {
-  const rootMentions = useAppSelector(selectComposeMentions);
-  const mentions = activeThreadItemId ? [] : rootMentions;
-  const firstMentionedAccount = useAppSelector((state) =>
-    selectPlainAccount(state, mentions.at(0)),
-  );
-
-  if (privacy === 'public' || privacy === 'unlisted') {
+  if (privacy === 'public') {
     return (
       <FormattedMessage id='privacy.public.short' defaultMessage='Public' />
     );

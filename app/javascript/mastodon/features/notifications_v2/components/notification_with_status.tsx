@@ -116,9 +116,9 @@ export const NotificationWithStatus: React.FC<{
     [dispatch, isPrivateMention, statusId],
   );
 
-  if (!statusId || isFiltered) return null;
-
   const handleStatusOpen = useCallback(() => {
+    if (!statusId) return;
+
     const isBlue2 =
       typeof document !== 'undefined' &&
       document.body.dataset.theme === 'blue-2';
@@ -129,6 +129,19 @@ export const NotificationWithStatus: React.FC<{
       dispatch(navigateToStatus(statusId));
     }
   }, [dispatch, isPrivateMention, statusId]);
+
+  const handleCardKeyDown = useCallback<React.KeyboardEventHandler<HTMLDivElement>>(
+    (event) => {
+      if (event.target !== event.currentTarget) return;
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+
+      event.preventDefault();
+      handleStatusOpen();
+    },
+    [handleStatusOpen],
+  );
+
+  if (!statusId || isFiltered) return null;
 
   return (
     <Hotkeys handlers={handlers}>
@@ -143,6 +156,7 @@ export const NotificationWithStatus: React.FC<{
         )}
         tabIndex={0}
         onClick={handleCardClick}
+        onKeyDown={handleCardKeyDown}
       >
         <h2 className='notification-ungrouped__header'>
           <div className='notification-ungrouped__header__icon'>
