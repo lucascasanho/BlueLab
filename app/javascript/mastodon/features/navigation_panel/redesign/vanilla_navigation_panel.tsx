@@ -21,7 +21,7 @@ import { fetchFollowRequests } from '@/mastodon/actions/accounts';
 import { fetchLists } from '@/mastodon/actions/lists';
 import { closeNavigation } from '@/mastodon/actions/navigation';
 import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
-import { Button } from '@/mastodon/components/button/redesign';
+import { Button } from '@/mastodon/components/button/vanilla_redesign';
 import { Callout } from '@/mastodon/components/callout/redesign';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 import { useScrollSensor } from '@/mastodon/hooks/useScrollSensor';
