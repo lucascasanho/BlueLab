@@ -26,10 +26,6 @@
 @use 'mastodon/rtl';
 @use 'mastodon/rich_text';
 
-// Legacy aliases exist for BlueLab themes and must not override the original
-// Mastodon 5.0 design tokens in Vanilla. Keep the compatibility layer scoped
-// to the themes whose custom styles still consume the old token names.
-body[data-theme='blue-2'],
-body[data-theme='mastodon-bird-ui-auto'] {
+html {
   @include legacy_tokens.apply;
 }
