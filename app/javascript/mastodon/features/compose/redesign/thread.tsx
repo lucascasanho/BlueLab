@@ -176,7 +176,6 @@ const ComposeThreadItem: React.FC<{
         size='sm'
         icon={XIcon}
         className={classes.threadItemRemove}
-        title={intl.formatMessage(messages.remove)}
         disabled={removalDisabled}
         onClick={() => {
           dispatch(removeComposeThreadItem(id));
@@ -214,7 +213,6 @@ const ComposeThreadItem: React.FC<{
                   size='sm'
                   icon={XIcon}
                   className={classes.mediaRemove}
-                  title={intl.formatMessage(messages.removeMedia)}
                   onClick={() =>
                     dispatch(removeComposeThreadMedia(id, mediaId))
                   }
