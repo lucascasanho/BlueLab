@@ -172,20 +172,24 @@ const createAddListClickHandler =
     listId: string,
     listTitle: string,
   ) =>
-  () =>
+  () => {
     addFeed(createPinnedListFeed(listId, listTitle));
+  };
 
 const createAddHashtagClickHandler =
-  (addFeed: (feed: Blue2PinnedFeed) => void, tagName: string) => () =>
+  (addFeed: (feed: Blue2PinnedFeed) => void, tagName: string) => () => {
     addFeed(createPinnedHashtagFeed(tagName));
+  };
 
 const createRemoveFeedClickHandler =
-  (removeFeed: (key: string) => void, key: string) => () =>
+  (removeFeed: (key: string) => void, key: string) => () => {
     removeFeed(key);
+  };
 
 const createSelectFeedClickHandler =
-  (onSelect: (key: string) => void, key: string) => () =>
+  (onSelect: (key: string) => void, key: string) => () => {
     onSelect(key);
+  };
 
 interface Blue2PinnedFeedMenuProps {
   showRemoveSection?: boolean;

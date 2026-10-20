@@ -19,7 +19,10 @@ import { useAppDispatch } from '@/mastodon/store';
 import classes from './gif_picker.module.scss';
 
 const KLIPY_API_BASE = 'https://api.klipy.com/v2';
-const KLIPY_API_KEY = import.meta.env.VITE_KLIPY_API_KEY?.trim();
+const KLIPY_ENV = import.meta.env as unknown as Record<string, unknown>;
+const rawKlipyApiKey = KLIPY_ENV.VITE_KLIPY_API_KEY;
+const KLIPY_API_KEY =
+  typeof rawKlipyApiKey === 'string' ? rawKlipyApiKey.trim() : '';
 const KLIPY_COUNTRY = 'BR';
 const KLIPY_LOCALE = 'pt_BR';
 const KLIPY_CONTENT_FILTER = 'high';
@@ -146,7 +149,12 @@ const ComposeGifDropdown: React.FC<
   const [selectingId, setSelectingId] = useState<string | null>(null);
 
   const load = useCallback(async (searchTerm: string, position?: string) => {
-    if (!KLIPY_API_KEY) return;
+    if (!KLIPY_API_KEY) {
+      setError(true);
+      setLoading(false);
+      setLoadingMore(false);
+      return;
+    }
 
     requestControllerRef.current?.abort();
     const controller = new AbortController();
@@ -194,15 +202,13 @@ const ComposeGifDropdown: React.FC<
       }
 
       const payload = (await response.json()) as KlipyResponse;
-      const items = (payload.results ?? []).filter(
-        (item) =>
-          item.id &&
-          !!item.media_formats?.gif?.url &&
-          !!item.media_formats?.tinygif?.url,
-      );
+      const items = (payload.results ?? []).filter((item) => {
+        const formats = item.media_formats;
+        return Boolean(item.id && formats?.gif?.url && formats?.tinygif?.url);
+      });
 
       setResults((current) => (isMore ? [...current, ...items] : items));
-      setNext(payload.next || null);
+      setNext(payload.next ?? null);
     } catch (loadError) {
       if (
         loadError instanceof DOMException &&
@@ -291,7 +297,7 @@ const ComposeGifDropdown: React.FC<
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
 
-        dispatch(uploadCompose(dataTransfer.files));
+        await dispatch(uploadCompose(dataTransfer.files));
         registerShare(gif.id);
         onClose();
       } catch {
@@ -307,6 +313,12 @@ const ComposeGifDropdown: React.FC<
       void load(query.trim(), next);
     }
   }, [load, next, query]);
+
+  const handleQueryChange = useCallback<
+    React.ChangeEventHandler<HTMLInputElement>
+  >((event) => {
+    setQuery(event.target.value);
+  }, []);
 
   return (
     <MenuCard
@@ -341,9 +353,7 @@ const ComposeGifDropdown: React.FC<
             value={query}
             placeholder={intl.formatMessage(messages.search)}
             aria-label={intl.formatMessage(messages.search)}
-            onChange={(event) => {
-              setQuery(event.target.value);
-            }}
+            onChange={handleQueryChange}
           />
         </div>
       </div>
@@ -375,7 +385,10 @@ const ComposeGifDropdown: React.FC<
               if (!previewUrl) return null;
 
               const dims = gif.media_formats?.tinygif?.dims ?? [220, 220];
-              const title = gif.content_description || gif.title || 'GIF';
+              const title =
+                [gif.content_description, gif.title].find(
+                  (candidate) => candidate?.trim(),
+                ) ?? 'GIF';
 
               return (
                 <button

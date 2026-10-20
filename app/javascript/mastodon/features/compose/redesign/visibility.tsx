@@ -19,7 +19,6 @@ import { openModal } from '@/mastodon/actions/modal';
 import type { ApiQuotePolicy } from '@/mastodon/api_types/quotes';
 import type { StatusVisibility } from '@/mastodon/api_types/statuses';
 import { Button, CaretIcon } from '@/mastodon/components/button/redesign';
-import { Icon } from '@/mastodon/components/icon';
 import {
   Menu,
   MenuList,
@@ -33,7 +32,7 @@ import {
 import { Tooltip } from '@/mastodon/components/tooltip';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
-import { selectComposeMentions, selectComposePrivacy } from './selectors';
+import { selectComposePrivacy } from './selectors';
 
 const isBlue2ThemeActive = () =>
   typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';

@@ -87,6 +87,11 @@ export const RedesignComposeForm: React.FC<
 }) => {
   const type = useAppSelector(selectComposeType);
   const isMessage = isMessageComposeType(type);
+  const handleSensitiveMouseDown = useCallback<
+    React.MouseEventHandler<HTMLButtonElement>
+  >((event) => {
+    event.preventDefault();
+  }, []);
   const rootSensitive = useAppSelector(selectComposeSensitive);
   const threadItems = useAppSelector(
     (state) => state.compose.get('thread_items') as ImmutableList<ThreadItem>,
@@ -166,7 +171,7 @@ export const RedesignComposeForm: React.FC<
       className={classNames(
         className,
         classes.root,
-        headless && classes.headless,
+        headless && classes['headless'],
       )}
     >
       {isMessage && <div className={classes.background} />}
@@ -200,9 +205,7 @@ export const RedesignComposeForm: React.FC<
               size='sm'
               active={sensitive}
               onClick={onSensitiveChange}
-              onMouseDown={(event) => {
-                event.preventDefault();
-              }}
+              onMouseDown={handleSensitiveMouseDown}
               leadingIcon={sensitiveIcon}
             >
               <FormattedMessage

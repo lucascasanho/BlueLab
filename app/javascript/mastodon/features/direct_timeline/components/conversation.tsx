@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 
@@ -108,7 +108,7 @@ export const Conversation: React.FC<{
     }
 
     if (unread) {
-      dispatch(markConversationRead(id));
+      void dispatch(markConversationRead(id));
     }
 
     if (lastStatus) {
@@ -128,7 +128,7 @@ export const Conversation: React.FC<{
   }, [dispatch, history, unread, id, lastStatus, onOpenConversation]);
 
   const handleMarkAsRead = useCallback(() => {
-    dispatch(markConversationRead(id));
+    void dispatch(markConversationRead(id));
   }, [dispatch, id]);
 
   const handleReply = useCallback(() => {
@@ -197,6 +197,36 @@ export const Conversation: React.FC<{
     .filter(Boolean)
     .reduce((prev, cur) => [prev, ', ', cur]);
 
+  const handleConversationCardClick = useCallback<
+    React.MouseEventHandler<HTMLDivElement>
+  >(
+    (event) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest(
+          '.status__action-bar, button, [role="menuitem"]',
+        )
+      ) {
+        return;
+      }
+
+      handleClick();
+    },
+    [handleClick],
+  );
+
+  const handleConversationCardKeyDown = useCallback<
+    React.KeyboardEventHandler<HTMLDivElement>
+  >(
+    (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+
+      event.preventDefault();
+      handleClick();
+    },
+    [handleClick],
+  );
+
   const handlers = {
     reply: handleReply,
     open: handleClick,
@@ -210,23 +240,8 @@ export const Conversation: React.FC<{
 
         tabIndex={0}
         role='button'
-        onClick={(event) => {
-          if (
-            (event.target as HTMLElement).closest(
-              '.status__action-bar, button, [role="menuitem"]',
-            )
-          ) {
-            return;
-          }
-
-          handleClick();
-        }}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            handleClick();
-          }
-        }}
+        onClick={handleConversationCardClick}
+        onKeyDown={handleConversationCardKeyDown}
       >
         <div className='conversation__avatar' role='presentation'>
           <AvatarComposite accounts={accounts} size={48} />
