@@ -576,6 +576,7 @@ $button-fallback-breakpoint: $button-breakpoint + 55px;
 }
 
 /* BlueLab-only overrides. The upstream stylesheet above remains active for Vanilla and other themes. */
+/* prettier-ignore */
 :global(body[data-theme='blue-2']) {
   .moved {
     opacity: 0.5;
