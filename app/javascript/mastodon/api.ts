@@ -129,7 +129,7 @@ export default function api(withAuthorization = true) {
         (status === undefined || status >= 500 || status === 429)
       ) {
         const requestIdValue: unknown =
-          error.response?.headers.get('x-request-id');
+          error.response?.headers['x-request-id'];
         const requestId =
           typeof requestIdValue === 'string' ? requestIdValue : undefined;
 
