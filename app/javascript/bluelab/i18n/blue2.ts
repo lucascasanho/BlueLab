@@ -3,6 +3,7 @@ export type Blue2TextKey =
   | 'write'
   | 'trendingFeeds'
   | 'federation'
+  | 'explore'
   | 'global'
   | 'haveAccount'
   | 'hideTrendsTitle'
@@ -25,6 +26,7 @@ const strings: Record<string, Blue2Strings> = {
     write: 'Write',
     trendingFeeds: 'Trending feeds',
     federation: 'Federation',
+    explore: 'Explore',
     global: 'Global',
     haveAccount: 'Already have an account?',
     hideTrendsTitle: 'Hide trending topics?',
@@ -44,6 +46,7 @@ const strings: Record<string, Blue2Strings> = {
     write: 'Escrever',
     trendingFeeds: 'Feeds em alta',
     federation: 'Federação',
+    explore: 'Explorar',
     global: 'Global',
     haveAccount: 'Já tem uma conta?',
     hideTrendsTitle: 'Ocultar assuntos em alta?',
@@ -63,6 +66,7 @@ const strings: Record<string, Blue2Strings> = {
     write: 'Escribir',
     trendingFeeds: 'Feeds en tendencia',
     federation: 'Federación',
+    explore: 'Explorar',
     global: 'Global',
     haveAccount: '¿Ya tienes una cuenta?',
     hideTrendsTitle: '¿Ocultar temas en tendencia?',
@@ -83,6 +87,7 @@ const strings: Record<string, Blue2Strings> = {
     write: 'Écrire',
     trendingFeeds: 'Fils tendance',
     federation: 'Fédération',
+    explore: 'Explorer',
     global: 'Global',
     haveAccount: 'Vous avez déjà un compte ?',
     hideTrendsTitle: 'Masquer les tendances ?',
@@ -103,6 +108,7 @@ const strings: Record<string, Blue2Strings> = {
     write: 'Schreiben',
     trendingFeeds: 'Trend-Feeds',
     federation: 'Föderation',
+    explore: 'Entdecken',
     global: 'Global',
     haveAccount: 'Du hast bereits ein Konto?',
     hideTrendsTitle: 'Trends ausblenden?',
@@ -122,6 +128,7 @@ const strings: Record<string, Blue2Strings> = {
     write: 'Scrivi',
     trendingFeeds: 'Feed di tendenza',
     federation: 'Federazione',
+    explore: 'Esplora',
     global: 'Globale',
     haveAccount: 'Hai già un account?',
     hideTrendsTitle: 'Nascondere le tendenze?',
@@ -142,6 +149,7 @@ const strings: Record<string, Blue2Strings> = {
     write: 'Schrijven',
     trendingFeeds: 'Trending feeds',
     federation: 'Federatie',
+    explore: 'Verkennen',
     global: 'Globaal',
     haveAccount: 'Heb je al een account?',
     hideTrendsTitle: 'Trending onderwerpen verbergen?',
@@ -161,6 +169,7 @@ const strings: Record<string, Blue2Strings> = {
     write: 'Napisz',
     trendingFeeds: 'Popularne kanały',
     federation: 'Federacja',
+    explore: 'Odkrywaj',
     global: 'Globalny',
     haveAccount: 'Masz już konto?',
     hideTrendsTitle: 'Ukryć popularne tematy?',
@@ -180,6 +189,7 @@ const strings: Record<string, Blue2Strings> = {
     write: 'Yaz',
     trendingFeeds: 'Gündemdeki akışlar',
     federation: 'Federasyon',
+    explore: 'Keşfet',
     global: 'Global',
     haveAccount: 'Zaten bir hesabın var mı?',
     hideTrendsTitle: 'Gündem konuları gizlensin mi?',
@@ -199,6 +209,7 @@ const strings: Record<string, Blue2Strings> = {
     write: 'Написать',
     trendingFeeds: 'Популярные ленты',
     federation: 'Федерация',
+    explore: 'Исследовать',
     global: 'Глобальная',
     haveAccount: 'Уже есть аккаунт?',
     hideTrendsTitle: 'Скрыть популярные темы?',
@@ -218,6 +229,7 @@ const strings: Record<string, Blue2Strings> = {
     write: '投稿する',
     trendingFeeds: 'トレンドフィード',
     federation: '連合',
+    explore: '探索',
     global: 'グローバル',
     haveAccount: 'すでにアカウントをお持ちですか？',
     hideTrendsTitle: 'トレンドを非表示にしますか？',
@@ -237,6 +249,7 @@ const strings: Record<string, Blue2Strings> = {
     write: '작성',
     trendingFeeds: '인기 피드',
     federation: '연합',
+    explore: '탐색',
     global: '글로벌',
     haveAccount: '이미 계정이 있나요?',
     hideTrendsTitle: '인기 주제를 숨길까요?',
@@ -256,6 +269,7 @@ const strings: Record<string, Blue2Strings> = {
     write: '撰写',
     trendingFeeds: '热门动态',
     federation: '联邦',
+    explore: '探索',
     global: '全局',
     haveAccount: '已经有账号了？',
     hideTrendsTitle: '隐藏热门话题？',
@@ -282,3 +296,4 @@ export const blue2Text = (locale: string, key: Blue2TextKey): string => {
 
   return (strings[language] ?? fallbackStrings)[key];
 };
+
