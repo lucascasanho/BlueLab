@@ -5,8 +5,8 @@ import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useLocation, useParams } from 'react-router-dom';
 
-import {
-  List as ImmutableList,
+import { List as ImmutableList } from 'immutable';
+import type {
   Map as ImmutableMap,
   Record as ImmutableRecord,
 } from 'immutable';
@@ -33,7 +33,6 @@ import { toggleFavourite } from '@/mastodon/actions/interactions';
 import { fetchStatus } from '@/mastodon/actions/statuses';
 import { connectDirectStream } from '@/mastodon/actions/streaming';
 import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
-import type { Account } from '@/mastodon/models/account';
 import { compareId } from '@/mastodon/compare_id';
 import AttachmentList from '@/mastodon/components/attachment_list';
 import { Avatar } from '@/mastodon/components/avatar';
@@ -167,18 +166,10 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     return [...ids].sort();
   }, [threadConversations]);
 
-  const accounts = useAppSelector(
-    (state) => state.accounts as unknown as ImmutableMap<string, Account>,
-  );
+  const accounts = useAppSelector((state) => state.accounts);
 
   const participantAccounts = useMemo(
-    () =>
-      participantIds
-        .map((accountId) => accounts.get(accountId))
-        .filter(
-          (account): account is NonNullable<typeof account> =>
-            account !== undefined && account !== null,
-        ),
+    () => participantIds.map((accountId) => accounts.get(accountId)).filter(Boolean),
     [accounts, participantIds],
   );
 
@@ -204,9 +195,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       .catch(async (error: unknown) => {
         if (!sourceStatusId) throw error;
 
-        const recoveredId = await dispatch(
+        const recoveredId = (await dispatch(
           findConversationForStatus(sourceStatusId),
-        );
+        )) as string | null;
 
         if (!recoveredId || recoveredId === id) throw error;
 
@@ -237,9 +228,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           if (!sourceStatusId || cancelled) return;
 
           try {
-            const recoveredId = await dispatch(
+            const recoveredId = (await dispatch(
               findConversationForStatus(sourceStatusId),
-            );
+            )) as string | null;
 
             if (!cancelled && recoveredId && recoveredId !== id) {
               browserHistory.replace(`/conversations/${recoveredId}`, {
@@ -290,17 +281,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
   const statuses = useAppSelector((state) =>
     effectiveMessageStatusIds
-      .map(
-        (statusId) =>
-          getStatus(state, { id: statusId }) as unknown as
-            | ImmutableRecord<StatusShape>
-            | undefined,
-      )
-      .filter(
-        (status): status is ImmutableRecord<StatusShape> =>
-          status !== undefined && status !== null,
-      ),
-  );
+      .map((statusId) => getStatus(state, { id: statusId }))
+      .filter(Boolean),
+  ) as ImmutableRecord<StatusShape>[];
 
   const initialLoadConversationIdRef = useRef<string | null>(null);
   const observedThreadStatusIdRef = useRef<string | null>(null);
@@ -516,7 +499,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     const oldestUnreadStatus =
       initialReadState?.unread === true
         ? statuses.find((status) => {
-            const statusId = status.get('id') as string;
+            const statusId = status.get<'id'>('id');
             const isIncoming = status.getIn(['account', 'id']) !== me;
 
             return (
@@ -576,7 +559,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   );
 
   const createReplyHandler = useCallback(
-    (status: ImmutableRecord<StatusShape>) => () => handleReply(status),
+    (status: ImmutableRecord<StatusShape>) => () => {
+      handleReply(status);
+    },
     [handleReply],
   );
 
@@ -786,14 +771,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                       onClick={createReplyHandler(status)}
                     />
                     <IconButton
-                      className={
-                        classes.messageAction +
-                        ' ' +
-                        classes.messageFavourite +
-                        ' star-icon'
-                      }
+                      className={classNames(classes.messageAction, classes.messageFavourite, 'star-icon')}
                       animate
-                      active={status.get('favourited') === true}
+                      active={status.get('favourited')}
                       title={intl.formatMessage(
                         status.get('favourited')
                           ? {
@@ -807,7 +787,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                       )}
                       icon='star'
                       iconComponent={
-                        status.get('favourited') === true ? StarIcon : StarBorderIcon
+                        status.get('favourited') ? StarIcon : StarBorderIcon
                       }
                       onClick={createFavouriteHandler(status.get<'id'>('id'))}
                     />

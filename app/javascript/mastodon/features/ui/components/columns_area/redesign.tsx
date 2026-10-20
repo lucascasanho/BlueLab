@@ -165,14 +165,12 @@ export const ColumnsAreaRedesign: React.FC<{
     [location.pathname],
   );
 
-  const handleSelectFollowing = useCallback(
-    () => selectFeedTab(null),
-    [selectFeedTab],
-  );
-  const handleSelectGlobal = useCallback(
-    () => selectFeedTab('global'),
-    [selectFeedTab],
-  );
+  const handleSelectFollowing = useCallback(() => {
+    selectFeedTab(null);
+  }, [selectFeedTab]);
+  const handleSelectGlobal = useCallback(() => {
+    selectFeedTab('global');
+  }, [selectFeedTab]);
 
   const clampFeedTabsScroll = useCallback((value: number) => {
     const scroller = feedTabsRef.current;
