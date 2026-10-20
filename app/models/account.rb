@@ -207,6 +207,16 @@ class Account < ApplicationRecord
     !domain.nil?
   end
 
+  def verified_badge_visible?
+    return false if unavailable?
+
+    if local?
+      user_role&.verified_by_instance? || false
+    else
+      remote_instance_verification.present?
+    end
+  end
+
   def moved?
     moved_to_account_id.present?
   end
