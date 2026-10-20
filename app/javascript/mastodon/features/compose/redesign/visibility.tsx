@@ -60,8 +60,6 @@ export const ComposeVisibility: React.FC<{
   const privacy = useThreadPrivacy(activeThreadItemId);
   const isEditing = useAppSelector((state) => !!state.compose.get('id'));
 
-  if (privacy === 'direct') return null;
-
   if (isEditing) {
     return (
       <div className={className}>
