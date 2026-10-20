@@ -4,7 +4,7 @@ Atualizado em: 2026-10-20 (UTC)
 Repositório: [lucascasanho/BlueLab](https://github.com/lucascasanho/BlueLab)  
 Canal de trabalho: `BlueLab-Test`  
 SHA auditado no início desta retomada: `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea`  
-Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código auditado neste checkpoint: `4dd73682bdf83f7226ae5aad7af4a11123aac317`; as validações automatizadas desse conjunto de correções ainda estão pendentes.
+Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código auditado neste checkpoint: `a341efc8e734d941f6d7851f2678fe0826ee953a`; as validações automatizadas desse conjunto de correções ainda estão pendentes.
 
 ## Escopo e proteções
 
@@ -72,7 +72,8 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 
 - [x] Corrigir manualmente os dois blocos de função com formatação divergente em `bug_report_modal.tsx`, sem alterar o comportamento.
 - [ ] Confirmar a formatação com o job oficial `Check formatting`; o diff exato de `yarn format` foi aplicado aos arquivos de código apontados e ao checkpoint. O workflow original `yarn format:check` permaneceu intacto.
-- [ ] Resolver erros ESLint/TypeScript concretos no código atual; não suprimir regras globalmente para mascarar problemas.
+- [x] Resolver os erros ESLint/TypeScript concretos reportados nas rodadas recentes sem suprimir regras globalmente; a rodada do SHA `09cf196` reduziu o lint a um único `no-unnecessary-condition` em `message_conversation.tsx`, corrigido em `a341efc8`.
+- [ ] Confirmar que a CI do SHA `a341efc8` passa em JavaScript Linting.
 - [ ] Rodar os comandos focados e o conjunto de lint JS.
 - [ ] Registrar quantidade de erros antes/depois e quaisquer bloqueios remanescentes.
 
@@ -144,6 +145,8 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 | 2026-10-20 | 46 | Corrigido o caminho vazio no sanitizador de relatos e aplicado o primeiro conjunto de alterações exatas reportadas pelo Oxfmt. | O spec de erro iniciado com `current_path: ''` cobre a regressão; confirmar no RSpec. | `007ddc85983b0cb26a13ddc0634eafbf14c18725` |
 | 2026-10-20 | 47 | Aplicada a formatação oficial em imports e casts do compositor e da conversa direta, conforme o diff do Oxfmt. | Formatação corrigida no branch de teste; confirmação oficial pendente. | `d4385cc3bdaffcd08f1c74f4f4e7b8d30c0af2a6` |
 | 2026-10-20 | 48 | Aplicadas as últimas correções Oxfmt em navegação, página de status e tipos de grupos de notificação. | Formatação corrigida no branch de teste; confirmação oficial pendente. | `4dd73682bdf83f7226ae5aad7af4a11123aac317` |
+| 2026-10-20 | 49 | Corrigidos dois testes customizados: a especificação `VerificationRequest#resolve!` agora cria uma conta persistida antes de criar a associação; o teste de bug report usa `user.account` em vez do antigo `token.resource_owner.account`, incompatível com o Doorkeeper atual. | Ajustes em specs; a nova execução Ruby do commit mais recente deve confirmar se eliminam essas falhas. | `a4e99ed2cf824a79873f2bc0abb3042b96f52dad` |
+| 2026-10-20 | 50 | Removida a optional chain redundante em `location.state.statusId`, após explicitar o tipo de estado do React Router na conversa direta. | A execução ESLint de `09cf196` apontou esse único erro restante; correção publicada para nova validação. | `a341efc8e734d941f6d7851f2678fe0826ee953a` |
 
 ## Referências da execução
 
