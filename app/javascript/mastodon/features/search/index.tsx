@@ -287,7 +287,9 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
     </>
   );
 
-  const pageTitle = intl.formatMessage(messages.title, { q });
+  const pageTitle = trimmedValue
+    ? intl.formatMessage(messages.searchFor, { q: trimmedValue })
+    : intl.formatMessage(messages.search);
 
   return (
     <Column bindToDocument={!multiColumn} label={pageTitle}>
