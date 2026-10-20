@@ -62,6 +62,7 @@ module ThemeHelper
     dark_text = safe_customization_color(:instance_dark_text_color, fallback: '#f7f9f9')
     custom_logo = Rails.cache.fetch('site_uploads/auth_logo') { SiteUpload.find_by(var: 'auth_logo') }&.file&.url
     custom_logo = nil unless custom_logo&.match?(%r{\A/[a-zA-Z0-9_./-]+\z})
+    custom_logo ||= favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png')
     logo_token = "--instance-logo: url(#{custom_logo});" if custom_logo.present?
 
     # This CSS is passed through safe_join before it is placed in a <style> RAWTEXT
