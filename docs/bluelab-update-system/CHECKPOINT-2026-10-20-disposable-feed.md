@@ -47,3 +47,33 @@ O aviso não significa que a lista foi atualizada.
 A alteração de código foi publicada no GitHub. Não foi possível executar Bash,
 testes de integração ou deploy no host local por esta conexão; a correção ainda
 precisa ser validada na execução real de `bluelab`.
+
+
+---
+
+# Checkpoint adicional — seletor de tema individual e Vanilla
+
+Data: 2026-10-20  
+Canal autorizado: `BlueLab-Test`
+
+## Problemas identificados
+
+- A página `Aparência da conta` renderizava o seletor `instance_theme` para administradores junto do seletor individual `bluelab_theme`. Isso misturava a preferência pessoal com a configuração global da instância.
+- `Themes::USER_SELECTABLE_NAMES` já permitia `default` (Vanilla), mas a definição `UserSettings` ainda permitia `mastodon-5` e rejeitava `default`. Essa divergência fazia a gravação da preferência Vanilla falhar.
+
+## Correções publicadas em BlueLab-Test
+
+- `5d8bb8320779370e1cc74939883fb3c3a375da6b`: remove o tratamento de `instance_theme` do controller de preferências; a página de conta não altera mais `Setting.theme` global.
+- `876494014dd7ff17f9f5af58cd1ad7b1b7953864`: remove o seletor administrativo da página pessoal; a configuração global permanece na tela administrativa própria.
+- `bb36873ae49eeee53f9a9cb06e6f6e388aaa1315`: alinha os valores válidos de `bluelab_theme` com os temas selecionáveis, incluindo `default`/Vanilla e removendo o identificador obsoleto `mastodon-5`.
+- `f9350c1ffce88677777eeed126119214543268c6`: adiciona testes de requisição para o único seletor individual, salvamento de Vanilla sem alterar o tema global, e rejeição de valores desconhecidos.
+
+## Validação pendente
+
+As alterações foram publicadas no GitHub, mas os testes automatizados e a verificação visual ainda não foram executados nesta conexão. Executar `bluelab` no host de teste, confirmar que o deploy termina e validar na interface:
+1. aparece somente o seletor individual de tema na página Aparência da conta, inclusive para administradores;
+2. selecionar Vanilla e salvar retorna normalmente à página, sem erro, e mantém Vanilla após recarregar;
+3. a seleção individual não altera o tema global da instância;
+4. a configuração global continua disponível em Administração > Aparência.
+
+Não promover para `BlueLab` e não alterar a Espelunca sem aprovação explícita.
