@@ -29,7 +29,7 @@ import { importFetchedStatus } from '@/mastodon/actions/importer';
 import { toggleFavourite } from '@/mastodon/actions/interactions';
 import { fetchStatus } from '@/mastodon/actions/statuses';
 import { connectDirectStream } from '@/mastodon/actions/streaming';
-import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
+import type { ApiMentionJSON, ApiStatusJSON } from '@/mastodon/api_types/statuses';
 import { compareId } from '@/mastodon/compare_id';
 import AttachmentList from '@/mastodon/components/attachment_list';
 import { Avatar } from '@/mastodon/components/avatar';
@@ -43,6 +43,7 @@ import { browserHistory } from '@/mastodon/components/router';
 import StatusContent from '@/mastodon/components/status/legacy/content';
 import { RedesignComposeForm } from '@/mastodon/features/compose/redesign';
 import { me } from '@/mastodon/initial_state';
+import type { Account } from '@/mastodon/models/account';
 import type { StatusShape } from '@/mastodon/models/status';
 import { dismissComposer } from '@/mastodon/reducers/slices/composer';
 import { makeGetStatus } from '@/mastodon/selectors';
@@ -286,11 +287,18 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   const statuses = useAppSelector<RootState, ImmutableRecord<StatusShape>[]>(
     (state) =>
       effectiveMessageStatusIds
-        .map(
-          (statusId) =>
-            getStatus(state, { id: statusId }) as ImmutableRecord<StatusShape>,
-        )
-        .filter(Boolean),
+        .map((statusId) => {
+          // The legacy selector also reads contextType from the same props object.
+          const selectorProps = { id: statusId, contextType: undefined };
+          return getStatus(state, selectorProps) as
+            | ImmutableRecord<StatusShape>
+            | null
+            | undefined;
+        })
+        .filter(
+          (status): status is ImmutableRecord<StatusShape> =>
+            status !== null && status !== undefined,
+        ),
   );
 
   const initialLoadConversationIdRef = useRef<string | null>(null);
@@ -655,12 +663,15 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           <div className={classes.messageListContent}>
             {statuses.map((status) => {
               const isMine = status.getIn(['account', 'id']) === me;
-              const displayAccount = status.get('account');
+              const displayAccount = status.get('account') as unknown as Account;
+              const mediaAttachments = status.get('media_attachments') as unknown as ImmutableList<
+                ImmutableMap<string, unknown>
+              >;
               const statusText =
-                typeof status.get('text') === 'string'
-                  ? (status.get('text') as string)
+                typeof status.get('content') === 'string'
+                  ? (status.get('content') as string)
                   : '';
-              const mentions = status.get('mentions') as ImmutableList<
+              const mentions = status.get('mentions') as unknown as ImmutableList<
                 ImmutableMap<string, unknown>
               >;
               const trimmedText = statusText.trimStart();
@@ -687,18 +698,23 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                   )
                 : undefined;
               const replyTargetText =
-                replyTarget && typeof replyTarget.get('text') === 'string'
-                  ? (replyTarget.get('text') as string)
+                replyTarget && typeof replyTarget.get('content') === 'string'
+                  ? (replyTarget.get('content') as string)
                   : '';
+              const replyTargetAccount = replyTarget?.get('account') as
+                | Account
+                | undefined;
 
               return (
                 <article
                   id={`message-${status.get<'id'>('id')}`}
                   key={status.get<'id'>('id')}
-                  className={classNames(classes.message, {
-                    [classes.messageHighlighted]:
-                      highlightedStatusId === status.get<'id'>('id'),
-                  })}
+                  className={classNames(
+                    classes.message,
+                    highlightedStatusId === status.get<'id'>('id')
+                      ? classes.messageHighlighted
+                      : undefined,
+                  )}
                   data-own-message={isMine ? 'true' : 'false'}
                 >
                   <div className={classes.messageMeta}>
@@ -722,8 +738,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                         },
                         {
                           name:
-                            replyTarget.getIn(['account', 'display_name']) ||
-                            replyTarget.getIn(['account', 'username']),
+                            replyTargetAccount?.display_name ||
+                            replyTargetAccount?.username ||
+                            '',
                         },
                       )}
                       onClick={createScrollToStatusHandler(replyTargetId)}
@@ -739,7 +756,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                           values={{
                             name: (
                               <DisplayNameSimple
-                                account={replyTarget.get('account')}
+                                account={replyTargetAccount as Account}
                               />
                             ),
                           }}
@@ -760,11 +777,8 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                     />
                   </div>
 
-                  {status.get('media_attachments').size > 0 && (
-                    <AttachmentList
-                      compact
-                      media={status.get('media_attachments')}
-                    />
+                  {mediaAttachments.size > 0 && (
+                    <AttachmentList compact media={mediaAttachments} />
                   )}
 
                   <div className={classes.messageActions}>
