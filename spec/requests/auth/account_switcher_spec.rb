@@ -14,7 +14,7 @@ RSpec.describe 'Auth Account Switcher' do
     it 'renders the additional-account login form without signing out the current account' do
       get new_user_session_path, params: { account_switcher: '1' }
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(200)
       expect(response.body).to include(I18n.t('auth.sign_in.another_account.title'))
       expect(response.body).to include(I18n.t('auth.sign_in.another_account.notice'))
       expect(current_user.session_activations).to be_present
@@ -78,10 +78,10 @@ RSpec.describe 'Auth Account Switcher' do
         session_id: @target_session_id,
       }
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(200)
       expect(response.parsed_body).to eq(
         'ok' => true,
-        'account_id' => target_user.account_id.to_s,
+        'account_id' => target_user.account_id.to_s
       )
       expect(response.cookies['_session_id']).to be_present
 
@@ -97,7 +97,7 @@ RSpec.describe 'Auth Account Switcher' do
         session_id: SecureRandom.hex(32),
       }
 
-      expect(response).to have_http_status(:not_found)
+      expect(response).to have_http_status(404)
     end
   end
 
@@ -106,7 +106,7 @@ RSpec.describe 'Auth Account Switcher' do
       sign_in current_user
       get root_path
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(200)
 
       expect(current_user.session_activations.find_by(session_id: cookies.signed['_session_id'])).to be_present
     end

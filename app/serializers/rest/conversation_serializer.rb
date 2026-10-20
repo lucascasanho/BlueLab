@@ -13,5 +13,4 @@ class REST::ConversationSerializer < ActiveModel::Serializer
   def conversation_id
     object.conversation_id.to_s
   end
-
 end

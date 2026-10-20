@@ -105,8 +105,6 @@ class CustomEmoji < ApplicationRecord
     Rails.cache.delete(EntityCache.instance.to_key(:emoji, shortcode, domain))
 
     previous_shortcode = saved_change_to_shortcode&.first
-    if previous_shortcode.present?
-      Rails.cache.delete(EntityCache.instance.to_key(:emoji, previous_shortcode, domain))
-    end
+    Rails.cache.delete(EntityCache.instance.to_key(:emoji, previous_shortcode, domain)) if previous_shortcode.present?
   end
 end

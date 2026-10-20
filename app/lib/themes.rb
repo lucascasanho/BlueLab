@@ -8,7 +8,7 @@ class Themes
     light: '#ffffff',
   }.freeze
 
-  USER_SELECTABLE_NAMES = %w[blue-2 mastodon-bird-ui-auto mastodon-5].freeze
+  USER_SELECTABLE_NAMES = %w(blue-2 mastodon-bird-ui-auto mastodon-5).freeze
 
   def initialize
     @conf = YAML.load_file(Rails.root.join('config', 'themes.yml'))

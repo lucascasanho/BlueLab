@@ -20,7 +20,7 @@ module Api
 
         def create
           unless VerificationRequest.requestable?(current_account)
-            render json: { error: 'Verification request is not available' }, status: :conflict
+            render json: { error: 'Verification request is not available' }, status: 409
             return
           end
 
@@ -31,11 +31,11 @@ module Api
           render json: {
             id: verification_request.id.to_s,
             created_at: verification_request.created_at.iso8601,
-          }, status: :created
+          }, status: 201
         rescue ActiveRecord::RecordNotUnique
-          render json: { error: 'A verification request is already pending' }, status: :conflict
+          render json: { error: 'A verification request is already pending' }, status: 409
         rescue ActiveRecord::RecordInvalid => e
-          render json: ValidationErrorFormatter.new(e).as_json, status: :unprocessable_entity
+          render json: ValidationErrorFormatter.new(e).as_json, status: 422
         end
 
         private

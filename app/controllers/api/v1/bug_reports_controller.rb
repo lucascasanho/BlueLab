@@ -34,12 +34,12 @@ class Api::V1::BugReportsController < Api::BaseController
     render json: {
       id: @bug_report.id,
       status: @bug_report.status,
-      created_at: @bug_report.created_at.iso8601
-    }, status: :created
+      created_at: @bug_report.created_at.iso8601,
+    }, status: 201
   rescue ActiveRecord::RecordInvalid, Paperclip::Error, Mastodon::DimensionsValidationError, Mastodon::StreamValidationError => e
     @bug_report&.destroy
     Rails.logger.warn("Bug report rejected: #{e.class}: #{e.message}")
-    render json: { error: 'Unable to save bug report' }, status: :unprocessable_content
+    render json: { error: 'Unable to save bug report' }, status: 422
   end
 
   private
@@ -85,7 +85,7 @@ class Api::V1::BugReportsController < Api::BaseController
         'method' => error['method'].to_s.truncate(16),
         'url' => error['url'].to_s.truncate(500),
         'request_id' => error['request_id'].to_s.truncate(128),
-        'timestamp' => error['timestamp'].to_s.truncate(64)
+        'timestamp' => error['timestamp'].to_s.truncate(64),
       }.compact
     end
   rescue JSON::ParserError, TypeError
@@ -100,10 +100,10 @@ class Api::V1::BugReportsController < Api::BaseController
       browser: detection.name.to_s.presence,
       browser_version: detection.version.to_s.presence,
       operating_system: platform.name.to_s.presence || platform.id.to_s.presence,
-      operating_system_version: platform.version.to_s.presence
+      operating_system_version: platform.version.to_s.presence,
     }
-  rescue StandardError => e
-    Rails.logger.debug("Bug report browser detection failed: #{e.class}: #{e.message}")
+  rescue => e
+    Rails.logger.debug { "Bug report browser detection failed: #{e.class}: #{e.message}" }
     {}
   end
 end

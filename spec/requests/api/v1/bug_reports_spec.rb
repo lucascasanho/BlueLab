@@ -32,7 +32,7 @@ RSpec.describe 'Bug reports' do
       expect(response.parsed_body).to match(
         a_hash_including(
           'status' => 'open',
-          'id' => be_present,
+          'id' => be_present
         )
       )
 
@@ -45,11 +45,10 @@ RSpec.describe 'Bug reports' do
         current_path: '/settings/preferences',
         viewport: '1280x720@1',
         app_version: '4.8.0',
-        account: token.resource_owner.account,
+        account: token.resource_owner.account
       )
       expect(report.client_errors.first['type']).to eq 'javascript'
     end
-
 
     context 'when anonymous' do
       subject do

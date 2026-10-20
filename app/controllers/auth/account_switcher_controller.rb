@@ -14,9 +14,7 @@ class Auth::AccountSwitcherController < ApplicationController
     end
 
     if target_user.two_factor_enabled?
-      if target_user.otp_required_for_login? && params.dig(:user, :otp_attempt).present?
-        return complete_otp_authentication(target_user)
-      end
+      return complete_otp_authentication(target_user) if target_user.otp_required_for_login? && params.dig(:user, :otp_attempt).present?
 
       if target_user.otp_required_for_login?
         session[:account_switcher_attempt_user_id] = target_user.id
@@ -51,9 +49,9 @@ class Auth::AccountSwitcherController < ApplicationController
   def switch
     activation = SessionActivation.includes(:user).find_by(session_id: params[:session_id].to_s)
 
-    return head :not_found unless activation
-    return head :forbidden unless activation.user&.active_for_authentication?
-    return head :forbidden unless activation.user&.functional?
+    return head 404 unless activation
+    return head 403 unless activation.user&.active_for_authentication?
+    return head 403 unless activation.user&.functional?
 
     cookies.signed['_session_id'] = {
       value: activation.session_id,

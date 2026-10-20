@@ -2,9 +2,7 @@
 
 class Settings::Preferences::AppearanceController < Settings::Preferences::BaseController
   def update
-    if theme_submitted? && Themes::USER_SELECTABLE_NAMES.exclude?(user_theme)
-      return bad_request
-    end
+    return bad_request if theme_submitted? && Themes::USER_SELECTABLE_NAMES.exclude?(user_theme)
 
     super
   end

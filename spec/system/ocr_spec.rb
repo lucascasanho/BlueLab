@@ -22,7 +22,7 @@ RSpec.describe 'OCR', :attachment_processing, :inline_jobs, :js, :streaming do
     click_button frontend_translations('compose.new.post')
 
     within('[data-bluelab-composer]') do
-      find('input[type="file"]', visible: :all).attach_file(file_fixture('text.png'))
+      find_field(type: 'file', visible: :all).attach_file(file_fixture('text.png'))
       click_button frontend_translations('compose.upload.edit')
     end
 

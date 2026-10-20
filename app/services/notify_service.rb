@@ -228,7 +228,7 @@ class NotifyService < BaseService
       type: type,
       activity: @activity
     )
-    @sender       = @notification.from_account
+    @sender = @notification.from_account
 
     # For certain conditions we don't need to create a notification at all
     return if drop?

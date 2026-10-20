@@ -24,7 +24,6 @@ RSpec.describe UserSettings do
       it 'defaults the BlueLab theme preference to BlueLab' do
         expect(subject[:bluelab_theme]).to eq 'blue-2'
       end
-
     end
 
     context 'when setting is set' do

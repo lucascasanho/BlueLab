@@ -47,7 +47,7 @@ class BugReportsController < ApplicationController
   rescue ActiveRecord::RecordInvalid, Paperclip::Error, Mastodon::DimensionsValidationError, Mastodon::StreamValidationError => e
     @bug_report&.destroy
     Rails.logger.warn("Bug report rejected: #{e.class}: #{e.message}")
-    render :new, status: :unprocessable_content
+    render :new, status: 422
   end
 
   private
@@ -79,7 +79,7 @@ class BugReportsController < ApplicationController
         'method' => error['method'].to_s.truncate(16),
         'url' => error['url'].to_s.truncate(500),
         'request_id' => error['request_id'].to_s.truncate(128),
-        'timestamp' => error['timestamp'].to_s.truncate(64)
+        'timestamp' => error['timestamp'].to_s.truncate(64),
       }.compact
     end
   rescue JSON::ParserError, TypeError
@@ -94,10 +94,10 @@ class BugReportsController < ApplicationController
       browser: detection.name.to_s.presence,
       browser_version: detection.version.to_s.presence,
       operating_system: platform.name.to_s.presence || platform.id.to_s.presence,
-      operating_system_version: platform.version.to_s.presence
+      operating_system_version: platform.version.to_s.presence,
     }
-  rescue StandardError => e
-    Rails.logger.debug("Bug report browser detection failed: #{e.class}: #{e.message}")
+  rescue => e
+    Rails.logger.debug { "Bug report browser detection failed: #{e.class}: #{e.message}" }
     {}
   end
 end
