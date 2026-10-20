@@ -1,0 +1,31 @@
+name: Temporary BlueLab ESLint autofix
+on:
+  push:
+    branches:
+      - BlueLab-Test
+    paths:
+      - '.github/workflows/bluelab-eslint-autofix.yml'
+permissions:
+  contents: write
+jobs:
+  eslint-autofix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Set up JavaScript environment
+        uses: ./.github/actions/setup-javascript
+      - name: Record base SHA
+        run: echo "ESLINT_BASE_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+      - name: Apply ESLint safe fixes
+        run: yarn lint:js --fix || true
+      - name: Commit ESLint autofixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet; then
+            git add -u
+            HUSKY=0 LEFTHOOK=0 git -c core.hooksPath=/dev/null commit -m "style: apply safe ESLint autofixes to alpha integration"
+            git push origin HEAD:refs/heads/BlueLab-Test
+          fi
