@@ -386,8 +386,8 @@ const ComposeGifDropdown: React.FC<
 
               const dims = gif.media_formats?.tinygif?.dims ?? [220, 220];
               const title =
-                [gif.content_description, gif.title].find(
-                  (candidate) => candidate?.trim(),
+                [gif.content_description, gif.title].find((candidate) =>
+                  candidate?.trim(),
                 ) ?? 'GIF';
 
               return (

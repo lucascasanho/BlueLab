@@ -203,9 +203,7 @@ export const Conversation: React.FC<{
     (event) => {
       if (
         event.target instanceof Element &&
-        event.target.closest(
-          '.status__action-bar, button, [role="menuitem"]',
-        )
+        event.target.closest('.status__action-bar, button, [role="menuitem"]')
       ) {
         return;
       }
