@@ -1,7 +1,7 @@
 # Checkpoint — atualização interrompida por fontes de domínios descartáveis
 
-Data: 2026-10-20  
-Canal autorizado: `BlueLab-Test`  
+Data: 2026-10-20
+Canal autorizado: `BlueLab-Test`
 Instância: mastodon.blue / usuário local `blue`
 
 ## Falha observada
@@ -48,12 +48,11 @@ A alteração de código foi publicada no GitHub. Não foi possível executar Ba
 testes de integração ou deploy no host local por esta conexão; a correção ainda
 precisa ser validada na execução real de `bluelab`.
 
-
 ---
 
 # Checkpoint adicional — seletor de tema individual e Vanilla
 
-Data: 2026-10-20  
+Data: 2026-10-20
 Canal autorizado: `BlueLab-Test`
 
 ## Problemas identificados
@@ -78,12 +77,11 @@ As alterações foram publicadas no GitHub, mas os testes automatizados e a veri
 
 Não promover para `BlueLab` e não alterar a Espelunca sem aprovação explícita.
 
-
 ---
 
 # Checkpoint adicional — identidade visual da instância em logos
 
-Data: 2026-10-20  
+Data: 2026-10-20
 Canal autorizado: `BlueLab-Test`
 
 ## Escopo da alteração
