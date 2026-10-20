@@ -140,6 +140,10 @@ export function Blocks () {
   return import('../../blocks');
 }
 
+export function DomainBlocks () {
+  return import('../../blocks/domains');
+}
+
 export function Mutes () {
   return import('../../mutes');
 }
