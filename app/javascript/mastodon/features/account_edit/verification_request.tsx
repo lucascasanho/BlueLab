@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useState } from 'react';
-import type { ChangeEvent, FC, FormEvent, MouseEvent } from 'react';
+import type { ChangeEvent, FC, MouseEvent, SyntheticEvent } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -101,18 +101,21 @@ export const VerificationRequestTrigger: FC = () => {
   const uniqueId = useId();
   const popoverId = `bluelab-verification-request-${uniqueId.replace(/:/g, '')}`;
 
-  const loadEligibility = useCallback(async () => {
-    try {
-      const result = await apiGetVerificationRequestStatus();
-      setCanRequest(result.can_request);
-    } catch {
-      setCanRequest(false);
-    }
-  }, []);
-
   useEffect(() => {
-    void loadEligibility();
-  }, [loadEligibility]);
+    let active = true;
+
+    void apiGetVerificationRequestStatus()
+      .then((result) => {
+        if (active) setCanRequest(result.can_request);
+      })
+      .catch(() => {
+        if (active) setCanRequest(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleClose = useCallback(() => {
     if (submitting) return;
@@ -123,7 +126,7 @@ export const VerificationRequestTrigger: FC = () => {
   }, [submitting]);
 
   const handleSubmit = useCallback(
-    async (event: FormEvent<HTMLFormElement>) => {
+    async (event: SyntheticEvent<HTMLFormElement>) => {
       event.preventDefault();
       setSubmitting(true);
       setError(false);
@@ -143,7 +146,7 @@ export const VerificationRequestTrigger: FC = () => {
   );
 
   const handleFormSubmit = useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
+    (event: SyntheticEvent<HTMLFormElement>) => {
       void handleSubmit(event);
     },
     [handleSubmit],

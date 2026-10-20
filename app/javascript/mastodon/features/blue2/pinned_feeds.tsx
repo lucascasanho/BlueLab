@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -85,13 +85,10 @@ export const useBlue2PinnedFeeds = () => {
     state.settings.getIn(['blue2', 'pinned_feeds']),
   );
 
-  const [legacyFeeds, setLegacyFeeds] = useState<Blue2PinnedFeed[]>(() =>
-    readPinnedFeeds(accountId),
+  const legacyFeeds = useMemo(
+    () => readPinnedFeeds(accountId),
+    [accountId],
   );
-
-  useEffect(() => {
-    setLegacyFeeds(readPinnedFeeds(accountId));
-  }, [accountId]);
 
   const serverValueExists =
     serverPinnedFeeds !== undefined && serverPinnedFeeds !== null;

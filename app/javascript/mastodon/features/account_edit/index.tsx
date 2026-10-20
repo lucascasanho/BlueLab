@@ -132,14 +132,12 @@ export const AccountEdit: FC = () => {
 
   const { profile, isPending } = useAppSelector((state) => state.profileEdit);
   const [badgeVisibilitySaving, setBadgeVisibilitySaving] = useState(false);
-  const [badgeVisible, setBadgeVisible] = useState(true);
+  const [badgeVisibleOverride, setBadgeVisibleOverride] = useState<boolean | null>(null);
+  const badgeVisible = badgeVisibleOverride ?? (account?.verified_badge_visible !== false);
   useEffect(() => {
     void dispatch(fetchProfile());
   }, [dispatch]);
 
-  useEffect(() => {
-    setBadgeVisible(account?.verified_badge_visible !== false);
-  }, [account?.verified_badge_visible]);
 
   const maxFieldCount = useAppSelector(
     (state) =>
@@ -183,10 +181,6 @@ export const AccountEdit: FC = () => {
     handleOpenModal('ACCOUNT_EDIT_PROFILE_DISPLAY');
   }, [handleOpenModal]);
 
-  const handleBadgeVisibilityToggleClick = useCallback(() => {
-    void handleBadgeVisibilityToggle();
-  }, [handleBadgeVisibilityToggle]);
-
   const history = useHistory();
   const handleFeaturedTagsEdit = useCallback(() => {
     history.push('/profile/featured_tags');
@@ -201,11 +195,11 @@ export const AccountEdit: FC = () => {
 
     const nextVisible = !badgeVisible;
     setBadgeVisibilitySaving(true);
-    setBadgeVisible(nextVisible);
+    setBadgeVisibleOverride(nextVisible);
 
     try {
       const result = await apiUpdateVerificationBadge(nextVisible);
-      setBadgeVisible(result.verified_badge_visible);
+      setBadgeVisibleOverride(result.verified_badge_visible);
       dispatch(
         updateVerificationBadgeVisibility({
           id: account.id,
@@ -213,11 +207,15 @@ export const AccountEdit: FC = () => {
         }),
       );
     } catch {
-      setBadgeVisible(!nextVisible);
+      setBadgeVisibleOverride(!nextVisible);
     } finally {
       setBadgeVisibilitySaving(false);
     }
   }, [account, badgeVisible, badgeVisibilitySaving, dispatch]);
+
+  const handleBadgeVisibilityToggleClick = useCallback(() => {
+    void handleBadgeVisibilityToggle();
+  }, [handleBadgeVisibilityToggle]);
 
   // Normally we would use the account emoji, but we want all custom emojis to be available to render after editing.
   const emojis = useCustomEmojis();
@@ -274,18 +272,17 @@ export const AccountEdit: FC = () => {
                   loading={badgeVisibilitySaving}
                   aria-pressed={badgeVisible}
                 >
-                  <FormattedMessage
-                    id={
-                      badgeVisible
-                        ? 'account_edit.verification.toggle_hide'
-                        : 'account_edit.verification.toggle_show'
-                    }
-                    defaultMessage={
-                      badgeVisible
-                        ? 'Hide verification badge'
-                        : 'Show verification badge'
-                    }
-                  />
+                  {badgeVisible ? (
+                    <FormattedMessage
+                      id='account_edit.verification.toggle_hide'
+                      defaultMessage='Hide verification badge'
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id='account_edit.verification.toggle_show'
+                      defaultMessage='Show verification badge'
+                    />
+                  )}
                 </Button>
               ) : (
                 <VerificationRequestTrigger />
