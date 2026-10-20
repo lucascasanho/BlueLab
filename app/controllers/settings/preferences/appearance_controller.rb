@@ -2,9 +2,18 @@
 
 class Settings::Preferences::AppearanceController < Settings::Preferences::BaseController
   def update
+    instance_theme = params[:instance_theme] if params.key?(:instance_theme)
+
+    if params.key?(:instance_theme)
+      return head :forbidden unless current_user.role&.can?(:manage_settings)
+      return bad_request unless Themes.instance.names.include?(instance_theme)
+    end
+
     return bad_request if theme_submitted? && Themes::USER_SELECTABLE_NAMES.exclude?(user_theme)
 
-    super
+    result = super
+    Setting.theme = instance_theme if instance_theme.present? && response.redirect?
+    result
   end
 
   private
@@ -17,6 +26,14 @@ class Settings::Preferences::AppearanceController < Settings::Preferences::BaseC
     settings = params.dig(:user, :settings_attributes)
     settings.respond_to?(:key?) && (settings.key?(:bluelab_theme) || settings.key?('bluelab_theme'))
   end
+
+  def user_params
+    permitted = super
+    settings = permitted[:settings_attributes]
+    settings.delete(:theme) if settings.respond_to?(:delete)
+    permitted
+  end
+
 
   def after_update_redirect_path
     settings_preferences_appearance_path
