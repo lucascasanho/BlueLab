@@ -27,6 +27,7 @@ const quoteWithEditor = (editor: 'bluelab' | 'mastodon') => {
     getIn: (path) => {
       if (path.join('.') === 'compose.composer_editor') return editor;
       if (path.join('.') === 'compose.mounted') return false;
+      if (path.join('.') === 'compose.text') return '';
       return undefined;
     },
   };
