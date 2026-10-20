@@ -11066,8 +11066,8 @@ noscript {
 }
 
 /* BlueLab layout overrides are enabled only on the BlueLab theme. */
+/* prettier-ignore */
 body[data-theme='blue-2'] {
-
   .compose-form {
     display: flex;
     flex-direction: column;
