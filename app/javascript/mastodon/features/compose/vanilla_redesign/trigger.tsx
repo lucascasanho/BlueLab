@@ -7,8 +7,8 @@ import { useRouteMatch } from 'react-router';
 
 import { PenNibIcon, ReadCvLogoIcon } from '@phosphor-icons/react';
 
-import type { IconButtonProps } from '@/mastodon/components/button/redesign';
-import { IconButton } from '@/mastodon/components/button/redesign';
+import type { IconButtonProps } from '@/mastodon/components/button/vanilla_redesign';
+import { IconButton } from '@/mastodon/components/button/vanilla_redesign';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
   minimizeComposerToggle,
