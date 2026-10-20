@@ -46,10 +46,10 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 
 ### Etapa 3 — schema e migrações BlueLab
 
-- [ ] Comparar migrações customizadas, modelos, schema exportado e testes.
-- [ ] Corrigir a ausência de `verified_badge_visible` e outras colunas/tabelas customizadas que a CI comprovar estarem faltando.
-- [ ] Rodar o teste de migrações e testes focados do recurso de verificação.
-- [ ] Registrar commit e resultados.
+- [x] Comparar migrações customizadas, modelos, schema exportado e testes.
+- [x] Corrigir no schema as três colunas ausentes confirmadas na auditoria: `accounts.verified_badge_visible`, `account_conversations.last_read_status_id` e `fasp_providers.capabilities`.
+- [ ] Rodar o teste de migrações e testes focados do recurso de verificação; confirmar os demais campos/tabelas pela CI.
+- [x] Registrar o commit de schema; resultados de teste ainda pendentes.
 
 ### Etapa 4 — lint e formatação
 
@@ -73,6 +73,7 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 |---|---|---|---|---|
 | 2026-10-20 | 1 | Criado checkpoint com estado inicial, escopo, CI e plano de correção. | Estado inicial auditado; CI do SHA `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea` consultada. | `0a9c63a1c6392e04cfa512890d7d59cfc1db9efb` |
 | 2026-10-20 | 2 | Restaurado o contrato `Themes#available_theme_colors`, atualizado `config/themes.yml` para o formato `path`/`colors` aceito pelo Mastodon atual, e adicionado teste para a paleta BlueLab. | Correção publicada no canal de teste. Testes e CI do novo SHA ainda pendentes; não declarar a etapa validada antes dos resultados. | `b573c59cf1c994d5cbc73febd10115afa54193df` |
+| 2026-10-20 | 3 | Corrigido `db/schema.rb` para incluir as colunas existentes nas migrações e que faltavam no schema: `last_read_status_id`, `verified_badge_visible` e `fasp_providers.capabilities`. | Diff aplicado no canal de teste; execução de migrações, RSpec e CI do novo SHA ainda pendentes. | `dbd20c5ff56eb4b641cde8e2de643c99d27790c9` |
 
 ## Referências da execução
 
