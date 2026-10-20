@@ -4,7 +4,7 @@ Atualizado em: 2026-10-20 (UTC)
 Repositório: [lucascasanho/BlueLab](https://github.com/lucascasanho/BlueLab)  
 Canal de trabalho: `BlueLab-Test`  
 SHA auditado no início desta retomada: `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea`  
-Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código: `75ff3a9e54c74a7ea0c569ce75424f171452e47e`; os jobs de CI dos SHAs anteriores ainda aguardam execução e uma nova rodada foi disparada.
+Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código: `3868256066ef1a53460c5619d8ebe6ffdeca46bf`; a CI continua na fila no GitHub e as validações ainda não foram confirmadas.
 
 ## Escopo e proteções
 
@@ -134,6 +134,8 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 
 | 2026-10-20 | 42 | Portada do estável a correção do scroll-to-top: removido o override desktop antigo que alterava `left` no tema BlueLab, preservando o posicionamento responsivo atual. | Patch aplicado em `BlueLab-Test`; CI ainda pendente. | `45d1a9f0c706acaaa823c006d123e14a1aa9bda8` |
 | 2026-10-20 | 43 | Restaurada a ação de mudança de política de citação no menu da interface legada, condicionada a `!isRedesignEnabled()`, sem expô-la no redesign. | Portado seletivamente do estável após comparação de arquivos; CI pendente. | `75ff3a9e54c74a7ea0c569ce75424f171452e47e` |
+
+| 2026-10-20 | 44 | Estreitado o tipo da classe CSS opcional `headless` no compositor redesign para evitar argumento de tipo de erro no `classNames`. | Correção publicada; confirmar no TypeScript/ESLint da rodada atual. | `3868256066ef1a53460c5619d8ebe6ffdeca46bf` |
 
 ## Referências da execução
 
