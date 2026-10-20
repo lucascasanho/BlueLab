@@ -201,7 +201,7 @@ const ComposeGifDropdown: React.FC<
       const payload = (await response.json()) as KlipyResponse;
       const items = (payload.results ?? []).filter((item) => {
         const formats = item.media_formats;
-        return Boolean(item.id && formats?.gif?.url && formats?.tinygif?.url);
+        return Boolean(item.id && formats?.gif?.url && formats.tinygif?.url);
       });
 
       setResults((current) => (isMore ? [...current, ...items] : items));

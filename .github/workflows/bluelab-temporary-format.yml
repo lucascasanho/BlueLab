@@ -1,5 +1,5 @@
 name: Temporary BlueLab format pass
-# Run the repository formatter after the Mastodon 5 alpha lint cleanup (pass 3).
+# Run the repository formatter after closing the final alpha lint diagnostics (pass 4).
 on:
   push:
     branches:

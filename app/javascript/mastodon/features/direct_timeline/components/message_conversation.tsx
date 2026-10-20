@@ -199,9 +199,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
         const recoveredId = (await dispatch(
           findConversationForStatus(sourceStatusId),
-        )) as string | null;
+        )) as string;
 
-        if (!recoveredId || recoveredId === id) throw error;
+        if (recoveredId === id) throw error;
 
         browserHistory.replace(`/conversations/${recoveredId}`, {
           statusId: sourceStatusId,
@@ -232,9 +232,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           try {
             const recoveredId = (await dispatch(
               findConversationForStatus(sourceStatusId),
-            )) as string | null;
+            )) as string;
 
-            if (!cancelled && recoveredId && recoveredId !== id) {
+            if (!cancelled && recoveredId !== id) {
               browserHistory.replace(`/conversations/${recoveredId}`, {
                 statusId: sourceStatusId,
               });
@@ -283,7 +283,10 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
   const statuses = useAppSelector((state) =>
     effectiveMessageStatusIds
-      .map((statusId) => getStatus(state, { id: statusId }))
+      .map(
+        (statusId) =>
+          getStatus(state, { id: statusId }) as ImmutableRecord<StatusShape>,
+      )
       .filter(Boolean),
   ) as ImmutableRecord<StatusShape>[];
 
