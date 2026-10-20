@@ -8,17 +8,17 @@ import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trig
 import {
   ComposeRedesignButton as VanillaComposeRedesignButton,
 } from '@/mastodon/features/compose/vanilla_redesign/trigger';
-import {
-  RedesignNavigationPanel as VanillaNavigationPanel,
-} from '@/mastodon/features/navigation_panel/redesign/vanilla_navigation_panel';
-import {
-  RedesignMobileNavigation as VanillaMobileNavigation,
-} from '@/mastodon/features/navigation_panel/redesign/vanilla_mobile_nav';
-import { DiscoveryPanel } from '@/mastodon/features/discovery_panel';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
+import { DiscoveryPanel } from '@/mastodon/features/discovery_panel';
 import { CollapsibleNavigationPanel } from '@/mastodon/features/navigation_panel';
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
+import {
+  RedesignMobileNavigation as VanillaMobileNavigation,
+} from '@/mastodon/features/navigation_panel/redesign/vanilla_mobile_nav';
+import {
+  RedesignNavigationPanel as VanillaNavigationPanel,
+} from '@/mastodon/features/navigation_panel/redesign/vanilla_navigation_panel';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useColumnsContext } from '@/mastodon/features/ui/util/columns_context';
 import { useAppSelector } from '@/mastodon/store';
