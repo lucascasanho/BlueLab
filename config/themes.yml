@@ -14,14 +14,6 @@ blue-2:
     - pink
     - orange
     - cyan
-mastodon-5:
-  path: styles/mastodon-5-v1.scss
-  colors:
-    - indigo
-    - lime
-    - pink
-    - orange
-    - cyan
 default:
   path: styles/application.scss
   colors:
