@@ -12,7 +12,7 @@ import {
 } from '@phosphor-icons/react';
 
 import { addPoll, uploadCompose } from '@/mastodon/actions/compose';
-import { Button, IconButton } from '@/mastodon/components/button/redesign';
+import { Button, IconButton } from '@/mastodon/components/button/vanilla_redesign';
 import {
   createAppSelector,
   useAppDispatch,
