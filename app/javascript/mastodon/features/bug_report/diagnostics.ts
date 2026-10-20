@@ -16,11 +16,22 @@ const MAX_ERRORS = 20;
 const MAX_TEXT = 4_000;
 const recentErrors: ClientBugReportError[] = [];
 
+const safeString = (value: unknown): string => {
+  if (typeof value === 'string') return value;
+  if (value instanceof Error) return value.message;
+
+  try {
+    return JSON.stringify(value ?? '') ?? '';
+  } catch {
+    return '';
+  }
+};
+
 const truncate = (value: unknown, max = MAX_TEXT) =>
-  String(value ?? '').slice(0, max);
+  safeString(value).slice(0, max);
 
 const pathOnly = (value: unknown) => {
-  const raw = String(value ?? '');
+  const raw = safeString(value);
   if (!raw) return '';
 
   if (typeof window === 'undefined') {
@@ -70,7 +81,7 @@ const installErrorListeners = () => {
 
     recordClientError({
       type: 'javascript',
-      message: error?.message || event.message || 'Unknown JavaScript error',
+      message: error?.message ?? event.message ?? 'Unknown JavaScript error',
       stack: error?.stack,
       source: event.filename,
     });
@@ -81,7 +92,7 @@ const installErrorListeners = () => {
 
     recordClientError({
       type: 'unhandled_rejection',
-      message: reason?.message || String(event.reason ?? 'Unhandled rejection'),
+      message: reason?.message ?? (safeString(event.reason).length > 0 ? safeString(event.reason) : 'Unhandled rejection'),
       stack: reason?.stack,
     });
   });

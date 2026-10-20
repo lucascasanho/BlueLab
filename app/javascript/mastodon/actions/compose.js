@@ -596,7 +596,7 @@ export function uploadCompose(files) {
 
         dispatch(uploadComposeSuccess(uploadedMedia, file));
       } catch (error) {
-        if (axios.isCancel(error) || error?.name === 'AbortError') {
+        if (isCancel(error) || error?.name === 'AbortError') {
           dispatch(uploadComposeCancel());
           return;
         } else {

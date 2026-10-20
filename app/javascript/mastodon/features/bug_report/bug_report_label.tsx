@@ -11,5 +11,5 @@ export const BugReportLabel = () => {
   const intl = useIntl();
   const locale = intl.locale.toLowerCase();
 
-  return <>{labels[locale] ?? labels[locale.split('-')[0]] ?? labels.en}</>;
+  return labels[locale] ?? labels[locale.split('-')[0]] ?? labels.en;
 };
