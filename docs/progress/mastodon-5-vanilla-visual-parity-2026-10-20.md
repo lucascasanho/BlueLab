@@ -57,3 +57,9 @@ Esses commits mostram que o redesenho oficial continuou recebendo refinamentos a
 
 ## Estado
 Três refinamentos visuais do upstream foram integrados seletivamente no canal de teste. A camada global de tokens legados foi mantida por segurança, porque componentes compartilhados ainda dependem dela. A paridade integral com o upstream não está comprovada. Não promover para estável até a sincronização, revisão e testes.
+
+## Etapa 5 — feedback de teste: tokens de tema, cores e arredondamentos
+- Feedback do usuário após teste manual: o Vanilla ainda não reproduz os arredondamentos do Mastodon 5.0 e não respeita corretamente o novo sistema de cores/temas.
+- Causa estrutural confirmada: `app/javascript/styles/application.scss` aplica `@include legacy_tokens.apply` globalmente em `html`; o mixin em `app/javascript/bluelab/styles/_legacy_tokens.scss` mapeia aliases antigos de espaçamento e raio para tokens numéricos atuais. Esses aliases podem afetar componentes compartilhados, então não devem ser removidos nem limitados por tema sem auditar todos os consumidores.
+- O sistema de tokens oficial está organizado em `app/javascript/styles/mastodon/tokens/index.scss`, que aplica tokens base e seleciona paletas por `data-color-scheme` e `data-theme-color`. A próxima etapa deve comparar os tokens atuais do upstream com o BlueLab e rastrear overrides de cores/raios em estilos globais e de temas antes de editar.
+- Nenhuma alteração funcional feita nesta etapa; os três refinamentos visuais anteriores não resolvem o problema de paridade global. Ainda faltam auditoria de tokens, correção, build/testes e validação visual no navegador.
