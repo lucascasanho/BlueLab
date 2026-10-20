@@ -4,6 +4,9 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Helmet } from '@unhead/react/helmet';
 
+import { Column } from '@/mastodon/components/column';
+import { ColumnHeader } from '@/mastodon/components/column_header';
+
 import { apiGetDomainBlocks } from 'mastodon/api/domain_blocks';
 import { Domain } from 'mastodon/components/domain';
 import ScrollableList from 'mastodon/components/scrollable_list';
@@ -53,29 +56,15 @@ const DomainBlocks: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
     setDomains((prev) => prev.filter((d) => d !== domain));
   }, []);
 
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
-
   return (
     <Column
       bindToDocument={!multiColumn}
-      label={intl.formatMessage(messages.heading)}
+      label={intl.formatMessage({ id: 'column.domain_blocks', defaultMessage: 'Blocked Domains' })}
     >
-      {isRedesignEnabled() || isBlue2 ? (
-        <ColumnHeader
-          withBackButton
-          title={intl.formatMessage(messages.heading)}
-        />
-      ) : (
-        <LegacyColumnHeader
-          icon='ban'
-          iconComponent={BlockIcon}
-          title={intl.formatMessage(messages.heading)}
-          multiColumn={multiColumn}
-          showBackButton
-          scrollTopOnClick
-        />
-      )}
+      <ColumnHeader
+        withBackButton={multiColumn && 'auto'}
+        title={intl.formatMessage({ id: 'column.domain_blocks', defaultMessage: 'Blocked Domains' })}
+      />
 
       <ScrollableList
         scrollKey='domain_blocks'
