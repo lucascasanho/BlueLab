@@ -1,10 +1,12 @@
-import { useMemo  } from 'react';
-import type {MouseEvent, JSX } from 'react';
+import { useCallback, useMemo } from 'react';
+import type { JSX, KeyboardEvent, MouseEvent } from 'react';
 
 import classNames from 'classnames';
 
 import { replyComposeById } from '@/mastodon/actions/compose_typed';
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
+import { StatusContext } from '@/mastodon/components/status/hooks';
+import { QuotedStatus } from '@/mastodon/components/status/quote';
 import { openConversationForStatus } from 'mastodon/actions/conversations';
 import { navigateToStatus } from 'mastodon/actions/statuses';
 import { Avatar } from 'mastodon/components/avatar';
@@ -78,10 +80,7 @@ export const NotificationGroupWithStatus: React.FC<{
     (state) => state.statuses.getIn([statusId, 'visibility']) === 'direct',
   );
 
-  const handleCardClick = (event: MouseEvent<HTMLDivElement>) => {
-    if (!(event.target instanceof Element)) return;
-    if (event.target.closest('a,button,input,textarea,select,[role="link"]'))
-      return;
+  const openCard = useCallback(() => {
     if (!statusId) return;
 
     if (isPrivateMention) {
@@ -89,7 +88,35 @@ export const NotificationGroupWithStatus: React.FC<{
     } else {
       dispatch(navigateToStatus(statusId));
     }
-  };
+  }, [dispatch, isPrivateMention, statusId]);
+
+  const handleCardClick = useCallback(
+    (event: MouseEvent<HTMLDivElement>) => {
+      if (!(event.target instanceof Element)) return;
+      if (
+        event.target.closest(
+          'a,button,input,textarea,select,[role="link"],[role="button"]',
+        )
+      ) {
+        return;
+      }
+
+      openCard();
+    },
+    [openCard],
+  );
+
+  const handleCardKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      if (event.target !== event.currentTarget) return;
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      openCard();
+    },
+    [openCard],
+  );
 
   const handlers = useMemo(
     () => ({
@@ -108,14 +135,6 @@ export const NotificationGroupWithStatus: React.FC<{
     [dispatch, isPrivateMention, statusId],
   );
 
-  const handleStatusOpen = () => {
-    if (isPrivateMention) {
-      dispatch(openConversationForStatus(statusId));
-    } else {
-      dispatch(navigateToStatus(statusId));
-    }
-  };
-
   return (
     <Hotkeys handlers={handlers}>
       <div
@@ -129,6 +148,7 @@ export const NotificationGroupWithStatus: React.FC<{
         )}
         tabIndex={0}
         onClick={handleCardClick}
+        onKeyDown={handleCardKeyDown}
       >
         <div className='notification-group__icon'>
           <Icon icon={icon} id={iconId} />
@@ -164,12 +184,11 @@ export const NotificationGroupWithStatus: React.FC<{
           </div>
 
           {statusId && (
-            <div
-              className='notification-group__main__status'
-              onClick={(event) => { event.stopPropagation(); }}
+            <StatusContext.Provider
+              value={{ id: statusId, contextType: 'notifications' }}
             >
-              <EmbeddedStatus statusId={statusId} onOpen={handleStatusOpen} />
-            </div>
+              <QuotedStatus id={statusId} clamp />
+            </StatusContext.Provider>
           )}
 
           {additionalContent && (

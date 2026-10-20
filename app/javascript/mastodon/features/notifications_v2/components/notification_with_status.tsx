@@ -1,11 +1,10 @@
-import { useMemo  } from 'react';
-import type {MouseEvent} from 'react';
+import { useCallback, useMemo } from 'react';
+import type { MouseEvent } from 'react';
 
 import classNames from 'classnames';
 
 import { replyComposeById } from '@/mastodon/actions/compose_typed';
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
-import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import { openConversationForStatus } from 'mastodon/actions/conversations';
 import { toggleReblog, toggleFavourite } from 'mastodon/actions/interactions';
 import {
@@ -64,9 +63,9 @@ export const NotificationWithStatus: React.FC<{
       getStatusHidden(state, { id: statusId, contextType: 'notifications' }),
   );
 
-  const handleCardClick = (event: MouseEvent<HTMLDivElement>) => {
+  const handleCardClick = useCallback((event: MouseEvent<HTMLDivElement>) => {
     if (!(event.target instanceof Element)) return;
-    if (event.target.closest('a,button,input,textarea,select,[role="link"]'))
+    if (event.target.closest('a,button,input,textarea,select,[role="link"],[role="button"],.status'))
       return;
     if (!statusId) return;
 
@@ -75,7 +74,7 @@ export const NotificationWithStatus: React.FC<{
     } else {
       dispatch(navigateToStatus(statusId));
     }
-  };
+  }, [dispatch, isPrivateMention, statusId]);
 
   const handlers = useMemo(
     () => ({
@@ -112,7 +111,7 @@ export const NotificationWithStatus: React.FC<{
 
   if (!statusId || isFiltered) return null;
 
-  const handleStatusOpen = () => {
+  const handleStatusOpen = useCallback(() => {
     const isBlue2 =
       typeof document !== 'undefined' &&
       document.body.dataset.theme === 'blue-2';
@@ -122,7 +121,7 @@ export const NotificationWithStatus: React.FC<{
     } else {
       dispatch(navigateToStatus(statusId));
     }
-  };
+  }, [dispatch, isPrivateMention, statusId]);
 
   return (
     <Hotkeys handlers={handlers}>
@@ -145,17 +144,15 @@ export const NotificationWithStatus: React.FC<{
           <span>{label}</span>
         </h2>
 
-        <div onClick={(event) => { event.stopPropagation(); }}>
-          <Status
-            id={statusId}
-            contextType='notifications'
-            onOpen={handleStatusOpen}
-            withDismiss
-            skipPrepend
-            avatarSize={40}
-            unfocusable
-          />
-        </div>
+        <Status
+          id={statusId}
+          contextType='notifications'
+          onOpen={handleStatusOpen}
+          withDismiss
+          skipPrepend
+          avatarSize={40}
+          unfocusable
+        />
       </div>
     </Hotkeys>
   );
