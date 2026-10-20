@@ -60,7 +60,7 @@ export const Blue2InternalFeed: React.FC<Blue2InternalFeedProps> = ({
     }
 
     void dispatch(expandHashtagTimeline(id, { local: false }));
-    return dispatch(connectHashtagStream(id, id, false));
+    return dispatch(connectHashtagStream(id, id, false, () => true));
   }, [dispatch, id, type]);
 
   const handleLoadMore = useCallback(
