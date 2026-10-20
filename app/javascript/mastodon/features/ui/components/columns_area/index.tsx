@@ -5,6 +5,9 @@ import classNames from 'classnames';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { ComposeRedesignButton as VanillaComposeRedesignButton } from '@/mastodon/features/compose/vanilla_redesign/trigger';
+import { RedesignNavigationPanel as VanillaNavigationPanel } from '@/mastodon/features/navigation_panel/redesign/vanilla_navigation_panel';
+import { RedesignMobileNavigation as VanillaMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/vanilla_mobile_nav';
 import { DiscoveryPanel } from '@/mastodon/features/discovery_panel';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
 import { CollapsibleNavigationPanel } from '@/mastodon/features/navigation_panel';
@@ -141,7 +144,7 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
   if (minimalShell) {
     return (
       <div ref={ref} className={classNames(classes.root, classes.rootMinimal)}>
-        {isMobile && <RedesignMobileNavigation />}
+        {isMobile && <VanillaMobileNavigation />}
         <div className={classes.main}>
           <div>{children}</div>
           <Footer />
@@ -154,9 +157,9 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
     return (
       <div ref={ref} className={classes.root}>
         <div className={classes.navigationWrapper}>
-          <RedesignNavigationPanel />
+          <VanillaNavigationPanel />
         </div>
-        {isMobile ? <RedesignMobileNavigation /> : <ComposeRedesignButton />}
+        {isMobile ? <VanillaMobileNavigation /> : <VanillaComposeRedesignButton />}
 
         <main className={classes.main}>{children}</main>
 
@@ -170,9 +173,9 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
   return (
     <main ref={ref} className={multiColClasses.root}>
       <div className={multiColClasses.navigationWrapper}>
-        <RedesignNavigationPanel multiColumn />
+        <VanillaNavigationPanel multiColumn />
       </div>
-      <ComposeRedesignButton />
+      <VanillaComposeRedesignButton />
       <MultiColumnContent>{children}</MultiColumnContent>
     </main>
   );
