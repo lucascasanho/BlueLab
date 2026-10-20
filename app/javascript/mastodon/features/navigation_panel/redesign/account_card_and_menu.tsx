@@ -16,8 +16,6 @@ import {
   GavelIcon,
   ShieldStarIcon,
   SignOutIcon,
-  BellSlashIcon,
-  HandWavingIcon,
 } from '@phosphor-icons/react';
 
 import { openModal } from '@/mastodon/actions/modal';
@@ -30,7 +28,6 @@ import {
   Menu,
   MenuItem,
   MenuItemDivider,
-  MenuItemGroup,
   MenuItemLink,
   MenuList,
   MenuTrigger,
@@ -56,9 +53,6 @@ export const NavigationAccountCardAndMenu: React.FC<{
 }> = ({ inSlideOut = false }) => {
   const { accountId } = useIdentity();
   const account = useAccount(accountId);
-  const handle = useAccountHandle(account);
-  const accountBasePath = `/@${account?.acct}`;
-
   if (!accountId) {
     return null;
   }
