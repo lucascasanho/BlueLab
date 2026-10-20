@@ -18,7 +18,8 @@ export const NotificationVerification: React.FC<{
         'notification-group focusable',
         classes.card,
         'notification-group--verification',
-        { 'notification-group--unread': unread, [classes.unread]: unread },
+        unread && 'notification-group--unread',
+        unread && classes.unread,
       )}
       role='status'
     >
