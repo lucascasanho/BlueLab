@@ -1,5 +1,5 @@
 name: Temporary BlueLab format pass
-# Run formatter after the latest TypeScript fixes (pass 2).
+# Run the repository formatter after the Mastodon 5 alpha lint cleanup (pass 3).
 on:
   push:
     branches:
