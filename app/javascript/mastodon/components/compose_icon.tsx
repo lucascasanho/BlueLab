@@ -20,6 +20,12 @@ export const ComposeIcon: FC<ComposeIconProps> = ({
   ...props
 }) => {
   return (
-    <EditSquareIcon {...props} width={size} height={size} fill='currentColor' data-weight={weight} />
+    <EditSquareIcon
+      {...props}
+      width={size}
+      height={size}
+      fill='currentColor'
+      data-weight={weight}
+    />
   );
 };

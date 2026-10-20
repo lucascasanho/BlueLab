@@ -21,6 +21,7 @@ import {
   FOCUS_TARGET,
   NavigationFocusTarget,
 } from '@/mastodon/components/navigation_focus_target';
+import { Scrollable } from '@/mastodon/components/scrollable_list/components';
 import { StatusActionItem } from '@/mastodon/components/status/action_bar';
 import {
   useStatusMenuActions,
@@ -33,7 +34,6 @@ import {
   StatusLikeIcon,
 } from '@/mastodon/components/status/icons';
 import { StatusRedesign as Status } from '@/mastodon/components/status/status';
-import { Scrollable } from '@/mastodon/components/scrollable_list/components';
 import { ScrollContainer } from '@/mastodon/containers/scroll_container';
 import type { ShouldUpdateScrollFn } from '@/mastodon/containers/scroll_container/default_should_update_scroll';
 import { useExpandedStatus } from '@/mastodon/hooks/useStatus';

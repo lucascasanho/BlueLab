@@ -12,12 +12,12 @@ import { Helmet } from '@unhead/react/helmet';
 
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
+import { Scrollable } from '@/mastodon/components/scrollable_list/components';
 import { submitSearch, expandSearch } from 'mastodon/actions/search';
 import type { ApiSearchType } from 'mastodon/api_types/search';
 import { Account } from 'mastodon/components/account';
 import { CompatibilityHashtag as Hashtag } from 'mastodon/components/hashtag';
 import { Icon } from 'mastodon/components/icon';
-import { Scrollable } from '@/mastodon/components/scrollable_list/components';
 import ScrollableList from 'mastodon/components/scrollable_list';
 import { Status } from 'mastodon/components/status';
 import { Search } from 'mastodon/features/compose/components/search';
