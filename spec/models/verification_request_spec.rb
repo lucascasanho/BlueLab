@@ -63,7 +63,7 @@ RSpec.describe VerificationRequest do
   end
 
   describe '#resolve!' do
-    let(:request) { Fabricate.build(:account).verification_requests.create!(explanation: '') }
+    let(:request) { Fabricate(:account).verification_requests.create!(explanation: '') }
     let(:resolver) { Fabricate(:account) }
 
     it 'approves a pending request' do

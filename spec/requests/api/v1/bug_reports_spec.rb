@@ -45,7 +45,7 @@ RSpec.describe 'Bug reports' do
         current_path: '/settings/preferences',
         viewport: '1280x720@1',
         app_version: '4.8.0',
-        account: token.resource_owner.account
+        account: user.account
       )
       expect(report.client_errors.first['type']).to eq 'javascript'
     end
