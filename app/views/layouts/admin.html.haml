@@ -4,9 +4,10 @@
   = vite_typescript_tag 'admin.tsx', crossorigin: 'anonymous'
 
 - content_for :body_classes, 'admin'
-- blue2_theme = current_theme == 'blue-2'
-- mastodon5_theme = current_theme == 'mastodon-5'
-- mastodon5_preferences_page = mastodon5_theme && request.path.start_with?('/settings/preferences')
+:ruby
+  blue2_theme = current_theme == 'blue-2'
+  mastodon5_theme = current_theme == 'mastodon-5'
+  mastodon5_preferences_page = mastodon5_theme && request.path.start_with?('/settings/preferences')
 
 - content_for :content do
   - mobile_page_title = strip_tags(content_for(:page_title)).to_s.strip
