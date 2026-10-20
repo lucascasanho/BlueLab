@@ -13,7 +13,10 @@ import {
   deletePollOption,
   updatePollOption,
 } from '@/mastodon/actions/compose_typed';
-import { Button, buttonClasses } from '@/mastodon/components/button/vanilla_redesign';
+import {
+  Button,
+  buttonClasses,
+} from '@/mastodon/components/button/vanilla_redesign';
 import {
   ToggleField,
   TextInput,

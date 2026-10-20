@@ -9,7 +9,10 @@ import type { UniqueIdentifier } from '@dnd-kit/core';
 import { DotsSixVerticalIcon } from '@phosphor-icons/react';
 
 import { rearrangeComposeAttachments } from '@/mastodon/actions/compose_typed';
-import { Button, IconButton } from '@/mastodon/components/button/vanilla_redesign';
+import {
+  Button,
+  IconButton,
+} from '@/mastodon/components/button/vanilla_redesign';
 import {
   ModalActions,
   ModalShell,

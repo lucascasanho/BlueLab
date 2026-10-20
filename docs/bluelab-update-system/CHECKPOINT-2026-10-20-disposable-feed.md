@@ -82,6 +82,7 @@ Data: 2026-10-20 Canal autorizado: `BlueLab-Test`
 As alterações foram publicadas no GitHub, mas os testes automatizados e a
 verificação visual ainda não foram executados nesta conexão. Executar `bluelab`
 no host de teste, confirmar que o deploy termina e validar na interface:
+
 1. aparece somente o seletor individual de tema na página Aparência da conta,
    inclusive para administradores;
 2. selecionar Vanilla e salvar retorna normalmente à página, sem erro, e mantém
@@ -117,6 +118,7 @@ Data: 2026-10-20 Canal autorizado: `BlueLab-Test`
 As alterações foram publicadas somente em `BlueLab-Test`. Não houve execução de
 testes, build de assets ou verificação visual nesta conexão. Após executar
 `bluelab` no host de teste, validar:
+
 1. login, cadastro, recuperação de senha, confirmação de e-mail, autenticação de
    dois fatores e fluxo OAuth;
 2. preferências de usuário, administração, denúncias e páginas de moderação em

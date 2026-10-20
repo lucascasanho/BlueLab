@@ -17,12 +17,13 @@ import { useDrag } from '@use-gesture/react';
 
 import { closeNavigation, openNavigation } from '@/mastodon/actions/navigation';
 import { Avatar } from '@/mastodon/components/avatar';
-import { Button, IconButton } from '@/mastodon/components/button/vanilla_redesign';
+import {
+  Button,
+  IconButton,
+} from '@/mastodon/components/button/vanilla_redesign';
 import { Menu, MenuList, MenuTrigger } from '@/mastodon/components/menu';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
-import {
-  ComposeRedesignButton,
-} from '@/mastodon/features/compose/vanilla_redesign/trigger';
+import { ComposeRedesignButton } from '@/mastodon/features/compose/vanilla_redesign/trigger';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
 import {

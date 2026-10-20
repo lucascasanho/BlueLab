@@ -5,20 +5,14 @@ import classNames from 'classnames';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
-import {
-  ComposeRedesignButton as VanillaComposeRedesignButton,
-} from '@/mastodon/features/compose/vanilla_redesign/trigger';
+import { ComposeRedesignButton as VanillaComposeRedesignButton } from '@/mastodon/features/compose/vanilla_redesign/trigger';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
 import { DiscoveryPanel } from '@/mastodon/features/discovery_panel';
 import { CollapsibleNavigationPanel } from '@/mastodon/features/navigation_panel';
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
-import {
-  RedesignMobileNavigation as VanillaMobileNavigation,
-} from '@/mastodon/features/navigation_panel/redesign/vanilla_mobile_nav';
-import {
-  RedesignNavigationPanel as VanillaNavigationPanel,
-} from '@/mastodon/features/navigation_panel/redesign/vanilla_navigation_panel';
+import { RedesignMobileNavigation as VanillaMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/vanilla_mobile_nav';
+import { RedesignNavigationPanel as VanillaNavigationPanel } from '@/mastodon/features/navigation_panel/redesign/vanilla_navigation_panel';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useColumnsContext } from '@/mastodon/features/ui/util/columns_context';
 import { useAppSelector } from '@/mastodon/store';
@@ -30,12 +24,10 @@ import {
 } from '../compose_panel';
 
 import { MultiColumnContent } from './multi_column_content';
-import {
-  MultiColumnContent as VanillaMultiColumnContent,
-} from './vanilla_multi_column_content';
 import { ColumnsAreaRedesign } from './redesign';
 import classes from './styles.module.scss';
 import multiColClasses from './styles_multi_column.module.scss';
+import { MultiColumnContent as VanillaMultiColumnContent } from './vanilla_multi_column_content';
 import vanillaClasses from './vanilla_styles.module.scss';
 import vanillaMultiColClasses from './vanilla_styles_multi_column.module.scss';
 
@@ -156,10 +148,7 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
     return (
       <div
         ref={ref}
-        className={classNames(
-          vanillaClasses.root,
-          vanillaClasses.rootMinimal,
-        )}
+        className={classNames(vanillaClasses.root, vanillaClasses.rootMinimal)}
       >
         {isMobile && <VanillaMobileNavigation />}
         <div className={vanillaClasses.main}>
