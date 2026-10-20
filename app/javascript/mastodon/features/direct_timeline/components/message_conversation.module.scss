@@ -115,7 +115,6 @@
   max-width: 100%;
   color: var(--color-text-primary);
   overflow-wrap: anywhere;
-  word-break: break-word;
 }
 
 .messageBody {
@@ -334,6 +333,7 @@
   color: var(--color-text-secondary);
   text-align: center;
 }
+
 /*
  * BlueLab message conversations have their own layout contract. Only this
  * theme/component uses these rules: the column fills its host, the history

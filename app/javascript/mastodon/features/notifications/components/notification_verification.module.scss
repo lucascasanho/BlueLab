@@ -39,7 +39,7 @@
   flex: 0 0 auto;
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .icon {
     width: 20px;
     height: 20px;

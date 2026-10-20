@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--color-border-primary, rgba(0, 0, 0, 0.12));
+  border: 1px solid var(--color-border-primary, rgba(0, 0, 0, 12%));
   border-radius: 16px;
   background: var(--blue2-surface-raised, var(--color-background, #fff));
   color: var(--color-text-primary, #111);
@@ -14,7 +14,7 @@
 .header {
   flex: 0 0 auto;
   padding: 20px 24px;
-  border-bottom: 1px solid var(--color-border-primary, rgba(0, 0, 0, 0.12));
+  border-bottom: 1px solid var(--color-border-primary, rgba(0, 0, 0, 12%));
 
   h1 {
     margin: 0 0 6px;
@@ -46,7 +46,7 @@
   min-height: 180px;
   resize: vertical;
   padding: 12px;
-  border: 1px solid var(--color-border-primary, rgba(0, 0, 0, 0.2));
+  border: 1px solid var(--color-border-primary, rgba(0, 0, 0, 20%));
   border-radius: 10px;
   background: var(--color-background, transparent);
   color: inherit;
@@ -77,7 +77,7 @@
   flex-wrap: wrap;
   gap: 10px;
   padding: 14px;
-  border: 1px dashed var(--color-border-primary, rgba(0, 0, 0, 0.2));
+  border: 1px dashed var(--color-border-primary, rgba(0, 0, 0, 20%));
   border-radius: 10px;
   background: var(--color-background, transparent);
   color: var(--color-text-secondary, #666);
@@ -101,7 +101,7 @@
 .previewCard {
   min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--color-border-primary, rgba(0, 0, 0, 0.12));
+  border: 1px solid var(--color-border-primary, rgba(0, 0, 0, 12%));
   border-radius: 10px;
   background: var(--color-background, transparent);
 
@@ -167,7 +167,7 @@
   justify-content: flex-end;
   gap: 10px;
   padding: 16px 24px;
-  border-top: 1px solid var(--color-border-primary, rgba(0, 0, 0, 0.12));
+  border-top: 1px solid var(--color-border-primary, rgba(0, 0, 0, 12%));
 }
 
 @media screen and (width <= 600px) {
