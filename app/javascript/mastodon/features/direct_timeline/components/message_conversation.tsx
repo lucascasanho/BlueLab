@@ -220,21 +220,21 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
     const disconnect = inline ? undefined : dispatch(connectDirectStream());
 
-    let cancelled = false;
+    const cancelled = { current: false };
 
     if (id) {
       const requestedId = id;
 
       void dispatch(fetchConversation(requestedId))
         .catch(async () => {
-          if (!sourceStatusId || cancelled) return;
+          if (!sourceStatusId || cancelled.current) return;
 
           try {
             const recoveredId = (await dispatch(
               findConversationForStatus(sourceStatusId),
             )) as string;
 
-            if (!cancelled && recoveredId !== id) {
+            if (!cancelled.current && recoveredId !== id) {
               browserHistory.replace(`/conversations/${recoveredId}`, {
                 statusId: sourceStatusId,
               });
@@ -244,12 +244,12 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           }
         })
         .finally(() => {
-          if (!cancelled) setConversationResolvedId(requestedId);
+          if (!cancelled.current) setConversationResolvedId(requestedId);
         });
     }
 
     return () => {
-      cancelled = true;
+      cancelled.current = true;
       if (!inline) {
         dispatch(unmountConversations());
         disconnect?.();
@@ -281,14 +281,14 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     return [...messageStatusIds, latestThreadStatusId].sort(compareId);
   }, [latestThreadStatusId, messageStatusIds]);
 
-  const statuses = useAppSelector((state) =>
+  const statuses = useAppSelector<ImmutableRecord<StatusShape>[]>((state) =>
     effectiveMessageStatusIds
       .map(
         (statusId) =>
           getStatus(state, { id: statusId }) as ImmutableRecord<StatusShape>,
       )
       .filter(Boolean),
-  ) as ImmutableRecord<StatusShape>[];
+  );
 
   const initialLoadConversationIdRef = useRef<string | null>(null);
   const observedThreadStatusIdRef = useRef<string | null>(null);
