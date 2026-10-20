@@ -296,4 +296,3 @@ export const blue2Text = (locale: string, key: Blue2TextKey): string => {
 
   return (strings[language] ?? fallbackStrings)[key];
 };
-

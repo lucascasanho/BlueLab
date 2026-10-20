@@ -128,8 +128,7 @@ export default function api(withAuthorization = true) {
         url !== '/api/v1/bug_reports' &&
         (status === undefined || status >= 500 || status === 429)
       ) {
-        const requestIdValue: unknown =
-          error.response?.headers['x-request-id'];
+        const requestIdValue: unknown = error.response?.headers['x-request-id'];
         const requestId =
           typeof requestIdValue === 'string' ? requestIdValue : undefined;
 

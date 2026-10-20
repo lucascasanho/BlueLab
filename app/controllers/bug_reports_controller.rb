@@ -53,7 +53,7 @@ class BugReportsController < ApplicationController
   private
 
   def sanitize_path(value)
-    value.to_s.split('?').first.truncate(500).presence
+    value.to_s.split('?', 2).first.to_s.truncate(500).presence
   end
 
   def valid_error_page(value)
