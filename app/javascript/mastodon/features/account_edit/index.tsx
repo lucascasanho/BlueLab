@@ -136,7 +136,7 @@ export const AccountEdit: FC = () => {
     boolean | null
   >(null);
   const badgeVisible =
-    badgeVisibleOverride ?? (account?.verified_badge_visible !== false);
+    badgeVisibleOverride ?? account?.verified_badge_visible !== false;
   useEffect(() => {
     void dispatch(fetchProfile());
   }, [dispatch]);

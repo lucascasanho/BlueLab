@@ -71,7 +71,6 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 ## Histórico de alterações desta atualização
 
 <!-- prettier-ignore -->
-
 | Data (UTC) | Etapa | Alteração | Validação | SHA |
 |---|---|---|---|---|
 | 2026-10-20 | 1 | Criado checkpoint com estado inicial, escopo, CI e plano de correção. | Estado inicial auditado; CI do SHA `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea` consultada. | `0a9c63a1c6392e04cfa512890d7d59cfc1db9efb` |

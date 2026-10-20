@@ -6,10 +6,7 @@ import classNames from 'classnames';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { List as ImmutableList } from 'immutable';
-import type {
-  Map as ImmutableMap,
-  Record as ImmutableRecord,
-} from 'immutable';
+import type { Map as ImmutableMap, Record as ImmutableRecord } from 'immutable';
 
 import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
@@ -88,10 +85,12 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [messageStatusIds, setMessageStatusIds] = useState<string[]>([]);
-  const [conversationResolvedId, setConversationResolvedId] =
-    useState<string | null>(null);
-  const [messagesResolvedId, setMessagesResolvedId] =
-    useState<string | null>(null);
+  const [conversationResolvedId, setConversationResolvedId] = useState<
+    string | null
+  >(null);
+  const [messagesResolvedId, setMessagesResolvedId] = useState<string | null>(
+    null,
+  );
   const conversationResolved = !id || conversationResolvedId === id;
   const messagesResolved = !id || messagesResolvedId === id;
   const [highlightedStatusId, setHighlightedStatusId] = useState<string | null>(
@@ -169,7 +168,10 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   const accounts = useAppSelector((state) => state.accounts);
 
   const participantAccounts = useMemo(
-    () => participantIds.map((accountId) => accounts.get(accountId)).filter(Boolean),
+    () =>
+      participantIds
+        .map((accountId) => accounts.get(accountId))
+        .filter(Boolean),
     [accounts, participantIds],
   );
 
@@ -186,9 +188,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     };
 
     const fetchMessages = (conversationId: string) =>
-      dispatch(
-        fetchConversationMessages(conversationId),
-      ) as unknown as Promise<{ id: string }[]>;
+      dispatch(fetchConversationMessages(conversationId)) as unknown as Promise<
+        { id: string }[]
+      >;
 
     return fetchMessages(id)
       .then(applyStatuses)
@@ -771,7 +773,11 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                       onClick={createReplyHandler(status)}
                     />
                     <IconButton
-                      className={classNames(classes.messageAction, classes.messageFavourite, 'star-icon')}
+                      className={classNames(
+                        classes.messageAction,
+                        classes.messageFavourite,
+                        'star-icon',
+                      )}
                       animate
                       active={status.get('favourited')}
                       title={intl.formatMessage(

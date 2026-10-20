@@ -581,8 +581,7 @@ export const ColumnsAreaRedesign: React.FC<{
                     style={
                       isIosSafari
                         ? {
-                            transform:
-                              `translate3d(-${iosFeedTabsOffset}px, 0, 0)`,
+                            transform: `translate3d(-${iosFeedTabsOffset}px, 0, 0)`,
                           }
                         : undefined
                     }

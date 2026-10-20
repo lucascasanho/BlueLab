@@ -103,10 +103,7 @@ export const ComposeGifButton: React.FC<{
         onClick={onToggle}
         aria-expanded={open}
       >
-        <FormattedMessage
-          id='gif_button.label'
-          defaultMessage='Insert GIF'
-        />
+        <FormattedMessage id='gif_button.label' defaultMessage='Insert GIF' />
       </IconButton>
 
       <Popover
@@ -204,9 +201,7 @@ const ComposeGifDropdown: React.FC<
       const payload = (await response.json()) as KlipyResponse;
       const items = (payload.results ?? []).filter((item) => {
         const formats = item.media_formats;
-        return Boolean(
-          item.id && formats?.gif?.url && formats?.tinygif?.url,
-        );
+        return Boolean(item.id && formats?.gif?.url && formats?.tinygif?.url);
       });
 
       setResults((current) => (isMore ? [...current, ...items] : items));
@@ -339,10 +334,7 @@ const ComposeGifDropdown: React.FC<
       <div className={classes.header}>
         <div className={classes.titleRow}>
           <strong>
-            <FormattedMessage
-              id='gif_button.title'
-              defaultMessage='GIFs'
-            />
+            <FormattedMessage id='gif_button.title' defaultMessage='GIFs' />
           </strong>
           <a
             href='https://klipy.com'
