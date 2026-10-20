@@ -69,7 +69,7 @@ describe('account switcher storage', () => {
 
   it('keeps the browser vault within the default ten-session server capacity', () => {
     for (let index = 0; index < 12; index += 1) {
-      upsertStoredAccount(account('account-' + index), index);
+      upsertStoredAccount(account(`account-${index}`), index);
     }
 
     const stored = readStoredAccounts();

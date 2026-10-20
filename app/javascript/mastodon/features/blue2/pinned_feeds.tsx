@@ -166,6 +166,27 @@ export const createPinnedHashtagFeed = (tag: string): Blue2PinnedFeed => {
   };
 };
 
+const createAddListClickHandler = (
+  addFeed: (feed: Blue2PinnedFeed) => void,
+  listId: string,
+  listTitle: string,
+) => () => addFeed(createPinnedListFeed(listId, listTitle));
+
+const createAddHashtagClickHandler = (
+  addFeed: (feed: Blue2PinnedFeed) => void,
+  tagName: string,
+) => () => addFeed(createPinnedHashtagFeed(tagName));
+
+const createRemoveFeedClickHandler = (
+  removeFeed: (key: string) => void,
+  key: string,
+) => () => removeFeed(key);
+
+const createSelectFeedClickHandler = (
+  onSelect: (key: string) => void,
+  key: string,
+) => () => onSelect(key);
+
 interface Blue2PinnedFeedMenuProps {
   showRemoveSection?: boolean;
 }
@@ -254,9 +275,7 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
               <MenuItem
                 key={list.id}
                 icon={RssSimpleIcon}
-                onClick={() => {
-                  addFeed(createPinnedListFeed(list.id, list.title));
-                }}
+                onClick={createAddListClickHandler(addFeed, list.id, list.title)}
               >
                 {list.title}
               </MenuItem>
@@ -286,9 +305,7 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
               <MenuItem
                 key={tag.name}
                 icon={HashIcon}
-                onClick={() => {
-                  addFeed(createPinnedHashtagFeed(tag.name));
-                }}
+                onClick={createAddHashtagClickHandler(addFeed, tag.name)}
               >
                 #{tag.name}
               </MenuItem>
@@ -324,9 +341,7 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
               {feeds.map((feed) => (
                 <MenuItem
                   key={`remove:${feed.key}`}
-                  onClick={() => {
-                    removeFeed(feed.key);
-                  }}
+                  onClick={createRemoveFeedClickHandler(removeFeed, feed.key)}
                 >
                   {feed.title}
                 </MenuItem>
@@ -361,9 +376,7 @@ export const Blue2PinnedFeedTabs: React.FC<{
           key={feed.key}
           type='button'
           className={activeKey === feed.key ? activeTabClassName : tabClassName}
-          onClick={() => {
-            onSelect(feed.key);
-          }}
+          onClick={createSelectFeedClickHandler(onSelect, feed.key)}
         >
           {showIcons && feed.type === 'list' && <RssSimpleIcon size={15} />}
           {feed.title}
