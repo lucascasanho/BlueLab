@@ -700,7 +700,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                 replyTarget && typeof replyTarget.get('content') === 'string'
                   ? (replyTarget.get('content') as string)
                   : '';
-              const replyTargetAccount = replyTarget?.get('account') as
+              const replyTargetAccount = replyTarget?.get('account') as unknown as
                 | Account
                 | undefined;
 
