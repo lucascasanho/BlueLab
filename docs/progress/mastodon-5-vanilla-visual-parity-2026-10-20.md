@@ -226,18 +226,18 @@ Não há aprovação automatizada comprovada nem teste visual concluído.
 ## Etapa 10 — correção do erro de build no Vanilla
 
 -O log de atualização do host `blue` apontou erro de sintaxe em
- `app/javascript/mastodon/features/ui/components/columns_area/index.tsx`, na
- renderização da navegação móvel do Vanilla.
+`app/javascript/mastodon/features/ui/components/columns_area/index.tsx`, na
+renderização da navegação móvel do Vanilla.
 -A causa foi a ausência de `>` no fechamento da abertura do elemento `div`
- dentro de `ColumnsAreaVanilla`. O elemento foi corrigido no commit
- `3b2f95cbe6cd174abd75f316569c32ff832b2c9e`.
+dentro de `ColumnsAreaVanilla`. O elemento foi corrigido no commit
+`3b2f95cbe6cd174abd75f316569c32ff832b2c9e`.
 -A cópia de histórias Storybook do compositor Vanilla produzia IDs duplicados
- com o compositor original. A cópia `vanilla_redesign/index.stories.tsx` foi
- removida, pois as histórias não são necessárias para executar o tema.
+com o compositor original. A cópia `vanilla_redesign/index.stories.tsx` foi
+removida, pois as histórias não são necessárias para executar o tema.
 -Os arquivos copiados do compositor e da navegação permanecem separados dos
- componentes BlueLab; a referência upstream consultada é o commit
- `5204e8ab940f870dbf13863ee92c48febfc4eedb`.
+componentes BlueLab; a referência upstream consultada é o commit
+`5204e8ab940f870dbf13863ee92c48febfc4eedb`.
 -O código está somente em `BlueLab-Test`. No último estado consultado, os checks
- de build, lint e testes ainda não haviam terminado. Não declarar a correção
- validada integralmente até CI concluir e haver teste visual em desktop e
- mobile, nos esquemas claro e escuro.
+de build, lint e testes ainda não haviam terminado. Não declarar a correção
+validada integralmente até CI concluir e haver teste visual em desktop e mobile,
+nos esquemas claro e escuro.
