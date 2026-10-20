@@ -27,7 +27,8 @@ export const NotificationAdminVerificationRequest: React.FC<{
       className={classNames(
         'notification-group notification-group--link notification-group--admin-verification-request focusable',
         classes.card,
-        { 'notification-group--unread': unread, [classes.unread]: unread },
+        unread && 'notification-group--unread',
+        unread && classes.unread,
       )}
     >
       <div className='notification-group__icon'>
