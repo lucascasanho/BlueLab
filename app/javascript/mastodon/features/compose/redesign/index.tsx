@@ -171,7 +171,7 @@ export const RedesignComposeForm: React.FC<
       className={classNames(
         className,
         classes.root,
-        headless && classes['headless'],
+        headless && classes.headless,
       )}
     >
       {isMessage && <div className={classes.background} />}
