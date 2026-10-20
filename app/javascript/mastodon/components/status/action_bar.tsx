@@ -31,6 +31,7 @@ import {
   MenuTrigger,
   LegacyDropdownMenuItems,
 } from '../menu';
+import { Tooltip } from '../tooltip';
 
 import {
   useStatusContext,
@@ -121,37 +122,47 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
 
   return (
     <div className={classes.actions}>
-      <Button
-        size='sm'
-        clipPadding
-        variant='ghost'
-        leadingIcon={reply.icon}
-        onClick={handleReplyClick}
-        tooltip={{ type: 'label', text: reply.title }}
-      >
-        {withCounters && reply.counter}
-      </Button>
+      <Tooltip text={reply.title}>
+        {({ getTooltipProps }) => (
+          <Button
+            {...getTooltipProps()}
+            aria-label={reply.title}
+            size='sm'
+            clipPadding
+            variant='ghost'
+            leadingIcon={reply.icon}
+            onClick={handleReplyClick}
+          >
+            {withCounters && reply.counter}
+          </Button>
+        )}
+      </Tooltip>
 
       <StatusReblogButton statusId={statusId}>
         {withCounters && status.reblogs_count}
       </StatusReblogButton>
 
-      <ToggleButton
-        size='sm'
-        variant='ghost'
-        active={status.favourited}
-        title={favouriteTitle}
-        leadingIcon={like.icon}
-        leadingIconWrapperClassName='favourite-animation-target'
-        onClick={handleFavouriteClick}
-        className={classNames(
-          classes.favouriteButton,
-          'star-icon',
-          classes.actionsButtonGap,
+      <Tooltip text={favouriteTitle}>
+        {({ getTooltipProps }) => (
+          <ToggleButton
+            {...getTooltipProps()}
+            aria-label={favouriteTitle}
+            size='sm'
+            variant='ghost'
+            active={status.favourited}
+            leadingIcon={like.icon}
+            leadingIconWrapperClassName='favourite-animation-target'
+            onClick={handleFavouriteClick}
+            className={classNames(
+              classes.favouriteButton,
+              'star-icon',
+              classes.actionsButtonGap,
+            )}
+          >
+            {withCounters && like.counter}
+          </ToggleButton>
         )}
-      >
-        {withCounters && like.counter}
-      </ToggleButton>
+      </Tooltip>
 
       {isPublic && (
         <IconButton
@@ -208,44 +219,53 @@ const StatusReblogButton: React.FC<{
 
   if (quickBoosting) {
     return (
-      <ToggleButton
-        size='sm'
-        variant='ghost'
-        active={boost.active}
-        tooltip={{
-          type: 'label',
-          text: boost.title,
-        }}
-        leadingIcon={boost.icon}
-        disabled={boost.disabled}
-        onClick={boost.action}
-      >
-        {children}
-      </ToggleButton>
+      <Tooltip text={boost.title}>
+        {({ getTooltipProps }) => (
+          <ToggleButton
+            {...getTooltipProps()}
+            aria-label={boost.title}
+            size='sm'
+            variant='ghost'
+            active={boost.active}
+            leadingIcon={boost.icon}
+            disabled={boost.disabled}
+            onClick={boost.action}
+          >
+            {children}
+          </ToggleButton>
+        )}
+      </Tooltip>
     );
   }
 
   return (
     <Menu>
-      <MenuTrigger
-        as={ToggleButton}
-        size='sm'
-        variant='ghost'
-        active={boost.active}
-        tooltip={{
-          type: 'label',
-          text: (
-            <FormattedMessage
-              id='status.reblog_or_quote'
-              defaultMessage='Boost or quote'
-            />
-          ),
-        }}
-        leadingIcon={boost.icon}
-        onClick={handleShiftClick}
+      <Tooltip
+        text={
+          <FormattedMessage
+            id='status.reblog_or_quote'
+            defaultMessage='Boost or quote'
+          />
+        }
       >
-        {children}
-      </MenuTrigger>
+        {({ getTooltipProps }) => (
+          <MenuTrigger
+            {...getTooltipProps()}
+            as={ToggleButton}
+            size='sm'
+            variant='ghost'
+            active={boost.active}
+            aria-label={intl.formatMessage({
+              id: 'status.reblog_or_quote',
+              defaultMessage: 'Boost or quote',
+            })}
+            leadingIcon={boost.icon}
+            onClick={handleShiftClick}
+          >
+            {children}
+          </MenuTrigger>
+        )}
+      </Tooltip>
 
       <MenuList placement='bottom' maxWidth={180}>
         <MenuItem
