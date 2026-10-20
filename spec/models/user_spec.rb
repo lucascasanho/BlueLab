@@ -460,6 +460,15 @@ RSpec.describe User do
     end
   end
 
+  describe '#setting_theme_color' do
+    it 'returns the configured web theme color' do
+      user = Fabricate(:user)
+      user.settings[:'web.theme_color'] = 'pink'
+
+      expect(user.setting_theme_color).to eq 'pink'
+    end
+  end
+
   describe '#setting_default_privacy' do
     it 'returns default privacy setting if user has configured' do
       user = Fabricate(:user)

@@ -79,6 +79,10 @@ module User::HasSettings
     settings['web.color_scheme']
   end
 
+  def setting_theme_color
+    settings['web.theme_color']
+  end
+
   def setting_contrast
     settings['web.contrast']
   end

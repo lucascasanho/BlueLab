@@ -85,6 +85,10 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 | 2026-10-20 | 9 | Removidos os quatro workflows temporários de autocorreção ESLint, formatação e RuboCop, que tinham permissões de escrita e não devem ficar permanentes no repositório. | Exclusão aplicada em um único commit; o branch volta a não conter essas automações auxiliares. | `7cb2283839dafbf0d0b37d801944aeb7c830b4cf` |
 | 2026-10-20 | 10 | Corrigido o hook selector usando os dois genéricos necessários (`RootState` e tipo selecionado), e trocada a flag local mutável por um objeto `current` para evitar a falsa condição de cancelamento detectada pelo ESLint. | Nova execução completa da CI iniciada no SHA atual; resultados de ESLint, testes Ruby/E2E e migrações ainda precisam ser confirmados antes da validação. | `0aa9cbe36c65a2576b855fb5c3f1a7244586db94` |
 
+| Data (UTC) | Etapa | Alteração | Validação | SHA |
+|---|---|---|---|---|
+| 2026-10-20 | 11 | Restaurado o accessor `User#setting_theme_color` em `User::HasSettings` e adicionado teste unitário para assegurar que a preferência `web.theme_color` é exposta ao helper. | Correção publicada no canal de teste; a nova CI precisa confirmar o fim dos HTTP 500 de E2E, junto com ESLint, formatação, Ruby e migrações. | SHA pendente de CI |
+
 ## Referências da execução
 
 - Branch de teste: [BlueLab-Test](https://github.com/lucascasanho/BlueLab/tree/BlueLab-Test)
