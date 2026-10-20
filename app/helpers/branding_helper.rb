@@ -11,21 +11,22 @@ module BrandingHelper
   end
 
   def _logo_as_symbol_wordmark
-    tag.svg(viewBox: '0 0 261 66', class: 'logo logo--wordmark') do
-      tag.title('Mastodon') +
-        tag.use(href: '#logo-symbol-wordmark')
+    tag.span(class: 'instance-wordmark-brand') do
+      image_tag(instance_brand_logo_url, alt: '') + tag.span(Setting.site_title)
     end
   end
 
   def _logo_as_symbol_icon
-    tag.svg(tag.use(href: '#logo-symbol-icon'), viewBox: '0 0 79 79', class: 'logo logo--icon')
+    image_tag(instance_brand_logo_url, alt: Setting.site_title, class: 'logo logo--icon')
   end
 
   def render_logo
-    image_tag(
-      instance_presenter.auth_logo&.file&.url || favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png'),
-      alt: Setting.site_title,
-      class: 'logo logo--icon'
-    )
+    image_tag(instance_brand_logo_url, alt: Setting.site_title, class: 'logo logo--icon')
+  end
+
+  def instance_brand_logo_url
+    instance_presenter.auth_logo&.file&.url.presence ||
+      favicon_path(48) ||
+      frontend_asset_path('icons/favicon-48x48.png')
   end
 end
