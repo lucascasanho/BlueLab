@@ -28,10 +28,17 @@ RSpec.describe 'Share page', :js, :streaming do
   end
 
   def fill_in_form
-    within('form') do
-      fill_in frontend_translations('compose.post.placeholder'),
-              with: 'This is a new status!'
-      click_on frontend_translations('compose.publish')
+    if page.has_css?('[data-bluelab-composer]')
+      within('[data-bluelab-composer]') do
+        find('[role="textbox"]').set('This is a new status!')
+        click_on frontend_translations('compose.publish')
+      end
+    else
+      within('form') do
+        fill_in frontend_translations('compose.post.placeholder'),
+                with: 'This is a new status!'
+        click_on frontend_translations('compose.publish')
+      end
     end
   end
 end

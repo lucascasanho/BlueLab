@@ -18,8 +18,12 @@ RSpec.describe 'OCR', :attachment_processing, :inline_jobs, :js, :streaming do
   it 'can recognize text in a media attachment' do
     expect(page).to have_css('div.app-holder')
 
-    click_button frontend_translations('compose.new')
-    click_button frontend_translations('compose.new.post')
+    if page.has_css?('body[data-theme="blue-2"]')
+      click_button frontend_translations('compose_form.placeholder')
+    else
+      click_button frontend_translations('compose.new')
+      click_button frontend_translations('compose.new.post')
+    end
 
     within('[data-bluelab-composer]') do
       find_field(type: 'file', visible: :all).attach_file(file_fixture('text.png'))

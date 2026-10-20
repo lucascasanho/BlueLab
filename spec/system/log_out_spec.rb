@@ -32,7 +32,14 @@ RSpec.describe 'Log out' do
       expect(page)
         .to have_css('body', class: 'app-body')
 
-      within 'nav' do
+      nav_selector =
+        if page.has_css?('nav[aria-label="BLUE 2.0"]')
+          'nav[aria-label="BLUE 2.0"]'
+        else
+          'nav'
+        end
+
+      within(nav_selector) do
         click_on frontend_translations('tabs_bar.account_settings')
       end
 

@@ -9,6 +9,7 @@ import { HashIcon } from '@phosphor-icons/react';
 
 // BLUELAB_INTEGRATION: optional BlueLab shell widgets and localized labels.
 import { blue2Text } from '@/bluelab/i18n/blue2';
+import mastodonLogo from '@/images/logo.svg?url';
 import { openNavigation } from '@/mastodon/actions/navigation';
 import { ColumnSettingsMenu } from '@/mastodon/components/column_header';
 import { Blue2Announcements } from '@/mastodon/features/blue2/announcements';
@@ -115,7 +116,7 @@ export const ColumnsAreaRedesign: React.FC<{
   const isBlue2Search = isBlue2 && blue2Pathname === '/search';
   const isBlue2FeedPage =
     (isBlue2Home || isBlue2Global) && !isBlue2MessagesPage;
-  const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
+  const blue2Brand = customInstanceLogo ?? customFavicon ?? mastodonLogo;
   const { feeds: pinnedFeeds } = useBlue2PinnedFeeds();
   const [selectedFeedState, setSelectedFeedState] = useState(() => ({
     pathname: location.pathname,
