@@ -3,17 +3,16 @@ import type { FC, FormEvent, MouseEvent } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import {
+  apiGetVerificationRequestStatus,
+  apiSubmitVerificationRequest,
+} from '@/mastodon/api/verification';
 import { Button } from '@/mastodon/components/button';
 import { TextAreaField } from '@/mastodon/components/form_fields';
 import { Icon } from '@/mastodon/components/icon';
 import { Popover } from '@/mastodon/components/popover';
 import { domain, title as instanceTitle } from '@/mastodon/initial_state';
 import CloseIcon from '@/material-icons/400-24px/close.svg?react';
-
-import {
-  apiGetVerificationRequestStatus,
-  apiSubmitVerificationRequest,
-} from '@/mastodon/api/verification';
 
 import classes from './verification_request.module.scss';
 
@@ -79,8 +78,7 @@ const messages = defineMessages({
   },
   successMessage: {
     id: 'account_edit.verification.popover.success_message',
-    defaultMessage:
-      'Your request was sent to the moderation team for review.',
+    defaultMessage: 'Your request was sent to the moderation team for review.',
   },
   close: {
     id: 'account_edit.verification.popover.close',
@@ -143,16 +141,13 @@ export const VerificationRequestTrigger: FC = () => {
     [explanation],
   );
 
-  const handleTrigger = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault();
-      setError(false);
-      setSubmitted(false);
-      setTriggerElement(event.currentTarget);
-      setOpen(true);
-    },
-    [],
-  );
+  const handleTrigger = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setError(false);
+    setSubmitted(false);
+    setTriggerElement(event.currentTarget);
+    setOpen(true);
+  }, []);
 
   const resolvedInstanceTitle = instanceTitle ?? domain ?? 'this server';
 

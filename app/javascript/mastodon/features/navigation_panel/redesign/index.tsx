@@ -20,21 +20,21 @@ import {
 } from '@phosphor-icons/react';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
+import FediIcon from '@/images/icons/icon_fediverse.svg?react';
+import { fetchFollowRequests } from '@/mastodon/actions/accounts';
 import {
   expandConversations,
   mountConversations,
   unmountConversations,
 } from '@/mastodon/actions/conversations';
-import { connectDirectStream } from '@/mastodon/actions/streaming';
-import { groupedConversationRepresentatives } from '@/mastodon/features/direct_timeline/conversation_grouping';
-import FediIcon from '@/images/icons/icon_fediverse.svg?react';
-import { fetchFollowRequests } from '@/mastodon/actions/accounts';
 import { fetchLists } from '@/mastodon/actions/lists';
 import { closeNavigation } from '@/mastodon/actions/navigation';
+import { connectDirectStream } from '@/mastodon/actions/streaming';
 import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
 import { Button } from '@/mastodon/components/button/redesign';
 import { Callout } from '@/mastodon/components/callout/redesign';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
+import { groupedConversationRepresentatives } from '@/mastodon/features/direct_timeline/conversation_grouping';
 import { useScrollSensor } from '@/mastodon/hooks/useScrollSensor';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
@@ -52,11 +52,10 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { invokeVirtualIosKeyboard } from '@/mastodon/utils/invoke_virtual_ios_keyboard';
 
 import { useHasAnnouncements } from '../../announcements/hooks';
-import { NavigationFooterLinks } from './footer_links';
-
 import { Blue2ComposeIcon } from '../../blue2/icons';
 
 import { NavigationAccountCardAndMenu } from './account_card_and_menu';
+import { NavigationFooterLinks } from './footer_links';
 import { NavigationHeader } from './header';
 import { ListSection } from './list_section';
 import { DisabledAccountBanner, LoggedOutInfo } from './logged_out_info';
@@ -165,9 +164,9 @@ export const RedesignNavigationPanel: React.FC<{
   const unreadMessagesCount = useAppSelector((state) => {
     const conversations = state.conversations.get('items');
 
-    return groupedConversationRepresentatives(conversations)
-      .filter((conversation) => conversation.get('unread'))
-      .length;
+    return groupedConversationRepresentatives(conversations).filter(
+      (conversation) => conversation.get('unread'),
+    ).length;
   });
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';

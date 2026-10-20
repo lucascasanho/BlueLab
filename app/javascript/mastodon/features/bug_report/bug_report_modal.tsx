@@ -6,8 +6,8 @@ import { useIntl } from 'react-intl';
 import api from '@/mastodon/api';
 import { Button } from '@/mastodon/components/button';
 
-import { getBugReportDiagnostics } from './diagnostics';
 import classes from './bug_report_modal.module.scss';
+import { getBugReportDiagnostics } from './diagnostics';
 
 type Copy = {
   title: string;
@@ -36,7 +36,8 @@ const COPY: Record<string, Copy> = {
     title: 'Report a bug',
     lead: 'Describe what went wrong and attach screenshots, GIFs, audio or video when useful.',
     description: 'What happened?',
-    placeholder: 'Describe the bug, what you expected to happen, and how to reproduce it.',
+    placeholder:
+      'Describe the bug, what you expected to happen, and how to reproduce it.',
     attachments: 'Attachments',
     attachmentHint: 'Images, GIFs, audio and video. Up to 5 files.',
     chooseFiles: 'Choose files',
@@ -46,9 +47,11 @@ const COPY: Record<string, Copy> = {
     submit: 'Send report',
     cancel: 'Cancel',
     successTitle: 'Bug report sent',
-    successBody: 'Your report was sent to the instance administrators with the available technical diagnostics.',
+    successBody:
+      'Your report was sent to the instance administrators with the available technical diagnostics.',
     close: 'Close',
-    diagnosticNotice: 'This report automatically includes browser and operating-system information, interface language, theme, interface mode and recent client errors.',
+    diagnosticNotice:
+      'This report automatically includes browser and operating-system information, interface language, theme, interface mode and recent client errors.',
     required: 'Describe the problem before sending.',
     sendError: 'The report could not be sent. Please try again.',
     characters: '{current}/5000',
@@ -57,7 +60,8 @@ const COPY: Record<string, Copy> = {
     title: 'Relatar bug',
     lead: 'Descreva o que aconteceu e anexe capturas, GIFs, áudio ou vídeo quando forem úteis.',
     description: 'O que aconteceu?',
-    placeholder: 'Descreva o bug, o que você esperava que acontecesse e como reproduzir o problema.',
+    placeholder:
+      'Descreva o bug, o que você esperava que acontecesse e como reproduzir o problema.',
     attachments: 'Anexos',
     attachmentHint: 'Imagens, GIFs, áudio e vídeo. Até 5 arquivos.',
     chooseFiles: 'Escolher arquivos',
@@ -67,9 +71,11 @@ const COPY: Record<string, Copy> = {
     submit: 'Enviar relato',
     cancel: 'Cancelar',
     successTitle: 'Relato enviado',
-    successBody: 'Seu relato foi enviado aos administradores da instância com os diagnósticos técnicos disponíveis.',
+    successBody:
+      'Seu relato foi enviado aos administradores da instância com os diagnósticos técnicos disponíveis.',
     close: 'Fechar',
-    diagnosticNotice: 'O relato inclui automaticamente informações do navegador e sistema operacional, idioma, tema, modo da interface e erros recentes do cliente.',
+    diagnosticNotice:
+      'O relato inclui automaticamente informações do navegador e sistema operacional, idioma, tema, modo da interface e erros recentes do cliente.',
     required: 'Descreva o problema antes de enviar.',
     sendError: 'Não foi possível enviar o relato. Tente novamente.',
     characters: '{current}/5000',
@@ -78,7 +84,8 @@ const COPY: Record<string, Copy> = {
     title: 'Informar un error',
     lead: 'Describe lo ocurrido y adjunta capturas, GIF, audio o vídeo cuando sea útil.',
     description: '¿Qué ocurrió?',
-    placeholder: 'Describe el error, lo que esperabas que ocurriera y cómo reproducir el problema.',
+    placeholder:
+      'Describe el error, lo que esperabas que ocurriera y cómo reproducir el problema.',
     attachments: 'Adjuntos',
     attachmentHint: 'Imágenes, GIF, audio y vídeo. Hasta 5 archivos.',
     chooseFiles: 'Elegir archivos',
@@ -88,9 +95,11 @@ const COPY: Record<string, Copy> = {
     submit: 'Enviar informe',
     cancel: 'Cancelar',
     successTitle: 'Informe enviado',
-    successBody: 'Tu informe se envió a los administradores de la instancia con los diagnósticos técnicos disponibles.',
+    successBody:
+      'Tu informe se envió a los administradores de la instancia con los diagnósticos técnicos disponibles.',
     close: 'Cerrar',
-    diagnosticNotice: 'El informe incluye automáticamente información del navegador y del sistema operativo, idioma, tema, modo de interfaz y errores recientes del cliente.',
+    diagnosticNotice:
+      'El informe incluye automáticamente información del navegador y del sistema operativo, idioma, tema, modo de interfaz y errores recientes del cliente.',
     required: 'Describe el problema antes de enviarlo.',
     sendError: 'No se pudo enviar el informe. Inténtalo de nuevo.',
     characters: '{current}/5000',
@@ -99,7 +108,8 @@ const COPY: Record<string, Copy> = {
     title: 'Signaler un bug',
     lead: 'Décrivez le problème et joignez des captures, des GIF, de l’audio ou de la vidéo si nécessaire.',
     description: 'Que s’est-il passé ?',
-    placeholder: 'Décrivez le bug, le résultat attendu et les étapes pour reproduire le problème.',
+    placeholder:
+      'Décrivez le bug, le résultat attendu et les étapes pour reproduire le problème.',
     attachments: 'Pièces jointes',
     attachmentHint: 'Images, GIF, audio et vidéo. Jusqu’à 5 fichiers.',
     chooseFiles: 'Choisir des fichiers',
@@ -109,9 +119,11 @@ const COPY: Record<string, Copy> = {
     submit: 'Envoyer le rapport',
     cancel: 'Annuler',
     successTitle: 'Rapport envoyé',
-    successBody: 'Votre rapport a été envoyé aux administrateurs de l’instance avec les diagnostics techniques disponibles.',
+    successBody:
+      'Votre rapport a été envoyé aux administrateurs de l’instance avec les diagnostics techniques disponibles.',
     close: 'Fermer',
-    diagnosticNotice: 'Le rapport inclut automatiquement les informations du navigateur et du système d’exploitation, la langue, le thème, le mode d’interface et les erreurs récentes du client.',
+    diagnosticNotice:
+      'Le rapport inclut automatiquement les informations du navigateur et du système d’exploitation, la langue, le thème, le mode d’interface et les erreurs récentes du client.',
     required: 'Décrivez le problème avant de l’envoyer.',
     sendError: 'Impossible d’envoyer le rapport. Réessayez.',
     characters: '{current}/5000',
@@ -273,10 +285,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
               addFiles(event.dataTransfer.files);
             }}
           >
-            <Button
-              type='button'
-              onClick={() => fileInputRef.current?.click()}
-            >
+            <Button type='button' onClick={() => fileInputRef.current?.click()}>
               {copy.chooseFiles}
             </Button>
             <span>{copy.dropFiles}</span>

@@ -7,9 +7,9 @@ import type {
 import { create as createAxiosInstance } from 'axios';
 import LinkHeader from 'http-link-header';
 
+import { recordClientError } from './features/bug_report/diagnostics';
 import { getAccessToken } from './initial_state';
 import ready from './ready';
-import { recordClientError } from './features/bug_report/diagnostics';
 
 export const getLinks = (response: AxiosResponse) => {
   const value = response.headers.link as string | undefined;

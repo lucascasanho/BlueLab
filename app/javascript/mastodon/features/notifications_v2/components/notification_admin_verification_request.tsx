@@ -5,10 +5,9 @@ import classNames from 'classnames';
 import { DisplayName } from '@/mastodon/components/display_name';
 import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
 import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
+import classes from 'mastodon/features/notifications/components/notification_verification.module.scss';
 import type { NotificationGroup } from 'mastodon/models/notification_group';
 import { useAppSelector } from 'mastodon/store';
-
-import classes from 'mastodon/features/notifications/components/notification_verification.module.scss';
 
 export const NotificationAdminVerificationRequest: React.FC<{
   notification: NotificationGroup;

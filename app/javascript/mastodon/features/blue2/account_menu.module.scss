@@ -200,7 +200,8 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: var(--color-text-secondary, var(--blue2-muted, currentColor)) transparent;
+  scrollbar-color: var(--color-text-secondary, var(--blue2-muted, currentColor))
+    transparent;
   scrollbar-gutter: stable;
   border: 1px solid var(--blue2-border-soft, #17232c);
 

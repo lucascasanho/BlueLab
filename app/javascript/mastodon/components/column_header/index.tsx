@@ -155,7 +155,11 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
       )}
     >
       <div className={classes.layout} data-has-unread={withUnreadMarker}>
-        {hasBackButton ? <BackButton onClick={onBackButtonClick} /> : <MobileMenuButton />}
+        {hasBackButton ? (
+          <BackButton onClick={onBackButtonClick} />
+        ) : (
+          <MobileMenuButton />
+        )}
         <NavigationFocusTarget className={classes.title}>
           <button
             type='button'

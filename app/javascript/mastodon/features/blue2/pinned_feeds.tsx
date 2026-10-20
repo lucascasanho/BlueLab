@@ -4,8 +4,9 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { HashIcon, PlusIcon, RssSimpleIcon } from '@phosphor-icons/react';
 
-import { changeSetting } from '@/mastodon/actions/settings';
 import { fetchLists } from '@/mastodon/actions/lists';
+import { changeSetting } from '@/mastodon/actions/settings';
+import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
 import { Button } from '@/mastodon/components/button/redesign';
 import {
   Menu,
@@ -15,7 +16,6 @@ import {
   MenuList,
   MenuTrigger,
 } from '@/mastodon/components/menu';
-import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
 import { useCurrentAccountId } from '@/mastodon/hooks/useAccountId';
 import { useIdentity } from '@/mastodon/identity_context';
 import { getOrderedLists } from '@/mastodon/selectors/lists';
@@ -99,7 +99,6 @@ const parsePinnedFeeds = (value: unknown): Blue2PinnedFeed[] => {
   );
 };
 
-
 export const useBlue2PinnedFeeds = () => {
   const { signedIn } = useIdentity();
   const accountId = useCurrentAccountId();
@@ -124,7 +123,12 @@ export const useBlue2PinnedFeeds = () => {
     : legacyFeeds;
 
   useEffect(() => {
-    if (!signedIn || !accountId || serverValueExists || legacyFeeds.length === 0) {
+    if (
+      !signedIn ||
+      !accountId ||
+      serverValueExists ||
+      legacyFeeds.length === 0
+    ) {
       return;
     }
 
@@ -132,13 +136,7 @@ export const useBlue2PinnedFeeds = () => {
     // migrates them into Mastodon's per-user Web::Setting. Subsequent devices
     // receive the same list from the server.
     dispatch(changeSetting(['blue2', 'pinned_feeds'], legacyFeeds));
-  }, [
-    accountId,
-    dispatch,
-    legacyFeeds,
-    serverValueExists,
-    signedIn,
-  ]);
+  }, [accountId, dispatch, legacyFeeds, serverValueExists, signedIn]);
 
   const updateFeeds = useCallback(
     (next: Blue2PinnedFeed[]) => {
@@ -278,7 +276,9 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
               <MenuItem
                 key={list.id}
                 icon={RssSimpleIcon}
-                onClick={() => addFeed(createPinnedListFeed(list.id, list.title))}
+                onClick={() =>
+                  addFeed(createPinnedListFeed(list.id, list.title))
+                }
               >
                 {list.title}
               </MenuItem>
@@ -322,10 +322,7 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
             </div>
           )}
 
-          <MenuItem
-            icon={HashIcon}
-            onClick={handleAddHashtag}
-          >
+          <MenuItem icon={HashIcon} onClick={handleAddHashtag}>
             <FormattedMessage
               id='blue2.pinned_feeds.add_hashtag'
               defaultMessage='Pin another hashtag…'
@@ -345,7 +342,10 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
               }
             >
               {feeds.map((feed) => (
-                <MenuItem key={`remove:${feed.key}`} onClick={() => removeFeed(feed.key)}>
+                <MenuItem
+                  key={`remove:${feed.key}`}
+                  onClick={() => removeFeed(feed.key)}
+                >
                   {feed.title}
                 </MenuItem>
               ))}
@@ -378,14 +378,10 @@ export const Blue2PinnedFeedTabs: React.FC<{
         <button
           key={feed.key}
           type='button'
-          className={
-            activeKey === feed.key ? activeTabClassName : tabClassName
-          }
+          className={activeKey === feed.key ? activeTabClassName : tabClassName}
           onClick={() => onSelect(feed.key)}
         >
-          {showIcons && feed.type === 'list' && (
-            <RssSimpleIcon size={15} />
-          )}
+          {showIcons && feed.type === 'list' && <RssSimpleIcon size={15} />}
           {feed.title}
         </button>
       ))}

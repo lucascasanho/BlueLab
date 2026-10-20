@@ -63,7 +63,9 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
         ? messages.title_redesign
         : messages.title,
   );
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [activeConversationId, setActiveConversationId] = useState<
+    string | null
+  >(null);
 
   const handleOpenConversation = useCallback((conversationId: string) => {
     setActiveConversationId(conversationId);
@@ -121,11 +123,13 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
       <Column
         bindToDocument={!multiColumn}
         label={title}
-        className={isBlue2 ? (
-          multiColumn
-            ? `${blue2Classes.column} ${blue2Classes.advancedColumn}`
-            : `${blue2Classes.column} ${activeConversationId ? blue2Classes.conversationColumn : ''}`
-        ) : undefined}
+        className={
+          isBlue2
+            ? multiColumn
+              ? `${blue2Classes.column} ${blue2Classes.advancedColumn}`
+              : `${blue2Classes.column} ${activeConversationId ? blue2Classes.conversationColumn : ''}`
+            : undefined
+        }
       >
         <div
           className={blue2Classes.root}
@@ -143,65 +147,65 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
           ) : (
             <>
               <ColumnHeader
-            title={title}
-            extraButtons={
-              <>
-                <ColumnHeaderButton
-                  showTextOnDesktop
-                  variant='solid'
-                  color='accent'
-                  icon={ChatCircleDotsIcon}
-                  onClick={handleNewConversation}
-                >
-                  {blue2Text(intl.locale, 'newConversation')}
-                </ColumnHeaderButton>
-                {multiColumn && (
-                  <ColumnSettingsMenu labelPrefix={title}>
-                    <MultiColumnMenuItems
-                      pinned={pinned}
-                      onPin={handlePin}
-                      onMove={handleMove}
-                    />
-                  </ColumnSettingsMenu>
-                )}
-              </>
-            }
-          />
-
-          <div className={blue2Classes.notice}>
-            <FormattedMessage
-              id='compose.message.notice'
-              defaultMessage='Messages are not end-to-end encrypted'
-            />{' '}
-            <a
-              href='https://docs.joinmastodon.org/user/posting/#private'
-              rel='noreferrer'
-              target='_blank'
-            >
-              <FormattedMessage
-                id='compose_form.direct_message_warning_learn_more'
-                defaultMessage='Learn more'
-              />
-            </a>
-          </div>
-
-          <section className={blue2Classes.inbox} aria-label={title}>
-            <div className={blue2Classes.listWrap}>
-              <ConversationsList
-                trackScroll={!pinned}
-                scrollKey={`direct_timeline-${columnId}`}
-                emptyMessage={
-                  <div className={blue2Classes.emptyInbox}>
-                    <ChatCircleDotsIcon size={58} />
-                    <strong>{blue2Text(intl.locale, 'sayHello')}</strong>
-                    <span>{blue2Text(intl.locale, 'inboxEmpty')}</span>
-                  </div>
+                title={title}
+                extraButtons={
+                  <>
+                    <ColumnHeaderButton
+                      showTextOnDesktop
+                      variant='solid'
+                      color='accent'
+                      icon={ChatCircleDotsIcon}
+                      onClick={handleNewConversation}
+                    >
+                      {blue2Text(intl.locale, 'newConversation')}
+                    </ColumnHeaderButton>
+                    {multiColumn && (
+                      <ColumnSettingsMenu labelPrefix={title}>
+                        <MultiColumnMenuItems
+                          pinned={pinned}
+                          onPin={handlePin}
+                          onMove={handleMove}
+                        />
+                      </ColumnSettingsMenu>
+                    )}
+                  </>
                 }
-                bindToDocument={!multiColumn}
-                onOpenConversation={handleOpenConversation}
               />
-            </div>
-          </section>
+
+              <div className={blue2Classes.notice}>
+                <FormattedMessage
+                  id='compose.message.notice'
+                  defaultMessage='Messages are not end-to-end encrypted'
+                />{' '}
+                <a
+                  href='https://docs.joinmastodon.org/user/posting/#private'
+                  rel='noreferrer'
+                  target='_blank'
+                >
+                  <FormattedMessage
+                    id='compose_form.direct_message_warning_learn_more'
+                    defaultMessage='Learn more'
+                  />
+                </a>
+              </div>
+
+              <section className={blue2Classes.inbox} aria-label={title}>
+                <div className={blue2Classes.listWrap}>
+                  <ConversationsList
+                    trackScroll={!pinned}
+                    scrollKey={`direct_timeline-${columnId}`}
+                    emptyMessage={
+                      <div className={blue2Classes.emptyInbox}>
+                        <ChatCircleDotsIcon size={58} />
+                        <strong>{blue2Text(intl.locale, 'sayHello')}</strong>
+                        <span>{blue2Text(intl.locale, 'inboxEmpty')}</span>
+                      </div>
+                    }
+                    bindToDocument={!multiColumn}
+                    onOpenConversation={handleOpenConversation}
+                  />
+                </div>
+              </section>
             </>
           )}
         </div>

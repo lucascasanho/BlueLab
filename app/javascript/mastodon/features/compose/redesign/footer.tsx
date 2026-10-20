@@ -38,8 +38,8 @@ import { shouldShowCharacterCounter } from '../components/character_counter';
 import { countableText } from '../util/counter';
 
 import type { OnEmojiPick } from './emoji';
-import { ComposeGifButton } from './gif_picker';
 import { ComposeEmojiButton } from './emoji';
+import { ComposeGifButton } from './gif_picker';
 import { ComposeSchedule } from './schedule';
 import {
   selectComposeAttachments,

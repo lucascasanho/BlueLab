@@ -141,8 +141,8 @@ export function hasVerifiedRole(account: DisplayNameProps['account']) {
     return true;
   }
 
-  return Array.from(account.roles).some(
-    (role) => VERIFIED_ROLE_NAMES.some((name) => role.name === name),
+  return Array.from(account.roles).some((role) =>
+    VERIFIED_ROLE_NAMES.some((name) => role.name === name),
   );
 }
 
@@ -185,13 +185,23 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
     [],
   );
 
-  if (!account || !hasVerifiedRole(account) || account.verified_badge_visible === false) {
+  if (
+    !account ||
+    !hasVerifiedRole(account) ||
+    account.verified_badge_visible === false
+  ) {
     return null;
   }
 
   const language = intl.locale.toLowerCase().split(/[-_]/)[0];
   const localizedCopy =
-    language === 'pt' ? copy.pt : language === 'es' ? copy.es : language === 'fr' ? copy.fr : copy.en;
+    language === 'pt'
+      ? copy.pt
+      : language === 'es'
+        ? copy.es
+        : language === 'fr'
+          ? copy.fr
+          : copy.en;
   const isRemote = account.acct.includes('@');
   const verification = account.instance_verification;
   const remoteBadge = isRemote ? verification?.badge : null;

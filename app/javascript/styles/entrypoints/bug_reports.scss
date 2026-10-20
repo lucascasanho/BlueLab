@@ -8,7 +8,8 @@
 .bug-report-page__context {
   margin-bottom: 20px;
   padding: 12px 14px;
-  border-inline-start: 3px solid var(--color-border-brand, var(--color-accent, #6364ff));
+  border-inline-start: 3px solid
+    var(--color-border-brand, var(--color-accent, #6364ff));
   border-radius: 8px;
   background: var(--color-bg-brand-softest, rgb(99 100 255 / 8%));
   color: var(--color-text-primary);

@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { navigateToProfile } from 'mastodon/actions/accounts';
 import { mentionComposeById } from 'mastodon/actions/compose';
 import { Hotkeys } from 'mastodon/components/hotkeys';
+import { NotificationVerification } from 'mastodon/features/notifications/components/notification_verification';
 import type { NotificationGroup as NotificationGroupModel } from 'mastodon/models/notification_group';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
@@ -11,7 +12,6 @@ import { NotificationAdminSignUp } from './notification_admin_sign_up';
 import { NotificationAdminVerificationRequest } from './notification_admin_verification_request';
 import { NotificationAnnualReport } from './notification_annual_report';
 import { NotificationCollection } from './notification_collection';
-import { NotificationVerification } from 'mastodon/features/notifications/components/notification_verification';
 import { NotificationFavourite } from './notification_favourite';
 import { NotificationFollow } from './notification_follow';
 import { NotificationFollowRequest } from './notification_follow_request';

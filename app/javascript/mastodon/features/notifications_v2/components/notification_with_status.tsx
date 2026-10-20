@@ -65,7 +65,8 @@ export const NotificationWithStatus: React.FC<{
 
   const handleCardClick = (event: MouseEvent<HTMLDivElement>) => {
     if (!(event.target instanceof Element)) return;
-    if (event.target.closest('a,button,input,textarea,select,[role="link"]')) return;
+    if (event.target.closest('a,button,input,textarea,select,[role="link"]'))
+      return;
     if (!statusId) return;
 
     if (isPrivateMention) {

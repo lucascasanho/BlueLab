@@ -65,11 +65,11 @@ export const LinkFooter: React.FC<{
           </li>
           <li>
             <button
-                type='button'
-                className={classes.bugReportButton}
-                onClick={openBugReport}
-              >
-                <BugReportLabel />
+              type='button'
+              className={classes.bugReportButton}
+              onClick={openBugReport}
+            >
+              <BugReportLabel />
             </button>
           </li>
           <li>

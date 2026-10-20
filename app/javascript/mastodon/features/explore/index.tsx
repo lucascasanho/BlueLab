@@ -23,7 +23,7 @@ const messages = defineMessages({
 const Explore: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   const { signedIn } = useIdentity();
   const intl = useIntl();
-  const logoRequired = useBreakpoint('full'); 
+  const logoRequired = useBreakpoint('full');
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
@@ -106,7 +106,9 @@ const Explore: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
       <Helmet>
         <title>
           {intl.formatMessage(
-            isRedesignEnabled() || isBlue2 ? messages.titleRedesign : messages.title,
+            isRedesignEnabled() || isBlue2
+              ? messages.titleRedesign
+              : messages.title,
           )}
         </title>
         <meta name='robots' content='all' />

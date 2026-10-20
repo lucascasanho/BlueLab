@@ -25,7 +25,15 @@ export const StatusImage: React.FC<
     sensitive?: boolean;
     animateGifv?: boolean;
   } & React.ComponentPropsWithRef<'div'>
-> = ({ attachment, children, sensitive, animateGifv = false, className, style, ...props }) => {
+> = ({
+  attachment,
+  children,
+  sensitive,
+  animateGifv = false,
+  className,
+  style,
+  ...props
+}) => {
   let x = 50;
   let y = 50;
   const focusX = attachment.meta?.focus?.x;
@@ -37,7 +45,9 @@ export const StatusImage: React.FC<
 
   const imgStyle = {
     backgroundImage:
-      !sensitive && attachment.preview_url && !(animateGifv && attachment.type === 'gifv')
+      !sensitive &&
+      attachment.preview_url &&
+      !(animateGifv && attachment.type === 'gifv')
         ? `url(${attachment.preview_url})`
         : undefined,
     backgroundPosition: `${x}% ${y}%`,

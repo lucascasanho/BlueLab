@@ -114,7 +114,13 @@ interface CollectionUpdateNotificationJSON extends BaseNotificationJSON {
   collection: ApiCollectionJSON | null;
 }
 
-type SimpleNotificationTypes = 'follow' | 'follow_request' | 'admin.sign_up' | 'admin.verification_request' | 'verification_request' | 'verification_approved';
+type SimpleNotificationTypes =
+  | 'follow'
+  | 'follow_request'
+  | 'admin.sign_up'
+  | 'admin.verification_request'
+  | 'verification_request'
+  | 'verification_approved';
 interface SimpleNotificationGroupJSON extends BaseNotificationGroupJSON {
   type: SimpleNotificationTypes;
 }

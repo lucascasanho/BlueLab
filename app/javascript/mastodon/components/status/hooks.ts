@@ -54,6 +54,7 @@ import {
 import { useAppSelector, useAppDispatch } from '@/mastodon/store';
 import type { AppDispatch } from '@/mastodon/store';
 import type { OnElementHandler } from '@/mastodon/utils/html';
+import ReplyAllLegacyIcon from '@/material-icons/400-24px/reply_all.svg?react';
 
 import type { HotkeyHandlerFunction, HotkeyName } from '../hotkeys';
 import { FOCUS_TARGET } from '../navigation_focus_target';
@@ -69,7 +70,6 @@ import {
   StatusLikeIcon,
   StatusReplyIcon,
 } from './icons';
-import ReplyAllLegacyIcon from '@/material-icons/400-24px/reply_all.svg?react';
 import type { StatusContextType } from './types';
 
 export const StatusContext = createContext<{

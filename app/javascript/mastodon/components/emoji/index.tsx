@@ -100,8 +100,7 @@ export const Emoji: FC<EmojiProps> = ({
     ...appState,
   });
   const isBlue2 =
-    typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'blue-2';
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   return (
     <img

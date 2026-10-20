@@ -21,7 +21,7 @@ const account = (id: string, lastUsedAt = 0): StoredAccount => ({
       url: 'https://example.social/emoji/test_custom.gif',
       category: '',
       featured: false,
-        visible_in_picker: true,
+      visible_in_picker: true,
     },
   ],
   instanceVerification: {

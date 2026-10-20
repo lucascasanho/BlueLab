@@ -145,85 +145,85 @@ const ComposeGifDropdown: React.FC<
   const [error, setError] = useState(false);
   const [selectingId, setSelectingId] = useState<string | null>(null);
 
-  const load = useCallback(
-    async (searchTerm: string, position?: string) => {
-      if (!KLIPY_API_KEY) return;
+  const load = useCallback(async (searchTerm: string, position?: string) => {
+    if (!KLIPY_API_KEY) return;
 
-      requestControllerRef.current?.abort();
-      const controller = new AbortController();
-      requestControllerRef.current = controller;
-      const isMore = !!position;
+    requestControllerRef.current?.abort();
+    const controller = new AbortController();
+    requestControllerRef.current = controller;
+    const isMore = !!position;
 
-      if (isMore) {
-        setLoadingMore(true);
-      } else {
-        setLoading(true);
-        setError(false);
+    if (isMore) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+      setError(false);
+    }
+
+    try {
+      const url = new URL(
+        KLIPY_API_BASE + '/' + (searchTerm ? 'search' : 'featured'),
+      );
+
+      url.searchParams.set('key', KLIPY_API_KEY);
+      url.searchParams.set('country', KLIPY_COUNTRY);
+      url.searchParams.set('locale', KLIPY_LOCALE);
+      url.searchParams.set('contentfilter', KLIPY_CONTENT_FILTER);
+      url.searchParams.set('media_filter', 'gif,tinygif');
+      url.searchParams.set('limit', String(KLIPY_LIMIT));
+
+      if (searchTerm) {
+        url.searchParams.set('q', searchTerm);
       }
 
-      try {
-        const url = new URL(
-          KLIPY_API_BASE + '/' + (searchTerm ? 'search' : 'featured'),
-        );
-
-        url.searchParams.set('key', KLIPY_API_KEY);
-        url.searchParams.set('country', KLIPY_COUNTRY);
-        url.searchParams.set('locale', KLIPY_LOCALE);
-        url.searchParams.set('contentfilter', KLIPY_CONTENT_FILTER);
-        url.searchParams.set('media_filter', 'gif,tinygif');
-        url.searchParams.set('limit', String(KLIPY_LIMIT));
-
-        if (searchTerm) {
-          url.searchParams.set('q', searchTerm);
-        }
-
-        if (position) {
-          url.searchParams.set('pos', position);
-        }
-
-        const response = await fetch(url, {
-          headers: {
-            Accept: 'application/json',
-          },
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error(
-            'KLIPY request failed with status ' + String(response.status),
-          );
-        }
-
-        const payload = (await response.json()) as KlipyResponse;
-        const items = (payload.results ?? []).filter(
-          (item) =>
-            item.id &&
-            !!item.media_formats?.gif?.url &&
-            !!item.media_formats?.tinygif?.url,
-        );
-
-        setResults((current) => (isMore ? [...current, ...items] : items));
-        setNext(payload.next || null);
-      } catch (loadError) {
-        if (loadError instanceof DOMException && loadError.name === 'AbortError') {
-          return;
-        }
-
-        setError(true);
-        if (!isMore) {
-          setResults([]);
-          setNext(null);
-        }
-      } finally {
-        if (requestControllerRef.current === controller) {
-          requestControllerRef.current = null;
-          setLoading(false);
-          setLoadingMore(false);
-        }
+      if (position) {
+        url.searchParams.set('pos', position);
       }
-    },
-    [],
-  );
+
+      const response = await fetch(url, {
+        headers: {
+          Accept: 'application/json',
+        },
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          'KLIPY request failed with status ' + String(response.status),
+        );
+      }
+
+      const payload = (await response.json()) as KlipyResponse;
+      const items = (payload.results ?? []).filter(
+        (item) =>
+          item.id &&
+          !!item.media_formats?.gif?.url &&
+          !!item.media_formats?.tinygif?.url,
+      );
+
+      setResults((current) => (isMore ? [...current, ...items] : items));
+      setNext(payload.next || null);
+    } catch (loadError) {
+      if (
+        loadError instanceof DOMException &&
+        loadError.name === 'AbortError'
+      ) {
+        return;
+      }
+
+      setError(true);
+      if (!isMore) {
+        setResults([]);
+        setNext(null);
+      }
+    } finally {
+      if (requestControllerRef.current === controller) {
+        requestControllerRef.current = null;
+        setLoading(false);
+        setLoadingMore(false);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {

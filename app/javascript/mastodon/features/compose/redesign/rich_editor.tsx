@@ -602,8 +602,7 @@ export const RichComposeEditor: React.FC<{
   const text = value ?? globalText;
   const contentType = contentTypeProp ?? globalContentType;
   const isBlueLabTheme =
-    typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'blue-2';
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const forceMessageMarkdown =
     messageToolbar || (isBlueLabTheme && isMessageComposeType(type));
   const isMarkdown = forceMessageMarkdown || contentType === 'text/markdown';

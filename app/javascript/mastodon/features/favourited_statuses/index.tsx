@@ -32,7 +32,7 @@ const Favourites: React.FC<{ columnId: string; multiColumn: boolean }> = ({
   multiColumn,
 }) => {
   const dispatch = useAppDispatch();
-  const intl = useIntl(); 
+  const intl = useIntl();
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const statusIds = useAppSelector((state) =>

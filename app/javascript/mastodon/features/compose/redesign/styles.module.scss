@@ -52,8 +52,8 @@
   pointer-events: none;
 }
 
-
-:global(body[data-theme='blue-2']) .root[data-bluelab-composer-message='true'][data-bluelab-composer-compact='true'] {
+:global(body[data-theme='blue-2'])
+  .root[data-bluelab-composer-message='true'][data-bluelab-composer-compact='true'] {
   margin-top: auto;
   padding: 0;
   gap: var(--space-xs);
@@ -319,8 +319,6 @@ textarea.textarea {
   }
 }
 
-
-
 :global(body[data-theme='blue-2']) .root[data-bluelab-composer-message='true'] {
   .content {
     gap: var(--space-xs);
@@ -420,7 +418,12 @@ textarea.textarea {
   gap: var(--space-3xs);
   min-width: 0;
   flex: 0 1 auto;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   line-height: 1;

@@ -8,11 +8,12 @@ import { useHistory } from 'react-router-dom';
 import { updateVerificationBadgeVisibility } from '@/mastodon/actions/accounts_typed';
 import type { ModalType } from '@/mastodon/actions/modal';
 import { openModal } from '@/mastodon/actions/modal';
+import { apiUpdateVerificationBadge } from '@/mastodon/api/verification';
 import { AccountBio } from '@/mastodon/components/account_bio';
 import { Avatar } from '@/mastodon/components/avatar';
-import { hasVerifiedRole } from '@/mastodon/components/display_name/verified_badge';
 import { Button } from '@/mastodon/components/button';
 import { DismissibleCallout } from '@/mastodon/components/callout/dismissible';
+import { hasVerifiedRole } from '@/mastodon/components/display_name/verified_badge';
 import { CustomEmojiProvider } from '@/mastodon/components/emoji/context';
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { ToggleField } from '@/mastodon/components/form_fields';
@@ -25,7 +26,6 @@ import {
   fetchProfile,
   patchProfile,
 } from '@/mastodon/reducers/slices/profile_edit';
-import { apiUpdateVerificationBadge } from '@/mastodon/api/verification';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { AccountEditColumn, AccountEditEmptyColumn } from './components/column';
@@ -33,9 +33,9 @@ import { EditButton } from './components/edit_button';
 import { AccountField } from './components/field';
 import { AccountFieldActions } from './components/field_actions';
 import { AccountImageEdit } from './components/image_edit';
-import { VerificationRequestTrigger } from './verification_request';
 import { AccountEditSection } from './components/section';
 import classes from './styles.module.scss';
+import { VerificationRequestTrigger } from './verification_request';
 
 export const messages = defineMessages({
   columnTitle: {

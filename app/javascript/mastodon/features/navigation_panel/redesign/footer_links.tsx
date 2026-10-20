@@ -41,9 +41,7 @@ export const NavigationFooterLinks: React.FC<{
         variant === 'blue2' && classes.rootBlue2,
       )}
     >
-      {variant !== 'blue2' && (
-        <h2 className={classes.heading}>{siteName}</h2>
-      )}
+      {variant !== 'blue2' && <h2 className={classes.heading}>{siteName}</h2>}
       <ul className={classes.list}>
         <li>
           <NavLink to='/about' {...multiColumnLinkAttrs}>
@@ -67,11 +65,11 @@ export const NavigationFooterLinks: React.FC<{
         </li>
         <li>
           <button
-              type='button'
-              className={classes.bugReportButton}
-              onClick={openBugReport}
-            >
-              <BugReportLabel />
+            type='button'
+            className={classes.bugReportButton}
+            onClick={openBugReport}
+          >
+            <BugReportLabel />
           </button>
         </li>
         {termsOfServiceEnabled && (

@@ -198,9 +198,8 @@ async function loaded() {
 
   applyRailsA11yPatches();
 
-  const bugReportForm = document.querySelector<HTMLFormElement>(
-    '#bug-report-form',
-  );
+  const bugReportForm =
+    document.querySelector<HTMLFormElement>('#bug-report-form');
   if (bugReportForm) {
     bugReportForm.addEventListener('submit', () => {
       populateBugReportFormDiagnostics(

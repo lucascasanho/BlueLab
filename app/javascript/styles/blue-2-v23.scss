@@ -101,7 +101,6 @@ body[data-theme='blue-2'] {
   }
 }
 
-
 /*
  * BlueLab standalone error pages.
  * Kept behind the explicit body class added by the Rails error layout so
@@ -216,7 +215,8 @@ body.error--bluelab {
     min-height: 42px;
     padding-inline: 22px;
     border-radius: 999px;
-    pointer-events: auto;  }
+    pointer-events: auto;
+  }
 
   @media (width <= 759px) {
     .error-page {
@@ -240,7 +240,6 @@ body.error--bluelab {
     }
   }
 }
-
 
 /*
  * Notification settings modal: keep the title and actions fixed while the

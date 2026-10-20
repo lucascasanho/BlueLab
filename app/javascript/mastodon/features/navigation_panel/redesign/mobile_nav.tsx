@@ -25,8 +25,8 @@ import {
   sso_redirect,
   trendsEnabled,
 } from '@/mastodon/initial_state';
-import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
+import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { invokeVirtualIosKeyboard } from '@/mastodon/utils/invoke_virtual_ios_keyboard';
 
 import { RedesignNavigationPanel } from '.';
@@ -37,10 +37,9 @@ export const RedesignMobileNavigation: React.FC = () => {
   const { accountId, signedIn } = useIdentity();
   const account = useAccount(accountId);
   const location = useLocation();
-  const blue2Pathname =
-    location.pathname.startsWith('/deck')
-      ? location.pathname.slice(5) || '/home'
-      : location.pathname;
+  const blue2Pathname = location.pathname.startsWith('/deck')
+    ? location.pathname.slice(5) || '/home'
+    : location.pathname;
   const isMessagesPage =
     blue2Pathname === '/conversations' ||
     blue2Pathname.startsWith('/conversations/');

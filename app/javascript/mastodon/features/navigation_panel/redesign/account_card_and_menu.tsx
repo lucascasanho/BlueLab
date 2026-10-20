@@ -21,7 +21,6 @@ import {
 } from '@phosphor-icons/react';
 
 import { openModal } from '@/mastodon/actions/modal';
-import { AccountSwitcherMenuSection } from '@/mastodon/features/account_switcher';
 import { Avatar } from '@/mastodon/components/avatar';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { DisplayName } from '@/mastodon/components/display_name';
@@ -37,6 +36,7 @@ import {
   MenuTrigger,
 } from '@/mastodon/components/menu';
 import { Popover } from '@/mastodon/components/popover';
+import { AccountSwitcherMenuSection } from '@/mastodon/features/account_switcher';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
 import {

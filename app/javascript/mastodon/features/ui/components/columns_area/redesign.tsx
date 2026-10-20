@@ -7,28 +7,27 @@ import { Link, useHistory, useLocation } from 'react-router-dom';
 
 import { HashIcon } from '@phosphor-icons/react';
 
+// BLUELAB_INTEGRATION: optional BlueLab shell widgets and localized labels.
+import { blue2Text } from '@/bluelab/i18n/blue2';
+import { openNavigation } from '@/mastodon/actions/navigation';
+import { ColumnSettingsMenu } from '@/mastodon/components/column_header';
+import { Blue2Announcements } from '@/mastodon/features/blue2/announcements';
+import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
+import { Blue2HomeFeedTitleBar } from '@/mastodon/features/blue2/feed_header';
+import { Blue2InternalFeed } from '@/mastodon/features/blue2/internal_feed';
+import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
 import {
   Blue2PinnedFeedMenu,
   Blue2PinnedFeedTabs,
   useBlue2PinnedFeeds,
 } from '@/mastodon/features/blue2/pinned_feeds';
-import { Blue2InternalFeed } from '@/mastodon/features/blue2/internal_feed';
-
-// BLUELAB_INTEGRATION: optional BlueLab shell widgets and localized labels.
-import { blue2Text } from '@/bluelab/i18n/blue2';
-import { openNavigation } from '@/mastodon/actions/navigation';
-import { Blue2Announcements } from '@/mastodon/features/blue2/announcements';
-import { Blue2HomeFeedTitleBar } from '@/mastodon/features/blue2/feed_header';
-import { ColumnSettingsMenu } from '@/mastodon/components/column_header';
-import { FeedColumnSettings } from '@/mastodon/features/public_timeline/components/feed_column_settings';
-import { HomeColumnSettings } from '@/mastodon/features/home_timeline/components/column_settings_redesign';
-import { Blue2ComposeLauncher } from '@/mastodon/features/blue2/compose_launcher';
-import { Blue2Navigation } from '@/mastodon/features/blue2/navigation';
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { HomeColumnSettings } from '@/mastodon/features/home_timeline/components/column_settings_redesign';
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';
+import { FeedColumnSettings } from '@/mastodon/features/public_timeline/components/feed_column_settings';
 import { ComposePanel } from '@/mastodon/features/ui/components/compose_panel';
 import { customFavicon, customInstanceLogo } from '@/mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
@@ -54,11 +53,7 @@ const isIosSafariBrowser = () => {
     /iPad|iPhone|iPod/.test(ua) ||
     (platform === 'MacIntel' && window.navigator.maxTouchPoints > 1);
 
-  return (
-    ios &&
-    /Safari\//.test(ua) &&
-    !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua)
-  );
+  return ios && /Safari\//.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
 };
 
 const TabsBarPortal: React.FC<React.ComponentProps<'div'>> = (props) => {
@@ -122,8 +117,8 @@ export const ColumnsAreaRedesign: React.FC<{
     (isBlue2Home || isBlue2Global) && !isBlue2MessagesPage;
   const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
   const { feeds: pinnedFeeds } = useBlue2PinnedFeeds();
-  const [selectedFeedKey, setSelectedFeedKey] = useState<string | null>(
-    () => (location.pathname === '/public' ? 'global' : null),
+  const [selectedFeedKey, setSelectedFeedKey] = useState<string | null>(() =>
+    location.pathname === '/public' ? 'global' : null,
   );
 
   useEffect(() => {
@@ -138,11 +133,11 @@ export const ColumnsAreaRedesign: React.FC<{
   const activeFeedTitle =
     selectedFeedKey === 'global'
       ? blue2Text(intl.locale, 'global')
-      : selectedPinnedFeed?.title ??
+      : (selectedPinnedFeed?.title ??
         intl.formatMessage({
           id: 'account.following',
           defaultMessage: 'Following',
-        });
+        }));
   const blue2FeedTitle = isBlue2FeedPage ? activeFeedTitle : null;
   const feedTabsRef = useRef<HTMLDivElement>(null);
   const feedTabsTrackRef = useRef<HTMLDivElement>(null);
@@ -571,44 +566,44 @@ export const ColumnsAreaRedesign: React.FC<{
                       isIosSafari
                         ? {
                             transform:
-                              'translate3d(-' +
-                              iosFeedTabsOffset +
-                              'px, 0, 0)',
+                              'translate3d(-' + iosFeedTabsOffset + 'px, 0, 0)',
                           }
                         : undefined
                     }
-                  >                    <button
-                    type='button'
-                    className={
-                      selectedFeedKey === null
-                        ? classes.blue2TabActive
-                        : classes.blue2Tab
-                    }
-                    onClick={() => selectFeedTab(null)}
                   >
-                    <FormattedMessage
-                      id='account.following'
-                      defaultMessage='Following'
+                    {' '}
+                    <button
+                      type='button'
+                      className={
+                        selectedFeedKey === null
+                          ? classes.blue2TabActive
+                          : classes.blue2Tab
+                      }
+                      onClick={() => selectFeedTab(null)}
+                    >
+                      <FormattedMessage
+                        id='account.following'
+                        defaultMessage='Following'
+                      />
+                    </button>
+                    <button
+                      type='button'
+                      className={
+                        selectedFeedKey === 'global'
+                          ? classes.blue2TabActive
+                          : classes.blue2Tab
+                      }
+                      onClick={() => selectFeedTab('global')}
+                    >
+                      {blue2Text(intl.locale, 'global')}
+                    </button>
+                    <Blue2PinnedFeedTabs
+                      activeKey={selectedFeedKey}
+                      onSelect={selectFeedTab}
+                      tabClassName={classes.blue2Tab}
+                      activeTabClassName={classes.blue2TabActive}
+                      showIcons={false}
                     />
-                  </button>
-                  <button
-                    type='button'
-                    className={
-                      selectedFeedKey === 'global'
-                        ? classes.blue2TabActive
-                        : classes.blue2Tab
-                    }
-                    onClick={() => selectFeedTab('global')}
-                  >
-                    {blue2Text(intl.locale, 'global')}
-                  </button>
-                  <Blue2PinnedFeedTabs
-                    activeKey={selectedFeedKey}
-                    onSelect={selectFeedTab}
-                    tabClassName={classes.blue2Tab}
-                    activeTabClassName={classes.blue2TabActive}
-                    showIcons={false}
-                  />
                   </div>
                 </div>
                 <Blue2PinnedFeedMenu />

@@ -9,13 +9,13 @@ import { openURL } from '@/mastodon/actions/search';
 import type { ApiMentionJSON } from '@/mastodon/api_types/statuses';
 import { getCollectionPath } from '@/mastodon/features/collections/utils';
 import { useAppDispatch } from '@/mastodon/store';
+import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import {
   getLocalUrlPath,
   handleFederatedLinkClick,
   resolveFederatedLink,
 } from '@/mastodon/utils/federated_links';
 import type { OnElementHandler } from '@/mastodon/utils/html';
-import { isRedesignEnabled } from '@/mastodon/utils/environment';
 
 import { HashtagMenu } from '../hashtag_menu';
 import { MenuTriggerText } from '../menu';

@@ -1,29 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
+
 import { useLocation, useParams } from 'react-router-dom';
 
-import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 import { List as ImmutableList } from 'immutable';
 
+import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
-import ReplyIcon from '@/material-icons/400-24px/reply.svg?react';
-import StarIcon from '@/material-icons/400-24px/star-fill.svg?react';
-import StarBorderIcon from '@/material-icons/400-24px/star.svg?react';
-
-import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
-
-import { importFetchedStatus } from '@/mastodon/actions/importer';
-import { toggleFavourite } from '@/mastodon/actions/interactions';
-import { fetchStatus } from '@/mastodon/actions/statuses';
 import {
   directComposeInline,
   replyComposeInline,
   resetCompose,
 } from '@/mastodon/actions/compose';
-import { connectDirectStream } from '@/mastodon/actions/streaming';
-import { browserHistory } from '@/mastodon/components/router';
 import {
   expandConversations,
   fetchConversation,
@@ -33,22 +23,31 @@ import {
   mountConversations,
   unmountConversations,
 } from '@/mastodon/actions/conversations';
-import { dismissComposer } from '@/mastodon/reducers/slices/composer';
-import { RedesignComposeForm } from '@/mastodon/features/compose/redesign';
+import { importFetchedStatus } from '@/mastodon/actions/importer';
+import { toggleFavourite } from '@/mastodon/actions/interactions';
+import { fetchStatus } from '@/mastodon/actions/statuses';
+import { connectDirectStream } from '@/mastodon/actions/streaming';
+import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
+import { compareId } from '@/mastodon/compare_id';
+import AttachmentList from '@/mastodon/components/attachment_list';
 import { Avatar } from '@/mastodon/components/avatar';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
-import { LoadingIndicator } from '@/mastodon/components/loading_indicator';
-import AttachmentList from '@/mastodon/components/attachment_list';
-import StatusContent from '@/mastodon/components/status/legacy/content';
 import { DisplayNameSimple } from '@/mastodon/components/display_name/simple';
-import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
-import { compareId } from '@/mastodon/compare_id';
 import { IconButton } from '@/mastodon/components/icon_button';
+import { LoadingIndicator } from '@/mastodon/components/loading_indicator';
+import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
+import { browserHistory } from '@/mastodon/components/router';
+import StatusContent from '@/mastodon/components/status/legacy/content';
+import { RedesignComposeForm } from '@/mastodon/features/compose/redesign';
 import { me } from '@/mastodon/initial_state';
 import type { StatusShape } from '@/mastodon/models/status';
+import { dismissComposer } from '@/mastodon/reducers/slices/composer';
 import { makeGetStatus } from '@/mastodon/selectors';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import ReplyIcon from '@/material-icons/400-24px/reply.svg?react';
+import StarIcon from '@/material-icons/400-24px/star-fill.svg?react';
+import StarBorderIcon from '@/material-icons/400-24px/star.svg?react';
 
 import classes from './message_conversation.module.scss';
 
@@ -79,7 +78,8 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   const { id: routeId } = useParams<{ id: string }>();
   const id = conversationId ?? routeId;
   const location = useLocation();
-  const sourceStatusId = (location.state as { statusId?: string } | undefined)?.statusId;
+  const sourceStatusId = (location.state as { statusId?: string } | undefined)
+    ?.statusId;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [messageStatusIds, setMessageStatusIds] = useState<string[]>([]);
@@ -88,9 +88,9 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   const [highlightedStatusId, setHighlightedStatusId] = useState<string | null>(
     null,
   );
-  const [pendingScrollStatusId, setPendingScrollStatusId] = useState<string | null>(
-    null,
-  );
+  const [pendingScrollStatusId, setPendingScrollStatusId] = useState<
+    string | null
+  >(null);
 
   const conversationItems = useAppSelector(
     (state) =>
@@ -317,7 +317,11 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   } | null>(null);
 
   useEffect(() => {
-    if (!id || !conversation || initialReadStateRef.current?.conversationId === id) {
+    if (
+      !id ||
+      !conversation ||
+      initialReadStateRef.current?.conversationId === id
+    ) {
       return;
     }
 
@@ -345,7 +349,10 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     }
 
     return (
-      <Column label={intl.formatMessage(messages.title)} className={classes.column}>
+      <Column
+        label={intl.formatMessage(messages.title)}
+        className={classes.column}
+      >
         {content}
       </Column>
     );
@@ -586,160 +593,162 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         <div className={classes.messageList} ref={messageListRef}>
           <div className={classes.messageListContent}>
             {statuses.map((status) => {
-            const isMine = status.getIn(['account', 'id']) === me;
-            const displayAccount = status.get('account');
-            const statusText =
-              typeof status.get('text') === 'string'
-                ? (status.get('text') as string)
-                : '';
-            const mentions = status.get('mentions') as Immutable.List<
-              Immutable.Map<string, unknown>
-            >;
-            const trimmedText = statusText.trimStart();
-            const showSenderName =
-              mentions?.size > 1 ||
-              mentions?.some((mention) => {
-                const acct = mention.get('acct');
-                const username = mention.get('username');
-                const startsWithMention =
-                  (typeof acct === 'string' &&
-                    trimmedText.startsWith(`@${acct}`)) ||
-                  (typeof username === 'string' &&
-                    trimmedText.startsWith(`@${username}`));
+              const isMine = status.getIn(['account', 'id']) === me;
+              const displayAccount = status.get('account');
+              const statusText =
+                typeof status.get('text') === 'string'
+                  ? (status.get('text') as string)
+                  : '';
+              const mentions = status.get('mentions') as Immutable.List<
+                Immutable.Map<string, unknown>
+              >;
+              const trimmedText = statusText.trimStart();
+              const showSenderName =
+                mentions?.size > 1 ||
+                mentions?.some((mention) => {
+                  const acct = mention.get('acct');
+                  const username = mention.get('username');
+                  const startsWithMention =
+                    (typeof acct === 'string' &&
+                      trimmedText.startsWith(`@${acct}`)) ||
+                    (typeof username === 'string' &&
+                      trimmedText.startsWith(`@${username}`));
 
-                return !startsWithMention;
-              });
+                  return !startsWithMention;
+                });
 
-            const replyTargetId = status.get('in_reply_to_id') as
-              | string
-              | null;
-            const replyTarget = replyTargetId
-              ? statuses.find((candidate) => candidate.get('id') === replyTargetId)
-              : undefined;
-            const replyTargetText =
-              replyTarget && typeof replyTarget.get('text') === 'string'
-                ? (replyTarget.get('text') as string)
-                : '';
+              const replyTargetId = status.get('in_reply_to_id') as
+                | string
+                | null;
+              const replyTarget = replyTargetId
+                ? statuses.find(
+                    (candidate) => candidate.get('id') === replyTargetId,
+                  )
+                : undefined;
+              const replyTargetText =
+                replyTarget && typeof replyTarget.get('text') === 'string'
+                  ? (replyTarget.get('text') as string)
+                  : '';
 
-            return (
-              <article
-                id={`message-${status.get('id') as string}`}
-                key={status.get('id') as string}
-                className={
-                  highlightedStatusId === (status.get('id') as string)
-                    ? classes.message + ' ' + classes.messageHighlighted
-                    : classes.message
-                }
-                data-own-message={isMine ? 'true' : 'false'}
-              >
-                <div className={classes.messageMeta}>
-                  <Avatar account={displayAccount} size={20} />
-                  {showSenderName && (
-                    <strong>
-                      <DisplayNameSimple account={displayAccount} />
-                    </strong>
+              return (
+                <article
+                  id={`message-${status.get('id') as string}`}
+                  key={status.get('id') as string}
+                  className={
+                    highlightedStatusId === (status.get('id') as string)
+                      ? classes.message + ' ' + classes.messageHighlighted
+                      : classes.message
+                  }
+                  data-own-message={isMine ? 'true' : 'false'}
+                >
+                  <div className={classes.messageMeta}>
+                    <Avatar account={displayAccount} size={20} />
+                    {showSenderName && (
+                      <strong>
+                        <DisplayNameSimple account={displayAccount} />
+                      </strong>
+                    )}
+                    <RelativeTimestamp timestamp={status.get('created_at')} />
+                  </div>
+
+                  {replyTarget && (
+                    <button
+                      type='button'
+                      className={classes.replyContext}
+                      aria-label={intl.formatMessage(
+                        {
+                          id: 'messages.conversation.replying_to',
+                          defaultMessage: 'Replying to {name}',
+                        },
+                        {
+                          name:
+                            replyTarget.getIn(['account', 'display_name']) ||
+                            replyTarget.getIn(['account', 'username']),
+                        },
+                      )}
+                      onClick={() => scrollToStatus(replyTargetId)}
+                    >
+                      <span className={classes.replyContextHeader}>
+                        <ReplyIcon
+                          className={classes.replyContextIcon}
+                          aria-hidden='true'
+                        />
+                        <FormattedMessage
+                          id='messages.conversation.replying_to'
+                          defaultMessage='Replying to {name}'
+                          values={{
+                            name: (
+                              <DisplayNameSimple
+                                account={replyTarget.get('account')}
+                              />
+                            ),
+                          }}
+                        />
+                      </span>
+                      <span className={classes.replyContextText}>
+                        {replyTargetText.slice(0, 120) +
+                          (replyTargetText.length > 120 ? '…' : '')}
+                      </span>
+                    </button>
                   )}
-                  <RelativeTimestamp timestamp={status.get('created_at')} />
-                </div>
 
-                {replyTarget && (
-                  <button
-                    type='button'
-                    className={classes.replyContext}
-                    aria-label={intl.formatMessage(
-                      {
-                        id: 'messages.conversation.replying_to',
-                        defaultMessage: 'Replying to {name}',
-                      },
-                      {
-                        name:
-                          replyTarget.getIn(['account', 'display_name']) ||
-                          replyTarget.getIn(['account', 'username']),
-                      },
-                    )}
-                    onClick={() => scrollToStatus(replyTargetId)}
-                  >
-                    <span className={classes.replyContextHeader}>
-                      <ReplyIcon
-                        className={classes.replyContextIcon}
-                        aria-hidden='true'
-                      />
-                      <FormattedMessage
-                        id='messages.conversation.replying_to'
-                        defaultMessage='Replying to {name}'
-                        values={{
-                          name: (
-                            <DisplayNameSimple
-                              account={replyTarget.get('account')}
-                            />
-                          ),
-                        }}
-                      />
-                    </span>
-                    <span className={classes.replyContextText}>
-                      {replyTargetText.slice(0, 120) +
-                        (replyTargetText.length > 120 ? '…' : '')}
-                    </span>
-                  </button>
-                )}
+                  <div className={classes.messageBody}>
+                    <StatusContent
+                      // @ts-expect-error Legacy StatusContent typing.
+                      status={status}
+                      expanded
+                    />
+                  </div>
 
-                <div className={classes.messageBody}>
-                  <StatusContent
-                    // @ts-expect-error Legacy StatusContent typing.
-                    status={status}
-                    expanded
-                  />
-                </div>
+                  {status.get('media_attachments').size > 0 && (
+                    <AttachmentList
+                      compact
+                      media={status.get('media_attachments')}
+                    />
+                  )}
 
-                {status.get('media_attachments').size > 0 && (
-                  <AttachmentList
-                    compact
-                    media={status.get('media_attachments')}
-                  />
-                )}
-
-                <div className={classes.messageActions}>
-                  <IconButton
-                    className={classes.messageAction}
-                    title={intl.formatMessage({
-                      id: 'status.reply',
-                      defaultMessage: 'Reply',
-                    })}
-                    icon='reply'
-                    iconComponent={ReplyIcon}
-                    onClick={() => handleReply(status)}
-                  />
-                  <IconButton
-                    className={
-                      classes.messageAction +
-                      ' ' +
-                      classes.messageFavourite +
-                      ' star-icon'
-                    }
-                    animate
-                    active={!!status.get('favourited')}
-                    title={intl.formatMessage(
-                      status.get('favourited')
-                        ? {
-                            id: 'status.remove_favourite',
-                            defaultMessage: 'Remove from favorites',
-                          }
-                        : {
-                            id: 'status.favourite',
-                            defaultMessage: 'Favorite',
-                          },
-                    )}
-                    icon='star'
-                    iconComponent={
-                      status.get('favourited') ? StarIcon : StarBorderIcon
-                    }
-                    onClick={() =>
-                      dispatch(toggleFavourite(status.get('id') as string))
-                    }
-                  />
-                </div>
-              </article>
-            );
+                  <div className={classes.messageActions}>
+                    <IconButton
+                      className={classes.messageAction}
+                      title={intl.formatMessage({
+                        id: 'status.reply',
+                        defaultMessage: 'Reply',
+                      })}
+                      icon='reply'
+                      iconComponent={ReplyIcon}
+                      onClick={() => handleReply(status)}
+                    />
+                    <IconButton
+                      className={
+                        classes.messageAction +
+                        ' ' +
+                        classes.messageFavourite +
+                        ' star-icon'
+                      }
+                      animate
+                      active={!!status.get('favourited')}
+                      title={intl.formatMessage(
+                        status.get('favourited')
+                          ? {
+                              id: 'status.remove_favourite',
+                              defaultMessage: 'Remove from favorites',
+                            }
+                          : {
+                              id: 'status.favourite',
+                              defaultMessage: 'Favorite',
+                            },
+                      )}
+                      icon='star'
+                      iconComponent={
+                        status.get('favourited') ? StarIcon : StarBorderIcon
+                      }
+                      onClick={() =>
+                        dispatch(toggleFavourite(status.get('id') as string))
+                      }
+                    />
+                  </div>
+                </article>
+              );
             })}
           </div>
         </div>
@@ -753,9 +762,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
             onSuccess={(status: ApiStatusJSON) => {
               dispatch(importFetchedStatus(status));
               setMessageStatusIds((current) =>
-                current.includes(status.id)
-                  ? current
-                  : [...current, status.id],
+                current.includes(status.id) ? current : [...current, status.id],
               );
 
               participantAccountsRef.current.forEach((account) => {

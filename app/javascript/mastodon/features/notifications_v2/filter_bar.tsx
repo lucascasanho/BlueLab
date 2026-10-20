@@ -6,16 +6,16 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { StackIcon } from '@phosphor-icons/react';
 
 import HomeIcon from '@/material-icons/400-24px/home-fill.svg?react';
-import ReplyAllLegacyIcon from '@/material-icons/400-24px/reply_all.svg?react';
 import InsertChartIcon from '@/material-icons/400-24px/insert_chart.svg?react';
 import PersonAddIcon from '@/material-icons/400-24px/person_add.svg?react';
+import ReplyAllLegacyIcon from '@/material-icons/400-24px/reply_all.svg?react';
 import { setNotificationsFilter } from 'mastodon/actions/notification_groups';
+import { Icon } from 'mastodon/components/icon';
 import {
   StatusBoostIcon,
   StatusLikeIcon,
   StatusReplyIcon,
 } from 'mastodon/components/status/icons';
-import { Icon } from 'mastodon/components/icon';
 import {
   selectSettingsNotificationsQuickFilterActive,
   selectSettingsNotificationsQuickFilterAdvanced,
