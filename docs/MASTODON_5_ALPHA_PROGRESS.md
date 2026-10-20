@@ -4,7 +4,7 @@ Atualizado em: 2026-10-20 (UTC)
 Repositório: [lucascasanho/BlueLab](https://github.com/lucascasanho/BlueLab)  
 Canal de trabalho: `BlueLab-Test`  
 SHA auditado no início desta retomada: `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea`  
-Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código auditado neste checkpoint: `a341efc8e734d941f6d7851f2678fe0826ee953a`; as validações automatizadas desse conjunto de correções ainda estão pendentes.
+Estado: **em correção e validação; não considerar pronto para aprovação**. Último commit de código auditado neste checkpoint: `8a0e2d5f4ead2cc46644eb410622b89d6425245f`; a validação automatizada dessa rodada segue pendente.
 
 ## Escopo e proteções
 
@@ -25,6 +25,7 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 - **Falhou no SHA inicial:** JavaScript Linting, formatação, Ruby/RSpec e E2E. As correções subsequentes estão sendo verificadas por novos workflows; consultar o histórico abaixo e não tratar a integração como validada enquanto os jobs atuais não passarem.
 - O primeiro bloqueio E2E (`Themes#available_theme_colors` ausente e `config/themes.yml` no formato antigo) foi corrigido na etapa 2 pelo commit `b573c59c`. Uma rodada posterior identificou `User#setting_theme_color` ausente no helper de tema; o accessor e um teste unitário foram adicionados no commit `1440c38c`. A correção precisa ser confirmada por uma nova rodada E2E.
 - A CI Ruby do SHA `bc5bbed` revelou que `BugReportsController#sanitize_path` chamava `truncate` sobre `nil` quando `current_path` era uma string vazia (`''.split('?').first`); esse cenário já é coberto pelo spec de relato iniciado numa página de erro. A correção em `007ddc85` transforma a primeira parte ausente em string vazia antes de truncar.
+- Os specs também confirmaram que o seletor de tema do site para papéis com `manage_settings` estava ausente da tela de aparência, apesar de as traduções e os exemplos já estarem no repositório. A UI e a persistência via `Setting.theme` foram restauradas no commit `e203d9ae`; a segurança do update é verificada pela permissão do papel e pela lista de temas existente.
 - Também há evidência de discrepância entre migrações e `db/schema.rb`: o modelo/testes de selo de verificação usam `verified_badge_visible`, coluna ausente do schema exportado, apesar de existir a migração `db/migrate/20260926151300_add_verified_badge_visible_to_accounts.rb`.
 - O commit `8b2c6e8281065a0bd968d9134920bc36ff78b3da` já tentou incluir tabelas BlueLab no schema, mas a execução atual demonstra que é necessário conferir a cobertura de colunas/tabelas customizadas, não apenas o nome do commit.
 - O PR #201 usa `qa/mastodon-5-alpha-validation-20261019` como base e `BlueLab-Test` como head, foi criado exclusivamente para disparar CI e **não deve ser mesclado**.
@@ -147,6 +148,8 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 | 2026-10-20 | 48 | Aplicadas as últimas correções Oxfmt em navegação, página de status e tipos de grupos de notificação. | Formatação corrigida no branch de teste; confirmação oficial pendente. | `4dd73682bdf83f7226ae5aad7af4a11123aac317` |
 | 2026-10-20 | 49 | Corrigidos dois testes customizados: a especificação `VerificationRequest#resolve!` agora cria uma conta persistida antes de criar a associação; o teste de bug report usa `user.account` em vez do antigo `token.resource_owner.account`, incompatível com o Doorkeeper atual. | Ajustes em specs; a nova execução Ruby do commit mais recente deve confirmar se eliminam essas falhas. | `a4e99ed2cf824a79873f2bc0abb3042b96f52dad` |
 | 2026-10-20 | 50 | Removida a optional chain redundante em `location.state.statusId`, após explicitar o tipo de estado do React Router na conversa direta. | A execução ESLint de `09cf196` apontou esse único erro restante; correção publicada para nova validação. | `a341efc8e734d941f6d7851f2678fe0826ee953a` |
+| 2026-10-20 | 51 | Restaurado o seletor administrativo de tema global em `settings/preferences/appearance`, com autorização `manage_settings`, validação contra temas conhecidos e gravação em `Setting.theme`; `user_params` ignora a antiga preferência por usuário `theme`. | Código e view publicados; Ruby Testing, Haml Linting e formatação do SHA seguinte devem confirmar o comportamento. | `e203d9ae998e81c4751e2a22d4abd8c284045a3c` |
+| 2026-10-20 | 52 | Corrigido o tipo da tabela `COPY` para idiomas suportados e restaurado `ComposerPublishError` ('empty' ou 'too-long') removido do reducer durante a integração. | Corrige diagnósticos TS2322 no modal de bug report e TS2304 no compositor reportados pela CI de `46d27a3`; validação no próximo job ainda pendente. | `8a0e2d5f4ead2cc46644eb410622b89d6425245f` |
 
 ## Referências da execução
 
