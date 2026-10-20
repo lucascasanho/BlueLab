@@ -19,26 +19,28 @@ RSpec.describe 'OCR', :attachment_processing, :inline_jobs, :js, :streaming do
     expect(page).to have_css('div.app-holder')
 
     if page.has_css?('body[data-theme="blue-2"]')
-      click_button frontend_translations('compose_form.placeholder')
-    else
-      click_button frontend_translations('compose.new')
-      click_button frontend_translations('compose.new.post')
-    end
-
-    within('[data-bluelab-composer]') do
-      find_field(type: 'file', visible: :all).attach_file(file_fixture('text.png'))
-      click_button frontend_translations('compose.upload.edit')
-    end
-
-    within('form[role="dialog"]') do
-      attach_file(file_fixture('text.png')) do
-        click_on(frontend_translations('upload_button.label'))
+      within('[data-bluelab-composer]') do
+        find_field(type: 'file', visible: :all).attach_file(file_fixture('text.png'))
+        click_button frontend_translations('compose.upload.edit')
       end
 
-      click_on(frontend_translations('alt_text_badge.label'))
-    end
+      # The image is already attached in Blue2, so use the editor's OCR action.
+      click_on(frontend_translations('alt_text_modal.add_text_from_image'))
+    else
+      within('nav') do
+        click_on frontend_translations('tabs_bar.publish')
+      end
 
-    click_on(frontend_translations('alt_text_modal.add_text_from_image'))
+      within('form[role="dialog"]') do
+        attach_file(file_fixture('text.png')) do
+          click_on(frontend_translations('upload_button.label'))
+        end
+
+        click_on(frontend_translations('alt_text_badge.label'))
+      end
+
+      click_on(frontend_translations('alt_text_modal.add_text_from_image'))
+    end
 
     expect(page).to have_css('#description', text: /Hello Mastodon\s*/, wait: 20)
   end

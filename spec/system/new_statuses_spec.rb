@@ -28,8 +28,10 @@ RSpec.describe 'NewStatuses', :inline_jobs, :js, :streaming do
       click_button frontend_translations('compose.publish')
     end
 
+    click_on frontend_translations('compose.published.open')
+
     expect(page)
-      .to have_css('article[data-id]', text: status_text)
+      .to have_css('.status__content__text', text: status_text)
   end
 
   def visit_homepage
