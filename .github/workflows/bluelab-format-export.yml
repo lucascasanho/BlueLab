@@ -6,7 +6,7 @@ on:
     paths:
       - '.github/workflows/bluelab-format-export.yml'
 permissions:
-  contents: read
+  contents: write
 jobs:
   format-export:
     runs-on: ubuntu-latest
@@ -18,6 +18,15 @@ jobs:
         uses: ./.github/actions/setup-javascript
       - name: Format repository files
         run: yarn format
+      - name: Commit formatter-only changes to test branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet; then
+            git add -u
+            git commit -m "style: apply Oxfmt to BlueLab alpha integration"
+            git push origin HEAD:refs/heads/BlueLab-Test
+          fi
       - name: Export formatter patch
         run: |
           git diff --binary > /tmp/bluelab-format.patch
