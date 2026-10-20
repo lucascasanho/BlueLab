@@ -1,6 +1,6 @@
 import { useIntl } from 'react-intl';
 
-const labels: Record<string, string> = {
+const labels: Partial<Record<string, string>> & { en: string } = {
   en: 'Report a bug',
   pt: 'Relatar bug',
   es: 'Informar un error',

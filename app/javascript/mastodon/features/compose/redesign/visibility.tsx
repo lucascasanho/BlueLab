@@ -100,7 +100,6 @@ export const ComposeVisibility: React.FC<{
         >
           <ComposeVisibilityButtonText
             privacy={privacy}
-            activeThreadItemId={activeThreadItemId}
           />
         </MenuTrigger>
 
@@ -116,8 +115,7 @@ export const ComposeVisibility: React.FC<{
 
 const ComposeVisibilityButtonText: React.FC<{
   privacy: StatusVisibility;
-  activeThreadItemId: string | null;
-}> = ({ privacy, activeThreadItemId }) => {
+}> = ({ privacy }) => {
   if (privacy === 'public') {
     return (
       <FormattedMessage id='privacy.public.short' defaultMessage='Public' />

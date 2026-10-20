@@ -21,7 +21,7 @@ const safeString = (value: unknown): string => {
   if (value instanceof Error) return value.message;
 
   try {
-    return JSON.stringify(value ?? '') ?? '';
+    return JSON.stringify(value ?? '');
   } catch {
     return '';
   }
@@ -81,7 +81,7 @@ const installErrorListeners = () => {
 
     recordClientError({
       type: 'javascript',
-      message: error?.message ?? event.message ?? 'Unknown JavaScript error',
+      message: error?.message ?? event.message,
       stack: error?.stack,
       source: event.filename,
     });

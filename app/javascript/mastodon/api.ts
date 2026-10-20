@@ -128,7 +128,7 @@ export default function api(withAuthorization = true) {
         url !== '/api/v1/bug_reports' &&
         (status === undefined || status >= 500 || status === 429)
       ) {
-        const requestId = error.response?.headers['x-request-id'];
+        const requestId = error.response?.headers.get('x-request-id');
 
         recordClientError({
           type: 'api',
