@@ -233,10 +233,9 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
     }
   }, [copy, description, files, intl.locale]);
 
-  const handleDescriptionChange = useCallback<React.ChangeEventHandler<HTMLTextAreaElement>>(
-    (event) => setDescription(event.target.value),
-    [],
-  );
+  const handleDescriptionChange = useCallback<
+    React.ChangeEventHandler<HTMLTextAreaElement>
+  >((event) => setDescription(event.target.value), []);
 
   const handleDragOver = useCallback<React.DragEventHandler<HTMLDivElement>>(
     (event) => {
@@ -264,7 +263,9 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
     fileInputRef.current?.click();
   }, []);
 
-  const handleFileInputChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const handleFileInputChange = useCallback<
+    React.ChangeEventHandler<HTMLInputElement>
+  >(
     (event) => {
       if (event.target.files) addFiles(event.target.files);
       event.target.value = '';

@@ -293,7 +293,6 @@ export const ComposeRedesignButton: React.FC<{
     );
   }
 
-
   if (displayState === 'minimized') {
     if (isBlue2) {
       // Keep the minimized launcher inside RedesignMobileNavigation instead of

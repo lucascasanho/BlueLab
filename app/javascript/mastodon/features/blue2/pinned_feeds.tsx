@@ -166,26 +166,26 @@ export const createPinnedHashtagFeed = (tag: string): Blue2PinnedFeed => {
   };
 };
 
-const createAddListClickHandler = (
-  addFeed: (feed: Blue2PinnedFeed) => void,
-  listId: string,
-  listTitle: string,
-) => () => addFeed(createPinnedListFeed(listId, listTitle));
+const createAddListClickHandler =
+  (
+    addFeed: (feed: Blue2PinnedFeed) => void,
+    listId: string,
+    listTitle: string,
+  ) =>
+  () =>
+    addFeed(createPinnedListFeed(listId, listTitle));
 
-const createAddHashtagClickHandler = (
-  addFeed: (feed: Blue2PinnedFeed) => void,
-  tagName: string,
-) => () => addFeed(createPinnedHashtagFeed(tagName));
+const createAddHashtagClickHandler =
+  (addFeed: (feed: Blue2PinnedFeed) => void, tagName: string) => () =>
+    addFeed(createPinnedHashtagFeed(tagName));
 
-const createRemoveFeedClickHandler = (
-  removeFeed: (key: string) => void,
-  key: string,
-) => () => removeFeed(key);
+const createRemoveFeedClickHandler =
+  (removeFeed: (key: string) => void, key: string) => () =>
+    removeFeed(key);
 
-const createSelectFeedClickHandler = (
-  onSelect: (key: string) => void,
-  key: string,
-) => () => onSelect(key);
+const createSelectFeedClickHandler =
+  (onSelect: (key: string) => void, key: string) => () =>
+    onSelect(key);
 
 interface Blue2PinnedFeedMenuProps {
   showRemoveSection?: boolean;
@@ -275,7 +275,11 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
               <MenuItem
                 key={list.id}
                 icon={RssSimpleIcon}
-                onClick={createAddListClickHandler(addFeed, list.id, list.title)}
+                onClick={createAddListClickHandler(
+                  addFeed,
+                  list.id,
+                  list.title,
+                )}
               >
                 {list.title}
               </MenuItem>

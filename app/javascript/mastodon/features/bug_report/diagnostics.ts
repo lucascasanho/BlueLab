@@ -92,7 +92,11 @@ const installErrorListeners = () => {
 
     recordClientError({
       type: 'unhandled_rejection',
-      message: reason?.message ?? (safeString(event.reason).length > 0 ? safeString(event.reason) : 'Unhandled rejection'),
+      message:
+        reason?.message ??
+        (safeString(event.reason).length > 0
+          ? safeString(event.reason)
+          : 'Unhandled rejection'),
       stack: reason?.stack,
     });
   });

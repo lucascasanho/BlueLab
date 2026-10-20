@@ -130,7 +130,9 @@ export const NotificationWithStatus: React.FC<{
     }
   }, [dispatch, isPrivateMention, statusId]);
 
-  const handleCardKeyDown = useCallback<React.KeyboardEventHandler<HTMLDivElement>>(
+  const handleCardKeyDown = useCallback<
+    React.KeyboardEventHandler<HTMLDivElement>
+  >(
     (event) => {
       if (event.target !== event.currentTarget) return;
       if (event.key !== 'Enter' && event.key !== ' ') return;

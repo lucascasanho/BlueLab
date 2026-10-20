@@ -145,18 +145,17 @@ interface AccountSwitcherState {
   removeAccount: (event: React.MouseEvent, accountId: string) => void;
 }
 
-const createSwitchAccountClickHandler = (
-  switchAccount: AccountSwitcherState['switchAccount'],
-  account: StoredAccount,
-) =>
+const createSwitchAccountClickHandler =
+  (
+    switchAccount: AccountSwitcherState['switchAccount'],
+    account: StoredAccount,
+  ) =>
   () => {
     void switchAccount(account);
   };
 
-const createRemoveAccountClickHandler = (
-  removeAccount: AccountSwitcherState['removeAccount'],
-  accountId: string,
-) =>
+const createRemoveAccountClickHandler =
+  (removeAccount: AccountSwitcherState['removeAccount'], accountId: string) =>
   (event: React.MouseEvent<HTMLButtonElement>) => {
     removeAccount(event, accountId);
   };
@@ -289,7 +288,10 @@ const AccountList: React.FC<{
               data-menu-item={variant === 'navigation' ? true : undefined}
               aria-current={active ? 'page' : undefined}
               disabled={active || switchingId !== null}
-              onClick={createSwitchAccountClickHandler(switchAccount, storedAccount)}
+              onClick={createSwitchAccountClickHandler(
+                switchAccount,
+                storedAccount,
+              )}
             >
               <img
                 src={storedAccount.avatar}
@@ -341,7 +343,10 @@ const AccountList: React.FC<{
                   },
                   { account: label },
                 )}
-                onClick={createRemoveAccountClickHandler(removeAccount, storedAccount.id)}
+                onClick={createRemoveAccountClickHandler(
+                  removeAccount,
+                  storedAccount.id,
+                )}
               >
                 ×
               </button>
