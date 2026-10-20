@@ -79,6 +79,8 @@ type DisplayState = 'hidden' | 'showing' | 'minimized';
 
 export type ComposeType = 'post' | 'message' | 'reply' | 'replyPrivate';
 
+export type ComposerPublishError = 'empty' | 'too-long';
+
 export type ComposerEditor = 'bluelab' | 'mastodon';
 
 export interface ComposerOrigin {

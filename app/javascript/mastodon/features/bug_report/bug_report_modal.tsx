@@ -31,7 +31,7 @@ interface Copy {
   characters: string;
 }
 
-const COPY: Record<string, Copy> = {
+const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr', Copy> = {
   en: {
     title: 'Report a bug',
     lead: 'Describe what went wrong and attach screenshots, GIFs, audio or video when useful.',
