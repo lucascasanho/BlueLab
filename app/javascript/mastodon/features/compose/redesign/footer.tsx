@@ -1,7 +1,12 @@
 import type React from 'react';
 import { useCallback, useRef, useState } from 'react';
 
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import {
+  defineMessages,
+  FormattedMessage,
+  FormattedNumber,
+  useIntl,
+} from 'react-intl';
 
 import classNames from 'classnames';
 
@@ -172,11 +177,7 @@ export const ComposeFooter: React.FC<{
             )}
           >
             {current > max && <WarningCircleIcon weight='fill' />}
-            <FormattedMessage
-              id='compose.counter_remaining'
-              defaultMessage='{remaining, number}'
-              values={{ remaining: max - current }}
-            />
+            <FormattedNumber value={max - current} />
           </span>
         )}
 
@@ -203,9 +204,7 @@ export const ComposeFooter: React.FC<{
             disabled={!canSubmit}
             loading={isSubmitting}
           >
-            {!isMessage && !scheduledAt && (
-              <FormattedMessage id='compose.publish' defaultMessage='Publish' />
-            )}
+            {!isMessage && !scheduledAt && publishText}
             {!isMessage && scheduledAt && (
               <FormattedMessage
                 id='compose.schedule.submit'
