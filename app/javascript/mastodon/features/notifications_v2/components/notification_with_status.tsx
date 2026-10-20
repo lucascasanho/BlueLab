@@ -1,4 +1,5 @@
-import { useMemo, type MouseEvent } from 'react';
+import { useMemo  } from 'react';
+import type {MouseEvent} from 'react';
 
 import classNames from 'classnames';
 
@@ -144,7 +145,7 @@ export const NotificationWithStatus: React.FC<{
           <span>{label}</span>
         </h2>
 
-        <div onClick={(event) => event.stopPropagation()}>
+        <div onClick={(event) => { event.stopPropagation(); }}>
           <Status
             id={statusId}
             contextType='notifications'

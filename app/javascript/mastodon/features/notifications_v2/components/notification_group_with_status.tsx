@@ -1,5 +1,5 @@
-import { useMemo, type MouseEvent } from 'react';
-import type { JSX } from 'react';
+import { useMemo  } from 'react';
+import type {MouseEvent, JSX } from 'react';
 
 import classNames from 'classnames';
 
@@ -166,7 +166,7 @@ export const NotificationGroupWithStatus: React.FC<{
           {statusId && (
             <div
               className='notification-group__main__status'
-              onClick={(event) => event.stopPropagation()}
+              onClick={(event) => { event.stopPropagation(); }}
             >
               <EmbeddedStatus statusId={statusId} onOpen={handleStatusOpen} />
             </div>

@@ -188,7 +188,7 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
   if (
     !account ||
     !hasVerifiedRole(account) ||
-    account.verified_badge_visible === false
+    !account.verified_badge_visible
   ) {
     return null;
   }

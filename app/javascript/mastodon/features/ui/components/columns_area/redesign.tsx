@@ -53,7 +53,7 @@ const isIosSafariBrowser = () => {
     /iPad|iPhone|iPod/.test(ua) ||
     (platform === 'MacIntel' && window.navigator.maxTouchPoints > 1);
 
-  return ios && /Safari\//.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+  return ios && ua.includes('Safari/') && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
 };
 
 const TabsBarPortal: React.FC<React.ComponentProps<'div'>> = (props) => {
@@ -579,7 +579,7 @@ export const ColumnsAreaRedesign: React.FC<{
                           ? classes.blue2TabActive
                           : classes.blue2Tab
                       }
-                      onClick={() => selectFeedTab(null)}
+                      onClick={() => { selectFeedTab(null); }}
                     >
                       <FormattedMessage
                         id='account.following'
@@ -593,7 +593,7 @@ export const ColumnsAreaRedesign: React.FC<{
                           ? classes.blue2TabActive
                           : classes.blue2Tab
                       }
-                      onClick={() => selectFeedTab('global')}
+                      onClick={() => { selectFeedTab('global'); }}
                     >
                       {blue2Text(intl.locale, 'global')}
                     </button>

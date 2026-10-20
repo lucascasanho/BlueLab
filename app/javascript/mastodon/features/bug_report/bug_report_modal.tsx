@@ -9,7 +9,7 @@ import { Button } from '@/mastodon/components/button';
 import classes from './bug_report_modal.module.scss';
 import { getBugReportDiagnostics } from './diagnostics';
 
-type Copy = {
+interface Copy {
   title: string;
   lead: string;
   description: string;
@@ -29,7 +29,7 @@ type Copy = {
   required: string;
   sendError: string;
   characters: string;
-};
+}
 
 const COPY: Record<string, Copy> = {
   en: {
@@ -151,7 +151,7 @@ const Preview: React.FC<{
 }> = ({ file, onRemove, removeLabel }) => {
   const url = useMemo(() => URL.createObjectURL(file), [file]);
 
-  useEffect(() => () => URL.revokeObjectURL(url), [url]);
+  useEffect(() => () => { URL.revokeObjectURL(url); }, [url]);
 
   return (
     <div className={classes.previewCard}>
@@ -215,7 +215,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
       form.append('app_version', diagnostics.app_version);
       form.append('client_errors', JSON.stringify(diagnostics.client_errors));
 
-      files.forEach((file) => form.append('files[]', file, file.name));
+      files.forEach((file) => { form.append('files[]', file, file.name); });
 
       await api().post('/api/v1/bug_reports', form);
       setSubmitted(true);
@@ -258,7 +258,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
           className={classes.textarea}
           value={description}
           maxLength={5000}
-          onChange={(event) => setDescription(event.target.value)}
+          onChange={(event) => { setDescription(event.target.value); }}
           placeholder={copy.placeholder}
           autoFocus
           rows={8}
@@ -278,7 +278,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
               event.preventDefault();
               setDragging(true);
             }}
-            onDragLeave={() => setDragging(false)}
+            onDragLeave={() => { setDragging(false); }}
             onDrop={(event) => {
               event.preventDefault();
               setDragging(false);
@@ -308,10 +308,9 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
                 <Preview
                   key={`${file.name}-${file.lastModified}-${index}`}
                   file={file}
-                  onRemove={() =>
-                    setFiles((current) =>
+                  onRemove={() => { setFiles((current) =>
                       current.filter((_, fileIndex) => fileIndex !== index),
-                    )
+                    ); }
                   }
                   removeLabel={copy.remove}
                 />
