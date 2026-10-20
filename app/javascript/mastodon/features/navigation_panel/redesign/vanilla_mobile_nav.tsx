@@ -20,7 +20,7 @@ import { Avatar } from '@/mastodon/components/avatar';
 import { Button, IconButton } from '@/mastodon/components/button/redesign';
 import { Menu, MenuList, MenuTrigger } from '@/mastodon/components/menu';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
-import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { ComposeRedesignButton } from '@/mastodon/features/compose/vanilla_redesign/trigger';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
@@ -34,7 +34,7 @@ import {
   RedesignNavigationPanel,
   useNotificationsCount,
   handleSearchLinkClick,
-} from '.';
+} from './vanilla_navigation_panel';
 import { AccountMenuItems } from './vanilla_account_card_and_menu';
 import { LogoLockup } from './vanilla_navigation_header';
 import classes from './vanilla_mobile_nav.module.scss';
