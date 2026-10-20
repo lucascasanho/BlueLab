@@ -1,5 +1,5 @@
 name: Temporary BlueLab format pass
-# Run once after the latest alpha-merge fixes.
+# Run formatter after the latest TypeScript fixes (pass 2).
 on:
   push:
     branches:
