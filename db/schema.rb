@@ -26,6 +26,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_161747) do
   create_table "account_conversations", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.bigint "conversation_id", null: false
+    t.bigint "last_read_status_id"
     t.bigint "last_status_id"
     t.integer "lock_version", default: 0, null: false
     t.bigint "participant_account_ids", default: [], null: false, array: true
@@ -235,6 +236,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_161747) do
     t.string "uri"
     t.string "url"
     t.string "username", default: "", null: false
+    t.boolean "verified_badge_visible", default: true, null: false
     t.datetime "verified_by_role_since"
     t.index "(((setweight(to_tsvector('simple'::regconfig, (display_name)::text), 'A'::\"char\") || setweight(to_tsvector('simple'::regconfig, (username)::text), 'B'::\"char\")) || setweight(to_tsvector('simple'::regconfig, (COALESCE(domain, ''::character varying))::text), 'C'::\"char\")))", name: "search_index", using: :gin
     t.index "lower((username)::text), COALESCE(lower((domain)::text), ''::text)", name: "index_accounts_on_username_and_domain_lower", unique: true
@@ -628,6 +630,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_161747) do
 
   create_table "fasp_providers", force: :cascade do |t|
     t.string "base_url", null: false
+    t.jsonb "capabilities", default: [], null: false
     t.boolean "confirmed", default: false, null: false
     t.string "contact_email"
     t.datetime "created_at", null: false
