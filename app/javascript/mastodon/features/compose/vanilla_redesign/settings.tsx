@@ -10,7 +10,7 @@ import {
 } from '@/mastodon/actions/compose';
 import { setComposeQuotePolicy } from '@/mastodon/actions/compose_typed';
 import type { ApiQuotePolicy } from '@/mastodon/api_types/quotes';
-import { IconButton } from '@/mastodon/components/button/redesign';
+import { IconButton } from '@/mastodon/components/button/vanilla_redesign';
 import {
   Menu,
   MenuItemCheckbox,
