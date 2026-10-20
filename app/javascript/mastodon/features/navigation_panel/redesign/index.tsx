@@ -4,7 +4,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { Link } from 'react-router-dom';
 
-import type { Map as ImmutableMap } from 'immutable';
+import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import {
   PenNibIcon,
@@ -16,7 +16,6 @@ import {
   BookmarkSimpleIcon,
   StarIcon,
   PlusIcon,
-  InfoIcon,
 } from '@phosphor-icons/react';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
@@ -31,7 +30,6 @@ import { fetchLists } from '@/mastodon/actions/lists';
 import { closeNavigation } from '@/mastodon/actions/navigation';
 import { connectDirectStream } from '@/mastodon/actions/streaming';
 import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
-import { Button } from '@/mastodon/components/button/redesign';
 import { Callout } from '@/mastodon/components/callout/redesign';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 import { groupedConversationRepresentatives } from '@/mastodon/features/direct_timeline/conversation_grouping';
@@ -162,7 +160,9 @@ export const RedesignNavigationPanel: React.FC<{
     selectUnreadNotificationGroupsCount,
   );
   const unreadMessagesCount = useAppSelector((state) => {
-    const conversations = state.conversations.get('items');
+    const conversations = state.conversations.get(
+      'items',
+    ) as ImmutableList<ImmutableMap<string, unknown>>;
 
     return groupedConversationRepresentatives(conversations).filter(
       (conversation) => conversation.get('unread'),
