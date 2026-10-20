@@ -1,4 +1,9 @@
-- bluelab_error = current_theme == 'blue-2'
+:ruby
+  bluelab_error = begin
+    current_theme == 'blue-2'
+  rescue ActiveRecord::ConnectionNotEstablished, ActiveRecord::NoDatabaseError, PG::ConnectionBad
+    false
+  end
 
 !!!
 %html{ lang: I18n.locale, data: { theme: (bluelab_error ? 'blue-2' : nil), contrast: 'auto', color_scheme: 'auto', system_theme: (bluelab_error ? 'true' : nil) } }
