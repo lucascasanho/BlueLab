@@ -39,10 +39,10 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 
 ### Etapa 2 — compatibilidade de temas / erros HTTP 500
 
-- [ ] Inspecionar os usos de `available_theme_colors` e a configuração atual de temas do Mastodon 5.
-- [ ] Corrigir a chamada obsoleta preservando a intenção visual BlueLab sem reintroduzir APIs removidas do upstream.
-- [ ] Executar os testes focados de helper/layout e pelo menos um smoke de renderização.
-- [ ] Registrar commit e resultados.
+- [x] Inspecionar os usos de `available_theme_colors` e a configuração atual de temas do Mastodon 5.
+- [x] Corrigir a chamada obsoleta preservando a intenção visual BlueLab, usando o contrato atual do upstream.
+- [x] Adicionar teste focado para a paleta configurada do tema BlueLab.
+- [ ] Aguardar os testes focados de helper/layout, build do Vite e CI do novo SHA; confirmar também que a preferência de cor não ficou vazia.
 
 ### Etapa 3 — schema e migrações BlueLab
 
@@ -71,7 +71,8 @@ A integração do alpha já está presente em `BlueLab-Test`; houve alterações
 
 | Data (UTC) | Etapa | Alteração | Validação | SHA |
 |---|---|---|---|---|
-| 2026-10-20 | 1 | Criado checkpoint com estado inicial, escopo, CI e plano de correção. | Estado inicial auditado; CI do SHA `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea` consultada. | Pendente de retorno da API após gravação |
+| 2026-10-20 | 1 | Criado checkpoint com estado inicial, escopo, CI e plano de correção. | Estado inicial auditado; CI do SHA `70c69b0a3b0eff0ab9df6ea36c9b0f8974947cea` consultada. | `0a9c63a1c6392e04cfa512890d7d59cfc1db9efb` |
+| 2026-10-20 | 2 | Restaurado o contrato `Themes#available_theme_colors`, atualizado `config/themes.yml` para o formato `path`/`colors` aceito pelo Mastodon atual, e adicionado teste para a paleta BlueLab. | Correção publicada no canal de teste. Testes e CI do novo SHA ainda pendentes; não declarar a etapa validada antes dos resultados. | `b573c59cf1c994d5cbc73febd10115afa54193df` |
 
 ## Referências da execução
 
