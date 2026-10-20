@@ -41,6 +41,12 @@ Esses commits mostram que o redesenho oficial continuou recebendo refinamentos a
 - Preservar as funções próprias do BlueLab e os temas BlueLab/Bird UI.
 - Não fazer merge amplo nem substituir arquivos em lote sem revisão dos diffs por área.
 
+## Etapa 4 — auditoria de dependências do modal de boost (em andamento)
+- Localizado o componente correto no upstream: `app/javascript/mastodon/features/ui/components/boost_modal.tsx`; o arquivo correspondente no BlueLab usa a implementação anterior com `EmbeddedStatus`, `PrivacyDropdown` e a assinatura `onReblog(status, privacy)`.
+- O commit oficial `e1ce504c20f8d3ed7c40aceb16b2f0cd5931f6e1` substitui essa interface por `ModalShell`, `QuotedStatus`, `Menu` e `ComposeVisibilityButtonText`, além de adicionar `boost_modal.module.scss`. Portanto, não é uma troca isolada de CSS nem uma substituição segura de um único arquivo.
+- Confirmada a existência no canal de teste dos componentes `components/menu/index.tsx`, `components/modal_shell/redesign.tsx`, `components/status/quote.tsx` e `features/compose/redesign/visibility.tsx`. Ainda é necessário verificar compatibilidade das APIs, a integração em `modal_root.jsx`, os callbacks de boost e os testes antes de aplicar a mudança.
+- Não foi alterado o código funcional nesta etapa; a intenção é evitar quebrar o fluxo de boost/quote ao importar apenas parte do redesign oficial.
+
 ## Validação pendente
 - Executar testes de Sass/build e lint.
 - Verificar visualmente Vanilla em desktop e mobile, nos esquemas claro/escuro.
