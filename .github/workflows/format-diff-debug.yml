@@ -1,0 +1,26 @@
+name: Temporary formatting diff (remove after use)
+on:
+  push:
+    branches:
+      - BlueLab-Test
+permissions:
+  contents: read
+jobs:
+  format-diff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Set up Javascript environment
+        uses: ./.github/actions/setup-javascript
+      - name: Run Oxfmt and print only the patch
+        shell: bash
+        run: |
+          yarn format
+          echo "::group::FORMAT_DIFF_STAT"
+          git --no-pager diff --stat
+          echo "::endgroup::"
+          echo "::group::FORMAT_DIFF"
+          git --no-pager diff --no-ext-diff --unified=2
+          echo "::endgroup::"
