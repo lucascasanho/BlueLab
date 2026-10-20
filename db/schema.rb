@@ -358,6 +358,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_161747) do
     t.index ["status_id"], name: "index_bookmarks_on_status_id"
   end
 
+  create_table "bug_reports", force: :cascade do |t|
+    t.string "app_version"
+    t.bigint "account_id"
+    t.bigint "assigned_account_id"
+    t.string "browser"
+    t.string "browser_version"
+    t.jsonb "client_errors", default: [], null: false
+    t.string "current_path"
+    t.datetime "created_at", null: false
+    t.text "description", null: false
+    t.string "error_page"
+    t.string "interface_language"
+    t.string "interface_layout"
+    t.string "operating_system"
+    t.string "operating_system_version"
+    t.string "request_id"
+    t.datetime "resolved_at"
+    t.bigint "resolved_by_account_id"
+    t.integer "status", default: 0, null: false
+    t.string "theme"
+    t.datetime "updated_at", null: false
+    t.string "viewport"
+    t.text "user_agent"
+    t.index ["account_id"], name: "index_bug_reports_on_account_id"
+    t.index ["assigned_account_id"], name: "index_bug_reports_on_assigned_account_id"
+    t.index ["resolved_by_account_id"], name: "index_bug_reports_on_resolved_by_account_id"
+  end
+
   create_table "bulk_import_rows", force: :cascade do |t|
     t.bigint "bulk_import_id", null: false
     t.datetime "created_at", null: false
@@ -816,6 +844,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_161747) do
   create_table "media_attachments", id: :bigint, default: -> { "timestamp_id('media_attachments'::text)" }, force: :cascade do |t|
     t.bigint "account_id"
     t.bigint "announcement_id"
+    t.bigint "bug_report_id"
     t.string "blurhash"
     t.datetime "created_at", precision: nil, null: false
     t.text "description"
@@ -840,6 +869,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_161747) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["account_id", "status_id"], name: "index_media_attachments_on_account_id_and_status_id", order: { status_id: :desc }
     t.index ["announcement_id"], name: "index_media_attachments_on_announcement_id"
+    t.index ["bug_report_id"], name: "index_media_attachments_on_bug_report_id"
     t.index ["scheduled_status_id"], name: "index_media_attachments_on_scheduled_status_id", where: "(scheduled_status_id IS NOT NULL)"
     t.index ["shortcode"], name: "index_media_attachments_on_shortcode", unique: true, opclass: :text_pattern_ops, where: "(shortcode IS NOT NULL)"
     t.index ["status_id"], name: "index_media_attachments_on_status_id"
@@ -1528,6 +1558,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_161747) do
     t.index ["repository", "channel"], name: "index_upstream_update_checks_on_repository_and_channel", unique: true
   end
 
+  create_table "verification_requests", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.text "explanation", default: "", null: false
+    t.datetime "resolved_at"
+    t.bigint "resolved_by_account_id"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_verification_requests_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["account_id"], name: "index_verification_requests_on_account_id_pending", unique: true, where: "(status = 0)"
+    t.index ["resolved_by_account_id"], name: "index_verification_requests_on_resolved_by_account_id"
+  end
+
   create_table "user_invite_requests", force: :cascade do |t|
     t.datetime "created_at", precision: nil, null: false
     t.text "text"
@@ -1691,6 +1734,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_161747) do
   add_foreign_key "bookmarks", "statuses", on_delete: :cascade
   add_foreign_key "bulk_import_rows", "bulk_imports", on_delete: :cascade
   add_foreign_key "bulk_imports", "accounts", on_delete: :cascade
+  add_foreign_key "bug_reports", "accounts", on_delete: :cascade
+  add_foreign_key "bug_reports", "accounts", column: "assigned_account_id", on_delete: :nullify
+  add_foreign_key "bug_reports", "accounts", column: "resolved_by_account_id", on_delete: :nullify
   add_foreign_key "canonical_email_blocks", "accounts", column: "reference_account_id", on_delete: :cascade
   add_foreign_key "collection_items", "accounts"
   add_foreign_key "collection_items", "collections", on_delete: :cascade
@@ -1741,6 +1787,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_161747) do
   add_foreign_key "markers", "users", on_delete: :cascade
   add_foreign_key "media_attachments", "accounts", name: "fk_96dd81e81b", on_delete: :nullify
   add_foreign_key "media_attachments", "announcements", on_delete: :nullify
+  add_foreign_key "media_attachments", "bug_reports", on_delete: :cascade
   add_foreign_key "media_attachments", "scheduled_statuses", on_delete: :nullify
   add_foreign_key "media_attachments", "statuses", on_delete: :nullify
   add_foreign_key "mentions", "accounts", name: "fk_970d43f9d1", on_delete: :cascade
@@ -1815,6 +1862,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_161747) do
   add_foreign_key "users", "invites", on_delete: :nullify
   add_foreign_key "users", "oauth_applications", column: "created_by_application_id", on_delete: :nullify
   add_foreign_key "users", "user_roles", column: "role_id", on_delete: :nullify
+  add_foreign_key "verification_requests", "accounts"
+  add_foreign_key "verification_requests", "accounts", column: "resolved_by_account_id"
   add_foreign_key "web_push_subscriptions", "oauth_access_tokens", column: "access_token_id", on_delete: :cascade
   add_foreign_key "web_push_subscriptions", "users", on_delete: :cascade
   add_foreign_key "web_settings", "users", name: "fk_11910667b2", on_delete: :cascade
