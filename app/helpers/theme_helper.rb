@@ -50,8 +50,8 @@ module ThemeHelper
     )
   end
 
-  # Validated semantic-token overrides. Keeping this after the selected theme
-  # lets every theme retain its structure while instance colors stay authoritative.
+  # Keep instance palette overrides on the alternative themes only. The default
+  # Vanilla theme must use Mastodon's own token and color-palette system.
   def instance_customization_styles
     accent = safe_customization_color(:instance_accent_color, fallback: '#6364ff')
     light_background = safe_customization_color(:instance_light_background_color, fallback: '#ffffff')
@@ -73,11 +73,12 @@ module ThemeHelper
     css = <<~CSS
       :root {
         #{logo_token}
+      }
+      html:has(body[data-theme=blue-2]),
+      html:has(body[data-theme=mastodon-bird-ui-auto]) {
         --color-bg-brand-base: #{accent};
         --color-bg-brand-base-hover: color-mix(in srgb, #{accent}, black 15%);
-
-        // Legacy semantic aliases used by Bird UI and older Mastodon controls.
-        // They intentionally resolve to the administrator-selected instance accent.
+        /* Legacy semantic aliases are scoped to the two alternative themes. */
         --color-brand-mastodon: #{accent};
         --color-brand-mastodon-links: #{accent};
         --color-accent: #{accent};
@@ -89,7 +90,10 @@ module ThemeHelper
         --color-bg-brand-soft: color-mix(in srgb, #{accent}, transparent 85%);
         --color-bg-brand-softest: color-mix(in srgb, #{accent}, transparent 90%);
       }
-      [data-color-scheme=dark], html:not([data-color-scheme]) {
+      html[data-color-scheme=dark]:has(body[data-theme=blue-2]),
+      html:not([data-color-scheme]):has(body[data-theme=blue-2]),
+      html[data-color-scheme=dark]:has(body[data-theme=mastodon-bird-ui-auto]),
+      html:not([data-color-scheme]):has(body[data-theme=mastodon-bird-ui-auto]) {
         --color-bg: #{dark_background};
         --color-bg-primary: #{dark_background};
         --color-bg-ambient: #{dark_background};
@@ -106,7 +110,8 @@ module ThemeHelper
         --color-text-status-links: var(--color-text-brand);
         --color-border-brand: var(--color-text-brand);
       }
-      [data-color-scheme=light] {
+      html[data-color-scheme=light]:has(body[data-theme=blue-2]),
+      html[data-color-scheme=light]:has(body[data-theme=mastodon-bird-ui-auto]) {
         --color-bg: #{light_background};
         --color-bg-primary: #{light_background};
         --color-bg-ambient: #{light_background};

@@ -72,3 +72,14 @@ Três refinamentos visuais do upstream foram integrados seletivamente no canal d
 - Também existem regras explicitamente escopadas em `app/javascript/mastodon/components/column_header/styles.module.scss` para `body[data-theme='mastodon-5']` e `body[data-theme='mastodon-bird-ui-auto']`. Essas regras precisam ser auditadas para garantir que o tema mastodon-5 não esteja sendo usado como substituto do Vanilla nem influencie outras escolhas de tema.
 - Próxima sequência obrigatória: (1) rastrear por que as colunas aparecem invertidas; (2) mapear todos os usos de aliases legados de espaçamento/raio e overrides de cores; (3) remover o efeito global BlueLab por migração/escopo, preservando comportamento dos temas BlueLab e Bird UI; (4) adicionar verificações de escopo quando viável; (5) executar build, lint e testes e registrar o resultado.
 - Não houve correção funcional nesta etapa. Tudo permanece em `BlueLab-Test`; não promover para `BlueLab` sem aprovação explícita.
+
+
+## Etapa 7 — isolamento do Vanilla em relação ao tema BlueLab
+- Referência upstream: Mastodon commit `5204e8ab940f870dbf13863ee92c48febfc4eedb` usado como base da atualização alpha.1.
+- Comparação dos módulos CSS compartilhados encontrou 19 folhas divergentes. O CSS oficial agora é a base; os estilos customizados anteriores são carregados dentro de `body[data-theme='blue-2']`. Ajustes explícitos para Bird UI e `mastodon-5` mantêm seus próprios seletores.
+- `app/javascript/styles/application.scss` voltou à versão oficial. A aplicação global de aliases de espaçamento e borda foi removida de `html`; o mixin legado é fornecido somente pelo tema BlueLab em `blue-2-v23.scss`.
+- O `components.scss` compartilhado agora usa a folha upstream como base. Overrides de layout que alteravam compositor, detalhes/status, barra de navegação, painel de composição e navegação móvel foram movidos para `body[data-theme='blue-2']`. Estilos de funções independentes, como instalações PWA, emoji zoom, upload e recursos de acessibilidade/verificação, foram preservados como estilos compartilhados.
+- Cores semânticas configuradas pela administração deixaram de ser atribuídas globalmente em `:root`; a paleta do site fica limitada aos temas BlueLab e Bird UI. O logotipo da instância continua global como identidade do site.
+- Tokens legados nos estilos do seletor de conta, conversas diretas e publicações agendadas foram trocados pelos tokens nativos do Mastodon. Na folha do Bird UI foi corrigido o único alias de raio encontrado na auditoria das 117 folhas SCSS.
+- Adicionada regressão RSpec garantindo que os tokens globais carreguem apenas o logotipo e que a paleta de instância fique limitada aos temas alternativos.
+- Arquivos preparados exclusivamente para `BlueLab-Test`; branch estável não alterada nem promovida. Build, RSpec e inspeção visual ainda dependem das verificações após commit.

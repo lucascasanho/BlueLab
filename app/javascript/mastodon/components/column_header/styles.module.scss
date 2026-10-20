@@ -46,7 +46,7 @@
 }
 
 .layout {
-  --column-header-padding: var(--space-3) var(--space-3) var(--space-1);
+  --column-header-padding: var(--space-2) var(--space-3);
 
   position: relative;
   display: grid;
@@ -144,9 +144,201 @@
   // }
 }
 
-// Mastodon 5 uses rounded column surfaces from the navigation redesign preview.
-// Keep this override strictly scoped to the theme so other themes retain their
-// existing column header treatment.
+/* BlueLab-only overrides. The upstream stylesheet above remains active for Vanilla and other themes. */
+:global(body[data-theme='blue-2']) {
+  .root {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding-top: var(--space-1);
+    color: var(--color-text-primary);
+    background: var(--color-bg-desktop);
+  
+    html[data-density='compact'] & {
+      padding-top: 0;
+      background: var(--color-bg-primary);
+    }
+  
+    @media (width <= variables.$mobile-menu-breakpoint) {
+      padding-top: 0;
+      background: var(--color-bg-primary);
+    }
+  
+    // Scroll fade that overlays the scrollable content below
+    &::after {
+      content: '';
+      pointer-events: none;
+      position: absolute;
+      top: 100%;
+      inset-inline: 0;
+      z-index: -1;
+      height: var(--space-10);
+      background: linear-gradient(
+        to bottom,
+        var(--color-bg-primary),
+        transparent
+      );
+      transition:
+        opacity,
+        transform 250ms ease-out;
+    }
+  
+    &.rootScrolledToTop::after {
+      opacity: 0;
+      transition-timing-function: ease-in;
+      transform: translateY(calc(-1 * var(--space-6)));
+    }
+  }
+  
+  .layout {
+    --column-header-padding: var(--space-3) var(--space-3) var(--space-1);
+  
+    position: relative;
+    display: grid;
+  
+    // Ensure title is centered regardless of side-content
+    grid-template-columns:
+      minmax(min-content, 1fr)
+      minmax(0, auto)
+      minmax(min-content, 1fr);
+    align-items: center;
+  
+    // Ensure that a header without buttons is as tall as one with buttons
+    min-height: 48px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: var(--radius-6) var(--radius-6) 0 0;
+    background: var(--color-bg-primary);
+  
+    html[data-density='compact'] & {
+      border-radius: 0;
+      background: transparent;
+    }
+  
+    @media (width <= variables.$mobile-menu-breakpoint) {
+      border-radius: 0;
+      background: transparent;
+    }
+  
+    // html[data-color-scheme='dark'] & {
+    //   border: var(--border-default);
+    //   border-bottom: none;
+    // }
+  }
+  
+  .unreadButton {
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    margin-inline: auto;
+    width: max-content;
+    max-width: 100%;
+  
+    :global(body.layout-multiple-columns) & {
+      margin-top: var(--space-1);
+    }
+  }
+  
+  .leftButton {
+    grid-area: 1 / 1;
+    justify-self: start;
+    padding: var(--column-header-padding);
+    cursor: default;
+  }
+  
+  .rightButtons {
+    grid-area: 1 / 3;
+    display: flex;
+    align-items: center;
+    justify-self: end;
+    padding: var(--column-header-padding);
+    cursor: default;
+  }
+  
+  .title {
+    @include mixins.type-heading-sm;
+  
+    grid-area: 1 / 2;
+    white-space: nowrap;
+    min-width: 0;
+    padding: var(--column-header-padding);
+  
+    > button {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
+      padding: 0;
+      border: none;
+      font: inherit;
+      color: inherit;
+      background: transparent;
+      border-radius: var(--radius-2);
+  
+      &:focus-visible {
+        outline: var(--outline-focus-default);
+        outline-offset: 2px;
+      }
+    }
+  }
+  
+  .extraStickyContent {
+    background: var(--color-bg-primary);
+  
+    // html[data-color-scheme='dark'] & {
+    //   border-inline: var(--border-default);
+    // }
+  }
+  
+  // Mastodon 5 uses rounded column surfaces from the navigation redesign preview.
+  // Keep this override strictly scoped to the theme so other themes retain their
+  // existing column header treatment.
+  :global(body[data-theme='mastodon-5']) {
+    .root {
+      border-top: 0;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  
+    .layout,
+    .extraStickyContent {
+      background: var(--m5-surface, var(--color-bg-secondary));
+      color: var(--m5-text, var(--color-text-primary));
+    }
+  
+    .layout {
+      min-height: 48px;
+      padding: 10px 14px;
+      border-radius: 16px 16px 0 0;
+      background-image: none;
+    }
+  
+    .title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+  }
+  
+  // Bird UI title bars must be opaque and use the exact page background.
+  // This covers the redesigned ColumnHeader CSS-module surface.
+  :global(body[data-theme='mastodon-bird-ui-auto']) {
+    .root {
+      background: var(--color-bg) !important;
+      background-color: var(--color-bg) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+  
+    .layout,
+    .extraStickyContent {
+      background: var(--color-bg) !important;
+      background-color: var(--color-bg) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+  }
+}
+
 :global(body[data-theme='mastodon-5']) {
   .root {
     border-top: 0;
@@ -173,9 +365,6 @@
     font-weight: 700;
   }
 }
-
-// Bird UI title bars must be opaque and use the exact page background.
-// This covers the redesigned ColumnHeader CSS-module surface.
 :global(body[data-theme='mastodon-bird-ui-auto']) {
   .root {
     background: var(--color-bg) !important;

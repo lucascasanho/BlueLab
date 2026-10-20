@@ -7,9 +7,8 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  padding: var(--space-2xs);
-  inset: unset; // override default [popover] UA styles (upstream #40448)
-  border-radius: var(--radius-md);
+  inset: unset; // override default [popover] UA styles
+  border-radius: var(--radius-4);
   background: var(--color-bg-primary);
   overflow: hidden;
   z-index: calc(infinity);
@@ -20,25 +19,10 @@
 
   &:not(&:has(.scrollableInnerCard)) {
     padding: var(--space-1);
-    padding-bottom: var(--space-half);
   }
 
   &[data-elevation='2'] {
     @include mixins.elevation-2;
-  }
-
-  :global(body[data-theme='blue-2']) & {
-    // Native popovers are rendered in the browser top layer. When that API is
-    // unavailable and the menu falls back to a document-body portal, use a
-    // concrete stacking level above BlueLab's tablet/main-column chrome rather
-    // than relying only on calc(infinity), which older engines may discard.
-    z-index: 1000;
-    max-height: calc(100dvh - 24px);
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scroll-padding-block: 12px;
   }
 }
 
@@ -47,7 +31,6 @@
   scrollbar-width: thin;
   overscroll-behavior: contain;
   padding: var(--space-1);
-  padding-bottom: var(--space-half);
 }
 
 .fullWidthCard {
@@ -58,13 +41,13 @@
   @include mixins.type-caption;
 
   color: var(--color-text-tertiary);
-  padding: var(--space-xs) var(--space-sm) 0;
+  padding: var(--space-2) var(--space-3) 0;
 }
 
 .itemDivider {
   height: 1px;
   background-color: var(--color-border-primary);
-  margin: var(--space-2xs) var(--space-sm);
+  margin: var(--space-1) var(--space-3);
   border: none;
 }
 
@@ -76,10 +59,9 @@
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  border-radius: var(--radius-sm);
-  gap: var(--space-xs);
-  margin-bottom: var(--space-half);
-  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-3);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   color: var(--color-text-primary);
   text-decoration: none;
   cursor: var(--cursor);
@@ -107,9 +89,14 @@
     background-color: var(--color-bg-highlight);
   }
 
+  &[aria-current='page'] {
+    font-weight: bold;
+    background-color: var(--color-bg-highlight);
+  }
+
   &:focus {
     // Override overeager global styles
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-3);
   }
 
   &:focus-visible {
@@ -143,7 +130,7 @@
   @include mixins.type-caption;
 
   display: block;
-  margin-top: var(--space-3xs);
+  margin-top: var(--space-half);
   color: var(--color-text-secondary);
 
   .item[aria-disabled='true'] &,
@@ -155,13 +142,181 @@
 }
 
 .itemIcon {
-  width: var(--space-lg);
-  height: var(--space-lg);
+  width: var(--space-5);
+  height: var(--space-5);
 }
 
 .itemTrailingContent {
   margin-inline-start: auto;
 
   // Add additional space after the text.
-  padding-inline-start: var(--space-xs);
+  padding-inline-start: var(--space-2);
+}
+
+/* BlueLab-only overrides. The upstream stylesheet above remains active for Vanilla and other themes. */
+:global(body[data-theme='blue-2']) {
+  .card {
+    @include mixins.elevation-1;
+  
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-2xs);
+    inset: unset; // override default [popover] UA styles (upstream #40448)
+    border-radius: var(--radius-md);
+    background: var(--color-bg-primary);
+    overflow: hidden;
+    z-index: calc(infinity);
+    max-height: var(--popover-height-available, 100vw); // Set by Popover component
+    max-width: var(--_max-card-width, 100vw);
+    min-width: var(--_min-card-width, 0);
+    text-align: start;
+  
+    &:not(&:has(.scrollableInnerCard)) {
+      padding: var(--space-1);
+      padding-bottom: var(--space-half);
+    }
+  
+    &[data-elevation='2'] {
+      @include mixins.elevation-2;
+    }
+  
+    & & {
+      // Native popovers are rendered in the browser top layer. When that API is
+      // unavailable and the menu falls back to a document-body portal, use a
+      // concrete stacking level above BlueLab's tablet/main-column chrome rather
+      // than relying only on calc(infinity), which older engines may discard.
+      z-index: 1000;
+      max-height: calc(100dvh - 24px);
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scroll-padding-block: 12px;
+    }
+  }
+  
+  .scrollableInnerCard {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    overscroll-behavior: contain;
+    padding: var(--space-1);
+    padding-bottom: var(--space-half);
+  }
+  
+  .fullWidthCard {
+    width: 100%;
+  }
+  
+  .itemGroupLabel {
+    @include mixins.type-caption;
+  
+    color: var(--color-text-tertiary);
+    padding: var(--space-xs) var(--space-sm) 0;
+  }
+  
+  .itemDivider {
+    height: 1px;
+    background-color: var(--color-border-primary);
+    margin: var(--space-2xs) var(--space-sm);
+    border: none;
+  }
+  
+  .item {
+    @include mixins.type-body-compact;
+  
+    --cursor: pointer;
+  
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    border-radius: var(--radius-sm);
+    gap: var(--space-xs);
+    margin-bottom: var(--space-half);
+    padding: var(--space-xs) var(--space-sm);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    cursor: var(--cursor);
+    transition:
+      background 200ms,
+      color 200ms;
+  
+    &:where(button) {
+      appearance: none;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: start;
+    }
+  
+    @media (width < variables.$mobile-menu-breakpoint) {
+      min-height: 48px;
+    }
+  
+    &:hover {
+      text-decoration: none;
+    }
+  
+    &:hover:not([aria-disabled='true']) {
+      background-color: var(--color-bg-highlight);
+    }
+  
+    &:focus {
+      // Override overeager global styles
+      border-radius: var(--radius-sm);
+    }
+  
+    &:focus-visible {
+      outline: var(--outline-focus-default);
+      outline-offset: -2px;
+    }
+  
+    &:active:not([aria-disabled='true']),
+    .itemActive {
+      background-color: var(--color-bg-inverted);
+      color: var(--color-text-inverted);
+  
+      label {
+        color: var(--color-text-inverted);
+      }
+    }
+  
+    &:has(:disabled),
+    &[aria-disabled='true'] {
+      --cursor: not-allowed;
+  
+      opacity: 0.5;
+    }
+  }
+  
+  .itemDestructive {
+    color: var(--color-text-error);
+  }
+  
+  .itemDescription {
+    @include mixins.type-caption;
+  
+    display: block;
+    margin-top: var(--space-3xs);
+    color: var(--color-text-secondary);
+  
+    .item[aria-disabled='true'] &,
+    .item:active &,
+    .itemActive &,
+    .itemDestructive & {
+      color: inherit;
+    }
+  }
+  
+  .itemIcon {
+    width: var(--space-lg);
+    height: var(--space-lg);
+  }
+  
+  .itemTrailingContent {
+    margin-inline-start: auto;
+  
+    // Add additional space after the text.
+    padding-inline-start: var(--space-xs);
+  }
 }

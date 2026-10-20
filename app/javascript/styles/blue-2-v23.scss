@@ -1,4 +1,13 @@
+@use '../bluelab/styles/legacy_tokens';
 @use 'blue-2-v21';
+
+/*
+ * Legacy layout tokens are available only while the BlueLab theme is selected.
+ * Vanilla and Bird UI use the original Mastodon token system without aliases.
+ */
+body[data-theme='blue-2'] {
+  @include legacy_tokens.apply;
+}
 
 /*
  * BlueLab settings navigation refinement.

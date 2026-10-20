@@ -9,124 +9,44 @@
 
   &:not(.buttonWrapperInline) {
     position: fixed;
-    bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
-    inset-inline-end: max(
-      calc(var(--space-md) + env(safe-area-inset-left)),
-      calc(var(--space-md) + env(safe-area-inset-right))
-    );
-    z-index: 100;
-    transition:
-      opacity 180ms ease,
-      transform 180ms ease,
-      visibility 0s linear;
+    bottom: var(--space-4);
+    right: var(--space-4);
+    z-index: 2;
   }
 }
 
-.mastodonButton:not(.buttonInline) {
-  display: none;
+.buttonWrapperHidden {
+  transform: translateX(calc(100% + var(--space-4)));
+  opacity: 0;
+  transition-timing-function: ease-in;
 }
 
-.composer,
-.composerMinimized {
-  position: fixed;
-  z-index: 101;
-  inset-inline-end: 0;
+.root {
   box-sizing: border-box;
-  pointer-events: auto;
-  isolation: isolate;
-  transform-origin: var(--composer-origin-x, 100%)
-    var(--composer-origin-y, 100%);
-  animation: composer-enter 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-
-.composerBackdrop {
   position: fixed;
-  z-index: 99;
+  z-index: 2;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  appearance: none;
-  background: transparent;
-  cursor: default;
-}
-
-@keyframes composer-enter {
-  from {
-    opacity: 0;
-    transform: scale(0.16);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .composer,
-  .composerMinimized {
-    animation: none;
-  }
-}
-
-:global(.reduce-motion) .composer,
-:global(.reduce-motion) .composerMinimized {
-  animation: none;
-}
-
-.composer {
   top: env(safe-area-inset-top);
-  width: 100%;
-  height: var(--viewport-height, var(--composer-visual-viewport-height, 100vh));
-  max-height: 100vh;
-  margin: 0;
-  border-radius: 0;
+  transition: bottom 200ms ease-in-out;
+
+  @media (width < #{variables.$mobile-menu-breakpoint}) {
+    // Add a backdrop for the mobile composer to cover up the page
+    // behind the composer that can be visible on Safari iOS
+    &::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-color: var(--color-bg-primary);
+    }
+  }
 
   @media (width >= #{variables.$mobile-menu-breakpoint}) {
-    top: auto;
-    bottom: 0;
-    width: calc(100vw - var(--space-md) * 2);
-    min-width: 300px;
-    max-width: 500px;
-    height: auto;
-    min-height: 520px;
-    margin: var(--space-md);
-    border-radius: var(--radius-xl);
-  }
-}
-
-// When in the mobile view and the composer is open, disable scroll on the body element.
-// This prevents scrolling the textarea accidentally hitting the body instead.
-@media (width < #{variables.$mobile-menu-breakpoint}) {
-  body:has(.composer) {
-    overflow-y: hidden !important;
-  }
-}
-
-@media (width >= #{variables.$mobile-menu-breakpoint}) and (height <= 800px) {
-  .composer {
-    min-height: min(440px, calc(100dvh - var(--space-md) * 2));
-    max-height: calc(100dvh - var(--space-md) * 2);
     top: auto;
     display: grid;
     grid-template-columns: var(--columns-area-grid-columns);
     bottom: 0;
     pointer-events: none;
-  }
-}
-
-@media (width < #{variables.$mobile-menu-breakpoint}) {
-  .composer::before {
-    // Add a backdrop for the mobile composer to cover up the page
-    // behind the composer that can be visible on Safari iOS
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background-color: var(--color-bg-primary);
   }
 }
 
@@ -153,231 +73,394 @@
 }
 
 .composerMinimized {
-  bottom: 0;
-  width: min(320px, calc(100vw - var(--space-md) * 2));
-  padding: var(--space-md);
-  margin: var(--space-md);
-  border-radius: var(--radius-xl);
-
-  @media (width < #{variables.$mobile-menu-breakpoint}) {
-    bottom: var(--mobile-bottom-nav-height);
-    width: auto;
-    padding: 0;
-    border-radius: var(--radius-round);
-  }
+  cursor: pointer;
 }
 
-@media (width < #{variables.$mobile-menu-breakpoint}) {
-  .button:not(.buttonInline) {
-    opacity: 0;
-    pointer-events: none;
-    visibility: hidden;
-    transform: translateY(var(--space-md)) scale(0.9);
+/* BlueLab-only overrides. The upstream stylesheet above remains active for Vanilla and other themes. */
+:global(body[data-theme='blue-2']) {
+  .buttonWrapper {
+    position: relative;
+  
+    @media (prefers-reduced-motion: no-preference) {
+      transition: all 200ms ease-out;
+    }
+  
+    &:not(.buttonWrapperInline) {
+      position: fixed;
+      bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+      inset-inline-end: max(
+        calc(var(--space-md) + env(safe-area-inset-left)),
+        calc(var(--space-md) + env(safe-area-inset-right))
+      );
+      z-index: 100;
+      transition:
+        opacity 180ms ease,
+        transform 180ms ease,
+        visibility 0s linear;
+    }
   }
-
+  
   .mastodonButton:not(.buttonInline) {
-    display: inline-flex;
+    display: none;
   }
-
-  :global(.ui--mobile-chrome-hidden) .button:not(.buttonInline) {
-    opacity: 1;
+  
+  .composer,
+  .composerMinimized {
+    position: fixed;
+    z-index: 101;
+    inset-inline-end: 0;
+    box-sizing: border-box;
     pointer-events: auto;
-    visibility: visible;
-    transform: translateY(0) scale(1);
+    isolation: isolate;
+    transform-origin: var(--composer-origin-x, 100%)
+      var(--composer-origin-y, 100%);
+    animation: composer-enter 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    .button:not(.buttonInline) {
-      transition: none;
+  
+  .composerBackdrop {
+    position: fixed;
+    z-index: 99;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    appearance: none;
+    background: transparent;
+    cursor: default;
+  }
+  
+  @keyframes composer-enter {
+    from {
+      opacity: 0;
+      transform: scale(0.16);
+    }
+  
+    to {
+      opacity: 1;
+      transform: scale(1);
     }
   }
-
-  :global(.reduce-motion) .button:not(.buttonInline) {
-    transition: none;
-  }
-}
-
-// Mastodon 5.0 keeps composer access in the page layout, so the global
-// floating launcher must not appear. The theme gate prevents this rule from
-// affecting any other theme.
-:global(body[data-theme='mastodon-5']) .button:not(.buttonInline) {
-  display: none;
-}
-
-// BLUE 2.0 uses an inline launcher in the timeline and renders the redesigned
-// composer as a centered Bluesky-like dialog. These selectors are impossible
-// to match in other themes because the body data attribute is theme-specific.
-:global(body[data-theme='blue-2']) .button:not(.buttonInline) {
-  display: none;
-}
-
-.blue2ResumeButton {
-  position: fixed;
-  inset-inline-end: max(
-    calc(var(--space-md) + env(safe-area-inset-left)),
-    calc(var(--space-md) + env(safe-area-inset-right))
-  );
-  bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
-  z-index: 120;
-  pointer-events: auto;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 28%);
-  transition: bottom 180ms ease;
-}
-
-:global(body[data-theme='blue-2']) .composer {
-  top: 50%;
-  left: 50%;
-  right: auto;
-  bottom: auto;
-  inset-inline-end: auto;
-  width: min(600px, calc(100vw - 32px));
-  max-width: 600px;
-  min-height: 0;
-  max-height: calc(100dvh - 32px);
-  margin: 0;
-  border: 1px solid var(--blue2-border-soft, #17232c);
-  border-radius: 16px;
-  transform: translate(-50%, -50%);
-  animation: none;
-  box-shadow:
-    0 0 0 100vmax rgb(0 0 0 / 58%),
-    0 18px 50px rgb(0 0 0 / 35%);
-}
-
-:global(body[data-theme='blue-2']) .composerMinimized {
-  right: 20px;
-  bottom: 20px;
-  margin: 0;
-  border: 1px solid var(--blue2-border-soft, #17232c);
-  background: var(--blue2-bg, #000);
-}
-
-@media (width < #{variables.$mobile-menu-breakpoint}) {
-  .blue2ResumeButton {
-    bottom: calc(var(--mobile-bottom-nav-height, 64px) + var(--space-sm));
-  }
-
-  // The minimized launcher is portaled to <body>, while the scroll state class
-  // lives on .ui. Use :has() so the fixed button follows the same chrome state:
-  // above the bottom nav while it is visible, and near the viewport edge after
-  // the nav is hidden by downward scrolling.
-  :global(body:has(.ui--mobile-chrome-hidden)) .blue2ResumeButton {
-    bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
-  }
-
+  
   @media (prefers-reduced-motion: reduce) {
-    .blue2ResumeButton {
-      transition: none;
-    }
-  }
-
-  :global(.reduce-motion) .blue2ResumeButton {
-    transition: none;
-  }
-
-  // Keep the old minimized card safe as a fallback for non-standard mounts.
-  :global(body[data-theme='blue-2']) .composerMinimized {
-    bottom: calc(var(--mobile-bottom-nav-height, 64px) + var(--space-sm));
-  }
-
-  :global(body[data-theme='blue-2']:has(.ui--mobile-chrome-hidden))
+    .composer,
     .composerMinimized {
-    bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+      animation: none;
+    }
   }
-
-  // On phones the BlueLab composer is centered using VisualViewport's actual
-  // center instead of top: 50%, which can be wrong on iOS when the layout and
-  // visual viewports differ. The form flow is also forced back to
-  // header -> scrollable content -> footer so controls cannot invert order.
-  :global(body[data-theme='blue-2'])
-    .composer[data-bluelab-composer][role='dialog'] {
-    --composer-viewport-height: var(--composer-visual-viewport-height, 100dvh);
-
-    top: var(--composer-visual-viewport-center-y, 50dvh);
+  
+  :global(.reduce-motion) .composer,
+  :global(.reduce-motion) .composerMinimized {
+    animation: none;
+  }
+  
+  .composer {
+    top: env(safe-area-inset-top);
+    width: 100%;
+    height: var(--viewport-height, var(--composer-visual-viewport-height, 100vh));
+    max-height: 100vh;
+    margin: 0;
+    border-radius: 0;
+  
+    @media (width >= #{variables.$mobile-menu-breakpoint}) {
+      top: auto;
+      bottom: 0;
+      width: calc(100vw - var(--space-md) * 2);
+      min-width: 300px;
+      max-width: 500px;
+      height: auto;
+      min-height: 520px;
+      margin: var(--space-md);
+      border-radius: var(--radius-xl);
+    }
+  }
+  
+  // When in the mobile view and the composer is open, disable scroll on the body element.
+  // This prevents scrolling the textarea accidentally hitting the body instead.
+  @media (width < #{variables.$mobile-menu-breakpoint}) {
+    body:has(.composer) {
+      overflow-y: hidden !important;
+    }
+  }
+  
+  @media (width >= #{variables.$mobile-menu-breakpoint}) and (height <= 800px) {
+    .composer {
+      min-height: min(440px, calc(100dvh - var(--space-md) * 2));
+      max-height: calc(100dvh - var(--space-md) * 2);
+      top: auto;
+      display: grid;
+      grid-template-columns: var(--columns-area-grid-columns);
+      bottom: 0;
+      pointer-events: none;
+    }
+  }
+  
+  @media (width < #{variables.$mobile-menu-breakpoint}) {
+    .composer::before {
+      // Add a backdrop for the mobile composer to cover up the page
+      // behind the composer that can be visible on Safari iOS
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-color: var(--color-bg-primary);
+    }
+  }
+  
+  .composer,
+  .composerMinimized {
+    @media (width >= #{variables.$mobile-menu-breakpoint}) {
+      box-sizing: border-box;
+      grid-column: 2;
+      pointer-events: auto;
+    }
+  }
+  
+  .composer {
+    @media (width < #{variables.$mobile-menu-breakpoint}) {
+      // Set from the visualViewport API.
+      height: var(--viewport-height, 100vh);
+      max-height: 100vh;
+    }
+  
+    @media (width >= #{variables.$mobile-menu-breakpoint}) {
+      min-height: 270px;
+      max-height: calc(100vh - (var(--space-4) * 2));
+    }
+  }
+  
+  .composerMinimized {
+    bottom: 0;
+    width: min(320px, calc(100vw - var(--space-md) * 2));
+    padding: var(--space-md);
+    margin: var(--space-md);
+    border-radius: var(--radius-xl);
+  
+    @media (width < #{variables.$mobile-menu-breakpoint}) {
+      bottom: var(--mobile-bottom-nav-height);
+      width: auto;
+      padding: 0;
+      border-radius: var(--radius-round);
+    }
+  }
+  
+  @media (width < #{variables.$mobile-menu-breakpoint}) {
+    .button:not(.buttonInline) {
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transform: translateY(var(--space-md)) scale(0.9);
+    }
+  
+    .mastodonButton:not(.buttonInline) {
+      display: inline-flex;
+    }
+  
+    :global(.ui--mobile-chrome-hidden) .button:not(.buttonInline) {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+  
+    @media (prefers-reduced-motion: reduce) {
+      .button:not(.buttonInline) {
+        transition: none;
+      }
+    }
+  
+    :global(.reduce-motion) .button:not(.buttonInline) {
+      transition: none;
+    }
+  }
+  
+  // Mastodon 5.0 keeps composer access in the page layout, so the global
+  // floating launcher must not appear. The theme gate prevents this rule from
+  // affecting any other theme.
+  :global(body[data-theme='mastodon-5']) .button:not(.buttonInline) {
+    display: none;
+  }
+  
+  // BLUE 2.0 uses an inline launcher in the timeline and renders the redesigned
+  // composer as a centered Bluesky-like dialog. These selectors are impossible
+  // to match in other themes because the body data attribute is theme-specific.
+  & .button:not(.buttonInline) {
+    display: none;
+  }
+  
+  .blue2ResumeButton {
+    position: fixed;
+    inset-inline-end: max(
+      calc(var(--space-md) + env(safe-area-inset-left)),
+      calc(var(--space-md) + env(safe-area-inset-right))
+    );
+    bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+    z-index: 120;
+    pointer-events: auto;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 28%);
+    transition: bottom 180ms ease;
+  }
+  
+  & .composer {
+    top: 50%;
     left: 50%;
     right: auto;
     bottom: auto;
     inset-inline-end: auto;
-    width: min(600px, calc(100vw - 24px));
+    width: min(600px, calc(100vw - 32px));
     max-width: 600px;
-    height: auto;
-    min-height: min(430px, calc(var(--composer-viewport-height) - 24px));
-    max-height: calc(var(--composer-viewport-height) - 24px);
+    min-height: 0;
+    max-height: calc(100dvh - 32px);
     margin: 0;
-    display: flex;
-    flex-direction: column !important;
-    overflow: hidden;
     border: 1px solid var(--blue2-border-soft, #17232c);
     border-radius: 16px;
     transform: translate(-50%, -50%);
+    animation: none;
     box-shadow:
       0 0 0 100vmax rgb(0 0 0 / 58%),
       0 18px 50px rgb(0 0 0 / 35%);
   }
-
-  :global(body[data-theme='blue-2'])
-    .composer[data-bluelab-composer][role='dialog']
-    > header {
-    order: 0;
-    flex: 0 0 auto;
-    position: relative;
-    z-index: 3;
-    background: var(--color-bg-primary);
+  
+  & .composerMinimized {
+    right: 20px;
+    bottom: 20px;
+    margin: 0;
+    border: 1px solid var(--blue2-border-soft, #17232c);
+    background: var(--blue2-bg, #000);
   }
-
-  :global(body[data-theme='blue-2'])
-    .composer[data-bluelab-composer][role='dialog']
-    [data-compose-scroll-container] {
-    order: 1;
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+  
+  @media (width < #{variables.$mobile-menu-breakpoint}) {
+    .blue2ResumeButton {
+      bottom: calc(var(--mobile-bottom-nav-height, 64px) + var(--space-sm));
+    }
+  
+    // The minimized launcher is portaled to <body>, while the scroll state class
+    // lives on .ui. Use :has() so the fixed button follows the same chrome state:
+    // above the bottom nav while it is visible, and near the viewport edge after
+    // the nav is hidden by downward scrolling.
+    :global(body:has(.ui--mobile-chrome-hidden)) .blue2ResumeButton {
+      bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+    }
+  
+    @media (prefers-reduced-motion: reduce) {
+      .blue2ResumeButton {
+        transition: none;
+      }
+    }
+  
+    :global(.reduce-motion) .blue2ResumeButton {
+      transition: none;
+    }
+  
+    // Keep the old minimized card safe as a fallback for non-standard mounts.
+    & .composerMinimized {
+      bottom: calc(var(--mobile-bottom-nav-height, 64px) + var(--space-sm));
+    }
+  
+    &:has(.ui--mobile-chrome-hidden)
+      .composerMinimized {
+      bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+    }
+  
+    // On phones the BlueLab composer is centered using VisualViewport's actual
+    // center instead of top: 50%, which can be wrong on iOS when the layout and
+    // visual viewports differ. The form flow is also forced back to
+    // header -> scrollable content -> footer so controls cannot invert order.
+    &
+      .composer[data-bluelab-composer][role='dialog'] {
+      --composer-viewport-height: var(--composer-visual-viewport-height, 100dvh);
+  
+      top: var(--composer-visual-viewport-center-y, 50dvh);
+      left: 50%;
+      right: auto;
+      bottom: auto;
+      inset-inline-end: auto;
+      width: min(600px, calc(100vw - 24px));
+      max-width: 600px;
+      height: auto;
+      min-height: min(430px, calc(var(--composer-viewport-height) - 24px));
+      max-height: calc(var(--composer-viewport-height) - 24px);
+      margin: 0;
+      display: flex;
+      flex-direction: column !important;
+      overflow: hidden;
+      border: 1px solid var(--blue2-border-soft, #17232c);
+      border-radius: 16px;
+      transform: translate(-50%, -50%);
+      box-shadow:
+        0 0 0 100vmax rgb(0 0 0 / 58%),
+        0 18px 50px rgb(0 0 0 / 35%);
+    }
+  
+    &
+      .composer[data-bluelab-composer][role='dialog']
+      > header {
+      order: 0;
+      flex: 0 0 auto;
+      position: relative;
+      z-index: 3;
+      background: var(--color-bg-primary);
+    }
+  
+    &
+      .composer[data-bluelab-composer][role='dialog']
+      [data-compose-scroll-container] {
+      order: 1;
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  
+    &
+      .composer[data-bluelab-composer][role='dialog']
+      [data-bluelab-compose-footer] {
+      order: 2;
+      flex: 0 0 auto;
+      position: relative;
+      bottom: auto;
+      z-index: 3;
+      background: var(--color-bg-primary);
+    }
+  
+    // With the software keyboard open, fill only the VisualViewport area above
+    // the keyboard. Header and footer remain visible while the middle content
+    // keeps the existing internal scroll behavior for media, quotes and drafts.
+    &
+      .composer[data-bluelab-composer][role='dialog'][data-keyboard-open] {
+      --composer-viewport-top: var(--composer-visual-viewport-offset-top, 0px);
+  
+      top: calc(var(--composer-viewport-top) + env(safe-area-inset-top));
+      left: 0;
+      right: 0;
+      bottom: var(--composer-visual-viewport-bottom, 0);
+      inset-inline-end: auto;
+      width: 100vw;
+      max-width: none;
+      height: auto;
+      min-height: 0;
+      max-height: none;
+      border-top: 0;
+      border-inline: 0;
+      border-radius: 0 0 16px 16px;
+      transform: none;
+      box-shadow:
+        0 0 0 100vmax rgb(0 0 0 / 58%),
+        0 12px 32px rgb(0 0 0 / 28%);
+    }
+  
+    &
+      .composer[data-bluelab-composer][role='dialog']
+      [contenteditable='true'],
+    &
+      .composer[data-bluelab-composer][role='dialog']
+      [contenteditable='plaintext-only'] {
+      min-height: 5.5rem;
+    }
   }
+}
 
-  :global(body[data-theme='blue-2'])
-    .composer[data-bluelab-composer][role='dialog']
-    [data-bluelab-compose-footer] {
-    order: 2;
-    flex: 0 0 auto;
-    position: relative;
-    bottom: auto;
-    z-index: 3;
-    background: var(--color-bg-primary);
-  }
-
-  // With the software keyboard open, fill only the VisualViewport area above
-  // the keyboard. Header and footer remain visible while the middle content
-  // keeps the existing internal scroll behavior for media, quotes and drafts.
-  :global(body[data-theme='blue-2'])
-    .composer[data-bluelab-composer][role='dialog'][data-keyboard-open] {
-    --composer-viewport-top: var(--composer-visual-viewport-offset-top, 0px);
-
-    top: calc(var(--composer-viewport-top) + env(safe-area-inset-top));
-    left: 0;
-    right: 0;
-    bottom: var(--composer-visual-viewport-bottom, 0);
-    inset-inline-end: auto;
-    width: 100vw;
-    max-width: none;
-    height: auto;
-    min-height: 0;
-    max-height: none;
-    border-top: 0;
-    border-inline: 0;
-    border-radius: 0 0 16px 16px;
-    transform: none;
-    box-shadow:
-      0 0 0 100vmax rgb(0 0 0 / 58%),
-      0 12px 32px rgb(0 0 0 / 28%);
-  }
-
-  :global(body[data-theme='blue-2'])
-    .composer[data-bluelab-composer][role='dialog']
-    [contenteditable='true'],
-  :global(body[data-theme='blue-2'])
-    .composer[data-bluelab-composer][role='dialog']
-    [contenteditable='plaintext-only'] {
-    min-height: 5.5rem;
-  }
+:global(body[data-theme='mastodon-5']) .button:not(.buttonInline) {
+  display: none;
 }

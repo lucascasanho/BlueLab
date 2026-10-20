@@ -64,7 +64,7 @@
   flex: 1 1 auto;
   padding: 6px 8px;
   border: 0;
-  border-radius: var(--radius-sm, 8px);
+  border-radius: var(--radius-3, 8px);
   display: flex;
   align-items: center;
   gap: 9px;
@@ -187,7 +187,7 @@
   min-height: 44px;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-sm, 8px);
+  border-radius: var(--radius-3, 8px);
   background: transparent;
   color: var(--color-text-secondary, var(--blue2-muted, currentColor));
   font-size: 19px;
@@ -219,7 +219,7 @@
   box-sizing: border-box;
   min-height: 42px;
   padding: 8px 10px;
-  border-radius: var(--radius-sm, 8px);
+  border-radius: var(--radius-3, 8px);
   display: flex;
   align-items: center;
   color: var(--color-text-primary, var(--blue2-text, currentColor));
@@ -254,7 +254,7 @@
 }
 
 .navigationError {
-  margin: 4px var(--space-sm) 6px;
+  margin: 4px var(--space-3) 6px;
 }
 
 .navigationAccountRow {
@@ -263,7 +263,7 @@
 
 .navigationAccountButton {
   min-height: 50px;
-  padding: var(--space-xs) var(--space-sm);
+  padding: var(--space-2) var(--space-3);
 }
 
 .navigationAction {

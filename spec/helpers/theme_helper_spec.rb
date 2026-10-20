@@ -61,6 +61,21 @@ RSpec.describe ThemeHelper do
     end
   end
 
+  describe '#instance_customization_styles' do
+    let(:css) { Nokogiri::HTML5.fragment(helper.instance_customization_styles).at_css('style').text }
+
+    it 'keeps Vanilla palette variables native and scopes instance colors to alternative themes' do
+      root_tokens = css.match(/:root\s*\{([^}]*)\}/m)&.captures&.first
+
+      expect(root_tokens).to include('--instance-logo:')
+      expect(root_tokens).not_to include('--color-bg-brand-base')
+      expect(css).to include('html:has(body[data-theme=blue-2])')
+      expect(css).to include('html:has(body[data-theme=mastodon-bird-ui-auto])')
+      expect(css).to include('html[data-color-scheme=dark]:has(body[data-theme=blue-2])')
+      expect(css).to include('html[data-color-scheme=light]:has(body[data-theme=mastodon-bird-ui-auto])')
+    end
+  end
+
   describe '#custom_stylesheet' do
     let(:custom_css) { 'body {}' }
     let(:custom_digest) { Digest::SHA256.hexdigest(custom_css) }
