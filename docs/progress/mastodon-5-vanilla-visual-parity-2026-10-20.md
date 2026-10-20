@@ -28,10 +28,16 @@ Commits recentes de redesign observados:
 - `f40067d31b07ffc29ad6c8bf4b56d2655635f8de` — espaçamento entre itens de menu.
 Esses commits mostram que o redesenho oficial continuou recebendo refinamentos após a base que o BlueLab já tinha. Os commits foram identificados, mas ainda não foram integrados seletivamente.
 
-## Etapa 2 — sincronização com o upstream 5.0 atual (pendente)
-- Comparar o código da branch de teste com o upstream oficial atual, incluindo os commits recentes do redesenho.
-- Identificar e integrar os arquivos upstream que ainda não chegaram ao BlueLab, sem sobrescrever personalizações próprias.
-- Auditar conflitos em React, SCSS, navegação, compositor, menus, cards de status, acessibilidade e traduções.
+## Etapa 2 — refinamentos upstream integrados seletivamente
+- `dfc8c14ba06c2c9592429ceb4e7d87aa2c0299ab` — atualiza o espaçamento vertical do cabeçalho de colunas conforme `005d48ff79e3bf7999b357393479c9f032f4eb18`.
+- `cb1655c23e6c131e47ed8a46a6f5bfee04232daf` — integra espaçamento entre itens e compensação do padding inferior em menus conforme `f40067d31b07ffc29ad6c8bf4b56d2655635f8de`, preservando regras específicas do BlueLab para popovers.
+- `9798aaa65a0a667e57748a587c7048b0a504cb30` — integra a cor de hover para botões ghost conforme `ba40995d49d47e74c14d8b725325e445087fca87`.
+- Os ajustes foram aplicados por trechos, preservando as regras personalizadas de BlueLab e Bird UI nos arquivos afetados.
+
+## Etapa 3 — sincronização mais ampla com o upstream 5.0 atual (pendente)
+- Revisar os diffs de toda a implementação oficial recente do redesenho, não apenas os três refinamentos acima.
+- Integrar componentes visuais e interações que ainda diferem, começando pela reformulação do modal de boost (`e1ce504c20f8d3ed7c40aceb16b2f0cd5931f6e1`) após mapear dependências e testes.
+- Auditar React, SCSS, navegação, compositor, menus, cards de status, acessibilidade e traduções.
 - Preservar as funções próprias do BlueLab e os temas BlueLab/Bird UI.
 - Não fazer merge amplo nem substituir arquivos em lote sem revisão dos diffs por área.
 
@@ -44,4 +50,4 @@ Esses commits mostram que o redesenho oficial continuou recebendo refinamentos a
 - A correção inicial de tokens foi revertida por risco de regressão; a sincronização real com upstream continua pendente.
 
 ## Estado
-Correção inicial de escopo de tokens registrada no canal de teste. A paridade integral com o upstream ainda não está comprovada. Não promover para estável até a sincronização, revisão e testes.
+Três refinamentos visuais do upstream foram integrados seletivamente no canal de teste. A camada global de tokens legados foi mantida por segurança, porque componentes compartilhados ainda dependem dela. A paridade integral com o upstream não está comprovada. Não promover para estável até a sincronização, revisão e testes.
