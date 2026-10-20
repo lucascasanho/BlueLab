@@ -26,7 +26,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if ! git diff --quiet; then
             git add -u
-            HUSKY=0 LEFTHOOK=0 git -c core.hooksPath=/dev/null commit -m "style: format alpha merge fixes"
+            HUSKY=0 LEFTHOOK=0 git -c core.hooksPath=/dev/null commit -m "style: format latest alpha merge fixes"
             git push origin HEAD:refs/heads/BlueLab-Test
           fi
       - name: Export formatter diff if push fails
