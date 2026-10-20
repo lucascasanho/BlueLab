@@ -77,3 +77,29 @@ As alterações foram publicadas no GitHub, mas os testes automatizados e a veri
 4. a configuração global continua disponível em Administração > Aparência.
 
 Não promover para `BlueLab` e não alterar a Espelunca sem aprovação explícita.
+
+
+---
+
+# Checkpoint adicional — identidade visual da instância em logos
+
+Data: 2026-10-20  
+Canal autorizado: `BlueLab-Test`
+
+## Escopo da alteração
+
+- O layout de autenticação usa a logo carregada da instância (com fallback para favicon da instância) e o nome configurado, inclusive nos fluxos em que antes era mostrado o wordmark Mastodon.
+- O layout administrativo usa um cabeçalho de instância consistente em desktop e mobile, incluindo preferências, administração e moderação.
+- O helper `render_logo` deixa de apontar diretamente para a arte estática do Mastodon.
+- A folha de estilos global injeta a logo da instância nas variantes SVG de logo da aplicação sem alterar os tamanhos intrínsecos dos elementos; a variável CSS usa a logo de autenticação ou o favicon como fallback.
+- A estilização do cabeçalho usa a fonte de título do tema, respeita o nome configurado e permite quebra de nomes longos para evitar transbordamento.
+
+## Validação pendente
+
+As alterações foram publicadas somente em `BlueLab-Test`. Não houve execução de testes, build de assets ou verificação visual nesta conexão. Após executar `bluelab` no host de teste, validar:
+1. login, cadastro, recuperação de senha, confirmação de e-mail, autenticação de dois fatores e fluxo OAuth;
+2. preferências de usuário, administração, denúncias e páginas de moderação em desktop e mobile;
+3. logo personalizada carregada e fallback para favicon quando não houver logo de autenticação;
+4. nomes de instância longos, contraste em temas claro/escuro e ausência de deslocamentos ou logos duplicadas.
+
+Não promover para `BlueLab` nem alterar a Espelunca sem aprovação explícita.
