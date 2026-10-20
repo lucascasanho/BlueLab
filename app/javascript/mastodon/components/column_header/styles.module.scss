@@ -366,6 +366,7 @@
     font-weight: 700;
   }
 }
+
 :global(body[data-theme='mastodon-bird-ui-auto']) {
   .root {
     background: var(--color-bg) !important;
