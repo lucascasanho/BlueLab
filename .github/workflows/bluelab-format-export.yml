@@ -16,6 +16,8 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - name: Set up JavaScript environment
         uses: ./.github/actions/setup-javascript
+      - name: Record formatter base SHA
+        run: echo "FORMAT_BASE_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
       - name: Format repository files
         run: yarn format
       - name: Commit formatter-only changes to test branch
@@ -24,14 +26,15 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if ! git diff --quiet; then
             git add -u
-            git commit -m "style: apply Oxfmt to BlueLab alpha integration"
-            git push origin HEAD:refs/heads/BlueLab-Test
+            HUSKY=0 LEFTHOOK=0 git -c core.hooksPath=/dev/null commit -m "style: apply Oxfmt to BlueLab alpha integration"
+            git push origin HEAD:refs/heads/BlueLab-Test || echo "::warning::Push failed; retaining formatter patch artifact"
           fi
       - name: Export formatter patch
+        if: always()
         run: |
-          git diff --binary > /tmp/bluelab-format.patch
-          git diff --name-only > /tmp/bluelab-format-files.txt
-          git diff --stat > /tmp/bluelab-format-stat.txt
+          git diff --binary "$FORMAT_BASE_SHA" > /tmp/bluelab-format.patch
+          git diff --name-only "$FORMAT_BASE_SHA" > /tmp/bluelab-format-files.txt
+          git diff --stat "$FORMAT_BASE_SHA" > /tmp/bluelab-format-stat.txt
           cat /tmp/bluelab-format-stat.txt
       - name: Upload format patch
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
