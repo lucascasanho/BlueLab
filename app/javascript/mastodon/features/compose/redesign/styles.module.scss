@@ -186,6 +186,21 @@ textarea.textarea {
   white-space: pre-wrap; // This makes the formatting match the text area.
 }
 
+/* The transport textarea mirrors contentEditable for the submit pipeline.
+   Keep it hidden in Vanilla as well as in the BlueLab theme. */
+.richEditorTransport {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .attachments {
   display: flex;
   flex-direction: column;

@@ -8,7 +8,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { List as ImmutableList } from 'immutable';
 import type { Map as ImmutableMap, Record as ImmutableRecord } from 'immutable';
 
-import { ChatCircleDotsIcon } from '@phosphor-icons/react';
+import { ChatCircleDotsIcon, HeartIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
 import {
@@ -33,6 +33,7 @@ import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
 import { compareId } from '@/mastodon/compare_id';
 import AttachmentList from '@/mastodon/components/attachment_list';
 import { Avatar } from '@/mastodon/components/avatar';
+import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
 import { DisplayNameSimple } from '@/mastodon/components/display_name/simple';
@@ -67,6 +68,27 @@ const messages = defineMessages({
 });
 
 const getStatus = makeGetStatus();
+
+type MessageAlignment = 'center' | 'end';
+
+function scrollMessageWithinList(
+  list: HTMLElement,
+  message: HTMLElement,
+  alignment: MessageAlignment,
+  behavior: ScrollBehavior = 'auto',
+) {
+  const listRect = list.getBoundingClientRect();
+  const messageRect = message.getBoundingClientRect();
+  const messageTop = list.scrollTop + messageRect.top - listRect.top;
+  const targetTop =
+    alignment === 'end'
+      ? messageTop + messageRect.height - list.clientHeight
+      : messageTop - (list.clientHeight - messageRect.height) / 2;
+  const maxScrollTop = Math.max(0, list.scrollHeight - list.clientHeight);
+  const top = Math.max(0, Math.min(maxScrollTop, targetTop));
+
+  list.scrollTo({ top, behavior });
+}
 
 interface MessageConversationProps {
   conversationId?: string;
@@ -448,10 +470,12 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       const element = document.getElementById('message-' + statusId);
 
       if (element) {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        const list = messageListRef.current;
+        if (list) {
+          scrollMessageWithinList(list, element, 'center', 'smooth');
+        } else {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
         highlightStatus(statusId);
         return;
       }
@@ -485,12 +509,10 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         'message-' + pendingScrollStatusId,
       );
 
-      if (!element) return;
+      const list = messageListRef.current;
+      if (!element || !list) return;
 
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
+      scrollMessageWithinList(list, element, 'center', 'smooth');
       highlightStatus(pendingScrollStatusId);
       setPendingScroll(null);
     });
@@ -519,9 +541,11 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     const lastStatus = statuses[statuses.length - 1];
     const lastReadStatusId = initialReadState?.lastReadStatusId;
 
-    const oldestUnreadStatus =
+    // Conversation statuses are ordered oldest to newest. Start at the latest
+    // incoming status after the read marker, not at the start of the thread.
+    const latestUnreadStatus =
       initialReadState?.unread === true
-        ? statuses.find((status) => {
+        ? [...statuses].reverse().find((status) => {
             const statusId = status.get<'id'>('id');
             const isIncoming = status.getIn(['account', 'id']) !== me;
 
@@ -532,7 +556,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           })
         : undefined;
 
-    const targetStatus = oldestUnreadStatus ?? lastStatus;
+    const targetStatus = latestUnreadStatus ?? lastStatus;
 
     if (!targetStatus) return;
 
@@ -549,12 +573,13 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         if (!list) return;
 
         if (targetMessage) {
-          targetMessage.scrollIntoView({
-            behavior: 'auto',
-            block: oldestUnreadStatus ? 'center' : 'end',
-          });
+          scrollMessageWithinList(
+            list,
+            targetMessage,
+            latestUnreadStatus ? 'center' : 'end',
+          );
         } else {
-          list.scrollTop = oldestUnreadStatus ? 0 : list.scrollHeight;
+          list.scrollTop = latestUnreadStatus ? 0 : list.scrollHeight;
         }
 
         initialScrollConversationIdRef.current = id;
@@ -705,11 +730,15 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                     (candidate) => candidate.get('id') === replyTargetId,
                   )
                 : undefined;
-              const rawReplyTargetText = replyTarget?.get<'content'>('content');
-              const replyTargetText =
-                typeof rawReplyTargetText === 'string'
-                  ? rawReplyTargetText
+              const rawReplyTargetHtml =
+                replyTarget?.getIn(['translation', 'contentHtml']) ??
+                replyTarget?.get('contentHtml');
+              const replyTargetHtml =
+                typeof rawReplyTargetHtml === 'string'
+                  ? rawReplyTargetHtml
                   : '';
+              const replyTargetEmojis = replyTarget?.get('emojis');
+              const replyTargetLanguage = replyTarget?.get('language');
               const replyTargetAccount = replyTarget?.get(
                 'account',
               ) as unknown as Account | undefined;
@@ -737,9 +766,10 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                   </div>
 
                   {replyTarget && (
-                    <button
-                      type='button'
+                    <div
                       className={classes.replyContext}
+                      role='button'
+                      tabIndex={0}
                       aria-label={intl.formatMessage(
                         {
                           id: 'messages.conversation.replying_to',
@@ -753,6 +783,11 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                         },
                       )}
                       onClick={createScrollToStatusHandler(replyTargetId)}
+                      onKeyDown={(event) => {
+                        if (event.key !== 'Enter' && event.key !== ' ') return;
+                        event.preventDefault();
+                        scrollToStatus(replyTargetId as string);
+                      }}
                     >
                       <span className={classes.replyContextHeader}>
                         <ReplyIcon
@@ -769,11 +804,18 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                           }}
                         />
                       </span>
-                      <span className={classes.replyContextText}>
-                        {replyTargetText.slice(0, 120) +
-                          (replyTargetText.length > 120 ? '…' : '')}
-                      </span>
-                    </button>
+                      <EmojiHTML
+                        as='div'
+                        className={classes.replyContextText}
+                        htmlString={replyTargetHtml}
+                        extraEmojis={replyTargetEmojis}
+                        lang={
+                          typeof replyTargetLanguage === 'string'
+                            ? replyTargetLanguage
+                            : undefined
+                        }
+                      />
+                    </div>
                   )}
 
                   <div className={classes.messageBody}>
@@ -799,31 +841,71 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                       iconComponent={ReplyIcon}
                       onClick={createReplyHandler(status)}
                     />
-                    <IconButton
-                      className={classNames(
-                        classes.messageAction,
-                        classes.messageFavourite,
-                        'star-icon',
-                      )}
-                      animate
-                      active={status.get('favourited')}
-                      title={intl.formatMessage(
-                        status.get('favourited')
-                          ? {
-                              id: 'status.remove_favourite',
-                              defaultMessage: 'Remove from favorites',
-                            }
-                          : {
-                              id: 'status.favourite',
-                              defaultMessage: 'Favorite',
-                            },
-                      )}
-                      icon='star'
-                      iconComponent={
-                        status.get('favourited') ? StarIcon : StarBorderIcon
-                      }
-                      onClick={createFavouriteHandler(status.get<'id'>('id'))}
-                    />
+                    {useVanillaAppearance ? (
+                      <button
+                        type='button'
+                        className={classNames(
+                          classes.messageAction,
+                          classes.messageFavouriteVanilla,
+                        )}
+                        aria-label={intl.formatMessage(
+                          status.get('favourited')
+                            ? {
+                                id: 'status.remove_favourite',
+                                defaultMessage: 'Remove from favorites',
+                              }
+                            : {
+                                id: 'status.favourite',
+                                defaultMessage: 'Favorite',
+                              },
+                        )}
+                        title={intl.formatMessage(
+                          status.get('favourited')
+                            ? {
+                                id: 'status.remove_favourite',
+                                defaultMessage: 'Remove from favorites',
+                              }
+                            : {
+                                id: 'status.favourite',
+                                defaultMessage: 'Favorite',
+                              },
+                        )}
+                        aria-pressed={Boolean(status.get('favourited'))}
+                        onClick={createFavouriteHandler(status.get<'id'>('id'))}
+                      >
+                        <HeartIcon
+                          weight={status.get('favourited') ? 'fill' : 'regular'}
+                          size={18}
+                          aria-hidden='true'
+                        />
+                      </button>
+                    ) : (
+                      <IconButton
+                        className={classNames(
+                          classes.messageAction,
+                          classes.messageFavourite,
+                          'star-icon',
+                        )}
+                        animate
+                        active={status.get('favourited')}
+                        title={intl.formatMessage(
+                          status.get('favourited')
+                            ? {
+                                id: 'status.remove_favourite',
+                                defaultMessage: 'Remove from favorites',
+                              }
+                            : {
+                                id: 'status.favourite',
+                                defaultMessage: 'Favorite',
+                              },
+                        )}
+                        icon='star'
+                        iconComponent={
+                          status.get('favourited') ? StarIcon : StarBorderIcon
+                        }
+                        onClick={createFavouriteHandler(status.get<'id'>('id'))}
+                      />
+                    )}
                   </div>
                 </article>
               );

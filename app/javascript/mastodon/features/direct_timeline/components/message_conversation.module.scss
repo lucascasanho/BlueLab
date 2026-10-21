@@ -21,7 +21,7 @@
   width: 100%;
   min-width: 0;
   min-height: 0;
-  height: auto;
+  height: 0;
   box-sizing: border-box;
   flex-direction: column;
   gap: var(--space-2);
@@ -171,6 +171,36 @@
   overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+
+  :global(p) {
+    display: inline;
+    margin: 0;
+  }
+
+  :global(a) {
+    color: inherit;
+    text-decoration: underline;
+  }
+}
+
+.messageFavouriteVanilla {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.messageFavouriteVanilla[aria-pressed='true'] {
+  color: var(--color-text-brand);
+}
+
+.messageFavouriteVanilla:focus-visible {
+  outline: var(--outline-focus-default);
+  outline-offset: 2px;
 }
 
 :global(body[data-theme='blue-2']) .message {
@@ -216,6 +246,8 @@
 .replyComposer {
   flex: 0 0 auto;
   min-height: 0;
+  align-self: stretch;
+  margin-top: auto;
 }
 
 .messageActions {
