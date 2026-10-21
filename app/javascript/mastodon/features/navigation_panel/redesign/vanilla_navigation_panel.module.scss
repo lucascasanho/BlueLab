@@ -22,6 +22,10 @@
   &[data-mode='slide-out'] {
     --navigation-background-color: var(--color-bg-primary);
   }
+
+  &[data-scrollable='true'] {
+    overscroll-behavior: contain;
+  }
 }
 
 .list {
@@ -75,9 +79,4 @@
 .callout {
   margin-inline: var(--space-4);
   margin-bottom: var(--space-2);
-}
-
-
-.root[data-scrollable='true'] {
-  overscroll-behavior: contain;
 }
