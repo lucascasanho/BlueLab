@@ -167,6 +167,7 @@ export const RedesignComposeForm: React.FC<
         autoFocus={autoFocus}
         onSubmit={onSubmit}
         messageToolbar={isMessage && embedded}
+        forceMarkdown={vanillaAppearance}
       >
         <ComposeAttachments className={classes.attachments} />
       </RichComposeEditor>
