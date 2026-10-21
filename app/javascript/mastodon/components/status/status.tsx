@@ -139,13 +139,20 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
     [],
   );
 
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const theme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
+  const isBlue2 = theme === 'blue-2';
+  const isVanillaTheme = theme === 'default';
 
-  const handleBlue2CardClick = useCallback<
+  const handleStatusCardClick = useCallback<
     React.MouseEventHandler<HTMLElement>
   >(
     (event) => {
+      if (isVanillaTheme) {
+        onOpenClick(event);
+        return;
+      }
+
       if (!isBlue2 || event.defaultPrevented) {
         return;
       }
@@ -162,7 +169,7 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
 
       onOpenClick(event);
     },
-    [isBlue2, onOpenClick],
+    [isBlue2, isVanillaTheme, onOpenClick],
   );
 
   if (!status) {
@@ -199,8 +206,8 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
     >
       <StatusHotkeys
         {...hotkeysProps}
-        onClick={handleBlue2CardClick}
-        onAuxClick={handleBlue2CardClick}
+        onClick={handleStatusCardClick}
+        onAuxClick={handleStatusCardClick}
         className={classNames(
           classes.root,
           variant === 'feed' && classes.variantFeed,
