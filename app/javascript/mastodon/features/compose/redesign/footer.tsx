@@ -157,6 +157,7 @@ export const ComposeFooter: React.FC<{
           <IconButton
             size='sm'
             icon={ChartBarHorizontalIcon}
+            className={classes.pollButton}
             disabled={hasQuote || hasPoll || !!activeThreadItemId}
             onClick={handlePoll}
           >

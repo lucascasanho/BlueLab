@@ -96,7 +96,14 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
           <FormattedMessage id='column_header.pin' defaultMessage='Pin' />
         )}
       </MenuTrigger>
-      <MenuList placement='bottom-end' strategy='fixed'>
+      <MenuList
+        placement='bottom-end'
+        strategy='fixed'
+        portal
+        mobilePresentation='popover'
+        constrainToViewport
+        scrollable
+      >
         <MenuItem onClick={handleBlue2ColumnPin}>
           {pinned ? (
             <FormattedMessage id='column_header.unpin' defaultMessage='Unpin' />

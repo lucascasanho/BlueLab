@@ -200,27 +200,98 @@ textarea.textarea {
   flex-wrap: wrap;
 }
 
-/* Keep the existing flex layout on BlueLab themes while grouping media
-   tools so Vanilla can place them on a dedicated mobile row. */
+/* Keep BlueLab's normal flex layout, and pin Vanilla's primary controls to the
+   end of the same footer row at every viewport width. */
 .secondaryActions {
   display: contents;
 }
 
 .footer[data-vanilla-appearance='true'] {
-  @media (width < #{variables.$mobile-menu-breakpoint}) {
-    .secondaryActions {
-      display: flex;
-      flex: 1 1 100%;
-      flex-wrap: wrap;
-      gap: var(--space-1);
-      min-width: 0;
-      width: 100%;
+  flex-wrap: nowrap;
+  gap: clamp(2px, 0.7vw, var(--space-1));
+
+  .secondaryActions {
+    display: flex;
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: clamp(2px, 0.7vw, var(--space-1));
+    min-width: 0;
+    width: auto;
+  }
+
+  .flexGrowWrap {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: clamp(2px, 0.7vw, var(--space-1));
+    min-width: 0;
+    width: auto;
+    margin-inline-start: auto;
+  }
+
+  [data-compose-primary-actions] {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: clamp(2px, 0.7vw, var(--space-1));
+    margin-inline-start: auto;
+    white-space: nowrap;
+  }
+
+  .threadAddButton {
+    box-sizing: border-box;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    min-height: 34px;
+    flex: 0 0 34px;
+    border-radius: var(--radius-round);
+  }
+
+  .submitButton {
+    flex: 0 0 auto;
+    margin-inline-start: 0;
+    white-space: nowrap;
+  }
+
+  .pollButton {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  @media (width <= 480px) {
+    gap: 2px;
+
+    .secondaryActions,
+    .flexGrowWrap,
+    [data-compose-primary-actions] {
+      gap: 2px;
     }
 
-    .flexGrowWrap {
-      flex: 1 1 100%;
-      min-width: 0;
-      width: 100%;
+    .pollButton {
+      box-sizing: border-box;
+      width: 32px;
+      min-width: 32px;
+      height: 32px;
+      padding-inline: 0;
+      font-size: 0;
+    }
+
+    .threadAddButton {
+      width: 30px;
+      min-width: 30px;
+      height: 30px;
+      min-height: 30px;
+      flex-basis: 30px;
+    }
+
+    .counter {
+      display: none;
     }
   }
 }
