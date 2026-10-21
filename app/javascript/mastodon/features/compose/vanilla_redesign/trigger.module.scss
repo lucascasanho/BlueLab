@@ -101,8 +101,7 @@
       )
     );
     max-height: calc(
-      var(--viewport-height, 100dvh) - env(safe-area-inset-top) -
-        var(--space-4)
+      var(--viewport-height, 100dvh) - env(safe-area-inset-top) - var(--space-4)
     );
     min-height: min(
       220px,
