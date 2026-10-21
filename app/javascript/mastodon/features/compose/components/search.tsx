@@ -26,7 +26,6 @@ import {
   useFocusAfterNavigation,
 } from '@/mastodon/components/navigation_focus_target';
 import { getCollectionPath } from '@/mastodon/features/collections/utils';
-import { useMergedRefs } from '@/mastodon/hooks/useMergedRefs';
 import {
   clickSearchResult,
   forgetSearchResult,
@@ -121,11 +120,19 @@ export const Search: React.FC<{
   const [shouldOpenOnFocus, setShouldOpenOnFocus] = useState(
     context === 'sidebar',
   );
+  const handleAfterNavigationFocus = useCallback(() => {
+    setShouldOpenOnFocus(true);
+  }, []);
   const focusAfterNavigation = useFocusAfterNavigation(
     FOCUS_TARGET.SEARCH,
-    () => {
-      setShouldOpenOnFocus(true);
+    handleAfterNavigationFocus,
+  );
+  const setSearchInputRef = useCallback(
+    (element: HTMLInputElement | null) => {
+      searchInputRef.current = element;
+      focusAfterNavigation(element);
     },
+    [focusAfterNavigation],
   );
 
   const unfocus = useCallback(() => {
@@ -535,16 +542,30 @@ export const Search: React.FC<{
     }
 
     if (searchInputRef.current && !singleColumn) {
-      const { left, right } = searchInputRef.current.getBoundingClientRect();
+      const input = searchInputRef.current;
+      const { left, right } = input.getBoundingClientRect();
+      const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
 
-      if (
-        left < 0 ||
-        right > (window.innerWidth || document.documentElement.clientWidth)
-      ) {
-        searchInputRef.current.scrollIntoView({
-          block: 'nearest',
-          inline: 'nearest',
-        });
+      if (left < 0 || right > viewportWidth) {
+        const horizontalDelta = left < 0 ? left : right - viewportWidth;
+        let scrollable: HTMLElement | null = input.parentElement;
+
+        while (scrollable && scrollable !== document.body) {
+          const { overflowX } = window.getComputedStyle(scrollable);
+          if (
+            scrollable.scrollWidth > scrollable.clientWidth &&
+            /(auto|scroll|overlay)/.test(overflowX)
+          ) {
+            break;
+          }
+          scrollable = scrollable.parentElement;
+        }
+
+        if (scrollable && scrollable !== document.body) {
+          scrollable.scrollLeft += horizontalDelta;
+        } else {
+          window.scrollBy({ left: horizontalDelta, top: 0, behavior: 'auto' });
+        }
       }
     }
   }, [shouldOpenOnFocus, singleColumn]);
@@ -604,10 +625,7 @@ export const Search: React.FC<{
         type='text'
         inputMode='search'
         data-main-search
-        ref={useMergedRefs(
-          searchInputRef,
-          context === 'column' ? focusAfterNavigation : null,
-        )}
+        ref={context === 'column' ? setSearchInputRef : searchInputRef}
         className={classes.search}
         placeholder={placeholder}
         aria-label={placeholder}

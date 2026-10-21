@@ -396,10 +396,19 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   }, [conversation, conversationResolved, dispatch, id]);
 
   const renderShell = (content: React.ReactNode) => {
+    const conversationContent = (
+      <div
+        className={classes.columnContent}
+        data-message-conversation='true'
+      >
+        {content}
+      </div>
+    );
+
     if (inline) {
       return (
         <div className={`${classes.column} ${classes.inlineColumn}`}>
-          {content}
+          {conversationContent}
         </div>
       );
     }
@@ -409,7 +418,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         label={intl.formatMessage(messages.title)}
         className={classes.column}
       >
-        {content}
+        {conversationContent}
       </Column>
     );
   };
