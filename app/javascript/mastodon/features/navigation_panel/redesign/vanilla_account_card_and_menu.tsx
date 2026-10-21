@@ -37,6 +37,7 @@ import {
   MenuList,
   MenuTrigger,
 } from '@/mastodon/components/menu';
+import { AccountSwitcherMenuSection } from '@/mastodon/features/account_switcher';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
@@ -113,6 +114,9 @@ export const AccountMenuItems: React.FC<{
 
   return (
     <>
+      <AccountSwitcherMenuSection variant='navigation' />
+      <MenuItemDivider />
+
       {context === 'mobile' && <ProfileMenuItem />}
 
       <MenuItemLink to={accountBasePath} exact icon={UserIcon}>
