@@ -38,6 +38,7 @@ import { ComposeFormHeader } from './header';
 import { ComposeHints } from './hints';
 import { LanguageButton } from './language';
 import { ComposeReply } from './reply';
+import { ComposeSettingsMenu as VanillaComposeSettingsMenu } from '../vanilla_redesign/settings';
 import { RichComposeEditor } from './rich_editor';
 import { resolveComposeScrollTarget } from './scroll';
 import {
@@ -57,6 +58,7 @@ interface RedesignComposeFormProps {
   className?: string;
   embedded?: boolean;
   compact?: boolean;
+  vanillaAppearance?: boolean;
   noMinimize?: boolean;
   redirectOnSuccess?: boolean;
   onSuccess?: (status: ApiStatusJSON) => void;
@@ -79,6 +81,7 @@ export const RedesignComposeForm: React.FC<
   headless = false,
   embedded = false,
   compact = false,
+  vanillaAppearance = false,
   noMinimize,
   redirectOnSuccess,
   onSuccess,
@@ -189,7 +192,7 @@ export const RedesignComposeForm: React.FC<
         data-compose-scroll-container
         data-compose-scroll-zone='panel'
       >
-        {!compact && <ComposeReply />}
+        {!compact && !vanillaAppearance && <ComposeReply />}
 
         {!compact && (
           <div className={classes.toolbar} data-bluelab-compose-toolbar>
@@ -200,21 +203,27 @@ export const RedesignComposeForm: React.FC<
 
             <LanguageButton activeThreadItemId={activeThreadItemId} />
 
-            <ToggleButton
-              type='button'
-              size='sm'
-              active={sensitive}
-              onClick={onSensitiveChange}
-              onMouseDown={handleSensitiveMouseDown}
-              leadingIcon={sensitiveIcon}
-            >
-              <FormattedMessage
-                id='compose.sensitive'
-                defaultMessage='Sensitive'
-              />
-            </ToggleButton>
+            {vanillaAppearance ? (
+              <VanillaComposeSettingsMenu />
+            ) : (
+              <ToggleButton
+                type='button'
+                size='sm'
+                active={sensitive}
+                onClick={onSensitiveChange}
+                onMouseDown={handleSensitiveMouseDown}
+                leadingIcon={sensitiveIcon}
+              >
+                <FormattedMessage
+                  id='compose.sensitive'
+                  defaultMessage='Sensitive'
+                />
+              </ToggleButton>
+            )}
           </div>
         )}
+
+        {!compact && vanillaAppearance && <ComposeReply />}
 
         {!compact && isMessage && (
           <p className={classes.toolbarMessage}>
