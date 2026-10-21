@@ -1,0 +1,42 @@
+name: Temporary Oxfmt application for BlueLab-Test
+
+on:
+  pull_request:
+    branches:
+      - 'BlueLab-Test'
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Set up Javascript environment
+        uses: ./.github/actions/setup-javascript
+
+      - name: Apply repository formatter
+        run: yarn format
+
+      - name: Verify formatter output
+        run: yarn format:check
+
+      - name: Commit formatted badge to temporary PR branch
+        env:
+          BRANCH_NAME: ${{ github.head_ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/javascript/mastodon/components/display_name/verified_badge.tsx
+          if git diff --cached --quiet; then
+            echo "Badge file is already formatted."
+          else
+            git commit -m "style: apply Oxfmt to verification badge"
+            git push origin "HEAD:${BRANCH_NAME}"
+          fi
