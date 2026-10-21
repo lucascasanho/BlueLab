@@ -95,11 +95,6 @@
   }
 
   :global([data-compose-scroll-container]) {
-    min-height: 0;
-    overscroll-behavior-y: contain;
-  }
-
-  :global([data-compose-scroll-container]) {
     display: flex;
     flex: 1 1 auto;
     min-height: 0;
@@ -254,6 +249,19 @@
     height: 1px;
     opacity: 0;
     pointer-events: none;
+  }
+
+  :global([data-bluelab-compose-message-notice]) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text-secondary);
+
+    svg {
+      flex: 0 0 auto;
+      width: 20px;
+      height: 20px;
+    }
   }
 
   :global([data-compose-primary-actions]) {
