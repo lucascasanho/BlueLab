@@ -47,25 +47,20 @@ const copy = {
 interface IconProps {
   className?: string;
   remoteBadge?: ApiInstanceVerificationBadgeJSON | null;
-  useRemoteFallback?: boolean;
 }
 
-const REMOTE_FALLBACK_COLORS = ['#60a5fa', '#1d9bf0', '#1d4ed8'];
+// This established three-blue palette is intentionally independent of theme
+// tokens, so local verification marks stay identical in Vanilla and BlueLab.
+const VERIFIED_BADGE_PALETTE = ['#60a5fa', '#1d9bf0', '#1d4ed8'] as const;
 
-export const VerifiedMark: FC<IconProps> = ({
-  className,
-  remoteBadge,
-  useRemoteFallback = false,
-}) => {
+export const VerifiedMark: FC<IconProps> = ({ className, remoteBadge }) => {
   const gradientId = `bluelab-verified-${useId().replace(/:/g, '')}`;
   const remoteColors = remoteBadge?.colors.length
     ? remoteBadge.colors
-    : useRemoteFallback
-      ? REMOTE_FALLBACK_COLORS
-      : null;
-  const startColor = remoteColors?.[0];
-  const middleColor = remoteColors?.[1] ?? startColor;
-  const endColor = remoteColors?.[2] ?? middleColor;
+    : VERIFIED_BADGE_PALETTE;
+  const startColor = remoteColors[0];
+  const middleColor = remoteColors[1] ?? startColor;
+  const endColor = remoteColors[2] ?? middleColor;
 
   return (
     <svg
@@ -246,7 +241,6 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
         <VerifiedMark
           className={classes.badge}
           remoteBadge={remoteBadge}
-          useRemoteFallback={isRemote}
         />
       </span>
 
@@ -273,7 +267,6 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
               <VerifiedMark
                 className={classes.inlineBadge}
                 remoteBadge={remoteBadge}
-                useRemoteFallback={isRemote}
               />
               <p className={classes.description}>{descriptionText}</p>
             </div>
