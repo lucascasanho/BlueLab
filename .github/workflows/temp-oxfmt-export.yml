@@ -1,6 +1,9 @@
 name: Temporary formatter export
 
 on:
+  push:
+    branches:
+      - 'BlueLab-Test'
   pull_request:
     paths:
       - '.github/workflows/temp-oxfmt-export.yml'
