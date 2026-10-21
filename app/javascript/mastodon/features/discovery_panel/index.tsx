@@ -4,6 +4,7 @@ import { Search } from '@/mastodon/features/compose/components/search';
 import { useIdentity } from '@/mastodon/identity_context';
 
 import { FooterLinks } from './footer_links';
+import { VanillaFooterLinks } from '@/mastodon/features/navigation_panel/redesign/vanilla_footer_links';
 import classes from './styles.module.scss';
 
 /**
@@ -28,6 +29,8 @@ const ROUTES_WITHOUT_SEARCH_BAR = [
 
 export const DiscoveryPanel: React.FC = () => {
   const { signedIn } = useIdentity();
+  const isVanillaTheme =
+    typeof document !== 'undefined' && document.body.dataset.theme === 'default';
 
   const isRouteWithSearchBar = !useRouteMatch({
     path: ROUTES_WITHOUT_SEARCH_BAR,
@@ -41,7 +44,11 @@ export const DiscoveryPanel: React.FC = () => {
       )}
 
       <footer className={classes.footer}>
-        <FooterLinks context='search' />
+        {isVanillaTheme ? (
+          <VanillaFooterLinks context='search' />
+        ) : (
+          <FooterLinks context='search' />
+        )}
       </footer>
     </div>
   );
