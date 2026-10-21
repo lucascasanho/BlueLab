@@ -34,7 +34,10 @@ import {
 } from '@/mastodon/initial_state';
 import { transientSingleColumn } from '@/mastodon/is_mobile';
 import { canViewFeed } from '@/mastodon/permissions';
-import { openNewComposer } from '@/mastodon/reducers/slices/composer';
+import {
+  composerOriginFromElement,
+  openPreferredComposer,
+} from '@/mastodon/reducers/slices/composer';
 import { getOrderedLists } from '@/mastodon/selectors/lists';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
@@ -151,10 +154,18 @@ export const RedesignNavigationPanel: React.FC<{
   const { signedIn } = useIdentity();
   const notificationsCount = useNotificationsCount();
 
-  const openComposer = useCallback(() => {
-    dispatch(closeNavigation());
-    dispatch(openNewComposer({ type: 'post' }));
-  }, [dispatch]);
+  const openComposer: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(
+      (event) => {
+        dispatch(closeNavigation());
+        dispatch(
+          openPreferredComposer({
+            origin: composerOriginFromElement(event.currentTarget),
+          }),
+        );
+      },
+      [dispatch],
+    );
 
   const { customFeeds } = useCustomFeeds();
   const { followedHashtags } = useFollowedHashtags();
