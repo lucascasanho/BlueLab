@@ -496,6 +496,21 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     [dispatch, highlightStatus, id],
   );
 
+  const handleReplyContextKeyDown = useCallback<
+    React.KeyboardEventHandler<HTMLDivElement>
+  >(
+    (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+
+      const statusId = event.currentTarget.dataset.statusId;
+      if (!statusId) return;
+
+      event.preventDefault();
+      scrollToStatus(statusId);
+    },
+    [scrollToStatus],
+  );
+
   useEffect(() => {
     if (
       !pendingScrollStatusId ||
@@ -770,6 +785,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                       className={classes.replyContext}
                       role='button'
                       tabIndex={0}
+                      data-status-id={replyTargetId ?? undefined}
                       aria-label={intl.formatMessage(
                         {
                           id: 'messages.conversation.replying_to',
@@ -783,11 +799,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                         },
                       )}
                       onClick={createScrollToStatusHandler(replyTargetId)}
-                      onKeyDown={(event) => {
-                        if (event.key !== 'Enter' && event.key !== ' ') return;
-                        event.preventDefault();
-                        scrollToStatus(replyTargetId as string);
-                      }}
+                      onKeyDown={handleReplyContextKeyDown}
                     >
                       <span className={classes.replyContextHeader}>
                         <ReplyIcon
@@ -870,7 +882,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
                                 defaultMessage: 'Favorite',
                               },
                         )}
-                        aria-pressed={Boolean(status.get('favourited'))}
+                        aria-pressed={status.get('favourited')}
                         onClick={createFavouriteHandler(status.get<'id'>('id'))}
                       >
                         <HeartIcon
