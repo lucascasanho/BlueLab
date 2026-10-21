@@ -462,16 +462,16 @@
 
 :global(body[data-theme='blue-2'])
   .replyComposer[data-bluelab-composer-compact='true']
-  .richEditor,
+  :global([data-bluelab-rich-editor-input]),
 :global(body[data-theme='default'])
   .replyComposer[data-bluelab-composer-compact='true']
-  .richEditor,
+  :global([data-bluelab-rich-editor-input]),
 :global(body[data-theme=''])
   .replyComposer[data-bluelab-composer-compact='true']
-  .richEditor,
+  :global([data-bluelab-rich-editor-input]),
 :global(body:not([data-theme]))
   .replyComposer[data-bluelab-composer-compact='true']
-  .richEditor {
+  :global([data-bluelab-rich-editor-input]) {
   max-height: 7rem;
 }
 
@@ -486,6 +486,16 @@
   :global(body:not([data-theme])) .column {
     height: 100%;
     max-height: 100%;
+  }
+
+  // Let the messages list shrink inside the viewport and own scrolling.
+  :global(body[data-theme='blue-2']) .columnContent,
+  :global(body[data-theme='default']) .columnContent,
+  :global(body[data-theme='']) .columnContent,
+  :global(body:not([data-theme])) .columnContent {
+    flex: 1 1 0;
+    height: 0;
+    min-height: 0;
   }
 
   // Reserve the mobile navigation's occupied height inside the message page
@@ -505,17 +515,19 @@
 
   :global(body[data-theme='blue-2'])
     .replyComposer[data-bluelab-composer-compact='true']
-    .richEditor,
+    :global([data-bluelab-rich-editor-input]),
   :global(body[data-theme='default'])
     .replyComposer[data-bluelab-composer-compact='true']
-    .richEditor,
+    :global([data-bluelab-rich-editor-input]),
   :global(body[data-theme=''])
     .replyComposer[data-bluelab-composer-compact='true']
-    .richEditor,
+    :global([data-bluelab-rich-editor-input]),
   :global(body:not([data-theme]))
     .replyComposer[data-bluelab-composer-compact='true']
-    .richEditor {
-    max-height: 7rem;
+    :global([data-bluelab-rich-editor-input]) {
+    min-height: min(5.5rem, 16dvh);
+    max-height: min(7rem, 22dvh);
+    flex: 0 1 auto;
   }
 }
 @media (width >= 1175px) {
