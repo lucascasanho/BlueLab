@@ -76,6 +76,22 @@ describe('<DisplayName />', () => {
     expect(displayName.nextElementSibling).toBe(badge);
   });
 
+  it('uses the fixed blue palette for local verification badges', () => {
+    const verifiedAccount = account
+      .set('acct', 'alice')
+      .set('username', 'alice')
+      .set('verified_by_role', true);
+    render(<DisplayName account={verifiedAccount} />);
+
+    const badge = screen.getByRole('button', { name: 'Verified account' });
+    const stops = Array.from(
+      badge.querySelectorAll('linearGradient stop'),
+      (stop) => stop.getAttribute('stop-color'),
+    );
+
+    expect(stops).toEqual(['#60a5fa', '#1d9bf0', '#1d4ed8']);
+  });
+
   it('supports the exact Verificado role as a backward-compatible fallback', () => {
     const verifiedAccount = accountFactoryImmutable({
       username: 'verified',
