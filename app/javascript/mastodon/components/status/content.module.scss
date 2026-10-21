@@ -176,3 +176,19 @@
   width: 100%;
   height: 100%;
 }
+
+
+/* Vanilla/default theme: match the current Mastodon 5 text rhythm. */
+:global(body[data-theme='default']) {
+  .text {
+    p,
+    pre,
+    blockquote,
+    & > ul,
+    & > ol {
+      &:not(:last-child) {
+        margin-block-end: 0.6lh;
+      }
+    }
+  }
+}
