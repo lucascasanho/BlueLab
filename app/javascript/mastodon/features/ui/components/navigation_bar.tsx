@@ -211,7 +211,7 @@ export const NavigationBar: React.FC = () => {
   const isVanillaMobile =
     signedIn &&
     typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'vanilla' &&
+    document.body.dataset.theme === 'default' &&
     typeof window !== 'undefined' &&
     window.matchMedia('(max-width: 760px)').matches;
 
