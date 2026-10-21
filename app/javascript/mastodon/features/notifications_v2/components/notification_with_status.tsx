@@ -87,10 +87,10 @@ export const NotificationWithStatus: React.FC<{
     () => ({
       open: () => {
         const usesConversationNavigation =
-          typeof document !== 'undefined' &&
-          (document.body.dataset.theme === 'blue-2' ||
-            document.body.dataset.theme === 'default' ||
-            !document.body.dataset.theme);
+      typeof document !== 'undefined' &&
+      (document.body.dataset.theme === 'blue-2' ||
+        document.body.dataset.theme === 'default' ||
+        !document.body.dataset.theme);
 
         if (usesConversationNavigation && isPrivateMention) {
           dispatch(openConversationForStatus(statusId));
