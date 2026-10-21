@@ -36,3 +36,19 @@
   padding: var(--space-10) var(--space-4);
   text-align: center;
 }
+
+
+/* Vanilla/default theme: match Mastodon 5 thread spacing. */
+:global(body[data-theme='default']) {
+  .thread > article {
+    &:first-child,
+    &[data-connect-next='false'] + article {
+      padding-block-start: var(--space-3);
+    }
+
+    &[data-connect-next='false'],
+    &:last-child {
+      padding-block-end: var(--space-2);
+    }
+  }
+}
