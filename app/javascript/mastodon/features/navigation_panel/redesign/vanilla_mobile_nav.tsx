@@ -46,6 +46,18 @@ import {
   handleSearchLinkClick,
 } from './vanilla_navigation_panel';
 
+const stopMobilePointerPropagation = (
+  event: React.PointerEvent<HTMLButtonElement>,
+) => {
+  event.stopPropagation();
+};
+
+const stopMobileTouchPropagation = (
+  event: React.TouchEvent<HTMLButtonElement>,
+) => {
+  event.stopPropagation();
+};
+
 export const RedesignMobileNavigation: React.FC = () => {
   const dispatch = useAppDispatch();
   const { accountId, signedIn } = useIdentity();
@@ -169,14 +181,6 @@ export const RedesignMobileNavigation: React.FC = () => {
       <SlideOutNavigation />
     </>
   );
-};
-
-const stopMobilePointerPropagation: React.PointerEventHandler<HTMLButtonElement> = (event) => {
-  event.stopPropagation();
-};
-
-const stopMobileTouchPropagation: React.TouchEventHandler<HTMLButtonElement> = (event) => {
-  event.stopPropagation();
 };
 
 const MENU_WIDTH = 320;
