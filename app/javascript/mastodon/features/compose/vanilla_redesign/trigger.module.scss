@@ -30,7 +30,7 @@
   top: calc(
     var(--composer-visual-viewport-offset-top, 0) + env(safe-area-inset-top)
   );
-  bottom: var(--composer-visual-viewport-bottom, 0px);
+  bottom: var(--composer-visual-viewport-bottom, 0);
   transition:
     top 160ms ease-out,
     bottom 160ms ease-out,
