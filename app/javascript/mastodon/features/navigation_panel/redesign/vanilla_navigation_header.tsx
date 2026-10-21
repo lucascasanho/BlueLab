@@ -3,7 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 
-import { IconLogo } from '@/mastodon/components/logo';
+import MastodonBrandMark from '@/images/mastodon-brand-mark.svg?react';
 import { customAppIcon, domain, title } from '@/mastodon/initial_state';
 
 import { getNavigationSkipLinkId } from '../../ui/components/skip_links';
@@ -44,7 +44,7 @@ export const LogoLockup: React.FC<{
             defaultMessage='powered by {logo}Mastodon'
             values={{
               logo: (
-                <IconLogo
+                <MastodonBrandMark
                   role='presentation'
                   className={classes.mastodonLogo}
                 />
