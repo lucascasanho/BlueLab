@@ -251,6 +251,19 @@
     pointer-events: none;
   }
 
+  :global([data-bluelab-compose-attachments]) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-height: min(18rem, 28vh);
+    overflow-y: auto;
+
+    &[data-has-quote='true'] {
+      max-height: none;
+      overflow: visible;
+    }
+  }
+
   :global([data-bluelab-compose-message-notice]) {
     display: flex;
     align-items: center;
