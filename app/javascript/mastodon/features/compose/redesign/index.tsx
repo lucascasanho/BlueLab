@@ -38,6 +38,7 @@ import { ComposeFormHeader } from './header';
 import { ComposeHints } from './hints';
 import { LanguageButton } from './language';
 import { ComposeReply } from './reply';
+import { ComposeFormHeader as VanillaComposeFormHeader } from '../vanilla_redesign/header';
 import { LanguageButton as VanillaLanguageButton } from '../vanilla_redesign/language';
 import { ComposeSettingsMenu as VanillaComposeSettingsMenu } from '../vanilla_redesign/settings';
 import { ComposeVisibility as VanillaComposeVisibility } from '../vanilla_redesign/visibility';
@@ -181,13 +182,19 @@ export const RedesignComposeForm: React.FC<
     >
       {isMessage && <div className={classes.background} />}
 
-      {!compact && (
-        <ComposeFormHeader
-          id={titleId}
-          noMinimize={noMinimize || embedded}
-          noClose={embedded}
-        />
-      )}
+      {!compact &&
+        (vanillaAppearance ? (
+          <VanillaComposeFormHeader
+            id={titleId}
+            noMinimize={noMinimize || embedded}
+          />
+        ) : (
+          <ComposeFormHeader
+            id={titleId}
+            noMinimize={noMinimize || embedded}
+            noClose={embedded}
+          />
+        ))}
 
       <div
         className={classes.content}
