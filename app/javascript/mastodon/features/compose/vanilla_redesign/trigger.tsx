@@ -137,6 +137,7 @@ export const ComposeRedesignButton: React.FC<{
         ) : (
           <BlueLabComposeForm
             autoFocus
+            vanillaAppearance
             className={classNames(classes.composer, classes.blueLabComposer)}
           />
         )}
