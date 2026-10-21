@@ -38,7 +38,9 @@ import { ComposeFormHeader } from './header';
 import { ComposeHints } from './hints';
 import { LanguageButton } from './language';
 import { ComposeReply } from './reply';
+import { LanguageButton as VanillaLanguageButton } from '../vanilla_redesign/language';
 import { ComposeSettingsMenu as VanillaComposeSettingsMenu } from '../vanilla_redesign/settings';
+import { ComposeVisibility as VanillaComposeVisibility } from '../vanilla_redesign/visibility';
 import { RichComposeEditor } from './rich_editor';
 import { resolveComposeScrollTarget } from './scroll';
 import {
@@ -196,12 +198,20 @@ export const RedesignComposeForm: React.FC<
 
         {!compact && (
           <div className={classes.toolbar} data-bluelab-compose-toolbar>
-            <ComposeVisibility
-              className={classes.flexGrowWrap}
-              activeThreadItemId={activeThreadItemId}
-            />
+            {vanillaAppearance ? (
+              <VanillaComposeVisibility className={classes.flexGrowWrap} />
+            ) : (
+              <ComposeVisibility
+                className={classes.flexGrowWrap}
+                activeThreadItemId={activeThreadItemId}
+              />
+            )}
 
-            <LanguageButton activeThreadItemId={activeThreadItemId} />
+            {vanillaAppearance ? (
+              <VanillaLanguageButton />
+            ) : (
+              <LanguageButton activeThreadItemId={activeThreadItemId} />
+            )}
 
             {vanillaAppearance ? (
               <VanillaComposeSettingsMenu />
