@@ -5,8 +5,8 @@ import { NavLink } from 'react-router-dom';
 import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
 import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
 import {
-  profile_directory as canViewProfileDirectory,
   domain,
+  profile_directory as canViewProfileDirectory,
   statusPageUrl,
   termsOfServiceEnabled,
   title,
