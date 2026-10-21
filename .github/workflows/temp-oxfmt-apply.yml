@@ -37,6 +37,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Badge file is already formatted."
           else
-            git commit -m "style: apply Oxfmt to verification badge"
+            HUSKY=0 git commit -m "style: apply Oxfmt to verification badge"
             git push origin "HEAD:${BRANCH_NAME}"
           fi
