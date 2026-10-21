@@ -1,5 +1,5 @@
-import { useCallback, useId, useState } from 'react';
 import type { FC, KeyboardEvent, MouseEvent } from 'react';
+import { useCallback, useId, useState } from 'react';
 
 import { useIntl } from 'react-intl';
 
