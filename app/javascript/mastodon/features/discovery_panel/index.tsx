@@ -1,8 +1,8 @@
 import { useRouteMatch } from 'react-router';
 
 import { Search } from '@/mastodon/features/compose/components/search';
-import { useIdentity } from '@/mastodon/identity_context';
 import { VanillaFooterLinks } from '@/mastodon/features/navigation_panel/redesign/vanilla_footer_links';
+import { useIdentity } from '@/mastodon/identity_context';
 
 import { FooterLinks } from './footer_links';
 import classes from './styles.module.scss';
