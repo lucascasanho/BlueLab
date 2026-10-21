@@ -1,1 +1,2 @@
 Temporary trigger for the isolated Oxfmt artifact workflow. Remove after collection.
+Trigger the formatter job after adding its commit-back step.
