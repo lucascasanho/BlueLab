@@ -308,7 +308,8 @@ export const openPreferredComposer = createAppThunk(
     const preferredEditor = selectComposerEditor(getState());
     const isVanillaTheme =
       typeof document !== 'undefined' &&
-      document.body.dataset.theme === 'default';
+      (!document.body.dataset.theme ||
+        document.body.dataset.theme === 'default');
 
     // Vanilla 5.0 now hosts either editor in its redesigned compose surface.
     // Keep the native editor inside that surface instead of redirecting to the
