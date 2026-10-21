@@ -273,11 +273,26 @@ textarea.textarea {
       gap: 2px;
     }
 
+    .secondaryActions :global(button) {
+      box-sizing: border-box;
+      width: 32px;
+      min-width: 32px;
+      height: 32px;
+      min-height: 32px;
+      flex: 0 0 32px;
+      padding-inline: 0;
+    }
+
+    .scheduledSummary {
+      display: none;
+    }
+
     .pollButton {
       box-sizing: border-box;
       width: 32px;
       min-width: 32px;
       height: 32px;
+      min-height: 32px;
       padding-inline: 0;
       font-size: 0;
     }
@@ -292,6 +307,37 @@ textarea.textarea {
 
     .counter {
       display: none;
+    }
+
+    @media (width <= 360px) {
+      gap: 1px;
+
+      .secondaryActions,
+      .flexGrowWrap,
+      [data-compose-primary-actions] {
+        gap: 1px;
+      }
+
+      .secondaryActions :global(button) {
+        width: 28px;
+        min-width: 28px;
+        height: 28px;
+        min-height: 28px;
+        flex-basis: 28px;
+      }
+
+      .threadAddButton {
+        width: 28px;
+        min-width: 28px;
+        height: 28px;
+        min-height: 28px;
+        flex-basis: 28px;
+      }
+
+      .submitButton {
+        padding-inline: var(--space-1);
+        font-size: 0.8125rem;
+      }
     }
   }
 }

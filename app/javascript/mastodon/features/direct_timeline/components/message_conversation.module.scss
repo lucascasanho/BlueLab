@@ -232,7 +232,10 @@
   border-radius: 50%;
 }
 
-:global(body[data-theme='blue-2']) .replyComposer {
+:global(body[data-theme='blue-2']) .replyComposer,
+:global(body[data-theme='default']) .replyComposer,
+:global(body[data-theme='']) .replyComposer,
+:global(body:not([data-theme])) .replyComposer {
   width: 100%;
   min-width: 0;
   flex: 0 0 auto;
@@ -285,6 +288,11 @@
 
   [data-bluelab-compose-footer] .submitButton {
     margin-inline-start: var(--space-2);
+  }
+
+  [data-bluelab-compose-footer][data-vanilla-appearance='true']
+    .submitButton {
+    margin-inline-start: 0;
   }
 
   :global(.autosuggest-textarea__suggestions) {
@@ -369,7 +377,10 @@
   overflow-y: auto;
 }
 
-:global(body[data-theme='blue-2']) .messageListContent {
+:global(body[data-theme='blue-2']) .messageListContent,
+:global(body[data-theme='default']) .messageListContent,
+:global(body[data-theme='']) .messageListContent,
+:global(body:not([data-theme])) .messageListContent {
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -378,7 +389,10 @@
   gap: var(--space-3);
 }
 
-:global(body[data-theme='blue-2']) .replyComposer {
+:global(body[data-theme='blue-2']) .replyComposer,
+:global(body[data-theme='default']) .replyComposer,
+:global(body[data-theme='']) .replyComposer,
+:global(body:not([data-theme])) .replyComposer {
   position: relative;
   z-index: 2;
   flex: 0 0 auto;
@@ -404,6 +418,15 @@
 }
 
 :global(body[data-theme='blue-2'])
+  .replyComposer[data-bluelab-composer-compact='true']
+  .richEditor,
+:global(body[data-theme='default'])
+  .replyComposer[data-bluelab-composer-compact='true']
+  .richEditor,
+:global(body[data-theme=''])
+  .replyComposer[data-bluelab-composer-compact='true']
+  .richEditor,
+:global(body:not([data-theme]))
   .replyComposer[data-bluelab-composer-compact='true']
   .richEditor {
   max-height: 7rem;
@@ -438,6 +461,15 @@
   }
 
   :global(body[data-theme='blue-2'])
+    .replyComposer[data-bluelab-composer-compact='true']
+    .richEditor,
+  :global(body[data-theme='default'])
+    .replyComposer[data-bluelab-composer-compact='true']
+    .richEditor,
+  :global(body[data-theme=''])
+    .replyComposer[data-bluelab-composer-compact='true']
+    .richEditor,
+  :global(body:not([data-theme]))
     .replyComposer[data-bluelab-composer-compact='true']
     .richEditor {
     max-height: 7rem;
