@@ -76,3 +76,8 @@
   margin-inline: var(--space-4);
   margin-bottom: var(--space-2);
 }
+
+
+.root[data-scrollable='true'] {
+  overscroll-behavior: contain;
+}
