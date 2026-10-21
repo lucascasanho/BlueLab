@@ -23,10 +23,7 @@ import { Avatar } from '@/mastodon/components/avatar';
 import { IconButton } from '@/mastodon/components/button/vanilla_redesign';
 import { DisplayName } from '@/mastodon/components/display_name';
 import { useAccountHandle } from '@/mastodon/components/display_name/default';
-import {
-  LockupLink,
-  LockupWrapper,
-} from '@/mastodon/components/lockup';
+import { LockupLink, LockupWrapper } from '@/mastodon/components/lockup';
 import {
   Menu,
   MenuItem,
