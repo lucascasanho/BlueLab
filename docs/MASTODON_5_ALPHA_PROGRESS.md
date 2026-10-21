@@ -54,9 +54,11 @@ Alvo: somente `BlueLab-Test` / `mastodon.blue`. A branch `BlueLab` e a Espelunca
 - [x] Adicionar Favoritos com ícone de coração e chave de tradução já existente nos idiomas suportados.
 - [x] Exibir os três atalhos e o cartão do perfil também no rodapé do menu lateral mobile.
 - [x] Tornar o acionador do perfil mobile robusto para pointer/touch e manter o menu fora de áreas recortadas.
-- [ ] Confirmar formatação, lint, TypeScript e testes JavaScript na CI do commit de teste.
+- [x] Confirmar formatação, ESLint, TypeScript e testes JavaScript na CI do SHA `f57d9f5`.
+- [x] Confirmar CSS lint, Ruby lint, Haml lint, auditoria de dependências, precompilação de assets e migrações históricas no SHA `f57d9f5`.
 - [ ] Validar manualmente no mastodon.blue a navegação, o destino exato da mensagem e os menus mobile.
-- [ ] Não promover para `BlueLab` sem aprovação explícita do usuário.
+- CI ampla ainda em execução no momento deste checkpoint: RSpec principal, E2E, integrações Elasticsearch/OpenSearch e build de imagens do container.
+- Não promover para `BlueLab` sem aprovação explícita do usuário.
 
 ## Etapas
 
