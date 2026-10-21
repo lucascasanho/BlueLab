@@ -20,8 +20,8 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
 
 import { useBreakpoint } from '../../ui/hooks/useBreakpoint';
-
 import { RedesignComposeForm as BlueLabComposeForm } from '../redesign';
+
 import { ComposeFormHeader } from './header';
 import { RedesignComposeForm as VanillaComposeForm } from './index';
 import composerClasses from './styles.module.scss';
