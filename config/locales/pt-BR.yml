@@ -15,6 +15,7 @@ pt-BR:
       memorial: Sua conta foi transformada em um memorial
       pending_approval: Sua conta está atualmente aguardando aprovação da moderação
       pending_confirmation: Sua conta não tem um endereço de e-mail confirmado
+      2fa_required: "Sua conta não pode ser usada sem que um segundo fator de autenticação esteja configurado"
     errors:
       cannot_be_added_to_collections: Esta conta não pode ser adicionada a coleções.
     followers:
@@ -81,6 +82,8 @@ pt-BR:
       disabled: Desativada
       discoverable:
         title: Visível
+        disabled: "A pessoa não optou por permitir que seu perfil seja descoberto"
+        enabled: "A pessoa optou por permitir que seu perfil seja descoberto"
       display_name: Nome de exibição
       domain: Domínio
       edit: Editar
@@ -92,6 +95,10 @@ pt-BR:
       enabled_msg: A conta de %{username} foi descongelada
       follow_recommendations:
         allowed: Permitido
+        suppress: "Suprimir recomendações de contas"
+        suppressed: "Suprimida"
+        title: "Recomendações de contas"
+        unsuppress: "Restaurar recomendações de contas"
       followers: Seguidores
       follows: Seguindo
       header: Capa
@@ -197,6 +204,10 @@ pt-BR:
       warn: Notificar
       web: Web
       whitelisted: Permitido para federação
+      disable_sign_in_token: "Desativar temporariamente a verificação por código de segurança"
+      enable_sign_in_token: "Ativar a verificação por código de segurança"
+      enable_unconfirmed: "Permitir confirmação por e-mail"
+      registration_app: "Aplicativo de cadastro"
     action_logs:
       action_types:
         approve_appeal: Aprovar recurso
@@ -349,6 +360,8 @@ pt-BR:
         update_username_block_html: "%{name} Atualizou a regra para nomes de usuários contendo %{target}"
         usable_tag_html: pode ser usado;
         username_change_account_html: "%{name} alterou o nome de usuário de %{target}"
+        create_moderation_subscription_html: "\"%{name} criou a assinatura de moderação %{target}\""
+        destroy_moderation_subscription_html: "\"%{name} excluiu a assinatura de moderação %{target}\""
       deleted_account: conta excluída
       empty: Nenhum registro encontrado.
       filter_by_action: Filtrar por ação
@@ -356,6 +369,7 @@ pt-BR:
       instance_customization_changes: Os valores anteriores e novos foram registrados com segurança.
       title: Auditar histórico
       unavailable_instance: "(nome de domínio indisponível)"
+      deleted_suggestion: "uma assinatura de moderação excluída"
     announcements:
       back: Voltar aos anúncios
       destroyed_msg: Anúncio excluído!
@@ -509,6 +523,11 @@ pt-BR:
       reject_reports_hint: Ignora todas as denúncias vindas deste domínio. Irrelevante para suspensões
       undo: Desfazer bloqueio de domínio
       view: Ver domínios bloqueados
+      confirm_downgrade:
+        cancel: "Cancelar"
+        confirm: "Rebaixar bloqueio"
+        preamble_html: "Você está prestes a rebaixar o bloqueio existente de <strong>%{domain}</strong> e seus subdomínios."
+        title: "Confirmar rebaixamento do bloqueio de domínio de %{domain}"
     email_domain_blocks:
       add_new: Adicionar novo
       allow_registrations_with_approval: Permitir inscrições com aprovação
@@ -629,6 +648,8 @@ pt-BR:
       capabilities:
         disable: Desativar
         enable: Ativar
+        activation_msg: "Recurso ativado com sucesso."
+        deactivation_msg: "Recurso desativado com sucesso."
       debug:
         callbacks:
           created_at: Criado em
@@ -655,6 +676,7 @@ pt-BR:
         sign_in: Entrar
         status: Estado
         title: Provedores de serviços auxiliares do Fediverso
+        capabilities: "Recursos"
       title: FASP
     follow_recommendations:
       description_html: "<strong>A recomendação de contas ajuda os novos usuários a encontrar rapidamente conteúdo interessante</strong>. Quando um usuário ainda não tiver interagido o suficiente para gerar recomendações de contas, essas contas serão recomendadas. Essas recomendações são recalculadas diariamente a partir de uma lista de contas com alto engajamento e maior número de seguidores locais em uma dada língua."
@@ -696,6 +718,7 @@ pt-BR:
         policy: Políticas
         reason: Razão pública
         title: Políticas de conteúdo
+        moderation_subscription: "Assinatura de moderação"
       dashboard:
         instance_accounts_dimension: Contas mais seguidas
         instance_accounts_measure: contas armazenadas
@@ -743,6 +766,8 @@ pt-BR:
       total_storage: Mídias anexadas
       totals_time_period_hint_html: Os totais exibidos abaixo incluem dados para todo o tempo.
       unknown_instance: Atualmente não há registros deste domínio neste servidor.
+      advisories:
+        title: "Avisos das assinaturas de moderação"
     invites:
       deactivate_all: Desativar todos
       filter:
@@ -1006,6 +1031,16 @@ pt-BR:
         users: Para usuários locais logados
       external:
         privacy: Privacidade
+        directory: "Diretório de servidores"
+        opt_in_server_directory:
+          description: "Permitir que seu servidor apareça em diretórios de servidores, como o disponível em https://joinmastodon.org/servers."
+          title: "Incluir seu servidor no diretório de servidores"
+        opt_in_server_recommendation:
+          description: "Permitir que seu servidor seja recomendado durante o cadastro em aplicativos, como os clientes oficiais do Mastodon."
+          title: "Incluir seu servidor nas recomendações"
+        preamble: "Controle quanta informação sobre seu servidor é compartilhada com outros serviços e o quanto ele pode ser descoberto."
+        publish_statistics: "Publicar estatísticas"
+        title: "Descoberta externa"
       feed_access:
         modes:
           authenticated: Apenas usuários autenticados
@@ -1103,12 +1138,15 @@ pt-BR:
         authorized_fetch: Exigir autenticação por parte de servidores federados
         authorized_fetch_hints:
           none: Exigir autenticação apenas quando estritamente necessário permite que seu proxy reverso armazene mais solicitações em cache. Essa opção pode ser removida no futuro. Utilize-a apenas se as outras opções causarem problemas.
+          actors: "Exigir autenticação para perfis permite acompanhar quais servidores já descobriram cada conta local, reduzindo solicitações desnecessárias ao notificar servidores sobre a exclusão de uma conta. Isso tem um pequeno custo de desempenho ao servir perfis, pois exige esse rastreamento e impede que o proxy reverso armazene em cache as respostas dessas solicitações. Também pode causar problemas de compatibilidade com alguns serviços federados."
+          all: "Além dos benefícios e desvantagens de exigir autenticação para perfis, exigir autenticação de forma incondicional de servidores federados permite aplicar com mais rigor os bloqueios no nível da conta e do servidor, mas também impede o armazenamento em cache da maioria das solicitações. Isso reduzirá ainda o alcance das suas respostas, pois o encaminhamento de respostas ficará desativado."
         authorized_fetch_modes:
           actors: Para perfis e conteúdo privado
           all: Para cada solicitação
           none: Somente para conteúdo privado
         authorized_fetch_overridden_hint: Você atualmente não pode alterar esta configuração porque ela é sobreposta por uma variável de ambiente.
         federation_authentication: Aplicação de autenticação da Federação
+        authorized_fetch_hint: "Defina quando servidores remotos precisam se autenticar ao buscar conteúdo deste servidor."
       title: Configurações do servidor
     site_uploads:
       delete: Excluir arquivo enviado
@@ -1348,6 +1386,9 @@ pt-BR:
           one: Compartilhado por uma pessoa na última semana
           other: Compartilhado por %{count} pessoas na última semana
         title: Em alta no momento
+        usage_comparison:
+          one: "Compartilhado %{count} vez hoje, em comparação com %{yesterday} ontem"
+          other: "Compartilhado %{count} vezes hoje, em comparação com %{yesterday} ontem"
       not_allowed_to_trend: Não tem permissão para criar tendências
       only_allowed: Somente permitido
       pending_review: Revisão pendente
@@ -1395,6 +1436,9 @@ pt-BR:
         used_by_over_week:
           one: Usado por uma pessoa na última semana
           other: Usado por %{count} pessoas na última semana
+        usage_comparison:
+          one: "Usada %{count} vez hoje, em comparação com %{yesterday} ontem"
+          other: "Usada %{count} vezes hoje, em comparação com %{yesterday} ontem"
       title: Recomendações e tendências
       trending: Em alta
     update_available: Atualização disponível
@@ -1420,6 +1464,10 @@ pt-BR:
     warning_presets:
       add_new: Adicionar novo
       delete: Excluir
+      edit_preset: "Editar resposta predefinida"
+      empty: "Você ainda não definiu respostas predefinidas."
+      navigation_title: "Respostas predefinidas"
+      title: "Respostas predefinidas de moderação"
     webhooks:
       add_new: Adicionar endpoint
       delete: Excluir
@@ -1440,6 +1488,92 @@ pt-BR:
       status: Status
       title: Webhooks
       webhook: Webhook
+    moderation_subscriptions:
+      add_new: "Adicionar assinatura"
+      advisory_action: "'Ação: %{action}'"
+      advisory_actions:
+        accept: "permitir"
+        limit: "limitar"
+        reject: "suspender"
+      apply_automatically: "Aplicar avisos automaticamente"
+      apply_conditions:
+        always: "Sempre"
+        never: "Nunca"
+        safely: "Somente se não romper relações existentes"
+      apply_conditions_hint:
+        always: "Sempre aplicar automaticamente as ações recomendadas. Use esta opção apenas para listas em que você confia totalmente."
+        never: "Nunca aplicar automaticamente as ações recomendadas. Sempre gerar uma sugestão."
+        safely: "Aplicar as ações recomendadas, a menos que elas rompam relações de seguimento existentes com usuários locais. Nesses casos, uma sugestão será gerada."
+      delete: "Excluir"
+      destroyed_msg: "Assinatura de moderação excluída com sucesso"
+      empty: "Nenhuma lista de moderação foi assinada ainda."
+      last_synced_at: "Última sincronização em"
+      list_action: "Tipo de lista"
+      list_actions:
+        accept: "Lista de permissões"
+        default: "Mista (permissões e bloqueios)"
+        reject: "Lista de bloqueios"
+      list_actions_hint:
+        accept: "Itens sem uma ação especificada serão considerados permitidos. Os bloqueios serão ignorados."
+        default: "Itens sem uma ação especificada serão considerados bloqueios. Bloqueios e permissões serão aplicados conforme definidos."
+        reject: "Itens sem uma ação especificada serão considerados bloqueios. As permissões serão ignoradas."
+      list_actions_short:
+        accept: "Permitir"
+        default: "Mista"
+        reject: "Bloquear"
+      name: "Nome"
+      new:
+        create: "Assinar"
+        title: "Nova assinatura de moderação"
+      override_unattributed: "Substituir bloqueios manuais"
+      override_unattributed_hint: "Permitir que esta assinatura atualize ou assuma automaticamente bloqueios manuais existentes ao aplicar avisos."
+      policies:
+        apply_advisories: "Aplica avisos automaticamente"
+        apply_advisories_safely: "Aplica automaticamente avisos que não rompem relações existentes"
+        apply_retractions: "Aplica retratações automaticamente"
+      priority: "Prioridade"
+      priority_hint: "As assinaturas de moderação são avaliadas por prioridade. Assinaturas com número menor têm precedência sobre as de número maior."
+      retract_automatically: "Retratar avisos automaticamente"
+      retract_automatically_hint: "Define se as mudanças de política podem ser removidas ou rebaixadas quando a assinatura remove o item correspondente. Com a retratação automática ativada, um aviso equivalente de uma lista com prioridade inferior será adotado. Se desativada, será gerada uma sugestão."
+      show:
+        delete_confirm: "Tem certeza de que deseja excluir esta assinatura de moderação?"
+        edit: "Editar assinatura"
+        empty: "Esta assinatura ainda não tem avisos."
+        title: "'Assinatura de moderação: %{name}'"
+      tabs:
+        logs: "Registros"
+        subscriptions: "Assinaturas"
+        suggestions: "Sugestões"
+      title: "Assinaturas de moderação"
+      type: "Tipo"
+      types:
+        csv_list: "Lista CSV"
+      url: "URL"
+    moderation_subscriptions_logs:
+      title: "Registros das assinaturas de moderação"
+    moderation_suggestions:
+      actions:
+        accept: "Permitir"
+        limit: "Limitar"
+        reject: "Suspender"
+        retract: "Retratar política atual"
+      applied_msg: "Sugestão para %{target_key} aplicada com sucesso"
+      apply_accept: "Permitir"
+      apply_limit: "Limitar"
+      apply_reject: "Suspender"
+      apply_retract: "Retratar"
+      current_states:
+        accept: "atualmente permitido"
+        limit: "atualmente limitado"
+        reject: "atualmente suspenso"
+      description: "Abaixo estão as sugestões das suas assinaturas de moderação, ordenadas por prioridade."
+      destroyed_msg: "Sugestão para %{target_key} descartada com sucesso"
+      dismiss: "Descartar sugestões"
+      empty: "Não há sugestões de moderação no momento."
+      retracted_msg: "Política de %{target_key} retratada com sucesso"
+      suggested_from_html: "Sugerido por %{link}"
+      title: "Sugestões de moderação"
+      unable_to_apply_msg: "Não foi possível aplicar a sugestão para %{target_key}"
   admin_mailer:
     auto_close_registrations:
       body: Devido à falta de atividade recente dos moderadores, as inscrições em %{instance} foram automaticamente alteradas para exigir revisão manual, para evitar que %{instance} seja usada como uma plataforma para potenciais atores mal-intencionados. Você pode alterá-la de volta para inscrições abertas a qualquer momento.
@@ -1487,6 +1621,12 @@ pt-BR:
       new_trending_tags:
         title: Hashtags em alta
       subject: Novas tendências para revisão em %{instance}
+    new_moderation_suggestions:
+      body: "As listas de moderação às quais seu servidor está inscrito publicaram novas sugestões."
+      subject: "Novas sugestões de moderação disponíveis em %{instance}!"
+    new_pending_accounts:
+      body: "Novas contas foram criadas em %{instance}. Como seu servidor está configurado para adiar os e-mails de confirmação até a aprovação da moderação, essas contas ainda não puderam confirmar seus endereços de e-mail. Os detalhes das novas contas estão abaixo. Você pode aprovar ou rejeitar essas solicitações."
+      subject: "Novas contas aguardando análise em %{instance}"
   aliases:
     add_new: Criar alias
     created_msg: Um novo atalho foi criado. Agora você pode iniciar a mudança da conta antiga.
@@ -1588,6 +1728,11 @@ pt-BR:
       link_not_received: Não recebeu um link?
       new_confirmation_instructions_sent: Você receberá um novo e-mail com o link de confirmação em alguns minutos!
       title: Verifique sua caixa de entrada
+      correct_email: "Corrigir endereço"
+      email_settings_hint_wait_html: "Sua inscrição está sendo analisada. Em breve você deverá receber um e-mail em %{email}. Quando recebê-lo, clique no link para começar a usar o Mastodon. Aguardaremos aqui."
+      title_wait: "Fique de olho na sua caixa de entrada"
+      wrong_email: "Endereço de e-mail incorreto?"
+      wrong_email_below_hint_html: "Não se preocupe! Você pode corrigir seu endereço de e-mail abaixo."
     sign_in:
       preamble_html: Entre com suas credenciais de domínios ( <strong>%{domain}</strong> ) . Se sua conta estiver hospedada em um servidor diferente, você não deve conseguir acessar este conteúdo.
       title: Entrar em %{domain}
@@ -1678,6 +1823,7 @@ pt-BR:
       more_details_html: Para mais detalhes, consulte a <a href="%{terms_path}">Política de Privacidade</a>.
       username_available: Seu nome de usuário ficará disponível novamente
       username_unavailable: Seu nome de usuário permanecerá indisponível
+    confirm_username_hint_html: "Digite <code>%{username}</code> para confirmar a conta que deseja excluir"
   disputes:
     strikes:
       action_taken: Ações tomadas
@@ -1865,6 +2011,10 @@ pt-BR:
       invalid_json_file: 'Arquivo JSON inválido. Erro: %{error}'
       status_not_found_warning: Alguns filtros seus ocultam publicações específicas que não são conhecidas neste servidor. Estas publicações serão filtradas automaticamente se forem descobertas depois pelo servidor.
       too_large: O arquivo é muito grande
+      no_data: "Este arquivo não contém dados correspondentes ao tipo de importação selecionado"
+      over_rows_processing_limit:
+        one: "contém mais de %{count} linha"
+        other: "contém mais de %{count} linhas"
     failures: Falhas
     imported: Importado
     mismatched_types_warning: Parece que você selecionou o tipo errado para esta importação, por favor verifique novamente.
@@ -2617,6 +2767,14 @@ pt-BR:
       sign_in_action: Entrar
       subject: Boas-vindas ao Mastodon
       title: Boas vindas, %{name}!
+    sign_in_token:
+      change_password: "altere sua senha"
+      details: "'Confira os detalhes da tentativa:'"
+      explanation: "'Detectamos uma tentativa de entrar na sua conta após um longo período de inatividade. Se foi você, digite o código de segurança abaixo na página de verificação de entrada:'"
+      further_actions: "'Se não foi você, altere sua senha e ative a autenticação de dois fatores na sua conta. Você pode fazer isso aqui:'"
+      further_actions_html: "Se não foi você, recomendamos que %{action} imediatamente e ative a autenticação de dois fatores para manter sua conta segura."
+      subject: "Confirme a tentativa de entrada"
+      title: "Tentativa de entrada"
   users:
     follow_limit_reached: Você não pode seguir mais de %{limit} pessoas
     go_to_sso_account_settings: Vá para as configurações de conta do seu provedor de identidade
@@ -2625,6 +2783,10 @@ pt-BR:
     rate_limited: Muitas tentativas de autenticação; tente novamente mais tarde.
     seamless_external_login: Você está logado através de um serviço externo, portanto as configurações de senha e e-mail não estão disponíveis.
     signed_in_as: 'Entrou como:'
+    generic_access_help_html: "Está com problemas para acessar sua conta? Entre em contato com %{email} para obter ajuda"
+    inactive_sign_in_confirmation: "Faz algum tempo que você não entra na sua conta. Por isso, estamos enviando um código de segurança ao seu e-mail para confirmar que é você."
+    inactive_sign_in_title: "Confirme seu código de segurança"
+    invalid_sign_in_token: "Código de segurança inválido"
   verification:
     extra_instructions_html: <strong>Dica:</strong> O link do seu site não precisa ser visível. O importante é a parte <code>rel="me"</code>, que impede a personificação em sites com conteúdo gerado pelo usuário. Você pode até usar uma tag <code>link</code> no cabeçalho da página ao invés de uma tag <code>a</code>, mas é importante que o HTML esteja acessível sem executar JavaScript.
     here_is_how: Veja como
@@ -2654,3 +2816,13 @@ pt-BR:
   wrapstodon:
     description: Veja como %{name} usou o Mastodon este ano!
     title: Wrapstodon de %{year} para %{name}
+
+  color_theme:
+    cyan: "Ciano"
+    indigo: "Índigo"
+    lime: "Verde-lima"
+    orange: "Laranja"
+    pink: "Rosa"
+  density:
+    compact: "Compacta"
+    default: "Padrão"
