@@ -841,10 +841,14 @@ export const RichComposeEditor: React.FC<{
   };
 
   return (
-    <div className={classes.richEditorWrapper}>
+    <div
+      className={classes.richEditorWrapper}
+      data-bluelab-rich-editor-wrapper
+    >
       {isMarkdown && (
         <div
           className={classes.richEditorToolbar}
+          data-bluelab-rich-editor-toolbar
           role='toolbar'
           aria-label={intl.formatMessage(messages.toolbar)}
         >
@@ -889,6 +893,7 @@ export const RichComposeEditor: React.FC<{
       <div
         ref={ref}
         className={classes.richEditor}
+        data-bluelab-rich-editor-input
         data-compose-scroll-zone='editor'
         contentEditable={isMarkdown ? true : 'plaintext-only'}
         suppressContentEditableWarning
@@ -915,6 +920,7 @@ export const RichComposeEditor: React.FC<{
         ref={hiddenRef}
         id={editorId ?? COMPOSER_TEXTAREA_ID}
         className={classes.richEditorTransport}
+        data-bluelab-rich-editor-transport
         tabIndex={-1}
         aria-hidden='true'
         readOnly
