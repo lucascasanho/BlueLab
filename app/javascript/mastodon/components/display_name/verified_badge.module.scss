@@ -20,14 +20,7 @@
   width: 0.9em;
   height: 0.9em;
   overflow: visible;
-  transition:
-    filter 120ms ease-out,
-    transform 120ms ease-out;
-}
-
-.trigger:hover .badge,
-.trigger:focus-visible .badge {
-  filter: brightness(1.08);
+  transition: transform 120ms ease-out;
 }
 
 .trigger:active .badge {
