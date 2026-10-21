@@ -306,8 +306,14 @@ export const openNewComposer = createAppThunk(
 export const openPreferredComposer = createAppThunk(
   (payload: Pick<ComposeNewPayload, 'origin'>, { dispatch, getState }) => {
     const preferredEditor = selectComposerEditor(getState());
+    const isVanillaTheme =
+      typeof document !== 'undefined' &&
+      document.body.dataset.theme === 'default';
 
-    if (preferredEditor === 'mastodon') {
+    // Vanilla 5.0 now hosts either editor in its redesigned compose surface.
+    // Keep the native editor inside that surface instead of redirecting to the
+    // legacy /publish page. Other themes retain their existing route behavior.
+    if (preferredEditor === 'mastodon' && !isVanillaTheme) {
       browserHistory.push('/publish', { focusTarget: false });
       return;
     }
