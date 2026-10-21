@@ -25,6 +25,7 @@ export const ComposeAttachments: React.FC<{ className?: string }> = ({
   return (
     <div
       className={className}
+      data-bluelab-compose-attachments
       data-compose-scroll-zone='panel'
       data-has-quote={quotedStatusId ? 'true' : 'false'}
     >
