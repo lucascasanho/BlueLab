@@ -41,7 +41,7 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { invokeVirtualIosKeyboard } from '@/mastodon/utils/invoke_virtual_ios_keyboard';
 
 import { useHasAnnouncements } from '../../announcements/hooks';
-import { FooterLinks } from '../../discovery_panel/footer_links';
+import { VanillaFooterLinks } from './vanilla_footer_links';
 
 import { NavigationAccountCardAndMenu } from './vanilla_account_card_and_menu';
 import { ListSection } from './vanilla_list_section';
@@ -298,7 +298,7 @@ export const RedesignNavigationPanel: React.FC<{
                 <NavigationAccountCardAndMenu />
               </>
             )}
-            <FooterLinks context='navigation' multiColumn={multiColumn} />
+            <VanillaFooterLinks context='navigation' multiColumn={multiColumn} />
           </footer>
         </>
       )}
@@ -316,7 +316,7 @@ export const RedesignNavigationPanel: React.FC<{
           </ul>
           <footer className={classes.footer} data-stuck={!isScrolledToBottom}>
             {disabledAccountId ? <DisabledAccountBanner /> : <LoggedOutInfo />}
-            <FooterLinks context='navigation' multiColumn={multiColumn} />
+            <VanillaFooterLinks context='navigation' multiColumn={multiColumn} />
           </footer>
         </>
       )}
