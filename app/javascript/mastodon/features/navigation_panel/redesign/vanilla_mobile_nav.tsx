@@ -21,7 +21,7 @@ import {
   Button,
   IconButton,
 } from '@/mastodon/components/button/vanilla_redesign';
-import { Menu, MenuList, useMenuContext } from '@/mastodon/components/menu';
+import { Menu, MenuList, MenuTrigger } from '@/mastodon/components/menu';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/vanilla_redesign/trigger';
 import { useAccount } from '@/mastodon/hooks/useAccount';
@@ -36,8 +36,10 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { AccountMenuItems } from './vanilla_account_card_and_menu';
 import classes from './vanilla_mobile_nav.module.scss';
 import { LogoLockup } from './vanilla_navigation_header';
-import { MobileNavLink } from './vanilla_navigation_link';
-import MobileNavigationLinkClasses from './vanilla_navigation_link.module.scss';
+import {
+  MobileNavLink,
+  MobileNavProfileButton,
+} from './vanilla_navigation_link';
 import {
   RedesignNavigationPanel,
   useNotificationsCount,
@@ -46,7 +48,8 @@ import {
 
 export const RedesignMobileNavigation: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { signedIn } = useIdentity();
+  const { accountId, signedIn } = useIdentity();
+  const mobileProfileAccount = useAccount(accountId);
 
   const notificationsCount = useNotificationsCount();
 
@@ -100,7 +103,37 @@ export const RedesignMobileNavigation: React.FC = () => {
                 defaultMessage='Notifications'
               />
             </MobileNavLink>
-            <MobileProfileMenu />
+            <Menu type='navigation'>
+              <MenuTrigger
+                as={MobileNavProfileButton}
+                avatar={
+                  <Avatar
+                    size={24}
+                    account={mobileProfileAccount}
+                    className={classes.avatar}
+                  />
+                }
+                onPointerDown={stopMobilePointerPropagation}
+                onTouchStart={stopMobileTouchPropagation}
+              >
+                <FormattedMessage
+                  id='tabs_bar.account_settings'
+                  defaultMessage='Account settings'
+                />
+              </MenuTrigger>
+              <MenuList
+                portal
+                mobilePresentation='popover'
+                placement='top-end'
+                strategy='fixed'
+                offset={8}
+                maxWidth='min(280px, calc(100vw - 24px))'
+                constrainToViewport
+                scrollable
+              >
+                <AccountMenuItems context='mobile' />
+              </MenuList>
+            </Menu>
           </ul>
           <ComposeRedesignButton inline />
         </nav>
@@ -138,116 +171,12 @@ export const RedesignMobileNavigation: React.FC = () => {
   );
 };
 
-const MobileProfileMenu: React.FC = () => (
-  <Menu type='navigation'>
-    <MobileProfileMenuTrigger />
-    <MenuList
-      portal
-      mobilePresentation='popover'
-      placement='top-end'
-      strategy='fixed'
-      offset={8}
-      maxWidth='min(280px, calc(100vw - 24px))'
-      constrainToViewport
-      scrollable
-    >
-      <AccountMenuItems context='mobile' />
-    </MenuList>
-  </Menu>
-);
+const stopMobilePointerPropagation: React.PointerEventHandler<HTMLButtonElement> = (event) => {
+  event.stopPropagation();
+};
 
-const MobileProfileMenuTrigger: React.FC = () => {
-  const { accountId } = useIdentity();
-  const account = useAccount(accountId);
-  const { menuTriggerProps, popover } = useMenuContext();
-  const pointerHandledRef = useRef(false);
-  const pointerResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
-
-  const clearPointerResetTimer = useCallback(() => {
-    if (pointerResetTimerRef.current) {
-      clearTimeout(pointerResetTimerRef.current);
-      pointerResetTimerRef.current = null;
-    }
-  }, []);
-
-  const markPointerHandled = useCallback(() => {
-    pointerHandledRef.current = true;
-    clearPointerResetTimer();
-    pointerResetTimerRef.current = setTimeout(() => {
-      pointerHandledRef.current = false;
-      pointerResetTimerRef.current = null;
-    }, 750);
-  }, [clearPointerResetTimer]);
-
-  useEffect(
-    () => () => {
-      clearPointerResetTimer();
-    },
-    [clearPointerResetTimer],
-  );
-
-  const handlePointerDown = useCallback<
-    React.PointerEventHandler<HTMLButtonElement>
-  >(
-    (event) => {
-      event.stopPropagation();
-
-      if (event.pointerType === 'mouse' && event.button !== 0) {
-        return;
-      }
-
-      markPointerHandled();
-      popover.toggleMenu();
-    },
-    [markPointerHandled, popover.toggleMenu],
-  );
-
-  const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
-    (event) => {
-      event.stopPropagation();
-
-      if (pointerHandledRef.current) {
-        pointerHandledRef.current = false;
-        clearPointerResetTimer();
-        return;
-      }
-
-      popover.toggleMenu();
-    },
-    [clearPointerResetTimer, popover.toggleMenu],
-  );
-
-  return (
-    <li>
-      <button
-        ref={menuTriggerProps.ref}
-        id={menuTriggerProps.id}
-        type='button'
-        aria-haspopup={menuTriggerProps['aria-haspopup']}
-        aria-expanded={popover.isMenuOpen}
-        aria-controls={menuTriggerProps['aria-controls']}
-        onKeyDown={menuTriggerProps.onKeyDown}
-        onPointerDown={handlePointerDown}
-        onClick={handleClick}
-        className={classNames(
-          MobileNavigationLinkClasses.link,
-          MobileNavigationLinkClasses.linkMobile,
-        )}
-      >
-        <span className={MobileNavigationLinkClasses.icon}>
-          <Avatar size={24} account={account} className={classes.avatar} />
-        </span>
-        <span className='sr-only'>
-          <FormattedMessage
-            id='tabs_bar.account_settings'
-            defaultMessage='Account settings'
-          />
-        </span>
-      </button>
-    </li>
-  );
+const stopMobileTouchPropagation: React.TouchEventHandler<HTMLButtonElement> = (event) => {
+  event.stopPropagation();
 };
 
 const MENU_WIDTH = 320;

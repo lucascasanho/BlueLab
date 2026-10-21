@@ -559,9 +559,14 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     if (initialScrollConversationIdRef.current === id) return;
 
     if (sourceStatusId) {
-      initialScrollConversationIdRef.current = id;
-      scrollToStatus(sourceStatusId);
-      return;
+      const frame = window.requestAnimationFrame(() => {
+        scrollToStatus(sourceStatusId);
+        initialScrollConversationIdRef.current = id;
+      });
+
+      return () => {
+        window.cancelAnimationFrame(frame);
+      };
     }
 
     const initialReadState = initialReadStateRef.current;

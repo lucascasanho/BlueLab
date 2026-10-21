@@ -98,9 +98,18 @@ export const MobileNavLink: React.FC<MobileNavLink> = ({
   );
 };
 
-export const MobileNavProfileButton: React.FC<
-  { avatar?: ReactNode } & Pick<MobileNavLink, 'children' | 'withDot'>
-> = ({ children, avatar, withDot, ...otherProps }) => {
+type MobileNavProfileButtonProps = {
+  avatar?: ReactNode;
+  onPointerDown?: React.PointerEventHandler<HTMLButtonElement>;
+  onTouchStart?: React.TouchEventHandler<HTMLButtonElement>;
+} & Pick<MobileNavLink, 'children' | 'withDot'>;
+
+export const MobileNavProfileButton: React.FC<MobileNavProfileButtonProps> = ({
+  children,
+  avatar,
+  withDot,
+  ...otherProps
+}) => {
   return (
     <li>
       <button

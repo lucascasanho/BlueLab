@@ -563,7 +563,11 @@ export const Search: React.FC<{
         }
 
         if (scrollable && scrollable !== document.body) {
-          scrollable.scrollLeft += horizontalDelta;
+          scrollable.scrollTo({
+            left: scrollable.scrollLeft + horizontalDelta,
+            top: scrollable.scrollTop,
+            behavior: 'auto',
+          });
         } else {
           window.scrollBy({ left: horizontalDelta, top: 0, behavior: 'auto' });
         }
