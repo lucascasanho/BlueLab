@@ -72,13 +72,19 @@ interface MessageConversationProps {
   conversationId?: string;
   onBack?: () => void;
   inline?: boolean;
+  vanillaAppearance?: boolean;
 }
 
 export const MessageConversation: React.FC<MessageConversationProps> = ({
   conversationId,
   onBack,
   inline = false,
+  vanillaAppearance,
 }) => {
+  const theme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
+  const useVanillaAppearance =
+    vanillaAppearance ?? (!theme || theme === 'default');
   const { id: routeId } = useParams<{ id: string }>();
   const id = conversationId ?? routeId;
   const location = useLocation<{ statusId?: string }>();
@@ -831,6 +837,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
             compact
             embedded
             autoFocus
+            vanillaAppearance={useVanillaAppearance}
             onSuccess={handleReplyComposeSuccess}
           />
         )}

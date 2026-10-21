@@ -54,10 +54,13 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const pinned = !!columnId;
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const theme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
+  const isBlue2 = theme === 'blue-2';
+  const isVanilla = !theme || theme === 'default';
+  const useBlueLabMessages = isBlue2 || isVanilla;
   const title = intl.formatMessage(
-    isBlue2
+    useBlueLabMessages
       ? messages.blue2Title
       : isRedesignEnabled()
         ? messages.title_redesign
@@ -118,7 +121,7 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
     };
   }, [dispatch]);
 
-  if (isBlue2) {
+  if (useBlueLabMessages) {
     return (
       <Column
         bindToDocument={!multiColumn}

@@ -42,7 +42,10 @@
   padding: var(--space-1) var(--space-1) var(--space-2);
 }
 
-:global(body[data-theme='blue-2']) .messageListContent {
+:global(body[data-theme='blue-2']) .messageListContent,
+:global(body[data-theme='default']) .messageListContent,
+:global(body[data-theme='']) .messageListContent,
+:global(body:not([data-theme])) .messageListContent {
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -51,7 +54,10 @@
   gap: var(--space-3);
 }
 
-:global(body[data-theme='blue-2']) .replyComposer {
+:global(body[data-theme='blue-2']) .replyComposer,
+:global(body[data-theme='default']) .replyComposer,
+:global(body[data-theme='']) .replyComposer,
+:global(body:not([data-theme])) .replyComposer {
   position: relative;
   z-index: 2;
   flex: 0 0 auto;
@@ -323,13 +329,19 @@
  * theme/component uses these rules: the column fills its host, the history
  * owns scrolling, and the composer stays outside that scroll region.
  */
-:global(body[data-theme='blue-2']) .column {
+:global(body[data-theme='blue-2']) .column,
+:global(body[data-theme='default']) .column,
+:global(body[data-theme='']) .column,
+:global(body:not([data-theme])) .column {
   box-sizing: border-box;
   min-width: 0;
   min-height: 0;
 }
 
-:global(body[data-theme='blue-2']) .inlineColumn {
+:global(body[data-theme='blue-2']) .inlineColumn,
+:global(body[data-theme='default']) .inlineColumn,
+:global(body[data-theme='']) .inlineColumn,
+:global(body:not([data-theme])) .inlineColumn {
   flex: 1 1 auto;
   width: 100%;
   min-width: 0;
@@ -338,14 +350,20 @@
   max-width: none;
 }
 
-:global(body[data-theme='blue-2']) .page {
+:global(body[data-theme='blue-2']) .page,
+:global(body[data-theme='default']) .page,
+:global(body[data-theme='']) .page,
+:global(body:not([data-theme])) .page {
   min-width: 0;
   min-height: 0;
   flex: 1 1 auto;
   overflow: hidden;
 }
 
-:global(body[data-theme='blue-2']) .messageList {
+:global(body[data-theme='blue-2']) .messageList,
+:global(body[data-theme='default']) .messageList,
+:global(body[data-theme='']) .messageList,
+:global(body:not([data-theme])) .messageList {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
@@ -372,6 +390,15 @@
 
 :global(body[data-theme='blue-2'])
   .replyComposer[data-bluelab-composer-compact='true']
+  [data-compose-scroll-container],
+:global(body[data-theme='default'])
+  .replyComposer[data-bluelab-composer-compact='true']
+  [data-compose-scroll-container],
+:global(body[data-theme=''])
+  .replyComposer[data-bluelab-composer-compact='true']
+  [data-compose-scroll-container],
+:global(body:not([data-theme]))
+  .replyComposer[data-bluelab-composer-compact='true']
   [data-compose-scroll-container] {
   overflow: hidden;
 }
@@ -387,14 +414,20 @@
   // navigation remains outside it, so the composer stays in normal flex flow
   // exactly above the navigation and moves to the viewport bottom when the
   // navigation chrome is hidden.
-  :global(body[data-theme='blue-2']) .column {
+  :global(body[data-theme='blue-2']) .column,
+  :global(body[data-theme='default']) .column,
+  :global(body[data-theme='']) .column,
+  :global(body:not([data-theme])) .column {
     height: 100%;
     max-height: 100%;
   }
 
   // Reserve the mobile navigation's occupied height inside the message page
   // so the fixed bottom bar cannot overlap the composer.
-  :global(body[data-theme='blue-2']) .page {
+  :global(body[data-theme='blue-2']) .page,
+  :global(body[data-theme='default']) .page,
+  :global(body[data-theme='']) .page,
+  :global(body:not([data-theme])) .page {
     padding-bottom: calc(56px + env(safe-area-inset-bottom));
   }
 
@@ -411,13 +444,19 @@
   }
 }
 @media (width >= 1175px) {
-  :global(body[data-theme='blue-2']) .advancedColumn {
+  :global(body[data-theme='blue-2']) .advancedColumn,
+  :global(body[data-theme='default']) .advancedColumn,
+  :global(body[data-theme='']) .advancedColumn,
+  :global(body:not([data-theme])) .advancedColumn {
     height: 100dvh;
     max-height: 100dvh;
     min-height: 0;
   }
 
-  :global(body[data-theme='blue-2']) .page {
+  :global(body[data-theme='blue-2']) .page,
+  :global(body[data-theme='default']) .page,
+  :global(body[data-theme='']) .page,
+  :global(body:not([data-theme])) .page {
     min-height: 0;
   }
 }
