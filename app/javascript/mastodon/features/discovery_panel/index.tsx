@@ -29,9 +29,11 @@ const ROUTES_WITHOUT_SEARCH_BAR = [
 
 export const DiscoveryPanel: React.FC = () => {
   const { signedIn } = useIdentity();
-  const isVanillaTheme =
+  const FooterLinksComponent =
     typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'default';
+    document.body.dataset.theme === 'default'
+      ? VanillaFooterLinks
+      : FooterLinks;
 
   const isRouteWithSearchBar = !useRouteMatch({
     path: ROUTES_WITHOUT_SEARCH_BAR,
@@ -45,11 +47,7 @@ export const DiscoveryPanel: React.FC = () => {
       )}
 
       <footer className={classes.footer}>
-        {isVanillaTheme ? (
-          <VanillaFooterLinks context='search' />
-        ) : (
-          <FooterLinks context='search' />
-        )}
+        <FooterLinksComponent context='search' />
       </footer>
     </div>
   );
