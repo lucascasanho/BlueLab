@@ -11,8 +11,9 @@ import type { IconButtonProps } from '@/mastodon/components/button/vanilla_redes
 import { IconButton } from '@/mastodon/components/button/vanilla_redesign';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
+  composerOriginFromElement,
   minimizeComposerToggle,
-  openNewComposer,
+  openPreferredComposer,
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
@@ -53,9 +54,16 @@ export const ComposeRedesignButton: React.FC<{
 
   const dispatch = useAppDispatch();
   const handleComposerOpen: React.MouseEventHandler<HTMLButtonElement> =
-    useCallback(() => {
-      dispatch(openNewComposer({ type: 'post' }));
-    }, [dispatch]);
+    useCallback(
+      (event) => {
+        dispatch(
+          openPreferredComposer({
+            origin: composerOriginFromElement(event.currentTarget),
+          }),
+        );
+      },
+      [dispatch],
+    );
 
   const toggleMinimize = useCallback(() => {
     dispatch(minimizeComposerToggle());
