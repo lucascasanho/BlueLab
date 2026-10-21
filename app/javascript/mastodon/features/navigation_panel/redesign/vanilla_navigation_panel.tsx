@@ -298,7 +298,10 @@ export const RedesignNavigationPanel: React.FC<{
                 <NavigationAccountCardAndMenu />
               </>
             )}
-            <VanillaFooterLinks context='navigation' multiColumn={multiColumn} />
+            <VanillaFooterLinks
+              context='navigation'
+              multiColumn={multiColumn}
+            />
           </footer>
         </>
       )}
@@ -316,7 +319,10 @@ export const RedesignNavigationPanel: React.FC<{
           </ul>
           <footer className={classes.footer} data-stuck={!isScrolledToBottom}>
             {disabledAccountId ? <DisabledAccountBanner /> : <LoggedOutInfo />}
-            <VanillaFooterLinks context='navigation' multiColumn={multiColumn} />
+            <VanillaFooterLinks
+              context='navigation'
+              multiColumn={multiColumn}
+            />
           </footer>
         </>
       )}
