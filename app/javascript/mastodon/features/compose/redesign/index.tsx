@@ -25,18 +25,10 @@ import {
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
-import {
-  ComposeFormHeader as VanillaComposeFormHeader,
-} from '../vanilla_redesign/header';
-import {
-  LanguageButton as VanillaLanguageButton,
-} from '../vanilla_redesign/language';
-import {
-  ComposeSettingsMenu as VanillaComposeSettingsMenu,
-} from '../vanilla_redesign/settings';
-import {
-  ComposeVisibility as VanillaComposeVisibility,
-} from '../vanilla_redesign/visibility';
+import { ComposeFormHeader as VanillaComposeFormHeader } from '../vanilla_redesign/header';
+import { LanguageButton as VanillaLanguageButton } from '../vanilla_redesign/language';
+import { ComposeSettingsMenu as VanillaComposeSettingsMenu } from '../vanilla_redesign/settings';
+import { ComposeVisibility as VanillaComposeVisibility } from '../vanilla_redesign/visibility';
 
 import { ComposeAttachments } from './attachments';
 import { ComposeAutocomplete } from './autocomplete';
