@@ -1,3 +1,4 @@
+@use '@/styles/mastodon/mixins';
 @use '@/styles/mastodon/variables';
 
 .buttonWrapper {
@@ -74,4 +75,32 @@
 
 .composerMinimized {
   cursor: pointer;
+}
+
+
+/* Use the Vanilla 5.0 compose surface for the BlueLab editor too.
+ * The content editor and enhanced actions come from BlueLab, while this
+ * theme-scoped rule preserves Vanilla's own panel treatment. */
+:global(body[data-theme='default']) .blueLabComposer {
+  background: var(--color-bg-primary);
+  border: 0;
+  box-shadow: none;
+
+  @media (width >= #{variables.$mobile-menu-breakpoint}) {
+    @include mixins.elevation-2;
+
+    border: 0;
+    border-bottom: none;
+    border-radius: var(--radius-6) var(--radius-6) 0 0;
+    overflow: hidden;
+  }
+
+  :global([data-compose-scroll-container]) {
+    min-height: 0;
+    overscroll-behavior-y: contain;
+  }
+
+  :global([data-bluelab-compose-toolbar]) {
+    background: var(--color-bg-primary);
+  }
 }
