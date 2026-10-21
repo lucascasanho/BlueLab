@@ -59,8 +59,8 @@ export const VerifiedMark: FC<IconProps> = ({ className, remoteBadge }) => {
     ? remoteBadge.colors
     : VERIFIED_BADGE_PALETTE;
   const startColor = remoteColors[0];
-  const middleColor = remoteColors[1] ?? startColor;
-  const endColor = remoteColors[2] ?? middleColor;
+  const middleColor = remoteColors[1];
+  const endColor = remoteColors[2];
 
   return (
     <svg
@@ -78,18 +78,9 @@ export const VerifiedMark: FC<IconProps> = ({ className, remoteBadge }) => {
           y2='22'
           gradientUnits='userSpaceOnUse'
         >
-          <stop
-            offset='0'
-            stopColor={startColor ?? VERIFIED_BADGE_PALETTE[0]}
-          />
-          <stop
-            offset='0.5'
-            stopColor={middleColor ?? VERIFIED_BADGE_PALETTE[1]}
-          />
-          <stop
-            offset='1'
-            stopColor={endColor ?? VERIFIED_BADGE_PALETTE[2]}
-          />
+          <stop offset='0' stopColor={startColor} />
+          <stop offset='0.5' stopColor={middleColor} />
+          <stop offset='1' stopColor={endColor} />
         </linearGradient>
       </defs>
 
