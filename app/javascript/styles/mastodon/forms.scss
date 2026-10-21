@@ -807,6 +807,18 @@ code {
   }
 }
 
+/* Use the active theme palette for native option lists, whose defaults can
+ * otherwise contrast poorly with dark themes on some browsers and systems. */
+select option {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+}
+
+select option:checked {
+  color: var(--color-text-on-brand-base);
+  background-color: var(--color-bg-brand-base);
+}
+
 .simple_form .input.field_with_errors,
 [data-has-error='true'] {
   input[type='text'],
