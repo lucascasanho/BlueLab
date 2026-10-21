@@ -78,9 +78,9 @@ export const VerifiedMark: FC<IconProps> = ({ className, remoteBadge }) => {
           y2='22'
           gradientUnits='userSpaceOnUse'
         >
-          <stop offset='0' stopColor={startColor} />
-          <stop offset='0.5' stopColor={middleColor} />
-          <stop offset='1' stopColor={endColor} />
+          <stop offset='0' stopColor={startColor ?? VERIFIED_BADGE_PALETTE[0]} />
+          <stop offset='0.5' stopColor={middleColor ?? VERIFIED_BADGE_PALETTE[1]} />
+          <stop offset='1' stopColor={endColor ?? VERIFIED_BADGE_PALETTE[2]} />
         </linearGradient>
       </defs>
 
