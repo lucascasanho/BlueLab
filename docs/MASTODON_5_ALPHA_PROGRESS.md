@@ -45,20 +45,22 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 - As correções de ícones de resposta no componente legado e no componente de status estão presentes no teste; o filtro de notificações já tinha a mesma lógica de escolher `StatusReplyIcon`/ícone legado conforme o redesign.
 - Portadas seletivamente as diferenças confirmadas: remover a regra CSS antiga que deslocava o botão de voltar ao topo, e restaurar a ação de política de citação só para o menu legado. Não foi feito merge nem cherry-pick cego do histórico estável.
 
-## Ajustes do tema Vanilla — 2026-10-21
+## Ajustes do tema Vanilla — 2026-10-21 (continuação)
 
-Alvo: somente `BlueLab-Test` / `mastodon.blue`. A branch `BlueLab` e a Espelunca não devem ser alteradas nesta etapa.
+Alvo: somente `BlueLab-Test` / `mastodon.blue`. A branch estável `BlueLab` e a Espelunca não devem ser alteradas.
 
-- [x] Rastrear a navegação de notificações diretas e a seleção da mensagem inicial na conversa.
-- [x] Priorizar o ID exato da mensagem clicada ao abrir a conversa pela notificação.
-- [x] Adicionar Favoritos com ícone de coração e chave de tradução já existente nos idiomas suportados.
-- [x] Exibir os três atalhos e o cartão do perfil também no rodapé do menu lateral mobile.
-- [x] Tornar o acionador do perfil mobile robusto para pointer/touch e manter o menu fora de áreas recortadas.
-- [x] Confirmar formatação, ESLint, TypeScript e testes JavaScript na CI do SHA `f57d9f5`.
-- [x] Confirmar CSS lint, Ruby lint, Haml lint, auditoria de dependências, precompilação de assets e migrações históricas no SHA `f57d9f5`.
-- [ ] Validar manualmente no mastodon.blue a navegação, o destino exato da mensagem e os menus mobile.
-- CI ampla ainda em execução no momento deste checkpoint: RSpec principal, E2E, integrações Elasticsearch/OpenSearch e build de imagens do container.
-- Não promover para `BlueLab` sem aprovação explícita do usuário.
+- [x] Corrigir a abertura de mensagens diretas pelas notificações para priorizar a conversa e preservar o ID exato da mensagem.
+- [x] Remover o card duplicado de perfil no menu de perfil mobile, mantendo o atalho traduzido “Ver perfil”.
+- [x] Restaurar o seletor entre postagem e mensagem no botão de compose e usar o ícone padrão do Mastodon.
+- [x] Dimensionar o compose mobile pela VisualViewport: tela inteira sem teclado e painel compacto acima do teclado.
+- [x] Corrigir a cadeia flexível de altura da conversa mobile e os seletores corretos do editor compacto.
+- [x] Fixar a barra inferior na borda real do viewport e respeitar a safe area interna.
+- [x] Preservar a posição visual da timeline quando novos posts são inseridos no topo, inclusive perto de `scrollTop = 0`; adicionar teste de regressão.
+- [x] A galeria de mídia já reserva proporção antes do carregamento (`aspect-ratio` por metadados ou fallback); a âncora da timeline cobre também a inserção de conteúdo.
+- [ ] Confirmar CI final desta etapa (formatação, ESLint, TypeScript, testes JS e Ruby).
+- [ ] Validar manualmente em `mastodon.blue`: conversas e scroll no mobile, notificação na mensagem exata, menu do perfil, seletor Post/Message, teclado aberto/fechado e timeline com mídia.
+- [ ] Não promover para `BlueLab` sem aprovação explícita do usuário.
+
 
 ## Etapas
 
