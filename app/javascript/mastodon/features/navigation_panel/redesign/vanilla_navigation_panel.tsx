@@ -304,10 +304,7 @@ export const RedesignNavigationPanel: React.FC<{
                 to='/bookmarks'
                 iconComponent={BookmarkSimpleIcon}
               >
-                <FormattedMessage
-                  id='tabs_bar.saved'
-                  defaultMessage='Saved'
-                />
+                <FormattedMessage id='tabs_bar.saved' defaultMessage='Saved' />
               </NavigationLink>
             </ul>
             <NavigationAccountCardAndMenu inSlideOut={mode === 'slide-out'} />

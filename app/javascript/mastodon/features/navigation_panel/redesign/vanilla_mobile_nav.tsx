@@ -36,8 +36,8 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { AccountMenuItems } from './vanilla_account_card_and_menu';
 import classes from './vanilla_mobile_nav.module.scss';
 import { LogoLockup } from './vanilla_navigation_header';
-import MobileNavigationLinkClasses from './vanilla_navigation_link.module.scss';
 import { MobileNavLink } from './vanilla_navigation_link';
+import MobileNavigationLinkClasses from './vanilla_navigation_link.module.scss';
 import {
   RedesignNavigationPanel,
   useNotificationsCount,
