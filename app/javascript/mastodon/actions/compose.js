@@ -119,8 +119,16 @@ const messages = defineMessages({
 
 export const ensureComposeIsVisible = (getState, dispatch) => {
   const state = getState();
+  const isVanillaTheme =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'default';
 
-  if (state.getIn(['compose', 'composer_editor']) !== 'mastodon') {
+  // Vanilla 5.0 hosts both composer preferences in its redesigned compose
+  // surface. Do not send its Mastodon preference to the legacy /publish page.
+  if (
+    state.getIn(['compose', 'composer_editor']) !== 'mastodon' ||
+    isVanillaTheme
+  ) {
     if (state.composer.displayState !== 'showing') {
       dispatch({ type: 'composer/showComposer' });
     }
