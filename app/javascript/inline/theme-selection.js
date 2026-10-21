@@ -21,4 +21,20 @@
 
   updateColorScheme();
   updateContrast();
+
+  const themeSelector = document.querySelector('select[name$="[bluelab_theme]"]');
+  const themeColorOptions = document.querySelector('[data-theme-color-options]');
+
+  const updateThemeColorOptions = () => {
+    if (!themeSelector || !themeColorOptions) {
+      return;
+    }
+
+    themeColorOptions.hidden = themeSelector.value !== 'default';
+  };
+
+  if (themeSelector && themeColorOptions) {
+    themeSelector.addEventListener('change', updateThemeColorOptions);
+    updateThemeColorOptions();
+  }
 })(document.documentElement);

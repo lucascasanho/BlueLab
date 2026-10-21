@@ -43,7 +43,7 @@
                    label_method: ->(contrast) { I18n.t("color_scheme.#{contrast}", default: contrast) },
                    wrapper: :with_label,
                    required: false
-      .input.horizontal-options
+      .input.horizontal-options{ data: { theme_color_options: true }, hidden: current_theme != 'default' }
         = ff.input :'web.theme_color',
                    as: :radio_buttons,
                    collection: available_theme_colors(current_theme),

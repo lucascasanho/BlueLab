@@ -52,6 +52,10 @@ export const isBirdUiTheme = () =>
   typeof document !== 'undefined' &&
   document.body.dataset.theme === 'mastodon-bird-ui-auto';
 
+export const isVanillaTheme = () =>
+  typeof document !== 'undefined' &&
+  (!document.body.dataset.theme || document.body.dataset.theme === 'default');
+
 const escapeHtml = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
