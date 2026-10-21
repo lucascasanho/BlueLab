@@ -80,3 +80,20 @@
   margin-inline: var(--space-4);
   margin-bottom: var(--space-2);
 }
+
+
+/* Keep the private-account indicator proportional to surrounding text. */
+:global(body[data-theme='default'] .display-name__locked) {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: 0.2em;
+  color: var(--color-text-secondary);
+  vertical-align: middle;
+  overflow: visible;
+}
+
+:global(body[data-theme='default'] .display-name__locked .icon) {
+  width: 0.8em;
+  height: 0.8em;
+  flex: 0 0 auto;
+}
