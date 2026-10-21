@@ -93,21 +93,9 @@
 @media (width < #{variables.$mobile-menu-breakpoint}) {
   .root[data-keyboard-open='true'] {
     top: auto;
-    height: min(
-      48dvh,
-      calc(
-        var(--viewport-height, 100dvh) - env(safe-area-inset-top) - var(--space-4)
-      )
-    );
-    max-height: calc(
-      var(--viewport-height, 100dvh) - env(safe-area-inset-top) - var(--space-4)
-    );
-    min-height: min(
-      220px,
-      calc(
-        var(--viewport-height, 100dvh) - env(safe-area-inset-top) - var(--space-4)
-      )
-    );
+    height: min(48dvh, var(--viewport-height, 100dvh));
+    max-height: var(--viewport-height, 100dvh);
+    min-height: min(220px, var(--viewport-height, 100dvh));
   }
 }
 
