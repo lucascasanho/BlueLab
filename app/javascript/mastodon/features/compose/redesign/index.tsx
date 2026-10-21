@@ -109,6 +109,7 @@ export const RedesignComposeForm: React.FC<
     ? threadItems.find((item) => item.get('id') === activeThreadItemId)
     : undefined;
   const threadMode = !threadItems.isEmpty();
+  const useVanillaToolbar = vanillaAppearance && !threadMode;
   const sensitive = activeThreadItem
     ? !!activeThreadItem.get('sensitive')
     : rootSensitive.sensitive;
@@ -201,11 +202,11 @@ export const RedesignComposeForm: React.FC<
         data-compose-scroll-container
         data-compose-scroll-zone='panel'
       >
-        {!compact && !vanillaAppearance && <ComposeReply />}
+        {!compact && !useVanillaToolbar && <ComposeReply />}
 
         {!compact && (
           <div className={classes.toolbar} data-bluelab-compose-toolbar>
-            {vanillaAppearance ? (
+            {useVanillaToolbar ? (
               <VanillaComposeVisibility className={classes.flexGrowWrap} />
             ) : (
               <ComposeVisibility
@@ -214,13 +215,13 @@ export const RedesignComposeForm: React.FC<
               />
             )}
 
-            {vanillaAppearance ? (
+            {useVanillaToolbar ? (
               <VanillaLanguageButton />
             ) : (
               <LanguageButton activeThreadItemId={activeThreadItemId} />
             )}
 
-            {vanillaAppearance ? (
+            {useVanillaToolbar ? (
               <VanillaComposeSettingsMenu />
             ) : (
               <ToggleButton
@@ -240,7 +241,7 @@ export const RedesignComposeForm: React.FC<
           </div>
         )}
 
-        {!compact && vanillaAppearance && <ComposeReply />}
+        {!compact && useVanillaToolbar && <ComposeReply />}
 
         {!compact && isMessage && (
           <p
