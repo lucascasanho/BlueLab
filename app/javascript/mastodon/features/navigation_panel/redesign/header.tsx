@@ -2,10 +2,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Link } from 'react-router-dom';
 
+import { MastodonLogoIcon } from '@phosphor-icons/react';
+
 // BLUELAB_INTEGRATION: BlueLab-owned labels for the optional BlueLab theme.
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import InstanceLogo from '@/images/logo-symbol-icon.svg?react';
-import { MastodonLogoIcon } from '@phosphor-icons/react';
 import {
   customAppIcon,
   customFavicon,
