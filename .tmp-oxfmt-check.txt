@@ -1,1 +1,2 @@
 Temporary marker for validating the latest BlueLab-Test format check.
+Trigger one formatter pass that writes only the expected formatted output to this temporary branch.
