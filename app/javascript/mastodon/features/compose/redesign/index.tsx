@@ -7,8 +7,6 @@ import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
-import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
-
 import { LockSimpleOpenIcon, PepperIcon } from '@phosphor-icons/react';
 
 import {
@@ -17,6 +15,7 @@ import {
   changeComposeThreadItem,
   insertEmojiCompose,
 } from '@/mastodon/actions/compose';
+import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
 import { ToggleButton } from '@/mastodon/components/button/redesign';
 import { TextInputField } from '@/mastodon/components/form_fields/redesign';
 import { Icon, useIconWeight } from '@/mastodon/components/icon';
