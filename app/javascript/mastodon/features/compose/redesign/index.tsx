@@ -236,7 +236,10 @@ export const RedesignComposeForm: React.FC<
         {!compact && vanillaAppearance && <ComposeReply />}
 
         {!compact && isMessage && (
-          <p className={classes.toolbarMessage}>
+          <p
+            className={classes.toolbarMessage}
+            data-bluelab-compose-message-notice
+          >
             <Icon id='lock-open' icon={LockSimpleOpenIcon} />
             <FormattedMessage
               id='compose.message.notice'
