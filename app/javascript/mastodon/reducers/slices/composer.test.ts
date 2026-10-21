@@ -118,4 +118,23 @@ describe('composer preference', () => {
       expect.objectContaining({ focusTarget: false }),
     );
   });
+
+  test('keeps the Mastodon editor in the redesigned Vanilla surface on the default theme', () => {
+    const previousTheme = document.body.dataset.theme;
+    document.body.dataset.theme = 'default';
+    const historyPush = vi.spyOn(browserHistory, 'push');
+
+    try {
+      expect(quoteWithEditor('mastodon')).toContainEqual({
+        type: 'composer/showComposer',
+      });
+      expect(historyPush).not.toHaveBeenCalled();
+    } finally {
+      if (previousTheme === undefined) {
+        delete document.body.dataset.theme;
+      } else {
+        document.body.dataset.theme = previousTheme;
+      }
+    }
+  });
 });
