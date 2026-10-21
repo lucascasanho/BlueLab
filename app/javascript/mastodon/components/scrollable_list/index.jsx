@@ -23,7 +23,6 @@ import { LoadingIndicator } from '../loading_indicator';
 import { Scrollable, ItemList } from './components';
 
 const MOUSE_IDLE_DELAY = 300;
-const TOP_THRESHOLD = 100;
 const BLUE2_SCROLL_SETTLE_DELAY = 180;
 const PULL_REFRESH_ACTIVATION_DISTANCE = 20;
 const PULL_REFRESH_THRESHOLD = 72;
