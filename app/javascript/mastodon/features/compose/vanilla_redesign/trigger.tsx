@@ -14,14 +14,16 @@ import {
   composerOriginFromElement,
   minimizeComposerToggle,
   openPreferredComposer,
+  selectComposerEditor,
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
 
 import { useBreakpoint } from '../../ui/hooks/useBreakpoint';
 
+import { RedesignComposeForm as BlueLabComposeForm } from '../redesign';
 import { ComposeFormHeader } from './header';
-import { RedesignComposeForm } from './index';
+import { RedesignComposeForm as VanillaComposeForm } from './index';
 import composerClasses from './styles.module.scss';
 import classes from './trigger.module.scss';
 
@@ -32,6 +34,7 @@ export const ComposeRedesignButton: React.FC<{
   inline?: boolean;
 }> = ({ inline = false }) => {
   const displayState = useAppSelector((state) => state.composer.displayState);
+  const composerEditor = useAppSelector(selectComposerEditor);
   const isMobile = useBreakpoint('openable');
 
   const hasMobileFloatingActionButton = useHasMobileFloatingActionButton({
@@ -129,7 +132,14 @@ export const ComposeRedesignButton: React.FC<{
   if (displayState === 'showing') {
     return (
       <div className={classes.root} style={style}>
-        <RedesignComposeForm autoFocus className={classes.composer} />
+        {composerEditor === 'mastodon' ? (
+          <VanillaComposeForm autoFocus className={classes.composer} />
+        ) : (
+          <BlueLabComposeForm
+            autoFocus
+            className={classNames(classes.composer, classes.blueLabComposer)}
+          />
+        )}
       </div>
     );
   }
