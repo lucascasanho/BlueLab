@@ -121,7 +121,8 @@ export const ensureComposeIsVisible = (getState, dispatch) => {
   const state = getState();
   const isVanillaTheme =
     typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'default';
+    (!document.body.dataset.theme ||
+      document.body.dataset.theme === 'default');
 
   // Vanilla 5.0 hosts both composer preferences in its redesigned compose
   // surface. Do not send its Mastodon preference to the legacy /publish page.
