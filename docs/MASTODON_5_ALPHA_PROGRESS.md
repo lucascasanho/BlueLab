@@ -61,7 +61,6 @@ Alvo: somente `BlueLab-Test` / `mastodon.blue`. A branch estável `BlueLab` e a 
 - [ ] Validar manualmente em `mastodon.blue`: conversas e scroll no mobile, notificação na mensagem exata, menu do perfil, seletor Post/Message, teclado aberto/fechado e timeline com mídia.
 - [ ] Não promover para `BlueLab` sem aprovação explícita do usuário.
 
-
 ## Etapas
 
 ### Etapa 1 — auditoria e checkpoint
