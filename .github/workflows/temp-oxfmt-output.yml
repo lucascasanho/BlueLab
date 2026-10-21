@@ -1,0 +1,38 @@
+name: Temporary Oxfmt output for BlueLab-Test
+
+on:
+  pull_request:
+    branches:
+      - 'BlueLab-Test'
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Set up Javascript environment
+        uses: ./.github/actions/setup-javascript
+
+      - name: Format repository
+        run: yarn format
+
+      - name: Collect files
+        run: |
+          mkdir -p /tmp/oxfmt
+          cp app/javascript/mastodon/components/display_name/verified_badge.tsx /tmp/oxfmt/verified_badge.tsx
+          cp app/javascript/mastodon/features/compose/redesign/index.tsx /tmp/oxfmt/compose-redesign-index.tsx
+          cp app/javascript/mastodon/features/compose/redesign/rich_editor.tsx /tmp/oxfmt/rich_editor.tsx
+          cp app/javascript/mastodon/features/compose/vanilla_redesign/trigger.tsx /tmp/oxfmt/vanilla-trigger.tsx
+
+      - name: Upload formatted files
+        uses: actions/upload-artifact@v4
+        with:
+          name: oxfmt-output
+          path: /tmp/oxfmt/*
+          if-no-files-found: error
