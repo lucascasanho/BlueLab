@@ -251,6 +251,8 @@ pt-BR:
         setting_display_media_default: Padrão
         setting_display_media_hide_all: Ocultar tudo
         setting_display_media_show_all: Mostrar tudo
+        setting_display_own_boosts: Mostrar meus próprios impulsos no feed principal
+        setting_display_own_posts: Mostrar minhas próprias publicações no feed principal
         setting_emoji_style: Estilo de emoji
         setting_expand_spoilers: Sempre expandir toots com Aviso de Conteúdo
         setting_hide_network: Ocultar suas relações
