@@ -28,6 +28,8 @@ pt-BR:
           sensitive: Marca todas as mídias do usuário como sensível.
           silence: Impede o usuário de postar publicamente, restringe suas publicações e notificações a somente quem o segue. Encerra todas as denúncias contra esta conta.
           suspend: Impede qualquer interação de ou para esta conta e exclui seu conteúdo. Reversível dentro de 30 dias. Encerra todas as denúncias contra esta conta.
+        text: "Opcional. Você pode usar a sintaxe de publicação. O texto aparecerá abaixo da resposta predefinida."
+        warning_preset_html: "Opcional. Você pode <a href=\"%{path}\">gerenciá-las aqui</a>."
       announcement:
         all_day: Quando marcada, apenas as datas do período serão mostradas
         ends_at: Opcional. O comunicado sairá do ar automaticamente
@@ -68,6 +70,7 @@ pt-BR:
         setting_use_pending_items: Ocultar atualizações da linha do tempo atrás de um clique ao invés de rolar automaticamente
         username: Você pode usar letras, números e underlines
         whole_word: Quando a palavra-chave ou frase é inteiramente alfanumérica, ela será aplicada somente se corresponder a palavra inteira
+        setting_default_spoiler_field: "Mantém o campo de aviso de conteúdo aberto no editor. Você pode personalizar o texto em cada publicação."
       domain_allow:
         domain: Este domínio poderá obter dados deste servidor e os dados recebidos dele serão processados e armazenados
       email_domain_block:
@@ -111,6 +114,7 @@ pt-BR:
         trendable_by_default: Pular a revisão manual do conteúdo em tendência. Itens individuais ainda poderão ser removidos das tendências após a sua exibição.
         trends: Tendências mostram quais publicações, hashtags e notícias estão ganhando destaque na sua instância.
         wrapstodon: Oferece aos usuários locais gerar um resumo divertido do Mastodon deles durante o ano. Este recurso está disponível entre 10 e 31 de dezembro de cada ano e é oferecido aos usuários que fizeram ao menos uma publicação Pública ou Silenciosa e usou ao menos uma hashtag no ano.
+        postpone_confirmation_emails: "Quando esta opção está ativada, os e-mails de confirmação de contas que aguardam aprovação só são enviados depois que essas contas forem aprovadas. Isso pode piorar a experiência de cadastro, pois as pessoas ainda precisarão confirmar o endereço de e-mail dentro do prazo após receber a mensagem, mas não controlarão quando ela será enviada. Também pode aumentar a carga de trabalho da moderação, já que o Mastodon não poderá filtrar contas pendentes com endereços de e-mail inválidos antes da aprovação."
       form_challenge:
         current_password: Você está entrando em uma área segura
       imports:
@@ -190,6 +194,7 @@ pt-BR:
         acct: Nome de usuário da nova conta
       account_warning_preset:
         title: Título
+        text: "Texto da resposta"
       admin_account_action:
         include_statuses: Incluir toots denunciados no e-mail
         send_email_notification: Notificar o usuário por e-mail
@@ -200,6 +205,8 @@ pt-BR:
           sensitive: Sensível
           silence: Suspender
           suspend: Banir e excluir conta
+        text: "Resposta personalizada"
+        warning_preset_id: "Resposta predefinida"
       announcement:
         all_day: Evento o dia inteiro
         ends_at: Fim do evento
@@ -274,6 +281,11 @@ pt-BR:
         username: Nome de usuário
         username_or_email: Nome de usuário ou e-mail
         whole_word: Palavra inteira
+        setting_color_scheme: "Modo"
+        setting_default_spoiler_field: "Usar avisos de conteúdo por padrão"
+        setting_density: "Densidade"
+        setting_theme_color: "Cor do tema"
+        sign_in_token_resend: "Reenviar código de segurança"
       email_domain_block:
         with_dns_records: Incluir registros MX e IPs do domínio
       featured_tag:
@@ -320,6 +332,7 @@ pt-BR:
         trendable_by_default: Permitir tendências sem revisão prévia
         trends: Habilitar tendências
         wrapstodon: Ativar Wrapstodon
+        postpone_confirmation_emails: "Adiar e-mails de confirmação até a aprovação"
       form_email_subscriptions_confirmation:
         agreement_email_volume: Eu compreendo que habilitar este recurso pode aumentar significativamente o volume de emails enviados a partir do servidor e que eu sou o único responsável por quaisquer custos incorridos.
         agreement_privacy_and_terms: Eu atualizei a Política de Privacidade e os Termos de Serviço.
@@ -358,6 +371,7 @@ pt-BR:
           none: Nunca notificar sobre atualizações (não recomendado)
           patch: Notificar sobre atualizações de correções
         trending_tag: Uma nova tendência requer revisão
+        moderation_suggestions: "Há sugestões automáticas de moderação disponíveis"
       rule:
         hint: Informações adicionais
         text: Regra
