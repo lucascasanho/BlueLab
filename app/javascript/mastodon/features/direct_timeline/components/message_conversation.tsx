@@ -397,10 +397,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
   const renderShell = (content: React.ReactNode) => {
     const conversationContent = (
-      <div
-        className={classes.columnContent}
-        data-message-conversation='true'
-      >
+      <div className={classes.columnContent} data-message-conversation='true'>
         {content}
       </div>
     );

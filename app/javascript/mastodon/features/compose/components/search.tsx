@@ -544,7 +544,8 @@ export const Search: React.FC<{
     if (searchInputRef.current && !singleColumn) {
       const input = searchInputRef.current;
       const { left, right } = input.getBoundingClientRect();
-      const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+      const viewportWidth =
+        window.innerWidth || document.documentElement.clientWidth;
 
       if (left < 0 || right > viewportWidth) {
         const horizontalDelta = left < 0 ? left : right - viewportWidth;
