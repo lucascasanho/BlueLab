@@ -154,18 +154,17 @@ export const RedesignNavigationPanel: React.FC<{
   const { signedIn } = useIdentity();
   const notificationsCount = useNotificationsCount();
 
-  const openComposer: React.MouseEventHandler<HTMLButtonElement> =
-    useCallback(
-      (event) => {
-        dispatch(closeNavigation());
-        dispatch(
-          openPreferredComposer({
-            origin: composerOriginFromElement(event.currentTarget),
-          }),
-        );
-      },
-      [dispatch],
-    );
+  const openComposer: React.MouseEventHandler<HTMLButtonElement> = useCallback(
+    (event) => {
+      dispatch(closeNavigation());
+      dispatch(
+        openPreferredComposer({
+          origin: composerOriginFromElement(event.currentTarget),
+        }),
+      );
+    },
+    [dispatch],
+  );
 
   const { customFeeds } = useCustomFeeds();
   const { followedHashtags } = useFollowedHashtags();
