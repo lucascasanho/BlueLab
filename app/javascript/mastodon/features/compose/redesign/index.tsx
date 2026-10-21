@@ -7,6 +7,8 @@ import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
+import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
+
 import { LockSimpleOpenIcon, PepperIcon } from '@phosphor-icons/react';
 
 import {
@@ -15,7 +17,6 @@ import {
   changeComposeThreadItem,
   insertEmojiCompose,
 } from '@/mastodon/actions/compose';
-import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
 import { ToggleButton } from '@/mastodon/components/button/redesign';
 import { TextInputField } from '@/mastodon/components/form_fields/redesign';
 import { Icon, useIconWeight } from '@/mastodon/components/icon';
@@ -24,6 +25,19 @@ import {
   submitComposer,
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+
+import {
+  ComposeFormHeader as VanillaComposeFormHeader,
+} from '../vanilla_redesign/header';
+import {
+  LanguageButton as VanillaLanguageButton,
+} from '../vanilla_redesign/language';
+import {
+  ComposeSettingsMenu as VanillaComposeSettingsMenu,
+} from '../vanilla_redesign/settings';
+import {
+  ComposeVisibility as VanillaComposeVisibility,
+} from '../vanilla_redesign/visibility';
 
 import { ComposeAttachments } from './attachments';
 import { ComposeAutocomplete } from './autocomplete';
@@ -38,18 +52,6 @@ import { ComposeFormHeader } from './header';
 import { ComposeHints } from './hints';
 import { LanguageButton } from './language';
 import { ComposeReply } from './reply';
-import {
-  ComposeFormHeader as VanillaComposeFormHeader,
-} from '../vanilla_redesign/header';
-import {
-  LanguageButton as VanillaLanguageButton,
-} from '../vanilla_redesign/language';
-import {
-  ComposeSettingsMenu as VanillaComposeSettingsMenu,
-} from '../vanilla_redesign/settings';
-import {
-  ComposeVisibility as VanillaComposeVisibility,
-} from '../vanilla_redesign/visibility';
 import { RichComposeEditor } from './rich_editor';
 import { resolveComposeScrollTarget } from './scroll';
 import {
