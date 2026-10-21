@@ -684,7 +684,7 @@ class UI extends PureComponent {
     const element = this.node.querySelector('.search__input');
 
     if (element) {
-      element.focus();
+      element.focus({ preventScroll: true });
     }
   };
 

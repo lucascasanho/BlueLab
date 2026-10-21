@@ -224,10 +224,7 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
         onClick={handleClick}
         onKeyDown={handleKeyDown}
       >
-        <VerifiedMark
-          className={classes.badge}
-          remoteBadge={remoteBadge}
-        />
+        <VerifiedMark className={classes.badge} remoteBadge={remoteBadge} />
       </span>
 
       <Popover

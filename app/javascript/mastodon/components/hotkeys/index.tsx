@@ -213,6 +213,19 @@ export function useHotkeys<T extends HTMLElement>(handlers: HotkeyHandlerMap) {
         !!target?.closest(
           '[contenteditable="true"], [contenteditable="plaintext-only"]',
         );
+      const activeElement =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : undefined;
+      const isFocusedInsideEditable =
+        !!activeElement &&
+        (['input', 'textarea', 'select'].includes(
+          activeElement.tagName.toLowerCase(),
+        ) ||
+          activeElement.isContentEditable ||
+          !!activeElement.closest(
+            '[contenteditable="true"], [contenteditable="plaintext-only"], [role="search"]',
+          ));
       const isInsideBlueLabComposer = !!target?.closest(
         '[data-bluelab-composer]',
       );
@@ -221,6 +234,7 @@ export function useHotkeys<T extends HTMLElement>(handlers: HotkeyHandlerMap) {
         !event.defaultPrevented &&
         !['input', 'textarea', 'select'].includes(tagName) &&
         !isInsideEditable &&
+        !isFocusedInsideEditable &&
         !isInsideBlueLabComposer &&
         !(
           ['a', 'button'].includes(tagName) &&

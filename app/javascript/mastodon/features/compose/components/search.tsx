@@ -468,7 +468,8 @@ export const Search: React.FC<{
       // Vanilla's single-page layout can let global timeline shortcuts react
       // to keystrokes intended for search. Keep those keystrokes local to the
       // search field and its suggestion list without changing other themes.
-      if (document.body.dataset.theme === 'default') {
+      const theme = document.body.dataset.theme;
+      if (!theme || theme === 'default') {
         e.stopPropagation();
       }
 
@@ -540,7 +541,10 @@ export const Search: React.FC<{
         left < 0 ||
         right > (window.innerWidth || document.documentElement.clientWidth)
       ) {
-        searchInputRef.current.scrollIntoView();
+        searchInputRef.current.scrollIntoView({
+          block: 'nearest',
+          inline: 'nearest',
+        });
       }
     }
   }, [shouldOpenOnFocus, singleColumn]);
