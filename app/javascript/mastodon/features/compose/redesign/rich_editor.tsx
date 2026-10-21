@@ -841,10 +841,7 @@ export const RichComposeEditor: React.FC<{
   };
 
   return (
-    <div
-      className={classes.richEditorWrapper}
-      data-bluelab-rich-editor-wrapper
-    >
+    <div className={classes.richEditorWrapper} data-bluelab-rich-editor-wrapper>
       {isMarkdown && (
         <div
           className={classes.richEditorToolbar}
