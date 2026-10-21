@@ -48,7 +48,13 @@ import { useAppDispatch } from '@/mastodon/store';
 
 import classes from './vanilla_account_card_and_menu.module.scss';
 
-export const NavigationAccountCardAndMenu: React.FC = () => {
+const stopDrawerGesture = (event: React.SyntheticEvent) => {
+  event.stopPropagation();
+};
+
+export const NavigationAccountCardAndMenu: React.FC<{
+  inSlideOut?: boolean;
+}> = ({ inSlideOut = false }) => {
   const { accountId } = useIdentity();
   const account = useAccount(accountId);
   const handle = useAccountHandle(account);
@@ -68,13 +74,22 @@ export const NavigationAccountCardAndMenu: React.FC = () => {
             icon={DotsThreeIcon}
             size='sm'
             variant='ghost'
+            onPointerDown={inSlideOut ? stopDrawerGesture : undefined}
+            onTouchStart={inSlideOut ? stopDrawerGesture : undefined}
           >
             <FormattedMessage
               id='tabs_bar.account_settings'
               defaultMessage='Account settings'
             />
           </MenuTrigger>
-          <MenuList placement='top' offset={12} strategy='fixed' minWidth={220}>
+          <MenuList
+            portal={inSlideOut}
+            mobilePresentation={inSlideOut ? 'popover' : 'bottom-sheet'}
+            placement='top'
+            offset={12}
+            strategy='fixed'
+            minWidth={220}
+          >
             <AccountMenuItems />
           </MenuList>
         </Menu>

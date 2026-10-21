@@ -86,11 +86,13 @@ export const NotificationWithStatus: React.FC<{
   const handlers = useMemo(
     () => ({
       open: () => {
-        const isBlue2 =
+        const usesConversationNavigation =
           typeof document !== 'undefined' &&
-          document.body.dataset.theme === 'blue-2';
+          (document.body.dataset.theme === 'blue-2' ||
+            document.body.dataset.theme === 'default' ||
+            !document.body.dataset.theme);
 
-        if (isBlue2 && isPrivateMention) {
+        if (usesConversationNavigation && isPrivateMention) {
           dispatch(openConversationForStatus(statusId));
         } else {
           dispatch(navigateToStatus(statusId));
@@ -119,11 +121,13 @@ export const NotificationWithStatus: React.FC<{
   const handleStatusOpen = useCallback(() => {
     if (!statusId) return;
 
-    const isBlue2 =
-      typeof document !== 'undefined' &&
-      document.body.dataset.theme === 'blue-2';
+    const usesConversationNavigation =
+          typeof document !== 'undefined' &&
+          (document.body.dataset.theme === 'blue-2' ||
+            document.body.dataset.theme === 'default' ||
+            !document.body.dataset.theme);
 
-    if (isBlue2 && isPrivateMention) {
+    if (usesConversationNavigation && isPrivateMention) {
       dispatch(openConversationForStatus(statusId));
     } else {
       dispatch(navigateToStatus(statusId));

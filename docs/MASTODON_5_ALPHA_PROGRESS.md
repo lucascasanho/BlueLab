@@ -45,6 +45,19 @@ Em 2026-10-20, a comparação dos branches indicou commits exclusivos de ambos o
 - As correções de ícones de resposta no componente legado e no componente de status estão presentes no teste; o filtro de notificações já tinha a mesma lógica de escolher `StatusReplyIcon`/ícone legado conforme o redesign.
 - Portadas seletivamente as diferenças confirmadas: remover a regra CSS antiga que deslocava o botão de voltar ao topo, e restaurar a ação de política de citação só para o menu legado. Não foi feito merge nem cherry-pick cego do histórico estável.
 
+## Ajustes do tema Vanilla — 2026-10-21
+
+Alvo: somente `BlueLab-Test` / `mastodon.blue`. A branch `BlueLab` e a Espelunca não devem ser alteradas nesta etapa.
+
+- [x] Rastrear a navegação de notificações diretas e a seleção da mensagem inicial na conversa.
+- [x] Priorizar o ID exato da mensagem clicada ao abrir a conversa pela notificação.
+- [x] Adicionar Favoritos com ícone de coração e chave de tradução já existente nos idiomas suportados.
+- [x] Exibir os três atalhos e o cartão do perfil também no rodapé do menu lateral mobile.
+- [x] Tornar o acionador do perfil mobile robusto para pointer/touch e manter o menu fora de áreas recortadas.
+- [ ] Confirmar formatação, lint, TypeScript e testes JavaScript na CI do commit de teste.
+- [ ] Validar manualmente no mastodon.blue a navegação, o destino exato da mensagem e os menus mobile.
+- [ ] Não promover para `BlueLab` sem aprovação explícita do usuário.
+
 ## Etapas
 
 ### Etapa 1 — auditoria e checkpoint

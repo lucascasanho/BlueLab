@@ -7,6 +7,7 @@ import type { Map as ImmutableMap } from 'immutable';
 import {
   PenNibIcon,
   HouseIcon,
+  HeartIcon,
   MagnifyingGlassIcon,
   RssSimpleIcon,
   BellIcon,
@@ -195,7 +196,12 @@ export const RedesignNavigationPanel: React.FC<{
               <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
             </NavigationLink>
             <ExploreLink />
-            <PublicFeedsLink />
+            <NavigationLink to='/favourites' iconComponent={HeartIcon}>
+              <FormattedMessage
+                id='navigation_bar.favourites'
+                defaultMessage='Favorites'
+              />
+            </NavigationLink>
             <ListSection
               id='custom-feeds'
               title={
@@ -225,6 +231,7 @@ export const RedesignNavigationPanel: React.FC<{
                 </NavigationLink>
               ))}
             </ListSection>
+            <PublicFeedsLink />
 
             {followedHashtags.length > 0 && (
               <ListSection
@@ -269,9 +276,7 @@ export const RedesignNavigationPanel: React.FC<{
               </Button>
             </div>
 
-            {mode !== 'slide-out' && (
-              <>
-                <ul className={classes.footerNav}>
+            <ul className={classes.footerNav}>
                   <NavigationLink
                     stacked
                     to='/notifications'
@@ -305,9 +310,7 @@ export const RedesignNavigationPanel: React.FC<{
                     />
                   </NavigationLink>
                 </ul>
-                <NavigationAccountCardAndMenu />
-              </>
-            )}
+            <NavigationAccountCardAndMenu inSlideOut={mode === 'slide-out'} />
             <VanillaFooterLinks
               context='navigation'
               multiColumn={multiColumn}

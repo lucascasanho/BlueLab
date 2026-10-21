@@ -551,12 +551,18 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       !conversationResolved ||
       !conversation ||
       !messagesResolved ||
-      statuses.length === 0
+      (statuses.length === 0 && !sourceStatusId)
     ) {
       return;
     }
 
     if (initialScrollConversationIdRef.current === id) return;
+
+    if (sourceStatusId) {
+      initialScrollConversationIdRef.current = id;
+      scrollToStatus(sourceStatusId);
+      return;
+    }
 
     const initialReadState = initialReadStateRef.current;
     const lastStatus = statuses[statuses.length - 1];
@@ -611,7 +617,15 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       window.cancelAnimationFrame(frame);
       window.cancelAnimationFrame(secondFrame);
     };
-  }, [conversation, conversationResolved, id, messagesResolved, statuses]);
+  }, [
+    conversation,
+    conversationResolved,
+    id,
+    messagesResolved,
+    scrollToStatus,
+    sourceStatusId,
+    statuses,
+  ]);
 
   const handleReply = useCallback(
     (status: ImmutableRecord<StatusShape>) => {
