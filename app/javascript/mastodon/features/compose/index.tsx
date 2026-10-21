@@ -63,12 +63,14 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
     (state) => state.settings.get('columns') as ImmutableList<ColumnMap>,
   );
   const composerEditor = useAppSelector(selectComposerEditor);
+  const isVanillaTheme =
+    typeof document !== 'undefined' &&
+    (!document.body.dataset.theme ||
+      document.body.dataset.theme === 'default');
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const useBlueLabComposer =
-    composerEditor === 'bluelab' &&
-    typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'blue-2';
+    composerEditor === 'bluelab' && (isVanillaTheme || isBlue2);
 
   useEffect(() => {
     dispatch(mountCompose());
@@ -188,6 +190,7 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
               <RedesignComposeForm
                 className='drawer__bluelab-compose'
                 embedded
+                vanillaAppearance={isVanillaTheme}
               />
             ) : (
               <>
@@ -235,6 +238,7 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
 
             autoFocus
             embedded
+            vanillaAppearance={isVanillaTheme}
           />
         ) : (
           <ComposeFormContainer
