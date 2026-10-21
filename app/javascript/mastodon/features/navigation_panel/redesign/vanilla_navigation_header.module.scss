@@ -74,11 +74,13 @@
   text-wrap: balance;
   color: var(--color-text-tertiary);
 
-  svg {
+  .mastodonLogo {
+    display: inline-block;
     width: 1em;
     height: 1em;
     margin-inline-end: var(--space-half);
     vertical-align: middle;
     color: inherit;
+    flex-shrink: 0;
   }
 }
