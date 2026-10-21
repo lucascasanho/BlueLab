@@ -49,8 +49,12 @@ describe('BlueLab compose primary actions', () => {
     const footer = container.querySelector(
       '[data-bluelab-compose-footer][data-vanilla-appearance="true"]',
     );
-    const mediaActions = container.querySelector('[data-compose-media-actions]');
-    const primaryActions = container.querySelector('[data-compose-primary-actions]');
+    const mediaActions = container.querySelector(
+      '[data-compose-media-actions]',
+    );
+    const primaryActions = container.querySelector(
+      '[data-compose-primary-actions]',
+    );
 
     expect(footer).not.toBeNull();
     expect(mediaActions).toContainElement(

@@ -65,8 +65,7 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   const composerEditor = useAppSelector(selectComposerEditor);
   const isVanillaTheme =
     typeof document !== 'undefined' &&
-    (!document.body.dataset.theme ||
-      document.body.dataset.theme === 'default');
+    (!document.body.dataset.theme || document.body.dataset.theme === 'default');
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const useBlueLabComposer =
