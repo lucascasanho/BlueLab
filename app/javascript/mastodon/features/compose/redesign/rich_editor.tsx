@@ -576,6 +576,7 @@ export const RichComposeEditor: React.FC<{
   onFiles?: (files: FileList) => void;
   dismissOnEscape?: boolean;
   messageToolbar?: boolean;
+  forceMarkdown?: boolean;
 }> = ({
   onSubmit,
   children,
@@ -589,6 +590,7 @@ export const RichComposeEditor: React.FC<{
   onFiles,
   dismissOnEscape = true,
   messageToolbar = false,
+  forceMarkdown = false,
 }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -605,7 +607,8 @@ export const RichComposeEditor: React.FC<{
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const forceMessageMarkdown =
     messageToolbar || (isBlueLabTheme && isMessageComposeType(type));
-  const isMarkdown = forceMessageMarkdown || contentType === 'text/markdown';
+  const shouldForceMarkdown = forceMarkdown || forceMessageMarkdown;
+  const isMarkdown = shouldForceMarkdown || contentType === 'text/markdown';
   const messageCommands = commands.filter(
     ([command, _icon, _message, value]) =>
       inlineCommands.includes(command as InlineCommand) ||
@@ -667,14 +670,14 @@ export const RichComposeEditor: React.FC<{
   }, [autoFocus]);
 
   useEffect(() => {
-    if (forceMessageMarkdown && contentType !== 'text/markdown') {
+    if (shouldForceMarkdown && contentType !== 'text/markdown') {
       if (onContentTypeChange) {
         onContentTypeChange('text/markdown');
       } else {
         dispatch(changeComposeContentType('text/markdown'));
       }
     }
-  }, [contentType, dispatch, forceMessageMarkdown, onContentTypeChange]);
+  }, [contentType, dispatch, onContentTypeChange, shouldForceMarkdown]);
 
   useEffect(() => {
     const editor = ref.current;
