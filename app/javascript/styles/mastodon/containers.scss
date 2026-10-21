@@ -42,6 +42,14 @@
   }
 }
 
+/* Vanilla uses the shared Rails auth layout, but must show the instance
+ * branding that the BlueLab-specific auth layout already displays. */
+body[data-theme='vanilla'] .logo-container .instance-auth-brand {
+  display: inline-flex;
+  width: fit-content;
+  max-width: calc(100% - 32px);
+}
+
 .compose-standalone {
   .compose-form {
     width: 400px;
