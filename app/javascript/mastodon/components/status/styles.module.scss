@@ -577,3 +577,9 @@
   .favouriteButton[aria-pressed='true'] {
   color: var(--color-yellow) !important;
 }
+
+
+/* Vanilla/default theme: use current Mastodon 5 status spacing. */
+:global(body[data-theme='default']) .root {
+  padding: var(--space-3) var(--space-4) var(--space-2);
+}
