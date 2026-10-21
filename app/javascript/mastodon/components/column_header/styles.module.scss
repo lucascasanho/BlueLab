@@ -384,3 +384,26 @@
     -webkit-backdrop-filter: none !important;
   }
 }
+
+
+/* Vanilla/default theme: use current Mastodon 5.0 column header behavior. */
+:global(body[data-theme='default']) {
+  .layout {
+    --column-header-padding: var(--space-3) var(--space-3) var(--space-1);
+  }
+}
+
+/* Ignore a legacy compact-density preference only for Vanilla. */
+@media (width > #{variables.$mobile-menu-breakpoint}) {
+  :global(html[data-density='compact'] body[data-theme='default']) {
+    .root {
+      padding-top: var(--space-1);
+      background: var(--color-bg-desktop);
+    }
+
+    .layout {
+      border-radius: var(--radius-6) var(--radius-6) 0 0;
+      background: var(--color-bg-primary);
+    }
+  }
+}
