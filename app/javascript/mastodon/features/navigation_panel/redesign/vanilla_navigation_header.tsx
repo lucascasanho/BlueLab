@@ -43,7 +43,7 @@ export const LogoLockup: React.FC<{
             id='navigation_bar.powered_by_mastodon'
             defaultMessage='powered by {logo}Mastodon'
             values={{
-              logo: <IconLogo role='presentation' />,
+              logo: <IconLogo role='presentation' className={classes.mastodonLogo} />,
             }}
           />
         </span>
