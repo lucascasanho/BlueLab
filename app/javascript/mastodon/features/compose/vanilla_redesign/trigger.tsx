@@ -1,19 +1,31 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 import { useRouteMatch } from 'react-router';
 
-import { PenNibIcon, ReadCvLogoIcon } from '@phosphor-icons/react';
+import {
+  ChatCircleDotsIcon,
+  NewspaperIcon,
+  PencilSimpleIcon,
+} from '@phosphor-icons/react';
 
 import type { IconButtonProps } from '@/mastodon/components/button/vanilla_redesign';
 import { IconButton } from '@/mastodon/components/button/vanilla_redesign';
+import { ComposeIcon } from '@/mastodon/components/compose_icon';
+import {
+  Menu,
+  MenuItem,
+  MenuList,
+  MenuTrigger,
+} from '@/mastodon/components/menu';
 import { useIdentity } from '@/mastodon/identity_context';
+import type { ComposerOrigin } from '@/mastodon/reducers/slices/composer';
 import {
   composerOriginFromElement,
   minimizeComposerToggle,
-  openPreferredComposer,
+  openNewComposer,
   selectComposerEditor,
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
@@ -41,27 +53,71 @@ export const ComposeRedesignButton: React.FC<{
     isMobile,
   });
 
-  // Update viewport based on visual size in order to account for the virtual keyboard.
-  const [viewportHeight, setViewportHeight] = useState<null | number>(null);
+  // Track the visible viewport as the keyboard opens, closes, or pans the page.
+  const [viewport, setViewport] = useState<{
+    height: number | null;
+    offsetTop: number;
+    bottomInset: number;
+    keyboardOpen: boolean;
+  }>({
+    height: null,
+    offsetTop: 0,
+    bottomInset: 0,
+    keyboardOpen: false,
+  });
   useEffect(() => {
-    const updateHeight = () => {
-      setViewportHeight(visualViewport?.height ?? null);
+    const updateViewport = () => {
+      const visualViewport = window.visualViewport;
+      const height = visualViewport?.height ?? window.innerHeight;
+      const offsetTop = visualViewport?.offsetTop ?? 0;
+      const bottomInset = Math.max(
+        0,
+        window.innerHeight - offsetTop - height,
+      );
+
+      setViewport({
+        height,
+        offsetTop,
+        bottomInset,
+        keyboardOpen: window.innerHeight - height > 150,
+      });
     };
 
-    visualViewport?.addEventListener('resize', updateHeight);
+    updateViewport();
+    window.visualViewport?.addEventListener('resize', updateViewport);
+    window.visualViewport?.addEventListener('scroll', updateViewport);
+    window.addEventListener('resize', updateViewport);
 
     return () => {
-      visualViewport?.removeEventListener('resize', updateHeight);
+      window.visualViewport?.removeEventListener('resize', updateViewport);
+      window.visualViewport?.removeEventListener('scroll', updateViewport);
+      window.removeEventListener('resize', updateViewport);
     };
   }, []);
 
   const dispatch = useAppDispatch();
+  const launcherOriginRef = useRef<ComposerOrigin | null>(null);
+
+  const captureLauncherPointerOrigin: React.PointerEventHandler<HTMLButtonElement> =
+    useCallback((event) => {
+      launcherOriginRef.current = composerOriginFromElement(event.currentTarget);
+    }, []);
+
+  const captureLauncherFocusOrigin: React.FocusEventHandler<HTMLButtonElement> =
+    useCallback((event) => {
+      launcherOriginRef.current = composerOriginFromElement(event.currentTarget);
+    }, []);
+
   const handleComposerOpen: React.MouseEventHandler<HTMLButtonElement> =
     useCallback(
       (event) => {
+        const type = event.currentTarget.name;
+        if (type !== 'post' && type !== 'message') return;
+
         dispatch(
-          openPreferredComposer({
-            origin: composerOriginFromElement(event.currentTarget),
+          openNewComposer({
+            type,
+            origin: launcherOriginRef.current ?? undefined,
           }),
         );
       },
@@ -96,15 +152,20 @@ export const ComposeRedesignButton: React.FC<{
     hidden: !hasMobileFloatingActionButton,
   } as const;
 
-  // Pass the viewport height as a CSS variable so it's only used for mobile.
+  // Pass visible viewport metrics to CSS so the composer stays above the keyboard.
   const style = {
-    '--viewport-height': viewportHeight ? `${viewportHeight}px` : undefined,
+    '--viewport-height': viewport.height ? `${viewport.height}px` : undefined,
+    '--composer-visual-viewport-height': viewport.height
+      ? `${viewport.height}px`
+      : undefined,
+    '--composer-visual-viewport-offset-top': `${viewport.offsetTop}px`,
+    '--composer-visual-viewport-bottom': `${viewport.bottomInset}px`,
   } as React.CSSProperties;
 
   if (displayState === 'minimized') {
     return isMobile ? (
       <FloatingActionButton
-        icon={ReadCvLogoIcon}
+        icon={PencilSimpleIcon}
         onClick={toggleMinimize}
         {...floatingButtonProps}
         hidden={false} // never hide minimized composer button
@@ -131,14 +192,23 @@ export const ComposeRedesignButton: React.FC<{
 
   if (displayState === 'showing') {
     return (
-      <div className={classes.root} style={style}>
+      <div
+        className={classes.root}
+        style={style}
+        data-keyboard-open={viewport.keyboardOpen ? 'true' : undefined}
+      >
         {composerEditor === 'mastodon' ? (
-          <VanillaComposeForm autoFocus className={classes.composer} />
+          <VanillaComposeForm
+            autoFocus
+            className={classes.composer}
+            data-keyboard-open={viewport.keyboardOpen ? 'true' : undefined}
+          />
         ) : (
           <BlueLabComposeForm
             autoFocus
             vanillaAppearance
             className={classNames(classes.composer, classes.blueLabComposer)}
+            data-keyboard-open={viewport.keyboardOpen ? 'true' : undefined}
           />
         )}
       </div>
@@ -146,13 +216,47 @@ export const ComposeRedesignButton: React.FC<{
   }
 
   return (
-    <FloatingActionButton
-      icon={PenNibIcon}
-      onClick={handleComposerOpen}
-      {...floatingButtonProps}
-    >
-      <FormattedMessage id='tabs_bar.publish' defaultMessage='New Post' />
-    </FloatingActionButton>
+    <Menu>
+      <MenuTrigger
+        as={FloatingActionButton}
+        inline={inline}
+        hidden={!hasMobileFloatingActionButton}
+        icon={ComposeIcon}
+        variant='solid'
+        color='accent'
+        size='lg'
+        onPointerDown={captureLauncherPointerOrigin}
+        onFocus={captureLauncherFocusOrigin}
+      >
+        <FormattedMessage
+          id='compose.new'
+          defaultMessage='Write a new post or message'
+        />
+      </MenuTrigger>
+      <MenuList
+        portal
+        mobilePresentation='popover'
+        maxWidth={180}
+        placement='top-end'
+        strategy='fixed'
+        offset={8}
+      >
+        <MenuItem name='post' onClick={handleComposerOpen} icon={NewspaperIcon}>
+          <FormattedMessage id='compose.new.post' defaultMessage='Post' />
+        </MenuItem>
+        <MenuItem
+          name='message'
+          onClick={handleComposerOpen}
+          icon={ChatCircleDotsIcon}
+        >
+          <FormattedMessage
+            id='compose.new.message'
+            defaultMessage='Message'
+            description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
+          />
+        </MenuItem>
+      </MenuList>
+    </Menu>
   );
 };
 

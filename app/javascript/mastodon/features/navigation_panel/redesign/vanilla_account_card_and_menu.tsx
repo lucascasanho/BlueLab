@@ -24,7 +24,6 @@ import { IconButton } from '@/mastodon/components/button/vanilla_redesign';
 import { DisplayName } from '@/mastodon/components/display_name';
 import { useAccountHandle } from '@/mastodon/components/display_name/default';
 import {
-  LockupContent,
   LockupLink,
   LockupWrapper,
 } from '@/mastodon/components/lockup';
@@ -131,8 +130,6 @@ export const AccountMenuItems: React.FC<{
     <>
       <AccountSwitcherMenuSection variant='navigation' />
       <MenuItemDivider />
-
-      {context === 'mobile' && <ProfileMenuItem />}
 
       <MenuItemLink to={accountBasePath} exact icon={UserIcon}>
         <FormattedMessage
@@ -242,30 +239,5 @@ export const AccountMenuItems: React.FC<{
         />
       </MenuItem>
     </>
-  );
-};
-
-const ProfileMenuItem: React.FC = () => {
-  const { accountId } = useIdentity();
-  const account = useAccount(accountId);
-  const handle = useAccountHandle(account);
-
-  if (!accountId) {
-    return null;
-  }
-
-  const accountBasePath = `/@${account?.acct}`;
-
-  return (
-    <MenuItemLink to={accountBasePath} exact>
-      <LockupWrapper
-        icon={<Avatar account={account} size={40} />}
-        className={classes.profileMenuItem}
-      >
-        <LockupContent subtitle={handle}>
-          <DisplayName variant='simple' account={account} />
-        </LockupContent>
-      </LockupWrapper>
-    </MenuItemLink>
   );
 };
