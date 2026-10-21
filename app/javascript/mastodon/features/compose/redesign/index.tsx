@@ -38,10 +38,18 @@ import { ComposeFormHeader } from './header';
 import { ComposeHints } from './hints';
 import { LanguageButton } from './language';
 import { ComposeReply } from './reply';
-import { ComposeFormHeader as VanillaComposeFormHeader } from '../vanilla_redesign/header';
-import { LanguageButton as VanillaLanguageButton } from '../vanilla_redesign/language';
-import { ComposeSettingsMenu as VanillaComposeSettingsMenu } from '../vanilla_redesign/settings';
-import { ComposeVisibility as VanillaComposeVisibility } from '../vanilla_redesign/visibility';
+import {
+  ComposeFormHeader as VanillaComposeFormHeader,
+} from '../vanilla_redesign/header';
+import {
+  LanguageButton as VanillaLanguageButton,
+} from '../vanilla_redesign/language';
+import {
+  ComposeSettingsMenu as VanillaComposeSettingsMenu,
+} from '../vanilla_redesign/settings';
+import {
+  ComposeVisibility as VanillaComposeVisibility,
+} from '../vanilla_redesign/visibility';
 import { RichComposeEditor } from './rich_editor';
 import { resolveComposeScrollTarget } from './scroll';
 import {
@@ -262,7 +270,6 @@ export const RedesignComposeForm: React.FC<
             label={intl.formatMessage(messages.sensitiveText)}
             value={sensitiveText}
             onChange={onSensitiveTextChange}
-
             autoFocus
           />
         )}
