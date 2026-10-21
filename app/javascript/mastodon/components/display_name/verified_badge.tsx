@@ -1,11 +1,9 @@
-import type { FC, KeyboardEvent, MouseEvent } from 'react';
 import { useCallback, useId, useState } from 'react';
+import type { FC, KeyboardEvent, MouseEvent } from 'react';
 
 import { useIntl } from 'react-intl';
 
-import type {
-  ApiInstanceVerificationBadgeJSON,
-} from 'mastodon/api_types/accounts';
+import type { ApiInstanceVerificationBadgeJSON } from 'mastodon/api_types/accounts';
 import { domain, title as instanceTitle } from 'mastodon/initial_state';
 
 import { Popover } from '../popover';
