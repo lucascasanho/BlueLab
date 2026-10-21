@@ -61,7 +61,12 @@ const messages = defineMessages({
 export const ComposeFooter: React.FC<{
   onEmojiPick: OnEmojiPick;
   activeThreadItemId?: string | null;
-}> = ({ onEmojiPick, activeThreadItemId = null }) => {
+  vanillaAppearance?: boolean;
+}> = ({
+  onEmojiPick,
+  activeThreadItemId = null,
+  vanillaAppearance = false,
+}) => {
   const type = useAppSelector(selectComposeType);
   const isEditing = useAppSelector((state) => !!state.compose.get('id'));
   const isMessage = isMessageComposeType(type);
@@ -133,32 +138,38 @@ export const ComposeFooter: React.FC<{
   }
 
   return (
-    <footer className={classes.footer} data-bluelab-compose-footer>
-      <ComposeUploadButton
-        activeThreadItemId={activeThreadItemId}
-        disabled={!activeThreadItemId && hasQuote}
-      />
+    <footer
+      className={classes.footer}
+      data-bluelab-compose-footer
+      data-vanilla-appearance={vanillaAppearance ? 'true' : undefined}
+    >
+      <div className={classes.secondaryActions} data-compose-media-actions>
+        <ComposeUploadButton
+          activeThreadItemId={activeThreadItemId}
+          disabled={!activeThreadItemId && hasQuote}
+        />
 
-      <ComposeGifButton disabled={!activeThreadItemId && hasQuote} />
+        <ComposeGifButton disabled={!activeThreadItemId && hasQuote} />
 
-      <ComposeEmojiButton onPick={onEmojiPick} />
+        <ComposeEmojiButton onPick={onEmojiPick} />
 
-      {!isMessage && (
-        <IconButton
-          size='sm'
-          icon={ChartBarHorizontalIcon}
-          disabled={hasQuote || hasPoll || !!activeThreadItemId}
-          onClick={handlePoll}
-        >
-          <FormattedMessage
-            id='poll_button.add_poll'
-            defaultMessage='Add a poll'
-          />
-        </IconButton>
-      )}
-      <ComposeSchedule />
+        {!isMessage && (
+          <IconButton
+            size='sm'
+            icon={ChartBarHorizontalIcon}
+            disabled={hasQuote || hasPoll || !!activeThreadItemId}
+            onClick={handlePoll}
+          >
+            <FormattedMessage
+              id='poll_button.add_poll'
+              defaultMessage='Add a poll'
+            />
+          </IconButton>
+        )}
+        <ComposeSchedule />
+      </div>
 
-      <div className={classes.flexGrowWrap}>
+      <div className={classes.flexGrowWrap} data-compose-footer-controls>
         {shouldShowCharacterCounter(
           hideStatusCharacterCounter,
           current,

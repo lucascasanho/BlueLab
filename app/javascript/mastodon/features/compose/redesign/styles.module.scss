@@ -200,6 +200,31 @@ textarea.textarea {
   flex-wrap: wrap;
 }
 
+/* Keep the existing flex layout on BlueLab themes while grouping media
+   tools so Vanilla can place them on a dedicated mobile row. */
+.secondaryActions {
+  display: contents;
+}
+
+.footer[data-vanilla-appearance='true'] {
+  @media (width < #{variables.$mobile-menu-breakpoint}) {
+    .secondaryActions {
+      display: flex;
+      flex: 1 1 100%;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+      min-width: 0;
+      width: 100%;
+    }
+
+    .flexGrowWrap {
+      flex: 1 1 100%;
+      min-width: 0;
+      width: 100%;
+    }
+  }
+}
+
 .counter {
   display: flex;
   align-items: center;

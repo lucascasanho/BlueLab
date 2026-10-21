@@ -301,6 +301,7 @@ export const RedesignComposeForm: React.FC<
       <ComposeFooter
         onEmojiPick={onEmojiPick}
         activeThreadItemId={activeThreadItemId}
+        vanillaAppearance={vanillaAppearance}
       />
     </form>
   );
