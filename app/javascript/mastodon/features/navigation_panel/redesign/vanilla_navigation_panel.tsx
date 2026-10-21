@@ -41,9 +41,9 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { invokeVirtualIosKeyboard } from '@/mastodon/utils/invoke_virtual_ios_keyboard';
 
 import { useHasAnnouncements } from '../../announcements/hooks';
-import { VanillaFooterLinks } from './vanilla_footer_links';
 
 import { NavigationAccountCardAndMenu } from './vanilla_account_card_and_menu';
+import { VanillaFooterLinks } from './vanilla_footer_links';
 import { ListSection } from './vanilla_list_section';
 import {
   DisabledAccountBanner,
