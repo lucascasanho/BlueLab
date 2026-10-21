@@ -137,4 +137,23 @@ describe('composer preference', () => {
       }
     }
   });
+
+  test('keeps the Mastodon editor in the redesigned Vanilla surface when data-theme is unset', () => {
+    const previousTheme = document.body.dataset.theme;
+    delete document.body.dataset.theme;
+    const historyPush = vi.spyOn(browserHistory, 'push');
+
+    try {
+      expect(quoteWithEditor('mastodon')).toContainEqual({
+        type: 'composer/showComposer',
+      });
+      expect(historyPush).not.toHaveBeenCalled();
+    } finally {
+      if (previousTheme === undefined) {
+        delete document.body.dataset.theme;
+      } else {
+        document.body.dataset.theme = previousTheme;
+      }
+    }
+  });
 });
