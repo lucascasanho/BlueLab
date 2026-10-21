@@ -272,8 +272,7 @@ class ScrollableList extends PureComponent {
       Children.count(prevProps.children) < Children.count(this.props.children) &&
       this.getFirstChildKey(prevProps) !== this.getFirstChildKey(this.props);
     const pendingChanged = (prevProps.numPending > 0) !== (this.props.numPending > 0);
-    const shouldPreservePosition = pendingChanged || someItemInserted &&
-      (this.getScrollTop() >= TOP_THRESHOLD || this.props.preventScroll);
+    const shouldPreservePosition = pendingChanged || someItemInserted;
 
     if (!shouldPreservePosition) {
       return null;
