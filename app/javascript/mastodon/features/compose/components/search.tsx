@@ -619,6 +619,7 @@ export const Search: React.FC<{
 
     const restoreWhileInputFocused = () => {
       if (
+        searchScrollSnapshotRef.current !== snapshot ||
         !snapshot.input.isConnected ||
         document.activeElement !== snapshot.input
       ) {
@@ -729,12 +730,6 @@ export const Search: React.FC<{
   );
 
   const handleInputFocus = useCallback(() => {
-    const input = searchInputRef.current;
-    if (input) {
-      setFocusedSearchInput(input);
-      captureSearchScroll(input, true);
-    }
-
     if (shouldOpenOnFocus) {
       setExpanded(true);
       setSelectedOption(-1);
@@ -771,6 +766,12 @@ export const Search: React.FC<{
           window.scrollBy({ left: horizontalDelta, top: 0, behavior: 'auto' });
         }
       }
+    }
+
+    const input = searchInputRef.current;
+    if (input) {
+      setFocusedSearchInput(input);
+      captureSearchScroll(input, true);
     }
   }, [captureSearchScroll, shouldOpenOnFocus, singleColumn]);
 
