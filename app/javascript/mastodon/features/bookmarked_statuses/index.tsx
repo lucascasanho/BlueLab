@@ -88,7 +88,7 @@ const Bookmarks: React.FC<{
       {isRedesignEnabled() || isBlue2 ? (
         <ColumnHeader
           title={title}
-          withBackButton={multiColumn && !pinned && 'auto'}
+          withBackButton={!multiColumn ? true : !pinned ? 'auto' : false}
           extraButtons={
             multiColumn && (
               <ColumnSettingsMenu labelPrefix={title}>
@@ -106,6 +106,7 @@ const Bookmarks: React.FC<{
           icon='bookmarks'
           iconComponent={BookmarksIcon}
           title={intl.formatMessage(messages.heading)}
+          showBackButton={!multiColumn || !pinned}
           onPin={handlePin}
           onMove={handleMove}
           pinned={pinned}

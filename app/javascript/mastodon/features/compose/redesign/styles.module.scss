@@ -1018,6 +1018,28 @@ div.emojiRoot {
     }
   }
   
+  .scheduleDateTime {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-xs);
+  }
+
+  .schedulePanel label {
+    min-width: 0;
+  }
+
+  .schedulePanel input,
+  .schedulePanel select {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  @media (width <= 360px) {
+    .scheduleDateTime {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
   .scheduleTimezone {
     color: var(--color-text-secondary);
   }

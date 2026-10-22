@@ -17,6 +17,14 @@ const messages = defineMessages({
     id: 'compose.schedule.open',
     defaultMessage: 'Schedule publication',
   },
+  date: {
+    id: 'compose.schedule.date',
+    defaultMessage: 'Date',
+  },
+  time: {
+    id: 'compose.schedule.time',
+    defaultMessage: 'Time',
+  },
   remove: {
     id: 'compose.schedule.remove',
     defaultMessage: 'Remove schedule and publish immediately',
@@ -163,10 +171,19 @@ export const ComposeSchedule: React.FC = () => {
   const toggle = useCallback(() => {
     setOpen((value) => !value);
   }, []);
-  const changeDateTime: React.ChangeEventHandler<HTMLInputElement> =
-    useCallback((event) => {
-      setDateTime(event.target.value);
-    }, []);
+  const [dateValue = '', timeValue = ''] = dateTime.split('T');
+  const changeDate: React.ChangeEventHandler<HTMLInputElement> = useCallback(
+    (event) => {
+      setDateTime(`${event.target.value}T${timeValue}`);
+    },
+    [timeValue],
+  );
+  const changeTime: React.ChangeEventHandler<HTMLInputElement> = useCallback(
+    (event) => {
+      setDateTime(`${dateValue}T${event.target.value}`);
+    },
+    [dateValue],
+  );
   const changeTimezone: React.ChangeEventHandler<HTMLSelectElement> =
     useCallback((event) => {
       setTimezone(event.target.value);
@@ -205,17 +222,16 @@ export const ComposeSchedule: React.FC = () => {
           : undefined
       }
     >
-      <label>
-        <FormattedMessage
-          id='compose.schedule.date_time'
-          defaultMessage='Date and time'
-        />
-        <input
-          type='datetime-local'
-          value={dateTime}
-          onChange={changeDateTime}
-        />
-      </label>
+      <div className={classes.scheduleDateTime}>
+        <label>
+          <FormattedMessage {...messages.date} />
+          <input type='date' value={dateValue} onChange={changeDate} />
+        </label>
+        <label>
+          <FormattedMessage {...messages.time} />
+          <input type='time' value={timeValue} onChange={changeTime} />
+        </label>
+      </div>
       <label className={classes.scheduleTimezone}>
         <FormattedMessage
           id='compose.schedule.timezone'

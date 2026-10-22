@@ -32,7 +32,7 @@ const Explore: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
       label={intl.formatMessage(messages.title)}
     >
       <ColumnHeader
-        withBackButton={multiColumn && 'auto'}
+        withBackButton={multiColumn ? 'auto' : true}
         title={intl.formatMessage(messages.titleRedesign)}
       />
 

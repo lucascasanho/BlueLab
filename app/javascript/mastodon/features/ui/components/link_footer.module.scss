@@ -146,3 +146,11 @@
     white-space: nowrap;
   }
 }
+
+/* Keep keyboard shortcuts in the desktop footer only. */
+@media (width <= 1024px), (hover: none) and (pointer: coarse) {
+  .list li.keyboardShortcuts,
+  :global(body[data-theme='blue-2']) .list li.keyboardShortcuts {
+    display: none;
+  }
+}

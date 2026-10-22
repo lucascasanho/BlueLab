@@ -242,7 +242,7 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
   const extraStickyHeaderContent = (
     <>
       <div className='explore__search-header'>
-        <Search singleColumn initialValue={trimmedValue} key={trimmedValue} />
+        <Search singleColumn initialValue={trimmedValue} />
       </div>
 
       <div className='account__section-headline'>
@@ -294,7 +294,7 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
   return (
     <Column bindToDocument={!multiColumn} label={pageTitle}>
       <ColumnHeader
-        withBackButton={multiColumn && 'auto'}
+        withBackButton={multiColumn ? 'auto' : true}
         title={pageTitle}
         extraStickyContent={extraStickyHeaderContent}
       />

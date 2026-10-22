@@ -54,7 +54,7 @@ export const LinkFooter: React.FC<{
               />
             </a>
           </li>
-          <li>
+          <li className={classes.keyboardShortcuts}>
             <Link to='/keyboard-shortcuts'>
               <FormattedMessage
                 id='footer.keyboard_shortcuts'

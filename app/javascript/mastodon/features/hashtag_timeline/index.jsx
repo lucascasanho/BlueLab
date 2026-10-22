@@ -179,7 +179,7 @@ class HashtagTimeline extends PureComponent {
           <ColumnHeader
             title={title}
             withUnreadMarker={hasUnread}
-            withBackButton={multiColumn && !pinned && 'auto'}
+            withBackButton={!multiColumn ? true : !pinned ? 'auto' : false}
             extraButtons={
               <HashtagColumnMenu
                 tagId={id}
