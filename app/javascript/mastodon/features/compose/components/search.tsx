@@ -113,10 +113,7 @@ const getSearchScrollPositions = (
   const seen = new Set<HTMLElement>();
   const documentScroller = document.scrollingElement;
 
-  const addPosition = (
-    element: HTMLElement,
-    includeNonScrollable = false,
-  ) => {
+  const addPosition = (element: HTMLElement, includeNonScrollable = false) => {
     if (seen.has(element)) return;
 
     if (

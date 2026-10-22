@@ -58,7 +58,8 @@ export const VerifiedMark: FC<IconProps> = ({ className, remoteBadge }) => {
     'var(--instance-verification-badge-middle, #1d9bf0)';
   const fallbackEnd = 'var(--instance-verification-badge-end, #1d4ed8)';
   const startColor = remoteColors?.[0] ?? fallbackStart;
-  const middleColor = remoteColors?.[1] ?? remoteColors?.[0] ?? fallbackMiddle;
+  const middleColor =
+    remoteColors?.[1] ?? remoteColors?.[0] ?? fallbackMiddle;
   const endColor =
     remoteColors?.[2] ??
     remoteColors?.[1] ??

@@ -103,9 +103,7 @@ export const ComposeGifButton: React.FC<{
   const resolveFocusedThreadItemId = useCallback(() => {
     const activeElement = document.activeElement;
     if (activeElement instanceof HTMLElement) {
-      const threadItem = activeElement.closest<HTMLElement>(
-        '[data-thread-item-id]',
-      );
+      const threadItem = activeElement.closest<HTMLElement>('[data-thread-item-id]');
       if (threadItem?.dataset.threadItemId) {
         return threadItem.dataset.threadItemId;
       }

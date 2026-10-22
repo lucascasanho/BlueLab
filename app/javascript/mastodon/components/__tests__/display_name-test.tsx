@@ -76,7 +76,7 @@ describe('<DisplayName />', () => {
     expect(displayName.nextElementSibling).toBe(badge);
   });
 
-  it('uses the fixed blue palette for local verification badges', () => {
+  it('uses instance palette variables for local verification badges', () => {
     const verifiedAccount = account
       .set('acct', 'alice')
       .set('username', 'alice')
@@ -89,7 +89,11 @@ describe('<DisplayName />', () => {
       (stop) => stop.getAttribute('stop-color'),
     );
 
-    expect(stops).toEqual(['#60a5fa', '#1d9bf0', '#1d4ed8']);
+    expect(stops).toEqual([
+      'var(--instance-verification-badge-start, #60a5fa)',
+      'var(--instance-verification-badge-middle, #1d9bf0)',
+      'var(--instance-verification-badge-end, #1d4ed8)',
+    ]);
   });
 
   it('supports the exact Verificado role as a backward-compatible fallback', () => {
@@ -165,7 +169,7 @@ describe('<DisplayName />', () => {
     expect(screen.getByText(/Verified since:/)).toBeTruthy();
   });
 
-  it('uses a fixed common-blue badge when a remote source has no vector', () => {
+  it('uses the instance palette fallback when a remote source has no vector', () => {
     const verifiedAccount = accountFactoryImmutable({
       username: 'alice',
       acct: 'alice@remote.example',
@@ -181,7 +185,7 @@ describe('<DisplayName />', () => {
 
     const badge = screen.getByRole('button', { name: 'Verified account' });
     expect(badge.querySelector('stop')?.getAttribute('stop-color')).toBe(
-      '#60a5fa',
+      'var(--instance-verification-badge-start, #60a5fa)',
     );
   });
 

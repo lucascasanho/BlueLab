@@ -7,9 +7,10 @@ import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import type { NotificationGroupFavourite } from 'mastodon/models/notification_group';
 import { useAppSelector } from 'mastodon/store';
 
+import classes from '../styles.module.scss';
+
 import type { LabelRenderer } from './notification_group_with_status';
 import { NotificationGroupWithStatus } from './notification_group_with_status';
-import classes from '../styles.module.scss';
 
 const messagesLegacy = defineMessages({
   like: {
