@@ -117,12 +117,16 @@
 }
 
 .threadMediaItem {
-  position: relative;
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-md);
   background: var(--color-bg-secondary);
+}
+
+.mediaPreview {
+  position: relative;
+  min-width: 0;
 
   img {
     display: block;
@@ -147,9 +151,14 @@
   background: var(--color-bg-primary);
 }
 
-.mediaAlt {
+.mediaAlt,
+.mediaAltAction {
   display: block;
   padding: var(--space-2xs);
+}
+
+.mediaAlt {
+  min-width: 0;
 
   input {
     box-sizing: border-box;

@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-no-bind, @typescript-eslint/no-confusing-void-expression -- Thread rows require handlers bound to their persistent item and media IDs. */
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -7,7 +7,7 @@ import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
-import { XIcon } from '@phosphor-icons/react';
+import { PencilSimpleIcon, XIcon } from '@phosphor-icons/react';
 
 import {
   addComposeThreadMedia,
@@ -32,6 +32,14 @@ const messages = defineMessages({
   removeMedia: {
     id: 'compose.thread.remove_media',
     defaultMessage: 'Remove media',
+  },
+  addAlt: {
+    id: 'compose.thread.add_alt',
+    defaultMessage: 'Add alt text',
+  },
+  editAlt: {
+    id: 'compose.thread.edit_alt',
+    defaultMessage: 'Edit alt text',
   },
 });
 
@@ -105,7 +113,6 @@ const ComposeThreadItem: React.FC<{
   onRemoved: () => void;
   onSubmit: (event?: React.SubmitEvent) => void;
 }> = ({ item, active, removalDisabled, onFocus, onRemoved, onSubmit }) => {
-  const intl = useIntl();
   const dispatch = useAppDispatch();
   const id = item.get('id') as string;
   const text = item.get('text') as string;
@@ -206,49 +213,84 @@ const ComposeThreadItem: React.FC<{
           {media.map((attachment) => {
             const mediaId = attachment.get('id') as string;
             return (
-              <div key={mediaId} className={classes.threadMediaItem}>
-                <img src={attachment.get('preview_url') as string} alt='' />
-                <IconButton
-                  as='button'
-                  type='button'
-                  size='sm'
-                  icon={XIcon}
-                  className={classes.mediaRemove}
-                  onClick={() =>
-                    dispatch(removeComposeThreadMedia(id, mediaId))
-                  }
-                >
-                  <FormattedMessage {...messages.removeMedia} />
-                </IconButton>
-                <label className={classes.mediaAlt}>
-                  <span className='sr-only'>
-                    <FormattedMessage
-                      id='compose.thread.alt'
-                      defaultMessage='Alternative text'
-                    />
-                  </span>
-                  <input
-                    value={
-                      (attachment.get('description') as string | undefined) ??
-                      ''
-                    }
-                    placeholder={intl.formatMessage({
-                      id: 'compose.thread.alt',
-                      defaultMessage: 'Alternative text',
-                    })}
-                    onChange={(event) => updateAlt(mediaId, event.target.value)}
-                    onBlur={() =>
-                      void api().put(`/api/v1/media/${mediaId}`, {
-                        description: attachment.get('description') ?? '',
-                      })
-                    }
-                  />
-                </label>
-              </div>
+              <ThreadMediaAttachment
+                key={mediaId}
+                attachment={attachment}
+                onRemove={() =>
+                  dispatch(removeComposeThreadMedia(id, mediaId))
+                }
+                onUpdateAlt={(description) => updateAlt(mediaId, description)}
+              />
             );
           })}
         </div>
       )}
     </section>
+  );
+};
+
+
+const ThreadMediaAttachment: React.FC<{
+  attachment: ImmutableMap<string, unknown>;
+  onRemove: () => void;
+  onUpdateAlt: (description: string) => void;
+}> = ({ attachment, onRemove, onUpdateAlt }) => {
+  const intl = useIntl();
+  const mediaId = attachment.get('id') as string;
+  const description = (attachment.get('description') as string | undefined) ?? '';
+  const [editingAlt, setEditingAlt] = useState(Boolean(description));
+
+  return (
+    <div className={classes.threadMediaItem}>
+      <div className={classes.mediaPreview}>
+        <img src={attachment.get('preview_url') as string} alt='' />
+        <IconButton
+          as='button'
+          type='button'
+          size='sm'
+          icon={XIcon}
+          className={classes.mediaRemove}
+          onClick={onRemove}
+        >
+          <FormattedMessage {...messages.removeMedia} />
+        </IconButton>
+      </div>
+      {editingAlt ? (
+        <label className={classes.mediaAlt}>
+          <span className='sr-only'>
+            <FormattedMessage
+              id='compose.thread.alt'
+              defaultMessage='Alternative text'
+            />
+          </span>
+          <input
+            autoFocus
+            value={description}
+            placeholder={intl.formatMessage({
+              id: 'compose.thread.alt',
+              defaultMessage: 'Alternative text',
+            })}
+            onChange={(event) => onUpdateAlt(event.target.value)}
+            onBlur={() =>
+              void api().put(`/api/v1/media/${mediaId}`, {
+                description,
+              })
+            }
+          />
+        </label>
+      ) : (
+        <div className={classes.mediaAltAction}>
+          <IconButton
+            as='button'
+            type='button'
+            size='sm'
+            icon={PencilSimpleIcon}
+            onClick={() => setEditingAlt(true)}
+          >
+            <FormattedMessage {...messages.addAlt} />
+          </IconButton>
+        </div>
+      )}
+    </div>
   );
 };
