@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useCallback } from 'react';
 
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import classNames from 'classnames';
 
@@ -27,6 +27,7 @@ export const ComposeUpload: React.FC<{
     selectComposeAttachment(state, id),
   );
   const sensitive = useAppSelector((state) => !!state.compose.get('spoiler'));
+  const intl = useIntl();
   const dispatch = useAppDispatch();
   const handleEdit = useCallback(() => {
     if (id) {
@@ -61,6 +62,17 @@ export const ComposeUpload: React.FC<{
         <Blurhash hash={attachment.blurhash} className={classes.blurHash} />
       )}
 
+      {!sensitive && attachment.type === 'video' && (
+        <video
+          className={classes.mediaVideo}
+          src={attachment.url ?? undefined}
+          poster={attachment.preview_url ?? undefined}
+          controls
+          playsInline
+          preload='metadata'
+        />
+      )}
+
       <IconButton
         as='button'
         type='button'
@@ -86,11 +98,15 @@ export const ComposeUpload: React.FC<{
         icon={PencilSimpleIcon}
         className={classes.mediaMenuButtons}
         onClick={handleEdit}
+        aria-label={intl.formatMessage({
+          id: 'compose.upload.menu.add_alt',
+          defaultMessage: 'Edit media and alt text',
+        })}
       >
         <span className='sr-only'>
           <FormattedMessage
             id='compose.upload.menu.add_alt'
-            defaultMessage='Add alt text'
+            defaultMessage='Edit media and alt text'
           />
         </span>
       </IconButton>
