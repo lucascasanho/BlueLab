@@ -441,6 +441,13 @@ export const Search: React.FC<{
     });
   }, []);
 
+  const handleBeforeInput = useCallback(
+    (event: React.FormEvent<HTMLInputElement>) => {
+      captureSearchScroll(event.currentTarget);
+    },
+    [captureSearchScroll],
+  );
+
   const handleChange = useCallback(
     ({
       target: { value },
@@ -785,6 +792,7 @@ export const Search: React.FC<{
         placeholder={placeholder}
         aria-label={placeholder}
         value={value}
+        onBeforeInput={handleBeforeInput}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         onFocus={handleInputFocus}
