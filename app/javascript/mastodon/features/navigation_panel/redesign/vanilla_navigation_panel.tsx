@@ -203,10 +203,7 @@ export const RedesignNavigationPanel: React.FC<{
                 defaultMessage='Favorites'
               />
             </NavigationLink>
-            <NavigationLink
-              to='/scheduled'
-              iconComponent={CalendarDotsIcon}
-            >
+            <NavigationLink to='/scheduled' iconComponent={CalendarDotsIcon}>
               <FormattedMessage
                 id='navigation_bar.scheduled_publications'
                 defaultMessage='Scheduled publications'

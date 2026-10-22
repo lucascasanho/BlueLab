@@ -157,8 +157,7 @@ export const ComposeSchedule: React.FC = () => {
   const updateDesktopPanelPosition = useCallback(() => {
     if (isMobileSchedule || typeof window === 'undefined') return;
 
-    const trigger =
-      rootRef.current?.querySelector<HTMLButtonElement>('button');
+    const trigger = rootRef.current?.querySelector<HTMLButtonElement>('button');
     if (!trigger) return;
 
     const rect = trigger.getBoundingClientRect();

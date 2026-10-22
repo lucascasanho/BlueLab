@@ -166,9 +166,7 @@ const getSearchScrollPositions = (
   return positions;
 };
 
-const restoreSearchScrollPositions = (
-  positions: SearchScrollPosition[],
-) => {
+const restoreSearchScrollPositions = (positions: SearchScrollPosition[]) => {
   positions.forEach(({ element, top, left }) => {
     if (!element.isConnected) return;
 
