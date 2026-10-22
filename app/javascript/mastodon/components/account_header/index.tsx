@@ -80,8 +80,7 @@ export const AccountHeader: React.FC<{
   const isLocal = !account.acct.includes('@');
   const isMe = me && account.id === me;
   const isBlue2 =
-    typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'blue-2';
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   return (
     <div className={isBlue2 ? 'blue2-profile' : undefined}>
@@ -130,6 +129,21 @@ export const AccountHeader: React.FC<{
                 size={isBlue2 ? 88 : 80}
               />
             </a>
+            {isBlue2 && (
+              <>
+                <AccountButtons
+                  accountId={accountId}
+                  className={classes.buttonsDesktop}
+                  noShare={!isMe || 'share' in navigator}
+                  forceMenu={'share' in navigator}
+                />
+                <AccountButtons
+                  accountId={accountId}
+                  className={classes.buttonsMobile}
+                  noShare
+                />
+              </>
+            )}
           </div>
 
           <div
@@ -139,15 +153,14 @@ export const AccountHeader: React.FC<{
             )}
           >
             <AccountName accountId={accountId} />
-            <AccountButtons
-              accountId={accountId}
-              className={classNames(
-                classes.buttonsDesktop,
-                isBlue2 && 'blue2-profile-actions',
-              )}
-              noShare={!isMe || 'share' in navigator}
-              forceMenu={'share' in navigator}
-            />
+            {!isBlue2 && (
+              <AccountButtons
+                accountId={accountId}
+                className={classes.buttonsDesktop}
+                noShare={!isMe || 'share' in navigator}
+                forceMenu={'share' in navigator}
+              />
+            )}
           </div>
 
           <AccountBadges accountId={accountId} />
@@ -185,15 +198,16 @@ export const AccountHeader: React.FC<{
               )}
             </div>
           )}
-          <AccountButtons
-            accountId={accountId}
-            className={classNames(
-              classes.buttonsMobile,
-              isBlue2 && 'blue2-profile-actions',
-              !isIntersecting && classes.buttonsMobileIsStuck,
-            )}
-            noShare
-          />
+          {!isBlue2 && (
+            <AccountButtons
+              accountId={accountId}
+              className={classNames(
+                classes.buttonsMobile,
+                !isIntersecting && classes.buttonsMobileIsStuck,
+              )}
+              noShare
+            />
+          )}
         </div>
       </AnimateEmojiProvider>
 

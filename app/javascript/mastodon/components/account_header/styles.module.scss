@@ -619,9 +619,21 @@ $button-fallback-breakpoint: $button-breakpoint + 55px;
     padding-top: 0;
     display: flex;
     align-items: flex-start;
+    justify-content: space-between;
     gap: 8px;
     overflow: visible;
     margin-inline-start: -2px; // aligns the pfp with content below
+
+    .buttonsMobile {
+      position: static;
+      bottom: auto;
+      align-self: flex-start;
+      flex: 0 0 auto;
+      padding: 0;
+      margin: 0;
+      border-top: 0;
+      background: transparent;
+    }
   }
 
   .avatar {

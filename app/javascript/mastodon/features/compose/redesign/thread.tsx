@@ -15,14 +15,12 @@ import {
   removeComposeThreadItem,
   removeComposeThreadMedia,
 } from '@/mastodon/actions/compose';
-import api from '@/mastodon/api';
 import { openModal } from '@/mastodon/actions/modal';
-import type {
-  ApiMediaAttachmentJSON,
-} from '@/mastodon/api_types/media_attachments';
+import api from '@/mastodon/api';
+import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
 import { IconButton } from '@/mastodon/components/button/redesign';
-import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import CloseIcon from '@/material-icons/400-20px/close.svg?react';
+import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { ComposeAutocomplete } from './autocomplete';
 import { RichComposeEditor } from './rich_editor';
@@ -156,7 +154,6 @@ const ComposeThreadItem: React.FC<{
     [dispatch, id, maximumMedia, media.size],
   );
 
-  
   return (
     <section
       className={classNames(
@@ -206,9 +203,7 @@ const ComposeThreadItem: React.FC<{
                 key={mediaId}
                 attachment={attachment}
                 threadItemId={id}
-                onRemove={() =>
-                  dispatch(removeComposeThreadMedia(id, mediaId))
-                }
+                onRemove={() => dispatch(removeComposeThreadMedia(id, mediaId))}
               />
             );
           })}

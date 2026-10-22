@@ -9,10 +9,10 @@ import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+import { selectAccountAvatarUrl } from '@/mastodon/selectors/accounts';
 import DeleteIcon from '@/material-icons/400-24px/delete.svg?react';
 import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 import SoundIcon from '@/material-icons/400-24px/graphic_eq.svg?react';
-import { selectAccountAvatarUrl } from '@/mastodon/selectors/accounts';
 import { undoUploadCompose } from 'mastodon/actions/compose';
 import { openModal } from 'mastodon/actions/modal';
 import { Blurhash } from 'mastodon/components/blurhash';
@@ -21,6 +21,7 @@ import type { MediaAttachment } from 'mastodon/models/media_attachment';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
 import { AudioVisualizer } from '../../audio/visualizer';
+
 import classes from './upload.module.scss';
 
 export const Upload: React.FC<{
@@ -110,10 +111,7 @@ export const Upload: React.FC<{
         )}
         {!sensitive && isVideo && (
           <video
-            className={classNames(
-              'compose-form__upload__video',
-              classes.video,
-            )}
+            className={classNames('compose-form__upload__video', classes.video)}
             src={mediaUrl ?? undefined}
             poster={preview_url ?? undefined}
             controls
@@ -124,10 +122,7 @@ export const Upload: React.FC<{
         )}
         {!sensitive && isAnimatedGif && (
           <video
-            className={classNames(
-              'compose-form__upload__video',
-              classes.video,
-            )}
+            className={classNames('compose-form__upload__video', classes.video)}
             src={mediaUrl}
             poster={preview_url ?? undefined}
             autoPlay

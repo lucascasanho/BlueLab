@@ -17,9 +17,9 @@ import Textarea from 'react-textarea-autosize';
 import { length } from 'stringz';
 
 import { showAlertForError } from 'mastodon/actions/alerts';
-import api from 'mastodon/api';
 import { changeComposeThreadItem, uploadThumbnail } from 'mastodon/actions/compose';
 import { changeUploadCompose } from 'mastodon/actions/compose_typed';
+import api from 'mastodon/api';
 import { Button } from 'mastodon/components/button';
 import { GIFV } from 'mastodon/components/gifv';
 import { LoadingIndicator } from 'mastodon/components/loading_indicator';
@@ -132,7 +132,9 @@ const Preview: React.FC<{
       const matchingThreadMedia = threadMedia?.find(
         (item) => item.get('id') === mediaId,
       );
-      if (matchingThreadMedia) return matchingThreadMedia as MediaAttachment;
+      if (matchingThreadMedia) {
+        return matchingThreadMedia as MediaAttachment;
+      }
     }
     return (
       (compose.get('media_attachments') as ImmutableList<MediaAttachment>)
@@ -285,7 +287,9 @@ export const AltTextModal = forwardRef<ModalRef, Props & Partial<RestoreProps>>(
         const matchingThreadMedia = threadMedia?.find(
           (item) => item.get('id') === mediaId,
         );
-        if (matchingThreadMedia) return matchingThreadMedia as MediaAttachment;
+        if (matchingThreadMedia) {
+          return matchingThreadMedia as MediaAttachment;
+        }
       }
       return (
         (compose.get('media_attachments') as ImmutableList<MediaAttachment>)
@@ -355,21 +359,23 @@ export const AltTextModal = forwardRef<ModalRef, Props & Partial<RestoreProps>>(
 
     const handleSubmit = useCallback(() => {
       setIsSaving(true);
-      const focus = `${((position[0] - 0.5) * 2).toFixed(2)},${((position[1] - 0.5) * -2).toFixed(2)}`;
+      const focusXFormatted = ((position[0] - 0.5) * 2).toFixed(2);
+      const focusYFormatted = ((position[1] - 0.5) * -2).toFixed(2);
+      const focus = `${focusXFormatted},${focusYFormatted}`;
 
       if (threadItemId) {
         void api()
           .put(`/api/v1/media/${mediaId}`, { description, focus })
           .then(() => {
             if (threadAttachments) {
-              const focusX = (position[0] - 0.5) * 2;
-              const focusY = (position[1] - 0.5) * -2;
+              const updatedFocusX = (position[0] - 0.5) * 2;
+              const updatedFocusY = (position[1] - 0.5) * -2;
               const updated = threadAttachments.map((attachment) =>
                 attachment.get('id') === mediaId
                   ? attachment
                       .set('description', description)
-                      .setIn(['meta', 'focus', 'x'], focusX)
-                      .setIn(['meta', 'focus', 'y'], focusY)
+                      .setIn(['meta', 'focus', 'x'], updatedFocusX)
+                      .setIn(['meta', 'focus', 'y'], updatedFocusY)
                   : attachment,
               );
               dispatch(
