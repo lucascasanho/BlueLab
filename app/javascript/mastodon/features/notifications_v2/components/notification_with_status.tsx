@@ -57,6 +57,41 @@ export const NotificationWithStatus: React.FC<{
     (state) => state.statuses.getIn([statusId, 'visibility']) === 'direct',
   );
 
+  const handlePrivateStatusClickCapture = useCallback(
+    (event: MouseEvent<HTMLDivElement>) => {
+      if (!isPrivateMention || !statusId || !(event.target instanceof Element)) {
+        return;
+      }
+
+      const target = event.target;
+      const statusElement = target.closest<HTMLElement>('article[data-id]');
+      if (!statusElement || statusElement.dataset.id !== statusId) return;
+
+      if (
+        target.closest(
+          'button,input,textarea,select,[role="button"],[role="switch"],[role="checkbox"],[contenteditable="true"]',
+        )
+      ) {
+        return;
+      }
+
+      const link = target.closest<HTMLAnchorElement>('a[href]');
+      if (link) {
+        const destination = new URL(link.href, window.location.href);
+        const path = destination.pathname.replace(/\\/+$/, '');
+        if (!path.endsWith(`/${statusId}`)) return;
+      }
+
+      // On touch devices, a tap on the status text can follow its permalink
+      // instead of the notification's conversation action. Keep direct-message
+      // previews on the conversation route while preserving profile/action links.
+      event.preventDefault();
+      event.stopPropagation();
+      dispatch(openConversationForStatus(statusId));
+    },
+    [dispatch, isPrivateMention, statusId],
+  );
+
   const isFiltered = useAppSelector(
     (state) =>
       statusId &&
@@ -149,6 +184,7 @@ export const NotificationWithStatus: React.FC<{
           },
         )}
         tabIndex={0}
+        onClickCapture={handlePrivateStatusClickCapture}
         onClick={handleCardClick}
         onKeyDown={handleCardKeyDown}
       >

@@ -128,6 +128,13 @@ export const ComposeSchedule: React.FC = () => {
       typeof window !== 'undefined' &&
       window.matchMedia(MOBILE_SCHEDULE_QUERY).matches,
   );
+  const [desktopPanelPosition, setDesktopPanelPosition] = useState<{
+    left: number;
+    top?: number;
+    bottom?: number;
+    width: number;
+    maxHeight: number;
+  } | null>(null);
   const [dateTime, setDateTime] = useState(() =>
     localValue(scheduledAt, timezone),
   );
@@ -146,6 +153,53 @@ export const ComposeSchedule: React.FC = () => {
       mediaQuery.removeEventListener('change', sync);
     };
   }, []);
+
+  const updateDesktopPanelPosition = useCallback(() => {
+    if (isMobileSchedule || typeof window === 'undefined') return;
+
+    const trigger = rootRef.current?.querySelector<HTMLButtonElement>('button');
+    if (!trigger) return;
+
+    const rect = trigger.getBoundingClientRect();
+    const viewportPadding = 12;
+    const width = Math.min(352, window.innerWidth - viewportPadding * 2);
+    const left = Math.max(
+      viewportPadding,
+      Math.min(
+        rect.left,
+        window.innerWidth - width - viewportPadding,
+      ),
+    );
+    const spaceAbove = Math.max(0, rect.top - viewportPadding);
+    const spaceBelow = Math.max(
+      0,
+      window.innerHeight - rect.bottom - viewportPadding,
+    );
+    const placeAbove = spaceAbove >= 280 || spaceAbove >= spaceBelow;
+    const availableSpace = placeAbove ? spaceAbove : spaceBelow;
+
+    setDesktopPanelPosition({
+      left,
+      width,
+      maxHeight: Math.max(120, Math.min(416, availableSpace - 8)),
+      ...(placeAbove
+        ? { bottom: window.innerHeight - rect.top + 8 }
+        : { top: rect.bottom + 8 }),
+    });
+  }, [isMobileSchedule]);
+
+  useEffect(() => {
+    if (!open || isMobileSchedule || typeof window === 'undefined') return;
+
+    updateDesktopPanelPosition();
+    window.addEventListener('resize', updateDesktopPanelPosition);
+    window.addEventListener('scroll', updateDesktopPanelPosition, true);
+
+    return () => {
+      window.removeEventListener('resize', updateDesktopPanelPosition);
+      window.removeEventListener('scroll', updateDesktopPanelPosition, true);
+    };
+  }, [open, isMobileSchedule, updateDesktopPanelPosition]);
 
   const closeAndRestoreFocus = useCallback(() => {
     setOpen(false);
@@ -169,8 +223,11 @@ export const ComposeSchedule: React.FC = () => {
     closeAndRestoreFocus();
   }, [closeAndRestoreFocus, dispatch]);
   const toggle = useCallback(() => {
-    setOpen((value) => !value);
-  }, []);
+    if (!open && !isMobileSchedule) {
+      updateDesktopPanelPosition();
+    }
+    setOpen(!open);
+  }, [isMobileSchedule, open, updateDesktopPanelPosition]);
   const [dateValue = '', timeValue = ''] = dateTime.split('T');
   const changeDate: React.ChangeEventHandler<HTMLInputElement> = useCallback(
     (event) => {
@@ -219,7 +276,21 @@ export const ComposeSchedule: React.FC = () => {
               overscrollBehavior: 'contain',
               transform: 'none',
             }
-          : undefined
+          : desktopPanelPosition
+            ? {
+                position: 'fixed',
+                zIndex: 10000,
+                insetInlineStart: `${desktopPanelPosition.left}px`,
+                ...(desktopPanelPosition.top !== undefined
+                  ? { top: `${desktopPanelPosition.top}px` }
+                  : { bottom: `${desktopPanelPosition.bottom ?? 0}px` }),
+                width: `${desktopPanelPosition.width}px`,
+                maxHeight: `${desktopPanelPosition.maxHeight}px`,
+                overflowY: 'auto',
+                overscrollBehavior: 'contain',
+                transform: 'none',
+              }
+            : { visibility: 'hidden' }
       }
     >
       <div className={classes.scheduleDateTime}>
@@ -274,9 +345,8 @@ export const ComposeSchedule: React.FC = () => {
         <FormattedMessage {...messages.schedule} />
       </IconButton>
       {open &&
-        (isMobileSchedule && typeof document !== 'undefined'
-          ? createPortal(schedulePanel, document.body)
-          : schedulePanel)}
+        typeof document !== 'undefined' &&
+        createPortal(schedulePanel, document.body)}
       {scheduledAt && (
         <span className={classes.scheduledSummary}>
           <FormattedMessage

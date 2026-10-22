@@ -472,13 +472,9 @@ export const Search: React.FC<{
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      // Vanilla's single-page layout can let global timeline shortcuts react
-      // to keystrokes intended for search. Keep those keystrokes local to the
-      // search field and its suggestion list without changing other themes.
-      const theme = document.body.dataset.theme;
-      if (!theme || theme === 'default') {
-        e.stopPropagation();
-      }
+      // Typed search input must not trigger global keyboard shortcuts in any
+      // theme, which can move the timeline or change the page scroll position.
+      e.stopPropagation();
 
       switch (e.key) {
         case 'Escape':
