@@ -38,9 +38,46 @@ export const VanillaScrollToTop: React.FC = () => {
     if (theme && theme !== 'default') return;
 
     const update = () => {
-      setVisible(hasScrolled());
+      const conversationOpen = Boolean(
+        document.querySelector(
+          "[data-bluelab-messages-conversation='true'], [data-message-conversation='true']",
+        ),
+      );
+      setVisible(!conversationOpen && hasScrolled());
     };
     update();
+
+    const observer = new MutationObserver((mutations) => {
+      const mayAffectConversation = mutations.some((mutation) => {
+        if (mutation.type === 'attributes') return true;
+
+        return [...mutation.addedNodes, ...mutation.removedNodes].some(
+          (node) => {
+            if (!(node instanceof Element)) return false;
+
+            return (
+              node.matches(
+                "[data-bluelab-messages-conversation], [data-message-conversation]",
+              ) ||
+              Boolean(
+                node.querySelector(
+                  "[data-bluelab-messages-conversation], [data-message-conversation]",
+                ),
+              )
+            );
+          },
+        );
+      });
+
+      if (mayAffectConversation) update();
+    });
+
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['data-bluelab-messages-conversation'],
+      childList: true,
+      subtree: true,
+    });
 
     window.addEventListener('scroll', update, { passive: true });
     document.addEventListener('scroll', update, {
@@ -50,6 +87,7 @@ export const VanillaScrollToTop: React.FC = () => {
     window.addEventListener('resize', update);
 
     return () => {
+      observer.disconnect();
       window.removeEventListener('scroll', update);
       document.removeEventListener('scroll', update, true);
       window.removeEventListener('resize', update);
