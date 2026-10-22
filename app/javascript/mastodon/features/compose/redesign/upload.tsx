@@ -163,22 +163,24 @@ const ComposeAudioUpload: React.FC<{
         </span>
       </IconButton>
 
-      <IconButton
+      <Button
         as='button'
         type='button'
         size='sm'
         variant='solid'
-        icon={PencilSimpleIcon}
+        leadingIcon={PencilSimpleIcon}
         className={classes.audioAltButton}
         onClick={onEdit}
+        aria-label='Add alt text'
       >
+        <span aria-hidden='true'>ALT</span>
         <span className='sr-only'>
           <FormattedMessage
             id='compose.upload.menu.add_alt'
             defaultMessage='Add alt text'
           />
         </span>
-      </IconButton>
+      </Button>
     </div>
   );
 };
