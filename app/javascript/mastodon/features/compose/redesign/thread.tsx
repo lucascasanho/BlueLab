@@ -18,7 +18,6 @@ import type {
   ApiMediaAttachmentJSON,
 } from '@/mastodon/api_types/media_attachments';
 import { IconButton } from '@/mastodon/components/button/redesign';
-import { Icon } from '@/mastodon/components/icon';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import CloseIcon from '@/material-icons/400-20px/close.svg?react';
 import DeleteIcon from '@/material-icons/400-24px/delete.svg?react';
@@ -296,25 +295,30 @@ const ThreadMediaAttachment: React.FC<{
         )}
 
         <div className={classes.mediaActions}>
-          <button
+          <IconButton
+            as='button'
             type='button'
+            size='sm'
+            variant='solid'
+            icon={DeleteIcon}
             className={classNames(
-              'icon-button',
               classes.mediaActionButton,
               classes.mediaRemove,
             )}
             onClick={onRemove}
             aria-label={intl.formatMessage(messages.removeMedia)}
           >
-            <Icon id='delete' icon={DeleteIcon} />
             <span className='sr-only'>
               <FormattedMessage {...messages.removeMedia} />
             </span>
-          </button>
-          <button
+          </IconButton>
+          <IconButton
+            as='button'
             type='button'
+            size='sm'
+            variant='solid'
+            icon={EditIcon}
             className={classNames(
-              'icon-button',
               classes.mediaActionButton,
               classes.mediaAltButton,
             )}
@@ -322,12 +326,10 @@ const ThreadMediaAttachment: React.FC<{
             aria-label={intl.formatMessage(messages.addAlt)}
             aria-expanded={editingAlt}
           >
-            <Icon id='edit' icon={EditIcon} />
-            <span>ALT</span>
             <span className='sr-only'>
               <FormattedMessage {...messages.addAlt} />
             </span>
-          </button>
+          </IconButton>
         </div>
       </div>
       {editingAlt && (

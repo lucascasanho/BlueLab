@@ -110,7 +110,10 @@ export const Upload: React.FC<{
         )}
         {!sensitive && isVideo && (
           <video
-            className={classNames('compose-form__upload__video', classes.video)}
+            className={classNames(
+              'compose-form__upload__video',
+              classes.video,
+            )}
             src={mediaUrl ?? undefined}
             poster={preview_url ?? undefined}
             controls
@@ -121,7 +124,10 @@ export const Upload: React.FC<{
         )}
         {!sensitive && isAnimatedGif && (
           <video
-            className={classNames('compose-form__upload__video', classes.video)}
+            className={classNames(
+              'compose-form__upload__video',
+              classes.video,
+            )}
             src={mediaUrl}
             poster={preview_url ?? undefined}
             autoPlay

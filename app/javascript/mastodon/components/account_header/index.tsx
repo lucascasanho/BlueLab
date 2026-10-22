@@ -71,7 +71,8 @@ export const AccountHeader: React.FC<{
   const isLocal = !account.acct.includes('@');
   const isMe = me && account.id === me;
   const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'blue-2';
 
   return (
     <div className={isBlue2 ? 'blue2-profile' : undefined}>
@@ -124,10 +125,24 @@ export const AccountHeader: React.FC<{
             </div>
             <AccountButtons
               accountId={accountId}
-              className={classes.buttonsMobile}
+              className={classNames(
+                classes.buttonsMobile,
+                isBlue2 && 'blue2-profile-actions',
+              )}
               noShare={!isMe || 'share' in navigator}
               forceMenu={'share' in navigator}
             />
+            {isBlue2 && (
+              <AccountButtons
+                accountId={accountId}
+                className={classNames(
+                  classes.buttonsDesktop,
+                  'blue2-profile-actions',
+                )}
+                noShare={!isMe || 'share' in navigator}
+                forceMenu={'share' in navigator}
+              />
+            )}
           </div>
 
           <div
@@ -137,12 +152,14 @@ export const AccountHeader: React.FC<{
             )}
           >
             <AccountName accountId={accountId} />
-            <AccountButtons
-              accountId={accountId}
-              className={classes.buttonsDesktop}
-              noShare={!isMe || 'share' in navigator}
-              forceMenu={'share' in navigator}
-            />
+            {!isBlue2 && (
+              <AccountButtons
+                accountId={accountId}
+                className={classes.buttonsDesktop}
+                noShare={!isMe || 'share' in navigator}
+                forceMenu={'share' in navigator}
+              />
+            )}
           </div>
 
           <AccountBadges accountId={accountId} />

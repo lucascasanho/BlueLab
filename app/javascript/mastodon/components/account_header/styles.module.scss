@@ -1215,40 +1215,66 @@ $button-breakpoint: 420px;
   }
 }
 
-/* Keep Blue 2 profile actions below the cover/avatar overlap on mobile.
- * The action row is intentionally independent from the desktop identity row.
- */
-@media screen and (width <= 759px) {
-  :global(body[data-theme='blue-2'] .blue2-profile-actions-row) {
-    display: flex;
-    width: 100%;
-    min-width: 0;
-    margin-top: 16px;
-    position: relative;
-    z-index: 1;
+/* Blue 2 profile actions align with the avatar without covering the banner. */
+:global(body[data-theme='blue-2']) {
+  .avatarActionsRow {
+    min-height: 88px;
+    margin-top: -64px;
   }
 
-  :global(body[data-theme='blue-2'] .blue2-profile-actions) {
+  .buttonsDesktop {
+    position: absolute;
+    inset-block-start: 64px;
+    inset-inline-end: 0;
     display: flex;
-    flex: 1 1 auto;
     flex-wrap: wrap;
-    align-items: center;
     justify-content: flex-end;
-    gap: 8px;
-    width: 100%;
+    width: max-content;
+    max-width: calc(100% - 96px);
     min-width: 0;
-    max-width: 100%;
     margin: 0;
+    padding: 0;
     transform: none;
+    z-index: 5;
   }
 
-  :global(body[data-theme='blue-2'] .blue2-profile-actions .button) {
+  .buttonsMobile {
+    position: absolute;
+    inset-block-start: 72px;
+    inset-inline-end: 0;
+    display: none;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    width: max-content;
+    max-width: calc(100% - 96px);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    transform: none;
+    z-index: 5;
+  }
+
+  .buttonsDesktop :global(.button),
+  .buttonsMobile :global(.button) {
     flex: 0 1 auto;
     width: auto;
     min-width: 0;
     max-width: 100%;
     white-space: nowrap;
   }
-}
 
+  @media screen and (width <= 759px) {
+    .avatarActionsRow {
+      min-height: 112px;
+    }
+
+    .buttonsDesktop {
+      display: none;
+    }
+
+    .buttonsMobile {
+      display: flex;
+    }
+  }
+}
 
