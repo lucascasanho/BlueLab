@@ -107,8 +107,8 @@ const AccountButtonsOther: FC<
       )}
       {isFollowing && (
         <>
-          <Button
-            leadingIcon={ChatCircleDotsIcon}
+          <IconButton
+            icon={ChatCircleDotsIcon}
             size='sm'
             variant='solid'
             color='accent'
@@ -119,7 +119,7 @@ const AccountButtonsOther: FC<
               defaultMessage='Message'
               description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
             />
-          </Button>
+          </IconButton>
           <IconButton icon={UserMinusIcon} size='sm' onClick={confirmUnfollow}>
             <FormattedMessage id='account.unfollow' defaultMessage='Unfollow' />
           </IconButton>

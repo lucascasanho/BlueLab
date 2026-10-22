@@ -95,13 +95,70 @@ export const ComposeGifButton: React.FC<{
 }> = ({ disabled = false, activeThreadItemId = null }) => {
   const [open, { onToggle, onFalse }] = useToggle();
   const [target, setTarget] = useState<HTMLButtonElement | null>(null);
+  const [pickerThreadItemId, setPickerThreadItemId] = useState<
+    string | null | undefined
+  >(undefined);
+  const pickerThreadItemIdRef = useRef<string | null | undefined>(undefined);
+
+  const resolveFocusedThreadItemId = useCallback(() => {
+    const activeElement = document.activeElement;
+    if (activeElement instanceof HTMLElement) {
+      const threadItem = activeElement.closest<HTMLElement>(
+        '[data-thread-item-id]',
+      );
+      if (threadItem?.dataset.threadItemId) {
+        return threadItem.dataset.threadItemId;
+      }
+
+      // A null target is intentional when the first post itself had focus.
+      if (activeElement.closest('[data-compose-thread-main]')) {
+        return null;
+      }
+    }
+
+    return activeThreadItemId;
+  }, [activeThreadItemId]);
+
+  const handlePointerDown = useCallback(() => {
+    const id = resolveFocusedThreadItemId();
+    pickerThreadItemIdRef.current = id;
+    setPickerThreadItemId(id);
+  }, [resolveFocusedThreadItemId]);
+
+  const handleToggle = useCallback(() => {
+    if (open) {
+      pickerThreadItemIdRef.current = undefined;
+      setPickerThreadItemId(undefined);
+    } else {
+      const id =
+        pickerThreadItemIdRef.current !== undefined
+          ? pickerThreadItemIdRef.current
+          : resolveFocusedThreadItemId();
+      pickerThreadItemIdRef.current = id;
+      setPickerThreadItemId(id);
+    }
+
+    onToggle();
+  }, [onToggle, open, resolveFocusedThreadItemId]);
+
+  const handleClose = useCallback(() => {
+    pickerThreadItemIdRef.current = undefined;
+    setPickerThreadItemId(undefined);
+    onFalse();
+  }, [onFalse]);
+
+  const effectiveThreadItemId =
+    pickerThreadItemId === undefined
+      ? activeThreadItemId
+      : pickerThreadItemId;
+
   const threadMedia = useAppSelector((state) => {
-    if (!activeThreadItemId) return null;
+    if (!effectiveThreadItemId) return null;
     const item = (
       state.compose.get('thread_items') as ImmutableList<
         ImmutableMap<string, unknown>
       >
-    ).find((candidate) => candidate.get('id') === activeThreadItemId);
+    ).find((candidate) => candidate.get('id') === effectiveThreadItemId);
     return (
       (item?.get('media_attachments') as
         | ImmutableList<ImmutableMap<string, unknown>>
@@ -128,7 +185,8 @@ export const ComposeGifButton: React.FC<{
         icon={GifIcon}
         ref={setTarget}
         disabled={disabled || disabledForThread}
-        onClick={onToggle}
+        onPointerDown={handlePointerDown}
+        onClick={handleToggle}
         aria-expanded={open}
       >
         <FormattedMessage id='gif_button.label' defaultMessage='Insert GIF' />
@@ -136,7 +194,7 @@ export const ComposeGifButton: React.FC<{
 
       <Popover
         isOpen={open}
-        onClose={onFalse}
+        onClose={handleClose}
         reference={target}
         placement='top-start'
         offset={4}
@@ -144,8 +202,8 @@ export const ComposeGifButton: React.FC<{
       >
         {({ props, placement }) => (
           <ComposeGifDropdown
-            onClose={onFalse}
-            activeThreadItemId={activeThreadItemId}
+            onClose={handleClose}
+            activeThreadItemId={effectiveThreadItemId}
             className={placement}
             {...props}
           />
