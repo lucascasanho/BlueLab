@@ -9,6 +9,7 @@ import { useAppSelector } from 'mastodon/store';
 
 import type { LabelRenderer } from './notification_group_with_status';
 import { NotificationGroupWithStatus } from './notification_group_with_status';
+import classes from '../styles.module.scss';
 
 const messagesLegacy = defineMessages({
   like: {
@@ -119,6 +120,7 @@ export const NotificationFavourite: React.FC<{
       type='favourite'
       icon={StatusLikeActiveIcon}
       iconId='star'
+      iconClassName={classes.favouriteIcon}
       accountIds={notification.sampleAccountIds}
       statusId={notification.statusId}
       timestamp={notification.latest_page_notification_at}

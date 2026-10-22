@@ -54,6 +54,8 @@ module ThemeHelper
   # Vanilla theme must use Mastodon's own token and color-palette system.
   def instance_customization_styles
     accent = safe_customization_color(:instance_accent_color, fallback: '#6364ff')
+    # Keep verification marks tied to the administrator's accent in every theme.
+    badge_colors = InstanceVerification.local_badge.fetch('colors')
     light_background = safe_customization_color(:instance_light_background_color, fallback: '#ffffff')
     light_surface = safe_customization_color(:instance_light_surface_color, fallback: '#f7f7f9')
     light_text = safe_customization_color(:instance_light_text_color, fallback: '#1f1b23')
@@ -73,6 +75,10 @@ module ThemeHelper
     css = <<~CSS
       :root {
         #{logo_token}
+        --instance-accent-color: #{accent};
+        --instance-verification-badge-start: #{badge_colors.fetch(0)};
+        --instance-verification-badge-middle: #{badge_colors.fetch(1)};
+        --instance-verification-badge-end: #{badge_colors.fetch(2)};
       }
       html:has(body[data-theme=blue-2]),
       html:has(body[data-theme=mastodon-bird-ui-auto]) {

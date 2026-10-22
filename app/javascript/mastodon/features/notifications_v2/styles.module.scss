@@ -13,3 +13,11 @@
     display: none;
   }
 }
+
+.favouriteIcon {
+  color: #dc2626;
+
+  :global(.icon) {
+    color: #dc2626;
+  }
+}

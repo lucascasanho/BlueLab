@@ -49,18 +49,21 @@ interface IconProps {
   remoteBadge?: ApiInstanceVerificationBadgeJSON | null;
 }
 
-// This established three-blue palette is intentionally independent of theme
-// tokens, so local verification marks stay identical in Vanilla and BlueLab.
-const VERIFIED_BADGE_PALETTE = ['#60a5fa', '#1d9bf0', '#1d4ed8'] as const;
-
 export const VerifiedMark: FC<IconProps> = ({ className, remoteBadge }) => {
   const gradientId = `bluelab-verified-${useId().replace(/:/g, '')}`;
-  const remoteColors = remoteBadge?.colors.length
-    ? remoteBadge.colors
-    : VERIFIED_BADGE_PALETTE;
-  const startColor = remoteColors[0];
-  const middleColor = remoteColors[1];
-  const endColor = remoteColors[2];
+  const remoteColors = remoteBadge?.colors;
+  const fallbackStart =
+    'var(--instance-verification-badge-start, #60a5fa)';
+  const fallbackMiddle =
+    'var(--instance-verification-badge-middle, #1d9bf0)';
+  const fallbackEnd = 'var(--instance-verification-badge-end, #1d4ed8)';
+  const startColor = remoteColors?.[0] ?? fallbackStart;
+  const middleColor = remoteColors?.[1] ?? remoteColors?.[0] ?? fallbackMiddle;
+  const endColor =
+    remoteColors?.[2] ??
+    remoteColors?.[1] ??
+    remoteColors?.[0] ??
+    fallbackEnd;
 
   return (
     <svg

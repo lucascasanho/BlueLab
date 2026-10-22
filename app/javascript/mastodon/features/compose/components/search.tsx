@@ -113,10 +113,14 @@ const getSearchScrollPositions = (
   const seen = new Set<HTMLElement>();
   const documentScroller = document.scrollingElement;
 
-  const addPosition = (element: HTMLElement) => {
+  const addPosition = (
+    element: HTMLElement,
+    includeNonScrollable = false,
+  ) => {
     if (seen.has(element)) return;
 
     if (
+      !includeNonScrollable &&
       element !== documentScroller &&
       element.scrollHeight <= element.clientHeight &&
       element.scrollWidth <= element.clientWidth
@@ -145,10 +149,10 @@ const getSearchScrollPositions = (
     .querySelectorAll<HTMLElement>(
       '.scrollable, .column, .columns-area, .columns-area--mobile, .columns-area__panels, .columns-area__panels__main, .main, [data-column-root]',
     )
-    .forEach(addPosition);
+    .forEach((scroller) => addPosition(scroller, true));
 
   if (documentScroller instanceof HTMLElement) {
-    addPosition(documentScroller);
+    addPosition(documentScroller, true);
   }
 
   return positions;

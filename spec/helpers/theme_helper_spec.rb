@@ -76,6 +76,17 @@ RSpec.describe ThemeHelper do
     end
   end
 
+  it 'provides administrator-derived verification colors to Vanilla without overriding its palette' do
+    Setting.instance_accent_color = '#d52a96'
+    badge_colors = InstanceVerification.local_badge.fetch('colors')
+    root_tokens = css.match(/:root\s*\{([^}]*)\}/m)&.captures&.first
+
+    expect(root_tokens).to include("--instance-verification-badge-start: #{badge_colors.fetch(0)};")
+    expect(root_tokens).to include("--instance-verification-badge-middle: #{badge_colors.fetch(1)};")
+    expect(root_tokens).to include("--instance-verification-badge-end: #{badge_colors.fetch(2)};")
+    expect(root_tokens).to_not include('--color-bg-brand-base')
+  end
+
   describe '#custom_stylesheet' do
     let(:custom_css) { 'body {}' }
     let(:custom_digest) { Digest::SHA256.hexdigest(custom_css) }

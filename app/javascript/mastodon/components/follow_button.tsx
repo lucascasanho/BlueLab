@@ -24,6 +24,7 @@ import { useBreakpoint } from '../features/ui/hooks/useBreakpoint';
 import { isRedesignEnabled } from '../utils/environment';
 
 import { Button as RedesignButton } from './button/redesign';
+import { Button as VanillaRedesignButton } from './button/vanilla_redesign';
 import type { ButtonProps as RedesignButtonProps } from './button/redesign';
 import type { MastodonLocationDescriptor } from './router';
 
@@ -264,10 +265,23 @@ const FollowButtonRedesign: React.FC<
     return null;
   }
 
+  const currentTheme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
+  const isVanillaTheme =
+    !currentTheme || currentTheme === 'default' || currentTheme === 'vanilla';
   const leadingIcon = labelLength === 'long' ? icon : undefined;
 
   if (link) {
-    return (
+    return isVanillaTheme ? (
+      <VanillaRedesignButton
+        as='link'
+        to={link}
+        leadingIcon={leadingIcon}
+        {...buttonProps}
+      >
+        {label}
+      </VanillaRedesignButton>
+    ) : (
       <RedesignButton
         as='link'
         to={link}
@@ -279,7 +293,18 @@ const FollowButtonRedesign: React.FC<
     );
   }
 
-  return (
+  return isVanillaTheme ? (
+    <VanillaRedesignButton
+      {...buttonProps}
+      leadingIcon={leadingIcon}
+      onClick={onClick}
+      disabled={disabled}
+      variant={secondary ? 'tonal' : 'solid'}
+      color={secondary ? undefined : 'accent'}
+    >
+      {label}
+    </VanillaRedesignButton>
+  ) : (
     <RedesignButton
       {...buttonProps}
       leadingIcon={leadingIcon}
@@ -292,7 +317,6 @@ const FollowButtonRedesign: React.FC<
     </RedesignButton>
   );
 };
-
 export const FollowButton: React.FC<
   FollowButtonOptions & {
     compact?: boolean;

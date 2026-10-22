@@ -5,16 +5,19 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import classNames from 'classnames';
 
+import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 import { GifIcon, MagnifyingGlassIcon } from '@phosphor-icons/react';
 
-import { uploadCompose } from '@/mastodon/actions/compose';
+import { addComposeThreadMedia, uploadCompose } from '@/mastodon/actions/compose';
+import api from '@/mastodon/api';
+import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { CircularProgress } from '@/mastodon/components/circular_progress';
 import { MenuCard } from '@/mastodon/components/menu/card';
 import type { PopoverChildProps } from '@/mastodon/components/popover';
 import { Popover } from '@/mastodon/components/popover';
 import { useToggle } from '@/mastodon/hooks/useToggle';
-import { useAppDispatch } from '@/mastodon/store';
+import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import classes from './gif_picker.module.scss';
 
@@ -85,9 +88,31 @@ interface KlipyResponse {
 
 export const ComposeGifButton: React.FC<{
   disabled?: boolean;
-}> = ({ disabled = false }) => {
+  activeThreadItemId?: string | null;
+}> = ({ disabled = false, activeThreadItemId = null }) => {
   const [open, { onToggle, onFalse }] = useToggle();
   const [target, setTarget] = useState<HTMLButtonElement | null>(null);
+  const threadMedia = useAppSelector((state) => {
+    if (!activeThreadItemId) return null;
+    const item = (
+      state.compose.get('thread_items') as ImmutableList<
+        ImmutableMap<string, unknown>
+      >
+    ).find((candidate) => candidate.get('id') === activeThreadItemId);
+    return (
+      (item?.get('media_attachments') as
+        | ImmutableList<ImmutableMap<string, unknown>>
+        | undefined) ?? null
+    );
+  });
+  const maxAttachments = useAppSelector(
+    (state) =>
+      state.server.server.item?.configuration.statuses.max_media_attachments ??
+      4,
+  );
+  const disabledForThread =
+    !!activeThreadItemId &&
+    (!threadMedia || threadMedia.size >= maxAttachments);
 
   if (!KLIPY_API_KEY) {
     return null;
@@ -99,7 +124,7 @@ export const ComposeGifButton: React.FC<{
         size='sm'
         icon={GifIcon}
         ref={setTarget}
-        disabled={disabled}
+        disabled={disabled || disabledForThread}
         onClick={onToggle}
         aria-expanded={open}
       >
@@ -117,6 +142,7 @@ export const ComposeGifButton: React.FC<{
         {({ props, placement }) => (
           <ComposeGifDropdown
             onClose={onFalse}
+            activeThreadItemId={activeThreadItemId}
             className={placement}
             {...props}
           />
@@ -129,11 +155,30 @@ export const ComposeGifButton: React.FC<{
 const ComposeGifDropdown: React.FC<
   {
     onClose: () => void;
+    activeThreadItemId?: string | null;
     className?: string;
   } & PopoverChildProps
-> = ({ onClose, className, ...props }) => {
+> = ({ onClose, activeThreadItemId = null, className, ...props }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const threadMedia = useAppSelector((state) => {
+    if (!activeThreadItemId) return null;
+    const item = (
+      state.compose.get('thread_items') as ImmutableList<
+        ImmutableMap<string, unknown>
+      >
+    ).find((candidate) => candidate.get('id') === activeThreadItemId);
+    return (
+      (item?.get('media_attachments') as
+        | ImmutableList<ImmutableMap<string, unknown>>
+        | undefined) ?? null
+    );
+  });
+  const maxAttachments = useAppSelector(
+    (state) =>
+      state.server.server.item?.configuration.statuses.max_media_attachments ??
+      4,
+  );
   const searchInputRef = useRef<HTMLInputElement>(null);
   const requestControllerRef = useRef<AbortController | null>(null);
 
@@ -294,7 +339,31 @@ const ComposeGifDropdown: React.FC<
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
 
-        await dispatch(uploadCompose(dataTransfer.files));
+        if (activeThreadItemId) {
+          if (!threadMedia) {
+            throw new Error('The selected thread item is no longer available');
+          }
+          if (threadMedia.size >= maxAttachments) {
+            throw new Error('The selected thread item has no media slots left');
+          }
+
+          const form = new FormData();
+          form.append('file', file);
+          let uploadResponse = await api().post<ApiMediaAttachmentJSON>(
+            '/api/v2/media',
+            form,
+          );
+          while (uploadResponse.status !== 200) {
+            await new Promise((resolve) => window.setTimeout(resolve, 1_000));
+            uploadResponse = await api().get<ApiMediaAttachmentJSON>(
+              `/api/v1/media/${uploadResponse.data.id}`,
+            );
+          }
+          dispatch(addComposeThreadMedia(activeThreadItemId, uploadResponse.data));
+        } else {
+          await dispatch(uploadCompose(dataTransfer.files));
+        }
+
         registerShare(gif.id);
         onClose();
       } catch {
@@ -302,7 +371,15 @@ const ComposeGifDropdown: React.FC<
         setError(true);
       }
     },
-    [dispatch, onClose, registerShare, selectingId],
+    [
+      activeThreadItemId,
+      dispatch,
+      maxAttachments,
+      onClose,
+      registerShare,
+      selectingId,
+      threadMedia,
+    ],
   );
 
   const createGifPickHandler = useCallback(

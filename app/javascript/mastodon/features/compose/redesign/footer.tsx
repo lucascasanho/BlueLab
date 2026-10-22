@@ -149,7 +149,10 @@ export const ComposeFooter: React.FC<{
           disabled={!activeThreadItemId && hasQuote}
         />
 
-        <ComposeGifButton disabled={!activeThreadItemId && hasQuote} />
+        <ComposeGifButton
+          activeThreadItemId={activeThreadItemId}
+          disabled={!activeThreadItemId && hasQuote}
+        />
 
         <ComposeEmojiButton onPick={onEmojiPick} />
 

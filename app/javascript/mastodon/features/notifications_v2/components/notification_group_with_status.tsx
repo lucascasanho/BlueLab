@@ -37,6 +37,7 @@ export type LabelRenderer = (
 export const NotificationGroupWithStatus: React.FC<{
   icon: IconProp;
   iconId: string;
+  iconClassName?: string;
   statusId?: string;
   actions?: JSX.Element;
   count: number;
@@ -50,6 +51,7 @@ export const NotificationGroupWithStatus: React.FC<{
 }> = ({
   icon,
   iconId,
+  iconClassName,
   timestamp,
   accountIds,
   actions,
@@ -150,7 +152,7 @@ export const NotificationGroupWithStatus: React.FC<{
         onClick={handleCardClick}
         onKeyDown={handleCardKeyDown}
       >
-        <div className='notification-group__icon'>
+        <div className={classNames('notification-group__icon', iconClassName)}>
           <Icon icon={icon} id={iconId} />
         </div>
 
