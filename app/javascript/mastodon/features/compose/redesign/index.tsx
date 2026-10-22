@@ -210,10 +210,7 @@ export const RedesignComposeForm: React.FC<
         {!compact && !useVanillaToolbar && <ComposeReply />}
 
         {!compact && (
-          <div
-            className={classes.toolbar}
-            data-bluelab-compose-toolbar
-          >
+          <div className={classes.toolbar} data-bluelab-compose-toolbar>
             {useVanillaToolbar ? (
               <VanillaComposeVisibility className={classes.flexGrowWrap} />
             ) : (

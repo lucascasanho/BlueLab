@@ -37,7 +37,9 @@ export const VanillaScrollToTop: React.FC = () => {
     const theme = document.body.dataset.theme;
     if (theme && theme !== 'default') return;
 
-    const update = () => setVisible(hasScrolled());
+    const update = () => {
+      setVisible(hasScrolled());
+    };
     update();
 
     window.addEventListener('scroll', update, { passive: true });
