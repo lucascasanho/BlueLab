@@ -102,6 +102,52 @@ const supportedTimezones = () => {
   return Array.from(new Set([browserTimezone(), 'UTC', ...zones]));
 };
 
+const getSchedulePanelStyle = (
+  isMobileSchedule: boolean,
+  desktopPanelPosition: {
+    left: number;
+    top?: number;
+    bottom?: number;
+    width: number;
+    maxHeight: number;
+  } | null,
+): React.CSSProperties => {
+  if (isMobileSchedule) {
+    return {
+      position: 'fixed',
+      zIndex: 10000,
+      insetInlineStart: '12px',
+      insetInlineEnd: '12px',
+      bottom: 'calc(env(safe-area-inset-bottom, 0px) + 4.75rem)',
+      width: 'min(22rem, calc(100vw - 24px))',
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: 'min(70dvh, 26rem)',
+      marginInline: 'auto',
+      overflowY: 'auto',
+      overscrollBehavior: 'contain',
+      transform: 'none',
+    };
+  }
+
+  if (!desktopPanelPosition) {
+    return { visibility: 'hidden' };
+  }
+
+  return {
+    position: 'fixed',
+    zIndex: 10000,
+    insetInlineStart: `${desktopPanelPosition.left}px`,
+    ...(desktopPanelPosition.top !== undefined
+      ? { top: `${desktopPanelPosition.top}px` }
+      : { bottom: `${desktopPanelPosition.bottom ?? 0}px` }),
+    width: `${desktopPanelPosition.width}px`,
+    maxHeight: `${desktopPanelPosition.maxHeight}px`,
+    overflowY: 'auto',
+    overscrollBehavior: 'contain',
+    transform: 'none',
+  };
+};
+
 export const ComposeSchedule: React.FC = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -261,38 +307,7 @@ export const ComposeSchedule: React.FC = () => {
       role='group'
       aria-label={intl.formatMessage(messages.schedule)}
       onKeyDown={panelKeyDown}
-      style={
-        isMobileSchedule
-          ? {
-              position: 'fixed',
-              zIndex: 10000,
-              insetInlineStart: '12px',
-              insetInlineEnd: '12px',
-              bottom: 'calc(env(safe-area-inset-bottom, 0px) + 4.75rem)',
-              width: 'min(22rem, calc(100vw - 24px))',
-              maxWidth: 'calc(100vw - 24px)',
-              maxHeight: 'min(70dvh, 26rem)',
-              marginInline: 'auto',
-              overflowY: 'auto',
-              overscrollBehavior: 'contain',
-              transform: 'none',
-            }
-          : desktopPanelPosition
-            ? {
-                position: 'fixed',
-                zIndex: 10000,
-                insetInlineStart: `${desktopPanelPosition.left}px`,
-                ...(desktopPanelPosition.top !== undefined
-                  ? { top: `${desktopPanelPosition.top}px` }
-                  : { bottom: `${desktopPanelPosition.bottom ?? 0}px` }),
-                width: `${desktopPanelPosition.width}px`,
-                maxHeight: `${desktopPanelPosition.maxHeight}px`,
-                overflowY: 'auto',
-                overscrollBehavior: 'contain',
-                transform: 'none',
-              }
-            : { visibility: 'hidden' }
-      }
+      style={getSchedulePanelStyle(isMobileSchedule, desktopPanelPosition)}
     >
       <div className={classes.scheduleDateTime}>
         <label>
