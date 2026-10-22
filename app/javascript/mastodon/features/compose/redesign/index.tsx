@@ -148,6 +148,29 @@ export const RedesignComposeForm: React.FC<
       element.scrollTop = nextScrollTop;
     }, []);
 
+  const handleToolbarClickCapture = useCallback<
+    React.MouseEventHandler<HTMLDivElement>
+  >((event) => {
+    const target = event.target;
+
+    if (!(target instanceof Element) || !target.closest('button')) return;
+
+    const form = event.currentTarget.closest<HTMLFormElement>(
+      'form[data-keyboard-open="true"]',
+    );
+    if (!form) return;
+
+    const editor = form.querySelector<HTMLElement>(
+      '[data-bluelab-rich-editor-input]',
+    );
+
+    // Release the soft keyboard before opening a Vanilla toolbar menu. On
+    // mobile browsers the keyboard can otherwise cover the popover entirely.
+    if (editor && document.activeElement === editor) {
+      editor.blur();
+    }
+  }, []);
+
   const handlePrimaryEditorFocus = useCallback(() => {
     setActiveThreadItemId(null);
   }, []);
@@ -208,7 +231,13 @@ export const RedesignComposeForm: React.FC<
         {!compact && !useVanillaToolbar && <ComposeReply />}
 
         {!compact && (
-          <div className={classes.toolbar} data-bluelab-compose-toolbar>
+          <div
+            className={classes.toolbar}
+            data-bluelab-compose-toolbar
+            onClickCapture={
+              useVanillaToolbar ? handleToolbarClickCapture : undefined
+            }
+          >
             {useVanillaToolbar ? (
               <VanillaComposeVisibility className={classes.flexGrowWrap} />
             ) : (

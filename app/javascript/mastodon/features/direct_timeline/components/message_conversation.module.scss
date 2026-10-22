@@ -210,7 +210,13 @@
 :global(body[data-theme='']) .messageFavouriteVanilla[aria-pressed='true'],
 :global(body[data-theme='default'])
   .messageFavouriteVanilla[aria-pressed='true'] {
-  color: #dc2626;
+  color: #dc2626 !important;
+
+  svg {
+    color: #dc2626 !important;
+    fill: #dc2626 !important;
+    stroke: #dc2626 !important;
+  }
 }
 
 .messageFavouriteVanilla:focus-visible {
@@ -531,6 +537,20 @@
     min-height: min(5.5rem, 16dvh);
     max-height: min(7rem, 22dvh);
     flex: 0 1 auto;
+  }
+
+  // Keep mobile browsers from zooming the viewport when the message editor
+  // receives focus. Scope the font-size fix to Vanilla's appearance.
+  :global(body[data-theme='default'])
+    .replyComposer[data-bluelab-composer-compact='true']
+    :global([data-bluelab-rich-editor-input]),
+  :global(body[data-theme=''])
+    .replyComposer[data-bluelab-composer-compact='true']
+    :global([data-bluelab-rich-editor-input]),
+  :global(body:not([data-theme]))
+    .replyComposer[data-bluelab-composer-compact='true']
+    :global([data-bluelab-rich-editor-input]) {
+    font-size: var(--fs-16);
   }
 }
 @media (width >= 1175px) {

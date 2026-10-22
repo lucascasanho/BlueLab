@@ -147,7 +147,12 @@ const ComposeVisibilityMenu: React.FC = () => {
     }, [dispatch]);
 
   return (
-    <MenuList placement='bottom-start' offset={4} maxWidth={280}>
+    <MenuList
+      portal
+      placement='bottom-start'
+      offset={4}
+      maxWidth={280}
+    >
       <MenuItemGroup
         label={
           <FormattedMessage

@@ -10,6 +10,7 @@ import { Button } from '@/mastodon/components/button/vanilla_redesign';
 import { Combobox } from '@/mastodon/components/form_fields';
 import { ComboboxMenuItem } from '@/mastodon/components/form_fields/combobox_field';
 import { PopoverMenuCard } from '@/mastodon/components/menu/card';
+import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useToggle } from '@/mastodon/hooks/useToggle';
 import { languages as initialStateLanguages } from '@/mastodon/initial_state';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
@@ -35,6 +36,7 @@ export const LanguageButton: React.FC = () => {
   const langCode = useAppSelector(
     (state) => state.compose.get('language') as string,
   );
+  const isMobile = useBreakpoint('openable');
 
   const [isOpen, { onToggle: toggle, onFalse: close }] = useToggle(false);
   const [triggerElement, setTriggerElement] =
@@ -67,12 +69,12 @@ export const LanguageButton: React.FC = () => {
         placement='bottom-end'
         strategy='fixed'
         reference={triggerElement}
-        container={null}
+        container={undefined}
         className={classes.languageMenu}
         maxWidth={280}
         onClose={close}
       >
-        <LanguageDropdown onClose={close} />
+        <LanguageDropdown onClose={close} autoFocus={!isMobile} />
       </PopoverMenuCard>
     </>
   );
@@ -85,9 +87,10 @@ interface LanguageObject {
   localName: string;
 }
 
-export const LanguageDropdown: React.FC<{ onClose: () => void }> = ({
-  onClose,
-}) => {
+export const LanguageDropdown: React.FC<{
+  onClose: () => void;
+  autoFocus?: boolean;
+}> = ({ onClose, autoFocus = true }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
 
@@ -125,7 +128,7 @@ export const LanguageDropdown: React.FC<{ onClose: () => void }> = ({
 
   return (
     <Combobox
-      autoFocus
+      autoFocus={autoFocus}
       listBoxType='in-place'
       value={inputValue}
       onChange={handleSearch}

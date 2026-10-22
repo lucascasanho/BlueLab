@@ -101,9 +101,15 @@
   :global(body:not([data-theme])) .root[data-keyboard-open='true'],
   :global(body[data-theme='']) .root[data-keyboard-open='true'],
   :global(body[data-theme='default']) .root[data-keyboard-open='true'] {
-    // Use all available space above the on-screen keyboard in Vanilla.
-    height: var(--viewport-height, 100dvh);
-    max-height: var(--viewport-height, 100dvh);
+    // Anchor to the measured visible viewport. Let top and bottom determine
+    // the height so no reserved blank area remains above the keyboard.
+    top: calc(
+      var(--composer-visual-viewport-offset-top, 0px) +
+        env(safe-area-inset-top)
+    );
+    bottom: var(--composer-visual-viewport-bottom, 0px);
+    height: auto;
+    max-height: none;
     min-height: 0;
   }
 }
@@ -191,6 +197,11 @@
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     cursor: text;
+
+    // Prevent the mobile browser from zooming when the editor is focused.
+    @media (width < #{variables.$mobile-menu-breakpoint}) {
+      font-size: var(--fs-16);
+    }
 
     b,
     strong {
