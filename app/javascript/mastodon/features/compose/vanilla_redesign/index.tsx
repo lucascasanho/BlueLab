@@ -51,6 +51,37 @@ export const RedesignComposeForm: React.FC<
 
   const titleId = useId();
 
+  const handleToolbarClickCapture = useCallback<
+    React.MouseEventHandler<HTMLDivElement>
+  >((event) => {
+    const target = event.target;
+    if (!(target instanceof Element) || !target.closest('button')) return;
+
+    const form = event.currentTarget.closest<HTMLFormElement>(
+      'form[data-keyboard-open="true"]',
+    );
+    const activeElement = document.activeElement;
+
+    if (
+      !form ||
+      !(activeElement instanceof HTMLElement) ||
+      !form.contains(activeElement) ||
+      !(
+        activeElement.isContentEditable ||
+        activeElement instanceof HTMLTextAreaElement ||
+        activeElement instanceof HTMLInputElement
+      )
+    ) {
+      return;
+    }
+
+    // Preserve the toolbar click first, then release the keyboard so the
+    // visibility, language, and settings menus are not hidden behind it.
+    window.requestAnimationFrame(() => {
+      if (activeElement.isConnected) activeElement.blur();
+    });
+  }, []);
+
   return (
     <form
       {...props}
@@ -69,7 +100,10 @@ export const RedesignComposeForm: React.FC<
 
       {!headless && <ComposeFormHeader id={titleId} noMinimize={noMinimize} />}
 
-      <div className={classes.toolbar}>
+      <div
+        className={classes.toolbar}
+        onClickCapture={handleToolbarClickCapture}
+      >
         <ComposeVisibility className={classes.flexGrowWrap} />
 
         <LanguageButton />

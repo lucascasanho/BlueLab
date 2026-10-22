@@ -550,7 +550,9 @@
   :global(body:not([data-theme]))
     .replyComposer[data-bluelab-composer-compact='true']
     :global([data-bluelab-rich-editor-input]) {
-    font-size: var(--fs-16);
+    // Use a fixed 16px size so iOS does not zoom when focusing the
+    // message editor, even when theme typography tokens change.
+    font-size: 16px !important;
   }
 }
 @media (width >= 1175px) {

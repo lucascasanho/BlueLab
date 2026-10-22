@@ -164,10 +164,13 @@ export const RedesignComposeForm: React.FC<
       '[data-bluelab-rich-editor-input]',
     );
 
-    // Release the soft keyboard before opening a Vanilla toolbar menu. On
-    // mobile browsers the keyboard can otherwise cover the popover entirely.
+    // Let the button's click handler open the menu before hiding the
+    // on-screen keyboard. Blurring synchronously during click capture can
+    // resize the viewport and cancel the click on mobile browsers.
     if (editor && document.activeElement === editor) {
-      editor.blur();
+      window.requestAnimationFrame(() => {
+        if (editor.isConnected) editor.blur();
+      });
     }
   }, []);
 
