@@ -50,17 +50,37 @@
 }
 
 .mediaMenuButtons {
-  display: flex;
-  gap: var(--space-2);
   position: absolute;
+  z-index: 3;
   inset-block-start: var(--space-2);
   inset-inline-end: var(--space-2);
 }
 
 .mediaMenuAltButton {
   position: absolute;
+  z-index: 3;
   inset-block-start: var(--space-2);
   inset-inline-start: var(--space-2);
+}
+
+.audioWrapper {
+  position: relative;
+  padding-top: calc(var(--space-2) + 36px);
+}
+
+.audioDeleteButton,
+.audioAltButton {
+  position: absolute;
+  z-index: 2;
+  top: var(--space-2);
+}
+
+.audioDeleteButton {
+  inset-inline-start: var(--space-2);
+}
+
+.audioAltButton {
+  inset-inline-end: var(--space-2);
 }
 
 // Audio

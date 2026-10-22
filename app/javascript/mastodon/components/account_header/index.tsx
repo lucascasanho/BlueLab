@@ -132,6 +132,14 @@ export const AccountHeader: React.FC<{
                 size={isBlue2 ? 88 : 80}
               />
             </a>
+            {!isBlue2 && (
+              <AccountButtons
+                accountId={accountId}
+                className={classes.buttonsDesktop}
+                noShare={!isMe || 'share' in navigator}
+                forceMenu={'share' in navigator}
+              />
+            )}
           </div>
 
           {isBlue2 ? (
@@ -149,12 +157,7 @@ export const AccountHeader: React.FC<{
           ) : (
             <div className={classes.displayNameWrapper}>
               <AccountName accountId={accountId} />
-              <AccountButtons
-                accountId={accountId}
-                className={classes.buttonsDesktop}
-                noShare={!isMe || 'share' in navigator}
-                forceMenu={'share' in navigator}
-              />
+              
             </div>
           )}
 

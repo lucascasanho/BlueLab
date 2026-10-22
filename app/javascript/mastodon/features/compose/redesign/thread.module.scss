@@ -136,11 +136,11 @@
   }
 }
 
-.mediaRemove {
+.mediaRemove,
+.mediaAltButton {
   position: absolute;
-  z-index: 1;
-  inset-block-start: var(--space-2xs);
-  inset-inline-end: var(--space-2xs);
+  z-index: 2;
+  top: var(--space-2xs);
   box-sizing: border-box;
   width: 32px;
   min-width: 32px;
@@ -151,8 +151,15 @@
   background: var(--color-bg-primary);
 }
 
-.mediaAlt,
-.mediaAltAction {
+.mediaRemove {
+  inset-inline-start: var(--space-2xs);
+}
+
+.mediaAltButton {
+  inset-inline-end: var(--space-2xs);
+}
+
+.mediaAlt {
   display: block;
   padding: var(--space-2xs);
 }
@@ -162,9 +169,9 @@
 
   input {
     box-sizing: border-box;
+    display: block;
     width: 100%;
     min-width: 0;
-    box-sizing: border-box;
     min-height: 40px;
     padding: var(--space-2xs) var(--space-xs);
     border: 0;

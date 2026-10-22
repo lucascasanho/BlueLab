@@ -39,7 +39,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
-  overflow: hidden;
+  overflow: visible;
   margin-inline-start: -2px; // aligns the pfp with content below
 }
 
@@ -199,11 +199,14 @@ $button-breakpoint: 420px;
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 
   :global(.button) {
-    flex-shrink: 1;
+    flex: 0 1 auto;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
     white-space: nowrap;
-    min-width: 80px;
   }
 
   :global(.icon-button) {
@@ -219,18 +222,24 @@ $button-breakpoint: 420px;
 }
 
 .buttonsDesktop {
-  // Always sit beside the display name. The <420px mobile copy used to live in
-  // the avatar row, and that row is pulled up over the cover (iPhone 14).
   flex: 0 1 auto;
   align-self: flex-start;
   justify-content: flex-end;
   margin-inline-start: auto;
   min-width: 0;
-  max-width: 100%;
+  max-width: calc(100% - 88px);
+  padding-top: 8px;
 
   :global(.button) {
+    flex: 0 1 auto;
+    width: auto;
     min-width: 0;
     max-width: 100%;
+    white-space: nowrap;
+  }
+
+  :global(.icon-button) {
+    flex: 0 0 auto;
   }
 }
 

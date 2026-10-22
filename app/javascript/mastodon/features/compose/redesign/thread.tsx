@@ -7,7 +7,7 @@ import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
-import { PencilSimpleIcon, XIcon } from '@phosphor-icons/react';
+import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react';
 
 import {
   addComposeThreadMedia,
@@ -233,7 +233,7 @@ const ThreadMediaAttachment: React.FC<{
   const intl = useIntl();
   const mediaId = attachment.get('id') as string;
   const description = (attachment.get('description') as string | undefined) ?? '';
-  const [editingAlt, setEditingAlt] = useState(Boolean(description));
+  const [editingAlt, setEditingAlt] = useState(false);
 
   return (
     <div className={classes.threadMediaItem}>
@@ -243,14 +243,26 @@ const ThreadMediaAttachment: React.FC<{
           as='button'
           type='button'
           size='sm'
-          icon={XIcon}
+          variant='solid'
+          icon={TrashIcon}
           className={classes.mediaRemove}
           onClick={onRemove}
         >
           <FormattedMessage {...messages.removeMedia} />
         </IconButton>
+        <IconButton
+          as='button'
+          type='button'
+          size='sm'
+          variant='solid'
+          icon={PencilSimpleIcon}
+          className={classes.mediaAltButton}
+          onClick={() => setEditingAlt((open) => !open)}
+        >
+          <FormattedMessage {...messages.addAlt} />
+        </IconButton>
       </div>
-      {editingAlt ? (
+      {editingAlt && (
         <label className={classes.mediaAlt}>
           <span className='sr-only'>
             <FormattedMessage
@@ -272,18 +284,6 @@ const ThreadMediaAttachment: React.FC<{
             }
           />
         </label>
-      ) : (
-        <div className={classes.mediaAltAction}>
-          <IconButton
-            as='button'
-            type='button'
-            size='sm'
-            icon={PencilSimpleIcon}
-            onClick={() => setEditingAlt(true)}
-          >
-            <FormattedMessage {...messages.addAlt} />
-          </IconButton>
-        </div>
       )}
     </div>
   );
