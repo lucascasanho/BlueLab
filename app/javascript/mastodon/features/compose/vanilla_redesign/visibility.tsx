@@ -4,8 +4,11 @@ import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 
+import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
+
 import { ChatCircleDotsIcon, EyeIcon } from '@phosphor-icons/react';
 
+import { changeComposeThreadItem } from '@/mastodon/actions/compose';
 import { changeComposeVisibility } from '@/mastodon/actions/compose_typed';
 import type { StatusVisibility } from '@/mastodon/api_types/statuses';
 import {
@@ -30,10 +33,27 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { selectComposePrivacy } from './selectors';
 import classes from './styles.module.scss';
 
-export const ComposeVisibility: React.FC<{ className?: string }> = ({
-  className,
-}) => {
-  const privacy = useAppSelector(selectComposePrivacy);
+const useThreadPrivacy = (activeThreadItemId: string | null) => {
+  const rootPrivacy = useAppSelector(selectComposePrivacy);
+  const threadPrivacy = useAppSelector((state) => {
+    if (!activeThreadItemId) return null;
+    const items = state.compose.get('thread_items') as ImmutableList<
+      ImmutableMap<string, unknown>
+    >;
+    const item = items.find(
+      (candidate) => candidate.get('id') === activeThreadItemId,
+    );
+    return (item?.get('visibility') as StatusVisibility | undefined) ?? null;
+  });
+
+  return threadPrivacy ?? rootPrivacy;
+};
+
+export const ComposeVisibility: React.FC<{
+  className?: string;
+  activeThreadItemId?: string | null;
+}> = ({ className, activeThreadItemId = null }) => {
+  const privacy = useThreadPrivacy(activeThreadItemId);
   const isEditing = useAppSelector((state) => !!state.compose.get('id'));
   const isMobile = useBreakpoint('openable');
 
@@ -83,7 +103,7 @@ export const ComposeVisibility: React.FC<{ className?: string }> = ({
           <ComposeVisibilityButtonText privacy={privacy} />
         </MenuTrigger>
 
-        <ComposeVisibilityMenu />
+        <ComposeVisibilityMenu activeThreadItemId={activeThreadItemId} />
       </Menu>
     </div>
   );
@@ -115,8 +135,10 @@ const ComposeVisibilityButtonText: React.FC<{
   return '-';
 };
 
-const ComposeVisibilityMenu: React.FC = () => {
-  const privacy = useAppSelector(selectComposePrivacy);
+const ComposeVisibilityMenu: React.FC<{
+  activeThreadItemId?: string | null;
+}> = ({ activeThreadItemId = null }) => {
+  const privacy = useThreadPrivacy(activeThreadItemId);
   const defaultPrivacy = useAppSelector(
     (state) => state.compose.get('default_privacy') as StatusVisibility,
   );
@@ -124,29 +146,35 @@ const ComposeVisibilityMenu: React.FC = () => {
   const isReply = useAppSelector((state) => !!state.compose.get('in_reply_to'));
 
   const dispatch = useAppDispatch();
+  const applyPrivacy = useCallback(
+    (value: StatusVisibility) => {
+      if (activeThreadItemId) {
+        dispatch(
+          changeComposeThreadItem(activeThreadItemId, 'visibility', value),
+        );
+      } else {
+        dispatch(changeComposeVisibility(value));
+      }
+    },
+    [activeThreadItemId, dispatch],
+  );
   const handlePrivacyChange = useCallback(
     ({ value }: { value: string }) => {
       if (value === 'private' && privacy !== 'private') {
-        dispatch(changeComposeVisibility(value));
+        applyPrivacy('private');
       } else if (value === 'public' && privacy === 'private') {
-        dispatch(
-          changeComposeVisibility(
-            defaultPrivacy === 'unlisted' ? 'unlisted' : 'public',
-          ),
-        );
+        applyPrivacy(defaultPrivacy === 'unlisted' ? 'unlisted' : 'public');
       } else if (value === 'unlisted' && privacy !== 'private') {
-        dispatch(
-          changeComposeVisibility(privacy === 'public' ? 'unlisted' : 'public'),
-        );
+        applyPrivacy(privacy === 'public' ? 'unlisted' : 'public');
       }
     },
-    [defaultPrivacy, dispatch, privacy],
+    [applyPrivacy, defaultPrivacy, privacy],
   );
 
   const handleSwitchToMessage: React.MouseEventHandler<HTMLButtonElement> =
     useCallback(() => {
-      dispatch(changeComposeVisibility('direct'));
-    }, [dispatch]);
+      applyPrivacy('direct');
+    }, [applyPrivacy]);
 
   return (
     <MenuList
