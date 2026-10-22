@@ -79,6 +79,7 @@ export const ComposeUpload: React.FC<{
       <Menu>
         <MenuTrigger
           as={IconButton}
+          className={classes.mediaMenuButton}
           icon={DotsThreeIcon}
           size='sm'
           variant='solid'
