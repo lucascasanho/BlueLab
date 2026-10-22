@@ -18,6 +18,7 @@ import { useColumnsContext } from '@/mastodon/features/ui/util/columns_context';
 import { useAppSelector } from '@/mastodon/store';
 
 import { ColumnsAreaMastodon5 } from '../../../mastodon5';
+import { VanillaScrollToTop } from './vanilla_scroll_to_top';
 import {
   ComposePanel,
   RedirectToMobileComposeIfNeeded,
@@ -155,6 +156,7 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
           <div>{children}</div>
           <Footer />
         </div>
+        <VanillaScrollToTop />
       </div>
     );
   }
@@ -176,6 +178,7 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
         <div className={vanillaClasses.discoveryWrapper}>
           <DiscoveryPanel />
         </div>
+        <VanillaScrollToTop />
       </div>
     );
   }
@@ -187,6 +190,7 @@ const ColumnsAreaVanilla: React.FC<ColumnsAreaProps> = ({
       </div>
       <VanillaComposeRedesignButton />
       <VanillaMultiColumnContent>{children}</VanillaMultiColumnContent>
+      <VanillaScrollToTop />
     </main>
   );
 };
