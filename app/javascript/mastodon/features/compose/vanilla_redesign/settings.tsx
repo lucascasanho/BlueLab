@@ -126,7 +126,7 @@ const ComposeSettingsInnerMenu: React.FC<{
 
   return (
     <>
-      {privacy !== 'direct' && (
+      {!activeThreadItemId && privacy !== 'direct' && (
         <MenuItemGroup
           label={
             <FormattedMessage
@@ -186,7 +186,7 @@ const ComposeSettingsInnerMenu: React.FC<{
         </MenuItemGroup>
       )}
 
-      {privacy !== 'direct' && <MenuItemDivider />}
+      {!activeThreadItemId && privacy !== 'direct' && <MenuItemDivider />}
 
       <MenuItemGroup
         label={
