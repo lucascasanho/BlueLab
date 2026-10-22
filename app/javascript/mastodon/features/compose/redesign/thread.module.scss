@@ -137,6 +137,12 @@
   z-index: 1;
   inset-block-start: var(--space-2xs);
   inset-inline-end: var(--space-2xs);
+  box-sizing: border-box;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0;
   border-radius: var(--radius-round);
   background: var(--color-bg-primary);
 }
@@ -149,12 +155,17 @@
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
+    box-sizing: border-box;
+    min-height: 40px;
     padding: var(--space-2xs) var(--space-xs);
     border: 0;
     border-radius: var(--radius-sm);
     outline: none;
     background: var(--color-bg-primary);
     color: var(--color-text-primary);
+    font-size: 16px;
+    line-height: 1.4;
+    -webkit-text-size-adjust: 100%;
 
     &:focus-visible {
       outline: 2px solid var(--color-border-brand);
