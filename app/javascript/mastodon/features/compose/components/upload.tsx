@@ -10,10 +10,9 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 import { selectAccountAvatarUrl } from '@/mastodon/selectors/accounts';
-import CloseIcon from '@/material-icons/400-20px/close.svg?react';
+import DeleteIcon from '@/material-icons/400-24px/delete.svg?react';
 import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 import SoundIcon from '@/material-icons/400-24px/graphic_eq.svg?react';
-import WarningIcon from '@/material-icons/400-24px/warning.svg?react';
 import { undoUploadCompose } from 'mastodon/actions/compose';
 import { openModal } from 'mastodon/actions/modal';
 import { Blurhash } from 'mastodon/components/blurhash';
@@ -22,6 +21,7 @@ import type { MediaAttachment } from 'mastodon/models/media_attachment';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
 import { AudioVisualizer } from '../../audio/visualizer';
+import classes from './upload.module.scss';
 
 export const Upload: React.FC<{
   id: string;
@@ -54,6 +54,10 @@ export const Upload: React.FC<{
     );
   }, [dispatch, id]);
 
+  const stopUploadDrag = useCallback((event: React.PointerEvent) => {
+    event.stopPropagation();
+  }, []);
+
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
 
@@ -76,6 +80,7 @@ export const Upload: React.FC<{
   const mediaUrl = media.get('url') as string | null;
   const mediaType = media.get('type') as string | null;
   const isAnimatedGif = mediaType === 'gifv' && !!mediaUrl;
+  const isVideo = mediaType === 'video' && !!mediaUrl;
   const blurhash = media.get('blurhash') as string | null;
 
   return (
@@ -103,9 +108,20 @@ export const Upload: React.FC<{
         {sensitive && blurhash && (
           <Blurhash hash={blurhash} className='compose-form__upload__preview' />
         )}
+        {!sensitive && isVideo && (
+          <video
+            className={classNames('compose-form__upload__video', classes.video)}
+            src={mediaUrl}
+            poster={preview_url ?? undefined}
+            controls
+            playsInline
+            preload='metadata'
+            onPointerDown={stopUploadDrag}
+          />
+        )}
         {!sensitive && isAnimatedGif && (
           <video
-            className='compose-form__upload__video'
+            className={classNames('compose-form__upload__video', classes.video)}
             src={mediaUrl}
             poster={preview_url ?? undefined}
             autoPlay
@@ -114,42 +130,41 @@ export const Upload: React.FC<{
             playsInline
             preload='metadata'
             aria-hidden='true'
+            onPointerDown={stopUploadDrag}
           />
         )}
-        {!sensitive && !preview_url && !isAnimatedGif && (
+        {!sensitive && !preview_url && !isAnimatedGif && !isVideo && (
           <div className='compose-form__upload__visualizer'>
             <AudioVisualizer poster={userAvatar} />
             <Icon id='sound' icon={SoundIcon} />
           </div>
         )}
 
-        <div className='compose-form__upload__actions'>
+        <div className={classes.actions}>
           <button
             type='button'
-            className='icon-button compose-form__upload__delete'
+            className={classNames('icon-button', classes.actionButton, classes.deleteButton)}
+            aria-label='Remove media'
+            onPointerDown={stopUploadDrag}
             onClick={handleUndoClick}
           >
-            <Icon id='close' icon={CloseIcon} />
+            <Icon id='delete' icon={DeleteIcon} />
           </button>
           <button
             type='button'
-            className='icon-button'
+            className={classNames('icon-button', classes.actionButton, classes.altButton)}
+            aria-expanded={undefined}
+            onPointerDown={stopUploadDrag}
             onClick={handleFocalPointClick}
           >
-            <Icon id='edit' icon={EditIcon} />{' '}
-            <FormattedMessage id='upload_form.edit' defaultMessage='Edit' />
-          </button>
-        </div>
-
-        <div className='compose-form__upload__warning'>
-          <button
-            type='button'
-            className={classNames('icon-button', {
-              active: missingDescription,
-            })}
-            onClick={handleFocalPointClick}
-          >
-            {missingDescription && <Icon id='warning' icon={WarningIcon} />} ALT
+            <Icon id='edit' icon={EditIcon} />
+            <span>ALT</span>
+            <span className='sr-only'>
+              <FormattedMessage
+                id='compose.thread.add_alt'
+                defaultMessage='Add alt text'
+              />
+            </span>
           </button>
         </div>
       </div>
