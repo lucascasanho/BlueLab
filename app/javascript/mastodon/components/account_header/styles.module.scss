@@ -33,6 +33,7 @@
 
 // Avatar
 .avatarWrapper {
+  position: relative;
   margin-top: -64px;
   padding-top: 0;
   display: flex;
@@ -226,9 +227,10 @@ $button-breakpoint: 420px;
   align-self: flex-start;
   justify-content: flex-end;
   margin-inline-start: auto;
+  margin-top: 72px;
   min-width: 0;
   max-width: calc(100% - 88px);
-  padding-top: 8px;
+  padding-top: 0;
 
   :global(.button) {
     flex: 0 1 auto;
