@@ -510,7 +510,11 @@ export const Search: React.FC<{
       document.removeEventListener('scroll', restoreUnexpectedScroll, true);
       window.removeEventListener('scroll', restoreUnexpectedScroll);
       document.removeEventListener('wheel', rebaseAfterIntentionalScroll, true);
-      document.removeEventListener('touchmove', rebaseAfterIntentionalScroll, true);
+      document.removeEventListener(
+        'touchmove',
+        rebaseAfterIntentionalScroll,
+        true,
+      );
     };
   }, [captureSearchScroll, focusedSearchInput]);
 
