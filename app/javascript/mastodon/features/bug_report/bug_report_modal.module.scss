@@ -4,17 +4,17 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--color-border-primary, rgba(0, 0, 0, 12%));
+  border: 1px solid var(--color-border-primary);
   border-radius: 16px;
-  background: var(--blue2-surface-raised, var(--color-background, #fff));
-  color: var(--color-text-primary, #111);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
   box-shadow: 0 20px 60px rgb(0 0 0 / 20%);
 }
 
 .header {
   flex: 0 0 auto;
   padding: 20px 24px;
-  border-bottom: 1px solid var(--color-border-primary, rgba(0, 0, 0, 12%));
+  border-bottom: 1px solid var(--color-border-primary);
 
   h1 {
     margin: 0 0 6px;
@@ -23,7 +23,7 @@
 
   p {
     margin: 0;
-    color: var(--color-text-secondary, #666);
+    color: var(--color-text-secondary);
     line-height: 1.45;
   }
 }
@@ -46,9 +46,9 @@
   min-height: 180px;
   resize: vertical;
   padding: 12px;
-  border: 1px solid var(--color-border-primary, rgba(0, 0, 0, 20%));
+  border: 1px solid var(--color-border-primary);
   border-radius: 10px;
-  background: var(--color-background, transparent);
+  background: var(--color-bg-primary);
   color: inherit;
   font: inherit;
   line-height: 1.5;
@@ -57,7 +57,7 @@
 .counter {
   margin-top: 6px;
   text-align: end;
-  color: var(--color-text-secondary, #666);
+  color: var(--color-text-secondary);
   font-size: 12px;
 }
 
@@ -67,7 +67,7 @@
 
 .hint {
   margin: 0 0 10px;
-  color: var(--color-text-secondary, #666);
+  color: var(--color-text-secondary);
   font-size: 13px;
 }
 
@@ -77,14 +77,14 @@
   flex-wrap: wrap;
   gap: 10px;
   padding: 14px;
-  border: 1px dashed var(--color-border-primary, rgba(0, 0, 0, 20%));
+  border: 1px dashed var(--color-border-primary);
   border-radius: 10px;
-  background: var(--color-background, transparent);
-  color: var(--color-text-secondary, #666);
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
 }
 
 .dropZoneActive {
-  border-color: var(--color-accent, #6364ff);
+  border-color: var(--color-text-brand);
 }
 
 .hiddenInput {
@@ -101,9 +101,9 @@
 .previewCard {
   min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--color-border-primary, rgba(0, 0, 0, 12%));
+  border: 1px solid var(--color-border-primary);
   border-radius: 10px;
-  background: var(--color-background, transparent);
+  background: var(--color-bg-primary);
 
   img,
   video {
@@ -139,7 +139,7 @@
     flex: 0 0 auto;
     border: 0;
     background: transparent;
-    color: var(--color-accent, #6364ff);
+    color: var(--color-text-brand);
     cursor: pointer;
     font: inherit;
     font-size: 12px;
@@ -150,15 +150,15 @@
   margin-top: 20px;
   padding: 12px;
   border-radius: 10px;
-  background: var(--color-background-contrast, rgb(0 0 0 / 5%));
-  color: var(--color-text-secondary, #666);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
   font-size: 13px;
   line-height: 1.45;
 }
 
 .error {
   margin-top: 12px;
-  color: var(--error-color, #c00);
+  color: var(--color-text-error);
 }
 
 .actions {
@@ -167,7 +167,7 @@
   justify-content: flex-end;
   gap: 10px;
   padding: 16px 24px;
-  border-top: 1px solid var(--color-border-primary, rgba(0, 0, 0, 12%));
+  border-top: 1px solid var(--color-border-primary);
 }
 
 @media screen and (width <= 600px) {
