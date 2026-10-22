@@ -76,7 +76,7 @@ export const AccountHeader: React.FC<{
   const profileButtons = (
     <AccountButtons
       accountId={accountId}
-      className={isBlue2 ? 'blue2-profile-actions' : classes.buttons}
+      className='blue2-profile-actions'
       noShare={!isMe || 'share' in navigator}
       forceMenu={'share' in navigator}
     />
@@ -146,7 +146,12 @@ export const AccountHeader: React.FC<{
           ) : (
             <div className={classes.displayNameWrapper}>
               <AccountName accountId={accountId} />
-              {profileButtons}
+              <AccountButtons
+                accountId={accountId}
+                className={classes.buttonsDesktop}
+                noShare={!isMe || 'share' in navigator}
+                forceMenu={'share' in navigator}
+              />
             </div>
           )}
 
@@ -184,6 +189,14 @@ export const AccountHeader: React.FC<{
                 <AccountSubscriptionForm accountId={accountId} />
               )}
             </div>
+          )}
+
+          {!isBlue2 && (
+            <AccountButtons
+              accountId={accountId}
+              className={classes.buttonsMobile}
+              noShare
+            />
           )}
         </div>
       </AnimateEmojiProvider>
