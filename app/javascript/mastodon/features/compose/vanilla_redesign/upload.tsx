@@ -13,9 +13,7 @@ import {
 
 import { undoUploadCompose } from '@/mastodon/actions/compose';
 import { openModal } from '@/mastodon/actions/modal';
-import type {
-  ApiAudioAttachmentJSON,
-} from '@/mastodon/api_types/media_attachments';
+import type { ApiAudioAttachmentJSON } from '@/mastodon/api_types/media_attachments';
 import { Blurhash } from '@/mastodon/components/blurhash';
 import {
   Button,
@@ -60,10 +58,7 @@ export const ComposeUpload: React.FC<{
 
   if (attachment.type === 'audio') {
     return (
-      <ComposeAudioUpload
-        attachment={attachment}
-        onEdit={handleAltEdit}
-      />
+      <ComposeAudioUpload attachment={attachment} onEdit={handleAltEdit} />
     );
   }
 
