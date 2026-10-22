@@ -208,7 +208,8 @@
 
 :global(body:not([data-theme])) .messageFavouriteVanilla[aria-pressed='true'],
 :global(body[data-theme='']) .messageFavouriteVanilla[aria-pressed='true'],
-:global(body[data-theme='default']) .messageFavouriteVanilla[aria-pressed='true'] {
+:global(body[data-theme='default'])
+  .messageFavouriteVanilla[aria-pressed='true'] {
   color: #dc2626;
 }
 
