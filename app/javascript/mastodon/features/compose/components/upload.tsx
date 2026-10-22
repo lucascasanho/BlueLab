@@ -9,10 +9,10 @@ import type { Map as ImmutableMap, List as ImmutableList } from 'immutable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import { selectAccountAvatarUrl } from '@/mastodon/selectors/accounts';
 import DeleteIcon from '@/material-icons/400-24px/delete.svg?react';
 import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 import SoundIcon from '@/material-icons/400-24px/graphic_eq.svg?react';
+import { selectAccountAvatarUrl } from '@/mastodon/selectors/accounts';
 import { undoUploadCompose } from 'mastodon/actions/compose';
 import { openModal } from 'mastodon/actions/modal';
 import { Blurhash } from 'mastodon/components/blurhash';

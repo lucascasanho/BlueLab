@@ -5,7 +5,6 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { PencilSimpleIcon, MinusIcon } from '@phosphor-icons/react';
 
 import CloseIcon from '@/material-icons/400-20px/close.svg?react';
-
 import { IconButton } from '@/mastodon/components/button/redesign';
 import {
   closeComposer,
