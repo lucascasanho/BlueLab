@@ -55,8 +55,9 @@
 
 .displayNameWrapper {
   display: flex;
-  align-items: start;
-  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  gap: 12px;
   margin-top: 16px;
   margin-bottom: 16px;
 
@@ -192,7 +193,6 @@
 }
 
 $button-breakpoint: 420px;
-$button-fallback-breakpoint: $button-breakpoint + 55px;
 
 .buttonsDesktop,
 .buttonsMobile {
@@ -219,61 +219,23 @@ $button-fallback-breakpoint: $button-breakpoint + 55px;
 }
 
 .buttonsDesktop {
-  @container (width < #{$button-breakpoint}) {
-    display: none;
-  }
+  // Always sit beside the display name. The <420px mobile copy used to live in
+  // the avatar row, and that row is pulled up over the cover (iPhone 14).
+  flex: 0 1 auto;
+  align-self: flex-start;
+  justify-content: flex-end;
+  margin-inline-start: auto;
+  min-width: 0;
+  max-width: 100%;
 
-  @supports (not (container-type: inline-size)) {
-    @media (max-width: #{$button-fallback-breakpoint}) {
-      display: none;
-    }
+  :global(.button) {
+    min-width: 0;
+    max-width: 100%;
   }
 }
 
 .buttonsMobile {
-  position: static;
-  display: flex;
-  flex: 0 1 auto;
-  align-self: flex-start;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  min-width: 0;
-  max-width: calc(100% - 88px);
-  padding: 0;
-  margin: 0 0 0 auto;
-
-  :global(.button) {
-    flex: 0 1 auto;
-    width: auto;
-    min-width: 0;
-    max-width: 100%;
-    white-space: nowrap;
-  }
-
-  :global(.icon-button) {
-    flex: 0 0 auto;
-  }
-
-  .followButton {
-    flex-grow: 0;
-    min-width: 0;
-  }
-
-  @container (width >= #{$button-breakpoint}) {
-    display: none;
-  }
-
-  @supports (not (container-type: inline-size)) {
-    @media (min-width: ($button-fallback-breakpoint + 1px)) {
-      display: none;
-    }
-  }
-
-  // Multi-column layout
-  @media (width >= #{$button-breakpoint}) {
-    bottom: 0;
-  }
+  display: none;
 }
 
 .buttonsMobileIsStuck {

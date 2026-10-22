@@ -132,13 +132,6 @@ export const AccountHeader: React.FC<{
                 size={isBlue2 ? 88 : 80}
               />
             </a>
-            {!isBlue2 && (
-              <AccountButtons
-                accountId={accountId}
-                className={classes.buttonsMobile}
-                noShare
-              />
-            )}
           </div>
 
           {isBlue2 ? (
