@@ -280,6 +280,7 @@
   "alert.unexpected.title": "¡Ups!",
   "alt_text_badge.label": "ALT",
   "alt_text_badge.title": "Texto alternativo",
+  "alt_text_badge.no_description": "No hay texto alternativo disponible para esta imagen.",
   "alt_text_modal.add_text_from_image": "Añadir texto a partir de la imagen",
   "alt_text_modal.cancel": "Cancelar",
   "alt_text_modal.change_thumbnail": "Cambiar miniatura",
