@@ -178,6 +178,7 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
       <ToggleIconButton
         size='sm'
         variant='ghost'
+        className='bookmark-icon'
         active={bookmark.active}
         icon={bookmark.icon}
         onClick={bookmark.action}

@@ -12389,3 +12389,20 @@ body[data-theme='blue-2'] {
     display: flex;
   }
 }
+
+/* Vanilla theme: stable active colors for likes and saved posts, including conversations. */
+body[data-theme='default'] .star-icon[aria-pressed='true'],
+body[data-theme='default'] .star-icon.active {
+  color: #dc2626 !important;
+  --default-icon-color: #dc2626 !important;
+  --hover-icon-color: #dc2626 !important;
+  opacity: 1 !important;
+}
+
+body[data-theme='default'] .bookmark-icon[aria-pressed='true'],
+body[data-theme='default'] .bookmark-icon.active {
+  color: #eab308 !important;
+  --default-icon-color: #eab308 !important;
+  --hover-icon-color: #eab308 !important;
+  opacity: 1 !important;
+}

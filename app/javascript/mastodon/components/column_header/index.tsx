@@ -139,6 +139,9 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   ) : null;
 
   const { isScrolledToTop, scrollTop } = useColumn();
+  const isVanillaTheme =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'default';
 
   const handleHeaderClick = useCallback<React.MouseEventHandler>(
     (e) => {
@@ -175,7 +178,8 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     [scrollTop],
   );
 
-  const hasScrollToTopButton = !isScrolledToTop && withUnreadMarker;
+  const hasScrollToTopButton =
+    !isScrolledToTop && (withUnreadMarker || isVanillaTheme);
   const headerRef = useTrackColumnHeaderHeight();
 
   return (

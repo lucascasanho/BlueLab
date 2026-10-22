@@ -439,7 +439,12 @@ export const Search: React.FC<{
     if (!focusedSearchInput) return;
 
     let frame = 0;
-    const rebaseAfterIntentionalScroll = () => {
+    let releaseIntentTimer: number | undefined;
+    let intentionalScroll = false;
+
+    const rebaseAfterIntentionalScroll = (event: Event) => {
+      intentionalScroll = true;
+
       if (frame) {
         window.cancelAnimationFrame(frame);
       }
@@ -450,11 +455,42 @@ export const Search: React.FC<{
         if (document.activeElement === focusedSearchInput) {
           captureSearchScroll(focusedSearchInput, true);
         }
+
+        if (releaseIntentTimer !== undefined) {
+          window.clearTimeout(releaseIntentTimer);
+        }
+
+        // Wheel gestures usually finish quickly. Touch scrolling can continue
+        // with momentum, so keep its allowance active a little longer.
+        const delay = event.type === 'touchmove' ? 700 : 120;
+        releaseIntentTimer = window.setTimeout(() => {
+          intentionalScroll = false;
+          releaseIntentTimer = undefined;
+        }, delay);
       });
     };
 
-    // Keep ordinary wheel/touch scrolling usable while the search remains
-    // focused. Only refresh the baseline after an explicit user scroll gesture.
+    const restoreUnexpectedScroll = () => {
+      if (intentionalScroll || document.activeElement !== focusedSearchInput) {
+        return;
+      }
+
+      const snapshot = searchScrollSnapshotRef.current;
+      if (snapshot?.input === focusedSearchInput) {
+        restoreSearchScrollPositions(snapshot.positions);
+      }
+    };
+
+    // Backspace can trigger browser scroll anchoring as the suggestion panel
+    // changes height. Keep that automatic movement from accumulating while
+    // leaving wheel and touch scrolling available to the user.
+    document.addEventListener('scroll', restoreUnexpectedScroll, {
+      capture: true,
+      passive: true,
+    });
+    window.addEventListener('scroll', restoreUnexpectedScroll, {
+      passive: true,
+    });
     document.addEventListener('wheel', rebaseAfterIntentionalScroll, {
       capture: true,
       passive: true,
@@ -468,12 +504,13 @@ export const Search: React.FC<{
       if (frame) {
         window.cancelAnimationFrame(frame);
       }
+      if (releaseIntentTimer !== undefined) {
+        window.clearTimeout(releaseIntentTimer);
+      }
+      document.removeEventListener('scroll', restoreUnexpectedScroll, true);
+      window.removeEventListener('scroll', restoreUnexpectedScroll);
       document.removeEventListener('wheel', rebaseAfterIntentionalScroll, true);
-      document.removeEventListener(
-        'touchmove',
-        rebaseAfterIntentionalScroll,
-        true,
-      );
+      document.removeEventListener('touchmove', rebaseAfterIntentionalScroll, true);
     };
   }, [captureSearchScroll, focusedSearchInput]);
 
