@@ -19,8 +19,8 @@ import { openModal } from '@/mastodon/actions/modal';
 import api from '@/mastodon/api';
 import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
 import { IconButton } from '@/mastodon/components/button/redesign';
-import CloseIcon from '@/material-icons/400-20px/close.svg?react';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import CloseIcon from '@/material-icons/400-20px/close.svg?react';
 
 import { ComposeAutocomplete } from './autocomplete';
 import { RichComposeEditor } from './rich_editor';
