@@ -146,7 +146,9 @@ const getSearchScrollPositions = (
     .querySelectorAll<HTMLElement>(
       '.scrollable, .column, .columns-area, .columns-area--mobile, .columns-area__panels, .columns-area__panels__main, .main, [data-column-root]',
     )
-    .forEach((scroller) => addPosition(scroller, true));
+    .forEach((scroller) => {
+      addPosition(scroller, true);
+    });
 
   if (documentScroller instanceof HTMLElement) {
     addPosition(documentScroller, true);

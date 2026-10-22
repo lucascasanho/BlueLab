@@ -34,7 +34,7 @@ import {
   getAncestorsIds,
   getDescendantsIds,
 } from '@/mastodon/selectors/contexts';
-import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import { useAppSelector } from '@/mastodon/store';
 
 import { BundleColumnError } from '../ui/components/bundle_column_error';
 import { useColumnsContext } from '../ui/util/columns_context';
@@ -192,18 +192,16 @@ export const StatusPage: React.FC = () => {
         withBackButton
         title={columnTitle}
         extraButtons={
-          <>
-            <ColumnSettingsMenu
-              label={
-                <FormattedMessage
-                  id='status.options'
-                  defaultMessage='Post options'
-                />
-              }
-            >
-              <StatusMenuItems status={status} />
-            </ColumnSettingsMenu>
-          </>
+          <ColumnSettingsMenu
+            label={
+              <FormattedMessage
+                id='status.options'
+                defaultMessage='Post options'
+              />
+            }
+          >
+            <StatusMenuItems status={status} />
+          </ColumnSettingsMenu>
         }
       />
 
