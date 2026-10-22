@@ -134,23 +134,14 @@ export const AccountHeader: React.FC<{
             />
           </div>
 
-          {isBlue2 ? (
-            <>
-              <div
-                className={classNames(
-                  classes.displayNameWrapper,
-                  'blue2-profile-identity',
-                )}
-              >
-                <AccountName accountId={accountId} />
-              </div>
-            </>
-          ) : (
-            <div className={classes.displayNameWrapper}>
-              <AccountName accountId={accountId} />
-              
-            </div>
-          )}
+          <div
+            className={classNames(
+              classes.displayNameWrapper,
+              isBlue2 && 'blue2-profile-identity',
+            )}
+          >
+            <AccountName accountId={accountId} />
+          </div>
 
           <AccountBadges accountId={accountId} />
 
@@ -204,3 +195,4 @@ export const AccountHeader: React.FC<{
     </div>
   );
 };
+
