@@ -280,6 +280,7 @@
   "alert.unexpected.title": "Oups !",
   "alt_text_badge.label": "ALT",
   "alt_text_badge.title": "Texte alternatif",
+  "alt_text_badge.no_description": "Aucun texte alternatif n’est disponible pour cette image.",
   "alt_text_modal.add_text_from_image": "Extraire le texte de l'image",
   "alt_text_modal.cancel": "Annuler",
   "alt_text_modal.change_thumbnail": "Changer la vignette",
