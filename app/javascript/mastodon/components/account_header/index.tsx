@@ -5,6 +5,8 @@ import classNames from 'classnames';
 import { Helmet } from '@unhead/react/helmet';
 
 import { openModal } from '@/mastodon/actions/modal';
+import { useLayout } from '@/mastodon/hooks/useLayout';
+import { useVisibility } from '@/mastodon/hooks/useVisibility';
 import {
   autoPlayGif,
   me,
@@ -62,6 +64,13 @@ export const AccountHeader: React.FC<{
     },
     [dispatch, account],
   );
+
+  const { layout } = useLayout();
+  const { observedRef, isIntersecting } = useVisibility({
+    observerOptions: {
+      rootMargin: layout === 'mobile' ? '0px 0px -55px 0px' : '',
+    },
+  });
 
   if (!account) {
     return null;
@@ -194,7 +203,10 @@ export const AccountHeader: React.FC<{
           {!isBlue2 && (
             <AccountButtons
               accountId={accountId}
-              className={classes.buttonsMobile}
+              className={classNames(
+                classes.buttonsMobile,
+                !isIntersecting && classes.buttonsMobileIsStuck,
+              )}
               noShare
             />
           )}
@@ -202,6 +214,7 @@ export const AccountHeader: React.FC<{
       </AnimateEmojiProvider>
 
       {!hideTabs && !hidden && <AccountTabs />}
+      <div ref={observedRef} />
 
       <Helmet>
         <title>{titleFromAccount(account, localDomain)}</title>
