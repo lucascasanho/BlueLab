@@ -76,15 +76,6 @@ export const AccountHeader: React.FC<{
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
-  const profileButtons = (
-    <AccountButtons
-      accountId={accountId}
-      className='blue2-profile-actions'
-      noShare={!isMe || 'share' in navigator}
-      forceMenu={'share' in navigator}
-    />
-  );
-
   return (
     <div className={isBlue2 ? 'blue2-profile' : undefined}>
       <AccountBanners account={account} />
@@ -132,19 +123,19 @@ export const AccountHeader: React.FC<{
                 size={isBlue2 ? 88 : 80}
               />
             </a>
-            {!isBlue2 && (
-              <AccountButtons
-                accountId={accountId}
-                className={classes.buttonsDesktop}
-                noShare={!isMe || 'share' in navigator}
-                forceMenu={'share' in navigator}
-              />
-            )}
+            <AccountButtons
+              accountId={accountId}
+              className={classNames(
+                classes.buttonsDesktop,
+                isBlue2 && 'blue2-profile-actions',
+              )}
+              noShare={!isMe || 'share' in navigator}
+              forceMenu={'share' in navigator}
+            />
           </div>
 
           {isBlue2 ? (
             <>
-              <div className='blue2-profile-actions-row'>{profileButtons}</div>
               <div
                 className={classNames(
                   classes.displayNameWrapper,

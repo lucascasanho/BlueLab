@@ -28,6 +28,7 @@
 
 // Wraps everything except the header image.
 .barWrapper {
+  display: flow-root;
   padding-inline: 16px;
 }
 
@@ -227,6 +228,8 @@ $button-breakpoint: 420px;
   align-self: flex-start;
   justify-content: flex-end;
   margin-inline-start: auto;
+  position: relative;
+  z-index: 2;
   margin-top: 72px;
   min-width: 0;
   max-width: calc(100% - 88px);
@@ -246,6 +249,13 @@ $button-breakpoint: 420px;
 
   .followButton {
     flex-grow: 0;
+  }
+}
+
+@media screen and (width <= 759px) {
+  .buttonsDesktop {
+    gap: 4px;
+    flex-wrap: wrap;
   }
 }
 
@@ -609,6 +619,7 @@ $button-breakpoint: 420px;
   
   // Wraps everything except the header image.
   .barWrapper {
+    display: flow-root;
     padding-inline: 16px;
   }
   
@@ -620,7 +631,7 @@ $button-breakpoint: 420px;
     align-items: flex-start;
     justify-content: space-between;
     gap: 8px;
-    overflow: hidden;
+    overflow: visible;
     margin-inline-start: -2px; // aligns the pfp with content below
   }
   

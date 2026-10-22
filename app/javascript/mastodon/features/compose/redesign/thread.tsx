@@ -7,7 +7,9 @@ import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
-import { PencilSimpleIcon, TrashIcon, XIcon } from '@phosphor-icons/react';
+import CloseIcon from '@/material-icons/400-20px/close.svg?react';
+import DeleteIcon from '@/material-icons/400-24px/delete.svg?react';
+import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 
 import {
   addComposeThreadMedia,
@@ -17,7 +19,7 @@ import {
 } from '@/mastodon/actions/compose';
 import api from '@/mastodon/api';
 import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
-import { IconButton } from '@/mastodon/components/button/redesign';
+import { Button, IconButton } from '@/mastodon/components/button/redesign';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { ComposeAutocomplete } from './autocomplete';
@@ -177,7 +179,7 @@ const ComposeThreadItem: React.FC<{
         as='button'
         type='button'
         size='sm'
-        icon={XIcon}
+        icon={CloseIcon}
         className={classes.threadItemRemove}
         disabled={removalDisabled}
         onClick={() => {
@@ -233,38 +235,72 @@ const ThreadMediaAttachment: React.FC<{
   const intl = useIntl();
   const mediaId = attachment.get('id') as string;
   const description = (attachment.get('description') as string | undefined) ?? '';
+  const type = attachment.get('type') as string | undefined;
+  const previewUrl = attachment.get('preview_url') as string | null;
+  const mediaUrl = attachment.get('url') as string | null;
+  const isVideo = type === 'video' || type === 'gifv';
+  const isAudio = type === 'audio';
   const [editingAlt, setEditingAlt] = useState(false);
 
   return (
     <div className={classes.threadMediaItem}>
-      <div className={classes.mediaPreview}>
-        <img src={attachment.get('preview_url') as string} alt='' />
+      <div className={classes.mediaPreview} data-media-type={type ?? 'image'}>
+        {isVideo && mediaUrl ? (
+          <video
+            className={classes.mediaVideo}
+            src={mediaUrl}
+            poster={previewUrl ?? undefined}
+            controls
+            playsInline
+            preload='metadata'
+          />
+        ) : isAudio && mediaUrl ? (
+          <div className={classes.mediaAudioPreview}>
+            {previewUrl ? (
+              <img className={classes.mediaImage} src={previewUrl} alt='' />
+            ) : (
+              <div className={classes.mediaAudioPlaceholder} aria-hidden='true' />
+            )}
+            <audio
+              className={classes.mediaAudio}
+              src={mediaUrl}
+              controls
+              preload='metadata'
+            />
+          </div>
+        ) : (
+          <img
+            className={classes.mediaImage}
+            src={previewUrl ?? mediaUrl ?? undefined}
+            alt=''
+          />
+        )}
+
         <IconButton
           as='button'
           type='button'
           size='sm'
           variant='solid'
-          icon={TrashIcon}
+          icon={DeleteIcon}
           className={classes.mediaRemove}
           onClick={onRemove}
         >
-          <span className='sr-only'>
-            <FormattedMessage {...messages.removeMedia} />
-          </span>
+          <FormattedMessage {...messages.removeMedia} />
         </IconButton>
-        <IconButton
+        <Button
           as='button'
           type='button'
           size='sm'
           variant='solid'
-          icon={PencilSimpleIcon}
+          color='neutral'
+          leadingIcon={EditIcon}
           className={classes.mediaAltButton}
           onClick={() => setEditingAlt((open) => !open)}
+          aria-label={intl.formatMessage(messages.addAlt)}
+          aria-expanded={editingAlt}
         >
-          <span className='sr-only'>
-            <FormattedMessage {...messages.addAlt} />
-          </span>
-        </IconButton>
+          ALT
+        </Button>
       </div>
       {editingAlt && (
         <label className={classes.mediaAlt}>

@@ -127,36 +127,78 @@
 .mediaPreview {
   position: relative;
   min-width: 0;
+  min-height: 6rem;
+  background: var(--color-bg-secondary);
+}
 
-  img {
-    display: block;
-    width: 100%;
-    max-height: 12rem;
-    object-fit: cover;
-  }
+.mediaImage {
+  display: block;
+  width: 100%;
+  max-height: 12rem;
+  object-fit: cover;
+}
+
+.mediaVideo {
+  display: block;
+  width: 100%;
+  max-height: 12rem;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  background: #000;
+}
+
+.mediaAudioPreview {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mediaAudioPlaceholder {
+  min-height: 6rem;
+  background: var(--color-bg-secondary);
+}
+
+.mediaAudio {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  padding: var(--space-2xs);
+  background: var(--color-bg-primary);
 }
 
 .mediaRemove,
 .mediaAltButton {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   top: var(--space-2xs);
   box-sizing: border-box;
-  width: 32px;
-  min-width: 32px;
   height: 32px;
   min-height: 32px;
-  padding: 0;
   border-radius: var(--radius-round);
   background: var(--color-bg-primary);
 }
 
 .mediaRemove {
   inset-inline-start: var(--space-2xs);
+  width: 32px;
+  min-width: 32px;
+  padding: 0;
 }
 
 .mediaAltButton {
   inset-inline-end: var(--space-2xs);
+  min-width: 48px;
+  padding-inline: var(--space-xs);
+  gap: 4px;
+  white-space: nowrap;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.mediaAltButton :global(.icon) {
+  width: 18px;
+  height: 18px;
 }
 
 .mediaAlt {
