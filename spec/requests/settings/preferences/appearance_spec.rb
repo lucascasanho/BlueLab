@@ -14,6 +14,9 @@ RSpec.describe 'Settings Preferences Appearance' do
     it 'shows one per-user theme selector and never exposes the instance theme selector' do
       expect(response).to have_http_status(:success)
       expect(response.body).to include('user[settings_attributes][bluelab_theme]')
+      expect(response.body).to include('<option selected="selected" value="default">')
+      expect(response.body).to_not include('<option value="blue-2">')
+      expect(response.body).to_not include('<option value="mastodon-bird-ui-auto">')
       expect(response.body).to_not include('name="instance_theme"')
       expect(response.body).to_not include('id="instance_theme"')
       expect(response.body).to_not include('user[settings_attributes][theme]')
@@ -41,6 +44,13 @@ RSpec.describe 'Settings Preferences Appearance' do
       expect(response).to redirect_to(settings_preferences_appearance_path)
       expect(Setting.theme).to eq('blue-2')
       expect(user.reload.settings['web.color_scheme']).to eq('dark')
+    end
+
+    it 'rejects an alternative theme while it is disabled' do
+      put settings_preferences_appearance_path,
+          params: { user: { settings_attributes: { bluelab_theme: 'blue-2' } } }
+
+      expect(response).to have_http_status(400)
     end
 
     it 'rejects an unknown per-user theme' do

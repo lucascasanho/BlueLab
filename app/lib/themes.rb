@@ -18,8 +18,12 @@ class Themes
     @conf.keys
   end
 
+  # Theme files stay installed even when they are hidden from users. Set
+  # selectable: true in config/themes.yml to re-enable an alternative theme.
   def selectable_names
-    names & USER_SELECTABLE_NAMES
+    names.select do |name|
+      USER_SELECTABLE_NAMES.include?(name) && @conf.dig(name, 'selectable') != false
+    end
   end
 
   def available_theme_colors(theme)

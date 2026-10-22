@@ -125,19 +125,22 @@ RSpec.describe ThemeHelper do
     subject { helper.current_theme }
 
     before do
-      allow(Themes.instance).to receive(:names).and_return %w(default blue-2 mastodon-bird-ui-auto)
+      allow(Themes.instance).to receive(:selectable_names).and_return(['default'])
     end
 
-    context 'when the administrator selected BlueLab' do
+    context 'when the administrator selected a disabled theme' do
       before { Setting.theme = 'blue-2' }
 
-      it { is_expected.to eq('blue-2') }
+      it 'forces Vanilla without changing the administrator setting' do
+        expect(subject).to eq('default')
+        expect(Setting.theme).to eq('blue-2')
+      end
     end
 
-    context 'when the administrator selected another selectable theme' do
+    context 'when the administrator selected Bird UI while disabled' do
       before { Setting.theme = 'mastodon-bird-ui-auto' }
 
-      it { is_expected.to eq('mastodon-bird-ui-auto') }
+      it { is_expected.to eq('default') }
     end
 
     context 'when the administrator theme is invalid' do
@@ -157,8 +160,8 @@ RSpec.describe ThemeHelper do
         Setting.theme = 'blue-2'
       end
 
-      it 'uses the personal preference without changing the administrator theme' do
-        expect(subject).to eq('mastodon-bird-ui-auto')
+      it 'ignores the saved alternative theme without changing the administrator setting' do
+        expect(subject).to eq('default')
         expect(Setting.theme).to eq('blue-2')
       end
     end
@@ -171,8 +174,8 @@ RSpec.describe ThemeHelper do
         Setting.theme = 'mastodon-bird-ui-auto'
       end
 
-      it 'uses BlueLab as the default user theme' do
-        expect(subject).to eq('blue-2')
+      it falls back to Vanilla when the site theme is disabled' do
+        expect(subject).to eq('default')
         expect(Setting.theme).to eq('mastodon-bird-ui-auto')
       end
     end

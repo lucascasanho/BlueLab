@@ -1,4 +1,6 @@
 mastodon-bird-ui-auto:
+  # Set to true to re-enable this theme for users.
+  selectable: false
   path: styles/mastodon-bird-ui-auto.scss
   colors:
     - indigo
@@ -7,6 +9,8 @@ mastodon-bird-ui-auto:
     - orange
     - cyan
 blue-2:
+  # Set to true to re-enable this theme for users.
+  selectable: false
   path: styles/blue-2-v23.scss
   colors:
     - indigo
@@ -15,6 +19,7 @@ blue-2:
     - orange
     - cyan
 default:
+  selectable: true
   path: styles/application.scss
   colors:
     - indigo
