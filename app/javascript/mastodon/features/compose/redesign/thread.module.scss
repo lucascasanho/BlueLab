@@ -163,22 +163,33 @@
   }
 }
 
-/* Keep Vanilla's thread cards compact and separated on small screens. */
+/* Keep Vanilla thread posts aligned and visually consistent on small screens. */
 @media screen and (width <= 759px) {
   .threadEditorScope[data-vanilla-thread='true'] {
-    gap: var(--space-xs);
+    min-width: 0;
+    gap: var(--space-2);
   }
 
-  .threadEditorScope[data-vanilla-thread='true'] .primaryPost {
-    padding-inline-start: var(--space-md);
+  .threadEditorScope[data-vanilla-thread='true'] .primaryPost,
+  .threadEditorScope[data-vanilla-thread='true'] .threadItem {
+    box-sizing: border-box;
+    min-width: 0;
+    margin: 0;
+    padding: var(--space-3);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-secondary);
   }
 
   .threadEditorScope[data-vanilla-thread='true'] .threadItem {
-    margin-block-start: var(--space-2);
-    padding-inline-start: var(--space-md);
-    padding-inline-end: 2.5rem;
-    border-radius: var(--radius-md);
-    background: var(--color-bg-secondary);
+    padding-inline-end: 2.75rem;
+  }
+
+  .threadEditorScope[data-vanilla-thread='true'] .primaryPost::before,
+  .threadEditorScope[data-vanilla-thread='true'] .primaryPost::after,
+  .threadEditorScope[data-vanilla-thread='true'] .threadItem::before,
+  .threadEditorScope[data-vanilla-thread='true'] .threadItem::after {
+    display: none;
   }
 }
 

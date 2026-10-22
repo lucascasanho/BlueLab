@@ -70,6 +70,9 @@ export const LanguageButton: React.FC = () => {
         strategy='fixed'
         reference={triggerElement}
         container={undefined}
+        mobilePresentation='popover'
+        constrainToViewport
+        scrollable
         className={classes.languageMenu}
         maxWidth={280}
         onClose={close}

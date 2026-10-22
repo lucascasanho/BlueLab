@@ -20,6 +20,7 @@ import {
   MenuList,
   MenuTrigger,
 } from '@/mastodon/components/menu';
+import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import {
   useAppDispatch,
   useAppSelector,
@@ -32,14 +33,19 @@ import {
 } from './selectors';
 
 export const ComposeSettingsMenu: React.FC = () => {
+  const isMobile = useBreakpoint('openable');
+
   return (
-    <Menu>
+    <Menu noFocus={isMobile}>
       <MenuTrigger as={IconButton} icon={GearIcon} size='sm'>
         <FormattedMessage id='compose.settings' defaultMessage='Settings' />
       </MenuTrigger>
 
       <MenuList
         portal
+        mobilePresentation='popover'
+        constrainToViewport
+        scrollable
         maxWidth={280}
         placement='top-end'
         strategy='fixed'

@@ -24,6 +24,7 @@ import {
   MenuItemCheckbox,
 } from '@/mastodon/components/menu';
 import { Tooltip } from '@/mastodon/components/tooltip';
+import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { selectComposePrivacy } from './selectors';
@@ -34,6 +35,7 @@ export const ComposeVisibility: React.FC<{ className?: string }> = ({
 }) => {
   const privacy = useAppSelector(selectComposePrivacy);
   const isEditing = useAppSelector((state) => !!state.compose.get('id'));
+  const isMobile = useBreakpoint('openable');
 
   if (privacy === 'direct') {
     return (
@@ -76,7 +78,7 @@ export const ComposeVisibility: React.FC<{ className?: string }> = ({
 
   return (
     <div className={className}>
-      <Menu>
+      <Menu noFocus={isMobile}>
         <MenuTrigger as={Button} size='sm' trailingIcon={CaretIcon}>
           <ComposeVisibilityButtonText privacy={privacy} />
         </MenuTrigger>
@@ -149,6 +151,9 @@ const ComposeVisibilityMenu: React.FC = () => {
   return (
     <MenuList
       portal
+      mobilePresentation='popover'
+      constrainToViewport
+      scrollable
       placement='bottom-start'
       offset={4}
       maxWidth={280}

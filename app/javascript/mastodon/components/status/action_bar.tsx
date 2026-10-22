@@ -301,6 +301,11 @@ const StatusActionMenu: React.FC<{
 }> = ({ status, reblogStatus, dismissQuoteHint, withDismiss }) => {
   const { contextType } = useStatusContext();
   const dispatch = useAppDispatch();
+  const currentTheme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
+  const isVanillaTheme =
+    typeof document !== 'undefined' &&
+    (!currentTheme || currentTheme === 'default' || currentTheme === 'vanilla');
 
   const menu = useStatusMenuActions({
     status,
@@ -331,7 +336,13 @@ const StatusActionMenu: React.FC<{
         <FormattedMessage id='status.more' defaultMessage='More' />
       </MenuTrigger>
 
-      <MenuList placement='top-end'>
+      <MenuList
+        portal={isVanillaTheme}
+        mobilePresentation={isVanillaTheme ? 'popover' : 'bottom-sheet'}
+        constrainToViewport={isVanillaTheme}
+        scrollable={isVanillaTheme}
+        placement='top-end'
+      >
         <LegacyDropdownMenuItems items={menu} />
       </MenuList>
     </Menu>

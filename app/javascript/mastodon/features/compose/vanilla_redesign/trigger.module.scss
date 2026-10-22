@@ -117,9 +117,7 @@
 /* Use the Vanilla 5.0 compose surface for the BlueLab editor too.
  * The content editor and enhanced actions come from BlueLab, while this
  * theme-scoped rule preserves Vanilla's own panel treatment. */
-:global(body:not([data-theme])) .blueLabComposer,
-:global(body[data-theme='']) .blueLabComposer,
-:global(body[data-theme='default']) .blueLabComposer {
+:global(body:not([data-theme='blue-2'])) .blueLabComposer {
   background: var(--color-bg-primary);
   border: 0;
   box-shadow: none;

@@ -714,6 +714,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       <ColumnHeader
         withBackButton
         onBackButtonClick={onBack}
+        hideScrollToTopButton
         title={
           <div className={classes.headerTitle}>
             <ChatCircleDotsIcon size={18} />
