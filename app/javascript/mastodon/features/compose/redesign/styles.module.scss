@@ -56,13 +56,17 @@
   }
 
   :global(body[data-theme='default'])
-    .root[data-bluelab-composer-vanilla='true'][role='dialog'] .content,
+    .root[data-bluelab-composer-vanilla='true'][role='dialog']
+    .content,
   :global(body[data-theme=''])
-    .root[data-bluelab-composer-vanilla='true'][role='dialog'] .content,
+    .root[data-bluelab-composer-vanilla='true'][role='dialog']
+    .content,
   :global(body:not([data-theme]))
-    .root[data-bluelab-composer-vanilla='true'][role='dialog'] .content,
+    .root[data-bluelab-composer-vanilla='true'][role='dialog']
+    .content,
   :global(body[data-theme='vanilla'])
-    .root[data-bluelab-composer-vanilla='true'][role='dialog'] .content {
+    .root[data-bluelab-composer-vanilla='true'][role='dialog']
+    .content {
     flex: 1 1 auto;
     min-height: 0;
     overflow-x: hidden;
@@ -71,13 +75,17 @@
   }
 
   :global(body[data-theme='default'])
-    .root[data-bluelab-composer-vanilla='true'] :global([data-bluelab-rich-editor-input]),
+    .root[data-bluelab-composer-vanilla='true']
+    :global([data-bluelab-rich-editor-input]),
   :global(body[data-theme=''])
-    .root[data-bluelab-composer-vanilla='true'] :global([data-bluelab-rich-editor-input]),
+    .root[data-bluelab-composer-vanilla='true']
+    :global([data-bluelab-rich-editor-input]),
   :global(body:not([data-theme]))
-    .root[data-bluelab-composer-vanilla='true'] :global([data-bluelab-rich-editor-input]),
+    .root[data-bluelab-composer-vanilla='true']
+    :global([data-bluelab-rich-editor-input]),
   :global(body[data-theme='vanilla'])
-    .root[data-bluelab-composer-vanilla='true'] :global([data-bluelab-rich-editor-input]) {
+    .root[data-bluelab-composer-vanilla='true']
+    :global([data-bluelab-rich-editor-input]) {
     font-size: 16px !important;
   }
 

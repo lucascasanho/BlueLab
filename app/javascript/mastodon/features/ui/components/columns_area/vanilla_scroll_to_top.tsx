@@ -57,11 +57,11 @@ export const VanillaScrollToTop: React.FC = () => {
 
             return (
               node.matches(
-                "[data-bluelab-messages-conversation], [data-message-conversation]",
+                '[data-bluelab-messages-conversation], [data-message-conversation]',
               ) ||
               Boolean(
                 node.querySelector(
-                  "[data-bluelab-messages-conversation], [data-message-conversation]",
+                  '[data-bluelab-messages-conversation], [data-message-conversation]',
                 ),
               )
             );
