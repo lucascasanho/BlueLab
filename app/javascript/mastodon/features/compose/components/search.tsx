@@ -152,10 +152,7 @@ const getSearchScrollPositions = (
     });
 
   const documentScroller = document.scrollingElement;
-  if (
-    documentScroller instanceof HTMLElement &&
-    !seen.has(documentScroller)
-  ) {
+  if (documentScroller instanceof HTMLElement && !seen.has(documentScroller)) {
     positions.push({
       element: documentScroller,
       top: documentScroller.scrollTop,
