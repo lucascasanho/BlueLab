@@ -101,7 +101,7 @@ interface SearchScrollPosition {
   left: number;
 }
 
-interface PendingSearchScroll {
+interface SearchScrollSnapshot {
   input: HTMLInputElement;
   positions: SearchScrollPosition[];
 }
@@ -111,53 +111,44 @@ const getSearchScrollPositions = (
 ): SearchScrollPosition[] => {
   const positions: SearchScrollPosition[] = [];
   const seen = new Set<HTMLElement>();
-  let element = input.parentElement;
+  const documentScroller = document.scrollingElement;
 
-  while (element) {
+  const addPosition = (element: HTMLElement) => {
+    if (seen.has(element)) return;
+
     if (
-      element.scrollHeight > element.clientHeight ||
-      element.scrollWidth > element.clientWidth ||
-      element === document.scrollingElement
+      element !== documentScroller &&
+      element.scrollHeight <= element.clientHeight &&
+      element.scrollWidth <= element.clientWidth
     ) {
-      positions.push({
-        element,
-        top: element.scrollTop,
-        left: element.scrollLeft,
-      });
-      seen.add(element);
+      return;
     }
 
+    positions.push({
+      element,
+      top: element.scrollTop,
+      left: element.scrollLeft,
+    });
+    seen.add(element);
+  };
+
+  let element = input.parentElement;
+  while (element) {
+    addPosition(element);
     element = element.parentElement;
   }
 
-  // In column layouts the results scroller is a sibling of the sticky
-  // search header, not an ancestor of the input. Preserve that scroll offset
-  // too, so updates to the suggestions cannot move the results underneath it.
-  const containingColumn = input.closest<HTMLElement>('.column');
-  containingColumn
-    ?.querySelectorAll<HTMLElement>('.scrollable')
-    .forEach((scrollable) => {
-      if (
-        !seen.has(scrollable) &&
-        (scrollable.scrollHeight > scrollable.clientHeight ||
-          scrollable.scrollWidth > scrollable.clientWidth)
-      ) {
-        positions.push({
-          element: scrollable,
-          top: scrollable.scrollTop,
-          left: scrollable.scrollLeft,
-        });
-        seen.add(scrollable);
-      }
-    });
+  // The timeline can scroll independently from the search header. Also track
+  // the shared document and layout scrollers, including when the search field
+  // lives in the navigation panel instead of inside a column.
+  document
+    .querySelectorAll<HTMLElement>(
+      '.scrollable, .column, .columns-area, .columns-area--mobile, .columns-area__panels, .columns-area__panels__main, .main, [data-column-root]',
+    )
+    .forEach(addPosition);
 
-  const documentScroller = document.scrollingElement;
-  if (documentScroller instanceof HTMLElement && !seen.has(documentScroller)) {
-    positions.push({
-      element: documentScroller,
-      top: documentScroller.scrollTop,
-      left: documentScroller.scrollLeft,
-    });
+  if (documentScroller instanceof HTMLElement) {
+    addPosition(documentScroller);
   }
 
   return positions;
@@ -420,26 +411,22 @@ export const Search: React.FC<{
     [dispatch, history, unfocus],
   );
 
-  const pendingSearchScrollRef = useRef<PendingSearchScroll | null>(null);
+  const searchScrollSnapshotRef = useRef<SearchScrollSnapshot | null>(null);
+  const [focusedSearchInput, setFocusedSearchInput] =
+    useState<HTMLInputElement | null>(null);
 
-  const captureSearchScroll = useCallback((input: HTMLInputElement) => {
-    const pending = pendingSearchScrollRef.current;
-    if (pending?.input === input) return;
+  const captureSearchScroll = useCallback(
+    (input: HTMLInputElement, replace = false) => {
+      const current = searchScrollSnapshotRef.current;
+      if (current?.input === input && !replace) return;
 
-    const snapshot = {
-      input,
-      positions: getSearchScrollPositions(input),
-    };
-    pendingSearchScrollRef.current = snapshot;
-
-    // A key may not change the input value (for example, a dead key or an
-    // intercepted shortcut). Do not let an unused snapshot affect later input.
-    window.requestAnimationFrame(() => {
-      if (pendingSearchScrollRef.current === snapshot) {
-        pendingSearchScrollRef.current = null;
-      }
-    });
-  }, []);
+      searchScrollSnapshotRef.current = {
+        input,
+        positions: getSearchScrollPositions(input),
+      };
+    },
+    [],
+  );
 
   const handleBeforeInput = useCallback(
     (event: React.FormEvent<HTMLInputElement>) => {
@@ -447,6 +434,48 @@ export const Search: React.FC<{
     },
     [captureSearchScroll],
   );
+
+  useEffect(() => {
+    if (!focusedSearchInput) return;
+
+    let frame = 0;
+    const rebaseAfterIntentionalScroll = () => {
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+      }
+
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+
+        if (document.activeElement === focusedSearchInput) {
+          captureSearchScroll(focusedSearchInput, true);
+        }
+      });
+    };
+
+    // Keep ordinary wheel/touch scrolling usable while the search remains
+    // focused. Only refresh the baseline after an explicit user scroll gesture.
+    document.addEventListener('wheel', rebaseAfterIntentionalScroll, {
+      capture: true,
+      passive: true,
+    });
+    document.addEventListener('touchmove', rebaseAfterIntentionalScroll, {
+      capture: true,
+      passive: true,
+    });
+
+    return () => {
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+      }
+      document.removeEventListener('wheel', rebaseAfterIntentionalScroll, true);
+      document.removeEventListener(
+        'touchmove',
+        rebaseAfterIntentionalScroll,
+        true,
+      );
+    };
+  }, [captureSearchScroll, focusedSearchInput]);
 
   const handleChange = useCallback(
     ({
@@ -579,10 +608,14 @@ export const Search: React.FC<{
   );
 
   useLayoutEffect(() => {
-    const snapshot = pendingSearchScrollRef.current;
-    if (!snapshot || snapshot.input !== searchInputRef.current) return;
-
-    pendingSearchScrollRef.current = null;
+    const snapshot = searchScrollSnapshotRef.current;
+    if (
+      !snapshot ||
+      snapshot.input !== searchInputRef.current ||
+      document.activeElement !== snapshot.input
+    ) {
+      return;
+    }
 
     const restoreWhileInputFocused = () => {
       if (
@@ -595,10 +628,13 @@ export const Search: React.FC<{
       restoreSearchScrollPositions(snapshot.positions);
     };
 
-    // Restore before paint and once more after the browser completes its own
-    // scroll anchoring for the updated search suggestions.
+    // Keep one stable baseline for the entire focus session. Capturing the
+    // already-shifted position after every key would allow the drift to add up.
     restoreWhileInputFocused();
-    window.requestAnimationFrame(restoreWhileInputFocused);
+    window.requestAnimationFrame(() => {
+      restoreWhileInputFocused();
+      window.requestAnimationFrame(restoreWhileInputFocused);
+    });
   }, [value]);
 
   const handleClear = useCallback(() => {
@@ -693,6 +729,12 @@ export const Search: React.FC<{
   );
 
   const handleInputFocus = useCallback(() => {
+    const input = searchInputRef.current;
+    if (input) {
+      setFocusedSearchInput(input);
+      captureSearchScroll(input, true);
+    }
+
     if (shouldOpenOnFocus) {
       setExpanded(true);
       setSelectedOption(-1);
@@ -730,11 +772,13 @@ export const Search: React.FC<{
         }
       }
     }
-  }, [shouldOpenOnFocus, singleColumn]);
+  }, [captureSearchScroll, shouldOpenOnFocus, singleColumn]);
 
   const handleInputBlur = useCallback(() => {
+    searchScrollSnapshotRef.current = null;
+    setFocusedSearchInput(null);
     setSelectedOption(-1);
-  }, [setSelectedOption]);
+  }, []);
 
   const getOptionFocusHandler = useCallback((index: number) => {
     return () => {
