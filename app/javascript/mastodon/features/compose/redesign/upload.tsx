@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 
-import { DotsThreeIcon, TrashIcon } from '@phosphor-icons/react';
+import { DotsThreeIcon, PencilSimpleIcon, TrashIcon, XIcon } from '@phosphor-icons/react';
 
 import { undoUploadCompose } from '@/mastodon/actions/compose';
 import { openModal } from '@/mastodon/actions/modal';
@@ -44,6 +44,12 @@ export const ComposeUpload: React.FC<{
     }
   }, [dispatch, id]);
 
+  const handleDelete = useCallback(() => {
+    if (id) {
+      dispatch(undoUploadCompose(id));
+    }
+  }, [dispatch, id]);
+
   if (!attachment || attachment.type === 'unknown') {
     return <div className={classNames(classes.mediaUpload, className)} />;
   }
@@ -62,6 +68,36 @@ export const ComposeUpload: React.FC<{
       {sensitive && attachment.blurhash && (
         <Blurhash hash={attachment.blurhash} className={classes.blurHash} />
       )}
+
+      <IconButton
+        as='button'
+        type='button'
+        size='sm'
+        variant='solid'
+        icon={PencilSimpleIcon}
+        className={classes.mediaMenuAltButton}
+        onClick={handleEdit}
+      >
+        <FormattedMessage
+          id='compose.upload.menu.add_alt'
+          defaultMessage='Add alt text'
+        />
+      </IconButton>
+
+      <IconButton
+        as='button'
+        type='button'
+        size='sm'
+        variant='solid'
+        icon={XIcon}
+        className={classes.mediaMenuButton}
+        onClick={handleDelete}
+      >
+        <FormattedMessage
+          id='compose.upload.menu.delete'
+          defaultMessage='Remove image'
+        />
+      </IconButton>
 
       <button
         type='button'
