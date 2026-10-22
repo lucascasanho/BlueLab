@@ -118,7 +118,14 @@ export const AltTextBadge: React.FC<{
                 />
               )}
 
-              <p>{description}</p>
+              <p>
+                {description || (
+                  <FormattedMessage
+                    id='alt_text_badge.no_description'
+                    defaultMessage='No alt text is available for this image.'
+                  />
+                )}
+              </p>
             </div>
           </div>
         )}
