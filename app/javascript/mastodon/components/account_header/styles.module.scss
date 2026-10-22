@@ -250,10 +250,8 @@ $button-breakpoint: 420px;
   .followButton {
     flex-grow: 0;
   }
-}
 
-@media screen and (width <= 759px) {
-  .buttonsDesktop {
+  @media screen and (width <= 759px) {
     gap: 4px;
     flex-wrap: wrap;
   }

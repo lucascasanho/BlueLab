@@ -178,7 +178,6 @@ export const AccountHeader: React.FC<{
               )}
             </div>
           )}
-
         </div>
       </AnimateEmojiProvider>
 

@@ -14,7 +14,9 @@ import {
   removeComposeThreadMedia,
 } from '@/mastodon/actions/compose';
 import api from '@/mastodon/api';
-import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
+import type {
+  ApiMediaAttachmentJSON,
+} from '@/mastodon/api_types/media_attachments';
 import { Button, IconButton } from '@/mastodon/components/button/redesign';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import CloseIcon from '@/material-icons/400-20px/close.svg?react';
@@ -233,7 +235,8 @@ const ThreadMediaAttachment: React.FC<{
 }> = ({ attachment, onRemove, onUpdateAlt }) => {
   const intl = useIntl();
   const mediaId = attachment.get('id') as string;
-  const description = (attachment.get('description') as string | undefined) ?? '';
+  const description =
+    (attachment.get('description') as string | undefined) ?? '';
   const type = attachment.get('type') as string | undefined;
   const previewUrl = attachment.get('preview_url') as string | null;
   const mediaUrl = attachment.get('url') as string | null;
@@ -258,7 +261,10 @@ const ThreadMediaAttachment: React.FC<{
             {previewUrl ? (
               <img className={classes.mediaImage} src={previewUrl} alt='' />
             ) : (
-              <div className={classes.mediaAudioPlaceholder} aria-hidden='true' />
+              <div
+                className={classes.mediaAudioPlaceholder}
+                aria-hidden='true'
+              />
             )}
             <audio
               className={classes.mediaAudio}

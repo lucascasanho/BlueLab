@@ -69,9 +69,6 @@ export const Upload: React.FC<{
   const focusY = media.getIn(['meta', 'focus', 'y']) as number;
   const x = (focusX / 2 + 0.5) * 100;
   const y = (focusY / -2 + 0.5) * 100;
-  const missingDescription =
-    ((media.get('description') as string | undefined) ?? '').length === 0;
-
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -98,7 +95,10 @@ export const Upload: React.FC<{
       {...listeners}
     >
       <div
-        className={classNames('compose-form__upload__thumbnail', classes.thumbnail)}
+        className={classNames(
+          'compose-form__upload__thumbnail',
+          classes.thumbnail,
+        )}
         style={{
           backgroundImage:
             !sensitive && preview_url ? `url(${preview_url})` : undefined,
@@ -143,7 +143,11 @@ export const Upload: React.FC<{
         <div className={classes.actions}>
           <button
             type='button'
-            className={classNames('icon-button', classes.actionButton, classes.deleteButton)}
+            className={classNames(
+              'icon-button',
+              classes.actionButton,
+              classes.deleteButton,
+            )}
             onPointerDown={stopUploadDrag}
             onClick={handleUndoClick}
           >
@@ -157,7 +161,11 @@ export const Upload: React.FC<{
           </button>
           <button
             type='button'
-            className={classNames('icon-button', classes.actionButton, classes.altButton)}
+            className={classNames(
+              'icon-button',
+              classes.actionButton,
+              classes.altButton,
+            )}
             onPointerDown={stopUploadDrag}
             onClick={handleFocalPointClick}
           >
