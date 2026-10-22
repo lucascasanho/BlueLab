@@ -37,10 +37,6 @@ const messages = defineMessages({
     id: 'compose.thread.add_alt',
     defaultMessage: 'Add alt text',
   },
-  editAlt: {
-    id: 'compose.thread.edit_alt',
-    defaultMessage: 'Edit alt text',
-  },
 });
 
 type ThreadItem = ImmutableMap<string, unknown>;
@@ -229,7 +225,6 @@ const ComposeThreadItem: React.FC<{
   );
 };
 
-
 const ThreadMediaAttachment: React.FC<{
   attachment: ImmutableMap<string, unknown>;
   onRemove: () => void;
@@ -264,7 +259,6 @@ const ThreadMediaAttachment: React.FC<{
             />
           </span>
           <input
-            autoFocus
             value={description}
             placeholder={intl.formatMessage({
               id: 'compose.thread.alt',
