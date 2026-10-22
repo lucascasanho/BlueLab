@@ -98,7 +98,7 @@ export const Upload: React.FC<{
       {...listeners}
     >
       <div
-        className='compose-form__upload__thumbnail'
+        className={classNames('compose-form__upload__thumbnail', classes.thumbnail)}
         style={{
           backgroundImage:
             !sensitive && preview_url ? `url(${preview_url})` : undefined,
@@ -144,16 +144,20 @@ export const Upload: React.FC<{
           <button
             type='button'
             className={classNames('icon-button', classes.actionButton, classes.deleteButton)}
-            aria-label='Remove media'
             onPointerDown={stopUploadDrag}
             onClick={handleUndoClick}
           >
             <Icon id='delete' icon={DeleteIcon} />
+            <span className='sr-only'>
+              <FormattedMessage
+                id='compose.thread.remove_media'
+                defaultMessage='Remove media'
+              />
+            </span>
           </button>
           <button
             type='button'
             className={classNames('icon-button', classes.actionButton, classes.altButton)}
-            aria-expanded={undefined}
             onPointerDown={stopUploadDrag}
             onClick={handleFocalPointClick}
           >
