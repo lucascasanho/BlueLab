@@ -46,18 +46,6 @@ import {
   handleSearchLinkClick,
 } from './vanilla_navigation_panel';
 
-const stopMobilePointerPropagation = (
-  event: React.PointerEvent<HTMLButtonElement>,
-) => {
-  event.stopPropagation();
-};
-
-const stopMobileTouchPropagation = (
-  event: React.TouchEvent<HTMLButtonElement>,
-) => {
-  event.stopPropagation();
-};
-
 export const RedesignMobileNavigation: React.FC = () => {
   const dispatch = useAppDispatch();
   const { accountId, signedIn } = useIdentity();
@@ -125,8 +113,6 @@ export const RedesignMobileNavigation: React.FC = () => {
                     className={classes.avatar}
                   />
                 }
-                onPointerDown={stopMobilePointerPropagation}
-                onTouchStart={stopMobileTouchPropagation}
               >
                 <FormattedMessage
                   id='tabs_bar.account_settings'
