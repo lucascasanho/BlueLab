@@ -255,6 +255,11 @@ $button-fallback-breakpoint: $button-breakpoint + 55px;
     flex: 0 0 auto;
   }
 
+  .followButton {
+    flex-grow: 0;
+    min-width: 0;
+  }
+
   @container (width >= #{$button-breakpoint}) {
     display: none;
   }
@@ -586,8 +591,7 @@ $button-fallback-breakpoint: $button-breakpoint + 55px;
 // Buttons
 
 .followButton {
-  flex-grow: 0;
-  min-width: 0;
+  flex-grow: 1;
 }
 
 .bioButtonsWrapper {
