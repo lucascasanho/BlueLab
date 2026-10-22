@@ -174,7 +174,7 @@ RSpec.describe ThemeHelper do
         Setting.theme = 'mastodon-bird-ui-auto'
       end
 
-      it falls back to Vanilla when the site theme is disabled' do
+      it 'falls back to Vanilla when the site theme is disabled' do
         expect(subject).to eq('default')
         expect(Setting.theme).to eq('mastodon-bird-ui-auto')
       end
