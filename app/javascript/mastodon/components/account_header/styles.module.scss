@@ -33,20 +33,14 @@
 }
 
 // Avatar
-.avatarActionsRow {
-  position: relative;
-  min-height: 80px;
-  margin-top: -64px;
-}
-
 .avatarWrapper {
-  position: relative;
-  margin-top: 0;
+  margin-top: -64px;
   padding-top: 0;
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 8px;
-  overflow: visible;
+  overflow: hidden;
   margin-inline-start: -2px; // aligns the pfp with content below
 }
 
@@ -200,20 +194,18 @@
 }
 
 $button-breakpoint: 420px;
+$button-fallback-breakpoint: $button-breakpoint + 55px;
 
 .buttonsDesktop,
 .buttonsMobile {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 0;
 
   :global(.button) {
-    flex: 0 1 auto;
-    width: auto;
-    min-width: 0;
-    max-width: 100%;
+    flex-shrink: 1;
     white-space: nowrap;
+    min-width: 80px;
   }
 
   :global(.icon-button) {
@@ -229,62 +221,41 @@ $button-breakpoint: 420px;
 }
 
 .buttonsDesktop {
-  flex: 0 1 auto;
-  align-self: flex-start;
-  justify-content: flex-end;
-  margin-inline-start: auto;
-  position: relative;
-  z-index: 2;
-  min-width: 0;
-  padding-top: 0;
-
-  :global(.button) {
-    flex: 0 1 auto;
-    width: auto;
-    min-width: 0;
-    max-width: 100%;
-    white-space: nowrap;
+  @container (width < #{$button-breakpoint}) {
+    display: none;
   }
 
-  :global(.icon-button) {
-    flex: 0 0 auto;
-  }
-
-  .followButton {
-    flex-grow: 0;
-  }
-
-  @media screen and (width <= 759px) {
-    gap: 4px;
-    flex-wrap: wrap;
+  @supports (not (container-type: inline-size)) {
+    @media (max-width: #{$button-fallback-breakpoint}) {
+      display: none;
+    }
   }
 }
 
 .buttonsMobile {
-  position: absolute;
-  inset-block-start: 72px;
-  inset-inline-end: 0;
-  display: none;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 4px;
-  width: max-content;
-  max-width: calc(100% - 88px);
-  z-index: 2;
-}
+  position: sticky;
+  bottom: var(--mobile-bottom-nav-height);
+  padding: 12px 16px;
+  margin: 0 -16px;
 
-@media screen and (width <= 759px) {
-  .avatarActionsRow {
-    min-height: 112px;
-  }
-
-  .buttonsDesktop {
+  @container (width >= #{$button-breakpoint}) {
     display: none;
   }
 
-  .buttonsMobile {
-    display: flex;
+  @supports (not (container-type: inline-size)) {
+    @media (min-width: ($button-fallback-breakpoint + 1px)) {
+      display: none;
+    }
   }
+
+  @media (width >= #{$button-breakpoint}) {
+    bottom: 0;
+  }
+}
+
+.buttonsMobileIsStuck {
+  background-color: var(--color-bg-primary);
+  border-top: 1px solid var(--color-border-primary);
 }
 
 .buttonMenu {

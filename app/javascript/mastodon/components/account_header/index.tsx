@@ -5,6 +5,8 @@ import classNames from 'classnames';
 import { Helmet } from '@unhead/react/helmet';
 
 import { openModal } from '@/mastodon/actions/modal';
+import { useLayout } from '@/mastodon/hooks/useLayout';
+import { useVisibility } from '@/mastodon/hooks/useVisibility';
 import {
   autoPlayGif,
   domain as localDomain,
@@ -63,6 +65,13 @@ export const AccountHeader: React.FC<{
     [dispatch, account],
   );
 
+  const { layout } = useLayout();
+  const { observedRef, isIntersecting } = useVisibility({
+    observerOptions: {
+      rootMargin: layout === 'mobile' ? '0px 0px -55px 0px' : '',
+    },
+  });
+
   if (!account) {
     return null;
   }
@@ -102,47 +111,25 @@ export const AccountHeader: React.FC<{
             isBlue2 && 'blue2-profile-body',
           )}
         >
-          <div className={classes.avatarActionsRow}>
-            <div
-              className={classNames(
-                classes.avatarWrapper,
-                isBlue2 && 'blue2-profile-avatar',
-              )}
-            >
-              <a
-                href={account.avatar}
-                rel='noopener'
-                target='_blank'
-                onClick={handleOpenAvatar}
-              >
-                <Avatar
-                  className={classes.avatar}
-                  account={suspendedOrHidden ? undefined : account}
-                  alt={account.avatar_description}
-                  size={isBlue2 ? 88 : 80}
-                />
-              </a>
-            </div>
-            <AccountButtons
-              accountId={accountId}
-              className={classNames(
-                classes.buttonsMobile,
-                isBlue2 && 'blue2-profile-actions',
-              )}
-              noShare={!isMe || 'share' in navigator}
-              forceMenu={'share' in navigator}
-            />
-            {isBlue2 && (
-              <AccountButtons
-                accountId={accountId}
-                className={classNames(
-                  classes.buttonsDesktop,
-                  'blue2-profile-actions',
-                )}
-                noShare={!isMe || 'share' in navigator}
-                forceMenu={'share' in navigator}
-              />
+          <div
+            className={classNames(
+              classes.avatarWrapper,
+              isBlue2 && 'blue2-profile-avatar',
             )}
+          >
+            <a
+              href={account.avatar}
+              rel='noopener'
+              target='_blank'
+              onClick={handleOpenAvatar}
+            >
+              <Avatar
+                className={classes.avatar}
+                account={suspendedOrHidden ? undefined : account}
+                alt={account.avatar_description}
+                size={isBlue2 ? 88 : 80}
+              />
+            </a>
           </div>
 
           <div
@@ -152,14 +139,15 @@ export const AccountHeader: React.FC<{
             )}
           >
             <AccountName accountId={accountId} />
-            {!isBlue2 && (
-              <AccountButtons
-                accountId={accountId}
-                className={classes.buttonsDesktop}
-                noShare={!isMe || 'share' in navigator}
-                forceMenu={'share' in navigator}
-              />
-            )}
+            <AccountButtons
+              accountId={accountId}
+              className={classNames(
+                classes.buttonsDesktop,
+                isBlue2 && 'blue2-profile-actions',
+              )}
+              noShare={!isMe || 'share' in navigator}
+              forceMenu={'share' in navigator}
+            />
           </div>
 
           <AccountBadges accountId={accountId} />
@@ -197,10 +185,20 @@ export const AccountHeader: React.FC<{
               )}
             </div>
           )}
+          <AccountButtons
+            accountId={accountId}
+            className={classNames(
+              classes.buttonsMobile,
+              isBlue2 && 'blue2-profile-actions',
+              !isIntersecting && classes.buttonsMobileIsStuck,
+            )}
+            noShare
+          />
         </div>
       </AnimateEmojiProvider>
 
       {!hideTabs && !hidden && <AccountTabs />}
+      <div ref={observedRef} />
 
       <Helmet>
         <title>{titleFromAccount(account, localDomain)}</title>
