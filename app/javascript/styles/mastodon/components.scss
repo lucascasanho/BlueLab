@@ -12390,9 +12390,13 @@ body[data-theme='blue-2'] {
   }
 }
 
-/* Vanilla theme: stable active colors for likes and saved posts, including conversations. */
-body[data-theme='default'] .star-icon[aria-pressed='true'],
-body[data-theme='default'] .star-icon.active {
+/* Vanilla theme: stable active colors in legacy and redesigned action bars. */
+body[data-theme='default'] button.star-icon[aria-pressed='true'],
+body[data-theme='default'] button.star-icon.active,
+body[data-theme='default'] .status__action-bar .star-icon[aria-pressed='true'],
+body[data-theme='default'] .status__action-bar .star-icon.active,
+body[data-theme='default'] button.favouriteButton[aria-pressed='true'],
+body[data-theme='default'] button.favouriteButton.active {
   color: #dc2626 !important;
 
   --default-icon-color: #dc2626 !important;
@@ -12401,8 +12405,10 @@ body[data-theme='default'] .star-icon.active {
   opacity: 1 !important;
 }
 
-body[data-theme='default'] .bookmark-icon[aria-pressed='true'],
-body[data-theme='default'] .bookmark-icon.active {
+body[data-theme='default'] button.bookmark-icon[aria-pressed='true'],
+body[data-theme='default'] button.bookmark-icon.active,
+body[data-theme='default'] .status__action-bar .bookmark-icon[aria-pressed='true'],
+body[data-theme='default'] .status__action-bar .bookmark-icon.active {
   color: #eab308 !important;
 
   --default-icon-color: #eab308 !important;

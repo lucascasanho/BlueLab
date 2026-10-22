@@ -592,6 +592,29 @@
   opacity: 1 !important;
 }
 
+/* Make the active state explicit in posts and conversation thread views. */
+:global(body[data-theme='default'] .star-icon[aria-pressed='true']),
+:global(body[data-theme='default'] .star-icon.active),
+:global(body[data-theme='default']) .favouriteButton[aria-pressed='true'],
+:global(body[data-theme='default']) .favouriteButton.active {
+  color: #dc2626 !important;
+
+  --default-icon-color: #dc2626 !important;
+  --hover-icon-color: #dc2626 !important;
+
+  opacity: 1 !important;
+}
+
+:global(body[data-theme='default'] .bookmark-icon[aria-pressed='true']),
+:global(body[data-theme='default'] .bookmark-icon.active) {
+  color: #eab308 !important;
+
+  --default-icon-color: #eab308 !important;
+  --hover-icon-color: #eab308 !important;
+
+  opacity: 1 !important;
+}
+
 /* Vanilla/default theme: use current Mastodon 5 status spacing. */
 :global(body[data-theme='default']) .root {
   padding: var(--space-3) var(--space-4) var(--space-2);
