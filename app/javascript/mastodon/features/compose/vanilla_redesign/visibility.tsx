@@ -241,20 +241,22 @@ const ComposeVisibilityMenu: React.FC<{
 
       <MenuItemDivider />
 
-      <MenuItem icon={ChatCircleDotsIcon} onClick={handleSwitchToMessage}>
-        {isReply ? (
-          <FormattedMessage
-            id='compose.post.to_private_reply'
-            defaultMessage='Reply privately instead'
-          />
-        ) : (
-          <FormattedMessage
-            id='compose.post.to_message'
-            defaultMessage='Convert to private message'
-            description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
-          />
-        )}
-      </MenuItem>
+      {!activeThreadItemId && (
+        <MenuItem icon={ChatCircleDotsIcon} onClick={handleSwitchToMessage}>
+          {isReply ? (
+            <FormattedMessage
+              id='compose.post.to_private_reply'
+              defaultMessage='Reply privately instead'
+            />
+          ) : (
+            <FormattedMessage
+              id='compose.post.to_message'
+              defaultMessage='Convert to private message'
+              description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
+            />
+          )}
+        </MenuItem>
+      )}
     </MenuList>
   );
 };
