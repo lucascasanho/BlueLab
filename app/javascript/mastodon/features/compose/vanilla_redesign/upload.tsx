@@ -57,7 +57,7 @@ export const ComposeUpload: React.FC<{
   }
 
   if (attachment.type === 'audio') {
-    return <ComposeAudioUpload attachment={attachment} />;
+    return <ComposeAudioUpload attachment={attachment} onEdit={handleAltEdit} />;
   }
 
   return (
@@ -68,6 +68,17 @@ export const ComposeUpload: React.FC<{
     >
       {sensitive && attachment.blurhash && (
         <Blurhash hash={attachment.blurhash} className={classes.blurHash} />
+      )}
+
+      {!sensitive && attachment.type === 'video' && (
+        <video
+          className={classes.mediaVideo}
+          src={attachment.url}
+          poster={attachment.preview_url}
+          controls
+          playsInline
+          preload='metadata'
+        />
       )}
 
       <Button
@@ -129,7 +140,8 @@ export const ComposeUpload: React.FC<{
 
 const ComposeAudioUpload: React.FC<{
   attachment: ComposeAttachment<ApiAudioAttachmentJSON>;
-}> = ({ attachment }) => {
+  onEdit: () => void;
+}> = ({ attachment, onEdit }) => {
   const { id, preview_url } = attachment;
   const sensitive = useAppSelector((state) => !!state.compose.get('spoiler'));
 
@@ -152,17 +164,42 @@ const ComposeAudioUpload: React.FC<{
       />
 
       <IconButton
-        size='md'
-        variant='ghost'
+        as='button'
+        type='button'
+        size='sm'
+        variant='solid'
         icon={TrashIcon}
-        color='destructive'
+        className={classes.audioDeleteButton}
         onClick={handleDelete}
+        aria-label='Remove audio'
       >
-        <FormattedMessage
-          id='compose.upload.audio.delete'
-          defaultMessage='Remove audio'
-        />
+        <span className='sr-only'>
+          <FormattedMessage
+            id='compose.upload.audio.delete'
+            defaultMessage='Remove audio'
+          />
+        </span>
       </IconButton>
+
+      <Button
+        contrastOnMedia
+        size='sm'
+        variant='solid'
+        onClick={onEdit}
+        className={classes.audioAltButton}
+        leadingIcon={PencilSimpleIcon}
+        aria-label='Add alt text'
+      >
+        <span aria-hidden='true'>
+          <FormattedMessage id='alt_text_badge.label' defaultMessage='ALT' />
+        </span>
+        <span className='sr-only'>
+          <FormattedMessage
+            id='compose.upload.menu.add_alt'
+            defaultMessage='Add alt text'
+          />
+        </span>
+      </Button>
     </div>
   );
 };

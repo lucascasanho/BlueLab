@@ -103,6 +103,7 @@ export const ComposeUpload: React.FC<{
           defaultMessage: 'Edit media and alt text',
         })}
       >
+        <span aria-hidden='true'>ALT</span>
         <span className='sr-only'>
           <FormattedMessage
             id='compose.upload.menu.add_alt'

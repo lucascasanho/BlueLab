@@ -49,31 +49,63 @@
   }
 }
 
-.mediaMenuButtons {
+ .mediaMenuButtons {
   display: flex;
   gap: var(--space-2);
   position: absolute;
-  inset-block-start: var(--space-2);
-  inset-inline-end: var(--space-2);
-}
-
-.mediaMenuAltButton {
-  position: absolute;
+  z-index: 4;
   inset-block-start: var(--space-2);
   inset-inline-start: var(--space-2);
 }
 
+.mediaMenuAltButton {
+  position: absolute;
+  z-index: 4;
+  inset-block-start: var(--space-2);
+  inset-inline-end: var(--space-2);
+}
+
+.mediaVideo {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+  background: #000;
+  pointer-events: auto;
+}
+
 // Audio
 
-.audioWrapper {
+ .audioWrapper {
   --height: var(--space-10);
 
+  position: relative;
   display: flex;
   align-items: center;
   border-radius: var(--radius-4);
   gap: var(--space-1);
   border: 0.5px solid var(--color-text-tertiary);
-  padding: var(--space-2);
+  padding: calc(var(--space-2) + 36px) var(--space-2) var(--space-2);
+}
+
+.audioDeleteButton,
+.audioAltButton {
+  position: absolute;
+  z-index: 4;
+  top: var(--space-2);
+}
+
+.audioDeleteButton {
+  inset-inline-start: var(--space-2);
+}
+
+.audioAltButton {
+  inset-inline-end: var(--space-2);
 }
 
 .audioCover {
