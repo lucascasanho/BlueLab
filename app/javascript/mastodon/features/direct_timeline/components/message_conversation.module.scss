@@ -206,8 +206,10 @@
   cursor: pointer;
 }
 
-.messageFavouriteVanilla[aria-pressed='true'] {
-  color: var(--color-text-brand);
+:global(body:not([data-theme])) .messageFavouriteVanilla[aria-pressed='true'],
+:global(body[data-theme='']) .messageFavouriteVanilla[aria-pressed='true'],
+:global(body[data-theme='default']) .messageFavouriteVanilla[aria-pressed='true'] {
+  color: #dc2626;
 }
 
 .messageFavouriteVanilla:focus-visible {

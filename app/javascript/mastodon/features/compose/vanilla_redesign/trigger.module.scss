@@ -97,6 +97,15 @@
     max-height: var(--viewport-height, 100dvh);
     min-height: min(220px, var(--viewport-height, 100dvh));
   }
+
+  :global(body:not([data-theme])) .root[data-keyboard-open='true'],
+  :global(body[data-theme='']) .root[data-keyboard-open='true'],
+  :global(body[data-theme='default']) .root[data-keyboard-open='true'] {
+    // Use all available space above the on-screen keyboard in Vanilla.
+    height: var(--viewport-height, 100dvh);
+    max-height: var(--viewport-height, 100dvh);
+    min-height: 0;
+  }
 }
 
 /* Use the Vanilla 5.0 compose surface for the BlueLab editor too.
