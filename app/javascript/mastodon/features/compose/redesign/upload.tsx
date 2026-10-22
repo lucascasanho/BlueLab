@@ -5,7 +5,12 @@ import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 
-import { DotsThreeIcon, PencilSimpleIcon, TrashIcon, XIcon } from '@phosphor-icons/react';
+import {
+  DotsThreeIcon,
+  PencilSimpleIcon,
+  TrashIcon,
+  XIcon,
+} from '@phosphor-icons/react';
 
 import { undoUploadCompose } from '@/mastodon/actions/compose';
 import { openModal } from '@/mastodon/actions/modal';
@@ -112,25 +117,24 @@ export const ComposeUpload: React.FC<{
           />
         </IconButton>
         <Menu>
-        <MenuTrigger
-          as={IconButton}
-          className={classes.mediaMenuButton}
-          icon={DotsThreeIcon}
-          size='sm'
-          variant='solid'
-          tooltipPlacement='top'
-        >
-          <FormattedMessage
-            id='compose.upload.menu.delete'
-            defaultMessage='Remove image'
-          />
-        </MenuTrigger>
+          <MenuTrigger
+            as={IconButton}
+            icon={DotsThreeIcon}
+            size='sm'
+            variant='solid'
+            tooltipPlacement='top'
+          >
+            <FormattedMessage
+              id='compose.upload.menu.delete'
+              defaultMessage='Remove image'
+            />
+          </MenuTrigger>
 
-        <ComposeUploadMenu
-          attachment={attachment}
-          single={single}
-          onEdit={handleEdit}
-        />
+          <ComposeUploadMenu
+            attachment={attachment}
+            single={single}
+            onEdit={handleEdit}
+          />
         </Menu>
       </div>
 
