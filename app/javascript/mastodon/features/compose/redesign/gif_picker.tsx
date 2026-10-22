@@ -6,6 +6,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
+
 import { GifIcon, MagnifyingGlassIcon } from '@phosphor-icons/react';
 
 import {
@@ -147,10 +148,7 @@ export const ComposeGifButton: React.FC<{
     onFalse();
   }, [onFalse]);
 
-  const effectiveThreadItemId =
-    pickerThreadItemId === undefined
-      ? activeThreadItemId
-      : pickerThreadItemId;
+  const effectiveThreadItemId = pickerThreadItemId === undefined ? activeThreadItemId : pickerThreadItemId;
 
   const threadMedia = useAppSelector((state) => {
     if (!effectiveThreadItemId) return null;
