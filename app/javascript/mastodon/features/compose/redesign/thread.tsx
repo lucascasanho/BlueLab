@@ -7,7 +7,7 @@ import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
-import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react';
+import { PencilSimpleIcon, TrashIcon, XIcon } from '@phosphor-icons/react';
 
 import {
   addComposeThreadMedia,
