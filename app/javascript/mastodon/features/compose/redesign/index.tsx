@@ -230,7 +230,9 @@ export const RedesignComposeForm: React.FC<
             )}
 
             {useVanillaToolbar ? (
-              <VanillaComposeSettingsMenu activeThreadItemId={activeThreadItemId} />
+              <VanillaComposeSettingsMenu
+                activeThreadItemId={activeThreadItemId}
+              />
             ) : (
               <ToggleButton
                 type='button'
