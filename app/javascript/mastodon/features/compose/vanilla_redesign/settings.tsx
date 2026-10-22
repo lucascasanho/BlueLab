@@ -105,16 +105,10 @@ const ComposeSettingsInnerMenu: React.FC<{
     if (activeThreadItemId) {
       const nextSensitive = !sensitive;
       dispatch(
-        changeComposeThreadItem(
-          activeThreadItemId,
-          'sensitive',
-          nextSensitive,
-        ),
+        changeComposeThreadItem(activeThreadItemId, 'sensitive', nextSensitive),
       );
       if (!nextSensitive) {
-        dispatch(
-          changeComposeThreadItem(activeThreadItemId, 'spoiler_text', ''),
-        );
+        dispatch(changeComposeThreadItem(activeThreadItemId, 'spoiler_text', ''));
       }
     } else {
       dispatch(changeComposeSpoilerness());
