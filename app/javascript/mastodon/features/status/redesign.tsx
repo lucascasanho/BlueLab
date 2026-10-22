@@ -8,8 +8,6 @@ import { useParams } from 'react-router';
 
 import { Helmet } from '@unhead/react/helmet';
 
-import { statusInteraction } from '@/mastodon/actions/interactions_typed';
-import { ToggleIconButton } from '@/mastodon/components/button/redesign';
 import { Column } from '@/mastodon/components/column';
 import {
   ColumnHeader,
@@ -27,12 +25,6 @@ import {
   useStatusMenuActions,
   useTextForScreenReader,
 } from '@/mastodon/components/status/hooks';
-import {
-  StatusBookmarkActiveIcon,
-  StatusBookmarkIcon,
-  StatusLikeActiveIcon,
-  StatusLikeIcon,
-} from '@/mastodon/components/status/icons';
 import { StatusRedesign as Status } from '@/mastodon/components/status/status';
 import { ScrollContainer } from '@/mastodon/containers/scroll_container';
 import type { ShouldUpdateScrollFn } from '@/mastodon/containers/scroll_container/default_should_update_scroll';
@@ -69,11 +61,6 @@ const messages = defineMessages({
   detailedStatus: {
     id: 'status.detailed_status',
     defaultMessage: 'Detailed conversation view',
-  },
-  favourite: { id: 'status.favourite', defaultMessage: 'Favorite' },
-  removeFavourite: {
-    id: 'status.remove_favourite',
-    defaultMessage: 'Remove from favorites',
   },
 });
 
@@ -147,30 +134,6 @@ export const StatusPage: React.FC = () => {
     [],
   );
 
-  const dispatch = useAppDispatch();
-  const handleBookmarkClick = useCallback(() => {
-    dispatch(
-      statusInteraction({
-        statusId,
-        intent: 'bookmark',
-        contextType: 'detailed',
-      }),
-    );
-  }, [dispatch, statusId]);
-  const handleFavouriteClick = useCallback(() => {
-    dispatch(
-      statusInteraction({
-        statusId,
-        intent: 'favourite',
-        contextType: 'detailed',
-      }),
-    );
-  }, [dispatch, statusId]);
-
-  const favouriteIcon = status?.favourited
-    ? StatusLikeActiveIcon
-    : StatusLikeIcon;
-
   if (isLoading) {
     return (
       <Column>
@@ -184,9 +147,6 @@ export const StatusPage: React.FC = () => {
   }
 
   const { account } = status;
-  const favouriteTitle = intl.formatMessage(
-    status.favourited ? messages.removeFavourite : messages.favourite,
-  );
   const isLocal = !account.acct.includes('@');
   const isIndexable = !account.noindex;
 
@@ -233,39 +193,6 @@ export const StatusPage: React.FC = () => {
         title={columnTitle}
         extraButtons={
           <>
-            <ToggleIconButton
-              size='sm'
-              variant='ghost'
-              active={status.favourited}
-              icon={favouriteIcon}
-              onClick={handleFavouriteClick}
-              className='star-icon'
-            >
-              {favouriteTitle}
-            </ToggleIconButton>
-            <ToggleIconButton
-              size='sm'
-              variant='ghost'
-              active={status.bookmarked}
-              icon={
-                status.bookmarked
-                  ? StatusBookmarkActiveIcon
-                  : StatusBookmarkIcon
-              }
-              onClick={handleBookmarkClick}
-            >
-              {!status.bookmarked ? (
-                <FormattedMessage
-                  id='status.bookmark'
-                  defaultMessage='Bookmark'
-                />
-              ) : (
-                <FormattedMessage
-                  id='status.remove_bookmark'
-                  defaultMessage='Remove bookmark'
-                />
-              )}
-            </ToggleIconButton>
             <ColumnSettingsMenu
               label={
                 <FormattedMessage
