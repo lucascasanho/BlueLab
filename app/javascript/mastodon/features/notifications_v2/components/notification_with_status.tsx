@@ -59,7 +59,11 @@ export const NotificationWithStatus: React.FC<{
 
   const handlePrivateStatusClickCapture = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
-      if (!isPrivateMention || !statusId || !(event.target instanceof Element)) {
+      if (
+        !isPrivateMention ||
+        !statusId ||
+        !(event.target instanceof Element)
+      ) {
         return;
       }
 
@@ -84,7 +88,7 @@ export const NotificationWithStatus: React.FC<{
 
       // On touch devices, a tap on the status text can follow its permalink
       // instead of the notification's conversation action. Keep direct-message
-      // previews on the conversation route while preserving profile/action links.
+      // previews on the conversation route while preserving profile links and actions.
       event.preventDefault();
       event.stopPropagation();
       dispatch(openConversationForStatus(statusId));
