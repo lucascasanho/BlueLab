@@ -44,10 +44,6 @@ import { useAppDispatch } from '@/mastodon/store';
 
 import classes from './vanilla_account_card_and_menu.module.scss';
 
-const stopDrawerGesture = (event: React.SyntheticEvent) => {
-  event.stopPropagation();
-};
-
 export const NavigationAccountCardAndMenu: React.FC<{
   inSlideOut?: boolean;
 }> = ({ inSlideOut = false }) => {
@@ -70,8 +66,6 @@ export const NavigationAccountCardAndMenu: React.FC<{
             icon={DotsThreeIcon}
             size='sm'
             variant='ghost'
-            onPointerDown={inSlideOut ? stopDrawerGesture : undefined}
-            onTouchStart={inSlideOut ? stopDrawerGesture : undefined}
           >
             <FormattedMessage
               id='tabs_bar.account_settings'
