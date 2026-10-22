@@ -65,8 +65,8 @@ export const ComposeUpload: React.FC<{
       {!sensitive && attachment.type === 'video' && (
         <video
           className={classes.mediaVideo}
-          src={attachment.url ?? undefined}
-          poster={attachment.preview_url ?? undefined}
+          src={attachment.url}
+          poster={attachment.preview_url}
           controls
           playsInline
           preload='metadata'

@@ -644,11 +644,10 @@ $button-breakpoint: 420px;
 
   // Avatar
   .avatarWrapper {
-    margin-top: -64px;
+    margin-top: 0;
     padding-top: 0;
     display: flex;
     align-items: flex-start;
-    justify-content: space-between;
     gap: 8px;
     overflow: visible;
     margin-inline-start: -2px; // aligns the pfp with content below
