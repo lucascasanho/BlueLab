@@ -1,11 +1,13 @@
 /* eslint-disable react/jsx-no-bind, @typescript-eslint/no-confusing-void-expression -- Thread rows require handlers bound to their persistent item and media IDs. */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
+
+import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react';
 
 import {
   addComposeThreadMedia,
@@ -14,14 +16,13 @@ import {
   removeComposeThreadMedia,
 } from '@/mastodon/actions/compose';
 import api from '@/mastodon/api';
+import { openModal } from '@/mastodon/actions/modal';
 import type {
   ApiMediaAttachmentJSON,
 } from '@/mastodon/api_types/media_attachments';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import CloseIcon from '@/material-icons/400-20px/close.svg?react';
-import DeleteIcon from '@/material-icons/400-24px/delete.svg?react';
-import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 
 import { ComposeAutocomplete } from './autocomplete';
 import { RichComposeEditor } from './rich_editor';
@@ -155,18 +156,7 @@ const ComposeThreadItem: React.FC<{
     [dispatch, id, maximumMedia, media.size],
   );
 
-  const updateAlt = useCallback(
-    (mediaId: string, description: string) => {
-      const updated = media.map((attachment) =>
-        attachment.get('id') === mediaId
-          ? attachment.set('description', description)
-          : attachment,
-      );
-      change('media_attachments', updated);
-    },
-    [change, media],
-  );
-
+  
   return (
     <section
       className={classNames(
@@ -215,10 +205,10 @@ const ComposeThreadItem: React.FC<{
               <ThreadMediaAttachment
                 key={mediaId}
                 attachment={attachment}
+                threadItemId={id}
                 onRemove={() =>
                   dispatch(removeComposeThreadMedia(id, mediaId))
                 }
-                onUpdateAlt={(description) => updateAlt(mediaId, description)}
               />
             );
           })}
@@ -230,20 +220,27 @@ const ComposeThreadItem: React.FC<{
 
 const ThreadMediaAttachment: React.FC<{
   attachment: ImmutableMap<string, unknown>;
+  threadItemId: string;
   onRemove: () => void;
-  onUpdateAlt: (description: string) => void;
-}> = ({ attachment, onRemove, onUpdateAlt }) => {
+}> = ({ attachment, threadItemId, onRemove }) => {
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const mediaId = attachment.get('id') as string;
-  const description =
-    (attachment.get('description') as string | undefined) ?? '';
   const type = attachment.get('type') as string | undefined;
   const previewUrl = attachment.get('preview_url') as string | null;
   const mediaUrl = attachment.get('url') as string | null;
   const isVideo = type === 'video';
   const isAnimatedGif = type === 'gifv';
   const isAudio = type === 'audio';
-  const [editingAlt, setEditingAlt] = useState(false);
+
+  const handleEditAlt = useCallback(() => {
+    dispatch(
+      openModal({
+        modalType: 'FOCAL_POINT',
+        modalProps: { mediaId, threadItemId },
+      }),
+    );
+  }, [dispatch, mediaId, threadItemId]);
 
   return (
     <div className={classes.threadMediaItem}>
@@ -300,7 +297,7 @@ const ThreadMediaAttachment: React.FC<{
             type='button'
             size='sm'
             variant='solid'
-            icon={DeleteIcon}
+            icon={TrashIcon}
             className={classNames(
               classes.mediaActionButton,
               classes.mediaRemove,
@@ -317,44 +314,26 @@ const ThreadMediaAttachment: React.FC<{
             type='button'
             size='sm'
             variant='solid'
-            icon={EditIcon}
+            icon={PencilSimpleIcon}
             className={classNames(
               classes.mediaActionButton,
               classes.mediaAltButton,
             )}
-            onClick={() => setEditingAlt((open) => !open)}
+            onClick={handleEditAlt}
             aria-label={intl.formatMessage(messages.addAlt)}
-            aria-expanded={editingAlt}
           >
+            <span aria-hidden='true'>
+              <FormattedMessage
+                id='alt_text_badge.label'
+                defaultMessage='ALT'
+              />
+            </span>
             <span className='sr-only'>
               <FormattedMessage {...messages.addAlt} />
             </span>
           </IconButton>
         </div>
       </div>
-      {editingAlt && (
-        <label className={classes.mediaAlt}>
-          <span className='sr-only'>
-            <FormattedMessage
-              id='compose.thread.alt'
-              defaultMessage='Alternative text'
-            />
-          </span>
-          <input
-            value={description}
-            placeholder={intl.formatMessage({
-              id: 'compose.thread.alt',
-              defaultMessage: 'Alternative text',
-            })}
-            onChange={(event) => onUpdateAlt(event.target.value)}
-            onBlur={() =>
-              void api().put(`/api/v1/media/${mediaId}`, {
-                description,
-              })
-            }
-          />
-        </label>
-      )}
     </div>
   );
 };
