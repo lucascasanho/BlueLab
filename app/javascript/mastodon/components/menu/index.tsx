@@ -10,6 +10,7 @@ import {
 import { mergeProps } from '@react-aria/utils';
 
 import type { PolymorphicProps } from '@/types/polymorphic';
+import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 
 import { Button } from '../button/redesign';
 import { normalizeKey } from '../hotkeys/utils';
@@ -110,6 +111,13 @@ export const Menu: React.FC<MenuProps> = ({
   children,
   noFocus,
 }) => {
+  const isMobile = useBreakpoint('openable');
+  const theme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
+  const isVanillaTheme =
+    !theme || theme === 'default' || theme === 'vanilla';
+  const skipInitialFocus = noFocus || (isMobile && isVanillaTheme);
+
   const id = useId();
   const triggerId = `${id}-trigger`;
   const listId = `${id}-list`;
@@ -121,13 +129,13 @@ export const Menu: React.FC<MenuProps> = ({
     (element: HTMLDivElement | null) => {
       setListElement(element);
 
-      if (element && type === 'actions' && !noFocus) {
+      if (element && type === 'actions' && !skipInitialFocus) {
         const menuItems = getAllMenuItems(element);
         const elementToFocus = menuItems[0] ?? element;
         elementToFocus.focus({ preventScroll: true });
       }
     },
-    [noFocus, type],
+    [skipInitialFocus, type],
   );
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);

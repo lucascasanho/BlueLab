@@ -108,16 +108,27 @@ export const PopoverMenuCard = <As extends React.ElementType>({
   closeOnClickOutside,
   constrainToViewport,
   scrollable,
-  mobilePresentation = 'bottom-sheet',
+  mobilePresentation,
   children,
   className,
   ...props
 }: PopoverMenuCardProps<As>) => {
   const isMobile = useBreakpoint('openable');
+  const theme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
+  const isVanillaTheme =
+    !theme || theme === 'default' || theme === 'vanilla';
+  const effectiveMobilePresentation =
+    mobilePresentation ?? (isVanillaTheme ? 'popover' : 'bottom-sheet');
 
-  // BlueLab's account card deliberately keeps an anchored popover on mobile;
-  // other Mastodon menus retain the upstream bottom-sheet presentation.
-  if (isMobile && isOpen && mobilePresentation === 'bottom-sheet') {
+  // Vanilla uses Mastodon 5's anchored popovers by default on mobile.
+  // Other themes keep their established bottom-sheet presentation unless a
+  // caller explicitly selects a different presentation.
+  if (
+    isMobile &&
+    isOpen &&
+    effectiveMobilePresentation === 'bottom-sheet'
+  ) {
     const sheet = (
       <BottomSheet {...props} onClose={onClose}>
         {children}
