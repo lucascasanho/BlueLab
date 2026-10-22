@@ -18,7 +18,7 @@ import {
 import { openModal } from '@/mastodon/actions/modal';
 import api from '@/mastodon/api';
 import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
-import { IconButton } from '@/mastodon/components/button/redesign';
+import { Button, IconButton } from '@/mastodon/components/button/redesign';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import CloseIcon from '@/material-icons/400-20px/close.svg?react';
 
@@ -304,12 +304,12 @@ const ThreadMediaAttachment: React.FC<{
               <FormattedMessage {...messages.removeMedia} />
             </span>
           </IconButton>
-          <IconButton
+          <Button
             as='button'
             type='button'
             size='sm'
             variant='solid'
-            icon={PencilSimpleIcon}
+            leadingIcon={PencilSimpleIcon}
             className={classNames(
               classes.mediaActionButton,
               classes.mediaAltButton,
@@ -317,16 +317,11 @@ const ThreadMediaAttachment: React.FC<{
             onClick={handleEditAlt}
             aria-label={intl.formatMessage(messages.addAlt)}
           >
-            <span aria-hidden='true'>
-              <FormattedMessage
-                id='alt_text_badge.label'
-                defaultMessage='ALT'
-              />
-            </span>
+            <span aria-hidden='true'>ALT</span>
             <span className='sr-only'>
               <FormattedMessage {...messages.addAlt} />
             </span>
-          </IconButton>
+          </Button>
         </div>
       </div>
     </div>
