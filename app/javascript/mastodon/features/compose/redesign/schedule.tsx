@@ -211,10 +211,7 @@ export const ComposeSchedule: React.FC = () => {
     const width = Math.min(352, window.innerWidth - viewportPadding * 2);
     const left = Math.max(
       viewportPadding,
-      Math.min(
-        rect.left,
-        window.innerWidth - width - viewportPadding,
-      ),
+      Math.min(rect.left, window.innerWidth - width - viewportPadding),
     );
     const spaceAbove = Math.max(0, rect.top - viewportPadding);
     const spaceBelow = Math.max(
