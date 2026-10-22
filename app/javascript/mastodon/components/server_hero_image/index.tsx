@@ -35,12 +35,7 @@ export const ServerHeroImage: React.FC<Props> = ({
       {blurhash && <Blurhash hash={blurhash} className='image__preview' />}
       <img src={src} srcSet={srcSet} alt={alt} onLoad={handleLoad} />
       {withAltBadge && src && (
-        <AltTextBadge
-          description={
-            alt || 'Não há texto alternativo disponível para esta imagem.'
-          }
-          className={classes.altBadge}
-        />
+        <AltTextBadge description={alt} className={classes.altBadge} />
       )}
     </div>
   );
