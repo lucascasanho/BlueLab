@@ -116,8 +116,7 @@ export const PopoverMenuCard = <As extends React.ElementType>({
   const isMobile = useBreakpoint('openable');
   const theme =
     typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
-  const isVanillaTheme =
-    !theme || theme === 'default' || theme === 'vanilla';
+  const isVanillaTheme = !theme || theme === 'default' || theme === 'vanilla';
   const effectiveMobilePresentation =
     mobilePresentation ?? (isVanillaTheme ? 'popover' : 'bottom-sheet');
 

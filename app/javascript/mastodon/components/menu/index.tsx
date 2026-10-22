@@ -114,8 +114,7 @@ export const Menu: React.FC<MenuProps> = ({
   const isMobile = useBreakpoint('openable');
   const theme =
     typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
-  const isVanillaTheme =
-    !theme || theme === 'default' || theme === 'vanilla';
+  const isVanillaTheme = !theme || theme === 'default' || theme === 'vanilla';
   const skipInitialFocus = noFocus || (isMobile && isVanillaTheme);
 
   const id = useId();
