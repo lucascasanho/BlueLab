@@ -24,7 +24,6 @@ import { openModal } from '@/mastodon/actions/modal';
 import { initMuteModal } from '@/mastodon/actions/mutes';
 import { initReport } from '@/mastodon/actions/reports';
 import { IconButton } from '@/mastodon/components/button/redesign';
-import { IconButton as VanillaIconButton } from '@/mastodon/components/button/vanilla_redesign';
 import {
   Menu,
   MenuList,
@@ -70,10 +69,6 @@ export const AccountMenu: FC<{ accountId: string }> = ({ accountId }) => {
     (state) => state.meta.get('me') as string,
   );
   const isMe = currentAccountId === accountId;
-  const currentTheme =
-    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
-  const isVanillaTheme =
-    !currentTheme || currentTheme === 'default' || currentTheme === 'vanilla';
 
   const dispatch = useAppDispatch();
   const menuItems = useMemo(() => {
@@ -94,32 +89,17 @@ export const AccountMenu: FC<{ accountId: string }> = ({ accountId }) => {
   if (isRedesignEnabled()) {
     return (
       <Menu>
-        {isVanillaTheme ? (
-          <MenuTrigger
-            as={VanillaIconButton}
-            size='sm'
-            icon={DotsThreeIcon}
-            variant='ghost'
-            disabled={menuItems.length === 0}
-          >
-            <FormattedMessage
-              id='account.menu.label'
-              defaultMessage='More account options'
-            />
-          </MenuTrigger>
-        ) : (
-          <MenuTrigger
-            as={IconButton}
-            size='sm'
-            icon={DotsThreeIcon}
-            disabled={menuItems.length === 0}
-          >
-            <FormattedMessage
-              id='account.menu.label'
-              defaultMessage='More account options'
-            />
-          </MenuTrigger>
-        )}
+        <MenuTrigger
+          as={IconButton}
+          size='sm'
+          icon={DotsThreeIcon}
+          disabled={menuItems.length === 0}
+        >
+          <FormattedMessage
+            id='account.menu.label'
+            defaultMessage='More account options'
+          />
+        </MenuTrigger>
         <MenuList>
           <LegacyDropdownMenuItems items={menuItems} />
         </MenuList>

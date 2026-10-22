@@ -152,8 +152,8 @@ export const NotificationGroupWithStatus: React.FC<{
         onClick={handleCardClick}
         onKeyDown={handleCardKeyDown}
       >
-        <div className={classNames('notification-group__icon', iconClassName)}>
-          <Icon icon={icon} id={iconId} />
+        <div className='notification-group__icon'>
+          <Icon icon={icon} id={iconId} className={iconClassName} />
         </div>
 
         <div className='notification-group__main'>

@@ -114,7 +114,7 @@ export const ComposeGifButton: React.FC<{
       4,
   );
   const disabledForThread =
-    !!activeThreadItemId &&
+    !!effectiveThreadItemId &&
     (!threadMedia || threadMedia.size >= maxAttachments);
 
   if (!KLIPY_API_KEY) {

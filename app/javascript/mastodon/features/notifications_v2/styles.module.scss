@@ -14,10 +14,11 @@
   }
 }
 
-.favouriteIcon {
-  color: #dc2626;
+:global(.notification-group--favourite) .favouriteIcon {
+  color: #dc2626 !important;
+  fill: #dc2626 !important;
+}
 
-  :global(.icon) {
-    color: #dc2626;
-  }
+:global(.notification-group--favourite) .favouriteIcon :global(path) {
+  fill: #dc2626 !important;
 }

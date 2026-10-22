@@ -13,7 +13,7 @@ import { getAccountHidden } from '@/mastodon/selectors/accounts';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
 
-import { Button, IconButton } from '../button/redesign';
+import { IconButton } from '../button/redesign';
 import { CopyIconButton } from '../copy_button';
 import { FollowButton } from '../follow_button';
 
