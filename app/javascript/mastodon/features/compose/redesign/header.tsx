@@ -2,7 +2,8 @@ import { useCallback } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { PencilSimpleIcon, MinusIcon, XIcon } from '@phosphor-icons/react';
+import { PencilSimpleIcon, MinusIcon } from '@phosphor-icons/react';
+import CloseIcon from '@/material-icons/400-20px/close.svg?react';
 
 import { IconButton } from '@/mastodon/components/button/redesign';
 import {
@@ -110,7 +111,7 @@ export const ComposeFormHeader: React.FC<{
       )}
 
       {!noClose && (
-        <IconButton icon={XIcon} variant='ghost' size='sm' onClick={onClose}>
+        <IconButton icon={CloseIcon} variant='ghost' size='sm' onClick={onClose}>
           <FormattedMessage id='lightbox.close' defaultMessage='Close' />
         </IconButton>
       )}

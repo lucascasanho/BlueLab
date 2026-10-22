@@ -124,10 +124,7 @@ export const AccountHeader: React.FC<{
             </div>
             <AccountButtons
               accountId={accountId}
-              className={classNames(
-                classes.buttonsMobile,
-                isBlue2 && 'blue2-profile-actions',
-              )}
+              className={classes.buttonsMobile}
               noShare={!isMe || 'share' in navigator}
               forceMenu={'share' in navigator}
             />
@@ -142,10 +139,7 @@ export const AccountHeader: React.FC<{
             <AccountName accountId={accountId} />
             <AccountButtons
               accountId={accountId}
-              className={classNames(
-                classes.buttonsDesktop,
-                isBlue2 && 'blue2-profile-actions',
-              )}
+              className={classes.buttonsDesktop}
               noShare={!isMe || 'share' in navigator}
               forceMenu={'share' in navigator}
             />
