@@ -529,6 +529,36 @@ textarea.textarea {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--space-2);
+  min-width: 0;
+
+  > label {
+    min-width: 0;
+  }
+}
+
+/* On phones, stack date and time to prevent native input borders from
+   colliding in narrow Safari viewports. Keep the desktop two-column layout. */
+@media screen and (width <= 759px) {
+  .schedulePanel {
+    width: calc(100vw - 24px);
+    max-width: 22rem;
+    padding: var(--space-3);
+    gap: var(--space-3);
+  }
+
+  .scheduleDateTime {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+
+  .scheduleActions {
+    width: 100%;
+
+    > button {
+      max-width: 100%;
+      white-space: normal;
+    }
+  }
 }
 
 .scheduleTimezone {
