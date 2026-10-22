@@ -241,6 +241,10 @@ $button-breakpoint: 420px;
   :global(.icon-button) {
     flex: 0 0 auto;
   }
+
+  .followButton {
+    flex-grow: 0;
+  }
 }
 
 .buttonsMobile {

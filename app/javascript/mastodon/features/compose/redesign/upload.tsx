@@ -70,10 +70,12 @@ export const ComposeUpload: React.FC<{
         className={classes.mediaMenuAltButton}
         onClick={handleDelete}
       >
-        <FormattedMessage
-          id='compose.upload.menu.delete'
-          defaultMessage='Remove media'
-        />
+        <span className='sr-only'>
+          <FormattedMessage
+            id='compose.upload.menu.delete'
+            defaultMessage='Remove media'
+          />
+        </span>
       </IconButton>
 
       <IconButton
@@ -85,10 +87,12 @@ export const ComposeUpload: React.FC<{
         className={classes.mediaMenuButtons}
         onClick={handleEdit}
       >
-        <FormattedMessage
-          id='compose.upload.menu.add_alt'
-          defaultMessage='Add alt text'
-        />
+        <span className='sr-only'>
+          <FormattedMessage
+            id='compose.upload.menu.add_alt'
+            defaultMessage='Add alt text'
+          />
+        </span>
       </IconButton>
 
       {attachment.description && (
@@ -134,10 +138,12 @@ const ComposeAudioUpload: React.FC<{
         className={classes.audioDeleteButton}
         onClick={handleDelete}
       >
-        <FormattedMessage
-          id='compose.upload.audio.delete'
-          defaultMessage='Remove audio'
-        />
+        <span className='sr-only'>
+          <FormattedMessage
+            id='compose.upload.audio.delete'
+            defaultMessage='Remove audio'
+          />
+        </span>
       </IconButton>
 
       <IconButton
@@ -149,10 +155,12 @@ const ComposeAudioUpload: React.FC<{
         className={classes.audioAltButton}
         onClick={onEdit}
       >
-        <FormattedMessage
-          id='compose.upload.menu.add_alt'
-          defaultMessage='Add alt text'
-        />
+        <span className='sr-only'>
+          <FormattedMessage
+            id='compose.upload.menu.add_alt'
+            defaultMessage='Add alt text'
+          />
+        </span>
       </IconButton>
     </div>
   );

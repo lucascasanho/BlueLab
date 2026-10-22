@@ -248,7 +248,9 @@ const ThreadMediaAttachment: React.FC<{
           className={classes.mediaRemove}
           onClick={onRemove}
         >
-          <FormattedMessage {...messages.removeMedia} />
+          <span className='sr-only'>
+            <FormattedMessage {...messages.removeMedia} />
+          </span>
         </IconButton>
         <IconButton
           as='button'
@@ -259,7 +261,9 @@ const ThreadMediaAttachment: React.FC<{
           className={classes.mediaAltButton}
           onClick={() => setEditingAlt((open) => !open)}
         >
-          <FormattedMessage {...messages.addAlt} />
+          <span className='sr-only'>
+            <FormattedMessage {...messages.addAlt} />
+          </span>
         </IconButton>
       </div>
       {editingAlt && (
