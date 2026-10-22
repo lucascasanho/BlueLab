@@ -279,6 +279,7 @@
   "alert.unexpected.message": "Ocorreu um erro inesperado.",
   "alert.unexpected.title": "Eita!",
   "alt_text_badge.title": "Texto alternativo",
+  "alt_text_badge.no_description": "Não há texto alternativo disponível para esta imagem.",
   "alt_text_modal.add_text_from_image": "Adicione texto a partir da imagem",
   "alt_text_modal.cancel": "Cancelar",
   "alt_text_modal.change_thumbnail": "Alterar miniatura",
