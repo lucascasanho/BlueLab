@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import { Helmet } from '@unhead/react/helmet';
 
 import { openModal } from '@/mastodon/actions/modal';
-import { useLayout } from '@/mastodon/hooks/useLayout';
 import {
   autoPlayGif,
   me,
@@ -63,8 +62,6 @@ export const AccountHeader: React.FC<{
     },
     [dispatch, account],
   );
-
-  const { layout } = useLayout();
 
   if (!account) {
     return null;
