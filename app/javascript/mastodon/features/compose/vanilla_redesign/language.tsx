@@ -3,9 +3,14 @@ import { useCallback, useId, useMemo, useState } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
+
 import { MagnifyingGlassIcon, TranslateIcon } from '@phosphor-icons/react';
 
-import { changeComposeLanguage } from '@/mastodon/actions/compose';
+import {
+  changeComposeLanguage,
+  changeComposeThreadItem,
+} from '@/mastodon/actions/compose';
 import { Button } from '@/mastodon/components/button/vanilla_redesign';
 import { Combobox } from '@/mastodon/components/form_fields';
 import { ComboboxMenuItem } from '@/mastodon/components/form_fields/combobox_field';
@@ -32,10 +37,23 @@ function getLanguageNameFromCode(code: string) {
   return language ? language[1] : undefined;
 }
 
-export const LanguageButton: React.FC = () => {
-  const langCode = useAppSelector(
+export const LanguageButton: React.FC<{
+  activeThreadItemId?: string | null;
+}> = ({ activeThreadItemId = null }) => {
+  const rootLangCode = useAppSelector(
     (state) => state.compose.get('language') as string,
   );
+  const threadLangCode = useAppSelector((state) => {
+    if (!activeThreadItemId) return null;
+    const items = state.compose.get('thread_items') as ImmutableList<
+      ImmutableMap<string, unknown>
+    >;
+    const item = items.find(
+      (candidate) => candidate.get('id') === activeThreadItemId,
+    );
+    return (item?.get('language') as string | undefined) ?? null;
+  });
+  const langCode = threadLangCode ?? rootLangCode;
   const isMobile = useBreakpoint('openable');
 
   const [isOpen, { onToggle: toggle, onFalse: close }] = useToggle(false);
@@ -77,7 +95,11 @@ export const LanguageButton: React.FC = () => {
         maxWidth={280}
         onClose={close}
       >
-        <LanguageDropdown onClose={close} autoFocus={!isMobile} />
+        <LanguageDropdown
+          onClose={close}
+          autoFocus={!isMobile}
+          activeThreadItemId={activeThreadItemId}
+        />
       </PopoverMenuCard>
     </>
   );
@@ -93,7 +115,8 @@ interface LanguageObject {
 export const LanguageDropdown: React.FC<{
   onClose: () => void;
   autoFocus?: boolean;
-}> = ({ onClose, autoFocus = true }) => {
+  activeThreadItemId?: string | null;
+}> = ({ onClose, autoFocus = true, activeThreadItemId = null }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
 
@@ -110,11 +133,17 @@ export const LanguageDropdown: React.FC<{
   const handleSelectLanguage = useCallback(
     ({ code }: LanguageObject) => {
       if (code) {
-        dispatch(changeComposeLanguage(code));
+        if (activeThreadItemId) {
+          dispatch(
+            changeComposeThreadItem(activeThreadItemId, 'language', code),
+          );
+        } else {
+          dispatch(changeComposeLanguage(code));
+        }
         onClose();
       }
     },
-    [dispatch, onClose],
+    [activeThreadItemId, dispatch, onClose],
   );
 
   const uniqueId = useId();
