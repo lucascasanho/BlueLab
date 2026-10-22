@@ -126,8 +126,12 @@
 
 .mediaPreview {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-width: 0;
   min-height: 6rem;
+  overflow: hidden;
   background: var(--color-bg-secondary);
 }
 
@@ -141,6 +145,8 @@
 .mediaVideo {
   display: block;
   width: 100%;
+  height: auto;
+  min-height: 6rem;
   max-height: 12rem;
   aspect-ratio: 16 / 9;
   object-fit: contain;
@@ -167,38 +173,51 @@
   background: var(--color-bg-primary);
 }
 
-.mediaRemove,
-.mediaAltButton {
+.mediaActions {
   position: absolute;
-  z-index: 3;
-  top: var(--space-2xs);
+  z-index: 4;
+  inset-block-start: 8px;
+  inset-inline: 8px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.mediaActionButton {
   box-sizing: border-box;
-  height: 32px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   min-height: 32px;
-  border-radius: var(--radius-round);
+  padding: 5px 8px;
+  border: 1px solid var(--color-border-primary);
+  border-radius: 6px;
   background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  pointer-events: auto;
+  white-space: nowrap;
+}
+
+.mediaActionButton :global(.icon) {
+  display: block;
+  width: 18px;
+  height: 18px;
 }
 
 .mediaRemove {
-  inset-inline-start: var(--space-2xs);
   width: 32px;
   min-width: 32px;
-  padding: 0;
+  padding: 5px;
 }
 
 .mediaAltButton {
-  inset-inline-end: var(--space-2xs);
-  min-width: 48px;
-  padding-inline: var(--space-xs);
-  gap: 4px;
-  white-space: nowrap;
+  min-width: 52px;
   font-size: 12px;
   line-height: 1;
-}
-
-.mediaAltButton :global(.icon) {
-  width: 18px;
-  height: 18px;
 }
 
 .mediaAlt {

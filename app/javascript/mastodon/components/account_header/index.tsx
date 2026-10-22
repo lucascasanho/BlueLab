@@ -104,29 +104,31 @@ export const AccountHeader: React.FC<{
             isBlue2 && 'blue2-profile-body',
           )}
         >
-          <div
-            className={classNames(
-              classes.avatarWrapper,
-              isBlue2 && 'blue2-profile-avatar',
-            )}
-          >
-            <a
-              href={account.avatar}
-              rel='noopener'
-              target='_blank'
-              onClick={handleOpenAvatar}
+          <div className={classes.avatarActionsRow}>
+            <div
+              className={classNames(
+                classes.avatarWrapper,
+                isBlue2 && 'blue2-profile-avatar',
+              )}
             >
-              <Avatar
-                className={classes.avatar}
-                account={suspendedOrHidden ? undefined : account}
-                alt={account.avatar_description}
-                size={isBlue2 ? 88 : 80}
-              />
-            </a>
+              <a
+                href={account.avatar}
+                rel='noopener'
+                target='_blank'
+                onClick={handleOpenAvatar}
+              >
+                <Avatar
+                  className={classes.avatar}
+                  account={suspendedOrHidden ? undefined : account}
+                  alt={account.avatar_description}
+                  size={isBlue2 ? 88 : 80}
+                />
+              </a>
+            </div>
             <AccountButtons
               accountId={accountId}
               className={classNames(
-                classes.buttonsDesktop,
+                classes.buttonsMobile,
                 isBlue2 && 'blue2-profile-actions',
               )}
               noShare={!isMe || 'share' in navigator}
@@ -141,6 +143,15 @@ export const AccountHeader: React.FC<{
             )}
           >
             <AccountName accountId={accountId} />
+            <AccountButtons
+              accountId={accountId}
+              className={classNames(
+                classes.buttonsDesktop,
+                isBlue2 && 'blue2-profile-actions',
+              )}
+              noShare={!isMe || 'share' in navigator}
+              forceMenu={'share' in navigator}
+            />
           </div>
 
           <AccountBadges accountId={accountId} />

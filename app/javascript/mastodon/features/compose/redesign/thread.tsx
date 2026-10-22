@@ -17,7 +17,8 @@ import api from '@/mastodon/api';
 import type {
   ApiMediaAttachmentJSON,
 } from '@/mastodon/api_types/media_attachments';
-import { Button, IconButton } from '@/mastodon/components/button/redesign';
+import { IconButton } from '@/mastodon/components/button/redesign';
+import { Icon } from '@/mastodon/components/icon';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import CloseIcon from '@/material-icons/400-20px/close.svg?react';
 import DeleteIcon from '@/material-icons/400-24px/delete.svg?react';
@@ -240,21 +241,34 @@ const ThreadMediaAttachment: React.FC<{
   const type = attachment.get('type') as string | undefined;
   const previewUrl = attachment.get('preview_url') as string | null;
   const mediaUrl = attachment.get('url') as string | null;
-  const isVideo = type === 'video' || type === 'gifv';
+  const isVideo = type === 'video';
+  const isAnimatedGif = type === 'gifv';
   const isAudio = type === 'audio';
   const [editingAlt, setEditingAlt] = useState(false);
 
   return (
     <div className={classes.threadMediaItem}>
       <div className={classes.mediaPreview} data-media-type={type ?? 'image'}>
-        {isVideo && mediaUrl ? (
+        {isVideo ? (
           <video
             className={classes.mediaVideo}
-            src={mediaUrl}
+            src={mediaUrl ?? undefined}
             poster={previewUrl ?? undefined}
             controls
             playsInline
             preload='metadata'
+          />
+        ) : isAnimatedGif ? (
+          <video
+            className={classes.mediaVideo}
+            src={mediaUrl ?? undefined}
+            poster={previewUrl ?? undefined}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload='metadata'
+            aria-hidden='true'
           />
         ) : isAudio && mediaUrl ? (
           <div className={classes.mediaAudioPreview}>
@@ -281,31 +295,40 @@ const ThreadMediaAttachment: React.FC<{
           />
         )}
 
-        <IconButton
-          as='button'
-          type='button'
-          size='sm'
-          variant='solid'
-          icon={DeleteIcon}
-          className={classes.mediaRemove}
-          onClick={onRemove}
-        >
-          <FormattedMessage {...messages.removeMedia} />
-        </IconButton>
-        <Button
-          as='button'
-          type='button'
-          size='sm'
-          variant='solid'
-          color='neutral'
-          leadingIcon={EditIcon}
-          className={classes.mediaAltButton}
-          onClick={() => setEditingAlt((open) => !open)}
-          aria-label={intl.formatMessage(messages.addAlt)}
-          aria-expanded={editingAlt}
-        >
-          ALT
-        </Button>
+        <div className={classes.mediaActions}>
+          <button
+            type='button'
+            className={classNames(
+              'icon-button',
+              classes.mediaActionButton,
+              classes.mediaRemove,
+            )}
+            onClick={onRemove}
+            aria-label={intl.formatMessage(messages.removeMedia)}
+          >
+            <Icon id='delete' icon={DeleteIcon} />
+            <span className='sr-only'>
+              <FormattedMessage {...messages.removeMedia} />
+            </span>
+          </button>
+          <button
+            type='button'
+            className={classNames(
+              'icon-button',
+              classes.mediaActionButton,
+              classes.mediaAltButton,
+            )}
+            onClick={() => setEditingAlt((open) => !open)}
+            aria-label={intl.formatMessage(messages.addAlt)}
+            aria-expanded={editingAlt}
+          >
+            <Icon id='edit' icon={EditIcon} />
+            <span>ALT</span>
+            <span className='sr-only'>
+              <FormattedMessage {...messages.addAlt} />
+            </span>
+          </button>
+        </div>
       </div>
       {editingAlt && (
         <label className={classes.mediaAlt}>

@@ -77,7 +77,7 @@ export const Upload: React.FC<{
   const mediaUrl = media.get('url') as string | null;
   const mediaType = media.get('type') as string | null;
   const isAnimatedGif = mediaType === 'gifv' && !!mediaUrl;
-  const isVideo = mediaType === 'video' && !!mediaUrl;
+  const isVideo = mediaType === 'video';
   const blurhash = media.get('blurhash') as string | null;
 
   return (
@@ -111,7 +111,7 @@ export const Upload: React.FC<{
         {!sensitive && isVideo && (
           <video
             className={classNames('compose-form__upload__video', classes.video)}
-            src={mediaUrl}
+            src={mediaUrl ?? undefined}
             poster={preview_url ?? undefined}
             controls
             playsInline
