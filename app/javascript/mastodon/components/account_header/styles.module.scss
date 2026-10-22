@@ -1172,3 +1172,40 @@ $button-fallback-breakpoint: $button-breakpoint + 55px;
     margin-top: 16px;
   }
 }
+
+/* Keep Blue 2 profile actions below the cover/avatar overlap on mobile.
+ * The action row is intentionally independent from the desktop identity row.
+ */
+@media screen and (width <= 759px) {
+  :global(body[data-theme='blue-2'] .blue2-profile-actions-row) {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    margin-top: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  :global(body[data-theme='blue-2'] .blue2-profile-actions) {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+    transform: none;
+  }
+
+  :global(body[data-theme='blue-2'] .blue2-profile-actions .button) {
+    flex: 0 1 auto;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+    white-space: nowrap;
+  }
+}
+
