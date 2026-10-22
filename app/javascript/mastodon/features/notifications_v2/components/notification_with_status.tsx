@@ -69,7 +69,7 @@ export const NotificationWithStatus: React.FC<{
 
       const target = event.target;
       const statusElement = target.closest<HTMLElement>('article[data-id]');
-      if (!statusElement || statusElement.dataset.id !== statusId) return;
+      if (statusElement?.dataset.id !== statusId) return;
 
       if (
         target.closest(

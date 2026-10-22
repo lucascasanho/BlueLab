@@ -429,7 +429,7 @@ export const Search: React.FC<{
   );
 
   const handleBeforeInput = useCallback(
-    (event: React.FormEvent<HTMLInputElement>) => {
+    (event: React.SyntheticEvent<HTMLInputElement>) => {
       captureSearchScroll(event.currentTarget);
     },
     [captureSearchScroll],
@@ -650,13 +650,8 @@ export const Search: React.FC<{
 
   useLayoutEffect(() => {
     const snapshot = searchScrollSnapshotRef.current;
-    if (
-      !snapshot ||
-      snapshot.input !== searchInputRef.current ||
-      document.activeElement !== snapshot.input
-    ) {
-      return;
-    }
+    if (snapshot?.input !== searchInputRef.current) return;
+    if (document.activeElement !== snapshot.input) return;
 
     const restoreWhileInputFocused = () => {
       if (
