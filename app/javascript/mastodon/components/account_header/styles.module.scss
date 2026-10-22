@@ -258,6 +258,7 @@ $button-fallback-breakpoint: $button-breakpoint + 55px;
   border-top: 1px solid var(--color-border-primary);
 }
 
+/* prettier-ignore */
 .buttons {
   display: flex;
   align-items: center;
