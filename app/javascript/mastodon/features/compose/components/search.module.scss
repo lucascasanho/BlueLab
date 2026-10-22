@@ -1,11 +1,11 @@
+@use '@/styles/mastodon/mixins';
+@use '@/styles/mastodon/variables';
+
 /* Search suggestions can resize on Backspace; opt out of browser scroll anchoring. */
 :global(.search),
 :global(.search__popout) {
   overflow-anchor: none;
 }
-
-@use '@/styles/mastodon/mixins';
-@use '@/styles/mastodon/variables';
 
 .search {
   box-sizing: border-box;
