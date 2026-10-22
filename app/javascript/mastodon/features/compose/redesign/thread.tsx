@@ -10,7 +10,6 @@ import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 import CloseIcon from '@/material-icons/400-20px/close.svg?react';
 import DeleteIcon from '@/material-icons/400-24px/delete.svg?react';
 import EditIcon from '@/material-icons/400-24px/edit.svg?react';
-
 import {
   addComposeThreadMedia,
   changeComposeThreadItem,
