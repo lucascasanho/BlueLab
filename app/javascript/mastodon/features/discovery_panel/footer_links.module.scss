@@ -46,6 +46,12 @@
   gap: var(--space-1) var(--space-2);
 }
 
+.keyboardShortcuts {
+  @media (width <= 1024px), (hover: none) and (pointer: coarse) {
+    display: none;
+  }
+}
+
 .bugReportButton {
   appearance: none;
   margin: 0;

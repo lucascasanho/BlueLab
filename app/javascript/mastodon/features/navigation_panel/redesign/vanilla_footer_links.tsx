@@ -52,6 +52,14 @@ export const VanillaFooterLinks: React.FC<{
               </NavLink>
             </li>
           )}
+          <li className={classes.keyboardShortcuts}>
+            <NavLink to='/keyboard-shortcuts' {...multiColumnLinkAttrs}>
+              <FormattedMessage
+                id='footer.keyboard_shortcuts'
+                defaultMessage='Keyboard shortcuts'
+              />
+            </NavLink>
+          </li>
           <li>
             <NavLink
               to='/privacy-policy'

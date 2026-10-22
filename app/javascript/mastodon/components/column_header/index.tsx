@@ -62,9 +62,15 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
 }: ColumnHeaderProps) => {
   const columnIndex = useColumnIndexContext();
   const location = useLocation<LocationState>();
+  const isSingleColumnSubpage =
+    typeof document !== 'undefined' &&
+    document.body.classList.contains('layout-single-column') &&
+    location.pathname !== '/' &&
+    location.pathname !== '/home';
   const hasBackButton =
     typeof onBackButtonClick === 'function' ||
     withBackButton === true ||
+    isSingleColumnSubpage ||
     (withBackButton === 'auto' && location.state?.fromMastodon);
   const hasExtraStickyContent = hasReactChildren(extraStickyContent);
   const { canPin, pinned, onPin, onMove } = useBlue2ColumnPinning();

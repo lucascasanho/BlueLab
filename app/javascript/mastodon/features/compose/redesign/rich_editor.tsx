@@ -577,6 +577,7 @@ export const RichComposeEditor: React.FC<{
   dismissOnEscape?: boolean;
   messageToolbar?: boolean;
   forceMarkdown?: boolean;
+  hideFormattingToolbar?: boolean;
 }> = ({
   onSubmit,
   children,
@@ -591,6 +592,7 @@ export const RichComposeEditor: React.FC<{
   dismissOnEscape = true,
   messageToolbar = false,
   forceMarkdown = false,
+  hideFormattingToolbar = false,
 }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -845,7 +847,7 @@ export const RichComposeEditor: React.FC<{
 
   return (
     <div className={classes.richEditorWrapper} data-bluelab-rich-editor-wrapper>
-      {isMarkdown && (
+      {isMarkdown && !hideFormattingToolbar && (
         <div
           className={classes.richEditorToolbar}
           data-bluelab-rich-editor-toolbar

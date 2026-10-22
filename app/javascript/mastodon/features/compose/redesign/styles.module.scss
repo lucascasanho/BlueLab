@@ -391,6 +391,95 @@ textarea.textarea {
   }
 }
 
+/* Shared schedule control styles for BlueLab and Vanilla composer appearances. */
+.scheduleControl {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.scheduledSummary {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  max-width: 13rem;
+  color: var(--color-text-secondary);
+}
+
+.schedulePanel {
+  position: absolute;
+  z-index: 20;
+  inset-inline-start: 0;
+  bottom: calc(100% + var(--space-2));
+  display: flex;
+  box-sizing: border-box;
+  width: min(22rem, calc(100vw - 2 * var(--space-4)));
+  max-height: min(70dvh, 26rem);
+  overflow-y: auto;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-4);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-card);
+
+  label {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  input,
+  select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    min-height: 40px;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-2);
+    outline: none;
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    font: inherit;
+    font-size: 1rem;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-border-brand);
+      outline-offset: 1px;
+    }
+  }
+}
+
+.scheduleDateTime {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-2);
+}
+
+.scheduleTimezone {
+  color: var(--color-text-secondary);
+}
+
+.scheduleActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+@media (width <= 360px) {
+  .scheduleDateTime {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 // Language selector
 
 .languageMenu {

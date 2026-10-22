@@ -24,6 +24,18 @@
   }
 }
 
+/* In single-column mode, let document-bound timelines grow the page so the
+   browser/document remains the vertical scroller instead of a fixed-height shell. */
+:global(body.layout-single-column) .root {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+:global(body.layout-single-column) .main {
+  flex: 1 0 auto;
+}
+
 .rootMinimal {
   // In `minimalShell` layout, no sidebar navigation is shown,
   // so we allow the column to collapse

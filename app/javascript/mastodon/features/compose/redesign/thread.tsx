@@ -196,6 +196,7 @@ const ComposeThreadItem: React.FC<{
             onFiles={(files) => void upload(files)}
             onSubmit={onSubmit}
             dismissOnEscape={false}
+            hideFormattingToolbar
           />
         </ComposeAutocomplete>
       </div>
