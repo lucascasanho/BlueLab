@@ -229,6 +229,7 @@ const StatusReblogButton: React.FC<{
             variant='ghost'
             active={boost.active}
             leadingIcon={boost.icon}
+            className={classes.reblogButton}
             disabled={boost.disabled}
             onClick={boost.action}
           >
@@ -261,6 +262,7 @@ const StatusReblogButton: React.FC<{
               defaultMessage: 'Boost or quote',
             })}
             leadingIcon={boost.icon}
+            className={classes.reblogButton}
             onClick={handleShiftClick}
           >
             {children}

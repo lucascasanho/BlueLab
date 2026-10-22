@@ -578,6 +578,20 @@
   color: var(--color-yellow) !important;
 }
 
+/* Vanilla/default theme: keep active interaction colors independent of theme accents. */
+:global(body[data-theme='default']) .favouriteButton[aria-pressed='true'],
+:global(body[data-theme='default'])
+  .favouriteButton[aria-pressed='true']
+  .favourite-animation-target {
+  color: #dc2626 !important;
+  opacity: 1 !important;
+}
+
+:global(body[data-theme='default']) .reblogButton[aria-pressed='true'] {
+  color: #15803d !important;
+  opacity: 1 !important;
+}
+
 /* Vanilla/default theme: use current Mastodon 5 status spacing. */
 :global(body[data-theme='default']) .root {
   padding: var(--space-3) var(--space-4) var(--space-2);
