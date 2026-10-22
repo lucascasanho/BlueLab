@@ -17,17 +17,26 @@ import Textarea from 'react-textarea-autosize';
 import { length } from 'stringz';
 
 import { showAlertForError } from 'mastodon/actions/alerts';
-import { changeComposeThreadItem, uploadThumbnail } from 'mastodon/actions/compose';
+import {
+  changeComposeThreadItem,
+  uploadThumbnail,
+} from 'mastodon/actions/compose';
 import { changeUploadCompose } from 'mastodon/actions/compose_typed';
 import api from 'mastodon/api';
 import { Button } from 'mastodon/components/button';
 import { GIFV } from 'mastodon/components/gifv';
 import { LoadingIndicator } from 'mastodon/components/loading_indicator';
-import { NavigationFocusTarget } from 'mastodon/components/navigation_focus_target';
+import {
+  NavigationFocusTarget,
+} from 'mastodon/components/navigation_focus_target';
 import { Skeleton } from 'mastodon/components/skeleton';
 import { Audio } from 'mastodon/features/audio';
-import { CharacterCounter } from 'mastodon/features/compose/components/character_counter';
-import { Tesseract as fetchTesseract } from 'mastodon/features/ui/util/async-components';
+import {
+  CharacterCounter,
+} from 'mastodon/features/compose/components/character_counter';
+import {
+  Tesseract as fetchTesseract,
+} from 'mastodon/features/ui/util/async-components';
 import { Video, getPointerPosition } from 'mastodon/features/video';
 import { me } from 'mastodon/initial_state';
 import type { MediaAttachment } from 'mastodon/models/media_attachment';
@@ -216,7 +225,9 @@ const Preview: React.FC<{
       <Video
         preview={media.get('preview_url') as string}
         frameRate={media.getIn(['meta', 'original', 'frame_rate']) as string}
-        aspectRatio={`${media.getIn(['meta', 'original', 'width']) as number} / ${media.getIn(['meta', 'original', 'height']) as number}`}
+        aspectRatio={`${media.getIn(['meta', 'original', 'width']) as number} / ${
+          media.getIn(['meta', 'original', 'height']) as number
+        }`}
         blurhash={media.get('blurhash') as string}
         src={media.get('url') as string}
         detailed
@@ -268,8 +279,14 @@ export interface ModalRef {
   getCloseConfirmationMessage: () => null | ConfirmationMessage;
 }
 
-export const AltTextModal = forwardRef<ModalRef, Props & Partial<RestoreProps>>(
-  ({ mediaId, threadItemId, previousDescription, previousPosition, onClose }, ref) => {
+export const AltTextModal = forwardRef<
+  ModalRef,
+  Props & Partial<RestoreProps>
+>(
+  (
+    { mediaId, threadItemId, previousDescription, previousPosition, onClose },
+    ref,
+  ) => {
     const intl = useIntl();
     const dispatch = useAppDispatch();
     const media = useAppSelector((state) => {
@@ -533,7 +550,9 @@ export const AltTextModal = forwardRef<ModalRef, Props & Partial<RestoreProps>>(
             />
 
             {/* This button is hidden for attached audio/video files, as they are already posted */}
-            {(type === 'audio' || type === 'video') && unattached && !threadItemId && (
+            {(type === 'audio' || type === 'video') &&
+              unattached &&
+              !threadItemId && (
               <UploadButton
                 onSelectFile={handleThumbnailChange}
                 mimeTypes='image/jpeg,image/png,image/gif,image/webp'
