@@ -124,11 +124,7 @@ export const PopoverMenuCard = <As extends React.ElementType>({
   // Vanilla uses Mastodon 5's anchored popovers by default on mobile.
   // Other themes keep their established bottom-sheet presentation unless a
   // caller explicitly selects a different presentation.
-  if (
-    isMobile &&
-    isOpen &&
-    effectiveMobilePresentation === 'bottom-sheet'
-  ) {
+  if (isMobile && isOpen && effectiveMobilePresentation === 'bottom-sheet') {
     const sheet = (
       <BottomSheet {...props} onClose={onClose}>
         {children}

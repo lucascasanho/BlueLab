@@ -9,8 +9,8 @@ import {
 
 import { mergeProps } from '@react-aria/utils';
 
-import type { PolymorphicProps } from '@/types/polymorphic';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
+import type { PolymorphicProps } from '@/types/polymorphic';
 
 import { Button } from '../button/redesign';
 import { normalizeKey } from '../hotkeys/utils';
