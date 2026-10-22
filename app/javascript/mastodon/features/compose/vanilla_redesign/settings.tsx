@@ -2,11 +2,14 @@ import { useCallback } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
+import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
+
 import { EyeSlashIcon, GearIcon, WarningIcon } from '@phosphor-icons/react';
 
 import {
   changeComposeSensitivity,
   changeComposeSpoilerness,
+  changeComposeThreadItem,
 } from '@/mastodon/actions/compose';
 import { setComposeQuotePolicy } from '@/mastodon/actions/compose_typed';
 import type { ApiQuotePolicy } from '@/mastodon/api_types/quotes';
@@ -32,7 +35,9 @@ import {
   selectComposeSensitive,
 } from './selectors';
 
-export const ComposeSettingsMenu: React.FC = () => {
+export const ComposeSettingsMenu: React.FC<{
+  activeThreadItemId?: string | null;
+}> = ({ activeThreadItemId = null }) => {
   const isMobile = useBreakpoint('openable');
 
   return (
@@ -50,13 +55,15 @@ export const ComposeSettingsMenu: React.FC = () => {
         placement='top-end'
         strategy='fixed'
       >
-        <ComposeSettingsInnerMenu />
+        <ComposeSettingsInnerMenu activeThreadItemId={activeThreadItemId} />
       </MenuList>
     </Menu>
   );
 };
 
-const ComposeSettingsInnerMenu: React.FC = () => {
+const ComposeSettingsInnerMenu: React.FC<{
+  activeThreadItemId: string | null;
+}> = ({ activeThreadItemId }) => {
   // Quote policy
   const quotePolicy = useAppSelector(selectComposeQuotePolicy);
   const privacy = useAppSelector(selectComposePrivacy);
@@ -80,11 +87,39 @@ const ComposeSettingsInnerMenu: React.FC = () => {
   );
 
   // Sensitive content
-  const { sensitive, mediaSensitive } = useAppSelector(selectComposeSensitive);
+  const rootSensitive = useAppSelector(selectComposeSensitive);
+  const threadSensitive = useAppSelector((state) => {
+    if (!activeThreadItemId) return null;
+    const items = state.compose.get('thread_items') as ImmutableList<
+      ImmutableMap<string, unknown>
+    >;
+    const item = items.find(
+      (candidate) => candidate.get('id') === activeThreadItemId,
+    );
+    return item ? !!item.get('sensitive') : null;
+  });
+  const sensitive = threadSensitive ?? rootSensitive.sensitive;
+  const mediaSensitive = rootSensitive.mediaSensitive;
 
   const onSensitiveChange = useCallback(() => {
-    dispatch(changeComposeSpoilerness());
-  }, [dispatch]);
+    if (activeThreadItemId) {
+      const nextSensitive = !sensitive;
+      dispatch(
+        changeComposeThreadItem(
+          activeThreadItemId,
+          'sensitive',
+          nextSensitive,
+        ),
+      );
+      if (!nextSensitive) {
+        dispatch(
+          changeComposeThreadItem(activeThreadItemId, 'spoiler_text', ''),
+        );
+      }
+    } else {
+      dispatch(changeComposeSpoilerness());
+    }
+  }, [activeThreadItemId, dispatch, sensitive]);
   const onMediaSensitiveChange = useCallback(() => {
     dispatch(changeComposeSensitivity());
   }, [dispatch]);
@@ -174,20 +209,22 @@ const ComposeSettingsInnerMenu: React.FC = () => {
             defaultMessage='Add content warning'
           />
         </MenuItemCheckbox>
-        <MenuItemCheckbox
-          name='media_spoiler'
-          value='on'
-          checked={mediaSensitive}
-          disabled={sensitive}
-          onChange={onMediaSensitiveChange}
-          keepMenuOpenOnClick
-          icon={EyeSlashIcon}
-        >
-          <FormattedMessage
-            id='compose.blur_media'
-            defaultMessage='Blur media'
-          />
-        </MenuItemCheckbox>
+        {!activeThreadItemId && (
+          <MenuItemCheckbox
+            name='media_spoiler'
+            value='on'
+            checked={mediaSensitive}
+            disabled={sensitive}
+            onChange={onMediaSensitiveChange}
+            keepMenuOpenOnClick
+            icon={EyeSlashIcon}
+          >
+            <FormattedMessage
+              id='compose.blur_media'
+              defaultMessage='Blur media'
+            />
+          </MenuItemCheckbox>
+        )}
       </MenuItemGroup>
     </>
   );
