@@ -148,32 +148,6 @@ export const RedesignComposeForm: React.FC<
       element.scrollTop = nextScrollTop;
     }, []);
 
-  const handleToolbarClickCapture = useCallback<
-    React.MouseEventHandler<HTMLDivElement>
-  >((event) => {
-    const target = event.target;
-
-    if (!(target instanceof Element) || !target.closest('button')) return;
-
-    const form = event.currentTarget.closest<HTMLFormElement>(
-      'form[data-keyboard-open="true"]',
-    );
-    if (!form) return;
-
-    const editor = form.querySelector<HTMLElement>(
-      '[data-bluelab-rich-editor-input]',
-    );
-
-    // Let the button's click handler open the menu before hiding the
-    // on-screen keyboard. Blurring synchronously during click capture can
-    // resize the viewport and cancel the click on mobile browsers.
-    if (editor && document.activeElement === editor) {
-      window.requestAnimationFrame(() => {
-        if (editor.isConnected) editor.blur();
-      });
-    }
-  }, []);
-
   const handlePrimaryEditorFocus = useCallback(() => {
     setActiveThreadItemId(null);
   }, []);
@@ -201,6 +175,8 @@ export const RedesignComposeForm: React.FC<
       data-bluelab-composer-embedded={embedded ? 'true' : undefined}
       data-bluelab-composer-compact={compact ? 'true' : undefined}
       data-bluelab-composer-message={isMessage ? 'true' : undefined}
+      data-bluelab-composer-vanilla={vanillaAppearance ? 'true' : undefined}
+      data-bluelab-composer-thread={threadMode ? 'true' : undefined}
       onSubmit={onSubmit}
       onWheelCapture={handleWheelCapture}
       aria-labelledby={titleId}
@@ -237,9 +213,6 @@ export const RedesignComposeForm: React.FC<
           <div
             className={classes.toolbar}
             data-bluelab-compose-toolbar
-            onClickCapture={
-              useVanillaToolbar ? handleToolbarClickCapture : undefined
-            }
           >
             {useVanillaToolbar ? (
               <VanillaComposeVisibility className={classes.flexGrowWrap} />
@@ -308,7 +281,10 @@ export const RedesignComposeForm: React.FC<
         )}
 
         {threadMode ? (
-          <div className={threadClasses.threadEditorScope}>
+          <div
+            className={threadClasses.threadEditorScope}
+            data-vanilla-thread={vanillaAppearance ? 'true' : undefined}
+          >
             <div
               className={threadClasses.primaryPost}
               data-compose-thread-main

@@ -682,6 +682,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         <ColumnHeader
           withBackButton
           onBackButtonClick={onBack}
+          hideScrollToTopButton
           title={intl.formatMessage(messages.title)}
         />
         <div className={classes.loading}>
@@ -697,6 +698,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         <ColumnHeader
           withBackButton
           onBackButtonClick={onBack}
+          hideScrollToTopButton
           title={intl.formatMessage(messages.title)}
         />
         <div className={classes.empty}>

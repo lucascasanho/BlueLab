@@ -45,6 +45,7 @@ export interface ColumnHeaderProps {
   withBackButton?: boolean | 'auto';
   onBackButtonClick?: () => void;
   withUnreadMarker?: boolean;
+  hideScrollToTopButton?: boolean;
   extraButtons?: React.ReactNode;
   extraStickyContent?: React.ReactNode;
   className?: string;
@@ -55,6 +56,7 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   withBackButton,
   onBackButtonClick,
   withUnreadMarker,
+  hideScrollToTopButton = false,
   extraButtons,
   extraStickyContent,
   className,
@@ -175,7 +177,8 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     [scrollTop],
   );
 
-  const hasScrollToTopButton = !isScrolledToTop && withUnreadMarker;
+  const hasScrollToTopButton =
+    !hideScrollToTopButton && !isScrolledToTop && withUnreadMarker;
   const headerRef = useTrackColumnHeaderHeight();
 
   return (

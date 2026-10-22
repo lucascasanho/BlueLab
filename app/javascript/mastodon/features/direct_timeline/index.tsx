@@ -149,6 +149,7 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
             <>
               <ColumnHeader
                 title={title}
+                hideScrollToTopButton
                 extraButtons={
                   <>
                     <ColumnHeaderButton
@@ -225,6 +226,7 @@ const DirectTimeline: React.FC<ColumnBase> = ({ columnId, multiColumn }) => {
         <ColumnHeader
           title={intl.formatMessage(messages.title_redesign)}
           withBackButton={multiColumn && !pinned && 'auto'}
+          hideScrollToTopButton
           extraButtons={
             <>
               <ColumnHeaderButton
