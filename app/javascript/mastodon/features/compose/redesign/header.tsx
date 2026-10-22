@@ -2,9 +2,8 @@ import { useCallback } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { PencilSimpleIcon, MinusIcon } from '@phosphor-icons/react';
+import { MinusIcon, PencilSimpleIcon } from '@phosphor-icons/react';
 
-import CloseIcon from '@/material-icons/400-20px/close.svg?react';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import {
   closeComposer,
@@ -16,6 +15,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from '@/mastodon/store';
+import CloseIcon from '@/material-icons/400-20px/close.svg?react';
 
 import { selectComposeType } from './selectors';
 import classes from './styles.module.scss';

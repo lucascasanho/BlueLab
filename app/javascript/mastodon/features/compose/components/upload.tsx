@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
 
-import type { Map as ImmutableMap, List as ImmutableList } from 'immutable';
+import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';

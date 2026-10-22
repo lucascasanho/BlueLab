@@ -7,11 +7,11 @@ import { Helmet } from '@unhead/react/helmet';
 import { openModal } from '@/mastodon/actions/modal';
 import {
   autoPlayGif,
-  me,
   domain as localDomain,
+  me,
 } from '@/mastodon/initial_state';
 import { getAccountHidden } from '@/mastodon/selectors/accounts';
-import { useAppSelector, useAppDispatch } from '@/mastodon/store';
+import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { AccountBio } from '../account_bio';
 import { Avatar } from '../avatar';

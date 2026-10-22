@@ -7,9 +7,6 @@ import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
-import CloseIcon from '@/material-icons/400-20px/close.svg?react';
-import DeleteIcon from '@/material-icons/400-24px/delete.svg?react';
-import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 import {
   addComposeThreadMedia,
   changeComposeThreadItem,
@@ -22,6 +19,9 @@ import type {
 } from '@/mastodon/api_types/media_attachments';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import CloseIcon from '@/material-icons/400-20px/close.svg?react';
+import DeleteIcon from '@/material-icons/400-24px/delete.svg?react';
+import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 
 import { ComposeAutocomplete } from './autocomplete';
 import { RichComposeEditor } from './rich_editor';
