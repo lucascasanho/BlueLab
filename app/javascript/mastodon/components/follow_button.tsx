@@ -317,6 +317,7 @@ const FollowButtonRedesign: React.FC<
     </RedesignButton>
   );
 };
+
 export const FollowButton: React.FC<
   FollowButtonOptions & {
     compact?: boolean;

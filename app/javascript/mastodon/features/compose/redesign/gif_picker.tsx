@@ -8,7 +8,10 @@ import classNames from 'classnames';
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 import { GifIcon, MagnifyingGlassIcon } from '@phosphor-icons/react';
 
-import { addComposeThreadMedia, uploadCompose } from '@/mastodon/actions/compose';
+import {
+  addComposeThreadMedia,
+  uploadCompose,
+} from '@/mastodon/actions/compose';
 import api from '@/mastodon/api';
 import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
 import { IconButton } from '@/mastodon/components/button/redesign';
@@ -359,7 +362,9 @@ const ComposeGifDropdown: React.FC<
               `/api/v1/media/${uploadResponse.data.id}`,
             );
           }
-          dispatch(addComposeThreadMedia(activeThreadItemId, uploadResponse.data));
+          dispatch(
+            addComposeThreadMedia(activeThreadItemId, uploadResponse.data),
+          );
         } else {
           await dispatch(uploadCompose(dataTransfer.files));
         }
