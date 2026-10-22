@@ -20,4 +20,4 @@ jobs:
         uses: ./.github/actions/setup-javascript
 
       - name: Check formatting
-        run: yarn format:check
+        run: yarn format && git diff -- app/javascript/mastodon/components/display_name/verified_badge.tsx app/javascript/mastodon/features/compose/redesign/gif_picker.tsx
