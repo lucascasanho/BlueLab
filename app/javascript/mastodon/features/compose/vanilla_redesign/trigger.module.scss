@@ -100,7 +100,8 @@
 
   :global(body:not([data-theme])) .root[data-keyboard-open='true'],
   :global(body[data-theme='']) .root[data-keyboard-open='true'],
-  :global(body[data-theme='default']) .root[data-keyboard-open='true'] {
+  :global(body[data-theme='default']) .root[data-keyboard-open='true'],
+  :global(body[data-theme='vanilla']) .root[data-keyboard-open='true'] {
     // Anchor to the measured visible viewport. Let top and bottom determine
     // the height so no reserved blank area remains above the keyboard.
     top: calc(
@@ -117,7 +118,10 @@
 /* Use the Vanilla 5.0 compose surface for the BlueLab editor too.
  * The content editor and enhanced actions come from BlueLab, while this
  * theme-scoped rule preserves Vanilla's own panel treatment. */
-:global(body:not([data-theme='blue-2'])) .blueLabComposer {
+:global(body:not([data-theme])) .blueLabComposer,
+:global(body[data-theme='']) .blueLabComposer,
+:global(body[data-theme='default']) .blueLabComposer,
+:global(body[data-theme='vanilla']) .blueLabComposer {
   background: var(--color-bg-primary);
   border: 0;
   box-shadow: none;
