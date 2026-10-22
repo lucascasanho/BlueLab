@@ -65,8 +65,7 @@ RSpec.describe ThemeHelper do
     let(:css) { Nokogiri::HTML5.fragment(helper.instance_customization_styles).at_css('style').text }
 
     it 'keeps Vanilla palette variables native and scopes instance colors to alternative themes' do
-      css_text = Nokogiri::HTML5.fragment(helper.instance_customization_styles).at_css('style').text
-    root_tokens = css_text.match(/:root\s*\{([^}]*)\}/m)&.captures&.first
+      root_tokens = css.match(/:root\s*\{([^}]*)\}/m)&.captures&.first
 
       expect(root_tokens).to include('--instance-logo:')
       expect(root_tokens).to_not include('--color-bg-brand-base')
@@ -80,7 +79,8 @@ RSpec.describe ThemeHelper do
   it 'provides administrator-derived verification colors to Vanilla without overriding its palette' do
     Setting.instance_accent_color = '#d52a96'
     badge_colors = InstanceVerification.local_badge.fetch('colors')
-    root_tokens = css.match(/:root\s*\{([^}]*)\}/m)&.captures&.first
+    css_text = Nokogiri::HTML5.fragment(helper.instance_customization_styles).at_css('style').text
+    root_tokens = css_text.match(/:root\s*\{([^}]*)\}/m)&.captures&.first
 
     expect(root_tokens).to include("--instance-verification-badge-start: #{badge_colors.fetch(0)};")
     expect(root_tokens).to include("--instance-verification-badge-middle: #{badge_colors.fetch(1)};")
