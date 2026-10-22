@@ -148,7 +148,8 @@ export const ComposeGifButton: React.FC<{
     onFalse();
   }, [onFalse]);
 
-  const effectiveThreadItemId = pickerThreadItemId === undefined ? activeThreadItemId : pickerThreadItemId;
+  const effectiveThreadItemId =
+    pickerThreadItemId === undefined ? activeThreadItemId : pickerThreadItemId;
 
   const threadMedia = useAppSelector((state) => {
     if (!effectiveThreadItemId) return null;
