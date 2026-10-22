@@ -11,7 +11,7 @@ import { undoUploadCompose } from '@/mastodon/actions/compose';
 import { openModal } from '@/mastodon/actions/modal';
 import type { ApiAudioAttachmentJSON } from '@/mastodon/api_types/media_attachments';
 import { Blurhash } from '@/mastodon/components/blurhash';
-import { IconButton } from '@/mastodon/components/button/redesign';
+import { Button, IconButton } from '@/mastodon/components/button/redesign';
 import { StatusImage } from '@/mastodon/components/status/image';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
@@ -90,12 +90,12 @@ export const ComposeUpload: React.FC<{
         </span>
       </IconButton>
 
-      <IconButton
+      <Button
         as='button'
         type='button'
         size='sm'
         variant='solid'
-        icon={PencilSimpleIcon}
+        leadingIcon={PencilSimpleIcon}
         className={classes.mediaMenuButtons}
         onClick={handleEdit}
         aria-label={intl.formatMessage({
@@ -110,7 +110,7 @@ export const ComposeUpload: React.FC<{
             defaultMessage='Edit media and alt text'
           />
         </span>
-      </IconButton>
+      </Button>
 
       {attachment.description && (
         <span className={classes.mediaAlt}>
