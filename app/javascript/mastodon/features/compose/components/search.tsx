@@ -3,6 +3,7 @@ import {
   useState,
   useRef,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useId,
 } from 'react';
@@ -92,6 +93,72 @@ const ClearButton: React.FC<{
       </button>
     </div>
   );
+};
+
+interface SearchScrollPosition {
+  element: HTMLElement;
+  top: number;
+  left: number;
+}
+
+interface PendingSearchScroll {
+  input: HTMLInputElement;
+  positions: SearchScrollPosition[];
+}
+
+const getSearchScrollPositions = (
+  input: HTMLInputElement,
+): SearchScrollPosition[] => {
+  const positions: SearchScrollPosition[] = [];
+  const seen = new Set<HTMLElement>();
+  let element = input.parentElement;
+
+  while (element) {
+    if (
+      element.scrollHeight > element.clientHeight ||
+      element.scrollWidth > element.clientWidth ||
+      element === document.scrollingElement
+    ) {
+      positions.push({
+        element,
+        top: element.scrollTop,
+        left: element.scrollLeft,
+      });
+      seen.add(element);
+    }
+
+    element = element.parentElement;
+  }
+
+  const documentScroller = document.scrollingElement;
+  if (
+    documentScroller instanceof HTMLElement &&
+    !seen.has(documentScroller)
+  ) {
+    positions.push({
+      element: documentScroller,
+      top: documentScroller.scrollTop,
+      left: documentScroller.scrollLeft,
+    });
+  }
+
+  return positions;
+};
+
+const restoreSearchScrollPositions = (
+  positions: SearchScrollPosition[],
+) => {
+  positions.forEach(({ element, top, left }) => {
+    if (!element.isConnected) return;
+
+    if (element.scrollTop !== top) {
+      element.scrollTop = top;
+    }
+
+    if (element.scrollLeft !== left) {
+      element.scrollLeft = left;
+    }
+  });
 };
 
 interface SearchOption {
@@ -337,8 +404,33 @@ export const Search: React.FC<{
     [dispatch, history, unfocus],
   );
 
+  const pendingSearchScrollRef = useRef<PendingSearchScroll | null>(null);
+
+  const captureSearchScroll = useCallback((input: HTMLInputElement) => {
+    const pending = pendingSearchScrollRef.current;
+    if (pending?.input === input) return;
+
+    const snapshot = {
+      input,
+      positions: getSearchScrollPositions(input),
+    };
+    pendingSearchScrollRef.current = snapshot;
+
+    // A key may not change the input value (for example, a dead key or an
+    // intercepted shortcut). Do not let an unused snapshot affect later input.
+    window.requestAnimationFrame(() => {
+      if (pendingSearchScrollRef.current === snapshot) {
+        pendingSearchScrollRef.current = null;
+      }
+    });
+  }, []);
+
   const handleChange = useCallback(
-    ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+    ({
+      target: { value },
+      currentTarget,
+    }: React.ChangeEvent<HTMLInputElement>) => {
+      captureSearchScroll(currentTarget);
       setValue(value);
       setExpanded(true);
       setSelectedOption(-1);
@@ -460,8 +552,31 @@ export const Search: React.FC<{
 
       setQuickActions(newQuickActions);
     },
-    [signedIn, dispatch, unfocus, history, submit],
+    [signedIn, dispatch, unfocus, history, submit, captureSearchScroll],
   );
+
+  useLayoutEffect(() => {
+    const snapshot = pendingSearchScrollRef.current;
+    if (!snapshot || snapshot.input !== searchInputRef.current) return;
+
+    pendingSearchScrollRef.current = null;
+
+    const restoreWhileInputFocused = () => {
+      if (
+        !snapshot.input.isConnected ||
+        document.activeElement !== snapshot.input
+      ) {
+        return;
+      }
+
+      restoreSearchScrollPositions(snapshot.positions);
+    };
+
+    // Restore before paint and once more after the browser completes its own
+    // scroll anchoring for the updated search suggestions.
+    restoreWhileInputFocused();
+    window.requestAnimationFrame(restoreWhileInputFocused);
+  }, [value]);
 
   const handleClear = useCallback(() => {
     setValue('');
@@ -472,6 +587,22 @@ export const Search: React.FC<{
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
+      const target = e.currentTarget;
+      const isTextEditingKey =
+        e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete';
+
+      // Snapshot scroll positions before the browser processes the keystroke.
+      // The layout effect restores them after React updates the suggestion list.
+      if (
+        target instanceof HTMLInputElement &&
+        target === searchInputRef.current &&
+        isTextEditingKey &&
+        !e.ctrlKey &&
+        !e.metaKey
+      ) {
+        captureSearchScroll(target);
+      }
+
       // Typed search input must not trigger global keyboard shortcuts in any
       // theme, which can move the timeline or change the page scroll position.
       e.stopPropagation();
@@ -528,7 +659,14 @@ export const Search: React.FC<{
           break;
       }
     },
-    [expanded, navigableOptions, selectedOption, submit, value],
+    [
+      captureSearchScroll,
+      expanded,
+      navigableOptions,
+      selectedOption,
+      submit,
+      value,
+    ],
   );
 
   const handleInputFocus = useCallback(() => {

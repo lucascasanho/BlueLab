@@ -150,7 +150,9 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
           .${classes.leftButton},
           .${classes.leftButton} *,
           .${classes.rightButtons},
-          .${classes.rightButtons} *`)
+          .${classes.rightButtons} *,
+          .${classes.extraStickyContent},
+          .${classes.extraStickyContent} *`)
       ) {
         scrollTop();
       }
