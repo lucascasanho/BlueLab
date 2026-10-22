@@ -130,6 +130,27 @@ const getSearchScrollPositions = (
     element = element.parentElement;
   }
 
+  // In column layouts the results scroller is a sibling of the sticky
+  // search header, not an ancestor of the input. Preserve that scroll offset
+  // too, so updates to the suggestions cannot move the results underneath it.
+  const containingColumn = input.closest<HTMLElement>('.column');
+  containingColumn
+    ?.querySelectorAll<HTMLElement>('.scrollable')
+    .forEach((scrollable) => {
+      if (
+        !seen.has(scrollable) &&
+        (scrollable.scrollHeight > scrollable.clientHeight ||
+          scrollable.scrollWidth > scrollable.clientWidth)
+      ) {
+        positions.push({
+          element: scrollable,
+          top: scrollable.scrollTop,
+          left: scrollable.scrollLeft,
+        });
+        seen.add(scrollable);
+      }
+    });
+
   const documentScroller = document.scrollingElement;
   if (
     documentScroller instanceof HTMLElement &&
