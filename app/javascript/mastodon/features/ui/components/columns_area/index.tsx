@@ -27,8 +27,8 @@ import { MultiColumnContent } from './multi_column_content';
 import { ColumnsAreaRedesign } from './redesign';
 import classes from './styles.module.scss';
 import multiColClasses from './styles_multi_column.module.scss';
-import { VanillaScrollToTop } from './vanilla_scroll_to_top';
 import { MultiColumnContent as VanillaMultiColumnContent } from './vanilla_multi_column_content';
+import { VanillaScrollToTop } from './vanilla_scroll_to_top';
 import vanillaClasses from './vanilla_styles.module.scss';
 import vanillaMultiColClasses from './vanilla_styles_multi_column.module.scss';
 
