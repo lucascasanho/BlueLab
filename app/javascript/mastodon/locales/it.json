@@ -1087,6 +1087,7 @@
   "not_signed_in_indicator.not_signed_in": "Devi accedere per consultare questa risorsa.",
   "notification.added_to_collection": "{name} ti ha aggiunto/a a una collezione",
   "notification.admin.report": "{name} ha segnalato {target}",
+  "notification.admin.bug_report": "È stata inviata una nuova segnalazione di bug",
   "notification.admin.report_account": "{name} ha segnalato {count, plural, one {un post} other {# post}} da {target} per {category}",
   "notification.admin.report_account_other": "{name} ha segnalato {count, plural, one {un post} other {# post}} da {target}",
   "notification.admin.report_statuses": "{name} ha segnalato {target} per {category}",
