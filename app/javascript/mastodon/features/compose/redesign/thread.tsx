@@ -68,9 +68,10 @@ export const ComposeThreadItems: React.FC<{
       if (id) {
         onFocusItem(id);
         window.requestAnimationFrame(() => {
+          const itemSelector = `[data-thread-item-id="${id}"]`;
           document
             .querySelector<HTMLElement>(
-              `[data-thread-item-id="${id}"] [data-compose-scroll-zone='editor']`,
+              `${itemSelector} [data-compose-scroll-zone='editor']`,
             )
             ?.focus();
         });
