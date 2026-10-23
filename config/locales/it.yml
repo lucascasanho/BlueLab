@@ -2059,6 +2059,8 @@ it:
       title_html: "%{name} ti ha aggiunto/a a una collezione"
     admin_report:
       title_html: "%{name} ha segnalato %{target}"
+    admin_bug_report:
+      title: "È stata inviata una nuova segnalazione di bug"
     admin_sign_up:
       title_and_others_html:
         one: "%{name} e un altro si sono iscritti"
