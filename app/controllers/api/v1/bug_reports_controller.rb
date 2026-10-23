@@ -5,7 +5,7 @@ class Api::V1::BugReportsController < Api::BaseController
 
   def create
     @bug_report = BugReport.create!(
-      account: current_account,
+      account: anonymous_report? ? nil : current_account,
       description: bug_report_params[:description],
       browser: browser_details[:browser],
       browser_version: browser_details[:browser_version],
@@ -25,11 +25,13 @@ class Api::V1::BugReportsController < Api::BaseController
 
     Array(params[:files]).compact_blank.first(BugReport::MAX_ATTACHMENTS).each do |file|
       @bug_report.media_attachments.create!(
-        account: current_account,
+        account: anonymous_report? ? nil : current_account,
         file: file,
         delay_processing: true
       )
     end
+
+    @bug_report.notify_moderation_staff!
 
     render json: {
       id: @bug_report.id,
@@ -47,6 +49,7 @@ class Api::V1::BugReportsController < Api::BaseController
   def bug_report_params
     params.permit(
       :description,
+      :anonymous,
       :interface_language,
       :theme,
       :interface_layout,
@@ -56,6 +59,10 @@ class Api::V1::BugReportsController < Api::BaseController
       :app_version,
       :client_errors
     )
+  end
+
+  def anonymous_report?
+    ActiveModel::Type::Boolean.new.cast(bug_report_params[:anonymous])
   end
 
   def sanitize_path(value)
