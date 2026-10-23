@@ -71,7 +71,9 @@ RSpec.describe 'Public bug reports' do
       expect(BugReport.last).to have_attributes(
         account: nil,
         error_page: '500',
-        current_path: '/auth/password/new'
+        current_path: '/auth/password/new',
+        request_id: nil,
+        user_agent: nil
       )
     end
   end
