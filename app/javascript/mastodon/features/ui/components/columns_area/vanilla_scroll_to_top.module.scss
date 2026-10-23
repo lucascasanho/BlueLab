@@ -54,8 +54,6 @@
 @media (width <= $mobile-menu-breakpoint) {
   .root {
     right: 14px;
-    bottom: calc(
-      76px + 44px + var(--space-3) + env(safe-area-inset-bottom)
-    );
+    bottom: calc(76px + 44px + var(--space-3) + env(safe-area-inset-bottom));
   }
 }
