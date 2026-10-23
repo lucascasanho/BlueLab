@@ -218,7 +218,8 @@
   min-width: 0;
 }
 
-/* Separate Vanilla thread posts while keeping the timeline connector continuous. */
+/* Separate Vanilla thread posts while keeping the timeline connector
+   continuous. */
 :global(body[data-theme='default']),
 :global(body[data-theme='']),
 :global(body:not([data-theme])),
@@ -234,7 +235,8 @@
   }
 }
 
-/* Keep Vanilla thread posts aligned and visually consistent on small screens. */
+/* Keep Vanilla thread posts aligned and visually consistent on small
+   screens. */
 @media screen and (width <= 759px) {
   :global(body[data-theme='default']),
   :global(body[data-theme='']),
