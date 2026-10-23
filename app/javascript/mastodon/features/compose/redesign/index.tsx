@@ -289,6 +289,10 @@ export const RedesignComposeForm: React.FC<
               data-compose-thread-main
               onFocusCapture={handlePrimaryEditorFocus}
             >
+              <div
+                className={threadClasses.threadIndicator}
+                aria-hidden='true'
+              />
               {mainEditor}
             </div>
             <ComposeThreadItems
