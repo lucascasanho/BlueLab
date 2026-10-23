@@ -5,9 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { useRouteMatch } from 'react-router';
 
-import {
-  ChatCircleDotsIcon,
-} from '@phosphor-icons/react';
+import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 
 import type { IconButtonProps } from '@/mastodon/components/button/vanilla_redesign';
 import { IconButton } from '@/mastodon/components/button/vanilla_redesign';
