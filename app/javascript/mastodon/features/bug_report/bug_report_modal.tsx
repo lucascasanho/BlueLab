@@ -26,12 +26,14 @@ interface Copy {
   successBody: string;
   close: string;
   diagnosticNotice: string;
+  anonymous: string;
+  anonymousHint: string;
   required: string;
   sendError: string;
   characters: string;
 }
 
-const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr', Copy> = {
+const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr' | 'it', Copy> = {
   en: {
     title: 'Report a bug',
     lead: 'Describe what went wrong and attach screenshots, GIFs, audio or video when useful.',
@@ -52,6 +54,9 @@ const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr', Copy> = {
     close: 'Close',
     diagnosticNotice:
       'This report automatically includes browser and operating-system information, interface language, theme, interface mode and recent client errors.',
+    anonymous: 'Prefer not to identify myself',
+    anonymousHint:
+      'Your report will still include where the bug occurred and technical diagnostics, but it will not be linked to your account.',
     required: 'Describe the problem before sending.',
     sendError: 'The report could not be sent. Please try again.',
     characters: '{current}/5000',
@@ -76,6 +81,9 @@ const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr', Copy> = {
     close: 'Fechar',
     diagnosticNotice:
       'O relato inclui automaticamente informações do navegador e sistema operacional, idioma, tema, modo da interface e erros recentes do cliente.',
+    anonymous: 'Prefiro não me identificar',
+    anonymousHint:
+      'O relato continuará incluindo a página em que o problema ocorreu e os diagnósticos técnicos, mas não será vinculado à sua conta.',
     required: 'Descreva o problema antes de enviar.',
     sendError: 'Não foi possível enviar o relato. Tente novamente.',
     characters: '{current}/5000',
@@ -100,6 +108,9 @@ const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr', Copy> = {
     close: 'Cerrar',
     diagnosticNotice:
       'El informe incluye automáticamente información del navegador y del sistema operativo, idioma, tema, modo de interfaz y errores recientes del cliente.',
+    anonymous: 'Prefiero no identificarme',
+    anonymousHint:
+      'El informe seguirá incluyendo la página donde ocurrió el problema y los diagnósticos técnicos, pero no se vinculará a tu cuenta.',
     required: 'Describe el problema antes de enviarlo.',
     sendError: 'No se pudo enviar el informe. Inténtalo de nuevo.',
     characters: '{current}/5000',
@@ -124,8 +135,34 @@ const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr', Copy> = {
     close: 'Fermer',
     diagnosticNotice:
       'Le rapport inclut automatiquement les informations du navigateur et du système d’exploitation, la langue, le thème, le mode d’interface et les erreurs récentes du client.',
+    anonymous: 'Je préfère ne pas m’identifier',
+    anonymousHint:
+      'Le rapport inclura toujours la page où le problème est survenu et les diagnostics techniques, sans être associé à votre compte.',
     required: 'Décrivez le problème avant de l’envoyer.',
     sendError: 'Impossible d’envoyer le rapport. Réessayez.',
+    characters: '{current}/5000',
+  },
+  it: {
+    title: 'Segnala un bug',
+    lead: 'Descrivi il problema e allega schermate, GIF, audio o video quando è utile.',
+    description: 'Che cosa è successo?',
+    placeholder: 'Descrivi il bug, il risultato atteso e i passaggi per riprodurlo.',
+    attachments: 'Allegati',
+    attachmentHint: 'Immagini, GIF, audio e video. Fino a 5 file.',
+    chooseFiles: 'Scegli file',
+    dropFiles: 'oppure trascina qui i file',
+    remove: 'Rimuovi',
+    sending: 'Invio…',
+    submit: 'Invia segnalazione',
+    cancel: 'Annulla',
+    successTitle: 'Segnalazione inviata',
+    successBody: 'La segnalazione è stata inviata agli amministratori dell’istanza con le informazioni tecniche disponibili.',
+    close: 'Chiudi',
+    diagnosticNotice: 'La segnalazione include automaticamente informazioni sul browser e sul sistema operativo, lingua, tema, modalità dell’interfaccia ed errori recenti del client.',
+    anonymous: 'Preferisco non identificarmi',
+    anonymousHint: 'La segnalazione includerà comunque la pagina in cui si è verificato il problema e le informazioni tecniche, ma non sarà associata al tuo account.',
+    required: 'Descrivi il problema prima di inviare.',
+    sendError: 'Impossibile inviare la segnalazione. Riprova.',
     characters: '{current}/5000',
   },
 };
@@ -140,6 +177,7 @@ const getCopy = (locale: string): Copy => {
   if (normalized.startsWith('pt')) return COPY['pt-BR'];
   if (normalized.startsWith('es')) return COPY.es;
   if (normalized.startsWith('fr')) return COPY.fr;
+  if (normalized.startsWith('it')) return COPY.it;
   return COPY.en;
 };
 
@@ -188,6 +226,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
   const copy = getCopy(intl.locale);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [description, setDescription] = useState('');
+  const [anonymous, setAnonymous] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [dragging, setDragging] = useState(false);
   const [sending, setSending] = useState(false);
@@ -216,6 +255,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
       const form = new FormData();
 
       form.append('description', trimmed);
+      form.append('anonymous', String(anonymous));
       form.append('interface_language', diagnostics.interface_language);
       form.append('theme', diagnostics.theme);
       form.append('interface_layout', diagnostics.interface_layout);
@@ -235,7 +275,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
     } finally {
       setSending(false);
     }
-  }, [copy, description, files, intl.locale]);
+  }, [anonymous, copy, description, files, intl.locale]);
 
   const handleDescriptionChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -292,6 +332,10 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
     void handleSubmit();
   }, [handleSubmit]);
 
+  const handleToggleAnonymous = useCallback(() => {
+    setAnonymous((current) => !current);
+  }, []);
+
   if (submitted) {
     return (
       <div className={`modal-root__modal ${classes.root}`}>
@@ -332,6 +376,18 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
 
         <div className={classes.counter}>
           {copy.characters.replace('{current}', String(description.length))}
+        </div>
+
+        <div className={classes.section}>
+          <Button
+            type='button'
+            onClick={handleToggleAnonymous}
+            disabled={sending}
+            aria-pressed={anonymous}
+          >
+            {copy.anonymous}
+          </Button>
+          <p className={classes.hint}>{copy.anonymousHint}</p>
         </div>
 
         <div className={classes.section}>
