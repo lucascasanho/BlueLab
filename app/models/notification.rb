@@ -87,6 +87,10 @@ class Notification < ApplicationRecord
       filterable: false,
       baseline: false,
     }.freeze,
+    'admin.bug_report': {
+      filterable: false,
+      baseline: false,
+    }.freeze,
     'admin.verification_request': {
       filterable: false,
       baseline: false,
