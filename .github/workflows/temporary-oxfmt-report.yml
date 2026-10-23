@@ -15,4 +15,4 @@ jobs:
       - name: Format and report changed source
         run: |
           yarn format
-          git diff --no-ext-diff --color=never -- app/javascript/mastodon/components/account_header/index.tsx app/javascript/mastodon/features/compose/components/upload.tsx app/javascript/mastodon/features/compose/redesign/thread.tsx
+          git diff --no-ext-diff --color=never -- app/javascript/mastodon/components/account_header/index.tsx app/javascript/mastodon/features/compose/components/upload.tsx app/javascript/mastodon/components/compose_icon.tsx app/javascript/mastodon/features/bug_report/bug_report_modal.tsx app/javascript/mastodon/features/compose/redesign/thread.tsx app/javascript/mastodon/features/compose/vanilla_redesign/trigger.tsx app/javascript/mastodon/features/notifications_v2/components/notification_group_with_status.tsx
