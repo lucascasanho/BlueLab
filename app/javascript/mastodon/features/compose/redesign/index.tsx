@@ -276,17 +276,14 @@ export const RedesignComposeForm: React.FC<
           />
         )}
 
-        {threadMode && (
-          <ComposeThreadFormattingToolbar
-            activeThreadItemId={activeThreadItemId}
-          />
-        )}
-
         {threadMode ? (
           <div
             className={threadClasses.threadEditorScope}
             data-vanilla-thread={vanillaAppearance ? 'true' : undefined}
           >
+            <ComposeThreadFormattingToolbar
+              activeThreadItemId={activeThreadItemId}
+            />
             <div
               className={threadClasses.primaryPost}
               data-compose-thread-main
