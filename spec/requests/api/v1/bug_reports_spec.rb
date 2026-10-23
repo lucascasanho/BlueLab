@@ -19,7 +19,14 @@ RSpec.describe 'Bug reports' do
         current_path: '/settings/preferences',
         viewport: '1280x720@1',
         app_version: '4.8.0',
-        client_errors: [{ type: 'javascript', message: 'TypeError: example', url: '/api/v1/private?token=secret', request_id: 'private-request' }].to_json,
+        client_errors: [
+          {
+            type: 'javascript',
+            message: 'TypeError: example',
+            url: '/api/v1/private?token=secret',
+            request_id: 'private-request',
+          },
+        ].to_json,
       }
     end
 
@@ -67,7 +74,8 @@ RSpec.describe 'Bug reports' do
         )
         expect(BugReport.last.client_errors.first).to include(
           'url' => '/api/v1/private'
-        ).and not_have_key('request_id')
+        )
+        expect(BugReport.last.client_errors.first).to_not have_key('request_id')
       end
     end
 
@@ -87,7 +95,8 @@ RSpec.describe 'Bug reports' do
         )
         expect(BugReport.last.client_errors.first).to include(
           'url' => '/api/v1/private'
-        ).and not_have_key('request_id')
+        )
+        expect(BugReport.last.client_errors.first).to_not have_key('request_id')
       end
     end
 
