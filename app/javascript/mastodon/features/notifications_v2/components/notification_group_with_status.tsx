@@ -115,7 +115,7 @@ export const NotificationGroupWithStatus: React.FC<{
       if (!link) return;
 
       const destination = new URL(link.href, window.location.href);
-      const path = destination.pathname.replace(/\\/+$/, '');
+      const path = destination.pathname.replace(/\/+$/, '');
       if (!path.endsWith(`/${statusId}`)) return;
 
       // A direct-message preview contains a permalink that would otherwise
