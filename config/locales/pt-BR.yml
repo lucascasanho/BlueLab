@@ -2193,6 +2193,8 @@ pt-BR:
       title_html: "%{name} te adicionou à uma coleção"
     admin_report:
       title_html: "%{name} denunciou %{target}"
+    admin_bug_report:
+      title: "Um novo relato de bug foi enviado"
     admin_sign_up:
       title_and_others_html:
         one: "%{name} e outros inscreveram-se"
