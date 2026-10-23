@@ -36,7 +36,8 @@ interface Copy {
 const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr' | 'it', Copy> = {
   en: {
     title: 'Report a bug',
-    lead: 'Describe what went wrong and attach screenshots, GIFs, audio or video when useful.',
+    lead:
+      'Describe what went wrong and attach screenshots, GIFs, audio or video when useful.',
     description: 'What happened?',
     placeholder:
       'Describe the bug, what you expected to happen, and how to reproduce it.',
@@ -63,7 +64,8 @@ const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr' | 'it', Copy> = {
   },
   'pt-BR': {
     title: 'Relatar bug',
-    lead: 'Descreva o que aconteceu e anexe capturas, GIFs, áudio ou vídeo quando forem úteis.',
+    lead:
+      'Descreva o que aconteceu e anexe capturas, GIFs, áudio ou vídeo quando forem úteis.',
     description: 'O que aconteceu?',
     placeholder:
       'Descreva o bug, o que você esperava que acontecesse e como reproduzir o problema.',
@@ -90,7 +92,8 @@ const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr' | 'it', Copy> = {
   },
   es: {
     title: 'Informar un error',
-    lead: 'Describe lo ocurrido y adjunta capturas, GIF, audio o vídeo cuando sea útil.',
+    lead:
+      'Describe lo ocurrido y adjunta capturas, GIF, audio o vídeo cuando sea útil.',
     description: '¿Qué ocurrió?',
     placeholder:
       'Describe el error, lo que esperabas que ocurriera y cómo reproducir el problema.',
@@ -117,7 +120,8 @@ const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr' | 'it', Copy> = {
   },
   fr: {
     title: 'Signaler un bug',
-    lead: 'Décrivez le problème et joignez des captures, des GIF, de l’audio ou de la vidéo si nécessaire.',
+    lead:
+      'Décrivez le problème et joignez des captures, des GIF, de l’audio ou de la vidéo si nécessaire.',
     description: 'Que s’est-il passé ?',
     placeholder:
       'Décrivez le bug, le résultat attendu et les étapes pour reproduire le problème.',
@@ -401,7 +405,9 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
           <p className={classes.hint}>{copy.attachmentHint}</p>
 
           <div
-            className={`${classes.dropZone} ${dragging ? classes.dropZoneActive : ''}`}
+            className={
+              `${classes.dropZone} ${dragging ? classes.dropZoneActive : ''}`
+            }
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
