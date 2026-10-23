@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class Api::V1::BugReportsController < Api::BaseController
-  skip_before_action :require_authenticated_user!
-  before_action -> { authorize_if_got_token! :write, :'write:reports' }
+  before_action -> { doorkeeper_authorize! :write, :'write:reports' }
+  before_action :require_user!
 
   def create
     @bug_report = BugReport.create!(
