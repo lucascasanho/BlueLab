@@ -103,17 +103,10 @@ export const NotificationGroupWithStatus: React.FC<{
       }
 
       const target = event.target;
-      const statusPreview = target.closest<HTMLElement>(
-        '[data-interactive-post-content="true"], .status, article[data-id]',
-      );
-      if (!statusPreview) return;
-
-      const article = target.closest<HTMLElement>('article[data-id]');
-      if (article && article.dataset.id !== statusId) return;
 
       if (
         target.closest(
-          'button,input,textarea,select,[role="button"],[role="switch"],[role="checkbox"],[contenteditable="true"]',
+          'button,input,textarea,select,[role="switch"],[role="checkbox"],[contenteditable="true"]',
         )
       ) {
         return;
@@ -123,6 +116,7 @@ export const NotificationGroupWithStatus: React.FC<{
       if (link) {
         const destination = new URL(link.href, window.location.href);
         const path = destination.pathname.replace(/\/+$/, '');
+        // Preserve profile/external links, but route the message permalink to its conversation.
         if (!path.endsWith(`/${statusId}`)) return;
       }
 
