@@ -2202,6 +2202,8 @@ en:
       title_html: "%{name} added you to a collection"
     admin_report:
       title_html: "%{name} reported %{target}"
+    admin_bug_report:
+      title: "A new bug report was submitted"
     admin_sign_up:
       title_and_others_html:
         one: "%{name} and one other signed up"
