@@ -96,11 +96,13 @@ RSpec.describe 'Bug reports' do
         report = BugReport.last
 
         [moderator, administrator].each do |staff|
-          expect(Notification.exists?(
-            account: staff.account,
-            type: 'admin.bug_report',
-            activity: report
-          )).to be true
+          expect(
+            Notification.exists?(
+              account: staff.account,
+              type: 'admin.bug_report',
+              activity: report
+            )
+          ).to be true
         end
       end
     end
