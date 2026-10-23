@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import {
-  PenNibIcon,
   HouseIcon,
   MagnifyingGlassIcon,
   RssSimpleIcon,
@@ -31,6 +30,7 @@ import { closeNavigation } from '@/mastodon/actions/navigation';
 import { connectDirectStream } from '@/mastodon/actions/streaming';
 import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
 import { Callout } from '@/mastodon/components/callout/redesign';
+import { ComposeIcon } from '@/mastodon/components/compose_icon';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 import { groupedConversationRepresentatives } from '@/mastodon/features/direct_timeline/conversation_grouping';
 import { useScrollSensor } from '@/mastodon/hooks/useScrollSensor';
@@ -50,7 +50,6 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { invokeVirtualIosKeyboard } from '@/mastodon/utils/invoke_virtual_ios_keyboard';
 
 import { useHasAnnouncements } from '../../announcements/hooks';
-import { Blue2ComposeIcon } from '../../blue2/icons';
 
 import { NavigationAccountCardAndMenu } from './account_card_and_menu';
 import { NavigationFooterLinks } from './footer_links';
@@ -226,7 +225,7 @@ export const RedesignNavigationPanel: React.FC<{
               as='button'
               data-bluelab-compose={isBlue2 ? 'true' : undefined}
               onClick={openComposer}
-              iconComponent={isBlue2 ? Blue2ComposeIcon : PenNibIcon}
+              iconComponent={ComposeIcon}
             >
               {isBlue2 ? (
                 blue2Text(intl.locale, 'write')
