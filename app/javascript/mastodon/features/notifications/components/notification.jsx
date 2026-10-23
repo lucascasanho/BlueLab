@@ -127,7 +127,7 @@ class Notification extends ImmutablePureComponent {
     const link = target.closest('a[href]');
     if (link) {
       const destination = new URL(link.href, window.location.href);
-      const path = destination.pathname.replace(/\\/+$/, '');
+      const path = destination.pathname.replace(/\/+$/, '');
       if (!path.endsWith('/' + statusId)) return;
     }
 
