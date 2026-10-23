@@ -12,7 +12,7 @@ class UserSettings
   # Keep Mastodon's legacy theme setting for compatibility. BlueLab account
   # themes are stored separately in :bluelab_theme.
   setting :theme, default: -> { ::Setting.theme }
-  setting :bluelab_theme, default: 'blue-2', in: %w(blue-2 mastodon-bird-ui-auto mastodon-5)
+  setting :bluelab_theme, default: 'blue-2', in: %w(default blue-2 mastodon-bird-ui-auto)
   setting :noindex, default: -> { ::Setting.noindex }
   setting :show_application, default: true
   setting :default_language, default: nil
@@ -21,7 +21,10 @@ class UserSettings
   setting :default_sensitive, default: false
   setting :default_privacy, default: nil, in: %w(public unlisted private)
   setting :default_quote_policy, default: 'public', in: %w(public followers nobody)
+  setting :default_spoiler_field, default: false
   setting :email_subscriptions, default: false
+  setting :display_own_boosts, default: false
+  setting :display_own_posts, default: true
 
   setting_inverse_alias :indexable, :noindex
 
@@ -45,6 +48,8 @@ class UserSettings
     setting :emoji_style, default: 'auto', in: %w(auto native twemoji)
     setting :color_scheme, default: 'auto', in: %w(auto light dark)
     setting :contrast, default: 'auto', in: %w(auto high)
+    setting :density, default: 'default', in: %w(default compact)
+    setting :theme_color, default: 'indigo' # TODO: dynamic inclusion checking?
   end
 
   namespace :notification_emails do
@@ -60,6 +65,7 @@ class UserSettings
     setting :appeal, default: true
     setting :software_updates, default: 'critical', in: %w(none critical patch all)
     setting :end_of_support, default: true
+    setting :moderation_suggestions, default: true
   end
 
   namespace :interactions do

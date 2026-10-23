@@ -1,22 +1,16 @@
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 
-import classNames from 'classnames';
 import { NavLink, Switch, Route } from 'react-router-dom';
 
 import { Helmet } from '@unhead/react/helmet';
 
 import { Column } from '@/mastodon/components/column';
-import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';
 import { ColumnHeader } from '@/mastodon/components/column_header';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
-import TrendingUpIcon from '@/material-icons/400-24px/trending_up.svg?react';
-import { SymbolLogo } from 'mastodon/components/logo';
 import { Search } from 'mastodon/features/compose/components/search';
-import { useBreakpoint } from 'mastodon/features/ui/hooks/useBreakpoint';
 import { useIdentity } from 'mastodon/identity_context';
 
 import Links from './links';
-import redesignClasses from './redesign.module.scss';
 import Statuses from './statuses';
 import Suggestions from './suggestions';
 import Tags from './tags';
@@ -29,7 +23,6 @@ const messages = defineMessages({
 const Explore: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   const { signedIn } = useIdentity();
   const intl = useIntl();
-  const logoRequired = useBreakpoint('full'); 
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
@@ -38,29 +31,12 @@ const Explore: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
       bindToDocument={!multiColumn}
       label={intl.formatMessage(messages.title)}
     >
-      {isRedesignEnabled() || isBlue2 ? (
-        <ColumnHeader
-          className='explore__column-header'
-          withBackButton={multiColumn && 'auto'}
-          title={intl.formatMessage(messages.titleRedesign)}
-        />
-      ) : (
-        <LegacyColumnHeader
-          className='explore__column-header'
-          icon={'explore'}
-          iconComponent={logoRequired ? SymbolLogo : TrendingUpIcon}
-          title={intl.formatMessage(messages.title)}
-          multiColumn={multiColumn}
-          scrollTopOnClick
-        />
-      )}
+      <ColumnHeader
+        withBackButton={multiColumn ? 'auto' : true}
+        title={intl.formatMessage(messages.titleRedesign)}
+      />
 
-      <div
-        className={classNames(
-          'explore__search-header',
-          (isRedesignEnabled() || isBlue2) && redesignClasses.searchHeader,
-        )}
-      >
+      <div className='explore__search-header'>
         <Search singleColumn />
       </div>
 
@@ -112,7 +88,9 @@ const Explore: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
       <Helmet>
         <title>
           {intl.formatMessage(
-            isRedesignEnabled() || isBlue2 ? messages.titleRedesign : messages.title,
+            isRedesignEnabled() || isBlue2
+              ? messages.titleRedesign
+              : messages.title,
           )}
         </title>
         <meta name='robots' content='all' />

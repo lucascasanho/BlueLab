@@ -20,12 +20,6 @@
     text-align: center;
     font-size: 15px;
     line-height: 22px;
-
-    &[data-redesign='false'] {
-      @media screen and (width >= 1175px) {
-        display: none;
-      }
-    }
   }
 }
 
@@ -33,25 +27,6 @@
   display: inline;
   margin-inline-end: 0.3em;
   font-weight: 500;
-}
-
-.instanceName {
-  color: inherit;
-  cursor: default;
-  text-decoration: none;
-}
-
-.bugReportButton {
-  appearance: none;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  line-height: inherit;
-  cursor: pointer;
-  white-space: nowrap;
 }
 
 .list {
@@ -69,8 +44,7 @@
     }
   }
 
-  a,
-  .bugReportButton {
+  a {
     color: var(--color-text-secondary);
     text-decoration: underline;
 
@@ -84,4 +58,99 @@
 
 .version {
   white-space: nowrap;
+}
+
+/* BlueLab-only overrides. The upstream stylesheet above remains active for Vanilla and other themes. */
+
+/* prettier-ignore */
+:global(body[data-theme='blue-2']) {
+  .wrapper {
+    z-index: 1;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+  
+    &[data-context='default'] {
+      padding: 20px 0;
+    }
+  
+    &[data-context='multi-column'] {
+      padding: 15px;
+    }
+  
+    &[data-context='about'] {
+      margin-top: 60px;
+      text-align: center;
+      font-size: 15px;
+      line-height: 22px;
+    }
+  }
+  
+  .heading {
+    display: inline;
+    margin-inline-end: 0.3em;
+    font-weight: 500;
+  }
+  
+  .instanceName {
+    color: inherit;
+    cursor: default;
+    text-decoration: none;
+  }
+  
+  .bugReportButton {
+    appearance: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  
+  .list {
+    display: inline;
+  
+    li {
+      display: inline;
+  
+      &:not(:last-child)::after {
+        content: ' · ';
+  
+        @supports (content: 'x' / 'y') {
+          content: ' · ' / '';
+        }
+      }
+    }
+  
+    a,
+    .bugReportButton {
+      color: var(--color-text-secondary);
+      text-decoration: underline;
+  
+      &:hover,
+      &:focus,
+      &:active {
+        text-decoration: none;
+      }
+    }
+  }
+  
+  .version {
+    white-space: nowrap;
+  }
+}
+
+/* Keep keyboard shortcuts in the desktop footer only. */
+@media (width <= 1024px), (hover: none) and (pointer: coarse) {
+  .list li.keyboardShortcuts,
+  :global(body[data-theme='blue-2']) .list li.keyboardShortcuts {
+    display: none;
+  }
 }

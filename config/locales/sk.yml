@@ -647,7 +647,6 @@ sk:
         follow_recommendations: Odporúčania pre nasledovanie
         profile_directory: Katalóg profilov
         public_timelines: Verejné časové osi
-        publish_statistics: Zverejni štatistiky
         title: Objavovanie
         trends: Trendy
       domain_blocks:
@@ -761,7 +760,6 @@ sk:
     warning_presets:
       add_new: Pridaj nové
       delete: Vymazať
-      edit_preset: Uprav varovnú predlohu
     webhooks:
       delete: Vymazať
       disable: Vypni

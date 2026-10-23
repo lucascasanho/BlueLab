@@ -21,6 +21,9 @@ module NotificationFallbackConcern
       object.account_relationship_severance_event.present?
     when :'admin.report'
       object.report.present?
+    when :'admin.bug_report'
+      activity = object.is_a?(NotificationGroup) ? object.notification.activity : object.activity
+      activity.present?
     when :added_to_collection, :collection_update
       object.target_collection.present?
     else
@@ -59,6 +62,8 @@ module NotificationFallbackConcern
         name: account.remote? ? account.domain : TextFormatter.link_to_mention(account),
         target: TextFormatter.link_to_mention(object.report.target_account)
       )
+    when :'admin.bug_report'
+      I18n.t('notification_fallbacks.admin_bug_report.title')
     when :added_to_collection
       I18n.t(
         'notification_fallbacks.added_to_collection.title_html',
@@ -86,7 +91,7 @@ module NotificationFallbackConcern
         'notification_fallbacks.moderation_warning.summary_html',
         link: link_to(I18n.t('notification_fallbacks.generic.sign_in'), disputes_strike_url(object.account_warning.id))
       )
-    when :'admin.sign_up', :'admin.report', :added_to_collection, :collection_update
+    when :'admin.sign_up', :'admin.report', :'admin.bug_report', :added_to_collection, :collection_update
       I18n.t(
         'notification_fallbacks.generic.summary_html',
         link: link_to(I18n.t('notification_fallbacks.generic.sign_in'), root_url)

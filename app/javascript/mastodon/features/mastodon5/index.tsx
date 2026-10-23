@@ -59,10 +59,7 @@ const Mastodon5Footer: React.FC = () => {
   return (
     <footer className={classes.desktopFooter}>
       <Link to='/about'>
-        <FormattedMessage
-          id='custom_homepage.about'
-          defaultMessage='About'
-        />
+        <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
       </Link>
       <span>·</span>
       <Link to='/privacy-policy'>

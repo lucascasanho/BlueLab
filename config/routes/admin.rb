@@ -114,6 +114,18 @@ namespace :admin do
     resources :moderation_notes, module: :instances, only: [:create, :destroy]
   end
 
+  resources :moderation_subscriptions do
+    collection do
+      get :logs
+    end
+  end
+
+  resources :moderation_suggestions do
+    member do
+      post :apply
+    end
+  end
+
   resources :rules, only: [:index, :new, :create, :edit, :update, :destroy] do
     member do
       post :move_up
@@ -207,6 +219,7 @@ namespace :admin do
   resources :users, only: [] do
     scope module: :users do
       resource :two_factor_authentication, only: [:destroy]
+      resource :sign_in_token_authentication, only: [:create, :destroy]
       resource :role, only: [:show, :update]
     end
   end

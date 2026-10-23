@@ -132,7 +132,7 @@ describe('<NavigationAccountCardAndMenu />', () => {
     vi.useRealTimers();
   });
 
-  it('handles the first mobile drawer menu item click before any sidebar navigation', () => {
+  it('handles the first mobile drawer menu item click before any sidebar navigation', async () => {
     vi.mocked(useBreakpoint).mockReturnValue(true);
     const documentClick = vi.fn();
     document.addEventListener('click', documentClick);
@@ -151,6 +151,9 @@ describe('<NavigationAccountCardAndMenu />', () => {
       const favorites = screen.getByRole('link', { name: 'Favorites' });
       fireEvent.pointerDown(favorites, { pointerType: 'touch', button: 0 });
       fireEvent.click(favorites);
+      await act(async () => {
+        await new Promise((resolve) => window.setTimeout(resolve, 120));
+      });
 
       expect(screen.getByTestId('location')).toHaveTextContent('/favourites');
       expect(documentClick).not.toHaveBeenCalled();

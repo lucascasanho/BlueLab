@@ -9,6 +9,16 @@ RSpec.describe Themes do
     end
   end
 
+  describe '#selectable_names' do
+    it 'exposes only Vanilla while alternative themes are disabled in config' do
+      expect(described_class.instance.selectable_names).to eq(['default'])
+    end
+
+    it 'keeps disabled themes installed and discoverable internally' do
+      expect(described_class.instance.names).to include('blue-2', 'mastodon-bird-ui-auto', 'default')
+    end
+  end
+
   describe 'theme labels' do
     it 'uses the BlueLab name for the Bluesky-inspired theme' do
       expect(I18n.t('themes.blue-2', locale: :en)).to eq('BlueLab')

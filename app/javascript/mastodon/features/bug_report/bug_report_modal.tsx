@@ -6,10 +6,10 @@ import { useIntl } from 'react-intl';
 import api from '@/mastodon/api';
 import { Button } from '@/mastodon/components/button';
 
-import { getBugReportDiagnostics } from './diagnostics';
 import classes from './bug_report_modal.module.scss';
+import { getBugReportDiagnostics } from './diagnostics';
 
-type Copy = {
+interface Copy {
   title: string;
   lead: string;
   description: string;
@@ -26,17 +26,20 @@ type Copy = {
   successBody: string;
   close: string;
   diagnosticNotice: string;
+  anonymous: string;
+  anonymousHint: string;
   required: string;
   sendError: string;
   characters: string;
-};
+}
 
-const COPY: Record<string, Copy> = {
+const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr' | 'it', Copy> = {
   en: {
     title: 'Report a bug',
     lead: 'Describe what went wrong and attach screenshots, GIFs, audio or video when useful.',
     description: 'What happened?',
-    placeholder: 'Describe the bug, what you expected to happen, and how to reproduce it.',
+    placeholder:
+      'Describe the bug, what you expected to happen, and how to reproduce it.',
     attachments: 'Attachments',
     attachmentHint: 'Images, GIFs, audio and video. Up to 5 files.',
     chooseFiles: 'Choose files',
@@ -46,9 +49,14 @@ const COPY: Record<string, Copy> = {
     submit: 'Send report',
     cancel: 'Cancel',
     successTitle: 'Bug report sent',
-    successBody: 'Your report was sent to the instance administrators with the available technical diagnostics.',
+    successBody:
+      'Your report was sent to the instance administrators with the available technical diagnostics.',
     close: 'Close',
-    diagnosticNotice: 'This report automatically includes browser and operating-system information, interface language, theme, interface mode and recent client errors.',
+    diagnosticNotice:
+      'This report automatically includes browser and operating-system information, interface language, theme, interface mode and recent client errors.',
+    anonymous: 'Prefer not to identify myself',
+    anonymousHint:
+      'Your report will still include where the bug occurred and technical diagnostics, but it will not be linked to your account.',
     required: 'Describe the problem before sending.',
     sendError: 'The report could not be sent. Please try again.',
     characters: '{current}/5000',
@@ -57,7 +65,8 @@ const COPY: Record<string, Copy> = {
     title: 'Relatar bug',
     lead: 'Descreva o que aconteceu e anexe capturas, GIFs, áudio ou vídeo quando forem úteis.',
     description: 'O que aconteceu?',
-    placeholder: 'Descreva o bug, o que você esperava que acontecesse e como reproduzir o problema.',
+    placeholder:
+      'Descreva o bug, o que você esperava que acontecesse e como reproduzir o problema.',
     attachments: 'Anexos',
     attachmentHint: 'Imagens, GIFs, áudio e vídeo. Até 5 arquivos.',
     chooseFiles: 'Escolher arquivos',
@@ -67,9 +76,14 @@ const COPY: Record<string, Copy> = {
     submit: 'Enviar relato',
     cancel: 'Cancelar',
     successTitle: 'Relato enviado',
-    successBody: 'Seu relato foi enviado aos administradores da instância com os diagnósticos técnicos disponíveis.',
+    successBody:
+      'Seu relato foi enviado aos administradores da instância com os diagnósticos técnicos disponíveis.',
     close: 'Fechar',
-    diagnosticNotice: 'O relato inclui automaticamente informações do navegador e sistema operacional, idioma, tema, modo da interface e erros recentes do cliente.',
+    diagnosticNotice:
+      'O relato inclui automaticamente informações do navegador e sistema operacional, idioma, tema, modo da interface e erros recentes do cliente.',
+    anonymous: 'Prefiro não me identificar',
+    anonymousHint:
+      'O relato continuará incluindo a página em que o problema ocorreu e os diagnósticos técnicos, mas não será vinculado à sua conta.',
     required: 'Descreva o problema antes de enviar.',
     sendError: 'Não foi possível enviar o relato. Tente novamente.',
     characters: '{current}/5000',
@@ -78,7 +92,8 @@ const COPY: Record<string, Copy> = {
     title: 'Informar un error',
     lead: 'Describe lo ocurrido y adjunta capturas, GIF, audio o vídeo cuando sea útil.',
     description: '¿Qué ocurrió?',
-    placeholder: 'Describe el error, lo que esperabas que ocurriera y cómo reproducir el problema.',
+    placeholder:
+      'Describe el error, lo que esperabas que ocurriera y cómo reproducir el problema.',
     attachments: 'Adjuntos',
     attachmentHint: 'Imágenes, GIF, audio y vídeo. Hasta 5 archivos.',
     chooseFiles: 'Elegir archivos',
@@ -88,9 +103,14 @@ const COPY: Record<string, Copy> = {
     submit: 'Enviar informe',
     cancel: 'Cancelar',
     successTitle: 'Informe enviado',
-    successBody: 'Tu informe se envió a los administradores de la instancia con los diagnósticos técnicos disponibles.',
+    successBody:
+      'Tu informe se envió a los administradores de la instancia con los diagnósticos técnicos disponibles.',
     close: 'Cerrar',
-    diagnosticNotice: 'El informe incluye automáticamente información del navegador y del sistema operativo, idioma, tema, modo de interfaz y errores recientes del cliente.',
+    diagnosticNotice:
+      'El informe incluye automáticamente información del navegador y del sistema operativo, idioma, tema, modo de interfaz y errores recientes del cliente.',
+    anonymous: 'Prefiero no identificarme',
+    anonymousHint:
+      'El informe seguirá incluyendo la página donde ocurrió el problema y los diagnósticos técnicos, pero no se vinculará a tu cuenta.',
     required: 'Describe el problema antes de enviarlo.',
     sendError: 'No se pudo enviar el informe. Inténtalo de nuevo.',
     characters: '{current}/5000',
@@ -99,7 +119,8 @@ const COPY: Record<string, Copy> = {
     title: 'Signaler un bug',
     lead: 'Décrivez le problème et joignez des captures, des GIF, de l’audio ou de la vidéo si nécessaire.',
     description: 'Que s’est-il passé ?',
-    placeholder: 'Décrivez le bug, le résultat attendu et les étapes pour reproduire le problème.',
+    placeholder:
+      'Décrivez le bug, le résultat attendu et les étapes pour reproduire le problème.',
     attachments: 'Pièces jointes',
     attachmentHint: 'Images, GIF, audio et vidéo. Jusqu’à 5 fichiers.',
     chooseFiles: 'Choisir des fichiers',
@@ -109,21 +130,58 @@ const COPY: Record<string, Copy> = {
     submit: 'Envoyer le rapport',
     cancel: 'Annuler',
     successTitle: 'Rapport envoyé',
-    successBody: 'Votre rapport a été envoyé aux administrateurs de l’instance avec les diagnostics techniques disponibles.',
+    successBody:
+      'Votre rapport a été envoyé aux administrateurs de l’instance avec les diagnostics techniques disponibles.',
     close: 'Fermer',
-    diagnosticNotice: 'Le rapport inclut automatiquement les informations du navigateur et du système d’exploitation, la langue, le thème, le mode d’interface et les erreurs récentes du client.',
+    diagnosticNotice:
+      'Le rapport inclut automatiquement les informations du navigateur et du système d’exploitation, la langue, le thème, le mode d’interface et les erreurs récentes du client.',
+    anonymous: 'Je préfère ne pas m’identifier',
+    anonymousHint:
+      'Le rapport inclura toujours la page où le problème est survenu et les diagnostics techniques, sans être associé à votre compte.',
     required: 'Décrivez le problème avant de l’envoyer.',
     sendError: 'Impossible d’envoyer le rapport. Réessayez.',
     characters: '{current}/5000',
   },
+  it: {
+    title: 'Segnala un bug',
+    lead: 'Descrivi il problema e allega schermate, GIF, audio o video quando è utile.',
+    description: 'Che cosa è successo?',
+    placeholder:
+      'Descrivi il bug, il risultato atteso e i passaggi per riprodurlo.',
+    attachments: 'Allegati',
+    attachmentHint: 'Immagini, GIF, audio e video. Fino a 5 file.',
+    chooseFiles: 'Scegli file',
+    dropFiles: 'oppure trascina qui i file',
+    remove: 'Rimuovi',
+    sending: 'Invio…',
+    submit: 'Invia segnalazione',
+    cancel: 'Annulla',
+    successTitle: 'Segnalazione inviata',
+    successBody:
+      'La segnalazione è stata inviata agli amministratori dell’istanza con le informazioni tecniche disponibili.',
+    close: 'Chiudi',
+    diagnosticNotice:
+      'La segnalazione include automaticamente informazioni sul browser e sul sistema operativo, lingua, tema, modalità dell’interfaccia ed errori recenti del client.',
+    anonymous: 'Preferisco non identificarmi',
+    anonymousHint:
+      'La segnalazione includerà comunque la pagina in cui si è verificato il problema e le informazioni tecniche, ma non sarà associata al tuo account.',
+    required: 'Descrivi il problema prima di inviare.',
+    sendError: 'Impossibile inviare la segnalazione. Riprova.',
+    characters: '{current}/5000',
+  },
 };
 
-const getCopy = (locale: string) => {
+const isCopyLocale = (locale: string): locale is keyof typeof COPY =>
+  Object.prototype.hasOwnProperty.call(COPY, locale);
+
+const getCopy = (locale: string): Copy => {
   const normalized = locale.toLowerCase();
-  if (COPY[locale]) return COPY[locale];
+
+  if (isCopyLocale(locale)) return COPY[locale];
   if (normalized.startsWith('pt')) return COPY['pt-BR'];
   if (normalized.startsWith('es')) return COPY.es;
   if (normalized.startsWith('fr')) return COPY.fr;
+  if (normalized.startsWith('it')) return COPY.it;
   return COPY.en;
 };
 
@@ -139,7 +197,12 @@ const Preview: React.FC<{
 }> = ({ file, onRemove, removeLabel }) => {
   const url = useMemo(() => URL.createObjectURL(file), [file]);
 
-  useEffect(() => () => URL.revokeObjectURL(url), [url]);
+  useEffect(
+    () => () => {
+      URL.revokeObjectURL(url);
+    },
+    [url],
+  );
 
   return (
     <div className={classes.previewCard}>
@@ -167,6 +230,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
   const copy = getCopy(intl.locale);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [description, setDescription] = useState('');
+  const [anonymous, setAnonymous] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [dragging, setDragging] = useState(false);
   const [sending, setSending] = useState(false);
@@ -195,6 +259,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
       const form = new FormData();
 
       form.append('description', trimmed);
+      form.append('anonymous', String(anonymous));
       form.append('interface_language', diagnostics.interface_language);
       form.append('theme', diagnostics.theme);
       form.append('interface_layout', diagnostics.interface_layout);
@@ -203,7 +268,9 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
       form.append('app_version', diagnostics.app_version);
       form.append('client_errors', JSON.stringify(diagnostics.client_errors));
 
-      files.forEach((file) => form.append('files[]', file, file.name));
+      files.forEach((file) => {
+        form.append('files[]', file, file.name);
+      });
 
       await api().post('/api/v1/bug_reports', form);
       setSubmitted(true);
@@ -212,7 +279,66 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
     } finally {
       setSending(false);
     }
-  }, [copy, description, files, intl.locale]);
+  }, [anonymous, copy, description, files, intl.locale]);
+
+  const handleDescriptionChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setDescription(event.target.value);
+    },
+    [],
+  );
+
+  const handleDragOver = useCallback<React.DragEventHandler<HTMLDivElement>>(
+    (event) => {
+      event.preventDefault();
+      setDragging(true);
+    },
+    [],
+  );
+
+  const handleDragLeave = useCallback(() => {
+    setDragging(false);
+  }, []);
+
+  const handleDrop = useCallback<React.DragEventHandler<HTMLDivElement>>(
+    (event) => {
+      event.preventDefault();
+      setDragging(false);
+      addFiles(event.dataTransfer.files);
+    },
+    [addFiles],
+  );
+
+  const handleChooseFiles = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileInputChange = useCallback<
+    React.ChangeEventHandler<HTMLInputElement>
+  >(
+    (event) => {
+      if (event.target.files) addFiles(event.target.files);
+      event.target.value = '';
+    },
+    [addFiles],
+  );
+
+  const createRemoveFileHandler = useCallback(
+    (fileIndex: number) => () => {
+      setFiles((current) =>
+        current.filter((_, currentIndex) => currentIndex !== fileIndex),
+      );
+    },
+    [],
+  );
+
+  const handleSubmitClick = useCallback(() => {
+    void handleSubmit();
+  }, [handleSubmit]);
+
+  const handleToggleAnonymous = useCallback(() => {
+    setAnonymous((current) => !current);
+  }, []);
 
   if (submitted) {
     return (
@@ -246,7 +372,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
           className={classes.textarea}
           value={description}
           maxLength={5000}
-          onChange={(event) => setDescription(event.target.value)}
+          onChange={handleDescriptionChange}
           placeholder={copy.placeholder}
           autoFocus
           rows={8}
@@ -257,26 +383,29 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
         </div>
 
         <div className={classes.section}>
+          <Button
+            type='button'
+            secondary={!anonymous}
+            onClick={handleToggleAnonymous}
+            disabled={sending}
+            aria-pressed={anonymous}
+          >
+            {copy.anonymous}
+          </Button>
+          <p className={classes.hint}>{copy.anonymousHint}</p>
+        </div>
+
+        <div className={classes.section}>
           <div className={classes.label}>{copy.attachments}</div>
           <p className={classes.hint}>{copy.attachmentHint}</p>
 
           <div
             className={`${classes.dropZone} ${dragging ? classes.dropZoneActive : ''}`}
-            onDragOver={(event) => {
-              event.preventDefault();
-              setDragging(true);
-            }}
-            onDragLeave={() => setDragging(false)}
-            onDrop={(event) => {
-              event.preventDefault();
-              setDragging(false);
-              addFiles(event.dataTransfer.files);
-            }}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
           >
-            <Button
-              type='button'
-              onClick={() => fileInputRef.current?.click()}
-            >
+            <Button type='button' onClick={handleChooseFiles}>
               {copy.chooseFiles}
             </Button>
             <span>{copy.dropFiles}</span>
@@ -286,10 +415,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
               type='file'
               accept='image/*,video/*,audio/*'
               multiple
-              onChange={(event) => {
-                if (event.target.files) addFiles(event.target.files);
-                event.target.value = '';
-              }}
+              onChange={handleFileInputChange}
             />
           </div>
 
@@ -299,11 +425,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
                 <Preview
                   key={`${file.name}-${file.lastModified}-${index}`}
                   file={file}
-                  onRemove={() =>
-                    setFiles((current) =>
-                      current.filter((_, fileIndex) => fileIndex !== index),
-                    )
-                  }
+                  onRemove={createRemoveFileHandler(index)}
                   removeLabel={copy.remove}
                 />
               ))}
@@ -321,7 +443,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
         </Button>
         <Button
           type='button'
-          onClick={handleSubmit}
+          onClick={handleSubmitClick}
           disabled={sending || description.trim().length === 0}
         >
           {sending ? copy.sending : copy.submit}

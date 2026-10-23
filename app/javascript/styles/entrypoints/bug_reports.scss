@@ -8,7 +8,8 @@
 .bug-report-page__context {
   margin-bottom: 20px;
   padding: 12px 14px;
-  border-inline-start: 3px solid var(--color-border-brand, var(--color-accent, #6364ff));
+  border-inline-start: 3px solid
+    var(--color-border-brand, var(--color-accent, #6364ff));
   border-radius: 8px;
   background: var(--color-bg-brand-softest, rgb(99 100 255 / 8%));
   color: var(--color-text-primary);
@@ -37,8 +38,25 @@
   width: 100%;
 }
 
-@media screen and (max-width: 600px) {
+@media (width <= 600px) {
   .bug-report-page {
     max-width: none;
   }
+}
+
+.bug-report-page__anonymous-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  cursor: pointer;
+}
+
+.bug-report-page__anonymous-toggle input[type='checkbox'] {
+  margin: 0;
+}
+
+.bug-report-page__anonymous-toggle + .hint {
+  display: block;
+  margin-top: 4px;
 }

@@ -42,6 +42,19 @@
   }
 }
 
+/* Vanilla uses the shared Rails auth layout, but must show the instance
+ * branding that the BlueLab-specific auth layout already displays. */
+body[data-theme='default'] .logo-container .instance-auth-brand {
+  // Keep the brand as a block-level flex container so its auto margins
+  // center it above the authentication form instead of leaving it at the left.
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: calc(100% - 32px);
+  margin: 0 auto;
+}
+
 .compose-standalone {
   .compose-form {
     width: 400px;

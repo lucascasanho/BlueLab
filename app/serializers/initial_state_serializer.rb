@@ -67,6 +67,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:default_content_type] = object_account_user.setting_default_content_type
       store[:composer_editor] = object_account_user.settings['composer_editor'] || 'bluelab'
       store[:default_quote_policy] = object_account_user.setting_default_quote_policy
+      store[:default_spoiler_field] = object_account_user.setting_default_spoiler_field
     end
 
     store[:text] = object.text if object.text

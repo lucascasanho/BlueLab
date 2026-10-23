@@ -151,6 +151,7 @@ class PublicTimeline extends PureComponent {
         {isBlue2 && !multiColumn ? null : isRedesignEnabled() || isBlue2 ? (
           <ColumnHeader
             title={title}
+            withBackButton={!multiColumn ? true : !pinned ? 'auto' : false}
             withUnreadMarker={hasUnread}
             extraButtons={
               <ColumnSettingsMenu
@@ -174,6 +175,7 @@ class PublicTimeline extends PureComponent {
             iconComponent={PublicIcon}
             active={hasUnread}
             title={title}
+            showBackButton={!multiColumn || !pinned}
             onPin={this.handlePin}
             onMove={this.handleMove}
             pinned={pinned}

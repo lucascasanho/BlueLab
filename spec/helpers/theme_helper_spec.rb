@@ -61,6 +61,33 @@ RSpec.describe ThemeHelper do
     end
   end
 
+  describe '#instance_customization_styles' do
+    let(:css) { Nokogiri::HTML5.fragment(helper.instance_customization_styles).at_css('style').text }
+
+    it 'keeps Vanilla palette variables native and scopes instance colors to alternative themes' do
+      root_tokens = css.match(/:root\s*\{([^}]*)\}/m)&.captures&.first
+
+      expect(root_tokens).to include('--instance-logo:')
+      expect(root_tokens).to_not include('--color-bg-brand-base')
+      expect(css).to include('html:has(body[data-theme=blue-2])')
+      expect(css).to include('html:has(body[data-theme=mastodon-bird-ui-auto])')
+      expect(css).to include('html[data-color-scheme=dark]:has(body[data-theme=blue-2])')
+      expect(css).to include('html[data-color-scheme=light]:has(body[data-theme=mastodon-bird-ui-auto])')
+    end
+  end
+
+  it 'provides administrator-derived verification colors to Vanilla without overriding its palette' do
+    Setting.instance_accent_color = '#d52a96'
+    badge_colors = InstanceVerification.local_badge.fetch('colors')
+    css_text = Nokogiri::HTML5.fragment(helper.instance_customization_styles).at_css('style').text
+    root_tokens = css_text.match(/:root\s*\{([^}]*)\}/m)&.captures&.first
+
+    expect(root_tokens).to include("--instance-verification-badge-start: #{badge_colors.fetch(0)};")
+    expect(root_tokens).to include("--instance-verification-badge-middle: #{badge_colors.fetch(1)};")
+    expect(root_tokens).to include("--instance-verification-badge-end: #{badge_colors.fetch(2)};")
+    expect(root_tokens).to_not include('--color-bg-brand-base')
+  end
+
   describe '#custom_stylesheet' do
     let(:custom_css) { 'body {}' }
     let(:custom_digest) { Digest::SHA256.hexdigest(custom_css) }
@@ -100,30 +127,39 @@ RSpec.describe ThemeHelper do
     end
   end
 
+  describe '#available_theme_colors' do
+    it 'returns the configured color palette for the BlueLab theme' do
+      expect(helper.available_theme_colors('blue-2')).to eq(%w(indigo lime pink orange cyan))
+    end
+  end
+
   describe '#current_theme' do
     subject { helper.current_theme }
 
     before do
-      allow(Themes.instance).to receive(:names).and_return %w(default blue-2 mastodon-5)
+      allow(Themes.instance).to receive(:selectable_names).and_return(['default'])
     end
 
-    context 'when the administrator selected BlueLab' do
+    context 'when the administrator selected a disabled theme' do
       before { Setting.theme = 'blue-2' }
 
-      it { is_expected.to eq('blue-2') }
+      it 'forces Vanilla without changing the administrator setting' do
+        expect(subject).to eq('default')
+        expect(Setting.theme).to eq('blue-2')
+      end
     end
 
-    context 'when the administrator selected another selectable theme' do
-      before { Setting.theme = 'mastodon-5' }
+    context 'when the administrator selected Bird UI while disabled' do
+      before { Setting.theme = 'mastodon-bird-ui-auto' }
 
-      it { is_expected.to eq('mastodon-5') }
+      it { is_expected.to eq('default') }
     end
 
     context 'when the administrator theme is invalid' do
       before { Setting.theme = 'missing-theme' }
 
-      it 'falls back to BlueLab' do
-        expect(subject).to eq('blue-2')
+      it 'falls back to Vanilla' do
+        expect(subject).to eq('default')
       end
     end
 
@@ -132,12 +168,12 @@ RSpec.describe ThemeHelper do
 
       before do
         allow(helper).to receive(:current_user).and_return(current_user)
-        current_user.settings.update(bluelab_theme: 'mastodon-5', noindex: false)
+        current_user.settings.update(bluelab_theme: 'mastodon-bird-ui-auto', noindex: false)
         Setting.theme = 'blue-2'
       end
 
-      it 'uses the personal preference without changing the administrator theme' do
-        expect(subject).to eq('mastodon-5')
+      it 'ignores the saved alternative theme without changing the administrator setting' do
+        expect(subject).to eq('default')
         expect(Setting.theme).to eq('blue-2')
       end
     end
@@ -147,12 +183,12 @@ RSpec.describe ThemeHelper do
 
       before do
         allow(helper).to receive(:current_user).and_return(current_user)
-        Setting.theme = 'mastodon-5'
+        Setting.theme = 'mastodon-bird-ui-auto'
       end
 
-      it 'uses BlueLab as the default user theme' do
-        expect(subject).to eq('blue-2')
-        expect(Setting.theme).to eq('mastodon-5')
+      it 'falls back to Vanilla when the site theme is disabled' do
+        expect(subject).to eq('default')
+        expect(Setting.theme).to eq('mastodon-bird-ui-auto')
       end
     end
   end

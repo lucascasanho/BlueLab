@@ -17,8 +17,9 @@ import Textarea from 'react-textarea-autosize';
 import { length } from 'stringz';
 
 import { showAlertForError } from 'mastodon/actions/alerts';
-import { uploadThumbnail } from 'mastodon/actions/compose';
+import { changeComposeThreadItem, uploadThumbnail } from 'mastodon/actions/compose';
 import { changeUploadCompose } from 'mastodon/actions/compose_typed';
+import api from 'mastodon/api';
 import { Button } from 'mastodon/components/button';
 import { GIFV } from 'mastodon/components/gifv';
 import { LoadingIndicator } from 'mastodon/components/loading_indicator';
@@ -100,9 +101,10 @@ const UploadButton: React.FC<{
 
 const Preview: React.FC<{
   mediaId: string;
+  threadItemId?: string;
   position: FocalPoint;
   onPositionChange: (arg0: FocalPoint) => void;
-}> = ({ mediaId, position, onPositionChange }) => {
+}> = ({ mediaId, threadItemId, position, onPositionChange }) => {
   const nodeRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
 
   const [dragging, setDragging] = useState<'started' | 'moving' | null>(null);
@@ -115,13 +117,29 @@ const Preview: React.FC<{
     },
     immediate: dragging === 'moving',
   });
-  const media = useAppSelector((state) =>
-    (
-      (state.compose as ImmutableMap<string, unknown>).get(
-        'media_attachments',
-      ) as ImmutableList<MediaAttachment>
-    ).find((x) => x.get('id') === mediaId),
-  );
+  const media = useAppSelector((state) => {
+    const compose = state.compose as ImmutableMap<string, unknown>;
+    if (threadItemId) {
+      const threadItems = compose.get('thread_items') as
+        | ImmutableList<ImmutableMap<string, unknown>>
+        | undefined;
+      const threadItem = threadItems?.find(
+        (item) => item.get('id') === threadItemId,
+      );
+      const threadMedia = threadItem?.get('media_attachments') as
+        | ImmutableList<ImmutableMap<string, unknown>>
+        | undefined;
+      const matchingThreadMedia = threadMedia?.find(
+        (item) => item.get('id') === mediaId,
+      );
+      if (matchingThreadMedia) {
+        return matchingThreadMedia as MediaAttachment;
+      }
+    }
+    return (
+      (compose.get('media_attachments') as ImmutableList<MediaAttachment>)
+    ).find((item) => item.get('id') === mediaId);
+  });
   const account = useAppSelector((state) =>
     me ? state.accounts.get(me) : undefined,
   );
@@ -198,7 +216,11 @@ const Preview: React.FC<{
       <Video
         preview={media.get('preview_url') as string}
         frameRate={media.getIn(['meta', 'original', 'frame_rate']) as string}
-        aspectRatio={`${media.getIn(['meta', 'original', 'width']) as number} / ${media.getIn(['meta', 'original', 'height']) as number}`}
+        aspectRatio={`${
+          media.getIn(['meta', 'original', 'width']) as number
+        } / ${
+          media.getIn(['meta', 'original', 'height']) as number
+        }`}
         blurhash={media.get('blurhash') as string}
         src={media.get('url') as string}
         detailed
@@ -237,6 +259,7 @@ interface RestoreProps {
 interface Props {
   mediaId: string;
   onClose: () => void;
+  threadItemId?: string;
 }
 
 interface ConfirmationMessage {
@@ -249,17 +272,51 @@ export interface ModalRef {
   getCloseConfirmationMessage: () => null | ConfirmationMessage;
 }
 
-export const AltTextModal = forwardRef<ModalRef, Props & Partial<RestoreProps>>(
-  ({ mediaId, previousDescription, previousPosition, onClose }, ref) => {
+export const AltTextModal = forwardRef<
+  ModalRef,
+  Props & Partial<RestoreProps>
+>(
+  (
+    { mediaId, threadItemId, previousDescription, previousPosition, onClose },
+    ref,
+  ) => {
     const intl = useIntl();
     const dispatch = useAppDispatch();
-    const media = useAppSelector((state) =>
-      (
-        (state.compose as ImmutableMap<string, unknown>).get(
-          'media_attachments',
-        ) as ImmutableList<MediaAttachment>
-      ).find((x) => x.get('id') === mediaId),
-    );
+    const media = useAppSelector((state) => {
+      const compose = state.compose as ImmutableMap<string, unknown>;
+      if (threadItemId) {
+        const threadItems = compose.get('thread_items') as
+          | ImmutableList<ImmutableMap<string, unknown>>
+          | undefined;
+        const threadItem = threadItems?.find(
+          (item) => item.get('id') === threadItemId,
+        );
+        const threadMedia = threadItem?.get('media_attachments') as
+          | ImmutableList<ImmutableMap<string, unknown>>
+          | undefined;
+        const matchingThreadMedia = threadMedia?.find(
+          (item) => item.get('id') === mediaId,
+        );
+        if (matchingThreadMedia) {
+          return matchingThreadMedia as MediaAttachment;
+        }
+      }
+      return (
+        (compose.get('media_attachments') as ImmutableList<MediaAttachment>)
+      ).find((item) => item.get('id') === mediaId);
+    });
+    const threadAttachments = useAppSelector((state) => {
+      if (!threadItemId) return undefined;
+      const threadItems = (state.compose as ImmutableMap<string, unknown>).get(
+        'thread_items',
+      ) as ImmutableList<ImmutableMap<string, unknown>>;
+      const threadItem = threadItems.find(
+        (item) => item.get('id') === threadItemId,
+      );
+      return threadItem?.get('media_attachments') as
+        | ImmutableList<ImmutableMap<string, unknown>>
+        | undefined;
+    });
     const lang = useAppSelector(
       (state) =>
         (state.compose as ImmutableMap<string, unknown>).get(
@@ -312,12 +369,49 @@ export const AltTextModal = forwardRef<ModalRef, Props & Partial<RestoreProps>>(
 
     const handleSubmit = useCallback(() => {
       setIsSaving(true);
+      const focusXFormatted = ((position[0] - 0.5) * 2).toFixed(2);
+      const focusYFormatted = ((position[1] - 0.5) * -2).toFixed(2);
+      const focus = `${focusXFormatted},${focusYFormatted}`;
+
+      if (threadItemId) {
+        void api()
+          .put(`/api/v1/media/${mediaId}`, { description, focus })
+          .then(() => {
+            if (threadAttachments) {
+              const updatedFocusX = (position[0] - 0.5) * 2;
+              const updatedFocusY = (position[1] - 0.5) * -2;
+              const updated = threadAttachments.map((attachment) =>
+                attachment.get('id') === mediaId
+                  ? attachment
+                      .set('description', description)
+                      .setIn(['meta', 'focus', 'x'], updatedFocusX)
+                      .setIn(['meta', 'focus', 'y'], updatedFocusY)
+                  : attachment,
+              );
+              dispatch(
+                changeComposeThreadItem(
+                  threadItemId,
+                  'media_attachments',
+                  updated,
+                ),
+              );
+            }
+            setIsSaving(false);
+            dirtyRef.current = false;
+            onClose();
+          })
+          .catch((err: unknown) => {
+            setIsSaving(false);
+            dispatch(showAlertForError(err));
+          });
+        return;
+      }
 
       dispatch(
         changeUploadCompose({
           id: mediaId,
           description,
-          focus: `${((position[0] - 0.5) * 2).toFixed(2)},${((position[1] - 0.5) * -2).toFixed(2)}`,
+          focus,
         }),
       )
         .then(() => {
@@ -330,7 +424,15 @@ export const AltTextModal = forwardRef<ModalRef, Props & Partial<RestoreProps>>(
           setIsSaving(false);
           dispatch(showAlertForError(err));
         });
-    }, [dispatch, setIsSaving, mediaId, onClose, position, description]);
+    }, [
+      dispatch,
+      mediaId,
+      onClose,
+      position,
+      description,
+      threadItemId,
+      threadAttachments,
+    ]);
 
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent) => {
@@ -418,8 +520,8 @@ export const AltTextModal = forwardRef<ModalRef, Props & Partial<RestoreProps>>(
             className='dialog-modal__header__title'
           >
             <FormattedMessage
-              id='alt_text_modal.add_alt_text'
-              defaultMessage='Add alt text'
+              id='account_edit.image_alt_modal.edit_title'
+              defaultMessage='Edit alt text'
             />
           </NavigationFocusTarget>
 
@@ -435,12 +537,15 @@ export const AltTextModal = forwardRef<ModalRef, Props & Partial<RestoreProps>>(
           <div className='dialog-modal__content__preview'>
             <Preview
               mediaId={mediaId}
+              threadItemId={threadItemId}
               position={position}
               onPositionChange={handlePositionChange}
             />
 
             {/* This button is hidden for attached audio/video files, as they are already posted */}
-            {(type === 'audio' || type === 'video') && unattached && (
+            {(type === 'audio' || type === 'video') &&
+              unattached &&
+              !threadItemId && (
               <UploadButton
                 onSelectFile={handleThumbnailChange}
                 mimeTypes='image/jpeg,image/png,image/gif,image/webp'
@@ -494,7 +599,7 @@ export const AltTextModal = forwardRef<ModalRef, Props & Partial<RestoreProps>>(
                 <button
                   className='link-button'
                   onClick={handleDetectClick}
-                  disabled={type !== 'image' || isDetecting}
+                  disabled={type !== 'image' || !!threadItemId || isDetecting}
                   type='button'
                 >
                   <FormattedMessage

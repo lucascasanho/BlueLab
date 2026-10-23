@@ -543,7 +543,6 @@ sc:
         follow_recommendations: Cussìgios de sighidura
         profile_directory: Diretòriu de profilos
         public_timelines: Lìnias de tempus pùblicas
-        publish_statistics: Pùblica istatìsticas
         title: Iscoberta
         trends: Tendèntzias
       domain_blocks:
@@ -612,8 +611,6 @@ sc:
     warning_presets:
       add_new: Agiunghe noa
       delete: Cantzella
-      edit_preset: Modìfica s'avisu predefinidu
-      empty: No as cunfiguradu ancora perunu avisu predefinidu.
     webhooks:
       delete: Cantzella
       disable: Disativa

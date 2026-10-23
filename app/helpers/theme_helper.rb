@@ -21,6 +21,10 @@ module ThemeHelper
     vite_stylesheet_tag "themes/#{theme}", type: :virtual, media: 'all', crossorigin: 'anonymous'
   end
 
+  def available_theme_colors(theme)
+    Themes.instance.available_theme_colors(theme)
+  end
+
   def theme_color_tags(color_scheme)
     case color_scheme
     when 'auto'
@@ -46,10 +50,12 @@ module ThemeHelper
     )
   end
 
-  # Validated semantic-token overrides. Keeping this after the selected theme
-  # lets every theme retain its structure while instance colors stay authoritative.
+  # Keep instance palette overrides on the alternative themes only. The default
+  # Vanilla theme must use Mastodon's own token and color-palette system.
   def instance_customization_styles
     accent = safe_customization_color(:instance_accent_color, fallback: '#6364ff')
+    # Keep verification marks tied to the administrator's accent in every theme.
+    badge_colors = InstanceVerification.local_badge.fetch('colors')
     light_background = safe_customization_color(:instance_light_background_color, fallback: '#ffffff')
     light_surface = safe_customization_color(:instance_light_surface_color, fallback: '#f7f7f9')
     light_text = safe_customization_color(:instance_light_text_color, fallback: '#1f1b23')
@@ -58,6 +64,7 @@ module ThemeHelper
     dark_text = safe_customization_color(:instance_dark_text_color, fallback: '#f7f9f9')
     custom_logo = Rails.cache.fetch('site_uploads/auth_logo') { SiteUpload.find_by(var: 'auth_logo') }&.file&.url
     custom_logo = nil unless custom_logo&.match?(%r{\A/[a-zA-Z0-9_./-]+\z})
+    custom_logo ||= favicon_path(48) || frontend_asset_path('icons/favicon-48x48.png')
     logo_token = "--instance-logo: url(#{custom_logo});" if custom_logo.present?
 
     # This CSS is passed through safe_join before it is placed in a <style> RAWTEXT
@@ -68,11 +75,16 @@ module ThemeHelper
     css = <<~CSS
       :root {
         #{logo_token}
+        --instance-accent-color: #{accent};
+        --instance-verification-badge-start: #{badge_colors.fetch(0)};
+        --instance-verification-badge-middle: #{badge_colors.fetch(1)};
+        --instance-verification-badge-end: #{badge_colors.fetch(2)};
+      }
+      html:has(body[data-theme=blue-2]),
+      html:has(body[data-theme=mastodon-bird-ui-auto]) {
         --color-bg-brand-base: #{accent};
         --color-bg-brand-base-hover: color-mix(in srgb, #{accent}, black 15%);
-
-        // Legacy semantic aliases used by Bird UI and older Mastodon controls.
-        // They intentionally resolve to the administrator-selected instance accent.
+        /* Legacy semantic aliases are scoped to the two alternative themes. */
         --color-brand-mastodon: #{accent};
         --color-brand-mastodon-links: #{accent};
         --color-accent: #{accent};
@@ -84,7 +96,10 @@ module ThemeHelper
         --color-bg-brand-soft: color-mix(in srgb, #{accent}, transparent 85%);
         --color-bg-brand-softest: color-mix(in srgb, #{accent}, transparent 90%);
       }
-      [data-color-scheme=dark], html:not([data-color-scheme]) {
+      html[data-color-scheme=dark]:has(body[data-theme=blue-2]),
+      html:not([data-color-scheme]):has(body[data-theme=blue-2]),
+      html[data-color-scheme=dark]:has(body[data-theme=mastodon-bird-ui-auto]),
+      html:not([data-color-scheme]):has(body[data-theme=mastodon-bird-ui-auto]) {
         --color-bg: #{dark_background};
         --color-bg-primary: #{dark_background};
         --color-bg-ambient: #{dark_background};
@@ -101,7 +116,8 @@ module ThemeHelper
         --color-text-status-links: var(--color-text-brand);
         --color-border-brand: var(--color-text-brand);
       }
-      [data-color-scheme=light] {
+      html[data-color-scheme=light]:has(body[data-theme=blue-2]),
+      html[data-color-scheme=light]:has(body[data-theme=mastodon-bird-ui-auto]) {
         --color-bg: #{light_background};
         --color-bg-primary: #{light_background};
         --color-bg-ambient: #{light_background};
@@ -202,8 +218,29 @@ module ThemeHelper
     current_user_if_available&.setting_contrast || 'auto'
   end
 
+  def density
+    current_user&.setting_density || 'default'
+  end
+
+  def theme_color(theme)
+    available_colors = available_theme_colors(theme)
+    return if available_colors.empty?
+
+    user_color = current_user&.setting_theme_color
+    return user_color if user_color && available_colors.include?(user_color)
+
+    color = Setting.theme_color
+    return color if color && available_colors.include?(color)
+
+    available_colors.first
+  end
+
   def page_color_scheme
     content_for(:force_color_scheme).presence || color_scheme
+  end
+
+  def page_theme_color(theme)
+    content_for(:force_theme_color).presence || theme_color(theme)
   end
 
   private

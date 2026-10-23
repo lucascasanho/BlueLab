@@ -19,8 +19,7 @@ module Admin
 
       preferred_verification_role_name = I18n.locale.to_s.start_with?('en') ? 'Verified' : UserRole::VERIFIED_ROLE_NAME
       verified_role = UserRole.where(name: UserRole::VERIFIED_ROLE_NAMES)
-                               .sort_by { |role| role.name == preferred_verification_role_name ? 0 : 1 }
-                               .first
+        .min_by { |role| role.name == preferred_verification_role_name ? 0 : 1 }
       unless verified_role
         return redirect_to admin_verification_request_path(@verification_request),
                            alert: I18n.t('admin.verification_requests.verified_role_missing')
@@ -48,7 +47,7 @@ module Admin
             @verification_request.resolve!(current_account, status: :approved)
           elsif user.role.position > verified_role.position
             user.errors.add(:role_id, :elevated)
-            raise ActiveRecord::RecordInvalid.new(user)
+            raise ActiveRecord::RecordInvalid, user
           else
             user.current_account = current_account
             previously_verified = user.role.verified_by_instance?
@@ -71,10 +70,7 @@ module Admin
       redirect_to admin_verification_request_path(@verification_request),
                   alert: I18n.t('admin.verification_requests.already_resolved')
     rescue ActiveRecord::RecordInvalid => e
-      if e.record.errors.added?(:role_id, :elevated)
-        redirect_to admin_verification_request_path(@verification_request),
-                    alert: I18n.t('admin.verification_requests.role_would_be_downgraded')
-      elsif e.record.errors.added?(:role, :elevated)
+      if e.record.errors.added?(:role_id, :elevated) || e.record.errors.added?(:role, :elevated)
         redirect_to admin_verification_request_path(@verification_request),
                     alert: I18n.t('admin.verification_requests.role_would_be_downgraded')
       else

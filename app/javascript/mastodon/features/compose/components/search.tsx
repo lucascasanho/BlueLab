@@ -3,6 +3,7 @@ import {
   useState,
   useRef,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useId,
 } from 'react';
@@ -19,30 +20,33 @@ import { useHistory } from 'react-router-dom';
 
 import { isFulfilled } from '@reduxjs/toolkit';
 
+import { MagnifyingGlassIcon, XCircleIcon, XIcon } from '@phosphor-icons/react';
+
 import {
   FOCUS_TARGET,
   useFocusAfterNavigation,
 } from '@/mastodon/components/navigation_focus_target';
 import { getCollectionPath } from '@/mastodon/features/collections/utils';
-import { useMergedRefs } from '@/mastodon/hooks/useMergedRefs';
-import { isRedesignEnabled } from '@/mastodon/utils/environment';
-import CancelIcon from '@/material-icons/400-24px/cancel-fill.svg?react';
-import CloseIcon from '@/material-icons/400-24px/close.svg?react';
-import SearchIcon from '@/material-icons/400-24px/search.svg?react';
 import {
   clickSearchResult,
   forgetSearchResult,
   openURL,
 } from 'mastodon/actions/search';
-import { Icon } from 'mastodon/components/icon';
+import { Icon, iconWeight } from 'mastodon/components/icon';
 import { useIdentity } from 'mastodon/identity_context';
 import { domain, searchEnabled } from 'mastodon/initial_state';
 import type { RecentSearch, SearchType } from 'mastodon/models/search';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 import { HASHTAG_REGEX } from 'mastodon/utils/hashtags';
 
+import classes from './search.module.scss';
+
 const messages = defineMessages({
   placeholder: { id: 'search.placeholder', defaultMessage: 'Search' },
+  placeholderSidebar: {
+    id: 'search.placeholder_ellipsis',
+    defaultMessage: 'Search…',
+  },
   clearSearch: { id: 'search.clear', defaultMessage: 'Clear search' },
   placeholderSignedIn: {
     id: 'search.search_or_paste',
@@ -69,9 +73,11 @@ const ClearButton: React.FC<{
 
   return (
     <div
-      className={classNames('search__icon-wrapper', { 'has-value': hasValue })}
+      className={classNames('search__icon-wrapper', classes.searchIcon, {
+        'has-value': hasValue,
+      })}
     >
-      <Icon id='search' icon={SearchIcon} className='search__icon' />
+      <Icon id='search' icon={MagnifyingGlassIcon} className='search__icon' />
       <button
         type='button'
         onClick={onClick}
@@ -81,12 +87,88 @@ const ClearButton: React.FC<{
       >
         <Icon
           id='times-circle'
-          icon={CancelIcon}
+          icon={iconWeight(XCircleIcon, 'fill')}
           aria-label={intl.formatMessage(messages.clearSearch)}
         />
       </button>
     </div>
   );
+};
+
+interface SearchScrollPosition {
+  element: HTMLElement;
+  top: number;
+  left: number;
+}
+
+interface SearchScrollSnapshot {
+  input: HTMLInputElement;
+  positions: SearchScrollPosition[];
+}
+
+const getSearchScrollPositions = (
+  input: HTMLInputElement,
+): SearchScrollPosition[] => {
+  const positions: SearchScrollPosition[] = [];
+  const seen = new Set<HTMLElement>();
+  const documentScroller = document.scrollingElement;
+
+  const addPosition = (element: HTMLElement, includeNonScrollable = false) => {
+    if (seen.has(element)) return;
+
+    if (
+      !includeNonScrollable &&
+      element !== documentScroller &&
+      element.scrollHeight <= element.clientHeight &&
+      element.scrollWidth <= element.clientWidth
+    ) {
+      return;
+    }
+
+    positions.push({
+      element,
+      top: element.scrollTop,
+      left: element.scrollLeft,
+    });
+    seen.add(element);
+  };
+
+  let element = input.parentElement;
+  while (element) {
+    addPosition(element);
+    element = element.parentElement;
+  }
+
+  // The timeline can scroll independently from the search header. Also track
+  // the shared document and layout scrollers, including when the search field
+  // lives in the navigation panel instead of inside a column.
+  document
+    .querySelectorAll<HTMLElement>(
+      '.scrollable, .column, .columns-area, .columns-area--mobile, .columns-area__panels, .columns-area__panels__main, .main, [data-column-root]',
+    )
+    .forEach((scroller) => {
+      addPosition(scroller, true);
+    });
+
+  if (documentScroller instanceof HTMLElement) {
+    addPosition(documentScroller, true);
+  }
+
+  return positions;
+};
+
+const restoreSearchScrollPositions = (positions: SearchScrollPosition[]) => {
+  positions.forEach(({ element, top, left }) => {
+    if (!element.isConnected) return;
+
+    if (element.scrollTop !== top) {
+      element.scrollTop = top;
+    }
+
+    if (element.scrollLeft !== left) {
+      element.scrollLeft = left;
+    }
+  });
 };
 
 interface SearchOption {
@@ -98,8 +180,9 @@ interface SearchOption {
 
 export const Search: React.FC<{
   singleColumn: boolean;
+  context?: 'column' | 'sidebar';
   initialValue?: string;
-}> = ({ singleColumn, initialValue }) => {
+}> = ({ singleColumn, context = 'column', initialValue }) => {
   const intl = useIntl();
   const recent = useAppSelector((state) => state.search.recent);
   const { signedIn } = useIdentity();
@@ -111,12 +194,22 @@ export const Search: React.FC<{
   const [expanded, setExpanded] = useState(false);
   const [selectedOption, setSelectedOption] = useState(-1);
   const [quickActions, setQuickActions] = useState<SearchOption[]>([]);
-  const [shouldOpenOnFocus, setShouldOpenOnFocus] = useState(false);
+  const [shouldOpenOnFocus, setShouldOpenOnFocus] = useState(
+    context === 'sidebar',
+  );
+  const handleAfterNavigationFocus = useCallback(() => {
+    setShouldOpenOnFocus(true);
+  }, []);
   const focusAfterNavigation = useFocusAfterNavigation(
     FOCUS_TARGET.SEARCH,
-    () => {
-      setShouldOpenOnFocus(true);
+    handleAfterNavigationFocus,
+  );
+  const setSearchInputRef = useCallback(
+    (element: HTMLInputElement | null) => {
+      searchInputRef.current = element;
+      focusAfterNavigation(element);
     },
+    [focusAfterNavigation],
   );
 
   const unfocus = useCallback(() => {
@@ -321,8 +414,119 @@ export const Search: React.FC<{
     [dispatch, history, unfocus],
   );
 
+  const searchScrollSnapshotRef = useRef<SearchScrollSnapshot | null>(null);
+  const [focusedSearchInput, setFocusedSearchInput] =
+    useState<HTMLInputElement | null>(null);
+
+  const captureSearchScroll = useCallback(
+    (input: HTMLInputElement, replace = false) => {
+      const current = searchScrollSnapshotRef.current;
+      if (current?.input === input && !replace) return;
+
+      searchScrollSnapshotRef.current = {
+        input,
+        positions: getSearchScrollPositions(input),
+      };
+    },
+    [],
+  );
+
+  const handleBeforeInput = useCallback(
+    (event: React.SyntheticEvent<HTMLInputElement>) => {
+      captureSearchScroll(event.currentTarget);
+    },
+    [captureSearchScroll],
+  );
+
+  useEffect(() => {
+    if (!focusedSearchInput) return;
+
+    let frame = 0;
+    let releaseIntentTimer: number | undefined;
+    let intentionalScroll = false;
+
+    const rebaseAfterIntentionalScroll = (event: Event) => {
+      intentionalScroll = true;
+
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+      }
+
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+
+        if (document.activeElement === focusedSearchInput) {
+          captureSearchScroll(focusedSearchInput, true);
+        }
+
+        if (releaseIntentTimer !== undefined) {
+          window.clearTimeout(releaseIntentTimer);
+        }
+
+        // Wheel gestures usually finish quickly. Touch scrolling can continue
+        // with momentum, so keep its allowance active a little longer.
+        const delay = event.type === 'touchmove' ? 700 : 120;
+        releaseIntentTimer = window.setTimeout(() => {
+          intentionalScroll = false;
+          releaseIntentTimer = undefined;
+        }, delay);
+      });
+    };
+
+    const restoreUnexpectedScroll = () => {
+      if (intentionalScroll || document.activeElement !== focusedSearchInput) {
+        return;
+      }
+
+      const snapshot = searchScrollSnapshotRef.current;
+      if (snapshot?.input === focusedSearchInput) {
+        restoreSearchScrollPositions(snapshot.positions);
+      }
+    };
+
+    // Backspace can trigger browser scroll anchoring as the suggestion panel
+    // changes height. Keep that automatic movement from accumulating while
+    // leaving wheel and touch scrolling available to the user.
+    document.addEventListener('scroll', restoreUnexpectedScroll, {
+      capture: true,
+      passive: true,
+    });
+    window.addEventListener('scroll', restoreUnexpectedScroll, {
+      passive: true,
+    });
+    document.addEventListener('wheel', rebaseAfterIntentionalScroll, {
+      capture: true,
+      passive: true,
+    });
+    document.addEventListener('touchmove', rebaseAfterIntentionalScroll, {
+      capture: true,
+      passive: true,
+    });
+
+    return () => {
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+      }
+      if (releaseIntentTimer !== undefined) {
+        window.clearTimeout(releaseIntentTimer);
+      }
+      document.removeEventListener('scroll', restoreUnexpectedScroll, true);
+      window.removeEventListener('scroll', restoreUnexpectedScroll);
+      document.removeEventListener('wheel', rebaseAfterIntentionalScroll, true);
+      document.removeEventListener(
+        'touchmove',
+        rebaseAfterIntentionalScroll,
+        true,
+      );
+    };
+  }, [captureSearchScroll, focusedSearchInput]);
+
   const handleChange = useCallback(
-    ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+    ({
+      target: { value },
+      currentTarget,
+    }: React.ChangeEvent<HTMLInputElement>) => {
+      captureSearchScroll(currentTarget);
       setValue(value);
       setExpanded(true);
       setSelectedOption(-1);
@@ -444,8 +648,34 @@ export const Search: React.FC<{
 
       setQuickActions(newQuickActions);
     },
-    [signedIn, dispatch, unfocus, history, submit],
+    [signedIn, dispatch, unfocus, history, submit, captureSearchScroll],
   );
+
+  useLayoutEffect(() => {
+    const snapshot = searchScrollSnapshotRef.current;
+    if (snapshot?.input !== searchInputRef.current) return;
+    if (document.activeElement !== snapshot.input) return;
+
+    const restoreWhileInputFocused = () => {
+      if (
+        searchScrollSnapshotRef.current !== snapshot ||
+        !snapshot.input.isConnected ||
+        document.activeElement !== snapshot.input
+      ) {
+        return;
+      }
+
+      restoreSearchScrollPositions(snapshot.positions);
+    };
+
+    // Keep one stable baseline for the entire focus session. Capturing the
+    // already-shifted position after every key would allow the drift to add up.
+    restoreWhileInputFocused();
+    window.requestAnimationFrame(() => {
+      restoreWhileInputFocused();
+      window.requestAnimationFrame(restoreWhileInputFocused);
+    });
+  }, [value]);
 
   const handleClear = useCallback(() => {
     setValue('');
@@ -456,6 +686,26 @@ export const Search: React.FC<{
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
+      const target = e.currentTarget;
+      const isTextEditingKey =
+        e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete';
+
+      // Snapshot scroll positions before the browser processes the keystroke.
+      // The layout effect restores them after React updates the suggestion list.
+      if (
+        target instanceof HTMLInputElement &&
+        target === searchInputRef.current &&
+        isTextEditingKey &&
+        !e.ctrlKey &&
+        !e.metaKey
+      ) {
+        captureSearchScroll(target);
+      }
+
+      // Typed search input must not trigger global keyboard shortcuts in any
+      // theme, which can move the timeline or change the page scroll position.
+      e.stopPropagation();
+
       switch (e.key) {
         case 'Escape':
           e.preventDefault();
@@ -508,7 +758,14 @@ export const Search: React.FC<{
           break;
       }
     },
-    [expanded, navigableOptions, selectedOption, submit, value],
+    [
+      captureSearchScroll,
+      expanded,
+      navigableOptions,
+      selectedOption,
+      submit,
+      value,
+    ],
   );
 
   const handleInputFocus = useCallback(() => {
@@ -518,20 +775,50 @@ export const Search: React.FC<{
     }
 
     if (searchInputRef.current && !singleColumn) {
-      const { left, right } = searchInputRef.current.getBoundingClientRect();
+      const input = searchInputRef.current;
+      const { left, right } = input.getBoundingClientRect();
+      const viewportWidth =
+        window.innerWidth || document.documentElement.clientWidth;
 
-      if (
-        left < 0 ||
-        right > (window.innerWidth || document.documentElement.clientWidth)
-      ) {
-        searchInputRef.current.scrollIntoView();
+      if (left < 0 || right > viewportWidth) {
+        const horizontalDelta = left < 0 ? left : right - viewportWidth;
+        let scrollable: HTMLElement | null = input.parentElement;
+
+        while (scrollable && scrollable !== document.body) {
+          const { overflowX } = window.getComputedStyle(scrollable);
+          if (
+            scrollable.scrollWidth > scrollable.clientWidth &&
+            /(auto|scroll|overlay)/.test(overflowX)
+          ) {
+            break;
+          }
+          scrollable = scrollable.parentElement;
+        }
+
+        if (scrollable && scrollable !== document.body) {
+          scrollable.scrollTo({
+            left: scrollable.scrollLeft + horizontalDelta,
+            top: scrollable.scrollTop,
+            behavior: 'auto',
+          });
+        } else {
+          window.scrollBy({ left: horizontalDelta, top: 0, behavior: 'auto' });
+        }
       }
     }
-  }, [shouldOpenOnFocus, singleColumn]);
+
+    const input = searchInputRef.current;
+    if (input) {
+      setFocusedSearchInput(input);
+      captureSearchScroll(input, true);
+    }
+  }, [captureSearchScroll, shouldOpenOnFocus, singleColumn]);
 
   const handleInputBlur = useCallback(() => {
+    searchScrollSnapshotRef.current = null;
+    setFocusedSearchInput(null);
     setSelectedOption(-1);
-  }, [setSelectedOption]);
+  }, []);
 
   const getOptionFocusHandler = useCallback((index: number) => {
     return () => {
@@ -567,6 +854,12 @@ export const Search: React.FC<{
   }, [expanded]);
 
   const searchOptionsHeading = useId();
+  let placeholder = intl.formatMessage(
+    signedIn ? messages.placeholderSignedIn : messages.placeholder,
+  );
+  if (context === 'sidebar') {
+    placeholder = intl.formatMessage(messages.placeholderSidebar);
+  }
 
   return (
     <form
@@ -575,20 +868,15 @@ export const Search: React.FC<{
       className={classNames('search', { active: expanded })}
     >
       <input
-        ref={useMergedRefs(
-          searchInputRef,
-          isRedesignEnabled() ? focusAfterNavigation : null,
-        )}
-        className='search__input'
         type='text'
         inputMode='search'
-        placeholder={intl.formatMessage(
-          signedIn ? messages.placeholderSignedIn : messages.placeholder,
-        )}
-        aria-label={intl.formatMessage(
-          signedIn ? messages.placeholderSignedIn : messages.placeholder,
-        )}
+        data-main-search
+        ref={context === 'column' ? setSearchInputRef : searchInputRef}
+        className={classes.search}
+        placeholder={placeholder}
+        aria-label={placeholder}
         value={value}
+        onBeforeInput={handleBeforeInput}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         onFocus={handleInputFocus}
@@ -634,7 +922,7 @@ export const Search: React.FC<{
                       onMouseDown={forget}
                       type='button'
                     >
-                      <Icon id='times' icon={CloseIcon} />
+                      <Icon id='times' icon={XIcon} />
                     </button>
                   </div>
                 ))

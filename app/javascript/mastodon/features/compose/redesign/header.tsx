@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
-import { ArrowsOutSimpleIcon, MinusIcon, XIcon } from '@phosphor-icons/react';
+import { MinusIcon, PencilSimpleIcon } from '@phosphor-icons/react';
 
 import { IconButton } from '@/mastodon/components/button/redesign';
 import {
@@ -15,6 +15,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from '@/mastodon/store';
+import CloseIcon from '@/material-icons/400-20px/close.svg?react';
 
 import { selectComposeType } from './selectors';
 import classes from './styles.module.scss';
@@ -91,14 +92,14 @@ export const ComposeFormHeader: React.FC<{
         <IconButton
           size='sm'
           variant='ghost'
-          icon={isMinimized ? ArrowsOutSimpleIcon : MinusIcon}
+          icon={isMinimized ? PencilSimpleIcon : MinusIcon}
           onClick={onMinimize}
           tooltipPlacement='top'
         >
           {isMinimized ? (
             <FormattedMessage
-              id='compose.expand'
-              defaultMessage='Show composer'
+              id='compose.resume_draft'
+              defaultMessage='Resume draft'
             />
           ) : (
             <FormattedMessage
@@ -110,7 +111,12 @@ export const ComposeFormHeader: React.FC<{
       )}
 
       {!noClose && (
-        <IconButton icon={XIcon} variant='ghost' size='sm' onClick={onClose}>
+        <IconButton
+          icon={CloseIcon}
+          variant='ghost'
+          size='sm'
+          onClick={onClose}
+        >
           <FormattedMessage id='lightbox.close' defaultMessage='Close' />
         </IconButton>
       )}

@@ -16,12 +16,9 @@ import {
   GavelIcon,
   ShieldStarIcon,
   SignOutIcon,
-  MastodonLogoIcon,
-  GithubLogoIcon,
 } from '@phosphor-icons/react';
 
 import { openModal } from '@/mastodon/actions/modal';
-import { AccountSwitcherMenuSection } from '@/mastodon/features/account_switcher';
 import { Avatar } from '@/mastodon/components/avatar';
 import { IconButton } from '@/mastodon/components/button/redesign';
 import { DisplayName } from '@/mastodon/components/display_name';
@@ -31,15 +28,14 @@ import {
   Menu,
   MenuItem,
   MenuItemDivider,
-  MenuItemGroup,
   MenuItemLink,
   MenuList,
   MenuTrigger,
 } from '@/mastodon/components/menu';
 import { Popover } from '@/mastodon/components/popover';
+import { AccountSwitcherMenuSection } from '@/mastodon/features/account_switcher';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
-import { source_url, version } from '@/mastodon/initial_state';
 import {
   canManageReports,
   canViewAdminDashboard,
@@ -56,10 +52,6 @@ export const NavigationAccountCardAndMenu: React.FC<{
   inSlideOut?: boolean;
 }> = ({ inSlideOut = false }) => {
   const { accountId } = useIdentity();
-  const account = useAccount(accountId);
-  const handle = useAccountHandle(account);
-  const accountBasePath = `/@${account?.acct}`;
-
   if (!accountId) {
     return null;
   }
@@ -345,17 +337,17 @@ export const AccountMenuItems: React.FC<{
         />
       </MenuItemLink>
 
-      <MenuItemLink to='/scheduled' icon={CalendarDotsIcon}>
-        <FormattedMessage
-          id='navigation_bar.scheduled_publications'
-          defaultMessage='Scheduled publications'
-        />
-      </MenuItemLink>
-
       <MenuItemLink to='/favourites' icon={FavouriteIcon}>
         <FormattedMessage
           id='navigation_bar.favourites'
           defaultMessage='Favorites'
+        />
+      </MenuItemLink>
+
+      <MenuItemLink to='/scheduled' icon={CalendarDotsIcon}>
+        <FormattedMessage
+          id='navigation_bar.scheduled_publications'
+          defaultMessage='Scheduled publications'
         />
       </MenuItemLink>
 
@@ -407,28 +399,6 @@ export const AccountMenuItems: React.FC<{
           )}
         </>
       )}
-
-      <MenuItemDivider />
-
-      <MenuItemGroup label={`Mastodon v${version}`}>
-        <MenuItemLink as='a' href={source_url} icon={GithubLogoIcon}>
-          <FormattedMessage
-            id='navigation_bar.source_code'
-            defaultMessage='Source Code'
-          />
-        </MenuItemLink>
-
-        <MenuItemLink
-          as='a'
-          href='https://joinmastodon.org'
-          icon={MastodonLogoIcon}
-        >
-          <FormattedMessage
-            id='navigation_bar.about_mastodon'
-            defaultMessage='About Mastodon'
-          />
-        </MenuItemLink>
-      </MenuItemGroup>
 
       <MenuItemDivider />
 

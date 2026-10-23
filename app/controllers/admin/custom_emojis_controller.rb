@@ -21,6 +21,11 @@ module Admin
       @custom_emoji = CustomEmoji.new
     end
 
+    def edit
+      @custom_emoji = local_custom_emoji
+      nil if performed?
+    end
+
     def create
       authorize :custom_emoji, :create?
 
@@ -32,11 +37,6 @@ module Admin
       else
         render :new
       end
-    end
-
-    def edit
-      @custom_emoji = local_custom_emoji
-      return if performed?
     end
 
     def update

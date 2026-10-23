@@ -5,7 +5,7 @@
   position: fixed;
   bottom: env(safe-area-inset-bottom);
   inset-inline: 0;
-  padding: 0 var(--space-4) var(--space-4);
+  padding: 0 var(--space-2) var(--space-2);
   z-index: 100;
   display: flex;
 
@@ -25,14 +25,6 @@
   @media (width > $mobile-menu-breakpoint) {
     display: none;
   }
-
-  // Blue2 deliberately treats tablet widths as compact/mobile. Keep the
-  // redesigned navigation visible there without changing other themes.
-  @media (width > $mobile-menu-breakpoint) and (width <= 1174px) {
-    :global(body[data-theme='blue-2']) & {
-      display: flex;
-    }
-  }
 }
 
 .floatingCard {
@@ -42,7 +34,7 @@
   align-self: stretch;
   background-color: var(--color-bg-primary);
   border-radius: var(--radius-round);
-  @include mixins.elevation-1;
+  border: var(--border-default);
 }
 
 .list {
@@ -78,20 +70,15 @@
 .slideOutWrapper {
   position: fixed;
   inset: 0;
-  z-index: 300;
+  z-index: 200;
   pointer-events: none;
-  visibility: hidden;
   background: rgb(from var(--color-bg-overlay) r g b/50%);
   opacity: 0;
-  transition:
-    opacity 250ms ease,
-    visibility 0s linear 250ms;
+  transition: opacity 250ms ease;
 
   &[data-is-open='true'] {
     pointer-events: auto;
-    visibility: visible;
     opacity: 1;
-    transition-delay: 0s;
   }
 }
 
@@ -102,13 +89,129 @@
   --pull-tolerance: 70px;
 
   position: fixed;
-  z-index: 1;
   inset-block: 0;
   inset-inline-start: calc(-1 * var(--pull-tolerance));
-  width: var(--navigation-max-width);
+  width: var(--navigation-width);
   max-width: calc(100vw - var(--space-8));
   padding-inline-start: var(--pull-tolerance);
   touch-action: pan-y;
   background: var(--color-bg-primary);
   box-shadow: var(--dropdown-shadow);
+}
+
+/* BlueLab-only overrides. The upstream stylesheet above remains active for Vanilla and other themes. */
+
+/* prettier-ignore */
+:global(body[data-theme='blue-2']) {
+  .root {
+    position: fixed;
+    bottom: env(safe-area-inset-bottom);
+    inset-inline: 0;
+    padding: 0 var(--space-2) var(--space-2);
+    z-index: 100;
+    display: flex;
+  
+    // This moves the compose FAB above the navigation,
+    // which somehow makes more sense for the focus order
+    flex-direction: column-reverse;
+    align-items: end;
+    gap: var(--space-2);
+  
+    // Allow clicking through this container
+    pointer-events: none;
+  
+    & > * {
+      pointer-events: initial;
+    }
+  
+    @media (width > $mobile-menu-breakpoint) {
+      display: none;
+    }
+  
+    // Blue2 deliberately treats tablet widths as compact/mobile. Keep the
+    // redesigned navigation visible there without changing other themes.
+    @media (width > $mobile-menu-breakpoint) and (width <= 1174px) {
+      & & {
+        display: flex;
+      }
+    }
+  }
+  
+  .floatingCard {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    background-color: var(--color-bg-primary);
+    border-radius: var(--radius-round);
+    border: var(--border-default);
+  }
+  
+  .list {
+    padding: var(--space-1);
+  
+    > li {
+      flex-grow: 1;
+    }
+  }
+  
+  .loggedOutInfo {
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+  }
+  
+  .logoLockup {
+    margin-inline-end: auto;
+  }
+  
+  .signUpButton {
+    white-space: nowrap;
+  
+    @media (width <= 360px) {
+      display: none;
+    }
+  }
+  
+  .avatar,
+  .avatar img {
+    border-radius: var(--radius-round);
+  }
+  
+  .slideOutWrapper {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    pointer-events: none;
+    visibility: hidden;
+    background: rgb(from var(--color-bg-overlay) r g b/50%);
+    opacity: 0;
+    transition:
+      opacity 250ms ease,
+      visibility 0s linear 250ms;
+  
+    &[data-is-open='true'] {
+      pointer-events: auto;
+      visibility: visible;
+      opacity: 1;
+      transition-delay: 0s;
+    }
+  }
+  
+  .slideOut {
+    // We extend the size of the slideOut to go beyond the viewport
+    // so that when it's pulled away from the side it was opened from,
+    // the background underneath the menu isn't revealed
+    --pull-tolerance: 70px;
+  
+    position: fixed;
+    z-index: 1;
+    inset-block: 0;
+    inset-inline-start: calc(-1 * var(--pull-tolerance));
+    width: var(--navigation-width);
+    max-width: calc(100vw - var(--space-8));
+    padding-inline-start: var(--pull-tolerance);
+    touch-action: pan-y;
+    background: var(--color-bg-primary);
+    box-shadow: var(--dropdown-shadow);
+  }
 }

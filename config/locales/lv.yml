@@ -826,10 +826,8 @@ lv:
         title: Pēc noklusējuma lietotāji būs atteikušies no meklētājprogrammu indeksēšanas
       discovery:
         follow_recommendations: Sekošanas ieteikumi
-        privacy: Konfidencialitāte
         profile_directory: Profila direktorija
         public_timelines: Publiskās ziņu lentas
-        publish_statistics: Publicēt statistiku
         title: Atklāt
         trends: Tendences
       domain_blocks:
@@ -1087,9 +1085,6 @@ lv:
     warning_presets:
       add_new: Pievienot jaunu
       delete: Dzēst
-      edit_preset: Labot iepriekš iestatītus brīdinājumus
-      empty: Tu vēl neesi definējis iepriekš iestatītos brīdinājumus.
-      title: Brīdinājumu priekšiestatījums
     webhooks:
       add_new: Pievienot galapunktu
       delete: Dzēst

@@ -18,6 +18,7 @@ export type MenuCardProps<As extends React.ElementType> = PolymorphicProps<
     children: React.ReactNode;
     className?: string;
     elevation?: 1 | 2;
+    minWidth?: number | string;
     maxWidth?: number | string;
     style?: React.CSSProperties;
     popover?: React.HTMLAttributes<As>['popover'];
@@ -30,6 +31,7 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
   children,
   className,
   elevation = 1,
+  minWidth,
   maxWidth,
   style,
   // Use the native top layer when the browser exposes the Popover API. Keep
@@ -65,6 +67,8 @@ export const MenuCard = <As extends React.ElementType = 'div'>({
         {
           '--_max-card-width':
             typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth,
+          '--_min-card-width':
+            typeof minWidth === 'number' ? `${minWidth}px` : minWidth,
           ...style,
         } as React.CSSProperties
       }
@@ -104,16 +108,22 @@ export const PopoverMenuCard = <As extends React.ElementType>({
   closeOnClickOutside,
   constrainToViewport,
   scrollable,
-  mobilePresentation = 'bottom-sheet',
+  mobilePresentation,
   children,
   className,
   ...props
 }: PopoverMenuCardProps<As>) => {
   const isMobile = useBreakpoint('openable');
+  const theme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
+  const isVanillaTheme = !theme || theme === 'default' || theme === 'vanilla';
+  const effectiveMobilePresentation =
+    mobilePresentation ?? (isVanillaTheme ? 'popover' : 'bottom-sheet');
 
-  // BlueLab's account card deliberately keeps an anchored popover on mobile;
-  // other Mastodon menus retain the upstream bottom-sheet presentation.
-  if (isMobile && isOpen && mobilePresentation === 'bottom-sheet') {
+  // Vanilla uses Mastodon 5's anchored popovers by default on mobile.
+  // Other themes keep their established bottom-sheet presentation unless a
+  // caller explicitly selects a different presentation.
+  if (isMobile && isOpen && effectiveMobilePresentation === 'bottom-sheet') {
     const sheet = (
       <BottomSheet {...props} onClose={onClose}>
         {children}
@@ -149,10 +159,10 @@ export const PopoverMenuCard = <As extends React.ElementType>({
           {...(props as React.ComponentPropsWithoutRef<As>)}
           className={classNames(
             className,
-            props.maxWidth && classes.popoverCard,
+            props.maxWidth && classes.fullWidthCard,
           )}
         >
-          {children}
+          <div className={classes.scrollableInnerCard}>{children}</div>
         </MenuCard>
       )}
     </Popover>

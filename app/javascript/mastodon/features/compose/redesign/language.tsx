@@ -11,7 +11,6 @@ import {
   changeComposeLanguage,
   changeComposeThreadItem,
 } from '@/mastodon/actions/compose';
-import { CaretIcon } from '@/mastodon/components/button/redesign';
 import { TextInput } from '@/mastodon/components/form_fields/redesign';
 import {
   Menu,

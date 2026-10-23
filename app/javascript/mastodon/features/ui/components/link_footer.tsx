@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { BugReportLabel } from 'mastodon/features/bug_report/bug_report_label';
 import { useOpenBugReport } from 'mastodon/features/bug_report/use_bug_report';
 import { domain, version } from 'mastodon/initial_state';
-import { isRedesignEnabled } from 'mastodon/utils/environment';
 
 import classes from './link_footer.module.scss';
 
@@ -17,11 +16,7 @@ export const LinkFooter: React.FC<{
   const displayVersion = version?.match(/^\d+\.\d+\.\d+/)?.[0] ?? version ?? '';
 
   return (
-    <footer
-      className={classes.wrapper}
-      data-context={context}
-      data-redesign={isRedesignEnabled()}
-    >
+    <footer className={classes.wrapper} data-context={context}>
       <section>
         <ul className={classes.list}>
           <li>
@@ -59,7 +54,7 @@ export const LinkFooter: React.FC<{
               />
             </a>
           </li>
-          <li>
+          <li className={classes.keyboardShortcuts}>
             <Link to='/keyboard-shortcuts'>
               <FormattedMessage
                 id='footer.keyboard_shortcuts'
@@ -69,11 +64,11 @@ export const LinkFooter: React.FC<{
           </li>
           <li>
             <button
-                type='button'
-                className={classes.bugReportButton}
-                onClick={openBugReport}
-              >
-                <BugReportLabel />
+              type='button'
+              className={classes.bugReportButton}
+              onClick={openBugReport}
+            >
+              <BugReportLabel />
             </button>
           </li>
           <li>
@@ -84,7 +79,7 @@ export const LinkFooter: React.FC<{
             >
               <FormattedMessage
                 id='footer.source_code'
-                defaultMessage='View source code'
+                defaultMessage='Source Code'
               />
             </a>
           </li>

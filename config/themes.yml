@@ -1,4 +1,29 @@
-mastodon-bird-ui-auto: styles/mastodon-bird-ui-auto.scss
-blue-2: styles/blue-2-v23.scss
-mastodon-5: styles/mastodon-5-v1.scss
-default: styles/application.scss
+mastodon-bird-ui-auto:
+  # Set to true to re-enable this theme for users.
+  selectable: false
+  path: styles/mastodon-bird-ui-auto.scss
+  colors:
+    - indigo
+    - lime
+    - pink
+    - orange
+    - cyan
+blue-2:
+  # Set to true to re-enable this theme for users.
+  selectable: false
+  path: styles/blue-2-v23.scss
+  colors:
+    - indigo
+    - lime
+    - pink
+    - orange
+    - cyan
+default:
+  selectable: true
+  path: styles/application.scss
+  colors:
+    - indigo
+    - lime
+    - pink
+    - orange
+    - cyan

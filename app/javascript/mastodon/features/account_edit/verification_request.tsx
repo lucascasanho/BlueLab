@@ -1,19 +1,20 @@
 import { useCallback, useEffect, useId, useState } from 'react';
-import type { FC, FormEvent, MouseEvent } from 'react';
+import type { ChangeEvent, FC, MouseEvent, SyntheticEvent } from 'react';
 
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import classNames from 'classnames';
+
+import {
+  apiGetVerificationRequestStatus,
+  apiSubmitVerificationRequest,
+} from '@/mastodon/api/verification';
 import { Button } from '@/mastodon/components/button';
 import { TextAreaField } from '@/mastodon/components/form_fields';
 import { Icon } from '@/mastodon/components/icon';
 import { Popover } from '@/mastodon/components/popover';
 import { domain, title as instanceTitle } from '@/mastodon/initial_state';
 import CloseIcon from '@/material-icons/400-24px/close.svg?react';
-
-import {
-  apiGetVerificationRequestStatus,
-  apiSubmitVerificationRequest,
-} from '@/mastodon/api/verification';
 
 import classes from './verification_request.module.scss';
 
@@ -79,8 +80,7 @@ const messages = defineMessages({
   },
   successMessage: {
     id: 'account_edit.verification.popover.success_message',
-    defaultMessage:
-      'Your request was sent to the moderation team for review.',
+    defaultMessage: 'Your request was sent to the moderation team for review.',
   },
   close: {
     id: 'account_edit.verification.popover.close',
@@ -99,21 +99,23 @@ export const VerificationRequestTrigger: FC = () => {
   const [triggerElement, setTriggerElement] =
     useState<HTMLButtonElement | null>(null);
   const uniqueId = useId();
-  const popoverId =
-    'bluelab-verification-request-' + uniqueId.replace(/:/g, '');
-
-  const loadEligibility = useCallback(async () => {
-    try {
-      const result = await apiGetVerificationRequestStatus();
-      setCanRequest(result.can_request);
-    } catch {
-      setCanRequest(false);
-    }
-  }, []);
+  const popoverId = `bluelab-verification-request-${uniqueId.replace(/:/g, '')}`;
 
   useEffect(() => {
-    void loadEligibility();
-  }, [loadEligibility]);
+    let active = true;
+
+    void apiGetVerificationRequestStatus()
+      .then((result) => {
+        if (active) setCanRequest(result.can_request);
+      })
+      .catch(() => {
+        if (active) setCanRequest(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleClose = useCallback(() => {
     if (submitting) return;
@@ -124,7 +126,7 @@ export const VerificationRequestTrigger: FC = () => {
   }, [submitting]);
 
   const handleSubmit = useCallback(
-    async (event: FormEvent<HTMLFormElement>) => {
+    async (event: SyntheticEvent<HTMLFormElement>) => {
       event.preventDefault();
       setSubmitting(true);
       setError(false);
@@ -143,16 +145,27 @@ export const VerificationRequestTrigger: FC = () => {
     [explanation],
   );
 
-  const handleTrigger = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault();
-      setError(false);
-      setSubmitted(false);
-      setTriggerElement(event.currentTarget);
-      setOpen(true);
+  const handleFormSubmit = useCallback(
+    (event: SyntheticEvent<HTMLFormElement>) => {
+      void handleSubmit(event);
+    },
+    [handleSubmit],
+  );
+
+  const handleExplanationChange = useCallback(
+    (event: ChangeEvent<HTMLTextAreaElement>) => {
+      setExplanation(event.target.value);
     },
     [],
   );
+
+  const handleTrigger = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    setError(false);
+    setSubmitted(false);
+    setTriggerElement(event.currentTarget);
+    setOpen(true);
+  }, []);
 
   const resolvedInstanceTitle = instanceTitle ?? domain ?? 'this server';
 
@@ -187,15 +200,15 @@ export const VerificationRequestTrigger: FC = () => {
             {...props}
             id={popoverId}
             role='dialog'
-            aria-labelledby={popoverId + '-title'}
-            className={
-              'dropdown-animation ' +
-              classes.popover +
-              (submitted ? ' ' + classes.popoverSuccess : '')
-            }
+            aria-labelledby={`${popoverId}-title`}
+            className={classNames(
+              'dropdown-animation',
+              classes.popover,
+              submitted && classes.popoverSuccess,
+            )}
           >
             <div className={classes.titleRow}>
-              <h3 id={popoverId + '-title'} className={classes.title}>
+              <h3 id={`${popoverId}-title`} className={classes.title}>
                 {submitted ? (
                   <FormattedMessage {...messages.successTitle} />
                 ) : (
@@ -245,16 +258,16 @@ export const VerificationRequestTrigger: FC = () => {
                     <FormattedMessage {...messages.disclaimer} />
                   </p>
 
-                  <form className={classes.form} onSubmit={handleSubmit}>
+                  <form className={classes.form} onSubmit={handleFormSubmit}>
                     <TextAreaField
-                      id={popoverId + '-explanation'}
+                      id={`${popoverId}-explanation`}
                       label={intl.formatMessage(messages.explanationLabel)}
                       hint={intl.formatMessage(messages.explanationHint)}
                       value={explanation}
                       maxLength={5_000}
                       rows={6}
                       required={false}
-                      onChange={(event) => setExplanation(event.target.value)}
+                      onChange={handleExplanationChange}
                     />
 
                     {error && (

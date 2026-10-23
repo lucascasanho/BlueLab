@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe ResumableMediaUploads::Finalizer, :attachment_processing do
   let(:account) { Fabricate(:account) }
   let(:storage_root) { Rails.root.join('tmp', 'spec-resumable-finalizer', SecureRandom.hex(8)) }
-  let(:fixture_path) { Rails.root.join('spec', 'fixtures', 'files', 'attachment.jpg') }
+  let(:fixture_path) { file_fixture('attachment.jpg') }
   let(:contents) { File.binread(fixture_path) }
   let(:chunk_size) { (contents.bytesize / 2.0).ceil }
   let(:upload) do

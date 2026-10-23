@@ -13,14 +13,17 @@ import { defaultMiddleware } from '@/mastodon/store/store';
 
 import { ComposeUpload } from './upload';
 
-const renderUpload = () => {
+const renderUpload = (type: 'image' | 'video' = 'image') => {
   const reducer = reducerWithInitialState({
     compose: {
       media_attachments: [
         fromJS({
           id: 'media-1',
-          type: 'image',
-          url: 'https://example.com/image.jpg',
+          type,
+          url:
+            type === 'video'
+              ? 'https://example.com/video.mp4'
+              : 'https://example.com/image.jpg',
           preview_url: 'https://example.com/preview.jpg',
           description: null,
           blurhash: null,
@@ -39,20 +42,20 @@ const renderUpload = () => {
       getDefaultMiddleware(defaultMiddleware),
   });
 
-  render(
+  const view = render(
     <Provider store={store}>
       <IntlProvider locale='en'>
-        <ComposeUpload id='media-1' single />
+        <ComposeUpload id='media-1' />
       </IntlProvider>
     </Provider>,
   );
 
-  return store;
+  return { ...view, store };
 };
 
 describe('ComposeUpload', () => {
   test('opens the alt-text editor when the media thumbnail is activated', () => {
-    const store = renderUpload();
+    const { store } = renderUpload();
 
     fireEvent.click(
       screen.getByRole('button', { name: 'Edit media and alt text' }),
@@ -63,8 +66,18 @@ describe('ComposeUpload', () => {
     expect(modal?.get('modalProps')).toEqual({ mediaId: 'media-1' });
   });
 
+  test('renders a playable video with media actions', () => {
+    const { container } = renderUpload('video');
+
+    expect(container.querySelector('video[controls]')).not.toBeNull();
+    expect(
+      screen.getByRole('button', { name: 'Edit media and alt text' }),
+    ).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Remove media' })).toBeTruthy();
+  });
+
   test('keeps the real alt-text editor accessible from the media thumbnail', () => {
-    const store = renderUpload();
+    const { store } = renderUpload();
     const onClose = vi.fn();
 
     fireEvent.click(

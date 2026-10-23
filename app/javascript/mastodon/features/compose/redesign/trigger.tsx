@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/no-autofocus */
 import type React from 'react';
 import {
   useCallback,
@@ -14,7 +13,7 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { useRouteMatch } from 'react-router';
 
-import { ChatCircleDotsIcon, NewspaperIcon } from '@phosphor-icons/react';
+import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 
 import type { IconButtonProps } from '@/mastodon/components/button/redesign';
 import { IconButton } from '@/mastodon/components/button/redesign';
@@ -26,7 +25,6 @@ import {
   MenuItem,
 } from '@/mastodon/components/menu';
 import { MenuCard } from '@/mastodon/components/menu/card';
-import { Blue2ComposeIcon } from '@/mastodon/features/blue2/icons';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
   composerOriginFromElement,
@@ -114,7 +112,7 @@ export const ComposerResumeButton: React.FC<{
   inline?: boolean;
 }> = ({ onResume, inline }) => (
   <IconButton
-    icon={Blue2ComposeIcon}
+    icon={ComposeIcon}
     variant='solid'
     color='accent'
     className={classNames(
@@ -150,6 +148,10 @@ export const ComposeRedesignButton: React.FC<{
     typeof composerOriginFromElement
   > | null>(null);
   const isBlue2 = useBlue2Theme();
+  const isMobile = useBreakpoint('openable');
+  const hasMobileFloatingActionButton = useHasMobileFloatingActionButton({
+    isMobile,
+  });
   const portalBlue2InlineOverlay = (content: React.ReactNode) =>
     isBlue2 && inline && typeof document !== 'undefined'
       ? createPortal(content, document.body)
@@ -342,8 +344,10 @@ export const ComposeRedesignButton: React.FC<{
   return (
     <Menu>
       <MenuTrigger
-        as={IconButton}
-        icon={isBlue2 ? Blue2ComposeIcon : ComposeIcon}
+        as={FloatingActionButton}
+        inline={inline ?? false}
+        hidden={isMobile && !hasMobileFloatingActionButton}
+        icon={ComposeIcon}
         variant='solid'
         color='accent'
         className={classNames(classes.button, inline && classes.buttonInline)}
@@ -367,7 +371,7 @@ export const ComposeRedesignButton: React.FC<{
         offset={8}
         data-testid='blue2-compose-type-menu'
       >
-        <MenuItem name='post' onClick={handleComposerOpen} icon={NewspaperIcon}>
+        <MenuItem name='post' onClick={handleComposerOpen} icon={ComposeIcon}>
           <FormattedMessage id='compose.new.post' defaultMessage='Post' />
         </MenuItem>
 

@@ -18,15 +18,30 @@ RSpec.describe 'OCR', :attachment_processing, :inline_jobs, :js, :streaming do
   it 'can recognize text in a media attachment' do
     expect(page).to have_css('div.app-holder')
 
-    click_button frontend_translations('compose.new')
-    click_button frontend_translations('compose.new.post')
+    if page.has_css?('body[data-theme="blue-2"]')
+      click_button frontend_translations('compose_form.placeholder')
 
-    within('[data-bluelab-composer]') do
-      find('input[type="file"]', visible: :all).attach_file(file_fixture('text.png'))
-      click_button frontend_translations('compose.upload.edit')
+      within('[data-bluelab-composer]') do
+        find_field(type: 'file', visible: :all).attach_file(file_fixture('text.png'))
+        click_button frontend_translations('compose.upload.edit')
+      end
+
+      # The image is already attached in Blue2; the shared OCR action runs below.
+    else
+      within('nav') do
+        click_on frontend_translations('tabs_bar.publish')
+      end
+
+      within('form[role="dialog"]') do
+        attach_file(file_fixture('text.png')) do
+          click_on(frontend_translations('upload_button.label'))
+        end
+
+        click_on(frontend_translations('alt_text_badge.label'))
+      end
     end
 
-    click_on('Add text from image')
+    click_on(frontend_translations('alt_text_modal.add_text_from_image'))
 
     expect(page).to have_css('#description', text: /Hello Mastodon\s*/, wait: 20)
   end

@@ -1,26 +1,27 @@
-- bluelab_error = current_theme == 'blue-2'
+:ruby
+  bluelab_error = begin
+    current_theme == 'blue-2'
+  rescue ActiveRecord::ConnectionNotEstablished, ActiveRecord::NoDatabaseError, ActiveRecord::StatementInvalid, PG::ConnectionBad
+    false
+  end
 
 !!!
-%html{ lang: I18n.locale, 'data-theme' => (bluelab_error ? 'blue-2' : nil), 'data-contrast' => 'auto', 'data-color-scheme' => 'auto', 'data-system-theme' => (bluelab_error ? 'true' : nil) }
+%html{ lang: I18n.locale, data: { theme: (bluelab_error ? 'blue-2' : nil), contrast: 'auto', color_scheme: 'auto', system_theme: (bluelab_error ? 'true' : nil) } }
   %head
     %meta{ 'content' => 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type' }/
     %meta{ charset: 'utf-8' }/
     %title= safe_join([yield(:page_title), Setting.default_settings['site_title']], ' - ')
     %meta{ content: 'width=device-width,initial-scale=1', name: 'viewport' }/
 
+    = vite_client_tag
+    = vite_react_refresh_tag
+    = vite_polyfills_tag
+    = vite_typescript_tag 'theme-selection.ts', crossorigin: 'anonymous', blocking: 'render'
     - if bluelab_error
-      = vite_client_tag
-      = vite_react_refresh_tag
-      = vite_polyfills_tag
-      = vite_typescript_tag 'theme-selection.ts', crossorigin: 'anonymous', blocking: 'render'
       = theme_style_tags 'blue-2'
       = instance_customization_styles
       = theme_color_tags 'auto'
     - else
-      = vite_client_tag
-      = vite_react_refresh_tag
-      = vite_polyfills_tag
-      = vite_typescript_tag 'theme-selection.ts', crossorigin: 'anonymous', blocking: 'render'
       = theme_style_tags Setting.default_settings['theme']
       = vite_typescript_tag 'error.ts', crossorigin: 'anonymous'
 

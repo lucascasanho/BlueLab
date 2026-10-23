@@ -288,8 +288,7 @@ const NewListWrapper: React.FC<{
   const dispatch = useAppDispatch();
   const history = useHistory();
   const isBlue2 =
-    typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'blue-2';
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const { signedIn } = useIdentity();
   const { id } = useParams<{ id?: string }>();
   const list = useAppSelector((state) =>
@@ -313,7 +312,11 @@ const NewListWrapper: React.FC<{
         <ColumnHeader
           withBackButton
           {...(isBlue2
-            ? { onBackButtonClick: () => history.push('/lists') }
+            ? {
+                onBackButtonClick: () => {
+                  history.push('/lists');
+                },
+              }
             : {})}
           title={title}
         />

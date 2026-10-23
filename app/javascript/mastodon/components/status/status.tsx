@@ -1,13 +1,18 @@
-import { useId, useMemo } from 'react';
+import { useCallback, useId, useMemo, useState } from 'react';
 
 import classNames from 'classnames';
 
 import type { Merge } from 'type-fest';
 
 import type { ExpandedStatusShape } from '@/mastodon/models/status';
-import { selectExpandedStatus } from '@/mastodon/selectors/statuses';
+import { selectStatusLoadingState } from '@/mastodon/selectors/statuses';
 import { createAppSelector, useAppSelector } from '@/mastodon/store';
 
+import type {
+  HotkeyHandlerFunction,
+  HotkeyHandlerMap,
+  HotkeyName,
+} from '../hotkeys';
 import { Hotkeys } from '../hotkeys';
 import { Poll } from '../poll';
 
@@ -43,19 +48,28 @@ type StatusRedesignProps = Merge<
 export type StatusVariant = 'feed' | 'thread' | 'page';
 
 const selectStatusReblog = createAppSelector(
-  [(state, id?: string | null) => selectExpandedStatus(state, id ?? undefined)],
-  (status) => {
+  [
+    (
+      state,
+      {
+        statusId,
+        contextType,
+      }: { statusId?: string | null; contextType?: StatusContextType },
+    ) => selectStatusLoadingState(state, { statusId, contextType }),
+  ],
+  ({ status, state }) => {
     if (!status) {
-      return {};
+      return { state };
     }
     if (!status.reblog) {
-      return { status };
+      return { status, state };
     }
 
     const { reblog, ...statusRest } = status;
     return {
       status: reblog,
       parent: statusRest,
+      state,
     };
   },
 );
@@ -75,13 +89,14 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
   withDismiss,
   onOpen,
   showThread,
+  shouldHighlightOnMount,
   headerContents,
   variant = contextToVariant(contextType),
   nextId,
 }) => {
   // Select data from store
   const { status, parent } = useAppSelector((state) =>
-    selectStatusReblog(state, id),
+    selectStatusReblog(state, { statusId: id, contextType }),
   );
   const statusId = status?.id;
 
@@ -116,6 +131,47 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
     onOpen,
   });
 
+  const [hotkeyHandlers, setHotkeyHandlers] = useState<HotkeyHandlerMap>({});
+  const registerHotkey = useCallback(
+    (hotkey: HotkeyName, handler: HotkeyHandlerFunction) => {
+      setHotkeyHandlers((prev) => ({ ...prev, [hotkey]: handler }));
+    },
+    [],
+  );
+
+  const theme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
+  const isBlue2 = theme === 'blue-2';
+  const isVanillaTheme = theme === 'default';
+
+  const handleStatusCardClick = useCallback<
+    React.MouseEventHandler<HTMLElement>
+  >(
+    (event) => {
+      if (isVanillaTheme) {
+        onOpenClick(event);
+        return;
+      }
+
+      if (!isBlue2 || event.defaultPrevented) {
+        return;
+      }
+
+      const target = event.target;
+      if (
+        target instanceof Element &&
+        target.closest(
+          'a, button, input, textarea, select, option, video, audio, iframe, [role="button"], [role="checkbox"], [role="switch"], [role="slider"], [contenteditable="true"], .media-gallery, .video-player, .audio-player, .status-card',
+        )
+      ) {
+        return;
+      }
+
+      onOpenClick(event);
+    },
+    [isBlue2, isVanillaTheme, onOpenClick],
+  );
+
   if (!status) {
     return null; // loading state
   }
@@ -126,32 +182,13 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
     muted,
     unfocusable,
     'data-id': id,
+    'data-variant': variant,
+    handlers: hotkeyHandlers,
   };
 
   const isHidden =
     (!showDespiteFilter && isFiltered) ||
     (!!status.spoiler_text && status.hidden);
-
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
-
-  const handleBlue2CardClick: React.MouseEventHandler<HTMLElement> = (event) => {
-    if (!isBlue2 || event.defaultPrevented) {
-      return;
-    }
-
-    const target = event.target;
-    if (
-      target instanceof Element &&
-      target.closest(
-        'a, button, input, textarea, select, option, video, audio, iframe, [role="button"], [role="checkbox"], [role="switch"], [role="slider"], [contenteditable="true"], .media-gallery, .video-player, .audio-player, .status-card',
-      )
-    ) {
-      return;
-    }
-
-    handlers.onOpenClick(event);
-  };
 
   if (hidden) {
     return (
@@ -164,23 +201,28 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
   }
 
   return (
-    <StatusContext.Provider value={{ id, contextType }}>
+    <StatusContext.Provider
+      value={{ id, contextType, registerHotkeyCallback: registerHotkey }}
+    >
       <StatusHotkeys
         {...hotkeysProps}
-        onClick={handleBlue2CardClick}
-        onAuxClick={handleBlue2CardClick}
+        onClick={handleStatusCardClick}
+        onAuxClick={handleStatusCardClick}
         className={classNames(
           classes.root,
           variant === 'feed' && classes.variantFeed,
           variant === 'thread' && classes.variantThread,
           variant === 'page' && classes.variantPage,
           isQuotedPost && classes.isQuote,
+          shouldHighlightOnMount && classes.isHighlighted,
           status.visibility === 'direct' && classes.isMessage,
           variant === 'thread' &&
             isNextReplyingToMe &&
             !showThread &&
             classes.connectNextReply,
+          !unfocusable && 'focusable',
         )}
+        tabIndex={unfocusable ? undefined : -1}
         data-featured={featured ? 'true' : null}
         aria-label={screenReaderText}
         data-nosnippet={status.account.noindex || undefined}
@@ -248,9 +290,9 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
             {showActions && !isQuotedPost && (
               <StatusActionBar
                 statusId={status.id}
+                reblogId={parent?.id}
                 withDismiss={withDismiss}
                 withCounters={withCounters}
-                onlyResponses={variant === 'page'}
               />
             )}
 
@@ -265,6 +307,7 @@ export const StatusRedesign: React.FC<StatusRedesignProps> = ({
 interface StatusHotkeysProps {
   children: React.ReactNode;
   status: ExpandedStatusShape;
+  handlers: HotkeyHandlerMap;
   onOpen?: () => void;
   muted?: boolean;
   unfocusable?: boolean;
@@ -276,6 +319,7 @@ const StatusHotkeys = ({
   onOpen,
   muted,
   unfocusable,
+  handlers: registeredHandlers,
   ...props
 }: StatusHotkeysProps & React.ComponentPropsWithoutRef<'article'>) => {
   const { contextType } = useStatusContext();
@@ -302,10 +346,9 @@ const StatusHotkeys = ({
         open: handlers.onOpenCallback,
         openProfile: handlers.onOpenProfile,
         toggleHidden: handlers.onToggleHidden,
-        // TODO: This is handled in a child component, so needs to be fixed.
-        // toggleSensitive: onMediaShowToggle,
         openMedia: handlers.onOpenMedia,
         onTranslate: handlers.onTranslate,
+        ...registeredHandlers,
       }}
       focusable={!unfocusable}
     >
@@ -318,11 +361,11 @@ function contextToVariant(contextType?: StatusContextType): StatusVariant {
   switch (contextType) {
     case 'composer':
     case 'detailed':
-    case undefined:
       return 'page';
     case 'thread':
       return 'thread';
     case 'notifications':
+    case undefined:
     default:
       return 'feed';
   }

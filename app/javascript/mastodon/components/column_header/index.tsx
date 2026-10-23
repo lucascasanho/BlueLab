@@ -5,7 +5,12 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { useLocation } from 'react-router';
 
-import { ArrowLeftIcon, DotsThreeIcon, ListIcon } from '@phosphor-icons/react';
+import {
+  ArrowLeftIcon,
+  ArrowUpIcon,
+  DotsThreeIcon,
+  ListIcon,
+} from '@phosphor-icons/react';
 import type { DistributedOmit } from 'type-fest';
 
 import { openNavigation } from '@/mastodon/actions/navigation';
@@ -40,6 +45,7 @@ export interface ColumnHeaderProps {
   withBackButton?: boolean | 'auto';
   onBackButtonClick?: () => void;
   withUnreadMarker?: boolean;
+  hideScrollToTopButton?: boolean;
   extraButtons?: React.ReactNode;
   extraStickyContent?: React.ReactNode;
   className?: string;
@@ -50,17 +56,23 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
   withBackButton,
   onBackButtonClick,
   withUnreadMarker,
+  hideScrollToTopButton = false,
   extraButtons,
   extraStickyContent,
   className,
   ...props
 }: ColumnHeaderProps) => {
-  const { scrollTop } = useColumn();
   const columnIndex = useColumnIndexContext();
   const location = useLocation<LocationState>();
+  const isSingleColumnSubpage =
+    typeof document !== 'undefined' &&
+    document.body.classList.contains('layout-single-column') &&
+    location.pathname !== '/' &&
+    location.pathname !== '/home';
   const hasBackButton =
     typeof onBackButtonClick === 'function' ||
     withBackButton === true ||
+    isSingleColumnSubpage ||
     (withBackButton === 'auto' && location.state?.fromMastodon);
   const hasExtraStickyContent = hasReactChildren(extraStickyContent);
   const { canPin, pinned, onPin, onMove } = useBlue2ColumnPinning();
@@ -92,7 +104,14 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
           <FormattedMessage id='column_header.pin' defaultMessage='Pin' />
         )}
       </MenuTrigger>
-      <MenuList placement='bottom-end' strategy='fixed'>
+      <MenuList
+        placement='bottom-end'
+        strategy='fixed'
+        portal
+        mobilePresentation='popover'
+        constrainToViewport
+        scrollable
+      >
         <MenuItem onClick={handleBlue2ColumnPin}>
           {pinned ? (
             <FormattedMessage id='column_header.unpin' defaultMessage='Unpin' />
@@ -121,6 +140,8 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     </Menu>
   ) : null;
 
+  const { isScrolledToTop, scrollTop } = useColumn();
+
   const handleHeaderClick = useCallback<React.MouseEventHandler>(
     (e) => {
       // Only scroll to top when clicking outside
@@ -131,7 +152,9 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
           .${classes.leftButton},
           .${classes.leftButton} *,
           .${classes.rightButtons},
-          .${classes.rightButtons} *`)
+          .${classes.rightButtons} *,
+          .${classes.extraStickyContent},
+          .${classes.extraStickyContent} *`)
       ) {
         scrollTop();
       }
@@ -139,17 +162,46 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     [scrollTop],
   );
 
+  const handleHeaderKeyDown = useCallback<React.KeyboardEventHandler>(
+    (event) => {
+      if (
+        event.target !== event.currentTarget ||
+        (event.key !== 'Enter' && event.key !== ' ')
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      scrollTop();
+    },
+    [scrollTop],
+  );
+
+  const hasScrollToTopButton =
+    !hideScrollToTopButton && !isScrolledToTop && withUnreadMarker;
+  const headerRef = useTrackColumnHeaderHeight();
+
   return (
     <header
       {...props}
+      role='button'
+      tabIndex={0}
+      onClick={handleHeaderClick}
+      onKeyDown={handleHeaderKeyDown}
+      ref={headerRef}
       className={classNames(
         className,
         classes.root,
+        isScrolledToTop && classes.rootScrolledToTop,
         hasExtraStickyContent && classes.withStickyContent,
       )}
     >
       <div className={classes.layout} data-has-unread={withUnreadMarker}>
-        {hasBackButton ? <BackButton onClick={onBackButtonClick} /> : <MobileMenuButton />}
+        {hasBackButton ? (
+          <BackButton onClick={onBackButtonClick} />
+        ) : (
+          <MobileMenuButton />
+        )}
         <NavigationFocusTarget className={classes.title}>
           <button
             type='button'
@@ -157,15 +209,6 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
             id={getColumnSkipLinkId(columnIndex)}
           >
             {title}
-            {withUnreadMarker && (
-              <span className='sr-only'>
-                {' '}
-                <FormattedMessage
-                  id='column.has_unread_content'
-                  defaultMessage='(has unread content)'
-                />
-              </span>
-            )}
           </button>
         </NavigationFocusTarget>
         {(hasReactChildren(extraButtons) || showBlue2ColumnSettings) && (
@@ -178,9 +221,34 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
       {hasExtraStickyContent && (
         <div className={classes.extraStickyContent}>{extraStickyContent}</div>
       )}
+      {hasScrollToTopButton && (
+        <Button
+          size='sm'
+          color='accent'
+          variant='solid'
+          onClick={scrollTop}
+          leadingIcon={ArrowUpIcon}
+          className={classes.unreadButton}
+        >
+          <FormattedMessage
+            id='column_header.scroll_to_top'
+            defaultMessage='Scroll to top'
+          />
+        </Button>
+      )}
     </header>
   );
 };
+
+/**
+ * This is used for pages that don't need a column title,
+ * but should have the same styles as the column header
+ */
+export const EmptyColumnHeader: React.FC = () => (
+  <div className={classes.root}>
+    <div className={classes.layout} />
+  </div>
+);
 
 type ColumnHeaderButtonProps = DistributedOmit<IconButtonProps, 'size'> & {
   showTextOnDesktop?: boolean;
@@ -260,3 +328,53 @@ const MobileMenuButton: React.FC = () => {
     </div>
   );
 };
+
+function updateHeaderHeightCssVariable(element: HTMLElement) {
+  const newHeight = `${element.offsetHeight}px`;
+  const currentHeight = getComputedStyle(
+    document.documentElement,
+  ).getPropertyValue('--column-header-height');
+
+  if (newHeight !== currentHeight) {
+    document.documentElement.style.setProperty(
+      '--column-header-height',
+      `${element.offsetHeight}px`,
+    );
+  }
+}
+
+/**
+ * Writes changes in the column header's height to a CSS variable
+ * that is used to keep feed items in view when navigating them via hotkeys
+ */
+function useTrackColumnHeaderHeight() {
+  const onResize: ResizeObserverCallback = useCallback((entries) => {
+    for (const { target } of entries) {
+      if (target instanceof HTMLElement) {
+        updateHeaderHeightCssVariable(target);
+      }
+    }
+  }, []);
+
+  const headerRef = useCallback(
+    (node: HTMLElement | null) => {
+      const isMultiColumnLayout = !!document.querySelector(
+        'body.layout-multiple-columns',
+      );
+      if (!node || isMultiColumnLayout) {
+        return;
+      }
+
+      const observer = new ResizeObserver(onResize);
+      observer.observe(node);
+      updateHeaderHeightCssVariable(node);
+
+      return () => {
+        observer.disconnect();
+      };
+    },
+    [onResize],
+  );
+
+  return headerRef;
+}

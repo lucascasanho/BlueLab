@@ -1,4 +1,13 @@
+@use '../bluelab/styles/legacy_tokens';
 @use 'blue-2-v21';
+
+/*
+ * Legacy layout tokens are available only while the BlueLab theme is selected.
+ * Vanilla and Bird UI use the original Mastodon token system without aliases.
+ */
+body[data-theme='blue-2'] {
+  @include legacy_tokens.apply;
+}
 
 /*
  * BlueLab settings navigation refinement.
@@ -100,7 +109,6 @@ body[data-theme='blue-2'] {
     }
   }
 }
-
 
 /*
  * BlueLab standalone error pages.
@@ -216,7 +224,8 @@ body.error--bluelab {
     min-height: 42px;
     padding-inline: 22px;
     border-radius: 999px;
-    pointer-events: auto;  }
+    pointer-events: auto;
+  }
 
   @media (width <= 759px) {
     .error-page {
@@ -240,7 +249,6 @@ body.error--bluelab {
     }
   }
 }
-
 
 /*
  * Notification settings modal: keep the title and actions fixed while the

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_16_161747) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -26,6 +26,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
   create_table "account_conversations", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.bigint "conversation_id", null: false
+    t.bigint "last_read_status_id"
     t.bigint "last_status_id"
     t.integer "lock_version", default: 0, null: false
     t.bigint "participant_account_ids", default: [], null: false, array: true
@@ -216,7 +217,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
     t.bigint "moved_to_account_id"
     t.text "note", default: "", null: false
     t.string "outbox_url", default: "", null: false
-    t.text "private_key"
     t.integer "protocol", default: 0, null: false
     t.text "public_key", default: "", null: false
     t.jsonb "remote_instance_verification", default: {}, null: false
@@ -236,6 +236,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
     t.string "uri"
     t.string "url"
     t.string "username", default: "", null: false
+    t.boolean "verified_badge_visible", default: true, null: false
     t.datetime "verified_by_role_since"
     t.index "(((setweight(to_tsvector('simple'::regconfig, (display_name)::text), 'A'::\"char\") || setweight(to_tsvector('simple'::regconfig, (username)::text), 'B'::\"char\")) || setweight(to_tsvector('simple'::regconfig, (COALESCE(domain, ''::character varying))::text), 'C'::\"char\")))", name: "search_index", using: :gin
     t.index "lower((username)::text), COALESCE(lower((domain)::text), ''::text)", name: "index_accounts_on_username_and_domain_lower", unique: true
@@ -256,6 +257,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
     t.string "action", default: "", null: false
     t.datetime "created_at", precision: nil, null: false
     t.string "human_identifier"
+    t.bigint "moderation_subscription_id"
     t.string "permalink"
     t.jsonb "recorded_changes"
     t.string "recorded_changes_format"
@@ -264,6 +266,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
     t.string "target_type"
     t.datetime "updated_at", precision: nil, null: false
     t.index ["account_id"], name: "index_admin_action_logs_on_account_id"
+    t.index ["moderation_subscription_id"], name: "index_admin_action_logs_on_moderation_subscription_id", where: "(moderation_subscription_id IS NOT NULL)"
     t.index ["target_type", "target_id"], name: "index_admin_action_logs_on_target_type_and_target_id"
   end
 
@@ -355,6 +358,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["account_id", "status_id"], name: "index_bookmarks_on_account_id_and_status_id", unique: true
     t.index ["status_id"], name: "index_bookmarks_on_status_id"
+  end
+
+  create_table "bug_reports", force: :cascade do |t|
+    t.string "app_version"
+    t.bigint "account_id"
+    t.bigint "assigned_account_id"
+    t.string "browser"
+    t.string "browser_version"
+    t.jsonb "client_errors", default: [], null: false
+    t.string "current_path"
+    t.datetime "created_at", null: false
+    t.text "description", null: false
+    t.string "error_page"
+    t.string "interface_language"
+    t.string "interface_layout"
+    t.string "operating_system"
+    t.string "operating_system_version"
+    t.string "request_id"
+    t.datetime "resolved_at"
+    t.bigint "resolved_by_account_id"
+    t.integer "status", default: 0, null: false
+    t.string "theme"
+    t.datetime "updated_at", null: false
+    t.string "viewport"
+    t.text "user_agent"
+    t.index ["account_id"], name: "index_bug_reports_on_account_id"
+    t.index ["assigned_account_id"], name: "index_bug_reports_on_assigned_account_id"
+    t.index ["resolved_by_account_id"], name: "index_bug_reports_on_resolved_by_account_id"
   end
 
   create_table "bulk_import_rows", force: :cascade do |t|
@@ -515,13 +546,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
   create_table "domain_allows", force: :cascade do |t|
     t.datetime "created_at", precision: nil, null: false
     t.string "domain", default: "", null: false
+    t.bigint "moderation_subscription_id"
     t.datetime "updated_at", precision: nil, null: false
     t.index ["domain"], name: "index_domain_allows_on_domain", unique: true
+    t.index ["moderation_subscription_id"], name: "index_domain_allows_on_moderation_subscription_id"
   end
 
   create_table "domain_blocks", force: :cascade do |t|
     t.datetime "created_at", precision: nil, null: false
     t.string "domain", default: "", null: false
+    t.bigint "moderation_subscription_id"
     t.boolean "obfuscate", default: false, null: false
     t.text "private_comment"
     t.text "public_comment"
@@ -530,6 +564,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
     t.integer "severity", default: 0
     t.datetime "updated_at", precision: nil, null: false
     t.index ["domain"], name: "index_domain_blocks_on_domain", unique: true
+    t.index ["moderation_subscription_id"], name: "index_domain_blocks_on_moderation_subscription_id"
   end
 
   create_table "email_domain_blocks", force: :cascade do |t|
@@ -811,6 +846,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
   create_table "media_attachments", id: :bigint, default: -> { "timestamp_id('media_attachments'::text)" }, force: :cascade do |t|
     t.bigint "account_id"
     t.bigint "announcement_id"
+    t.bigint "bug_report_id"
     t.string "blurhash"
     t.datetime "created_at", precision: nil, null: false
     t.text "description"
@@ -835,6 +871,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["account_id", "status_id"], name: "index_media_attachments_on_account_id_and_status_id", order: { status_id: :desc }
     t.index ["announcement_id"], name: "index_media_attachments_on_announcement_id"
+    t.index ["bug_report_id"], name: "index_media_attachments_on_bug_report_id"
     t.index ["scheduled_status_id"], name: "index_media_attachments_on_scheduled_status_id", where: "(scheduled_status_id IS NOT NULL)"
     t.index ["shortcode"], name: "index_media_attachments_on_shortcode", unique: true, opclass: :text_pattern_ops, where: "(shortcode IS NOT NULL)"
     t.index ["status_id"], name: "index_media_attachments_on_status_id"
@@ -848,6 +885,44 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["account_id", "status_id"], name: "index_mentions_on_account_id_and_status_id", unique: true
     t.index ["status_id"], name: "index_mentions_on_status_id"
+  end
+
+  create_table "moderation_subscription_advisories", force: :cascade do |t|
+    t.integer "action", null: false
+    t.datetime "created_at", null: false
+    t.bigint "moderation_subscription_id", null: false
+    t.string "target_key", null: false
+    t.integer "target_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["moderation_subscription_id"], name: "index_moderation_advisories_on_moderation_subscription_id"
+    t.index ["target_type", "target_key", "moderation_subscription_id"], name: "idx_on_target_type_target_key_moderation_subscripti_a3f09c29b9", unique: true
+  end
+
+  create_table "moderation_subscriptions", force: :cascade do |t|
+    t.boolean "apply_automatically", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "last_synced_at"
+    t.integer "list_action"
+    t.string "name"
+    t.boolean "override_unattributed", default: false, null: false
+    t.boolean "preserve_relationships", default: true, null: false
+    t.integer "priority"
+    t.boolean "retract_automatically", default: true, null: false
+    t.integer "type", null: false
+    t.datetime "updated_at", null: false
+    t.string "url", null: false
+  end
+
+  create_table "moderation_suggestions", force: :cascade do |t|
+    t.bigint "moderation_subscription_id"
+    t.integer "state", default: 0, null: false
+    t.integer "action", null: false
+    t.integer "target_type", null: false
+    t.string "target_key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["moderation_subscription_id"], name: "index_moderation_suggestions_on_moderation_subscription_id"
+    t.index ["target_type", "target_key", "action"], name: "idx_on_target_type_target_key_action_4f6ab01ebc", unique: true
   end
 
   create_table "mutes", force: :cascade do |t|
@@ -1485,6 +1560,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
     t.index ["repository", "channel"], name: "index_upstream_update_checks_on_repository_and_channel", unique: true
   end
 
+  create_table "verification_requests", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.datetime "created_at", null: false
+    t.text "explanation", default: "", null: false
+    t.datetime "resolved_at"
+    t.bigint "resolved_by_account_id"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "created_at"], name: "index_verification_requests_on_account_id_and_created_at", order: { created_at: :desc }
+    t.index ["account_id"], name: "index_verification_requests_on_account_id_pending", unique: true, where: "(status = 0)"
+    t.index ["resolved_by_account_id"], name: "index_verification_requests_on_resolved_by_account_id"
+  end
+
   create_table "user_invite_requests", force: :cascade do |t|
     t.datetime "created_at", precision: nil, null: false
     t.text "text"
@@ -1648,6 +1736,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
   add_foreign_key "bookmarks", "statuses", on_delete: :cascade
   add_foreign_key "bulk_import_rows", "bulk_imports", on_delete: :cascade
   add_foreign_key "bulk_imports", "accounts", on_delete: :cascade
+  add_foreign_key "bug_reports", "accounts", on_delete: :cascade
+  add_foreign_key "bug_reports", "accounts", column: "assigned_account_id", on_delete: :nullify
+  add_foreign_key "bug_reports", "accounts", column: "resolved_by_account_id", on_delete: :nullify
   add_foreign_key "canonical_email_blocks", "accounts", column: "reference_account_id", on_delete: :cascade
   add_foreign_key "collection_items", "accounts"
   add_foreign_key "collection_items", "collections", on_delete: :cascade
@@ -1662,6 +1753,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
   add_foreign_key "custom_filter_statuses", "custom_filters", on_delete: :cascade
   add_foreign_key "custom_filter_statuses", "statuses", on_delete: :cascade
   add_foreign_key "custom_filters", "accounts", on_delete: :cascade
+  add_foreign_key "domain_allows", "moderation_subscriptions", on_delete: :nullify
+  add_foreign_key "domain_blocks", "moderation_subscriptions", on_delete: :nullify
   add_foreign_key "email_domain_blocks", "email_domain_blocks", column: "parent_id", on_delete: :cascade
   add_foreign_key "email_subscriptions", "accounts", on_delete: :cascade
   add_foreign_key "fasp_backfill_requests", "fasp_providers"
@@ -1696,10 +1789,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
   add_foreign_key "markers", "users", on_delete: :cascade
   add_foreign_key "media_attachments", "accounts", name: "fk_96dd81e81b", on_delete: :nullify
   add_foreign_key "media_attachments", "announcements", on_delete: :nullify
+  add_foreign_key "media_attachments", "bug_reports", on_delete: :cascade
   add_foreign_key "media_attachments", "scheduled_statuses", on_delete: :nullify
   add_foreign_key "media_attachments", "statuses", on_delete: :nullify
   add_foreign_key "mentions", "accounts", name: "fk_970d43f9d1", on_delete: :cascade
   add_foreign_key "mentions", "statuses", on_delete: :cascade
+  add_foreign_key "moderation_subscription_advisories", "moderation_subscriptions"
+  add_foreign_key "moderation_suggestions", "moderation_subscriptions", on_delete: :nullify
   add_foreign_key "mutes", "accounts", column: "target_account_id", name: "fk_eecff219ea", on_delete: :cascade
   add_foreign_key "mutes", "accounts", name: "fk_b8d8daf315", on_delete: :cascade
   add_foreign_key "notification_permissions", "accounts", column: "from_account_id", on_delete: :cascade
@@ -1768,6 +1864,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_26_000100) do
   add_foreign_key "users", "invites", on_delete: :nullify
   add_foreign_key "users", "oauth_applications", column: "created_by_application_id", on_delete: :nullify
   add_foreign_key "users", "user_roles", column: "role_id", on_delete: :nullify
+  add_foreign_key "verification_requests", "accounts"
+  add_foreign_key "verification_requests", "accounts", column: "resolved_by_account_id"
   add_foreign_key "web_push_subscriptions", "oauth_access_tokens", column: "access_token_id", on_delete: :cascade
   add_foreign_key "web_push_subscriptions", "users", on_delete: :cascade
   add_foreign_key "web_settings", "users", name: "fk_11910667b2", on_delete: :cascade

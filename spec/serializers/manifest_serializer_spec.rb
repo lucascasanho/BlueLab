@@ -47,6 +47,7 @@ RSpec.describe ManifestSerializer do
       screenshots = described_class.new(instance).screenshots
 
       expect(screenshots.pluck(:src)).to all(include('espelunca-social'))
+      expect(screenshots.pluck(:sizes)).to contain_exactly('471x939', '1890x940')
     end
   end
 

@@ -19,7 +19,10 @@ vi.mock('./emoji', () => ({
   ComposeEmojiButton: () => <button type='button'>Emoji</button>,
 }));
 
-const renderFooter = (privacy: 'public' | 'direct' = 'public') => {
+const renderFooter = (
+  privacy: 'public' | 'direct' = 'public',
+  vanillaAppearance = false,
+) => {
   const store = configureStore({
     reducer: reducerWithInitialState({
       compose: { text: 'First post', privacy },
@@ -30,7 +33,10 @@ const renderFooter = (privacy: 'public' | 'direct' = 'public') => {
   const result = render(
     <Provider store={store}>
       <IntlProvider locale='en'>
-        <ComposeFooter onEmojiPick={vi.fn()} />
+        <ComposeFooter
+          onEmojiPick={vi.fn()}
+          vanillaAppearance={vanillaAppearance}
+        />
       </IntlProvider>
     </Provider>,
   );
@@ -38,6 +44,35 @@ const renderFooter = (privacy: 'public' | 'direct' = 'public') => {
 };
 
 describe('BlueLab compose primary actions', () => {
+  test('groups media tools separately from thread and publish actions in Vanilla appearance', () => {
+    const { container } = renderFooter('public', true);
+    const footer = container.querySelector(
+      '[data-bluelab-compose-footer][data-vanilla-appearance="true"]',
+    );
+    const mediaActions = container.querySelector(
+      '[data-compose-media-actions]',
+    );
+    const primaryActions = container.querySelector(
+      '[data-compose-primary-actions]',
+    );
+
+    expect(footer).not.toBeNull();
+    expect(mediaActions).toContainElement(
+      screen.getByRole('button', {
+        name: 'Add images, a video or an audio file',
+      }),
+    );
+    expect(mediaActions).not.toContainElement(
+      screen.getByRole('button', { name: 'Publish' }),
+    );
+    expect(primaryActions).toContainElement(
+      screen.getByRole('button', { name: 'Publish' }),
+    );
+    expect(primaryActions).toContainElement(
+      screen.getByRole('button', { name: 'Add another post to this thread' }),
+    );
+  });
+
   test('uses message actions for direct replies', () => {
     renderFooter('direct');
 

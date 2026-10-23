@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useCallback, useRef, useState } from 'react';
 
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, FormattedNumber } from 'react-intl';
 
 import classNames from 'classnames';
 
@@ -38,8 +38,8 @@ import { shouldShowCharacterCounter } from '../components/character_counter';
 import { countableText } from '../util/counter';
 
 import type { OnEmojiPick } from './emoji';
-import { ComposeGifButton } from './gif_picker';
 import { ComposeEmojiButton } from './emoji';
+import { ComposeGifButton } from './gif_picker';
 import { ComposeSchedule } from './schedule';
 import {
   selectComposeAttachments,
@@ -61,9 +61,14 @@ const messages = defineMessages({
 export const ComposeFooter: React.FC<{
   onEmojiPick: OnEmojiPick;
   activeThreadItemId?: string | null;
-}> = ({ onEmojiPick, activeThreadItemId = null }) => {
-  const intl = useIntl();
+  vanillaAppearance?: boolean;
+}> = ({
+  onEmojiPick,
+  activeThreadItemId = null,
+  vanillaAppearance = false,
+}) => {
   const type = useAppSelector(selectComposeType);
+  const isEditing = useAppSelector((state) => !!state.compose.get('id'));
   const isMessage = isMessageComposeType(type);
   const rootCounter = useAppSelector(selectComposeCharsCount);
   const { hasPoll, quotedStatusId } = useAppSelector(
@@ -121,33 +126,54 @@ export const ComposeFooter: React.FC<{
     dispatch(addComposeThreadItem());
   }, [dispatch]);
 
+  let publishText = (
+    <FormattedMessage id='compose.publish' defaultMessage='Publish' />
+  );
+  if (isEditing) {
+    publishText = <FormattedMessage id='compose.save' defaultMessage='Save' />;
+  } else if (type === 'message' || type === 'replyPrivate') {
+    publishText = (
+      <FormattedMessage id='compose.message.publish' defaultMessage='Send' />
+    );
+  }
+
   return (
-    <footer className={classes.footer} data-bluelab-compose-footer>
-      <ComposeUploadButton
-        activeThreadItemId={activeThreadItemId}
-        disabled={!activeThreadItemId && hasQuote}
-      />
+    <footer
+      className={classes.footer}
+      data-bluelab-compose-footer
+      data-vanilla-appearance={vanillaAppearance ? 'true' : undefined}
+    >
+      <div className={classes.secondaryActions} data-compose-media-actions>
+        <ComposeUploadButton
+          activeThreadItemId={activeThreadItemId}
+          disabled={!activeThreadItemId && hasQuote}
+        />
 
-      <ComposeGifButton disabled={!activeThreadItemId && hasQuote} />
+        <ComposeGifButton
+          activeThreadItemId={activeThreadItemId}
+          disabled={!activeThreadItemId && hasQuote}
+        />
 
-      <ComposeEmojiButton onPick={onEmojiPick} />
+        <ComposeEmojiButton onPick={onEmojiPick} />
 
-      {!isMessage && (
-        <IconButton
-          size='sm'
-          icon={ChartBarHorizontalIcon}
-          disabled={hasQuote || hasPoll || !!activeThreadItemId}
-          onClick={handlePoll}
-        >
-          <FormattedMessage
-            id='poll_button.add_poll'
-            defaultMessage='Add a poll'
-          />
-        </IconButton>
-      )}
-      <ComposeSchedule />
+        {!isMessage && (
+          <IconButton
+            size='sm'
+            icon={ChartBarHorizontalIcon}
+            className={classes.pollButton}
+            disabled={hasQuote || hasPoll || !!activeThreadItemId}
+            onClick={handlePoll}
+          >
+            <FormattedMessage
+              id='poll_button.add_poll'
+              defaultMessage='Add a poll'
+            />
+          </IconButton>
+        )}
+        <ComposeSchedule />
+      </div>
 
-      <div className={classes.flexGrowWrap}>
+      <div className={classes.flexGrowWrap} data-compose-footer-controls>
         {shouldShowCharacterCounter(
           hideStatusCharacterCounter,
           current,
@@ -160,11 +186,7 @@ export const ComposeFooter: React.FC<{
             )}
           >
             {current > max && <WarningCircleIcon weight='fill' />}
-            <FormattedMessage
-              id='compose.counter_remaining'
-              defaultMessage='{remaining, number}'
-              values={{ remaining: max - current }}
-            />
+            <FormattedNumber value={max - current} />
           </span>
         )}
 
@@ -176,7 +198,6 @@ export const ComposeFooter: React.FC<{
               size='sm'
               icon={PlusIcon}
               className={classes.threadAddButton}
-              title={intl.formatMessage(messages.addThreadItem)}
               disabled={threadItemCount >= 24 || hasPublishedThreadItems}
               onClick={handleAddThreadItem}
             >
@@ -191,9 +212,7 @@ export const ComposeFooter: React.FC<{
             disabled={!canSubmit}
             loading={isSubmitting}
           >
-            {!isMessage && !scheduledAt && (
-              <FormattedMessage id='compose.publish' defaultMessage='Publish' />
-            )}
+            {!isMessage && !scheduledAt && publishText}
             {!isMessage && scheduledAt && (
               <FormattedMessage
                 id='compose.schedule.submit'

@@ -19,6 +19,7 @@ import {
   Blue2EmojiFieldWrapper,
   isBirdUiTheme,
   isBlue2Theme,
+  isVanillaTheme,
 } from './blue2_emoji_field_wrapper';
 import classes from './emoji_text_field.module.scss';
 import type { CommonFieldWrapperProps, InputProps } from './form_field_wrapper';
@@ -151,7 +152,8 @@ const EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = (props) => {
     document.body.dataset.theme === 'mastodon-5';
 
   if (
-    (props.blue2EmojiEditor && (isBlue2Theme() || isBirdUiTheme())) ||
+    (props.blue2EmojiEditor &&
+      (isBlue2Theme() || isBirdUiTheme() || isVanillaTheme())) ||
     (props.mastodon5EmojiEditor && isMastodon5Theme)
   ) {
     return <Blue2EmojiFieldWrapper {...props} />;

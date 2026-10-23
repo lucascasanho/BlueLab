@@ -224,6 +224,11 @@ class ActionBar extends PureComponent {
 
   render () {
     const { status, relationship, statusQuoteState, quotedAccountId, intl } = this.props;
+    const currentTheme =
+      typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
+    const isVanillaTheme =
+      typeof document !== 'undefined' &&
+      (!currentTheme || currentTheme === 'default' || currentTheme === 'vanilla');
     const { signedIn, permissions } = this.props.identity;
 
     const publicStatus       = ['public', 'unlisted'].includes(status.get('visibility'));
@@ -369,7 +374,7 @@ class ActionBar extends PureComponent {
         </div>
 
         <div className='detailed-status__action-bar-dropdown'>
-          <Dropdown icon='ellipsis-h' iconComponent={MoreHorizIcon} status={status} items={menu} direction='left' title={intl.formatMessage(messages.more)} />
+          <Dropdown icon='ellipsis-h' iconComponent={MoreHorizIcon} status={status} items={menu} direction='left' forceDropdown={isVanillaTheme} title={intl.formatMessage(messages.more)} />
         </div>
       </div>
     );
