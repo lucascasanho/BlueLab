@@ -386,6 +386,7 @@ export const BugReportModal: React.FC<{ onClose: () => void }> = ({
         <div className={classes.section}>
           <Button
             type='button'
+            secondary={!anonymous}
             onClick={handleToggleAnonymous}
             disabled={sending}
             aria-pressed={anonymous}
