@@ -1,6 +1,6 @@
 import type { FC, SVGProps } from 'react';
 
-import EditSquareIcon from '@/material-icons/400-24px/edit_square.svg?react';
+import { Blue2ComposeIcon } from '@/mastodon/features/blue2/icons';
 
 interface ComposeIconProps extends SVGProps<SVGSVGElement> {
   size?: number | string;
@@ -8,24 +8,13 @@ interface ComposeIconProps extends SVGProps<SVGSVGElement> {
 }
 
 /**
- * Canonical compose icon used by BlueLab launchers.
- *
- * The underlying asset is Mastodon's vendored Material Symbols `edit_square`
- * icon (Apache-2.0). Keep the icon color inherited from the surrounding
- * control so instance accent colors and light/dark appearance remain intact.
+ * Shared compose icon for every post composer launcher.
+ * Uses the icon geometry previously exclusive to the BlueLab theme.
  */
 export const ComposeIcon: FC<ComposeIconProps> = ({
   size = 24,
   weight,
   ...props
-}) => {
-  return (
-    <EditSquareIcon
-      {...props}
-      width={size}
-      height={size}
-      fill='currentColor'
-      data-weight={weight}
-    />
-  );
-};
+}) => (
+  <Blue2ComposeIcon {...props} size={size} weight={weight} />
+);
