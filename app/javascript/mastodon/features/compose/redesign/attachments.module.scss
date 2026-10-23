@@ -137,11 +137,11 @@
 }
 
 .audioDeleteButton {
-  inset-inline-start: var(--space-2);
+  inset-inline-end: var(--space-2);
 }
 
 .audioAltButton {
-  inset-inline-end: var(--space-2);
+  inset-inline-start: var(--space-2);
 }
 
 // Audio
