@@ -28,8 +28,8 @@ class BugReportsController < ApplicationController
       error_page: @error_page,
       viewport: params[:viewport].presence,
       app_version: params[:app_version].presence || Rails.configuration.x.mastodon.version,
-      request_id: request.request_id,
-      user_agent: request.user_agent.to_s.truncate(2_000),
+      request_id: anonymous_report? ? nil : request.request_id,
+      user_agent: anonymous_report? ? nil : request.user_agent.to_s.truncate(2_000),
       client_errors: client_errors
     )
 
@@ -55,7 +55,7 @@ class BugReportsController < ApplicationController
   private
 
   def anonymous_report?
-    ActiveModel::Type::Boolean.new.cast(params[:anonymous])
+    current_account.nil? || ActiveModel::Type::Boolean.new.cast(params[:anonymous])
   end
 
   def sanitize_path(value)
