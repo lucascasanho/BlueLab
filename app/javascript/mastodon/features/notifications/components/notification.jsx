@@ -110,6 +110,12 @@ class Notification extends ImmutablePureComponent {
     }
 
     const target = event.target;
+    const statusPreview = target.closest('.status, article[data-id]');
+    if (!statusPreview) return;
+
+    const article = target.closest('article[data-id]');
+    if (article && article.dataset.id !== statusId) return;
+
     if (
       target.closest(
         'button,input,textarea,select,[role="button"],[role="switch"],[role="checkbox"],[contenteditable="true"]',
@@ -119,11 +125,11 @@ class Notification extends ImmutablePureComponent {
     }
 
     const link = target.closest('a[href]');
-    if (!link) return;
-
-    const destination = new URL(link.href, window.location.href);
-    const path = destination.pathname.replace(/\/+$/, '');
-    if (!path.endsWith('/' + statusId)) return;
+    if (link) {
+      const destination = new URL(link.href, window.location.href);
+      const path = destination.pathname.replace(/\\/+$/, '');
+      if (!path.endsWith('/' + statusId)) return;
+    }
 
     event.preventDefault();
     event.stopPropagation();
