@@ -13,52 +13,31 @@
   background: var(--color-bg-primary);
 }
 
-.primaryPost {
+.primaryPost,
+.threadItem {
   position: relative;
-  padding-inline-start: calc(var(--space-2xl) + var(--space-xl));
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset-inline-start: 10px;
-    top: 14px;
-    bottom: calc(-1 * var(--space-md));
-    width: 2px;
-    border-radius: var(--radius-round);
-    background: var(--color-border-primary);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset-inline-start: 6px;
-    top: 10px;
-    width: 10px;
-    height: 10px;
-    box-sizing: border-box;
-    border: 2px solid var(--color-border-brand);
-    border-radius: var(--radius-round);
-    background: var(--color-bg-primary);
-  }
-}
-
-.threadItems {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  column-gap: var(--space-sm);
+  min-width: 0;
+  padding-inline-start: var(--space-2);
 }
 
 .threadItem {
-  position: relative;
-  min-width: 0;
-  padding: var(--space-sm) 2.75rem var(--space-md)
-    calc(var(--space-2xl) + var(--space-xl));
+  padding: var(--space-sm) 2.75rem var(--space-md) var(--space-2);
   background: transparent;
+}
+
+.threadIndicator {
+  position: relative;
+  grid-column: 1;
+  min-width: 14px;
+  align-self: stretch;
 
   &::before {
     content: '';
     position: absolute;
-    inset-inline-start: 10px;
+    inset-inline-start: 6px;
     top: 0;
     bottom: 0;
     width: 2px;
@@ -69,8 +48,8 @@
   &::after {
     content: '';
     position: absolute;
-    inset-inline-start: 6px;
-    top: calc(var(--space-sm) + 4px);
+    inset-inline-start: 2px;
+    top: 4px;
     width: 10px;
     height: 10px;
     box-sizing: border-box;
@@ -81,15 +60,23 @@
       border-color 120ms ease,
       background-color 120ms ease;
   }
-
-  &:last-child::before {
-    bottom: calc(100% - var(--space-sm) - 10px);
-  }
 }
 
-.threadItemActive::after {
+.primaryPost > .threadIndicator::after {
+  border-color: var(--color-border-brand);
+}
+
+.threadItemActive > .threadIndicator::after {
   border-color: var(--color-border-brand);
   background: var(--color-border-brand);
+}
+
+.threadItem:not(:last-child) > .threadIndicator::before {
+  bottom: calc(-1 * var(--space-md));
+}
+
+.threadItem:last-child > .threadIndicator::before {
+  bottom: calc(100% - 14px);
 }
 
 .threadEditor {
@@ -229,7 +216,7 @@
       gap: var(--space-3);
     }
 
-    .threadItem:not(:last-child)::before {
+    .threadItem:not(:last-child) > .threadIndicator::before {
       bottom: calc(-1 * var(--space-3));
     }
   }
@@ -251,8 +238,7 @@
         box-sizing: border-box;
         min-width: 0;
         margin: 0;
-        padding: var(--space-3) var(--space-3) var(--space-3)
-          calc(var(--space-2xl) + var(--space-lg));
+        padding: var(--space-3);
         border: 1px solid var(--color-border-primary);
         border-radius: var(--radius-md);
         background: var(--color-bg-secondary);
@@ -280,23 +266,8 @@
     background: var(--color-bg-primary);
   }
 
-  .primaryPost,
-  .threadItem {
-    padding-inline-start: calc(var(--space-2xl) + var(--space-lg));
-  }
-
   .threadItem {
     padding-inline-end: 2.5rem;
-  }
-
-  .primaryPost::before,
-  .threadItem::before {
-    inset-inline-start: 7px;
-  }
-
-  .primaryPost::after,
-  .threadItem::after {
-    inset-inline-start: 3px;
   }
 
   .threadMedia {
