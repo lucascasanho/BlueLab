@@ -61,7 +61,9 @@ RSpec.describe 'Bug reports' do
         expect(response).to have_http_status(201)
         expect(BugReport.last).to have_attributes(
           account: nil,
-          current_path: '/settings/preferences'
+          current_path: '/settings/preferences',
+          request_id: nil,
+          user_agent: nil
         )
       end
     end
@@ -76,7 +78,9 @@ RSpec.describe 'Bug reports' do
         expect(BugReport.last).to have_attributes(
           account: nil,
           current_path: '/settings/preferences',
-          interface_language: 'pt-BR'
+          interface_language: 'pt-BR',
+          request_id: nil,
+          user_agent: nil
         )
       end
     end
