@@ -1082,6 +1082,7 @@
   "not_signed_in_indicator.not_signed_in": "Vous devez vous connecter pour accéder à cette ressource.",
   "notification.added_to_collection": "{name} vous a ajouté·e à une collection",
   "notification.admin.report": "{name} a signalé {target}",
+  "notification.admin.bug_report": "Un nouveau rapport de bug a été envoyé",
   "notification.admin.report_account": "{name} a signalé {count, plural, one {un message} other {# messages}} de {target} pour {category}",
   "notification.admin.report_account_other": "{name} a signalé {count, plural, one {un message} other {# messages}} de {target}",
   "notification.admin.report_statuses": "{name} a signalé {target} pour {category}",
