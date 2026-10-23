@@ -15,7 +15,7 @@ class BugReportsController < ApplicationController
     @interface_layout = @error_page.present? ? 'error' : 'auth'
 
     @bug_report = BugReport.new(
-      account: current_account,
+      account: anonymous_report? ? nil : current_account,
       description: params[:description],
       browser: browser_details[:browser],
       browser_version: browser_details[:browser_version],
@@ -37,11 +37,13 @@ class BugReportsController < ApplicationController
 
     Array(params[:files]).compact_blank.first(BugReport::MAX_ATTACHMENTS).each do |file|
       @bug_report.media_attachments.create!(
-        account: current_account,
+        account: anonymous_report? ? nil : current_account,
         file: file,
         delay_processing: true
       )
     end
+
+    @bug_report.notify_moderation_staff!
 
     render :success
   rescue ActiveRecord::RecordInvalid, Paperclip::Error, Mastodon::DimensionsValidationError, Mastodon::StreamValidationError => e
@@ -51,6 +53,10 @@ class BugReportsController < ApplicationController
   end
 
   private
+
+  def anonymous_report?
+    ActiveModel::Type::Boolean.new.cast(params[:anonymous])
+  end
 
   def sanitize_path(value)
     value.to_s.split('?', 2).first.to_s.truncate(500).presence
