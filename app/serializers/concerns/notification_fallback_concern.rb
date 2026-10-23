@@ -22,7 +22,8 @@ module NotificationFallbackConcern
     when :'admin.report'
       object.report.present?
     when :'admin.bug_report'
-      object.activity.present?
+      activity = object.is_a?(NotificationGroup) ? object.notification.activity : object.activity
+      activity.present?
     when :added_to_collection, :collection_update
       object.target_collection.present?
     else
