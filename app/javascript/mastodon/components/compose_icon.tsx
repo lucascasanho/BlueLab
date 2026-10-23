@@ -16,5 +16,9 @@ export const ComposeIcon: FC<ComposeIconProps> = ({
   weight,
   ...props
 }) => (
-  <Blue2ComposeIcon {...props} size={size} weight={weight} />
+  <Blue2ComposeIcon
+    {...props}
+    size={size}
+    weight={weight}
+  />
 );
