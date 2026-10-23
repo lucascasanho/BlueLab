@@ -267,12 +267,17 @@
   margin-bottom: 16px;
 }
 
-.sectionButtons {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  flex-wrap: wrap;
+:global(body[data-theme='default']),
+:global(body[data-theme='']),
+:global(body:not([data-theme])),
+:global(body[data-theme='vanilla']) {
+  .sectionButtons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
 }
 
 .sectionTitle {
