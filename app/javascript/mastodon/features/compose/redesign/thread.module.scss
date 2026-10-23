@@ -13,6 +13,12 @@
   background: var(--color-bg-primary);
 }
 
+.threadItems {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
 .primaryPost,
 .threadItem {
   position: relative;
@@ -28,22 +34,38 @@
   background: transparent;
 }
 
+/* Draw the connector against the post card's full box so its line crosses
+   card padding and the gap between adjacent thread items without a break. */
+.primaryPost::before,
+.threadItem::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: calc(var(--space-2) + 6px);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  border-radius: var(--radius-round);
+  background: var(--color-border-primary);
+}
+
+.primaryPost::before {
+  top: 9px;
+  bottom: calc(-1 * var(--space-sm));
+}
+
+.threadItem:not(:last-child)::before {
+  bottom: 0;
+}
+
+.threadItem:last-child::before {
+  bottom: calc(100% - var(--space-sm) - 9px);
+}
+
 .threadIndicator {
   position: relative;
   grid-column: 1;
   min-width: 14px;
   align-self: stretch;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset-inline-start: 6px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    border-radius: var(--radius-round);
-    background: var(--color-border-primary);
-  }
 
   &::after {
     content: '';
@@ -212,11 +234,15 @@
 :global(body:not([data-theme])),
 :global(body[data-theme='vanilla']) {
   .threadEditorScope[data-vanilla-thread='true'] {
+    .primaryPost::before {
+      bottom: calc(-1 * (var(--space-sm) + var(--space-3)));
+    }
+
     .threadItems {
       gap: var(--space-3);
     }
 
-    .threadItem:not(:last-child) > .threadIndicator::before {
+    .threadItem:not(:last-child)::before {
       bottom: calc(-1 * var(--space-3));
     }
   }
@@ -246,6 +272,24 @@
 
       .threadItem {
         padding-inline-end: 2.75rem;
+      }
+
+      .primaryPost::before,
+      .threadItem::before {
+        inset-inline-start: calc(var(--space-3) + 6px);
+      }
+
+      .primaryPost::before {
+        top: calc(var(--space-3) + 9px);
+        bottom: calc(-1 * (var(--space-2) + var(--space-3)));
+      }
+
+      .threadItem:last-child::before {
+        bottom: calc(100% - var(--space-3) - 9px);
+      }
+
+      .threadIndicator::after {
+        background: var(--color-bg-secondary);
       }
     }
   }
