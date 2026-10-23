@@ -66,6 +66,45 @@ RSpec.describe 'Bug reports' do
       end
     end
 
+    context 'when an authenticated user opts out of identification' do
+      let(:params) { super().merge(anonymous: 'true') }
+
+      it 'keeps diagnostics but does not associate the report with the user' do
+        subject
+
+        expect(response).to have_http_status(201)
+        expect(BugReport.last).to have_attributes(
+          account: nil,
+          current_path: '/settings/preferences',
+          interface_language: 'pt-BR'
+        )
+      end
+    end
+
+    context 'when notifying staff about a new report' do
+      let!(:moderator_role) do
+        Fabricate(:user_role, name: 'Bug report moderator', permissions: UserRole::FLAGS[:manage_reports])
+      end
+      let!(:moderator) { Fabricate(:user, role: moderator_role) }
+      let!(:admin_role) do
+        Fabricate(:user_role, name: 'Bug report administrator', permissions: UserRole::FLAGS[:administrator])
+      end
+      let!(:administrator) { Fabricate(:user, role: admin_role) }
+
+      it 'creates an in-app notification for every account with moderation permissions' do
+        subject
+        report = BugReport.last
+
+        [moderator, administrator].each do |staff|
+          expect(Notification.exists?(
+            account: staff.account,
+            type: 'admin.bug_report',
+            activity: report
+          )).to be true
+        end
+      end
+    end
+
     it 'rejects an overlong description' do
       params[:description] = 'a' * (BugReport::MAX_DESCRIPTION_LENGTH + 1)
 
