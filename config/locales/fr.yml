@@ -2034,6 +2034,8 @@ fr:
       title_html: "%{name} vous a ajouté·e à une collection"
     admin_report:
       title_html: "%{name} a signalé %{target}"
+    admin_bug_report:
+      title: "Un nouveau rapport de bug a été envoyé"
     admin_sign_up:
       title_and_others_html:
         one: "%{name} et un·e autre se sont inscrit·e·s"
