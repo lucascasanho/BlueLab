@@ -79,7 +79,7 @@ export const ComposeUpload: React.FC<{
         size='sm'
         variant='solid'
         icon={TrashIcon}
-        className={classes.mediaMenuAltButton}
+        className={classes.mediaMenuButtons}
         onClick={handleDelete}
       >
         <span className='sr-only'>
@@ -96,7 +96,7 @@ export const ComposeUpload: React.FC<{
         size='sm'
         variant='solid'
         leadingIcon={PencilSimpleIcon}
-        className={classes.mediaMenuButtons}
+        className={classes.mediaMenuAltButton}
         onClick={handleEdit}
         aria-label={intl.formatMessage({
           id: 'compose.upload.menu.add_alt',
