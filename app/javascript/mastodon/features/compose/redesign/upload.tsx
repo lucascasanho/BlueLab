@@ -73,23 +73,6 @@ export const ComposeUpload: React.FC<{
         />
       )}
 
-      <IconButton
-        as='button'
-        type='button'
-        size='sm'
-        variant='solid'
-        icon={TrashIcon}
-        className={classes.mediaMenuButtons}
-        onClick={handleDelete}
-      >
-        <span className='sr-only'>
-          <FormattedMessage
-            id='compose.upload.menu.delete'
-            defaultMessage='Remove media'
-          />
-        </span>
-      </IconButton>
-
       <Button
         as='button'
         type='button'
@@ -111,6 +94,23 @@ export const ComposeUpload: React.FC<{
           />
         </span>
       </Button>
+
+      <IconButton
+        as='button'
+        type='button'
+        size='sm'
+        variant='solid'
+        icon={TrashIcon}
+        className={classes.mediaMenuButtons}
+        onClick={handleDelete}
+      >
+        <span className='sr-only'>
+          <FormattedMessage
+            id='compose.upload.menu.delete'
+            defaultMessage='Remove media'
+          />
+        </span>
+      </IconButton>
 
       {attachment.description && (
         <span className={classes.mediaAlt}>
