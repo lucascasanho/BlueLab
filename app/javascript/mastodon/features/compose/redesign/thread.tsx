@@ -164,10 +164,7 @@ const ComposeThreadItem: React.FC<{
       data-thread-item-id={id}
       onFocusCapture={onFocus}
     >
-      <div
-        className={classes.threadIndicator}
-        aria-hidden='true'
-      />
+      <div className={classes.threadIndicator} aria-hidden='true' />
       <IconButton
         as='button'
         type='button'
