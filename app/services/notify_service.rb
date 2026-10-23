@@ -6,6 +6,7 @@ class NotifyService < BaseService
   # TODO: the severed_relationships and annual_report types probably warrants email notifications
   NON_EMAIL_TYPES = %i(
     admin.report
+    admin.bug_report
     admin.sign_up
     admin.verification_request
     verification_request
@@ -109,7 +110,7 @@ class NotifyService < BaseService
   class DropCondition < BaseCondition
     def drop?
       blocked   = @recipient.unavailable?
-      blocked ||= from_self? && %i(poll severed_relationships moderation_warning annual_report verification_request verification_approved).exclude?(@notification.type)
+      blocked ||= from_self? && %i(poll severed_relationships moderation_warning annual_report verification_request verification_approved admin.bug_report).exclude?(@notification.type)
 
       return blocked if message? && from_staff?
 
