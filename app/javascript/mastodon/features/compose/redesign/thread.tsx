@@ -163,6 +163,7 @@ const ComposeThreadItem: React.FC<{
       data-thread-item-id={id}
       onFocusCapture={onFocus}
     >
+      <div className={classes.threadIndicator} aria-hidden='true' />
       <IconButton
         as='button'
         type='button'
@@ -192,23 +193,22 @@ const ComposeThreadItem: React.FC<{
             dismissOnEscape={false}
           />
         </ComposeAutocomplete>
+        {media.size > 0 && (
+          <div className={classes.threadMedia}>
+            {media.map((attachment) => {
+              const mediaId = attachment.get('id') as string;
+              return (
+                <ThreadMediaAttachment
+                  key={mediaId}
+                  attachment={attachment}
+                  threadItemId={id}
+                  onRemove={() => dispatch(removeComposeThreadMedia(id, mediaId))}
+                />
+              );
+            })}
+          </div>
+        )}
       </div>
-
-      {media.size > 0 && (
-        <div className={classes.threadMedia}>
-          {media.map((attachment) => {
-            const mediaId = attachment.get('id') as string;
-            return (
-              <ThreadMediaAttachment
-                key={mediaId}
-                attachment={attachment}
-                threadItemId={id}
-                onRemove={() => dispatch(removeComposeThreadMedia(id, mediaId))}
-              />
-            );
-          })}
-        </div>
-      )}
     </section>
   );
 };
