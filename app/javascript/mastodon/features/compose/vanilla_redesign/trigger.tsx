@@ -288,6 +288,7 @@ const MOBILE_COMPOSE_BUTTON_ALLOW_ROUTES = includeMultiColumnPaths([
   '/public',
   '/lists',
   '/tags',
+  '/favourites',
 ]);
 const MOBILE_COMPOSE_BUTTON_BLOCK_ROUTES = includeMultiColumnPaths([
   '/lists/new',
