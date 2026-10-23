@@ -13,7 +13,6 @@ import {
   BellIcon,
   ChatCircleDotsIcon,
   BookmarkSimpleIcon,
-  CalendarDotsIcon,
   PlusIcon,
   InfoIcon,
 } from '@phosphor-icons/react';
@@ -201,12 +200,6 @@ export const RedesignNavigationPanel: React.FC<{
               <FormattedMessage
                 id='navigation_bar.favourites'
                 defaultMessage='Favorites'
-              />
-            </NavigationLink>
-            <NavigationLink to='/scheduled' iconComponent={CalendarDotsIcon}>
-              <FormattedMessage
-                id='navigation_bar.scheduled_publications'
-                defaultMessage='Scheduled publications'
               />
             </NavigationLink>
             <ListSection
