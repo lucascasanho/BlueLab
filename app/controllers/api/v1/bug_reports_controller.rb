@@ -91,8 +91,8 @@ class Api::V1::BugReportsController < Api::BaseController
         'source' => error['source'].to_s.truncate(2_000),
         'status' => error['status'].to_i.presence,
         'method' => error['method'].to_s.truncate(16),
-        'url' => error['url'].to_s.truncate(500),
-        'request_id' => error['request_id'].to_s.truncate(128),
+        'url' => anonymous_report? ? sanitize_path(error['url']) : error['url'].to_s.truncate(500),
+        'request_id' => anonymous_report? ? nil : error['request_id'].to_s.truncate(128),
         'timestamp' => error['timestamp'].to_s.truncate(64),
       }.compact
     end
