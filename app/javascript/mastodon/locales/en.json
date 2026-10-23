@@ -1096,6 +1096,7 @@
   "not_signed_in_indicator.not_signed_in": "You need to login to access this resource.",
   "notification.added_to_collection": "{name} added you to a collection",
   "notification.admin.report": "{name} reported {target}",
+  "notification.admin.bug_report": "A new bug report was submitted",
   "notification.admin.report_account": "{name} reported {count, plural, one {one post} other {# posts}} from {target} for {category}",
   "notification.admin.report_account_other": "{name} reported {count, plural, one {one post} other {# posts}} from {target}",
   "notification.admin.report_statuses": "{name} reported {target} for {category}",
