@@ -55,3 +55,8 @@
 .bug-report-page__anonymous-toggle input[type='checkbox'] {
   margin: 0;
 }
+
+.bug-report-page__anonymous-toggle + .hint {
+  display: block;
+  margin-top: 4px;
+}
