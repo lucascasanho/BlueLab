@@ -97,6 +97,39 @@ class Notification extends ImmutablePureComponent {
     }
   };
 
+  handlePrivateStatusClickCapture = event => {
+    const { notification, status, onOpenConversation } = this.props;
+    const statusId = notification.get('status');
+
+    if (
+      status?.get('visibility') !== 'direct' ||
+      !statusId ||
+      !(event.target instanceof Element)
+    ) {
+      return;
+    }
+
+    const target = event.target;
+    if (
+      target.closest(
+        'button,input,textarea,select,[role="button"],[role="switch"],[role="checkbox"],[contenteditable="true"]',
+      )
+    ) {
+      return;
+    }
+
+    const link = target.closest('a[href]');
+    if (!link) return;
+
+    const destination = new URL(link.href, window.location.href);
+    const path = destination.pathname.replace(/\/+$/, '');
+    if (!path.endsWith(\`/\${statusId}\`)) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    onOpenConversation(statusId);
+  };
+
   handleOpenProfile = () => {
     const { notification } = this.props;
     this.props.history.push(`/@${notification.getIn(['account', 'acct'])}`);
@@ -200,7 +233,7 @@ class Notification extends ImmutablePureComponent {
 
     return (
       <Hotkeys handlers={this.getHandlers()}>
-        <div className={classNames('notification notification-favourite focusable', { unread })} tabIndex={0} aria-label={notificationForScreenReader(intl, intl.formatMessage(likeMessage, { name: notification.getIn(['account', 'acct']) }), notification.get('created_at'))}>
+        <div className={classNames('notification notification-favourite focusable', { unread })} tabIndex={0} onClickCapture={this.handlePrivateStatusClickCapture} aria-label={notificationForScreenReader(intl, intl.formatMessage(likeMessage, { name: notification.getIn(['account', 'acct']) }), notification.get('created_at'))}>
           <div className='notification__message'>
             <Icon id='star' icon={StatusLikeIcon} className='star-icon' />
 
@@ -213,6 +246,7 @@ class Notification extends ImmutablePureComponent {
             id={notification.get('status')}
             account={notification.get('account')}
             muted
+            onOpen={this.handleOpen}
             withDismiss
             hidden={!!this.props.hidden}
             getScrollPosition={this.props.getScrollPosition}
