@@ -111,7 +111,7 @@ class Notification extends ImmutablePureComponent {
     }
 
     const target = event.target;
-    const statusPreview = target.closest('.status, article[data-id]');
+    const statusPreview = target.closest('[data-interactive-post-content="true"], .status, article[data-id]');
     if (!statusPreview) return;
 
     const article = target.closest('article[data-id]');
