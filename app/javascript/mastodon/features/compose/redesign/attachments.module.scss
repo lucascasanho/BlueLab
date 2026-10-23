@@ -34,6 +34,29 @@
   overflow: hidden;
 }
 
+/* Keep GIF picker playback and overlay controls within the attachment frame.
+   The base StatusImage component does not size the GIFV wrapper itself. */
+.mediaUpload :global(.gifv),
+.mediaUpload :global(.gifv video) {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+}
+
+.mediaUpload :global(.gifv) {
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mediaUpload :global(.gifv video) {
+  object-fit: contain;
+  pointer-events: none;
+}
+
 .mediaUploadPending {
   animation: pulse 1s ease-in-out infinite;
   background-color: var(--color-bg-disabled);
