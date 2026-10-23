@@ -2059,6 +2059,8 @@ es:
       title_html: "%{name} te añadió a una colección"
     admin_report:
       title_html: "%{name} informó de %{target}"
+    admin_bug_report:
+      title: "Se ha enviado un nuevo informe de error"
     admin_sign_up:
       title_and_others_html:
         one: "%{name} y uno más se registró"
