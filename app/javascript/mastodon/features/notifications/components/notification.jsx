@@ -123,7 +123,7 @@ class Notification extends ImmutablePureComponent {
 
     const destination = new URL(link.href, window.location.href);
     const path = destination.pathname.replace(/\/+$/, '');
-    if (!path.endsWith(\`/\${statusId}\`)) return;
+    if (!path.endsWith('/' + statusId)) return;
 
     event.preventDefault();
     event.stopPropagation();
