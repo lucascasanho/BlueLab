@@ -92,6 +92,41 @@ export const NotificationGroupWithStatus: React.FC<{
     }
   }, [dispatch, isPrivateMention, statusId]);
 
+  const handlePrivateStatusClickCapture = useCallback(
+    (event: MouseEvent<HTMLDivElement>) => {
+      if (
+        !isPrivateMention ||
+        !statusId ||
+        !(event.target instanceof Element)
+      ) {
+        return;
+      }
+
+      const target = event.target;
+      if (
+        target.closest(
+          'button,input,textarea,select,[role="button"],[role="switch"],[role="checkbox"],[contenteditable="true"]',
+        )
+      ) {
+        return;
+      }
+
+      const link = target.closest<HTMLAnchorElement>('a[href]');
+      if (!link) return;
+
+      const destination = new URL(link.href, window.location.href);
+      const path = destination.pathname.replace(/\\/+$/, '');
+      if (!path.endsWith(`/${statusId}`)) return;
+
+      // A direct-message preview contains a permalink that would otherwise
+      // bypass the card handler and open the status page, especially on touch.
+      event.preventDefault();
+      event.stopPropagation();
+      dispatch(openConversationForStatus(statusId));
+    },
+    [dispatch, isPrivateMention, statusId],
+  );
+
   const handleCardClick = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
       if (!(event.target instanceof Element)) return;
@@ -149,6 +184,7 @@ export const NotificationGroupWithStatus: React.FC<{
           },
         )}
         tabIndex={0}
+        onClickCapture={handlePrivateStatusClickCapture}
         onClick={handleCardClick}
         onKeyDown={handleCardKeyDown}
       >
