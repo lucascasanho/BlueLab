@@ -1087,6 +1087,7 @@
   "not_signed_in_indicator.not_signed_in": "Necesitas iniciar sesión para acceder a este recurso.",
   "notification.added_to_collection": "{name} te añadió a una colección",
   "notification.admin.report": "{name} informó {target}",
+  "notification.admin.bug_report": "Se ha enviado un nuevo informe de error",
   "notification.admin.report_account": "{name} informó de {count, plural, one {una publicación} other {# publicaciones}} de {target} por {category}",
   "notification.admin.report_account_other": "{name} informó de {count, plural, one {una publicación} other {# publicaciones}} de {target}",
   "notification.admin.report_statuses": "{name} informó de {target} por {category}",
