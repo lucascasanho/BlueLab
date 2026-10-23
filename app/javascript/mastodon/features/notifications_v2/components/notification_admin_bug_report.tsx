@@ -5,7 +5,9 @@ import classNames from 'classnames';
 import BugReportIcon from '@/material-icons/400-24px/bug_report.svg?react';
 import { Icon } from 'mastodon/components/icon';
 import { RelativeTimestamp } from 'mastodon/components/relative_timestamp';
-import type { NotificationGroupAdminBugReport } from 'mastodon/models/notification_group';
+import type {
+  NotificationGroupAdminBugReport,
+} from 'mastodon/models/notification_group';
 
 export const NotificationAdminBugReport: React.FC<{
   notification: NotificationGroupAdminBugReport;
