@@ -58,6 +58,8 @@ en:
     attachment_hint: Images, GIFs, audio and video. Up to 5 files.
     diagnostic_notice: Browser, operating system, language, theme, interface mode, viewport and recent client errors may be included automatically.
     error_page: This report was opened from error page %{code}.
+    anonymous: "Prefer not to identify myself"
+    anonymous_hint: "The page and technical diagnostics will still be included, but this report will not be linked to your account."
     submit: Send report
     back: Cancel
     success_title: Bug report sent
