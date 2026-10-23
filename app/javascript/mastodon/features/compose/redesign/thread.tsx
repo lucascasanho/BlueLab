@@ -189,7 +189,6 @@ const ComposeThreadItem: React.FC<{
             onFiles={(files) => void upload(files)}
             onSubmit={onSubmit}
             dismissOnEscape={false}
-            hideFormattingToolbar
           />
         </ComposeAutocomplete>
       </div>
@@ -287,23 +286,6 @@ const ThreadMediaAttachment: React.FC<{
         )}
 
         <div className={classes.mediaActions}>
-          <IconButton
-            as='button'
-            type='button'
-            size='sm'
-            variant='solid'
-            icon={TrashIcon}
-            className={classNames(
-              classes.mediaActionButton,
-              classes.mediaRemove,
-            )}
-            onClick={onRemove}
-            aria-label={intl.formatMessage(messages.removeMedia)}
-          >
-            <span className='sr-only'>
-              <FormattedMessage {...messages.removeMedia} />
-            </span>
-          </IconButton>
           <Button
             as='button'
             type='button'
@@ -322,6 +304,23 @@ const ThreadMediaAttachment: React.FC<{
               <FormattedMessage {...messages.addAlt} />
             </span>
           </Button>
+          <IconButton
+            as='button'
+            type='button'
+            size='sm'
+            variant='solid'
+            icon={TrashIcon}
+            className={classNames(
+              classes.mediaActionButton,
+              classes.mediaRemove,
+            )}
+            onClick={onRemove}
+            aria-label={intl.formatMessage(messages.removeMedia)}
+          >
+            <span className='sr-only'>
+              <FormattedMessage {...messages.removeMedia} />
+            </span>
+          </IconButton>
         </div>
       </div>
     </div>

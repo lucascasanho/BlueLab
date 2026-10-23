@@ -34,6 +34,29 @@
   overflow: hidden;
 }
 
+/* Keep GIF picker previews and their controls inside the media card. */
+.mediaUpload :global(.gifv),
+.mediaUpload :global(.gifv video),
+.mediaUpload > video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+}
+
+.mediaUpload :global(.gifv) {
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mediaUpload :global(.gifv video) {
+  pointer-events: none;
+}
+
 .mediaUploadPending {
   animation: pulse 1s ease-in-out infinite;
   background-color: var(--color-bg-disabled);
@@ -55,7 +78,7 @@
   position: absolute;
   z-index: 4;
   inset-block-start: var(--space-2);
-  inset-inline-start: var(--space-2);
+  inset-inline-end: var(--space-2);
   width: max-content;
   max-width: 100%;
   min-width: 0;
@@ -73,7 +96,7 @@
   position: absolute;
   z-index: 4;
   inset-block-start: var(--space-2);
-  inset-inline-end: var(--space-2);
+  inset-inline-start: var(--space-2);
   width: max-content;
   max-width: 100%;
   min-width: 0;
@@ -132,11 +155,11 @@
 }
 
 .audioDeleteButton {
-  inset-inline-start: var(--space-2);
+  inset-inline-end: var(--space-2);
 }
 
 .audioAltButton {
-  inset-inline-end: var(--space-2);
+  inset-inline-start: var(--space-2);
 }
 
 .audioCover {

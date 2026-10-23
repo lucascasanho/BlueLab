@@ -3,12 +3,6 @@
   flex-direction: column;
   gap: var(--space-sm);
 
-  // Thread mode uses one shared formatting toolbar. The editor's built-in
-  // toolbar stays available outside thread mode, but is hidden inside this
-  // scope to avoid repeating the same controls for every post.
-  :global([role='toolbar']) {
-    display: none;
-  }
 }
 
 .formattingToolbar {
