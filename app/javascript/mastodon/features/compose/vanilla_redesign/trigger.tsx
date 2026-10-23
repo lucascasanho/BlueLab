@@ -7,8 +7,6 @@ import { useRouteMatch } from 'react-router';
 
 import {
   ChatCircleDotsIcon,
-  NewspaperIcon,
-  PencilSimpleIcon,
 } from '@phosphor-icons/react';
 
 import type { IconButtonProps } from '@/mastodon/components/button/vanilla_redesign';
@@ -166,7 +164,7 @@ export const ComposeRedesignButton: React.FC<{
   if (displayState === 'minimized') {
     return isMobile ? (
       <FloatingActionButton
-        icon={PencilSimpleIcon}
+        icon={ComposeIcon}
         onClick={toggleMinimize}
         {...floatingButtonProps}
         hidden={false} // never hide minimized composer button
@@ -242,7 +240,7 @@ export const ComposeRedesignButton: React.FC<{
         strategy='fixed'
         offset={8}
       >
-        <MenuItem name='post' onClick={handleComposerOpen} icon={NewspaperIcon}>
+        <MenuItem name='post' onClick={handleComposerOpen} icon={ComposeIcon}>
           <FormattedMessage id='compose.new.post' defaultMessage='Post' />
         </MenuItem>
         <MenuItem
