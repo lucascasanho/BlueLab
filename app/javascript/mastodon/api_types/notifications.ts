@@ -20,6 +20,7 @@ export const allNotificationTypes: NotificationType[] = [
   'update',
   'admin.sign_up',
   'admin.report',
+  'admin.bug_report',
   'admin.verification_request',
   'verification_request',
   'verification_approved',
@@ -48,6 +49,7 @@ export type NotificationType =
   | 'severed_relationships'
   | 'admin.sign_up'
   | 'admin.report'
+  | 'admin.bug_report'
   | 'admin.verification_request'
   | 'verification_request'
   | 'verification_approved'
@@ -82,6 +84,16 @@ interface NotificationGroupWithStatusJSON extends BaseNotificationGroupJSON {
 interface NotificationWithStatusJSON extends BaseNotificationJSON {
   type: NotificationWithStatusType;
   status: ApiStatusJSON | null;
+}
+
+interface BugReportNotificationGroupJSON extends BaseNotificationGroupJSON {
+  type: 'admin.bug_report';
+  bug_report_id: string;
+}
+
+interface BugReportNotificationJSON extends BaseNotificationJSON {
+  type: 'admin.bug_report';
+  bug_report_id: string;
 }
 
 interface ReportNotificationGroupJSON extends BaseNotificationGroupJSON {
@@ -180,6 +192,7 @@ interface AnnualReportNotificationGroupJSON extends BaseNotificationGroupJSON {
 
 export type ApiNotificationJSON =
   | SimpleNotificationJSON
+  | BugReportNotificationJSON
   | ReportNotificationJSON
   | AccountRelationshipSeveranceNotificationJSON
   | NotificationWithStatusJSON
@@ -189,6 +202,7 @@ export type ApiNotificationJSON =
 
 export type ApiNotificationGroupJSON =
   | SimpleNotificationGroupJSON
+  | BugReportNotificationGroupJSON
   | ReportNotificationGroupJSON
   | AccountRelationshipSeveranceNotificationGroupJSON
   | NotificationGroupWithStatusJSON
