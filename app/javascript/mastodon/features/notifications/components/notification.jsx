@@ -8,6 +8,7 @@ import { withRouter } from 'react-router-dom';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { ImmutablePureComponent } from 'react-immutable-pure-component';
 
+import BugReportIcon from '@/material-icons/400-24px/bug_report.svg?react';
 import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 import FlagIcon from '@/material-icons/400-24px/flag-fill.svg?react';
 import HomeIcon from '@/material-icons/400-24px/home-fill.svg?react';
@@ -515,6 +516,35 @@ class Notification extends ImmutablePureComponent {
     );
   }
 
+  renderAdminBugReport (notification) {
+    const { intl, unread } = this.props;
+    const message = intl.formatMessage({
+      id: 'notification.admin.bug_report',
+      defaultMessage: 'A new bug report was submitted',
+    });
+
+    return (
+      <a
+        href={`/admin/bug_reports/${notification.get('bug_report_id')}`}
+        target='_blank'
+        rel='noopener noreferrer'
+        className={classNames('notification notification-admin-bug-report focusable', { unread })}
+        tabIndex={0}
+        aria-label={notificationForScreenReader(intl, message, notification.get('created_at'))}
+      >
+        <div className='notification__message'>
+          <Icon id='bug-report' icon={BugReportIcon} />
+          <span title={notification.get('created_at')}>
+            <FormattedMessage
+              id='notification.admin.bug_report'
+              defaultMessage='A new bug report was submitted'
+            />
+          </span>
+        </div>
+      </a>
+    );
+  }
+
   renderAdminSignUp (notification, account, link) {
     const { intl, unread } = this.props;
 
@@ -642,6 +672,8 @@ class Notification extends ImmutablePureComponent {
       return this.renderAdminSignUp(notification, account, link);
     case 'admin.report':
       return this.renderAdminReport(notification, account, link);
+    case 'admin.bug_report':
+      return this.renderAdminBugReport(notification);
     case 'verification_request':
     case 'verification_approved':
       return this.renderVerification(notification);
