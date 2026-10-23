@@ -103,6 +103,12 @@ export const NotificationGroupWithStatus: React.FC<{
       }
 
       const target = event.target;
+      const statusPreview = target.closest<HTMLElement>('.status, article[data-id]');
+      if (!statusPreview) return;
+
+      const article = target.closest<HTMLElement>('article[data-id]');
+      if (article && article.dataset.id !== statusId) return;
+
       if (
         target.closest(
           'button,input,textarea,select,[role="button"],[role="switch"],[role="checkbox"],[contenteditable="true"]',
@@ -112,14 +118,14 @@ export const NotificationGroupWithStatus: React.FC<{
       }
 
       const link = target.closest<HTMLAnchorElement>('a[href]');
-      if (!link) return;
+      if (link) {
+        const destination = new URL(link.href, window.location.href);
+        const path = destination.pathname.replace(/\\/+$/, '');
+        if (!path.endsWith(`/${statusId}`)) return;
+      }
 
-      const destination = new URL(link.href, window.location.href);
-      const path = destination.pathname.replace(/\/+$/, '');
-      if (!path.endsWith(`/${statusId}`)) return;
-
-      // A direct-message preview contains a permalink that would otherwise
-      // bypass the card handler and open the status page, especially on touch.
+      // Intercept direct-message preview activation before the status permalink
+      // handler runs. Profile links and interactive controls remain unaffected.
       event.preventDefault();
       event.stopPropagation();
       dispatch(openConversationForStatus(statusId));
