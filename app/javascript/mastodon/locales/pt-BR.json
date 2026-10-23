@@ -1114,6 +1114,7 @@
   "not_signed_in_indicator.not_signed_in": "É necessário registrar para acessar este recurso.",
   "notification.added_to_collection": "{name} adicionou você a uma coleção",
   "notification.admin.report": "{name} denunciou {target}",
+  "notification.admin.bug_report": "Um novo relato de bug foi enviado",
   "notification.admin.report_account": "{name} denunciou {count, plural, one {uma publicação} other {# publicações}} de {target} para {category}",
   "notification.admin.report_account_other": "{name} denunciou {count, plural, one {uma publicação} other {# publicações}} de {target}",
   "notification.admin.report_statuses": "{name} denunciou {target} para {category}",
