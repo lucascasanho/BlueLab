@@ -144,9 +144,11 @@ const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr' | 'it', Copy> = {
   },
   it: {
     title: 'Segnala un bug',
-    lead: 'Descrivi il problema e allega schermate, GIF, audio o video quando è utile.',
+    lead:
+      'Descrivi il problema e allega schermate, GIF, audio o video quando è utile.',
     description: 'Che cosa è successo?',
-    placeholder: 'Descrivi il bug, il risultato atteso e i passaggi per riprodurlo.',
+    placeholder:
+      'Descrivi il bug, il risultato atteso e i passaggi per riprodurlo.',
     attachments: 'Allegati',
     attachmentHint: 'Immagini, GIF, audio e video. Fino a 5 file.',
     chooseFiles: 'Scegli file',
@@ -156,11 +158,14 @@ const COPY: Record<'en' | 'pt-BR' | 'es' | 'fr' | 'it', Copy> = {
     submit: 'Invia segnalazione',
     cancel: 'Annulla',
     successTitle: 'Segnalazione inviata',
-    successBody: 'La segnalazione è stata inviata agli amministratori dell’istanza con le informazioni tecniche disponibili.',
+    successBody:
+      'La segnalazione è stata inviata agli amministratori dell’istanza con le informazioni tecniche disponibili.',
     close: 'Chiudi',
-    diagnosticNotice: 'La segnalazione include automaticamente informazioni sul browser e sul sistema operativo, lingua, tema, modalità dell’interfaccia ed errori recenti del client.',
+    diagnosticNotice:
+      'La segnalazione include automaticamente informazioni sul browser e sul sistema operativo, lingua, tema, modalità dell’interfaccia ed errori recenti del client.',
     anonymous: 'Preferisco non identificarmi',
-    anonymousHint: 'La segnalazione includerà comunque la pagina in cui si è verificato il problema e le informazioni tecniche, ma non sarà associata al tuo account.',
+    anonymousHint:
+      'La segnalazione includerà comunque la pagina in cui si è verificato il problema e le informazioni tecniche, ma non sarà associata al tuo account.',
     required: 'Descrivi il problema prima di inviare.',
     sendError: 'Impossibile inviare la segnalazione. Riprova.',
     characters: '{current}/5000',
