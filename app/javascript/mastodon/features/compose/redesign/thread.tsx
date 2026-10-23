@@ -163,7 +163,10 @@ const ComposeThreadItem: React.FC<{
       data-thread-item-id={id}
       onFocusCapture={onFocus}
     >
-      <div className={classes.threadIndicator} aria-hidden='true' />
+      <div
+        className={classes.threadIndicator}
+        aria-hidden='true'
+      />
       <IconButton
         as='button'
         type='button'
@@ -202,7 +205,9 @@ const ComposeThreadItem: React.FC<{
                   key={mediaId}
                   attachment={attachment}
                   threadItemId={id}
-                  onRemove={() => dispatch(removeComposeThreadMedia(id, mediaId))}
+                  onRemove={() =>
+                    dispatch(removeComposeThreadMedia(id, mediaId))
+                  }
                 />
               );
             })}
