@@ -2,6 +2,7 @@
 
 class Api::V1::BugReportsController < Api::BaseController
   skip_before_action :require_authenticated_user!
+  before_action -> { authorize_if_got_token! :write, :'write:reports' }
 
   def create
     @bug_report = BugReport.create!(
