@@ -93,14 +93,6 @@
   background: var(--color-border-brand);
 }
 
-.threadItem:not(:last-child) > .threadIndicator::before {
-  bottom: calc(-1 * var(--space-md));
-}
-
-.threadItem:last-child > .threadIndicator::before {
-  bottom: calc(100% - 14px);
-}
-
 .threadEditor {
   min-width: 0;
 }
