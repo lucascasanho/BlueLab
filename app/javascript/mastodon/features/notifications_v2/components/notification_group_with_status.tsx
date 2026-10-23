@@ -103,7 +103,7 @@ export const NotificationGroupWithStatus: React.FC<{
       }
 
       const target = event.target;
-      const statusPreview = target.closest<HTMLElement>('.status, article[data-id]');
+      const statusPreview = target.closest<HTMLElement>('[data-interactive-post-content="true"], .status, article[data-id]');
       if (!statusPreview) return;
 
       const article = target.closest<HTMLElement>('article[data-id]');
