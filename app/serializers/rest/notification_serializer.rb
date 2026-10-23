@@ -11,6 +11,7 @@ class REST::NotificationSerializer < ActiveModel::Serializer
   attribute :filtered, if: :filtered?
 
   attribute :fallback, if: :needs_fallback?
+  attribute :bug_report_id, if: :bug_report_type?
 
   belongs_to :from_account, key: :account, serializer: REST::AccountSerializer
   belongs_to :target_status, key: :status, if: :status_type?, serializer: REST::StatusSerializer
@@ -25,6 +26,14 @@ class REST::NotificationSerializer < ActiveModel::Serializer
 
   def group_key
     object.group_key || "ungrouped-#{object.id}"
+  end
+
+  def bug_report_id
+    object.activity_id.to_s
+  end
+
+  def bug_report_type?
+    object.type == :'admin.bug_report'
   end
 
   def status_type?
