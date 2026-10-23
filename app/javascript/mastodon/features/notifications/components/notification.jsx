@@ -111,15 +111,10 @@ class Notification extends ImmutablePureComponent {
     }
 
     const target = event.target;
-    const statusPreview = target.closest('[data-interactive-post-content="true"], .status, article[data-id]');
-    if (!statusPreview) return;
-
-    const article = target.closest('article[data-id]');
-    if (article && article.dataset.id !== statusId) return;
 
     if (
       target.closest(
-        'button,input,textarea,select,[role="button"],[role="switch"],[role="checkbox"],[contenteditable="true"]',
+        'button,input,textarea,select,[role="switch"],[role="checkbox"],[contenteditable="true"]',
       )
     ) {
       return;
@@ -129,6 +124,7 @@ class Notification extends ImmutablePureComponent {
     if (link) {
       const destination = new URL(link.href, window.location.href);
       const path = destination.pathname.replace(/\/+$/, '');
+      // Preserve profile/external links, but route the message permalink to its conversation.
       if (!path.endsWith('/' + statusId)) return;
     }
 
