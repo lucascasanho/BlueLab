@@ -5,7 +5,6 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import type { Map as ImmutableMap } from 'immutable';
 
 import {
-  PenNibIcon,
   HouseIcon,
   HeartIcon,
   MagnifyingGlassIcon,
@@ -23,6 +22,7 @@ import { fetchLists } from '@/mastodon/actions/lists';
 import { closeNavigation } from '@/mastodon/actions/navigation';
 import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
 import { Button } from '@/mastodon/components/button/vanilla_redesign';
+import { ComposeIcon } from '@/mastodon/components/compose_icon';
 import { Callout } from '@/mastodon/components/callout/redesign';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 import { useScrollSensor } from '@/mastodon/hooks/useScrollSensor';
@@ -263,7 +263,7 @@ export const RedesignNavigationPanel: React.FC<{
           <footer className={classes.footer} data-stuck={!isScrolledToBottom}>
             <div className={classes.newPostButton}>
               <Button
-                leadingIcon={PenNibIcon}
+                leadingIcon={ComposeIcon}
                 onClick={openComposer}
                 variant='solid'
                 color='accent'
