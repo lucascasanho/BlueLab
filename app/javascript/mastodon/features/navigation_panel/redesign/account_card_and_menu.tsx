@@ -337,17 +337,17 @@ export const AccountMenuItems: React.FC<{
         />
       </MenuItemLink>
 
-      <MenuItemLink to='/scheduled' icon={CalendarDotsIcon}>
-        <FormattedMessage
-          id='navigation_bar.scheduled_publications'
-          defaultMessage='Scheduled publications'
-        />
-      </MenuItemLink>
-
       <MenuItemLink to='/favourites' icon={FavouriteIcon}>
         <FormattedMessage
           id='navigation_bar.favourites'
           defaultMessage='Favorites'
+        />
+      </MenuItemLink>
+
+      <MenuItemLink to='/scheduled' icon={CalendarDotsIcon}>
+        <FormattedMessage
+          id='navigation_bar.scheduled_publications'
+          defaultMessage='Scheduled publications'
         />
       </MenuItemLink>
 
