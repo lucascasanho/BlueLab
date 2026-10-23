@@ -16,7 +16,7 @@
 
 .primaryPost {
   position: relative;
-  padding-inline-start: calc(var(--space-xl) + var(--space-lg));
+  padding-inline-start: calc(var(--space-2xl) + var(--space-xl));
 
   &::before {
     content: '';
@@ -52,7 +52,7 @@
 .threadItem {
   position: relative;
   min-width: 0;
-  padding: var(--space-sm) 2.75rem var(--space-md) calc(var(--space-xl) + var(--space-lg));
+  padding: var(--space-sm) 2.75rem var(--space-md) calc(var(--space-2xl) + var(--space-xl));
   background: transparent;
 
   &::before {
@@ -286,7 +286,7 @@
 
   .primaryPost,
   .threadItem {
-    padding-inline-start: calc(var(--space-lg) + var(--space-md));
+    padding-inline-start: calc(var(--space-2xl) + var(--space-lg));
   }
 
   .threadItem {
