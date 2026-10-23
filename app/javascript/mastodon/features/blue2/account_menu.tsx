@@ -153,19 +153,6 @@ export const Blue2AccountMenu: React.FC<{
       </NavLink>
 
       <NavLink
-        to='/scheduled'
-        className={classes.menuItem}
-        onClick={closeMenu}
-        role='menuitem'
-      >
-        <CalendarDotsIcon />
-        <FormattedMessage
-          id='navigation_bar.scheduled_publications'
-          defaultMessage='Scheduled publications'
-        />
-      </NavLink>
-
-      <NavLink
         to='/favourites'
         className={classes.menuItem}
         onClick={closeMenu}
@@ -175,6 +162,19 @@ export const Blue2AccountMenu: React.FC<{
         <FormattedMessage
           id='navigation_bar.favourites'
           defaultMessage='Favorites'
+        />
+      </NavLink>
+
+      <NavLink
+        to='/scheduled'
+        className={classes.menuItem}
+        onClick={closeMenu}
+        role='menuitem'
+      >
+        <CalendarDotsIcon />
+        <FormattedMessage
+          id='navigation_bar.scheduled_publications'
+          defaultMessage='Scheduled publications'
         />
       </NavLink>
 
