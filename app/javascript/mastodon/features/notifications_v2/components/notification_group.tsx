@@ -7,6 +7,7 @@ import { NotificationVerification } from 'mastodon/features/notifications/compon
 import type { NotificationGroup as NotificationGroupModel } from 'mastodon/models/notification_group';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 
+import { NotificationAdminBugReport } from './notification_admin_bug_report';
 import { NotificationAdminReport } from './notification_admin_report';
 import { NotificationAdminSignUp } from './notification_admin_sign_up';
 import { NotificationAdminVerificationRequest } from './notification_admin_verification_request';
@@ -138,6 +139,14 @@ export const NotificationGroup: React.FC<{
     case 'admin.report':
       content = (
         <NotificationAdminReport
+          unread={unread}
+          notification={notificationGroup}
+        />
+      );
+      break;
+    case 'admin.bug_report':
+      content = (
+        <NotificationAdminBugReport
           unread={unread}
           notification={notificationGroup}
         />
