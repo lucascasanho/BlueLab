@@ -8,6 +8,7 @@ import {
   GearIcon,
   CirclesFourIcon,
   HeartIcon,
+  CalendarDotsIcon,
   BookmarkSimpleIcon,
   UsersThreeIcon,
   ProhibitIcon,
@@ -149,6 +150,13 @@ export const AccountMenuItems: React.FC<{
         <FormattedMessage
           id='navigation_bar.liked_posts'
           defaultMessage='Liked Posts'
+        />
+      </MenuItemLink>
+
+      <MenuItemLink to='/scheduled' icon={CalendarDotsIcon}>
+        <FormattedMessage
+          id='navigation_bar.scheduled_publications'
+          defaultMessage='Scheduled publications'
         />
       </MenuItemLink>
 
