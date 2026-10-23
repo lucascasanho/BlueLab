@@ -188,6 +188,7 @@ const ComposeThreadItem: React.FC<{
             onContentTypeChange={(value) => change('content_type', value)}
             onFiles={(files) => void upload(files)}
             onSubmit={onSubmit}
+            hideFormattingToolbar
             dismissOnEscape={false}
           />
         </ComposeAutocomplete>
