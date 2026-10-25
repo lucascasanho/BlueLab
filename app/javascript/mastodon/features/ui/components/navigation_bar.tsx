@@ -208,15 +208,20 @@ export const NavigationBar: React.FC = () => {
     document.body.dataset.theme === 'blue-2' &&
     typeof window !== 'undefined' &&
     window.matchMedia('(max-width: 1174px)').matches;
+  const isVanillaMobile =
+    signedIn &&
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'default' &&
+    typeof window !== 'undefined' &&
+    window.matchMedia('(max-width: 760px)').matches;
 
   const handleClick = useCallback(() => {
     dispatch(toggleNavigation());
   }, [dispatch]);
 
-  // BlueLab compact viewports render their own mobile navigation shell.
-  // The advanced-interface preference must not restore the legacy navigation
-  // underneath it on tablets either.
-  if (isBlue2Mobile) {
+  // The redesigned mobile shells own navigation on these compact viewports.
+  // Do not render the legacy bar underneath either shell.
+  if (isBlue2Mobile || isVanillaMobile) {
     return null;
   }
 

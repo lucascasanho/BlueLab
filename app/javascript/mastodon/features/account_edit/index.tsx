@@ -8,11 +8,12 @@ import { useHistory } from 'react-router-dom';
 import { updateVerificationBadgeVisibility } from '@/mastodon/actions/accounts_typed';
 import type { ModalType } from '@/mastodon/actions/modal';
 import { openModal } from '@/mastodon/actions/modal';
+import { apiUpdateVerificationBadge } from '@/mastodon/api/verification';
 import { AccountBio } from '@/mastodon/components/account_bio';
 import { Avatar } from '@/mastodon/components/avatar';
-import { hasVerifiedRole } from '@/mastodon/components/display_name/verified_badge';
 import { Button } from '@/mastodon/components/button';
 import { DismissibleCallout } from '@/mastodon/components/callout/dismissible';
+import { hasVerifiedRole } from '@/mastodon/components/display_name/verified_badge';
 import { CustomEmojiProvider } from '@/mastodon/components/emoji/context';
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { ToggleField } from '@/mastodon/components/form_fields';
@@ -25,7 +26,6 @@ import {
   fetchProfile,
   patchProfile,
 } from '@/mastodon/reducers/slices/profile_edit';
-import { apiUpdateVerificationBadge } from '@/mastodon/api/verification';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { AccountEditColumn, AccountEditEmptyColumn } from './components/column';
@@ -33,9 +33,9 @@ import { EditButton } from './components/edit_button';
 import { AccountField } from './components/field';
 import { AccountFieldActions } from './components/field_actions';
 import { AccountImageEdit } from './components/image_edit';
-import { VerificationRequestTrigger } from './verification_request';
 import { AccountEditSection } from './components/section';
 import classes from './styles.module.scss';
+import { VerificationRequestTrigger } from './verification_request';
 
 export const messages = defineMessages({
   columnTitle: {
@@ -132,14 +132,14 @@ export const AccountEdit: FC = () => {
 
   const { profile, isPending } = useAppSelector((state) => state.profileEdit);
   const [badgeVisibilitySaving, setBadgeVisibilitySaving] = useState(false);
-  const [badgeVisible, setBadgeVisible] = useState(true);
+  const [badgeVisibleOverride, setBadgeVisibleOverride] = useState<
+    boolean | null
+  >(null);
+  const badgeVisible =
+    badgeVisibleOverride ?? account?.verified_badge_visible !== false;
   useEffect(() => {
     void dispatch(fetchProfile());
   }, [dispatch]);
-
-  useEffect(() => {
-    setBadgeVisible(account?.verified_badge_visible !== false);
-  }, [account?.verified_badge_visible]);
 
   const maxFieldCount = useAppSelector(
     (state) =>
@@ -197,11 +197,11 @@ export const AccountEdit: FC = () => {
 
     const nextVisible = !badgeVisible;
     setBadgeVisibilitySaving(true);
-    setBadgeVisible(nextVisible);
+    setBadgeVisibleOverride(nextVisible);
 
     try {
       const result = await apiUpdateVerificationBadge(nextVisible);
-      setBadgeVisible(result.verified_badge_visible);
+      setBadgeVisibleOverride(result.verified_badge_visible);
       dispatch(
         updateVerificationBadgeVisibility({
           id: account.id,
@@ -209,11 +209,15 @@ export const AccountEdit: FC = () => {
         }),
       );
     } catch {
-      setBadgeVisible(!nextVisible);
+      setBadgeVisibleOverride(!nextVisible);
     } finally {
       setBadgeVisibilitySaving(false);
     }
   }, [account, badgeVisible, badgeVisibilitySaving, dispatch]);
+
+  const handleBadgeVisibilityToggleClick = useCallback(() => {
+    void handleBadgeVisibilityToggle();
+  }, [handleBadgeVisibilityToggle]);
 
   // Normally we would use the account emoji, but we want all custom emojis to be available to render after editing.
   const emojis = useCustomEmojis();
@@ -266,22 +270,21 @@ export const AccountEdit: FC = () => {
               {hasVerifiedRole(account) ? (
                 <Button
                   className={classes.editButton}
-                  onClick={handleBadgeVisibilityToggle}
+                  onClick={handleBadgeVisibilityToggleClick}
                   loading={badgeVisibilitySaving}
                   aria-pressed={badgeVisible}
                 >
-                  <FormattedMessage
-                    id={
-                      badgeVisible
-                        ? 'account_edit.verification.toggle_hide'
-                        : 'account_edit.verification.toggle_show'
-                    }
-                    defaultMessage={
-                      badgeVisible
-                        ? 'Hide verification badge'
-                        : 'Show verification badge'
-                    }
-                  />
+                  {badgeVisible ? (
+                    <FormattedMessage
+                      id='account_edit.verification.toggle_hide'
+                      defaultMessage='Hide verification badge'
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id='account_edit.verification.toggle_show'
+                      defaultMessage='Show verification badge'
+                    />
+                  )}
                 </Button>
               ) : (
                 <VerificationRequestTrigger />

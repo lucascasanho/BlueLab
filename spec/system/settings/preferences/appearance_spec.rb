@@ -15,6 +15,8 @@ RSpec.describe 'Settings preferences appearance page' do
 
     check confirm_reblog_field
     uncheck confirm_delete_field
+    uncheck display_own_posts
+    check display_own_boosts
 
     check advanced_layout_field
     expect(page).to have_no_field(theme_field)
@@ -22,6 +24,8 @@ RSpec.describe 'Settings preferences appearance page' do
     expect { save_changes }
       .to change { user.reload.settings['web.reblog_modal'] }.to(true)
       .and change { user.reload.settings['web.delete_modal'] }.to(false)
+      .and change { user.reload.settings['display_own_posts'] }.to(false)
+      .and change { user.reload.settings['display_own_boosts'] }.to(true)
       .and(change { user.reload.settings['web.advanced_layout'] }.to(true))
     expect(page)
       .to have_title(I18n.t('settings.appearance'))

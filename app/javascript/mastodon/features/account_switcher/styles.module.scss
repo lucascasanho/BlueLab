@@ -3,7 +3,6 @@
   color: var(--color-text-primary, var(--blue2-text, currentColor));
 }
 
-
 .navigationSection {
   margin: 0;
   padding: 0;
@@ -65,7 +64,7 @@
   flex: 1 1 auto;
   padding: 6px 8px;
   border: 0;
-  border-radius: var(--radius-sm, 8px);
+  border-radius: var(--radius-3, 8px);
   display: flex;
   align-items: center;
   gap: 9px;
@@ -83,13 +82,19 @@
 .accountButton:focus-visible:not(:disabled),
 .navigationAccountButton:hover:not(:disabled),
 .navigationAccountButton:focus-visible:not(:disabled) {
-  background: var(--color-bg-highlight, var(--blue2-hover, rgb(127 127 127 / 12%)));
+  background: var(
+    --color-bg-highlight,
+    var(--blue2-hover, rgb(127 127 127 / 12%))
+  );
   outline: none;
 }
 
 .accountButton[aria-current='page'],
 .navigationAccountButton[aria-current='page'] {
-  background: var(--color-bg-secondary, var(--blue2-hover, rgb(127 127 127 / 10%)));
+  background: var(
+    --color-bg-secondary,
+    var(--blue2-hover, rgb(127 127 127 / 10%))
+  );
 }
 
 .accountButton:disabled,
@@ -104,7 +109,10 @@
   height: 34px;
   border-radius: 999px;
   object-fit: cover;
-  background: var(--color-bg-secondary, var(--blue2-hover, rgb(127 127 127 / 12%)));
+  background: var(
+    --color-bg-secondary,
+    var(--blue2-hover, rgb(127 127 127 / 12%))
+  );
 }
 
 .accountText {
@@ -162,7 +170,10 @@
   overflow: hidden;
   padding: 3px 6px;
   border-radius: 999px;
-  background: var(--color-bg-secondary, var(--blue2-hover, rgb(127 127 127 / 10%)));
+  background: var(
+    --color-bg-secondary,
+    var(--blue2-hover, rgb(127 127 127 / 10%))
+  );
   color: var(--color-text-secondary, var(--blue2-muted, currentColor));
   font-size: 10px;
   font-weight: 700;
@@ -176,7 +187,7 @@
   min-height: 44px;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-sm, 8px);
+  border-radius: var(--radius-3, 8px);
   background: transparent;
   color: var(--color-text-secondary, var(--blue2-muted, currentColor));
   font-size: 19px;
@@ -186,7 +197,10 @@
 
 .removeButton:hover,
 .removeButton:focus-visible {
-  background: var(--color-bg-highlight, var(--blue2-hover, rgb(127 127 127 / 12%)));
+  background: var(
+    --color-bg-highlight,
+    var(--blue2-hover, rgb(127 127 127 / 12%))
+  );
   color: var(--color-text-primary, var(--blue2-text, currentColor));
   outline: none;
 }
@@ -194,7 +208,10 @@
 .divider {
   height: 1px;
   margin: 6px 4px;
-  background: var(--color-border-primary, var(--blue2-border-soft, rgb(127 127 127 / 20%)));
+  background: var(
+    --color-border-primary,
+    var(--blue2-border-soft, rgb(127 127 127 / 20%))
+  );
 }
 
 .action,
@@ -202,7 +219,7 @@
   box-sizing: border-box;
   min-height: 42px;
   padding: 8px 10px;
-  border-radius: var(--radius-sm, 8px);
+  border-radius: var(--radius-3, 8px);
   display: flex;
   align-items: center;
   color: var(--color-text-primary, var(--blue2-text, currentColor));
@@ -219,7 +236,10 @@
 .action:focus-visible,
 .navigationAction:hover,
 .navigationAction:focus-visible {
-  background: var(--color-bg-highlight, var(--blue2-hover, rgb(127 127 127 / 12%)));
+  background: var(
+    --color-bg-highlight,
+    var(--blue2-hover, rgb(127 127 127 / 12%))
+  );
   color: var(--color-text-primary, var(--blue2-text, currentColor));
   text-decoration: none;
   outline: none;
@@ -234,7 +254,7 @@
 }
 
 .navigationError {
-  margin: 4px var(--space-sm) 6px;
+  margin: 4px var(--space-3) 6px;
 }
 
 .navigationAccountRow {
@@ -243,7 +263,7 @@
 
 .navigationAccountButton {
   min-height: 50px;
-  padding: var(--space-xs) var(--space-sm);
+  padding: var(--space-2) var(--space-3);
 }
 
 .navigationAction {

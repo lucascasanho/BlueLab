@@ -735,7 +735,6 @@
         follow_recommendations: Følg anbefalinger
         profile_directory: Profilkatalog
         public_timelines: Offentlige tidslinjer
-        publish_statistics: Publiser statistikk
         title: Oppdagelse
         trends: Trender
       domain_blocks:
@@ -930,8 +929,6 @@
     warning_presets:
       add_new: Legg til ny
       delete: Slett
-      edit_preset: Rediger advarsel forhåndsinnstilling
-      empty: Du har ikke definert noen forhåndsinnstillinger for varsler enda.
     webhooks:
       add_new: Legg til endepunkt
       delete: Slett

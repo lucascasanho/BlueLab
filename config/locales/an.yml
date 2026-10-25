@@ -678,7 +678,6 @@ an:
         follow_recommendations: Recomendacions de cuentas
         profile_directory: Directorio de perfils
         public_timelines: Linias de tiempo publicas
-        publish_statistics: Publicar las estatisticas
         title: Escubrimiento
         trends: Tendencias
       domain_blocks:
@@ -811,8 +810,6 @@ an:
     warning_presets:
       add_new: Anyadir nuevo
       delete: Borrar
-      edit_preset: Editar aviso predeterminau
-      empty: Encara no has definiu garra preajuste d'alvertencia.
     webhooks:
       add_new: Anyadir endpoint
       delete: Eliminar

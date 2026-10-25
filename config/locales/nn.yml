@@ -980,10 +980,8 @@ nn:
       discovery:
         follow_recommendations: Fylgjeforslag
         preamble: Å framheva interessant innhald er viktig for å ta imot nye brukarar som ikkje nødvendigvis kjenner nokon på Mastodon. Kontroller korleis oppdagingsfunksjonane på tenaren din fungerer.
-        privacy: Personvern
         profile_directory: Profilkatalog
         public_timelines: Offentlege tidsliner
-        publish_statistics: Publiser statistikk
         title: Oppdaging
         trends: Populært
         wrapstodon: Mastodon-året
@@ -1277,9 +1275,6 @@ nn:
     warning_presets:
       add_new: Legg til ny
       delete: Slett
-      edit_preset: Endr åtvaringsoppsett
-      empty: Du har ikke definert noen forhåndsinnstillinger for advarsler enda.
-      title: Førehandsinnstillingar for varsel
     webhooks:
       add_new: Legg til endepunkt
       delete: Slett

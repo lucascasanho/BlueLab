@@ -59,6 +59,7 @@ class User < ApplicationRecord
   include User::LdapAuthenticable
   include User::Omniauthable
   include User::PamAuthenticable
+  include User::SignInToken
 
   devise :two_factor_authenticatable,
          otp_secret_length: 32
@@ -120,6 +121,7 @@ class User < ApplicationRecord
   before_create :set_age_verified_at
   after_commit :send_pending_devise_notifications
   after_create_commit :trigger_webhooks
+  after_commit :reload_home_feed, if: :saved_change_to_settings, on: [:create, :update]
 
   normalizes :locale, with: ->(locale) { I18n.available_locales.exclude?(locale.to_sym) ? nil : locale }
   normalizes :time_zone, with: ->(time_zone) { ActiveSupport::TimeZone[time_zone].nil? ? nil : time_zone }
@@ -200,8 +202,30 @@ class User < ApplicationRecord
     redis.publish("timeline:system:#{account.id}", { event: :kill }.to_json)
   end
 
+  def mails_disabled?
+    disabled? && confirmed_at.nil? && confirmation_sent_at.nil?
+  end
+
   def enable!
     update!(disabled: false)
+
+    # Users that are disabled at creation-time do not generate a confirmation link,
+    # so generate one on re-enable if that's the case
+    send_confirmation_instructions if confirmation_sent_at.nil? && confirmed_at.nil?
+  end
+
+  # Redefined so users that are created disabled do not cause a confirmation mail to be sent
+  def generate_confirmation_token
+    return if mails_disabled?
+
+    super
+  end
+
+  # Redefined so users that are created disabled do not cause a confirmation mail to be sent
+  def send_confirmation_instructions
+    return if mails_disabled?
+
+    super
   end
 
   def to_log_human_identifier
@@ -252,12 +276,30 @@ class User < ApplicationRecord
     !account.memorial?
   end
 
+  def nonfunctional_reason
+    if !confirmed?
+      :pending_confirmation
+    elsif !approved?
+      :pending_approval
+    elsif account.deleted?
+      :account_deleted
+    elsif account.suspended?
+      :account_suspended
+    elsif account.memorial?
+      :memorial
+    elsif disabled?
+      :login_disabled
+    elsif missing_2fa?
+      :'2fa_required'
+    end
+  end
+
   def functional?
     functional_or_moved? && account.moved_to_account_id.nil?
   end
 
   def functional_or_moved?
-    confirmed? && approved? && !disabled? && !account.unavailable? && !account.memorial? && !missing_2fa?
+    !nonfunctional_reason
   end
 
   def missing_2fa?
@@ -271,6 +313,7 @@ class User < ApplicationRecord
   def approve!
     return if approved?
 
+    enable! if disabled?
     update!(approved: true)
 
     # Avoid extremely unlikely race condition when approving and confirming
@@ -449,6 +492,8 @@ class User < ApplicationRecord
         open_registrations? || valid_bypassing_invitation? || external?
       end
     end
+
+    self.disabled ||= !approved && Setting.postpone_confirmation_emails
   end
 
   def set_age_verified_at
@@ -557,5 +602,21 @@ class User < ApplicationRecord
 
   def trigger_webhooks
     TriggerWebhookWorker.perform_async('account.created', 'Account', account_id)
+  end
+
+  def reload_home_feed
+    reblog_setting = initial_setting_display_own_boosts
+    post_setting = initial_setting_display_own_posts
+
+    # hand the initial status of the settings, to check at execution, to which it changed
+    MultiMergeIntoOwnHomeWorker.perform_async(account.id, post_setting, reblog_setting)
+  end
+
+  def initial_setting_display_own_boosts
+    saved_change_to_settings.first['display_own_boosts']
+  end
+
+  def initial_setting_display_own_posts
+    saved_change_to_settings.first['display_own_posts']
   end
 end

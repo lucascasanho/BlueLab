@@ -6,23 +6,20 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { useParams } from 'react-router';
 
-import { BookmarkSimpleIcon, StarIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
-import { statusInteraction } from '@/mastodon/actions/interactions_typed';
-import { ToggleIconButton } from '@/mastodon/components/button/redesign';
 import { Column } from '@/mastodon/components/column';
 import {
   ColumnHeader,
   ColumnSettingsMenu,
 } from '@/mastodon/components/column_header';
 import { DisplayNameSimple } from '@/mastodon/components/display_name/simple';
-import { useIconWeight } from '@/mastodon/components/icon';
 import { LoadingIndicator } from '@/mastodon/components/loading_indicator';
 import {
   FOCUS_TARGET,
   NavigationFocusTarget,
 } from '@/mastodon/components/navigation_focus_target';
+import { Scrollable } from '@/mastodon/components/scrollable_list/components';
 import { StatusActionItem } from '@/mastodon/components/status/action_bar';
 import {
   useStatusMenuActions,
@@ -37,7 +34,7 @@ import {
   getAncestorsIds,
   getDescendantsIds,
 } from '@/mastodon/selectors/contexts';
-import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import { useAppSelector } from '@/mastodon/store';
 
 import { BundleColumnError } from '../ui/components/bundle_column_error';
 import { useColumnsContext } from '../ui/util/columns_context';
@@ -64,11 +61,6 @@ const messages = defineMessages({
   detailedStatus: {
     id: 'status.detailed_status',
     defaultMessage: 'Detailed conversation view',
-  },
-  favourite: { id: 'status.favourite', defaultMessage: 'Favorite' },
-  removeFavourite: {
-    id: 'status.remove_favourite',
-    defaultMessage: 'Remove from favorites',
   },
 });
 
@@ -100,10 +92,28 @@ export const StatusPage: React.FC = () => {
   const descendantIds = useAppSelector((state) =>
     getDescendantsIds(state, statusId),
   );
+  const newReplyIds = useNewReplies({ statusId, descendantIds });
 
   const screenReaderText = useTextForScreenReader({ statusId });
 
+  // Scroll into view when the main status changes or ancestors change.
   const statusFocusRef = useRef<HTMLDivElement>(null);
+  const hasStatus = !!status;
+  const lastScrolledRef = useRef<{ statusId: string; ancestors: number }>(null);
+  useEffect(() => {
+    const node = statusFocusRef.current;
+    if (!node) {
+      lastScrolledRef.current = null;
+      return;
+    }
+
+    const last = lastScrolledRef.current;
+    if (last?.statusId !== statusId || last.ancestors < ancestorIds.length) {
+      node.scrollIntoView(true);
+    }
+    lastScrolledRef.current = { statusId, ancestors: ancestorIds.length };
+  }, [statusId, ancestorIds.length, isLoading, hasStatus]);
+
   const shouldUpdateScroll: ShouldUpdateScrollFn = useCallback(
     (prevLocation, location) => {
       // Do not change scroll when opening a modal
@@ -119,36 +129,9 @@ export const StatusPage: React.FC = () => {
         return [0, statusFocusRef.current.offsetTop];
       }
 
-      // Do not scroll otherwise, `componentDidUpdate` will take care of that
       return false;
     },
     [],
-  );
-
-  const dispatch = useAppDispatch();
-  const handleBookmarkClick = useCallback(() => {
-    dispatch(
-      statusInteraction({
-        statusId,
-        intent: 'bookmark',
-        contextType: 'detailed',
-      }),
-    );
-  }, [dispatch, statusId]);
-  const handleFavouriteClick = useCallback(() => {
-    dispatch(
-      statusInteraction({
-        statusId,
-        intent: 'favourite',
-        contextType: 'detailed',
-      }),
-    );
-  }, [dispatch, statusId]);
-
-  const favouriteIcon = useIconWeight(StarIcon, status?.favourited && 'fill');
-  const bookmarkIcon = useIconWeight(
-    BookmarkSimpleIcon,
-    status?.bookmarked && 'fill',
   );
 
   if (isLoading) {
@@ -164,9 +147,6 @@ export const StatusPage: React.FC = () => {
   }
 
   const { account } = status;
-  const favouriteTitle = intl.formatMessage(
-    status.favourited ? messages.removeFavourite : messages.favourite,
-  );
   const isLocal = !account.acct.includes('@');
   const isIndexable = !account.noindex;
 
@@ -212,48 +192,16 @@ export const StatusPage: React.FC = () => {
         withBackButton
         title={columnTitle}
         extraButtons={
-          <>
-            <ToggleIconButton
-              size='sm'
-              variant='ghost'
-              active={status.favourited}
-              icon={favouriteIcon}
-              onClick={handleFavouriteClick}
-              className='star-icon'
-              title={favouriteTitle}
-            >
-              {favouriteTitle}
-            </ToggleIconButton>
-            <ToggleIconButton
-              size='sm'
-              variant='ghost'
-              active={status.bookmarked}
-              icon={bookmarkIcon}
-              onClick={handleBookmarkClick}
-            >
-              {!status.bookmarked ? (
-                <FormattedMessage
-                  id='status.bookmark'
-                  defaultMessage='Bookmark'
-                />
-              ) : (
-                <FormattedMessage
-                  id='status.remove_bookmark'
-                  defaultMessage='Remove bookmark'
-                />
-              )}
-            </ToggleIconButton>
-            <ColumnSettingsMenu
-              label={
-                <FormattedMessage
-                  id='status.options'
-                  defaultMessage='Post options'
-                />
-              }
-            >
-              <StatusMenuItems status={status} />
-            </ColumnSettingsMenu>
-          </>
+          <ColumnSettingsMenu
+            label={
+              <FormattedMessage
+                id='status.options'
+                defaultMessage='Post options'
+              />
+            }
+          >
+            <StatusMenuItems status={status} />
+          </ColumnSettingsMenu>
         }
       />
 
@@ -261,15 +209,11 @@ export const StatusPage: React.FC = () => {
         scrollKey='thread'
         shouldUpdateScroll={shouldUpdateScroll}
       >
-        <div
-          className={classNames({
-            fullscreen,
-          })}
-        >
+        <Scrollable className={classNames({ fullscreen })}>
           {
             // Length needs to be greater than 1, as ancestorIds includes the current root ID.
             ancestorIds.length > 1 && (
-              <div className={classes.thread}>
+              <div className={classNames(classes.thread, 'item-list')}>
                 <StatusRelativeList statusIds={ancestorIds} rootId={statusId} />
               </div>
             )
@@ -278,7 +222,7 @@ export const StatusPage: React.FC = () => {
           <NavigationFocusTarget
             as='div'
             focusTargetName={FOCUS_TARGET.POST}
-            className={classes.mainStatus}
+            className={classNames('item-list', classes.mainStatus)}
             tabIndex={0}
             ref={statusFocusRef}
             aria-label={screenReaderText}
@@ -287,8 +231,12 @@ export const StatusPage: React.FC = () => {
           </NavigationFocusTarget>
 
           {descendantIds.length > 0 && (
-            <div className={classes.thread}>
-              <StatusRelativeList statusIds={descendantIds} rootId={statusId} />
+            <div className={classNames(classes.thread, 'item-list')}>
+              <StatusRelativeList
+                statusIds={descendantIds}
+                rootId={statusId}
+                highlightIds={newReplyIds}
+              />
             </div>
           )}
 
@@ -311,7 +259,7 @@ export const StatusPage: React.FC = () => {
             statusId={status.id}
             statusCreatedAt={status.created_at}
           />
-        </div>
+        </Scrollable>
       </ScrollContainer>
 
       <Helmet>
@@ -329,7 +277,11 @@ export const StatusPage: React.FC = () => {
 const StatusMenuItems: React.FC<{ status: ExpandedStatusShape }> = ({
   status,
 }) => {
-  const menu = useStatusMenuActions({ status, contextType: 'detailed' });
+  const menu = useStatusMenuActions({
+    status,
+    reblogStatus: null, // Boosts are only shown in feeds
+    contextType: 'detailed',
+  });
 
   return menu.map((item, index) => (
     <StatusActionItem key={index} item={item} />
@@ -339,7 +291,8 @@ const StatusMenuItems: React.FC<{ status: ExpandedStatusShape }> = ({
 const StatusRelativeList: React.FC<{
   statusIds: string[];
   rootId: string;
-}> = ({ statusIds, rootId }) => {
+  highlightIds?: string[];
+}> = ({ statusIds, rootId, highlightIds }) => {
   return (
     statusIds
       // Omits the current post ID, but it still is in statusIds so nextId can link correctly.
@@ -352,7 +305,45 @@ const StatusRelativeList: React.FC<{
           contextType='thread'
           previousId={statusIds[index - 1]}
           nextId={statusIds[index + 1]}
+          shouldHighlightOnMount={highlightIds?.includes(statusId)}
         />
       ))
   );
 };
+
+/**
+ * Hook to determine new replies.
+ */
+function useNewReplies({
+  statusId,
+  descendantIds,
+}: {
+  statusId: string;
+  descendantIds: string[];
+}) {
+  const [prevStatusId, setPrevStatusId] = useState(statusId);
+  const [prevDescendantIds, setPrevDescendantIds] = useState(descendantIds);
+  const [newReplyIds, setNewReplyIds] = useState<string[]>([]);
+
+  // If the status or descendants change, detect new replies.
+  if (prevStatusId !== statusId || prevDescendantIds !== descendantIds) {
+    setPrevStatusId(statusId);
+    setPrevDescendantIds(descendantIds);
+
+    // If it's the same status and we have descendants, recalculate new ones.
+    if (prevStatusId === statusId && prevDescendantIds.length > 0) {
+      const addedIds = descendantIds.filter(
+        (id) => !prevDescendantIds.includes(id),
+      );
+
+      if (addedIds.length > 0) {
+        setNewReplyIds(addedIds);
+      }
+    } else {
+      // ...otherwise reset.
+      setNewReplyIds([]);
+    }
+  }
+
+  return newReplyIds;
+}

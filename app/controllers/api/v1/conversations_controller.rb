@@ -23,11 +23,11 @@ class Api::V1::ConversationsController < Api::BaseController
       .order(Arel.sql('last_status_id DESC NULLS LAST, id DESC'))
       .first
 
-    return head :not_found unless conversation
+    return head 404 unless conversation
 
     conversation.participant_accounts = matching_conversations
       .flat_map(&:participant_accounts)
-      .uniq { |account| account.id }
+      .uniq(&:id)
 
     render json: conversation,
            serializer: REST::ConversationSerializer,
@@ -48,7 +48,7 @@ class Api::V1::ConversationsController < Api::BaseController
     matching_conversations.update_all(
       unread: false,
       last_read_status_id:,
-      updated_at: Time.current,
+      updated_at: Time.current
     )
 
     @conversation.reload
@@ -58,7 +58,7 @@ class Api::V1::ConversationsController < Api::BaseController
   def by_status
     status = Status.find_by(id: params[:status_id])
 
-    return head :not_found unless status
+    return head 404 unless status
 
     participant_account_ids = (
       status.active_mentions.pluck(:account_id) +
@@ -68,7 +68,7 @@ class Api::V1::ConversationsController < Api::BaseController
 
     conversations = AccountConversation.where(
       account: current_account,
-      participant_account_ids: participant_account_ids,
+      participant_account_ids: participant_account_ids
     )
 
     # Prefer the exact account-conversation row that contains the status.
@@ -88,10 +88,11 @@ class Api::V1::ConversationsController < Api::BaseController
 
     conversation ||= conversations.order(Arel.sql('last_status_id DESC NULLS LAST, id DESC')).first
 
-    return head :not_found unless conversation
+    return head 404 unless conversation
 
     render json: { id: conversation.id.to_s }
   end
+
   def unread
     matching_conversations.update_all(unread: true, updated_at: Time.current)
     render json: @conversation, serializer: REST::ConversationSerializer
@@ -111,12 +112,12 @@ class Api::V1::ConversationsController < Api::BaseController
   def matching_conversations
     account_conversations = AccountConversation.where(account: current_account)
     participant_matches = account_conversations.where(
-      participant_account_ids: @conversation.participant_account_ids,
+      participant_account_ids: @conversation.participant_account_ids
     )
 
     if @conversation.conversation_id.present?
       participant_matches.or(
-        account_conversations.where(conversation_id: @conversation.conversation_id),
+        account_conversations.where(conversation_id: @conversation.conversation_id)
       )
     else
       participant_matches
@@ -148,7 +149,7 @@ class Api::V1::ConversationsController < Api::BaseController
   def paginated_conversations
     latest_per_participant_set = AccountConversation
       .where(account: current_account)
-      .select("DISTINCT ON (participant_account_ids) id")
+      .select('DISTINCT ON (participant_account_ids) id')
       .order(Arel.sql('participant_account_ids, last_status_id DESC NULLS LAST, id DESC'))
 
     AccountConversation

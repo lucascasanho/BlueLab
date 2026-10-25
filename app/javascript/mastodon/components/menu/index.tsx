@@ -7,9 +7,13 @@ import {
   useState,
 } from 'react';
 
+import { mergeProps } from '@react-aria/utils';
+
+import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import type { PolymorphicProps } from '@/types/polymorphic';
 
 import { Button } from '../button/redesign';
+import { normalizeKey } from '../hotkeys/utils';
 
 import { PopoverMenuCard } from './card';
 import type { PopoverMenuCardProps } from './card';
@@ -107,6 +111,12 @@ export const Menu: React.FC<MenuProps> = ({
   children,
   noFocus,
 }) => {
+  const isMobile = useBreakpoint('openable');
+  const theme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
+  const isVanillaTheme = !theme || theme === 'default' || theme === 'vanilla';
+  const skipInitialFocus = noFocus || (isMobile && isVanillaTheme);
+
   const id = useId();
   const triggerId = `${id}-trigger`;
   const listId = `${id}-list`;
@@ -118,13 +128,13 @@ export const Menu: React.FC<MenuProps> = ({
     (element: HTMLDivElement | null) => {
       setListElement(element);
 
-      if (element && type === 'actions' && !noFocus) {
+      if (element && type === 'actions' && !skipInitialFocus) {
         const menuItems = getAllMenuItems(element);
         const elementToFocus = menuItems[0] ?? element;
         elementToFocus.focus({ preventScroll: true });
       }
     },
-    [noFocus, type],
+    [skipInitialFocus, type],
   );
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -147,6 +157,15 @@ export const Menu: React.FC<MenuProps> = ({
   }, [listElement, triggerElement, onClose]);
 
   const toggleMenu = isMenuOpen ? closeMenu : openMenu;
+
+  const handleTriggerClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (!e.defaultPrevented) {
+        toggleMenu();
+      }
+    },
+    [toggleMenu],
+  );
 
   const handleMenuNavigation = useCallback(
     (event: React.KeyboardEvent<HTMLElement>) => {
@@ -227,7 +246,7 @@ export const Menu: React.FC<MenuProps> = ({
       'aria-haspopup': role,
       'aria-expanded': isMenuOpen,
       'aria-controls': listElement ? listId : undefined,
-      onClick: toggleMenu,
+      onClick: handleTriggerClick,
       onKeyDown: handleMenuNavigation,
     };
 
@@ -247,17 +266,18 @@ export const Menu: React.FC<MenuProps> = ({
       menuListProps,
     };
   }, [
-    type,
     isMenuOpen,
     openMenu,
     closeMenu,
     toggleMenu,
     triggerElement,
     listElement,
-    mountListElement,
+    type,
     triggerId,
     listId,
+    handleTriggerClick,
     handleMenuNavigation,
+    mountListElement,
   ]);
 
   return <MenuContext value={contextValue}>{children}</MenuContext>;
@@ -267,13 +287,58 @@ export const MenuTrigger = <As extends React.ElementType = typeof Button>({
   as: asComp,
   children,
   ...props
-}: PolymorphicProps<object, As>) => {
+}: PolymorphicProps<React.PropsWithChildren, As>) => {
   const Component = asComp ?? Button;
   const { menuTriggerProps } = useMenuContext();
+  const mergedProps = mergeProps(
+    props as React.ComponentPropsWithoutRef<As>,
+    menuTriggerProps,
+  ) as React.ComponentPropsWithoutRef<As> & typeof menuTriggerProps;
+
+  return <Component {...mergedProps}>{children}</Component>;
+};
+
+export const MenuTriggerText = ({
+  children,
+  ...props
+}: React.ComponentPropsWithRef<'a'>) => {
+  const {
+    menuTriggerProps: {
+      onClick: onMenuClick,
+      onKeyDown: onMenuKeyDown,
+      ...menuTriggerProps
+    },
+  } = useMenuContext();
+
+  const onClick: React.MouseEventHandler = useCallback(
+    (event) => {
+      if (event.button === 0 && !event.ctrlKey && !event.metaKey) {
+        event.preventDefault();
+        onMenuClick(event as React.MouseEvent<HTMLButtonElement>);
+      }
+    },
+    [onMenuClick],
+  );
+  const onKeyDown: React.KeyboardEventHandler = useCallback(
+    (event) => {
+      if (normalizeKey(event.key) === 'space') {
+        event.preventDefault();
+        onMenuKeyDown(event as React.KeyboardEvent<HTMLButtonElement>);
+      }
+    },
+    [onMenuKeyDown],
+  );
+
   return (
-    <Component {...props} {...menuTriggerProps}>
+    <a
+      role='button'
+      tabIndex={0}
+      {...mergeProps(props, menuTriggerProps)}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+    >
       {children}
-    </Component>
+    </a>
   );
 };
 

@@ -15,7 +15,7 @@ class BugReportsController < ApplicationController
     @interface_layout = @error_page.present? ? 'error' : 'auth'
 
     @bug_report = BugReport.new(
-      account: current_account,
+      account: anonymous_report? ? nil : current_account,
       description: params[:description],
       browser: browser_details[:browser],
       browser_version: browser_details[:browser_version],
@@ -28,8 +28,8 @@ class BugReportsController < ApplicationController
       error_page: @error_page,
       viewport: params[:viewport].presence,
       app_version: params[:app_version].presence || Rails.configuration.x.mastodon.version,
-      request_id: request.request_id,
-      user_agent: request.user_agent.to_s.truncate(2_000),
+      request_id: anonymous_report? ? nil : request.request_id,
+      user_agent: anonymous_report? ? nil : request.user_agent.to_s.truncate(2_000),
       client_errors: client_errors
     )
 
@@ -37,23 +37,29 @@ class BugReportsController < ApplicationController
 
     Array(params[:files]).compact_blank.first(BugReport::MAX_ATTACHMENTS).each do |file|
       @bug_report.media_attachments.create!(
-        account: current_account,
+        account: anonymous_report? ? nil : current_account,
         file: file,
         delay_processing: true
       )
     end
 
+    @bug_report.notify_moderation_staff!
+
     render :success
   rescue ActiveRecord::RecordInvalid, Paperclip::Error, Mastodon::DimensionsValidationError, Mastodon::StreamValidationError => e
     @bug_report&.destroy
     Rails.logger.warn("Bug report rejected: #{e.class}: #{e.message}")
-    render :new, status: :unprocessable_content
+    render :new, status: 422
   end
 
   private
 
+  def anonymous_report?
+    current_account.nil? || ActiveModel::Type::Boolean.new.cast(params[:anonymous])
+  end
+
   def sanitize_path(value)
-    value.to_s.split('?').first.truncate(500).presence
+    value.to_s.split('?', 2).first.to_s.truncate(500).presence
   end
 
   def valid_error_page(value)
@@ -77,9 +83,9 @@ class BugReportsController < ApplicationController
         'source' => error['source'].to_s.truncate(2_000),
         'status' => error['status'].to_i.presence,
         'method' => error['method'].to_s.truncate(16),
-        'url' => error['url'].to_s.truncate(500),
-        'request_id' => error['request_id'].to_s.truncate(128),
-        'timestamp' => error['timestamp'].to_s.truncate(64)
+        'url' => anonymous_report? ? sanitize_path(error['url']) : error['url'].to_s.truncate(500),
+        'request_id' => anonymous_report? ? nil : error['request_id'].to_s.truncate(128),
+        'timestamp' => error['timestamp'].to_s.truncate(64),
       }.compact
     end
   rescue JSON::ParserError, TypeError
@@ -94,10 +100,10 @@ class BugReportsController < ApplicationController
       browser: detection.name.to_s.presence,
       browser_version: detection.version.to_s.presence,
       operating_system: platform.name.to_s.presence || platform.id.to_s.presence,
-      operating_system_version: platform.version.to_s.presence
+      operating_system_version: platform.version.to_s.presence,
     }
-  rescue StandardError => e
-    Rails.logger.debug("Bug report browser detection failed: #{e.class}: #{e.message}")
+  rescue => e
+    Rails.logger.debug { "Bug report browser detection failed: #{e.class}: #{e.message}" }
     {}
   end
 end

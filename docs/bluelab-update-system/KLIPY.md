@@ -55,5 +55,6 @@ blue-reiniciar
 A integração usa a chave no cliente porque o Vite incorpora `VITE_*` ao bundle. Portanto a chave Test não deve ser tratada como segredo de servidor.
 
 Fontes:
+
 - https://docs.klipy.com/
 - https://docs.klipy.com/stickers-api

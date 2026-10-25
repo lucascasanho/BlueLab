@@ -1,5 +1,5 @@
-import { useCallback, useId, useState } from 'react';
 import type { FC, KeyboardEvent, MouseEvent } from 'react';
+import { useCallback, useId, useState } from 'react';
 
 import { useIntl } from 'react-intl';
 
@@ -47,25 +47,18 @@ const copy = {
 interface IconProps {
   className?: string;
   remoteBadge?: ApiInstanceVerificationBadgeJSON | null;
-  useRemoteFallback?: boolean;
 }
 
-const REMOTE_FALLBACK_COLORS = ['#60a5fa', '#1d9bf0', '#1d4ed8'];
-
-export const VerifiedMark: FC<IconProps> = ({
-  className,
-  remoteBadge,
-  useRemoteFallback = false,
-}) => {
+export const VerifiedMark: FC<IconProps> = ({ className, remoteBadge }) => {
   const gradientId = `bluelab-verified-${useId().replace(/:/g, '')}`;
-  const remoteColors = remoteBadge?.colors.length
-    ? remoteBadge.colors
-    : useRemoteFallback
-      ? REMOTE_FALLBACK_COLORS
-      : null;
-  const startColor = remoteColors?.[0];
-  const middleColor = remoteColors?.[1] ?? startColor;
-  const endColor = remoteColors?.[2] ?? middleColor;
+  const remoteColors = remoteBadge?.colors;
+  const fallbackStart = 'var(--instance-verification-badge-start, #60a5fa)';
+  const fallbackMiddle = 'var(--instance-verification-badge-middle, #1d9bf0)';
+  const fallbackEnd = 'var(--instance-verification-badge-end, #1d4ed8)';
+  const startColor = remoteColors?.[0] ?? fallbackStart;
+  const middleColor = remoteColors?.[1] ?? remoteColors?.[0] ?? fallbackMiddle;
+  const endColor =
+    remoteColors?.[2] ?? remoteColors?.[1] ?? remoteColors?.[0] ?? fallbackEnd;
 
   return (
     <svg
@@ -83,23 +76,9 @@ export const VerifiedMark: FC<IconProps> = ({
           y2='22'
           gradientUnits='userSpaceOnUse'
         >
-          <stop
-            offset='0'
-            stopColor={
-              startColor ?? 'var(--color-text-brand-soft, currentColor)'
-            }
-          />
-          <stop
-            offset='0.5'
-            stopColor={
-              middleColor ??
-              'var(--color-bg-brand-base, var(--color-text-brand, currentColor))'
-            }
-          />
-          <stop
-            offset='1'
-            stopColor={endColor ?? 'var(--color-text-brand, currentColor)'}
-          />
+          <stop offset='0' stopColor={startColor} />
+          <stop offset='0.5' stopColor={middleColor} />
+          <stop offset='1' stopColor={endColor} />
         </linearGradient>
       </defs>
 
@@ -141,8 +120,8 @@ export function hasVerifiedRole(account: DisplayNameProps['account']) {
     return true;
   }
 
-  return Array.from(account.roles).some(
-    (role) => VERIFIED_ROLE_NAMES.some((name) => role.name === name),
+  return Array.from(account.roles).some((role) =>
+    VERIFIED_ROLE_NAMES.some((name) => role.name === name),
   );
 }
 
@@ -185,13 +164,23 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
     [],
   );
 
-  if (!account || !hasVerifiedRole(account) || account.verified_badge_visible === false) {
+  if (
+    !account ||
+    !hasVerifiedRole(account) ||
+    !account.verified_badge_visible
+  ) {
     return null;
   }
 
   const language = intl.locale.toLowerCase().split(/[-_]/)[0];
   const localizedCopy =
-    language === 'pt' ? copy.pt : language === 'es' ? copy.es : language === 'fr' ? copy.fr : copy.en;
+    language === 'pt'
+      ? copy.pt
+      : language === 'es'
+        ? copy.es
+        : language === 'fr'
+          ? copy.fr
+          : copy.en;
   const isRemote = account.acct.includes('@');
   const verification = account.instance_verification;
   const remoteBadge = isRemote ? verification?.badge : null;
@@ -233,11 +222,7 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
         onClick={handleClick}
         onKeyDown={handleKeyDown}
       >
-        <VerifiedMark
-          className={classes.badge}
-          remoteBadge={remoteBadge}
-          useRemoteFallback={isRemote}
-        />
+        <VerifiedMark className={classes.badge} remoteBadge={remoteBadge} />
       </span>
 
       <Popover
@@ -263,7 +248,6 @@ export const VerifiedBadge: FC<Pick<DisplayNameProps, 'account'>> = ({
               <VerifiedMark
                 className={classes.inlineBadge}
                 remoteBadge={remoteBadge}
-                useRemoteFallback={isRemote}
               />
               <p className={classes.description}>{descriptionText}</p>
             </div>

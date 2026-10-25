@@ -2,14 +2,10 @@ import { useCallback, useState } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
-import classNames from 'classnames';
-
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import {
   ChatCircleDotsIcon,
-  EyeIcon,
-  MagnifyingGlassIcon,
   NewspaperIcon,
   QuotesIcon,
 } from '@phosphor-icons/react';
@@ -23,7 +19,6 @@ import { openModal } from '@/mastodon/actions/modal';
 import type { ApiQuotePolicy } from '@/mastodon/api_types/quotes';
 import type { StatusVisibility } from '@/mastodon/api_types/statuses';
 import { Button, CaretIcon } from '@/mastodon/components/button/redesign';
-import { Icon } from '@/mastodon/components/icon';
 import {
   Menu,
   MenuList,
@@ -35,11 +30,9 @@ import {
   MenuItemCheckbox,
 } from '@/mastodon/components/menu';
 import { Tooltip } from '@/mastodon/components/tooltip';
-import { selectPlainAccount } from '@/mastodon/selectors/accounts';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
-import { selectComposeMentions, selectComposePrivacy } from './selectors';
-import classes from './styles.module.scss';
+import { selectComposePrivacy } from './selectors';
 
 const isBlue2ThemeActive = () =>
   typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
@@ -66,8 +59,6 @@ export const ComposeVisibility: React.FC<{
 }> = ({ className, activeThreadItemId = null }) => {
   const privacy = useThreadPrivacy(activeThreadItemId);
   const isEditing = useAppSelector((state) => !!state.compose.get('id'));
-
-  if (privacy === 'direct') return null;
 
   if (isEditing) {
     return (
@@ -105,10 +96,7 @@ export const ComposeVisibility: React.FC<{
           trailingIcon={CaretIcon}
           disabled={isEditing}
         >
-          <ComposeVisibilityButtonText
-            privacy={privacy}
-            activeThreadItemId={activeThreadItemId}
-          />
+          <ComposeVisibilityButtonText privacy={privacy} />
         </MenuTrigger>
 
         {privacy !== 'direct' ? (
@@ -123,15 +111,8 @@ export const ComposeVisibility: React.FC<{
 
 const ComposeVisibilityButtonText: React.FC<{
   privacy: StatusVisibility;
-  activeThreadItemId: string | null;
-}> = ({ privacy, activeThreadItemId }) => {
-  const rootMentions = useAppSelector(selectComposeMentions);
-  const mentions = activeThreadItemId ? [] : rootMentions;
-  const firstMentionedAccount = useAppSelector((state) =>
-    selectPlainAccount(state, mentions.at(0)),
-  );
-
-  if (privacy === 'public' || privacy === 'unlisted') {
+}> = ({ privacy }) => {
+  if (privacy === 'public') {
     return (
       <FormattedMessage id='privacy.public.short' defaultMessage='Public' />
     );

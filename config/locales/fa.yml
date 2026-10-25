@@ -946,10 +946,8 @@ fa:
       discovery:
         follow_recommendations: پیروی از پیشنهادها
         preamble: ارائه محتوای جذّاب برای آغاز به کار کاربرانی که شاید کسی را روی ماستودون نشناسند ضروری است. واپایش چگونگی کار کردن ویژگی‌های کشف روی کارسازتان.
-        privacy: محرمانگی
         profile_directory: شاخهٔ نمایه
         public_timelines: خط زمانی‌های عمومی
-        publish_statistics: انتشار آمار
         title: کشف
         trends: پرطرفدارها
         wrapstodon: خلاصهٔ ماستودون
@@ -1234,9 +1232,6 @@ fa:
     warning_presets:
       add_new: افزودن تازه
       delete: زدودن
-      edit_preset: ویرایش هشدار پیش‌فرض
-      empty: هنز هیچ پیش‌تنظیم هشداری را تعریف نکرده‌اید.
-      title: از پیش تنظیم های هشدار
     webhooks:
       add_new: افزودن نقطهٔ پایانی
       delete: حذف

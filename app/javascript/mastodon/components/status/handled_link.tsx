@@ -9,16 +9,17 @@ import { openURL } from '@/mastodon/actions/search';
 import type { ApiMentionJSON } from '@/mastodon/api_types/statuses';
 import { getCollectionPath } from '@/mastodon/features/collections/utils';
 import { useAppDispatch } from '@/mastodon/store';
+import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import {
   getLocalUrlPath,
   handleFederatedLinkClick,
   resolveFederatedLink,
 } from '@/mastodon/utils/federated_links';
 import type { OnElementHandler } from '@/mastodon/utils/html';
-import { isRedesignEnabled } from '@/mastodon/utils/environment';
 
 import { HashtagMenu } from '../hashtag_menu';
-import { MenuTrigger } from '../menu';
+import { MenuTriggerText } from '../menu';
+import { Tooltip } from '../tooltip';
 
 import classes from './handled_link.module.scss';
 
@@ -80,9 +81,12 @@ export const HandledLink: FC<HandledLinkProps & ComponentProps<'a'>> = ({
     if (isRedesignEnabled()) {
       return (
         <HashtagMenu tagId={hashtag} accountId={hashtagAccountId}>
-          <MenuTrigger as='button' className={classes.hashtag}>
+          <MenuTriggerText
+            className={classes.hashtag}
+            href={`/tags/${encodeURIComponent(hashtag)}`}
+          >
             {children}
-          </MenuTrigger>
+          </MenuTriggerText>
         </HashtagMenu>
       );
     }
@@ -124,9 +128,17 @@ export const HandledLink: FC<HandledLinkProps & ComponentProps<'a'>> = ({
   // Non-absolute paths treated as internal links. This shouldn't happen, but just in case.
   if (href.startsWith('/')) {
     return (
-      <Link className={classNames('unhandled-link', className)} to={href}>
-        {children}
-      </Link>
+      <Tooltip text={href}>
+        {({ getTooltipProps }) => (
+          <Link
+            {...getTooltipProps()}
+            className={classNames('unhandled-link', className)}
+            to={href}
+          >
+            {children}
+          </Link>
+        )}
+      </Tooltip>
     );
   }
 

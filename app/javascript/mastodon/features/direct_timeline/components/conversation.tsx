@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 
@@ -11,6 +11,7 @@ import type {
   Record as ImmutableRecord,
 } from 'immutable';
 
+import { replyComposeById } from '@/mastodon/actions/compose_typed';
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
 import { AnimateEmojiProvider } from '@/mastodon/components/emoji/context';
 import { StatusReplyIcon } from '@/mastodon/components/status/icons';
@@ -23,13 +24,11 @@ import {
   useAppSelector,
 } from '@/mastodon/store';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
-import { replyCompose } from 'mastodon/actions/compose';
 import {
   markConversationRead,
   deleteConversation,
   openConversationForStatus,
 } from 'mastodon/actions/conversations';
-import { openModal } from 'mastodon/actions/modal';
 import {
   muteStatus,
   unmuteStatus,
@@ -109,7 +108,7 @@ export const Conversation: React.FC<{
     }
 
     if (unread) {
-      dispatch(markConversationRead(id));
+      void dispatch(markConversationRead(id));
     }
 
     if (lastStatus) {
@@ -129,26 +128,11 @@ export const Conversation: React.FC<{
   }, [dispatch, history, unread, id, lastStatus, onOpenConversation]);
 
   const handleMarkAsRead = useCallback(() => {
-    dispatch(markConversationRead(id));
+    void dispatch(markConversationRead(id));
   }, [dispatch, id]);
 
   const handleReply = useCallback(() => {
-    dispatch((_, getState) => {
-      const state = getState();
-      const composeText = state.compose.get('text');
-      const text = typeof composeText === 'string' ? composeText.trim() : '';
-
-      if (text.length !== 0) {
-        dispatch(
-          openModal({
-            modalType: 'CONFIRM_REPLY',
-            modalProps: { status: lastStatus },
-          }),
-        );
-      } else {
-        dispatch(replyCompose(lastStatus));
-      }
-    });
+    dispatch(replyComposeById({ statusId: lastStatus?.get('id') }));
   }, [dispatch, lastStatus]);
 
   const handleDelete = useCallback(() => {
@@ -170,6 +154,34 @@ export const Conversation: React.FC<{
       dispatch(toggleStatusSpoilers(lastStatus.get('id')));
     }
   }, [dispatch, lastStatus]);
+
+  const handleConversationCardClick = useCallback<
+    React.MouseEventHandler<HTMLDivElement>
+  >(
+    (event) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest('.status__action-bar, button, [role="menuitem"]')
+      ) {
+        return;
+      }
+
+      handleClick();
+    },
+    [handleClick],
+  );
+
+  const handleConversationCardKeyDown = useCallback<
+    React.KeyboardEventHandler<HTMLDivElement>
+  >(
+    (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+
+      event.preventDefault();
+      handleClick();
+    },
+    [handleClick],
+  );
 
   if (!lastStatus) {
     return null;
@@ -223,26 +235,11 @@ export const Conversation: React.FC<{
     <Hotkeys handlers={handlers}>
       <div
         className={classNames('conversation focusable muted', { unread })}
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+
         tabIndex={0}
         role='button'
-        onClick={(event) => {
-          if (
-            (event.target as HTMLElement).closest(
-              '.status__action-bar, button, [role="menuitem"]',
-            )
-          ) {
-            return;
-          }
-
-          handleClick();
-        }}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            handleClick();
-          }
-        }}
+        onClick={handleConversationCardClick}
+        onKeyDown={handleConversationCardKeyDown}
       >
         <div className='conversation__avatar' role='presentation'>
           <AvatarComposite accounts={accounts} size={48} />

@@ -7,9 +7,9 @@ import type {
 import { create as createAxiosInstance } from 'axios';
 import LinkHeader from 'http-link-header';
 
+import { recordClientError } from './features/bug_report/diagnostics';
 import { getAccessToken } from './initial_state';
 import ready from './ready';
-import { recordClientError } from './features/bug_report/diagnostics';
 
 export const getLinks = (response: AxiosResponse) => {
   const value = response.headers.link as string | undefined;
@@ -128,6 +128,10 @@ export default function api(withAuthorization = true) {
         url !== '/api/v1/bug_reports' &&
         (status === undefined || status >= 500 || status === 429)
       ) {
+        const requestIdValue: unknown = error.response?.headers['x-request-id'];
+        const requestId =
+          typeof requestIdValue === 'string' ? requestIdValue : undefined;
+
         recordClientError({
           type: 'api',
           message: status
@@ -136,7 +140,7 @@ export default function api(withAuthorization = true) {
           status,
           method: error.config?.method,
           url,
-          request_id: error.response?.headers?.['x-request-id'],
+          request_id: requestId,
         });
       }
 

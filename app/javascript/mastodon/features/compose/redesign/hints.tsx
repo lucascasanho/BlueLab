@@ -55,7 +55,9 @@ export const ComposeHints = () => {
   const guess = useLanguageGuess();
   const isDifferentLanguage = lang && guess && lang !== guess;
 
-  const publishErrors = useAppSelector((state) => state.composer.publishErrors);
+  const publishErrors = useAppSelector(
+    (state) => state.composer.publishErrors as string[],
+  );
 
   const messages: React.ReactNode[] = [];
 

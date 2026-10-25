@@ -58,6 +58,8 @@ pt-BR:
     attachment_hint: Imagens, GIFs, áudio e vídeo. Até 5 arquivos.
     diagnostic_notice: Navegador, sistema operacional, idioma, tema, modo da interface, tamanho da janela e erros recentes do cliente podem ser incluídos automaticamente.
     error_page: Este relato foi iniciado na página de erro %{code}.
+    anonymous: "Prefiro não me identificar"
+    anonymous_hint: "A página em que o problema ocorreu e os diagnósticos técnicos continuarão incluídos, mas o relato não será vinculado à sua conta."
     submit: Enviar relato
     back: Cancelar
     success_title: Relato enviado

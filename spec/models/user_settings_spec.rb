@@ -24,7 +24,6 @@ RSpec.describe UserSettings do
       it 'defaults the BlueLab theme preference to BlueLab' do
         expect(subject[:bluelab_theme]).to eq 'blue-2'
       end
-
     end
 
     context 'when setting is set' do
@@ -76,12 +75,13 @@ RSpec.describe UserSettings do
 
   describe '#update' do
     before do
-      subject.update(always_send_emails: true, default_language: 'fr', default_privacy: nil)
+      subject.update(always_send_emails: true, default_language: 'fr', default_privacy: nil, display_own_boosts: true)
     end
 
     it 'updates values' do
       expect(subject[:always_send_emails]).to be true
       expect(subject[:default_language]).to eq 'fr'
+      expect(subject[:display_own_boosts]).to be true
     end
 
     it 'does not set values that are nil' do

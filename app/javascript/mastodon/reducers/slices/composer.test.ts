@@ -27,6 +27,7 @@ const quoteWithEditor = (editor: 'bluelab' | 'mastodon') => {
     getIn: (path) => {
       if (path.join('.') === 'compose.composer_editor') return editor;
       if (path.join('.') === 'compose.mounted') return false;
+      if (path.join('.') === 'compose.text') return '';
       return undefined;
     },
   };
@@ -106,15 +107,63 @@ describe('composer preference', () => {
     expect(historyPush).not.toHaveBeenCalled();
   });
 
-  test('opens a quote in the Mastodon composer when it is preferred', () => {
+  test('opens a quote in the Mastodon composer on BlueLab when it is preferred', () => {
+    const previousTheme = document.body.dataset.theme;
+    document.body.dataset.theme = 'blue-2';
     const historyPush = vi.spyOn(browserHistory, 'push');
 
-    expect(quoteWithEditor('mastodon')).not.toContainEqual({
-      type: 'composer/showComposer',
-    });
-    expect(historyPush).toHaveBeenCalledWith(
-      '/publish',
-      expect.objectContaining({ focusTarget: false }),
-    );
+    try {
+      expect(quoteWithEditor('mastodon')).not.toContainEqual({
+        type: 'composer/showComposer',
+      });
+      expect(historyPush).toHaveBeenCalledWith(
+        '/publish',
+        expect.objectContaining({ focusTarget: false }),
+      );
+    } finally {
+      if (previousTheme === undefined) {
+        delete document.body.dataset.theme;
+      } else {
+        document.body.dataset.theme = previousTheme;
+      }
+    }
+  });
+
+  test('keeps the Mastodon editor in the redesigned Vanilla surface on the default theme', () => {
+    const previousTheme = document.body.dataset.theme;
+    document.body.dataset.theme = 'default';
+    const historyPush = vi.spyOn(browserHistory, 'push');
+
+    try {
+      expect(quoteWithEditor('mastodon')).toContainEqual({
+        type: 'composer/showComposer',
+      });
+      expect(historyPush).not.toHaveBeenCalled();
+    } finally {
+      if (previousTheme === undefined) {
+        delete document.body.dataset.theme;
+      } else {
+        document.body.dataset.theme = previousTheme;
+      }
+    }
+  });
+
+  test('keeps the Mastodon editor in the redesigned Vanilla surface when data-theme is unset', () => {
+    const previousTheme = document.body.dataset.theme;
+    delete document.body.dataset.theme;
+    const historyPush = vi.spyOn(browserHistory, 'push');
+
+    try {
+      expect(quoteWithEditor('mastodon')).toContainEqual({
+        type: 'composer/showComposer',
+      });
+      expect(historyPush).not.toHaveBeenCalled();
+    } finally {
+      if (previousTheme === undefined) {
+        delete document.body.dataset.theme;
+      } else {
+        document.body.dataset.theme = previousTheme;
+      }
+    }
   });
 });

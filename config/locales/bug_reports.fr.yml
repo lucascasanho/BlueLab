@@ -58,6 +58,8 @@ fr:
     attachment_hint: Images, GIF, audio et vidéo. Jusqu’à 5 fichiers.
     diagnostic_notice: Le navigateur, le système d’exploitation, la langue, le thème, le mode d’interface, la fenêtre et les erreurs récentes du client peuvent être inclus automatiquement.
     error_page: Ce rapport a été ouvert depuis la page d’erreur %{code}.
+    anonymous: "Je préfère ne pas m’identifier"
+    anonymous_hint: "La page où le problème est survenu et les diagnostics techniques seront toujours inclus, sans associer le rapport à votre compte."
     submit: Envoyer le rapport
     back: Annuler
     success_title: Rapport envoyé

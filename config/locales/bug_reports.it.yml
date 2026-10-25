@@ -1,0 +1,66 @@
+it:
+  bug_reports:
+    link: Segnala un bug
+    title: Segnala un bug
+    lead: Descrivi il problema e allega schermate, GIF, audio o video quando è utile.
+    description: Che cosa è successo?
+    placeholder: Descrivi il bug, il risultato atteso e i passaggi per riprodurlo.
+    character_limit: Massimo %{count} caratteri.
+    attachments: Allegati
+    attachment_hint: Immagini, GIF, audio e video. Fino a 5 file.
+    diagnostic_notice: Il browser, il sistema operativo, la lingua, il tema, la modalità dell'interfaccia, la finestra e gli errori recenti del client possono essere inclusi automaticamente.
+    error_page: Questa segnalazione è stata avviata dalla pagina di errore %{code}.
+    anonymous: Preferisco non identificarmi
+    anonymous_hint: La segnalazione includerà comunque la pagina in cui si è verificato il problema e le informazioni tecniche, ma non sarà associata al tuo account.
+    submit: Invia segnalazione
+    back: Annulla
+    success_title: Segnalazione inviata
+    success_body: La segnalazione è stata inviata agli amministratori dell'istanza con le informazioni tecniche disponibili.
+  admin:
+    bug_reports:
+      title: Segnalazioni di bug
+      report_title: Segnalazione di bug %{id}
+      all: Tutte
+      open: Aperte
+      resolved: Risolte
+      id: ID
+      reported_by: Segnalato da
+      created_at: Creata il
+      anonymous: Visitatore
+      error_page: Pagina di errore
+      status: Stato
+      assigned_to: Assegnata a
+      attachments: Allegati
+      view: Visualizza
+      none: Nessuno
+      details: Dettagli della segnalazione
+      description: Descrizione
+      technical_details: Dettagli tecnici
+      browser: Browser
+      browser_version: Versione del browser
+      operating_system: Sistema operativo
+      operating_system_version: Versione del sistema operativo
+      interface_language: Lingua dell'interfaccia
+      theme: Tema
+      interface_layout: Modalità dell'interfaccia
+      current_path: Pagina al momento della segnalazione
+      viewport: Finestra
+      app_version: Versione di BlueLab
+      request_id: ID della richiesta
+      user_agent: User agent
+      recent_errors: Errori recenti del client
+      no_errors: Non sono stati rilevati errori recenti del client.
+      message: Messaggio
+      stack: Stack
+      attachments_title: File allegati
+      no_attachments: Nessun file allegato.
+      assign_to_self: Assegna a me
+      unassign: Rimuovi assegnazione
+      resolve: Segna come risolta
+      reopen: Riapri
+      back: Torna alle segnalazioni di bug
+      resolved_by: Risolta da
+      resolved_at: Risolta il
+      resolved_msg: Segnalazione di bug contrassegnata come risolta.
+      status_open: Aperta
+      status_resolved: Risolta

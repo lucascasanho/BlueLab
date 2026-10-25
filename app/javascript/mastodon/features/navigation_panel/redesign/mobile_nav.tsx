@@ -5,6 +5,8 @@ import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 import { useLocation } from 'react-router';
 
+import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
+
 import {
   BellIcon,
   ChatCircleDotsIcon,
@@ -20,9 +22,8 @@ import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
-import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
-import { invokeVirtualIosKeyboard } from '@/mastodon/utils/invoke_virtual_ios_keyboard';
+import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { RedesignNavigationPanel } from '.';
 import classes from './mobile_nav.module.scss';
@@ -32,10 +33,9 @@ export const RedesignMobileNavigation: React.FC = () => {
   const { accountId, signedIn } = useIdentity();
   const account = useAccount(accountId);
   const location = useLocation();
-  const blue2Pathname =
-    location.pathname.startsWith('/deck')
-      ? location.pathname.slice(5) || '/home'
-      : location.pathname;
+  const blue2Pathname = location.pathname.startsWith('/deck')
+    ? location.pathname.slice(5) || '/home'
+    : location.pathname;
   const isMessagesPage =
     blue2Pathname === '/conversations' ||
     blue2Pathname.startsWith('/conversations/');
@@ -44,9 +44,17 @@ export const RedesignMobileNavigation: React.FC = () => {
     selectUnreadNotificationGroupsCount,
   );
   const unreadMessagesCount = useAppSelector((state) => {
-    const conversations = state.conversations.get('items');
+    const conversationsState = state.conversations as unknown as ImmutableMap<
+      string,
+      unknown
+    >;
+    const conversations = conversationsState.get('items') as ImmutableList<
+      ImmutableMap<string, unknown>
+    >;
 
-    return conversations.some((conversation) => conversation.get('unread'));
+    return conversations.some(
+      (conversation) => conversation.get('unread') === true,
+    );
   });
 
   if (!signedIn) {

@@ -7,7 +7,7 @@ import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
-import { XIcon } from '@phosphor-icons/react';
+import { PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react';
 
 import {
   addComposeThreadMedia,
@@ -15,10 +15,12 @@ import {
   removeComposeThreadItem,
   removeComposeThreadMedia,
 } from '@/mastodon/actions/compose';
+import { openModal } from '@/mastodon/actions/modal';
 import api from '@/mastodon/api';
 import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
-import { IconButton } from '@/mastodon/components/button/redesign';
+import { Button, IconButton } from '@/mastodon/components/button/redesign';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import CloseIcon from '@/material-icons/400-20px/close.svg?react';
 
 import { ComposeAutocomplete } from './autocomplete';
 import { RichComposeEditor } from './rich_editor';
@@ -32,6 +34,10 @@ const messages = defineMessages({
   removeMedia: {
     id: 'compose.thread.remove_media',
     defaultMessage: 'Remove media',
+  },
+  addAlt: {
+    id: 'compose.thread.add_alt',
+    defaultMessage: 'Add alt text',
   },
 });
 
@@ -62,9 +68,10 @@ export const ComposeThreadItems: React.FC<{
       if (id) {
         onFocusItem(id);
         window.requestAnimationFrame(() => {
+          const itemSelector = `[data-thread-item-id="${id}"]`;
           document
             .querySelector<HTMLElement>(
-              `[data-thread-item-id="${id}"] [data-compose-scroll-zone='editor']`,
+              `${itemSelector} [data-compose-scroll-zone='editor']`,
             )
             ?.focus();
         });
@@ -105,7 +112,6 @@ const ComposeThreadItem: React.FC<{
   onRemoved: () => void;
   onSubmit: (event?: React.SubmitEvent) => void;
 }> = ({ item, active, removalDisabled, onFocus, onRemoved, onSubmit }) => {
-  const intl = useIntl();
   const dispatch = useAppDispatch();
   const id = item.get('id') as string;
   const text = item.get('text') as string;
@@ -149,18 +155,6 @@ const ComposeThreadItem: React.FC<{
     [dispatch, id, maximumMedia, media.size],
   );
 
-  const updateAlt = useCallback(
-    (mediaId: string, description: string) => {
-      const updated = media.map((attachment) =>
-        attachment.get('id') === mediaId
-          ? attachment.set('description', description)
-          : attachment,
-      );
-      change('media_attachments', updated);
-    },
-    [change, media],
-  );
-
   return (
     <section
       className={classNames(
@@ -170,13 +164,13 @@ const ComposeThreadItem: React.FC<{
       data-thread-item-id={id}
       onFocusCapture={onFocus}
     >
+      <div className={classes.threadIndicator} aria-hidden='true' />
       <IconButton
         as='button'
         type='button'
         size='sm'
-        icon={XIcon}
+        icon={CloseIcon}
         className={classes.threadItemRemove}
-        title={intl.formatMessage(messages.remove)}
         disabled={removalDisabled}
         onClick={() => {
           dispatch(removeComposeThreadItem(id));
@@ -196,60 +190,143 @@ const ComposeThreadItem: React.FC<{
             onContentTypeChange={(value) => change('content_type', value)}
             onFiles={(files) => void upload(files)}
             onSubmit={onSubmit}
+            hideFormattingToolbar
             dismissOnEscape={false}
           />
         </ComposeAutocomplete>
-      </div>
-
-      {media.size > 0 && (
-        <div className={classes.threadMedia}>
-          {media.map((attachment) => {
-            const mediaId = attachment.get('id') as string;
-            return (
-              <div key={mediaId} className={classes.threadMediaItem}>
-                <img src={attachment.get('preview_url') as string} alt='' />
-                <IconButton
-                  as='button'
-                  type='button'
-                  size='sm'
-                  icon={XIcon}
-                  className={classes.mediaRemove}
-                  title={intl.formatMessage(messages.removeMedia)}
-                  onClick={() =>
+        {media.size > 0 && (
+          <div className={classes.threadMedia}>
+            {media.map((attachment) => {
+              const mediaId = attachment.get('id') as string;
+              return (
+                <ThreadMediaAttachment
+                  key={mediaId}
+                  attachment={attachment}
+                  threadItemId={id}
+                  onRemove={() =>
                     dispatch(removeComposeThreadMedia(id, mediaId))
                   }
-                >
-                  <FormattedMessage {...messages.removeMedia} />
-                </IconButton>
-                <label className={classes.mediaAlt}>
-                  <span className='sr-only'>
-                    <FormattedMessage
-                      id='compose.thread.alt'
-                      defaultMessage='Alternative text'
-                    />
-                  </span>
-                  <input
-                    value={
-                      (attachment.get('description') as string | undefined) ??
-                      ''
-                    }
-                    placeholder={intl.formatMessage({
-                      id: 'compose.thread.alt',
-                      defaultMessage: 'Alternative text',
-                    })}
-                    onChange={(event) => updateAlt(mediaId, event.target.value)}
-                    onBlur={() =>
-                      void api().put(`/api/v1/media/${mediaId}`, {
-                        description: attachment.get('description') ?? '',
-                      })
-                    }
-                  />
-                </label>
-              </div>
-            );
-          })}
-        </div>
-      )}
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
     </section>
+  );
+};
+
+const ThreadMediaAttachment: React.FC<{
+  attachment: ImmutableMap<string, unknown>;
+  threadItemId: string;
+  onRemove: () => void;
+}> = ({ attachment, threadItemId, onRemove }) => {
+  const intl = useIntl();
+  const dispatch = useAppDispatch();
+  const mediaId = attachment.get('id') as string;
+  const type = attachment.get('type') as string | undefined;
+  const previewUrl = attachment.get('preview_url') as string | null;
+  const mediaUrl = attachment.get('url') as string | null;
+  const isVideo = type === 'video';
+  const isAnimatedGif = type === 'gifv';
+  const isAudio = type === 'audio';
+
+  const handleEditAlt = useCallback(() => {
+    dispatch(
+      openModal({
+        modalType: 'FOCAL_POINT',
+        modalProps: { mediaId, threadItemId },
+      }),
+    );
+  }, [dispatch, mediaId, threadItemId]);
+
+  return (
+    <div className={classes.threadMediaItem}>
+      <div className={classes.mediaPreview} data-media-type={type ?? 'image'}>
+        {isVideo ? (
+          <video
+            className={classes.mediaVideo}
+            src={mediaUrl ?? undefined}
+            poster={previewUrl ?? undefined}
+            controls
+            playsInline
+            preload='metadata'
+          />
+        ) : isAnimatedGif ? (
+          <video
+            className={classes.mediaVideo}
+            src={mediaUrl ?? undefined}
+            poster={previewUrl ?? undefined}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload='metadata'
+            aria-hidden='true'
+          />
+        ) : isAudio && mediaUrl ? (
+          <div className={classes.mediaAudioPreview}>
+            {previewUrl ? (
+              <img className={classes.mediaImage} src={previewUrl} alt='' />
+            ) : (
+              <div
+                className={classes.mediaAudioPlaceholder}
+                aria-hidden='true'
+              />
+            )}
+            <audio
+              className={classes.mediaAudio}
+              src={mediaUrl}
+              controls
+              preload='metadata'
+            />
+          </div>
+        ) : (
+          <img
+            className={classes.mediaImage}
+            src={previewUrl ?? mediaUrl ?? undefined}
+            alt=''
+          />
+        )}
+
+        <div className={classes.mediaActions}>
+          <Button
+            as='button'
+            type='button'
+            size='sm'
+            variant='solid'
+            leadingIcon={PencilSimpleIcon}
+            className={classNames(
+              classes.mediaActionButton,
+              classes.mediaAltButton,
+            )}
+            onClick={handleEditAlt}
+            aria-label={intl.formatMessage(messages.addAlt)}
+          >
+            <span aria-hidden='true'>ALT</span>
+            <span className='sr-only'>
+              <FormattedMessage {...messages.addAlt} />
+            </span>
+          </Button>
+          <IconButton
+            as='button'
+            type='button'
+            size='sm'
+            variant='solid'
+            icon={TrashIcon}
+            className={classNames(
+              classes.mediaActionButton,
+              classes.mediaRemove,
+            )}
+            onClick={onRemove}
+            aria-label={intl.formatMessage(messages.removeMedia)}
+          >
+            <span className='sr-only'>
+              <FormattedMessage {...messages.removeMedia} />
+            </span>
+          </IconButton>
+        </div>
+      </div>
+    </div>
   );
 };

@@ -30,13 +30,13 @@ export const Blue2FooterLinks: React.FC = () => {
         />
       </Link>
       <span>·</span>
-      <Link to='/keyboard-shortcuts'>
+      <Link className={classes.keyboardShortcuts} to='/keyboard-shortcuts'>
         <FormattedMessage
           id='keyboard_shortcuts.heading'
           defaultMessage='Keyboard Shortcuts'
         />
       </Link>
-      <span>·</span>
+      <span className={classes.keyboardShortcutsSeparator}>·</span>
       <button type='button' onClick={openBugReport}>
         <BugReportLabel />
       </button>

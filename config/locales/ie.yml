@@ -727,7 +727,6 @@ ie:
         follow_recommendations: Seque-recomandationes
         profile_directory: Profilarium
         public_timelines: Public témpor-lineas
-        publish_statistics: Publicar statisticas
         title: Decovriment
         trends: Tendenties
       domain_blocks:
@@ -906,8 +905,6 @@ ie:
     warning_presets:
       add_new: Adjunter un nov
       delete: Deleter
-      edit_preset: Modificar prefiguration de avise
-      empty: Vu ancor ha definit null prefigurationes de avise.
     webhooks:
       add_new: Adjunter punctu terminal
       delete: Deleter

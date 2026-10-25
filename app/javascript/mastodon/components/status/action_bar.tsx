@@ -1,18 +1,10 @@
 import { useCallback } from 'react';
 
-import { FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import classNames from 'classnames';
 
-import {
-  ArrowsClockwiseIcon,
-  BookmarkSimpleIcon,
-  ChatCircleIcon,
-  DotsThreeIcon,
-  QuotesIcon,
-  ShareFatIcon,
-  StarIcon,
-} from '@phosphor-icons/react';
+import { DotsThreeIcon, ShareFatIcon } from '@phosphor-icons/react';
 
 import { statusInteraction } from '@/mastodon/actions/interactions';
 import { fetchStatus } from '@/mastodon/actions/statuses';
@@ -22,7 +14,6 @@ import { useAccountStatus } from '@/mastodon/hooks/useStatus';
 import { quickBoosting } from '@/mastodon/initial_state';
 import type { MenuItem as DropdownItem } from '@/mastodon/models/dropdown_menu';
 import type { AccountStatusShape } from '@/mastodon/models/status';
-import { selectStatusConditions } from '@/mastodon/selectors/statuses';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import {
@@ -34,22 +25,27 @@ import {
 import {
   Menu,
   MenuItem,
+  MenuItemDivider,
+  MenuItemLink,
   MenuList,
   MenuTrigger,
   LegacyDropdownMenuItems,
 } from '../menu';
+import { Tooltip } from '../tooltip';
 
-import { boostItemState, quoteItemState } from './boost_button_utils';
-import { useStatusContext, useStatusMenuActions } from './hooks';
+import {
+  useStatusContext,
+  useStatusIcons,
+  useStatusMenuActions,
+} from './hooks';
 import { RemoveQuoteHint } from './legacy/action_bar/remove_quote_hint';
 import classes from './styles.module.scss';
 
 interface StatusActionBarProps {
   statusId: string;
+  reblogId: string | undefined;
   withDismiss?: boolean;
   withCounters?: boolean;
-  /** Only show methods to respond (reply, boost, like) and not sharing, bookmarking, and the overflow menu. */
-  onlyResponses?: boolean;
 }
 
 const messages = defineMessages({
@@ -63,11 +59,12 @@ const messages = defineMessages({
 
 export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   statusId,
+  reblogId,
   withDismiss,
   withCounters,
-  onlyResponses,
 }) => {
   const status = useAccountStatus(statusId);
+  const reblogStatus = useAccountStatus(reblogId);
   const quotedAccountId = useAppSelector(
     (state) =>
       state.statuses.getIn([status?.quote?.quoted_status, 'account']) ?? null,
@@ -75,6 +72,11 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   const currentAccountId = useCurrentAccountId();
   const { contextType } = useStatusContext();
   const statusUrl = status?.url ?? status?.uri;
+  const { reply, like, bookmark } = useStatusIcons(statusId);
+  const intl = useIntl();
+  const favouriteTitle = intl.formatMessage(
+    status?.favourited ? messages.removeFavourite : messages.favourite,
+  );
 
   // Actions
   const dispatch = useAppDispatch();
@@ -107,13 +109,6 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
     }
   }, [contextType, dispatch, statusId, statusUrl]);
 
-  const intl = useIntl();
-  const favouriteIcon = useIconWeight(StarIcon, status?.favourited && 'fill');
-  const bookmarkIcon = useIconWeight(
-    BookmarkSimpleIcon,
-    status?.bookmarked && 'fill',
-  );
-
   if (!status) {
     return null;
   }
@@ -125,49 +120,49 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
   const shouldShowQuoteRemovalHint =
     isQuotingMe && contextType === 'notifications';
 
-  const responseButtons = (
-    <>
-      <Button
-        size='sm'
-        clipPadding
-        variant='ghost'
-        leadingIcon={reply.icon}
-        onClick={reply.action}
-        tooltip={{ type: 'label', text: reply.title }}
-      >
-        {withCounters && reply.counter}
-      </Button>
+  return (
+    <div className={classes.actions}>
+      <Tooltip text={reply.title}>
+        {({ getTooltipProps }) => (
+          <Button
+            {...getTooltipProps()}
+            aria-label={reply.title}
+            size='sm'
+            clipPadding
+            variant='ghost'
+            leadingIcon={reply.icon}
+            onClick={handleReplyClick}
+          >
+            {withCounters && reply.counter}
+          </Button>
+        )}
+      </Tooltip>
 
       <StatusReblogButton statusId={statusId}>
         {withCounters && status.reblogs_count}
       </StatusReblogButton>
 
-      <ToggleButton
-        size='sm'
-        variant='ghost'
-        active={status.favourited}
-        title={favouriteTitle}
-        leadingIcon={favouriteIcon}
-        leadingIconWrapperClassName='favourite-animation-target'
-        onClick={handleFavouriteClick}
-        className={classNames(
-          classes.favouriteButton,
-          'star-icon',
-          !onlyResponses && classes.actionsButtonGap,
+      <Tooltip text={favouriteTitle}>
+        {({ getTooltipProps }) => (
+          <ToggleButton
+            {...getTooltipProps()}
+            aria-label={favouriteTitle}
+            size='sm'
+            variant='ghost'
+            active={status.favourited}
+            leadingIcon={like.icon}
+            leadingIconWrapperClassName='favourite-animation-target'
+            onClick={handleFavouriteClick}
+            className={classNames(
+              classes.favouriteButton,
+              'star-icon',
+              classes.actionsButtonGap,
+            )}
+          >
+            {withCounters && like.counter}
+          </ToggleButton>
         )}
-      >
-        {withCounters && like.counter}
-      </ToggleButton>
-    </>
-  );
-
-  if (onlyResponses) {
-    return <div className={classes.actions}>{responseButtons}</div>;
-  }
-
-  return (
-    <div className={classes.actions}>
-      {responseButtons}
+      </Tooltip>
 
       {isPublic && (
         <IconButton
@@ -183,9 +178,10 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
       <ToggleIconButton
         size='sm'
         variant='ghost'
-        active={status.bookmarked}
-        icon={bookmarkIcon}
-        onClick={handleBookmarkClick}
+        className='bookmark-icon'
+        active={bookmark.active}
+        icon={bookmark.icon}
+        onClick={bookmark.action}
       >
         {bookmark.title}
       </ToggleIconButton>
@@ -198,6 +194,7 @@ export const StatusActionBar: React.FC<StatusActionBarProps> = ({
           <StatusActionMenu
             dismissQuoteHint={dismissQuoteHint}
             status={status}
+            reblogStatus={reblogStatus}
             withDismiss={withDismiss}
           />
         )}
@@ -210,46 +207,69 @@ const StatusReblogButton: React.FC<{
   children: React.ReactNode;
 }> = ({ statusId, children }) => {
   const { boost, quote } = useStatusIcons(statusId);
+  const intl = useIntl();
+
+  const handleShiftClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.shiftKey) {
+        e.preventDefault();
+        boost.action();
+      }
+    },
+    [boost],
+  );
 
   if (quickBoosting) {
     return (
-      <ToggleButton
-        size='sm'
-        variant='ghost'
-        active={boost.active}
-        tooltip={{
-          type: 'label',
-          text: boost.title,
-        }}
-        leadingIcon={boost.icon}
-        disabled={boost.disabled}
-        onClick={boost.action}
-      >
-        {children}
-      </ToggleButton>
+      <Tooltip text={boost.title}>
+        {({ getTooltipProps }) => (
+          <ToggleButton
+            {...getTooltipProps()}
+            aria-label={boost.title}
+            size='sm'
+            variant='ghost'
+            active={boost.active}
+            leadingIcon={boost.icon}
+            className={classes.reblogButton}
+            disabled={boost.disabled}
+            onClick={boost.action}
+          >
+            {children}
+          </ToggleButton>
+        )}
+      </Tooltip>
     );
   }
 
   return (
     <Menu>
-      <MenuTrigger
-        as={ToggleButton}
-        size='sm'
-        variant='ghost'
-        active={boost.active}
-        tooltip={{
-          type: 'label',
-          text: (
-            <FormattedMessage
-              id='status.reblog_or_quote'
-              defaultMessage='Boost or quote'
-            />
-          ),
-        }}
-        leadingIcon={boost.icon}
+      <Tooltip
+        text={
+          <FormattedMessage
+            id='status.reblog_or_quote'
+            defaultMessage='Boost or quote'
+          />
+        }
       >
-        {children}
-      </MenuTrigger>
+        {({ getTooltipProps }) => (
+          <MenuTrigger
+            {...getTooltipProps()}
+            as={ToggleButton}
+            size='sm'
+            variant='ghost'
+            active={boost.active}
+            aria-label={intl.formatMessage({
+              id: 'status.reblog_or_quote',
+              defaultMessage: 'Boost or quote',
+            })}
+            leadingIcon={boost.icon}
+            className={classes.reblogButton}
+            onClick={handleShiftClick}
+          >
+            {children}
+          </MenuTrigger>
+        )}
+      </Tooltip>
 
       <MenuList placement='bottom' maxWidth={180}>
         <MenuItem
@@ -276,12 +296,23 @@ const StatusReblogButton: React.FC<{
 const StatusActionMenu: React.FC<{
   dismissQuoteHint: () => void;
   status: AccountStatusShape;
+  reblogStatus: AccountStatusShape | null;
   withDismiss?: boolean;
-}> = ({ status, dismissQuoteHint, withDismiss }) => {
+}> = ({ status, reblogStatus, dismissQuoteHint, withDismiss }) => {
   const { contextType } = useStatusContext();
   const dispatch = useAppDispatch();
+  const currentTheme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
+  const isVanillaTheme =
+    typeof document !== 'undefined' &&
+    (!currentTheme || currentTheme === 'default' || currentTheme === 'vanilla');
 
-  const menu = useStatusMenuActions({ status, contextType, withDismiss });
+  const menu = useStatusMenuActions({
+    status,
+    reblogStatus,
+    contextType,
+    withDismiss,
+  });
 
   const onOpen = useCallback(() => {
     // Replicates needsStatusRefresh of the Dropdown component.
@@ -305,7 +336,13 @@ const StatusActionMenu: React.FC<{
         <FormattedMessage id='status.more' defaultMessage='More' />
       </MenuTrigger>
 
-      <MenuList placement='top-end'>
+      <MenuList
+        portal={isVanillaTheme}
+        mobilePresentation={isVanillaTheme ? 'popover' : 'bottom-sheet'}
+        constrainToViewport={isVanillaTheme}
+        scrollable={isVanillaTheme}
+        placement='top-end'
+      >
         <LegacyDropdownMenuItems items={menu} />
       </MenuList>
     </Menu>

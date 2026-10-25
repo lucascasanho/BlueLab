@@ -58,7 +58,12 @@ SimpleNavigation::Configuration.run do |navigation|
     n.item :moderation, safe_join([material_symbol('gavel'), t('moderation.title')]), nil, if: -> { current_user.can?(:manage_reports, :view_audit_log, :manage_users, :manage_invites, :manage_taxonomies, :manage_federation, :manage_blocks, :manage_roles) && !self_destruct } do |s|
       s.item :reports, safe_join([material_symbol('flag'), t('admin.reports.title')]), admin_reports_path, highlights_on: %r{/admin/reports|admin/report_notes}, html: { class: 'reports-navigation-item' }, if: -> { current_user.can?(:manage_reports) }
       s.item :bug_reports, safe_join([material_symbol('bug_report'), t('admin.bug_reports.title')]), admin_bug_reports_path, highlights_on: %r{/admin/bug_reports}, html: { class: 'bug-reports-navigation-item' }, if: -> { current_user.can?(:manage_reports) }
-      s.item :verification_requests, safe_join([inline_svg_tag('icons/icon_verified.svg', class: ['icon', 'icon-verified'], role: :img), ' ', t('admin.verification_requests.title')]), admin_verification_requests_path, highlights_on: %r{/admin/verification_requests}, html: { class: 'verification-requests-navigation-item' }, if: -> { current_user.can?(:manage_roles) }
+      s.item :verification_requests,
+             safe_join([inline_svg_tag('icons/icon_verified.svg', class: ['icon', 'icon-verified'], role: :img), ' ', t('admin.verification_requests.title')]),
+             admin_verification_requests_path,
+             highlights_on: %r{/admin/verification_requests},
+             html: { class: 'verification-requests-navigation-item' },
+             if: -> { current_user.can?(:manage_roles) }
       s.item :appeals, safe_join([material_symbol('feedback'), t('admin.disputes.appeals.title')]), admin_disputes_appeals_path, highlights_on: %r{/admin/disputes/}, if: -> { current_user.can?(:manage_appeals) }
       s.item :accounts, safe_join([material_symbol('groups'), t('admin.accounts.title')]), admin_accounts_path(origin: 'local'), highlights_on: %r{/admin/accounts|admin/account_moderation_notes|/admin/pending_accounts|/admin/users}, if: -> { current_user.can?(:manage_users) }
       s.item :tags, safe_join([material_symbol('tag'), t('admin.tags.title')]), admin_tags_path, highlights_on: %r{/admin/tags}, if: -> { current_user.can?(:manage_taxonomies) }
@@ -66,9 +71,11 @@ SimpleNavigation::Configuration.run do |navigation|
       s.item :instances, safe_join([material_symbol('cloud'), t('admin.instances.title')]), admin_instances_path(limited: limited_federation_mode? ? nil : '1'), highlights_on: %r{/admin/instances|/admin/domain_blocks|/admin/domain_allows|/admin/export_domain_blocks}, if: lambda {
         current_user.can?(:manage_federation)
       }
+      s.item :moderation_subscriptions, safe_join([material_symbol('cloud_download'), t('admin.moderation_subscriptions.title')]), admin_moderation_suggestions_path, highlights_on: %r{/admin/moderation_subscriptions|/admin/moderation_suggestions}, if: -> { Mastodon::Feature.moderation_subscriptions_enabled? && current_user.can?(:manage_federation) }
       s.item :email_domain_blocks, safe_join([material_symbol('mail'), t('admin.email_domain_blocks.title')]), admin_email_domain_blocks_path, highlights_on: %r{/admin/email_domain_blocks}, if: -> { current_user.can?(:manage_blocks) }
       s.item :username_blocks, safe_join([material_symbol('supervised_user_circle_off'), t('admin.username_blocks.title')]), admin_username_blocks_path, highlights_on: %r{/admin/username_blocks}, if: -> { current_user.can?(:manage_blocks) }
       s.item :ip_blocks, safe_join([material_symbol('hide_source'), t('admin.ip_blocks.title')]), admin_ip_blocks_path, highlights_on: %r{/admin/ip_blocks}, if: -> { current_user.can?(:manage_blocks) }
+      s.item :warning_presets, safe_join([material_symbol('quick_phrases'), t('admin.warning_presets.navigation_title')]), admin_warning_presets_path, highlights_on: %r{/admin/warning_presets}, if: -> { current_user.can?(:manage_settings) }
       s.item :action_logs, safe_join([material_symbol('list'), t('admin.action_logs.title')]), admin_action_logs_path, if: -> { current_user.can?(:view_audit_log) }
     end
 

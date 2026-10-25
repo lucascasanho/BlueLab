@@ -50,4 +50,32 @@ RSpec.describe REST::NotificationGroupSerializer do
   it_behaves_like 'with fallback notifications', 'admin.report', [:report, :report]
   it_behaves_like 'with fallback notifications', 'added_to_collection', [:collection_item]
   it_behaves_like 'with fallback notifications', 'collection_update', [:collection]
+
+  context 'when the notification is a bug report alert' do
+    let(:bug_report) { Fabricate(:bug_report, account: nil) }
+    let(:notification) do
+      Fabricate(
+        :notification,
+        type: 'admin.bug_report',
+        activity: bug_report,
+        account: current_user.account,
+        from_account: current_user.account
+      )
+    end
+    let(:notification_group) do
+      NotificationGroup.new(
+        notification: notification,
+        sample_accounts: [current_user.account],
+        pagination_data: { latest_notification_at: notification.created_at }
+      )
+    end
+
+    it 'includes the bug report identifier without reporter details' do
+      expect(subject).to include(
+        'type' => 'admin.bug_report',
+        'bug_report_id' => bug_report.id.to_s
+      )
+      expect(subject).to_not have_key('status_id')
+    end
+  end
 end

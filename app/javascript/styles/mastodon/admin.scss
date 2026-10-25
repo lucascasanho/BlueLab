@@ -962,6 +962,12 @@ a.name-tag,
   border-radius: 4px;
   margin-bottom: 20px;
 
+  &__media {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
   &__profile {
     display: flex;
     justify-content: space-between;

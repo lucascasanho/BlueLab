@@ -1,0 +1,58 @@
+import { FormattedMessage } from 'react-intl';
+
+import classNames from 'classnames';
+import { Link } from 'react-router-dom';
+
+import MastodonBrandMark from '@/images/mastodon-brand-mark.svg?react';
+import { customAppIcon, domain, title } from '@/mastodon/initial_state';
+
+import { getNavigationSkipLinkId } from '../../ui/components/skip_links';
+
+import classes from './vanilla_navigation_header.module.scss';
+
+export const NavigationHeader: React.FC<{
+  siteName?: string;
+  isStuck: boolean;
+}> = ({ siteName, isStuck }) => {
+  return (
+    <header className={classes.root} data-stuck={isStuck}>
+      <LogoLockup siteName={siteName} />
+    </header>
+  );
+};
+
+export const LogoLockup: React.FC<{
+  siteName?: string;
+  className?: string;
+}> = ({ siteName, className }) => {
+  return (
+    <Link
+      to='/'
+      className={classNames(classes.siteNameLink, className)}
+      id={getNavigationSkipLinkId()}
+    >
+      {customAppIcon && (
+        <img src={customAppIcon} alt='' className={classes.appIcon} />
+      )}
+      <span className={classes.content}>
+        <span className={classes.serverName}>
+          {siteName ?? title ?? domain}
+        </span>
+        <span className={classes.poweredBy}>
+          <FormattedMessage
+            id='navigation_bar.powered_by_mastodon'
+            defaultMessage='powered by {logo}Mastodon'
+            values={{
+              logo: (
+                <MastodonBrandMark
+                  role='presentation'
+                  className={classes.mastodonLogo}
+                />
+              ),
+            }}
+          />
+        </span>
+      </span>
+    </Link>
+  );
+};

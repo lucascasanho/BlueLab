@@ -4,10 +4,9 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { Link } from 'react-router-dom';
 
-import type { Map as ImmutableMap } from 'immutable';
+import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import {
-  PenNibIcon,
   HouseIcon,
   MagnifyingGlassIcon,
   RssSimpleIcon,
@@ -16,31 +15,31 @@ import {
   BookmarkSimpleIcon,
   StarIcon,
   PlusIcon,
-  InfoIcon,
 } from '@phosphor-icons/react';
 
 import { blue2Text } from '@/bluelab/i18n/blue2';
+import FediIcon from '@/images/icons/icon_fediverse.svg?react';
+import { fetchFollowRequests } from '@/mastodon/actions/accounts';
 import {
   expandConversations,
   mountConversations,
   unmountConversations,
 } from '@/mastodon/actions/conversations';
-import { connectDirectStream } from '@/mastodon/actions/streaming';
-import { groupedConversationRepresentatives } from '@/mastodon/features/direct_timeline/conversation_grouping';
-import FediIcon from '@/images/icons/icon_fediverse.svg?react';
-import { fetchFollowRequests } from '@/mastodon/actions/accounts';
 import { fetchLists } from '@/mastodon/actions/lists';
 import { closeNavigation } from '@/mastodon/actions/navigation';
+import { connectDirectStream } from '@/mastodon/actions/streaming';
 import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
-import { Button } from '@/mastodon/components/button/redesign';
 import { Callout } from '@/mastodon/components/callout/redesign';
+import { ComposeIcon } from '@/mastodon/components/compose_icon';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
+import { groupedConversationRepresentatives } from '@/mastodon/features/direct_timeline/conversation_grouping';
 import { useScrollSensor } from '@/mastodon/hooks/useScrollSensor';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
   disabledAccountId,
   localLiveFeedAccess,
   remoteLiveFeedAccess,
+  trendsEnabled,
 } from '@/mastodon/initial_state';
 import { transientSingleColumn } from '@/mastodon/is_mobile';
 import { canViewFeed } from '@/mastodon/permissions';
@@ -51,8 +50,6 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { invokeVirtualIosKeyboard } from '@/mastodon/utils/invoke_virtual_ios_keyboard';
 
 import { useHasAnnouncements } from '../../announcements/hooks';
-
-import { Blue2ComposeIcon } from '../../blue2/icons';
 
 import { NavigationAccountCardAndMenu } from './account_card_and_menu';
 import { NavigationFooterLinks } from './footer_links';
@@ -162,11 +159,20 @@ export const RedesignNavigationPanel: React.FC<{
     selectUnreadNotificationGroupsCount,
   );
   const unreadMessagesCount = useAppSelector((state) => {
-    const conversations = state.conversations.get('items');
+    const conversationsState = state.conversations as unknown as ImmutableMap<
+      string,
+      unknown
+    >;
+    const conversations = conversationsState.get('items') as ImmutableList<
+      ImmutableMap<string, unknown>
+    >;
+    const representatives = groupedConversationRepresentatives(
+      conversations,
+    ) as unknown as ImmutableMap<string, unknown>[];
 
-    return groupedConversationRepresentatives(conversations)
-      .filter((conversation) => conversation.get('unread'))
-      .length;
+    return representatives.filter(
+      (conversation) => conversation.get('unread') === true,
+    ).length;
   });
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
@@ -195,9 +201,7 @@ export const RedesignNavigationPanel: React.FC<{
 
   const { sensor: topSensor, isInViewport: isScrolledToTop } = useScrollSensor({
     placement: 'top',
-    // Only show overlay fade after a bit of scrolling, as the nav header has
-    // a bit of bottom spacing where the fade isn't needed yet
-    tolerance: 36,
+    tolerance: 2,
   });
   const { sensor: bottomSensor, isInViewport: isScrolledToBottom } =
     useScrollSensor({
@@ -221,7 +225,7 @@ export const RedesignNavigationPanel: React.FC<{
               as='button'
               data-bluelab-compose={isBlue2 ? 'true' : undefined}
               onClick={openComposer}
-              iconComponent={isBlue2 ? Blue2ComposeIcon : PenNibIcon}
+              iconComponent={ComposeIcon}
             >
               {isBlue2 ? (
                 blue2Text(intl.locale, 'write')
@@ -235,18 +239,7 @@ export const RedesignNavigationPanel: React.FC<{
             <NavigationLink to='/home' iconComponent={HouseIcon}>
               <FormattedMessage id='tabs_bar.home' defaultMessage='Home' />
             </NavigationLink>
-            <NavigationLink
-              to={{
-                pathname: '/explore',
-                state: { focusTarget: FOCUS_TARGET.SEARCH },
-              }}
-              iconComponent={MagnifyingGlassIcon}
-            >
-              <FormattedMessage
-                id='tabs_bar.explore'
-                defaultMessage='Explore'
-              />
-            </NavigationLink>
+            <ExploreLink isBlue2={isBlue2} />
             {mode === 'slide-out' && isBlue2 && (
               <NavigationLink to='/favourites' iconComponent={StarIcon}>
                 <FormattedMessage
@@ -255,21 +248,7 @@ export const RedesignNavigationPanel: React.FC<{
                 />
               </NavigationLink>
             )}
-            <NavigationLink
-              withSpaceAfter
-              to='/public/local'
-              iconComponent={FediIcon}
-              isActive={isFediverseFeedsLinkActive}
-            >
-              {isBlue2 ? (
-                blue2Text(intl.locale, 'fediverseFeeds')
-              ) : (
-                <FormattedMessage
-                  id='tabs_bar.fediverse_feeds'
-                  defaultMessage='Fediverse Feeds'
-                />
-              )}
-            </NavigationLink>
+            <PublicFeedsLink isBlue2={isBlue2} />
             <ListSection
               id='custom-feeds'
               title={
@@ -360,6 +339,7 @@ export const RedesignNavigationPanel: React.FC<{
               </ListSection>
             )}
           </ul>
+
           <footer className={classes.footer} data-stuck={!isScrolledToBottom}>
             <ul className={classes.footerNav}>
               <NavigationLink
@@ -437,22 +417,50 @@ export const RedesignNavigationPanel: React.FC<{
   );
 };
 
-const ExploreLink: React.FC = () => {
+const ExploreLink: React.FC<{ isBlue2: boolean }> = ({ isBlue2 }) => {
+  const intl = useIntl();
+
   return (
     <NavigationLink
       to={{
-        pathname: '/explore',
+        pathname: trendsEnabled ? '/explore' : '/search',
         state: { focusTarget: FOCUS_TARGET.SEARCH },
       }}
       iconComponent={MagnifyingGlassIcon}
-      onClick={invokeVirtualIosKeyboard}
+      onClick={handleSearchLinkClick}
     >
-      <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
+      {isBlue2 ? (
+        blue2Text(intl.locale, 'explore')
+      ) : trendsEnabled ? (
+        <FormattedMessage id='tabs_bar.explore' defaultMessage='Explore' />
+      ) : (
+        <FormattedMessage id='navigation_bar.search' defaultMessage='Search' />
+      )}
     </NavigationLink>
   );
 };
 
-const PublicFeedsLink: React.FC = () => {
+export function handleSearchLinkClick() {
+  const mainSearchInput = document.querySelector<HTMLInputElement>(
+    '[data-column-root] input[data-main-search]',
+  );
+
+  // Focus the main search input if we're already on the search page
+  if (mainSearchInput) {
+    mainSearchInput.focus();
+    return;
+  }
+
+  // Otherwise, the search element is not on screen yet and
+  // the page needs to be rendered first. In this case, we use
+  // `invokeVirtualIosKeyboard` to work around an iOS quirk that
+  // prevents the virtual keyboard from opening when an element wasn't
+  // focused synchronously.
+  invokeVirtualIosKeyboard();
+}
+
+const PublicFeedsLink: React.FC<{ isBlue2: boolean }> = ({ isBlue2 }) => {
+  const intl = useIntl();
   const { signedIn, permissions } = useIdentity();
 
   const canViewLocalFeed = canViewFeed(
@@ -474,11 +482,14 @@ const PublicFeedsLink: React.FC = () => {
 
   return (
     <NavigationLink
+      withSpaceAfter
       to={canViewLocalFeed ? '/public/local' : '/public/remote'}
       iconComponent={FediIcon}
       isActive={isFediverseFeedsLinkActive}
     >
-      {canViewOnlyOneFeed ? (
+      {isBlue2 ? (
+        blue2Text(intl.locale, 'fediverseFeeds')
+      ) : canViewOnlyOneFeed ? (
         <FormattedMessage
           id='tabs_bar.public_feed'
           defaultMessage='Public Feed'

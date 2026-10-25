@@ -1,29 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
+
+import classNames from 'classnames';
 import { useLocation, useParams } from 'react-router-dom';
 
-import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 import { List as ImmutableList } from 'immutable';
+import type { Map as ImmutableMap, Record as ImmutableRecord } from 'immutable';
 
+import { ChatCircleDotsIcon, HeartIcon } from '@phosphor-icons/react';
 import { Helmet } from '@unhead/react/helmet';
 
-import ReplyIcon from '@/material-icons/400-24px/reply.svg?react';
-import StarIcon from '@/material-icons/400-24px/star-fill.svg?react';
-import StarBorderIcon from '@/material-icons/400-24px/star.svg?react';
-
-import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
-
-import { importFetchedStatus } from '@/mastodon/actions/importer';
-import { toggleFavourite } from '@/mastodon/actions/interactions';
-import { fetchStatus } from '@/mastodon/actions/statuses';
 import {
   directComposeInline,
   replyComposeInline,
   resetCompose,
 } from '@/mastodon/actions/compose';
-import { connectDirectStream } from '@/mastodon/actions/streaming';
-import { browserHistory } from '@/mastodon/components/router';
 import {
   expandConversations,
   fetchConversation,
@@ -33,22 +25,34 @@ import {
   mountConversations,
   unmountConversations,
 } from '@/mastodon/actions/conversations';
-import { dismissComposer } from '@/mastodon/reducers/slices/composer';
-import { RedesignComposeForm } from '@/mastodon/features/compose/redesign';
+import { importFetchedStatus } from '@/mastodon/actions/importer';
+import { toggleFavourite } from '@/mastodon/actions/interactions';
+import { fetchStatus } from '@/mastodon/actions/statuses';
+import { connectDirectStream } from '@/mastodon/actions/streaming';
+import type { ApiStatusJSON } from '@/mastodon/api_types/statuses';
+import { compareId } from '@/mastodon/compare_id';
+import AttachmentList from '@/mastodon/components/attachment_list';
 import { Avatar } from '@/mastodon/components/avatar';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
-import { LoadingIndicator } from '@/mastodon/components/loading_indicator';
-import AttachmentList from '@/mastodon/components/attachment_list';
-import StatusContent from '@/mastodon/components/status/legacy/content';
 import { DisplayNameSimple } from '@/mastodon/components/display_name/simple';
-import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
-import { compareId } from '@/mastodon/compare_id';
+import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { IconButton } from '@/mastodon/components/icon_button';
+import { LoadingIndicator } from '@/mastodon/components/loading_indicator';
+import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
+import { browserHistory } from '@/mastodon/components/router';
+import StatusContent from '@/mastodon/components/status/legacy/content';
+import { RedesignComposeForm } from '@/mastodon/features/compose/redesign';
 import { me } from '@/mastodon/initial_state';
+import type { Account } from '@/mastodon/models/account';
 import type { StatusShape } from '@/mastodon/models/status';
+import { dismissComposer } from '@/mastodon/reducers/slices/composer';
 import { makeGetStatus } from '@/mastodon/selectors';
+import type { RootState } from '@/mastodon/store';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import ReplyIcon from '@/material-icons/400-24px/reply.svg?react';
+import StarIcon from '@/material-icons/400-24px/star-fill.svg?react';
+import StarBorderIcon from '@/material-icons/400-24px/star.svg?react';
 
 import classes from './message_conversation.module.scss';
 
@@ -65,39 +69,79 @@ const messages = defineMessages({
 
 const getStatus = makeGetStatus();
 
+type MessageAlignment = 'center' | 'end';
+
+function scrollMessageWithinList(
+  list: HTMLElement,
+  message: HTMLElement,
+  alignment: MessageAlignment,
+  behavior: ScrollBehavior = 'auto',
+) {
+  const listRect = list.getBoundingClientRect();
+  const messageRect = message.getBoundingClientRect();
+  const messageTop = list.scrollTop + messageRect.top - listRect.top;
+  const targetTop =
+    alignment === 'end'
+      ? messageTop + messageRect.height - list.clientHeight
+      : messageTop - (list.clientHeight - messageRect.height) / 2;
+  const maxScrollTop = Math.max(0, list.scrollHeight - list.clientHeight);
+  const top = Math.max(0, Math.min(maxScrollTop, targetTop));
+
+  list.scrollTo({ top, behavior });
+}
+
 interface MessageConversationProps {
   conversationId?: string;
   onBack?: () => void;
   inline?: boolean;
+  vanillaAppearance?: boolean;
 }
 
 export const MessageConversation: React.FC<MessageConversationProps> = ({
   conversationId,
   onBack,
   inline = false,
+  vanillaAppearance,
 }) => {
+  const theme =
+    typeof document !== 'undefined' ? document.body.dataset.theme : undefined;
+  const useVanillaAppearance =
+    vanillaAppearance ?? (!theme || theme === 'default');
   const { id: routeId } = useParams<{ id: string }>();
   const id = conversationId ?? routeId;
-  const location = useLocation();
-  const sourceStatusId = (location.state as { statusId?: string } | undefined)?.statusId;
+  const location = useLocation<{ statusId?: string }>();
+  const sourceStatusId = location.state.statusId;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [messageStatusIds, setMessageStatusIds] = useState<string[]>([]);
-  const [conversationResolved, setConversationResolved] = useState(false);
-  const [messagesResolved, setMessagesResolved] = useState(false);
+  const [conversationResolvedId, setConversationResolvedId] = useState<
+    string | null
+  >(null);
+  const [messagesResolvedId, setMessagesResolvedId] = useState<string | null>(
+    null,
+  );
+  const conversationResolved = !id || conversationResolvedId === id;
+  const messagesResolved = !id || messagesResolvedId === id;
   const [highlightedStatusId, setHighlightedStatusId] = useState<string | null>(
     null,
   );
-  const [pendingScrollStatusId, setPendingScrollStatusId] = useState<string | null>(
-    null,
-  );
+  const [pendingScroll, setPendingScroll] = useState<{
+    conversationId: string;
+    statusId: string;
+  } | null>(null);
+  const pendingScrollStatusId =
+    pendingScroll?.conversationId === id ? pendingScroll.statusId : null;
 
-  const conversationItems = useAppSelector(
-    (state) =>
-      state.conversations.get('items') as Immutable.List<
-        Immutable.Map<string, unknown>
-      >,
-  );
+  const conversationItems = useAppSelector((state) => {
+    const conversationsState = state.conversations as unknown as ImmutableMap<
+      string,
+      unknown
+    >;
+
+    return conversationsState.get('items') as ImmutableList<
+      ImmutableMap<string, unknown>
+    >;
+  });
 
   const conversation = useMemo(
     () => conversationItems.find((item) => item.get('id') === id),
@@ -113,13 +157,13 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     if (!conversation) return [];
 
     const targetParticipants = conversation.get('accounts') as
-      | Immutable.List<string>
+      | ImmutableList<string>
       | undefined;
 
     return conversationItems
       .filter((item) => {
         const itemParticipants = item.get('accounts') as
-          | Immutable.List<string>
+          | ImmutableList<string>
           | undefined;
         const sameParticipants =
           ImmutableList.isList(itemParticipants) &&
@@ -159,26 +203,14 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     () =>
       participantIds
         .map((accountId) => accounts.get(accountId))
-        .filter(
-          (account): account is NonNullable<typeof account> =>
-            account !== undefined && account !== null,
-        ),
+        .filter(Boolean),
     [accounts, participantIds],
   );
-
-  const statuses = useAppSelector((state) =>
-    messageStatusIds
-      .map((statusId) =>
-        // @ts-expect-error Legacy selector is not typed yet.
-        getStatus(state, { id: statusId }),
-      )
-      .filter(Boolean),
-  ) as Array<Immutable.Record<StatusShape>>;
 
   const loadMessages = useCallback(() => {
     if (!id) return Promise.resolve([]);
 
-    const applyStatuses = (statuses: Array<{ id: string }>) => {
+    const applyStatuses = (statuses: { id: string }[]) => {
       const fetchedStatusIds = statuses.map((status) => status.id);
 
       setMessageStatusIds((current) =>
@@ -187,14 +219,19 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       return statuses;
     };
 
-    return dispatch(fetchConversationMessages(id))
+    const fetchMessages = (conversationId: string) =>
+      dispatch(fetchConversationMessages(conversationId)) as unknown as Promise<
+        { id: string }[]
+      >;
+
+    return fetchMessages(id)
       .then(applyStatuses)
-      .catch(async (error) => {
+      .catch(async (error: unknown) => {
         if (!sourceStatusId) throw error;
 
-        const recoveredId = await dispatch(
+        const recoveredId = (await dispatch(
           findConversationForStatus(sourceStatusId),
-        );
+        )) as string | null | undefined;
 
         if (!recoveredId || recoveredId === id) throw error;
 
@@ -202,7 +239,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           statusId: sourceStatusId,
         });
 
-        const statuses = await dispatch(fetchConversationMessages(recoveredId));
+        const statuses = await fetchMessages(recoveredId);
         return applyStatuses(statuses);
       });
   }, [dispatch, id, sourceStatusId]);
@@ -215,22 +252,22 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
     const disconnect = inline ? undefined : dispatch(connectDirectStream());
 
-    let cancelled = false;
+    const cancelled: { current: boolean } = { current: false };
+    const isCancelled = (): boolean => cancelled.current;
 
     if (id) {
-      setConversationResolved(false);
-      setMessagesResolved(false);
+      const requestedId = id;
 
-      void dispatch(fetchConversation(id))
+      void dispatch(fetchConversation(requestedId))
         .catch(async () => {
-          if (!sourceStatusId || cancelled) return;
+          if (!sourceStatusId || isCancelled()) return;
 
           try {
-            const recoveredId = await dispatch(
+            const recoveredId = (await dispatch(
               findConversationForStatus(sourceStatusId),
-            );
+            )) as string | null | undefined;
 
-            if (!cancelled && recoveredId && recoveredId !== id) {
+            if (!isCancelled() && recoveredId && recoveredId !== id) {
               browserHistory.replace(`/conversations/${recoveredId}`, {
                 statusId: sourceStatusId,
               });
@@ -240,20 +277,18 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           }
         })
         .finally(() => {
-          if (!cancelled) setConversationResolved(true);
+          if (!isCancelled()) setConversationResolvedId(requestedId);
         });
-    } else {
-      setConversationResolved(true);
     }
 
     return () => {
-      cancelled = true;
+      cancelled.current = true;
       if (!inline) {
         dispatch(unmountConversations());
         disconnect?.();
       }
     };
-  }, [dispatch, id, inline]);
+  }, [dispatch, id, inline, sourceStatusId]);
 
   const latestThreadStatusId = useMemo(
     () =>
@@ -268,6 +303,34 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
     [threadConversations],
   );
 
+  const effectiveMessageStatusIds = useMemo(() => {
+    if (
+      !latestThreadStatusId ||
+      messageStatusIds.includes(latestThreadStatusId)
+    ) {
+      return messageStatusIds;
+    }
+
+    return [...messageStatusIds, latestThreadStatusId].sort(compareId);
+  }, [latestThreadStatusId, messageStatusIds]);
+
+  const statuses = useAppSelector<RootState, ImmutableRecord<StatusShape>[]>(
+    (state) =>
+      effectiveMessageStatusIds
+        .map((statusId) => {
+          // The legacy selector also reads contextType from the same props object.
+          const selectorProps = { id: statusId, contextType: undefined };
+          return getStatus(state, selectorProps) as
+            | ImmutableRecord<StatusShape>
+            | null
+            | undefined;
+        })
+        .filter(
+          (status): status is ImmutableRecord<StatusShape> =>
+            status !== null && status !== undefined,
+        ),
+  );
+
   const initialLoadConversationIdRef = useRef<string | null>(null);
   const observedThreadStatusIdRef = useRef<string | null>(null);
 
@@ -276,13 +339,12 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
     initialLoadConversationIdRef.current = id;
     observedThreadStatusIdRef.current = null;
-    setPendingScrollStatusId(null);
 
     let cancelled = false;
     void loadMessages()
       .catch(() => undefined)
       .finally(() => {
-        if (!cancelled) setMessagesResolved(true);
+        if (!cancelled) setMessagesResolvedId(id);
       });
 
     return () => {
@@ -299,12 +361,6 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
 
     observedThreadStatusIdRef.current = latestThreadStatusId;
 
-    setMessageStatusIds((current) =>
-      current.includes(latestThreadStatusId)
-        ? current
-        : [...current, latestThreadStatusId].sort(compareId),
-    );
-
     if (!isFirstObservedStatus && statusChanged) {
       void loadMessages();
     }
@@ -317,7 +373,11 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   } | null>(null);
 
   useEffect(() => {
-    if (!id || !conversation || initialReadStateRef.current?.conversationId === id) {
+    if (
+      !id ||
+      !conversation ||
+      initialReadStateRef.current?.conversationId === id
+    ) {
       return;
     }
 
@@ -336,24 +396,36 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
   }, [conversation, conversationResolved, dispatch, id]);
 
   const renderShell = (content: React.ReactNode) => {
+    const conversationContent = (
+      <div className={classes.columnContent} data-message-conversation='true'>
+        {content}
+      </div>
+    );
+
     if (inline) {
       return (
         <div className={`${classes.column} ${classes.inlineColumn}`}>
-          {content}
+          {conversationContent}
         </div>
       );
     }
 
     return (
-      <Column label={intl.formatMessage(messages.title)} className={classes.column}>
-        {content}
+      <Column
+        label={intl.formatMessage(messages.title)}
+        className={classes.column}
+      >
+        {conversationContent}
       </Column>
     );
   };
 
   const participantAccountIdsKey = participantIds.join(',');
   const participantAccountsRef = useRef(participantAccounts);
-  participantAccountsRef.current = participantAccounts;
+
+  useEffect(() => {
+    participantAccountsRef.current = participantAccounts;
+  }, [participantAccounts]);
 
   useEffect(() => {
     const recipients = participantAccountsRef.current;
@@ -404,10 +476,12 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       const element = document.getElementById('message-' + statusId);
 
       if (element) {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
+        const list = messageListRef.current;
+        if (list) {
+          scrollMessageWithinList(list, element, 'center', 'smooth');
+        } else {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
         highlightStatus(statusId);
         return;
       }
@@ -417,7 +491,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           ? current
           : [...current, statusId].sort(compareId),
       );
-      setPendingScrollStatusId(statusId);
+      setPendingScroll({ conversationId: id, statusId });
       dispatch(
         fetchStatus(statusId, {
           forceFetch: true,
@@ -425,7 +499,22 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         }),
       );
     },
-    [dispatch, highlightStatus],
+    [dispatch, highlightStatus, id],
+  );
+
+  const handleReplyContextKeyDown = useCallback<
+    React.KeyboardEventHandler<HTMLDivElement>
+  >(
+    (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+
+      const statusId = event.currentTarget.dataset.statusId;
+      if (!statusId) return;
+
+      event.preventDefault();
+      scrollToStatus(statusId);
+    },
+    [scrollToStatus],
   );
 
   useEffect(() => {
@@ -441,17 +530,17 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         'message-' + pendingScrollStatusId,
       );
 
-      if (!element) return;
+      const list = messageListRef.current;
+      if (!element || !list) return;
 
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
+      scrollMessageWithinList(list, element, 'center', 'smooth');
       highlightStatus(pendingScrollStatusId);
-      setPendingScrollStatusId(null);
+      setPendingScroll(null);
     });
 
-    return () => window.cancelAnimationFrame(frame);
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
   }, [highlightStatus, pendingScrollStatusId, statuses]);
 
   const initialScrollConversationIdRef = useRef<string | null>(null);
@@ -462,21 +551,34 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       !conversationResolved ||
       !conversation ||
       !messagesResolved ||
-      statuses.length === 0
+      (statuses.length === 0 && !sourceStatusId)
     ) {
       return;
     }
 
     if (initialScrollConversationIdRef.current === id) return;
 
+    if (sourceStatusId) {
+      const frame = window.requestAnimationFrame(() => {
+        scrollToStatus(sourceStatusId);
+        initialScrollConversationIdRef.current = id;
+      });
+
+      return () => {
+        window.cancelAnimationFrame(frame);
+      };
+    }
+
     const initialReadState = initialReadStateRef.current;
     const lastStatus = statuses[statuses.length - 1];
     const lastReadStatusId = initialReadState?.lastReadStatusId;
 
-    const oldestUnreadStatus =
+    // Conversation statuses are ordered oldest to newest. Start at the latest
+    // incoming status after the read marker, not at the start of the thread.
+    const latestUnreadStatus =
       initialReadState?.unread === true
-        ? statuses.find((status) => {
-            const statusId = status.get('id') as string;
+        ? [...statuses].reverse().find((status) => {
+            const statusId = status.get<'id'>('id');
             const isIncoming = status.getIn(['account', 'id']) !== me;
 
             return (
@@ -486,7 +588,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
           })
         : undefined;
 
-    const targetStatus = oldestUnreadStatus ?? lastStatus;
+    const targetStatus = latestUnreadStatus ?? lastStatus;
 
     if (!targetStatus) return;
 
@@ -503,12 +605,13 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         if (!list) return;
 
         if (targetMessage) {
-          targetMessage.scrollIntoView({
-            behavior: 'auto',
-            block: oldestUnreadStatus ? 'center' : 'end',
-          });
+          scrollMessageWithinList(
+            list,
+            targetMessage,
+            latestUnreadStatus ? 'center' : 'end',
+          );
         } else {
-          list.scrollTop = oldestUnreadStatus ? 0 : list.scrollHeight;
+          list.scrollTop = latestUnreadStatus ? 0 : list.scrollHeight;
         }
 
         initialScrollConversationIdRef.current = id;
@@ -519,11 +622,56 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       window.cancelAnimationFrame(frame);
       window.cancelAnimationFrame(secondFrame);
     };
-  }, [conversation, conversationResolved, id, messagesResolved, statuses]);
+  }, [
+    conversation,
+    conversationResolved,
+    id,
+    messagesResolved,
+    scrollToStatus,
+    sourceStatusId,
+    statuses,
+  ]);
 
   const handleReply = useCallback(
-    (status: Immutable.Record<StatusShape>) => {
+    (status: ImmutableRecord<StatusShape>) => {
       dispatch(replyComposeInline(status));
+    },
+    [dispatch],
+  );
+
+  const createScrollToStatusHandler = useCallback(
+    (statusId: string | null) => () => {
+      if (statusId) scrollToStatus(statusId);
+    },
+    [scrollToStatus],
+  );
+
+  const createReplyHandler = useCallback(
+    (status: ImmutableRecord<StatusShape>) => () => {
+      handleReply(status);
+    },
+    [handleReply],
+  );
+
+  const createFavouriteHandler = useCallback(
+    (statusId: string) => () => {
+      dispatch(toggleFavourite(statusId));
+    },
+    [dispatch],
+  );
+
+  const handleReplyComposeSuccess = useCallback(
+    (status: ApiStatusJSON) => {
+      dispatch(importFetchedStatus(status));
+      setMessageStatusIds((current) =>
+        current.includes(status.id)
+          ? current
+          : [...current, status.id].sort(compareId),
+      );
+
+      participantAccountsRef.current.forEach((account) => {
+        dispatch(directComposeInline(account));
+      });
     },
     [dispatch],
   );
@@ -534,6 +682,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         <ColumnHeader
           withBackButton
           onBackButtonClick={onBack}
+          hideScrollToTopButton
           title={intl.formatMessage(messages.title)}
         />
         <div className={classes.loading}>
@@ -549,6 +698,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         <ColumnHeader
           withBackButton
           onBackButtonClick={onBack}
+          hideScrollToTopButton
           title={intl.formatMessage(messages.title)}
         />
         <div className={classes.empty}>
@@ -564,6 +714,7 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
       <ColumnHeader
         withBackButton
         onBackButtonClick={onBack}
+        hideScrollToTopButton
         title={
           <div className={classes.headerTitle}>
             <ChatCircleDotsIcon size={18} />
@@ -586,160 +737,218 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
         <div className={classes.messageList} ref={messageListRef}>
           <div className={classes.messageListContent}>
             {statuses.map((status) => {
-            const isMine = status.getIn(['account', 'id']) === me;
-            const displayAccount = status.get('account');
-            const statusText =
-              typeof status.get('text') === 'string'
-                ? (status.get('text') as string)
-                : '';
-            const mentions = status.get('mentions') as Immutable.List<
-              Immutable.Map<string, unknown>
-            >;
-            const trimmedText = statusText.trimStart();
-            const showSenderName =
-              mentions?.size > 1 ||
-              mentions?.some((mention) => {
-                const acct = mention.get('acct');
-                const username = mention.get('username');
-                const startsWithMention =
-                  (typeof acct === 'string' &&
-                    trimmedText.startsWith(`@${acct}`)) ||
-                  (typeof username === 'string' &&
-                    trimmedText.startsWith(`@${username}`));
+              const isMine = status.getIn(['account', 'id']) === me;
+              const displayAccount = status.get(
+                'account',
+              ) as unknown as Account;
+              const mediaAttachments = status.get(
+                'media_attachments',
+              ) as unknown as ImmutableList<ImmutableMap<string, unknown>>;
+              const rawStatusText = status.get<'content'>('content');
+              const statusText =
+                typeof rawStatusText === 'string' ? rawStatusText : '';
+              const mentions = status.get(
+                'mentions',
+              ) as unknown as ImmutableList<ImmutableMap<string, unknown>>;
+              const trimmedText = statusText.trimStart();
+              const showSenderName =
+                mentions.size > 1 ||
+                mentions.some((mention) => {
+                  const acct = mention.get('acct');
+                  const username = mention.get('username');
+                  const startsWithMention =
+                    (typeof acct === 'string' &&
+                      trimmedText.startsWith(`@${acct}`)) ||
+                    (typeof username === 'string' &&
+                      trimmedText.startsWith(`@${username}`));
 
-                return !startsWithMention;
-              });
+                  return !startsWithMention;
+                });
 
-            const replyTargetId = status.get('in_reply_to_id') as
-              | string
-              | null;
-            const replyTarget = replyTargetId
-              ? statuses.find((candidate) => candidate.get('id') === replyTargetId)
-              : undefined;
-            const replyTargetText =
-              replyTarget && typeof replyTarget.get('text') === 'string'
-                ? (replyTarget.get('text') as string)
-                : '';
+              const replyTargetId = status.get('in_reply_to_id') as
+                | string
+                | null;
+              const replyTarget = replyTargetId
+                ? statuses.find(
+                    (candidate) => candidate.get('id') === replyTargetId,
+                  )
+                : undefined;
+              const rawReplyTargetHtml =
+                replyTarget?.getIn(['translation', 'contentHtml']) ??
+                replyTarget?.get('contentHtml');
+              const replyTargetHtml =
+                typeof rawReplyTargetHtml === 'string'
+                  ? rawReplyTargetHtml
+                  : '';
+              const replyTargetEmojis = replyTarget?.get('emojis');
+              const replyTargetLanguage = replyTarget?.get('language');
+              const replyTargetAccount = replyTarget?.get(
+                'account',
+              ) as unknown as Account | undefined;
 
-            return (
-              <article
-                id={`message-${status.get('id') as string}`}
-                key={status.get('id') as string}
-                className={
-                  highlightedStatusId === (status.get('id') as string)
-                    ? classes.message + ' ' + classes.messageHighlighted
-                    : classes.message
-                }
-                data-own-message={isMine ? 'true' : 'false'}
-              >
-                <div className={classes.messageMeta}>
-                  <Avatar account={displayAccount} size={20} />
-                  {showSenderName && (
-                    <strong>
-                      <DisplayNameSimple account={displayAccount} />
-                    </strong>
+              return (
+                <article
+                  id={`message-${status.get<'id'>('id')}`}
+                  key={status.get<'id'>('id')}
+                  className={classNames(
+                    classes.message,
+                    highlightedStatusId === status.get<'id'>('id')
+                      ? classes.messageHighlighted
+                      : undefined,
                   )}
-                  <RelativeTimestamp timestamp={status.get('created_at')} />
-                </div>
-
-                {replyTarget && (
-                  <button
-                    type='button'
-                    className={classes.replyContext}
-                    aria-label={intl.formatMessage(
-                      {
-                        id: 'messages.conversation.replying_to',
-                        defaultMessage: 'Replying to {name}',
-                      },
-                      {
-                        name:
-                          replyTarget.getIn(['account', 'display_name']) ||
-                          replyTarget.getIn(['account', 'username']),
-                      },
+                  data-own-message={isMine ? 'true' : 'false'}
+                >
+                  <div className={classes.messageMeta}>
+                    <Avatar account={displayAccount} size={20} />
+                    {showSenderName && (
+                      <strong>
+                        <DisplayNameSimple account={displayAccount} />
+                      </strong>
                     )}
-                    onClick={() => scrollToStatus(replyTargetId)}
-                  >
-                    <span className={classes.replyContextHeader}>
-                      <ReplyIcon
-                        className={classes.replyContextIcon}
-                        aria-hidden='true'
+                    <RelativeTimestamp timestamp={status.get('created_at')} />
+                  </div>
+
+                  {replyTarget && (
+                    <div
+                      className={classes.replyContext}
+                      role='button'
+                      tabIndex={0}
+                      data-status-id={replyTargetId ?? undefined}
+                      aria-label={intl.formatMessage(
+                        {
+                          id: 'messages.conversation.replying_to',
+                          defaultMessage: 'Replying to {name}',
+                        },
+                        {
+                          name:
+                            replyTargetAccount?.display_name ??
+                            replyTargetAccount?.username ??
+                            '',
+                        },
+                      )}
+                      onClick={createScrollToStatusHandler(replyTargetId)}
+                      onKeyDown={handleReplyContextKeyDown}
+                    >
+                      <span className={classes.replyContextHeader}>
+                        <ReplyIcon
+                          className={classes.replyContextIcon}
+                          aria-hidden='true'
+                        />
+                        <FormattedMessage
+                          id='messages.conversation.replying_to'
+                          defaultMessage='Replying to {name}'
+                          values={{
+                            name: (
+                              <DisplayNameSimple account={replyTargetAccount} />
+                            ),
+                          }}
+                        />
+                      </span>
+                      <EmojiHTML
+                        as='div'
+                        className={classes.replyContextText}
+                        htmlString={replyTargetHtml}
+                        extraEmojis={replyTargetEmojis}
+                        lang={
+                          typeof replyTargetLanguage === 'string'
+                            ? replyTargetLanguage
+                            : undefined
+                        }
                       />
-                      <FormattedMessage
-                        id='messages.conversation.replying_to'
-                        defaultMessage='Replying to {name}'
-                        values={{
-                          name: (
-                            <DisplayNameSimple
-                              account={replyTarget.get('account')}
-                            />
-                          ),
-                        }}
+                    </div>
+                  )}
+
+                  <div className={classes.messageBody}>
+                    <StatusContent
+                      // @ts-expect-error Legacy StatusContent typing.
+                      status={status}
+                      expanded
+                    />
+                  </div>
+
+                  {mediaAttachments.size > 0 && (
+                    <AttachmentList compact media={mediaAttachments} />
+                  )}
+
+                  <div className={classes.messageActions}>
+                    <IconButton
+                      className={classes.messageAction}
+                      title={intl.formatMessage({
+                        id: 'status.reply',
+                        defaultMessage: 'Reply',
+                      })}
+                      icon='reply'
+                      iconComponent={ReplyIcon}
+                      onClick={createReplyHandler(status)}
+                    />
+                    {useVanillaAppearance ? (
+                      <button
+                        type='button'
+                        className={classNames(
+                          classes.messageAction,
+                          classes.messageFavouriteVanilla,
+                        )}
+                        aria-label={intl.formatMessage(
+                          status.get('favourited')
+                            ? {
+                                id: 'status.remove_favourite',
+                                defaultMessage: 'Remove from favorites',
+                              }
+                            : {
+                                id: 'status.favourite',
+                                defaultMessage: 'Favorite',
+                              },
+                        )}
+                        title={intl.formatMessage(
+                          status.get('favourited')
+                            ? {
+                                id: 'status.remove_favourite',
+                                defaultMessage: 'Remove from favorites',
+                              }
+                            : {
+                                id: 'status.favourite',
+                                defaultMessage: 'Favorite',
+                              },
+                        )}
+                        aria-pressed={status.get('favourited')}
+                        onClick={createFavouriteHandler(status.get<'id'>('id'))}
+                      >
+                        <HeartIcon
+                          weight={status.get('favourited') ? 'fill' : 'regular'}
+                          size={18}
+                          aria-hidden='true'
+                        />
+                      </button>
+                    ) : (
+                      <IconButton
+                        className={classNames(
+                          classes.messageAction,
+                          classes.messageFavourite,
+                          'star-icon',
+                        )}
+                        animate
+                        active={status.get('favourited')}
+                        title={intl.formatMessage(
+                          status.get('favourited')
+                            ? {
+                                id: 'status.remove_favourite',
+                                defaultMessage: 'Remove from favorites',
+                              }
+                            : {
+                                id: 'status.favourite',
+                                defaultMessage: 'Favorite',
+                              },
+                        )}
+                        icon='star'
+                        iconComponent={
+                          status.get('favourited') ? StarIcon : StarBorderIcon
+                        }
+                        onClick={createFavouriteHandler(status.get<'id'>('id'))}
                       />
-                    </span>
-                    <span className={classes.replyContextText}>
-                      {replyTargetText.slice(0, 120) +
-                        (replyTargetText.length > 120 ? '…' : '')}
-                    </span>
-                  </button>
-                )}
-
-                <div className={classes.messageBody}>
-                  <StatusContent
-                    // @ts-expect-error Legacy StatusContent typing.
-                    status={status}
-                    expanded
-                  />
-                </div>
-
-                {status.get('media_attachments').size > 0 && (
-                  <AttachmentList
-                    compact
-                    media={status.get('media_attachments')}
-                  />
-                )}
-
-                <div className={classes.messageActions}>
-                  <IconButton
-                    className={classes.messageAction}
-                    title={intl.formatMessage({
-                      id: 'status.reply',
-                      defaultMessage: 'Reply',
-                    })}
-                    icon='reply'
-                    iconComponent={ReplyIcon}
-                    onClick={() => handleReply(status)}
-                  />
-                  <IconButton
-                    className={
-                      classes.messageAction +
-                      ' ' +
-                      classes.messageFavourite +
-                      ' star-icon'
-                    }
-                    animate
-                    active={!!status.get('favourited')}
-                    title={intl.formatMessage(
-                      status.get('favourited')
-                        ? {
-                            id: 'status.remove_favourite',
-                            defaultMessage: 'Remove from favorites',
-                          }
-                        : {
-                            id: 'status.favourite',
-                            defaultMessage: 'Favorite',
-                          },
                     )}
-                    icon='star'
-                    iconComponent={
-                      status.get('favourited') ? StarIcon : StarBorderIcon
-                    }
-                    onClick={() =>
-                      dispatch(toggleFavourite(status.get('id') as string))
-                    }
-                  />
-                </div>
-              </article>
-            );
+                  </div>
+                </article>
+              );
             })}
           </div>
         </div>
@@ -750,18 +959,8 @@ export const MessageConversation: React.FC<MessageConversationProps> = ({
             compact
             embedded
             autoFocus
-            onSuccess={(status: ApiStatusJSON) => {
-              dispatch(importFetchedStatus(status));
-              setMessageStatusIds((current) =>
-                current.includes(status.id)
-                  ? current
-                  : [...current, status.id],
-              );
-
-              participantAccountsRef.current.forEach((account) => {
-                dispatch(directComposeInline(account));
-              });
-            }}
+            vanillaAppearance={useVanillaAppearance}
+            onSuccess={handleReplyComposeSuccess}
           />
         )}
       </div>

@@ -1,3 +1,22 @@
 .redesignOverrides {
   border-top: none !important;
+
+  // The legacy minimal account card makes the name block-level. Keep the
+  // display-name and verification badge on one line on the About page.
+  :global(.about__meta .account--minimal .display-name__name) {
+    display: inline-flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    max-width: 100%;
+    min-width: 0;
+    vertical-align: bottom;
+  }
+
+  :global(.about__meta .account--minimal .display-name__html) {
+    display: inline;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }

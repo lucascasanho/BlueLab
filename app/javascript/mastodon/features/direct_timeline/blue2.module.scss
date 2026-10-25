@@ -9,6 +9,24 @@
   color: var(--blue2-text, #f7f7f8);
 }
 
+/* Reuse the BlueLab messages layout in Vanilla while inheriting Vanilla's
+   semantic palette instead of falling back to the BlueLab dark colors. */
+:global(body[data-theme='default']) .root,
+:global(body[data-theme='']) .root,
+:global(body:not([data-theme])) .root {
+  --blue2-bg: var(--color-bg-primary);
+  --blue2-text: var(--color-text-primary);
+  --blue2-border-soft: var(--color-border-primary);
+  --blue2-search: var(--color-bg-secondary);
+  --blue2-muted: var(--color-text-secondary);
+  --blue2-blue: var(--color-border-brand);
+  --blue2-blue-hover: var(--color-bg-tertiary);
+  --blue2-hover: var(--color-bg-tertiary);
+
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
 // The DirectTimeline component receives these classes from the React shell.
 // Keep their geometry local to BlueLab messages so no generic Mastodon column
 // sizing is changed.
@@ -151,7 +169,6 @@
   overflow: hidden;
 }
 
-
 .root[data-bluelab-messages-advanced='true'] .inbox,
 .root[data-bluelab-messages-advanced='true'] .listWrap,
 .root[data-bluelab-messages-advanced='true'] :global(.scrollable) {
@@ -240,8 +257,20 @@
 }
 
 @media (width <= 759px) {
+  .column:not(.advancedColumn) {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    width: 100%;
+    height: calc(100dvh - 64px);
+    max-height: calc(100dvh - 64px);
+    min-height: 0;
+    overflow: hidden;
+  }
+
   .root {
-    min-height: calc(100dvh - 64px);
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
   }
 
   .header {

@@ -576,6 +576,8 @@ export const RichComposeEditor: React.FC<{
   onFiles?: (files: FileList) => void;
   dismissOnEscape?: boolean;
   messageToolbar?: boolean;
+  forceMarkdown?: boolean;
+  hideFormattingToolbar?: boolean;
 }> = ({
   onSubmit,
   children,
@@ -589,6 +591,8 @@ export const RichComposeEditor: React.FC<{
   onFiles,
   dismissOnEscape = true,
   messageToolbar = false,
+  forceMarkdown = false,
+  hideFormattingToolbar = false,
 }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -602,11 +606,11 @@ export const RichComposeEditor: React.FC<{
   const text = value ?? globalText;
   const contentType = contentTypeProp ?? globalContentType;
   const isBlueLabTheme =
-    typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'blue-2';
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const forceMessageMarkdown =
     messageToolbar || (isBlueLabTheme && isMessageComposeType(type));
-  const isMarkdown = forceMessageMarkdown || contentType === 'text/markdown';
+  const shouldForceMarkdown = forceMarkdown || forceMessageMarkdown;
+  const isMarkdown = shouldForceMarkdown || contentType === 'text/markdown';
   const messageCommands = commands.filter(
     ([command, _icon, _message, value]) =>
       inlineCommands.includes(command as InlineCommand) ||
@@ -668,14 +672,14 @@ export const RichComposeEditor: React.FC<{
   }, [autoFocus]);
 
   useEffect(() => {
-    if (forceMessageMarkdown && contentType !== 'text/markdown') {
+    if (shouldForceMarkdown && contentType !== 'text/markdown') {
       if (onContentTypeChange) {
         onContentTypeChange('text/markdown');
       } else {
         dispatch(changeComposeContentType('text/markdown'));
       }
     }
-  }, [contentType, dispatch, forceMessageMarkdown, onContentTypeChange]);
+  }, [contentType, dispatch, onContentTypeChange, shouldForceMarkdown]);
 
   useEffect(() => {
     const editor = ref.current;
@@ -842,10 +846,11 @@ export const RichComposeEditor: React.FC<{
   };
 
   return (
-    <div className={classes.richEditorWrapper}>
-      {isMarkdown && (
+    <div className={classes.richEditorWrapper} data-bluelab-rich-editor-wrapper>
+      {isMarkdown && !hideFormattingToolbar && (
         <div
           className={classes.richEditorToolbar}
+          data-bluelab-rich-editor-toolbar
           role='toolbar'
           aria-label={intl.formatMessage(messages.toolbar)}
         >
@@ -860,7 +865,6 @@ export const RichComposeEditor: React.FC<{
                 type='button'
                 size='sm'
                 icon={icon as IconProp}
-                title={label}
                 data-command={command}
                 data-value={value}
                 color={active ? 'accent' : 'neutral'}
@@ -878,7 +882,6 @@ export const RichComposeEditor: React.FC<{
               type='button'
               size='sm'
               icon={LinkIcon}
-              title={intl.formatMessage(messages.link)}
               color={activeFormats.has('link') ? 'accent' : 'neutral'}
               aria-pressed={activeFormats.has('link')}
               onMouseDown={preventToolbarFocus}
@@ -892,6 +895,7 @@ export const RichComposeEditor: React.FC<{
       <div
         ref={ref}
         className={classes.richEditor}
+        data-bluelab-rich-editor-input
         data-compose-scroll-zone='editor'
         contentEditable={isMarkdown ? true : 'plaintext-only'}
         suppressContentEditableWarning
@@ -918,6 +922,7 @@ export const RichComposeEditor: React.FC<{
         ref={hiddenRef}
         id={editorId ?? COMPOSER_TEXTAREA_ID}
         className={classes.richEditorTransport}
+        data-bluelab-rich-editor-transport
         tabIndex={-1}
         aria-hidden='true'
         readOnly
