@@ -42,7 +42,7 @@ class ActivityPub::Dereferencer
   def perform_request(uri, headers: nil)
     return if non_matching_uri_hosts?(@permitted_origin, uri)
 
-    req = Request.new(:get, uri)
+    req = Request.new(:get, uri, follow: false)
 
     req.add_headers('Accept' => 'application/ld+json; profile="https://www.w3.org/ns/activitystreams", application/activity+json')
     req.add_headers(headers) if headers
@@ -52,6 +52,8 @@ class ActivityPub::Dereferencer
       if res.code == 200
         json = body_to_json(res.body_with_limit)
         json if json.present? && json['id'] == uri
+      elsif (300...400).cover?(res.code)
+        nil
       else
         raise Mastodon::UnexpectedResponseError, res unless response_successful?(res) || response_error_unsalvageable?(res)
       end
