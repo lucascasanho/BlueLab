@@ -243,6 +243,63 @@ RSpec.describe ActivityPub::ProcessAccountService do
       end
     end
 
+    context 'when the key URL redirects to another origin' do
+      let(:attacker_pem) { "-----BEGIN PUBLIC KEY-----\nEVIL\n-----END PUBLIC KEY-----\n" }
+      let(:attacker_document) do
+        {
+          id: 'https://evil.test/key',
+          owner: 'https://foo.test/actor',
+          publicKeyPem: attacker_pem,
+        }.deep_stringify_keys
+      end
+
+      [301, 302, 307, 308].each do |status|
+        context "with HTTP #{status}" do
+          before do
+            stub_request(:get, key_id).to_return(
+              status: status,
+              headers: { 'Location' => 'https://evil.test/key', 'Content-Type' => 'application/activity+json' }
+            )
+            stub_request(:get, 'https://evil.test/key').to_return(
+              status: 200,
+              body: attacker_document.to_json,
+              headers: { 'Content-Type': 'application/activity+json' }
+            )
+          end
+
+          it 'does not follow the redirect or store the attacker key' do
+            account = subject.call(payload)
+
+            expect(a_request(:get, 'https://evil.test/key')).to_not have_been_made
+            expect(account.keypairs).to be_empty
+          end
+        end
+      end
+    end
+
+    context 'when the key URL is on another host' do
+      let(:key_id) { 'https://evil.test/key' }
+
+      before do
+        stub_request(:get, key_id).to_return(
+          status: 200,
+          body: {
+            id: key_id,
+            owner: 'https://foo.test/actor',
+            publicKeyPem: 'attacker',
+          }.to_json,
+          headers: { 'Content-Type': 'application/activity+json' }
+        )
+      end
+
+      it 'does not fetch or store the key' do
+        account = subject.call(payload)
+
+        expect(a_request(:get, key_id)).to_not have_been_made
+        expect(account.keypairs).to be_empty
+      end
+    end
+
     context 'when the account was known with a legacy key' do
       let!(:alice) { Fabricate(:account, uri: 'https://foo.test/actor', domain: 'foo.test', username: 'alice', legacy_keypair: true) }
 
