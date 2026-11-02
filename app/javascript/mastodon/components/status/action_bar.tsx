@@ -213,11 +213,15 @@ const StatusReblogButton: React.FC<{
     (e: React.MouseEvent) => {
       if (e.shiftKey) {
         e.preventDefault();
-        boost.action();
+        boost.action(e);
       }
     },
     [boost],
   );
+
+  const preventMenuOpenOnShiftClick = useCallback((e?: React.MouseEvent) => {
+    return !e?.shiftKey;
+  }, []);
 
   if (quickBoosting) {
     return (

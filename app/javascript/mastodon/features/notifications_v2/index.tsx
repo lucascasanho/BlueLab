@@ -20,8 +20,8 @@ import {
 } from '@/mastodon/actions/columns';
 import { submitMarkers } from '@/mastodon/actions/markers';
 import { openModal } from '@/mastodon/actions/modal';
+import { Button } from '@/mastodon/components/button/redesign';
 import { Column } from '@/mastodon/components/column';
-import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';
 import {
   ColumnHeader,
   ColumnHeaderButton,
@@ -31,9 +31,6 @@ import { MultiColumnMenuItems } from '@/mastodon/components/column_header/multic
 import { LoadGap } from '@/mastodon/components/load_gap';
 import { MenuItem, MenuItemDivider } from '@/mastodon/components/menu';
 import ScrollableList from '@/mastodon/components/scrollable_list';
-import { isRedesignEnabled } from '@/mastodon/utils/environment';
-import DoneAllIcon from '@/material-icons/400-24px/done_all.svg?react';
-import NotificationsIcon from '@/material-icons/400-24px/notifications-fill.svg?react';
 import {
   fetchNotifications,
   fetchNotificationsGap,
@@ -44,7 +41,6 @@ import {
   unmountNotifications,
 } from 'mastodon/actions/notification_groups';
 import { compareId } from 'mastodon/compare_id';
-import { Icon } from 'mastodon/components/icon';
 import { NotSignedInIndicator } from 'mastodon/components/not_signed_in_indicator';
 import { useIdentity } from 'mastodon/identity_context';
 import type { NotificationGap } from 'mastodon/reducers/notification_groups';
@@ -62,12 +58,8 @@ import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
 import { Announcements } from '../announcements';
 import { useHasAnnouncements } from '../announcements/hooks';
-import {
-  FilteredNotificationsBanner,
-  FilteredNotificationsIconButton,
-} from '../notifications/components/filtered_notifications_banner';
+import { FilteredNotificationsBanner } from '../notifications/components/filtered_notifications_banner';
 import NotificationsPermissionBanner from '../notifications/components/notifications_permission_banner';
-import ColumnSettingsContainer from '../notifications/containers/column_settings_container';
 
 import { FollowRequestsBanner } from './components/follow_requests_banner';
 import { NotificationGroup } from './components/notification_group';
@@ -85,6 +77,37 @@ const messages = defineMessages({
     defaultMessage: 'Mark all as read',
   },
 });
+
+const UnreadBar: React.FC<{
+  unreadCount: number;
+  onMarkAsRead: (() => void) | null;
+}> = ({ unreadCount, onMarkAsRead }) => {
+  return (
+    <div className={classes.unreadBar}>
+      <FormattedMessage
+        id='notifications.unread_with_count'
+        defaultMessage='{count} unread'
+        values={{ count: unreadCount }}
+        tagName='span'
+      />
+      {onMarkAsRead && (
+        <Button
+          size='sm'
+          color='accent'
+          variant='ghost'
+          leadingIcon={ChecksIcon}
+          clipPadding
+          onClick={onMarkAsRead}
+        >
+          <FormattedMessage
+            id='notifications.mark_all_as_read'
+            defaultMessage='Mark all as read'
+          />
+        </Button>
+      )}
+    </div>
+  );
+};
 
 export const Notifications: React.FC<{
   columnId?: string;
@@ -258,8 +281,12 @@ export const Notifications: React.FC<{
     <>
       {needsNotificationPermission && <NotificationsPermissionBanner />}
       {shouldShowAnnouncements && <Announcements />}
-      <div className={isRedesignEnabled() ? classes.topLinks : undefined}>
-        {isRedesignEnabled() && <FollowRequestsBanner />}
+      <UnreadBar
+        unreadCount={unreadNotificationsCount}
+        onMarkAsRead={canMarkAsRead ? handleMarkAsRead : null}
+      />
+      <div className={classes.topLinks}>
+        <FollowRequestsBanner />
         <FilteredNotificationsBanner />
       </div>
     </>
@@ -289,23 +316,6 @@ export const Notifications: React.FC<{
     <NotSignedInIndicator />
   );
 
-  const extraButton = (
-    <>
-      <FilteredNotificationsIconButton className='column-header__button' />
-      {canMarkAsRead && (
-        <button
-          aria-label={intl.formatMessage(messages.markAsRead)}
-          title={intl.formatMessage(messages.markAsRead)}
-          onClick={handleMarkAsRead}
-          className='column-header__button'
-          type='button'
-        >
-          <Icon id='done-all' icon={DoneAllIcon} />
-        </button>
-      )}
-    </>
-  );
-
   return (
     <Column
       bindToDocument={!multiColumn}
@@ -321,26 +331,13 @@ export const Notifications: React.FC<{
               {isBlue2 && extraButton}
               <ColumnHeaderButton icon={GearIcon} onClick={openSettingsModal}>
                 <FormattedMessage
-                  id='notifications.open_settings'
-                  defaultMessage='Open notification settings'
+                  id='notifications.more_options'
+                  defaultMessage='More options'
                 />
-              </ColumnHeaderButton>
-              <ColumnSettingsMenu
-                label={
-                  <FormattedMessage
-                    id='notifications.more_options'
-                    defaultMessage='More options'
-                  />
-                }
-              >
-                <MenuItem
-                  disabled={!canMarkAsRead}
-                  onClick={handleMarkAsRead}
-                  icon={ChecksIcon}
-                >
-                  {intl.formatMessage(messages.markAsReadRedesign)}
-                </MenuItem>
-                {hasAnnouncements && (
+              }
+            >
+              {hasAnnouncements && (
+                <>
                   <MenuItem
                     onClick={handleToggleAnnouncements}
                     icon={NewspaperIcon}

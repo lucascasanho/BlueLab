@@ -26,7 +26,7 @@ import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 import { checkAnnualReport } from '@/mastodon/reducers/slices/annual_report';
 import { openNewComposer, openPreferredComposer } from '@/mastodon/reducers/slices/composer';
 
-import { uploadCompose, resetCompose, changeComposeSpoilerness } from '../../actions/compose';
+import { uploadCompose, resetCompose } from '../../actions/compose';
 import { clearHeight } from '../../actions/height_cache';
 import { fetchServer, fetchServerTranslationLanguages } from '../../actions/server';
 import { expandHomeTimeline } from '../../actions/timelines';
@@ -681,7 +681,7 @@ class UI extends PureComponent {
   handleHotkeySearch = e => {
     e.preventDefault();
 
-    const element = this.node.querySelector('.search__input');
+    const element = this.node.querySelector('[data-main-search="true"]');
 
     if (element) {
       element.focus({ preventScroll: true });
@@ -699,7 +699,7 @@ class UI extends PureComponent {
 
   handleHotkeyToggleComposeSpoilers = e => {
     e.preventDefault();
-    this.props.dispatch(changeComposeSpoilerness());
+    this.props.dispatch(toggleContentWarning());
   };
 
   handleHotkeyFocusColumn = e => {

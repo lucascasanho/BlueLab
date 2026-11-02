@@ -218,10 +218,6 @@ module ThemeHelper
     current_user_if_available&.setting_contrast || 'auto'
   end
 
-  def density
-    current_user&.setting_density || 'default'
-  end
-
   def theme_color(theme)
     available_colors = available_theme_colors(theme)
     return if available_colors.empty?

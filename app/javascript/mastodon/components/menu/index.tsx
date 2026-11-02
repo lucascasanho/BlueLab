@@ -139,16 +139,20 @@ export const Menu: React.FC<MenuProps> = ({
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const openMenu = useCallback(() => {
-    const shouldOpen = onOpen?.();
-    if (shouldOpen === false) return;
+  const openMenu = useCallback(
+    (e?: React.MouseEvent) => {
+      const shouldOpen = onOpen?.(e);
+      if (shouldOpen === false) return;
 
-    setIsMenuOpen(true);
-  }, [onOpen]);
+      setIsMenuOpen(true);
+    },
+    [onOpen],
+  );
 
-  const closeMenu = useCallback(() => {
-    const shouldClose = onClose?.();
-    if (shouldClose === false) return;
+  const closeMenu = useCallback(
+    (e?: React.MouseEvent) => {
+      const shouldClose = onClose?.(e);
+      if (shouldClose === false) return;
 
     setIsMenuOpen(false);
     if (listElement?.contains(document.activeElement)) {
@@ -164,8 +168,10 @@ export const Menu: React.FC<MenuProps> = ({
         toggleMenu();
       }
     },
-    [toggleMenu],
+    [listElement, triggerElement, onClose],
   );
+
+  const toggleMenu = isMenuOpen ? closeMenu : openMenu;
 
   const handleMenuNavigation = useCallback(
     (event: React.KeyboardEvent<HTMLElement>) => {
@@ -246,7 +252,7 @@ export const Menu: React.FC<MenuProps> = ({
       'aria-haspopup': role,
       'aria-expanded': isMenuOpen,
       'aria-controls': listElement ? listId : undefined,
-      onClick: handleTriggerClick,
+      onClick: toggleMenu,
       onKeyDown: handleMenuNavigation,
     };
 
@@ -275,7 +281,6 @@ export const Menu: React.FC<MenuProps> = ({
     type,
     triggerId,
     listId,
-    handleTriggerClick,
     handleMenuNavigation,
     mountListElement,
   ]);

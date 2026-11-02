@@ -88,6 +88,7 @@ class ScrollableList extends PureComponent {
     children: PropTypes.node,
     bindToDocument: PropTypes.bool,
     preventScroll: PropTypes.bool,
+    noSnippet: PropTypes.bool,
     footer: PropTypes.node,
     className: PropTypes.string,
   };
@@ -558,7 +559,7 @@ class ScrollableList extends PureComponent {
   };
 
   render () {
-    const { children, scrollKey, className, trackScroll, showLoading, isLoading, hasMore, numPending, prepend, alwaysPrepend, append, footer, emptyMessage, onLoadMore } = this.props;
+    const { children, scrollKey, className, trackScroll, showLoading, isLoading, hasMore, numPending, prepend, alwaysPrepend, append, footer, emptyMessage, onLoadMore, noSnippet } = this.props;
     const { fullscreen } = this.state;
     const childrenCount = Children.count(children);
     const pullToRefreshEnabled = this.isBlueLabPullToRefreshEnabled();

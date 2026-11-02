@@ -38,7 +38,7 @@ import type { CollectionAttachment } from 'mastodon/models/status';
 import { compareUrls } from 'mastodon/utils/compare_urls';
 import { isRedesignEnabled } from 'mastodon/utils/environment';
 
-import Card from './card';
+import { Card } from './card';
 
 interface VideoModalOptions {
   startTime: number;

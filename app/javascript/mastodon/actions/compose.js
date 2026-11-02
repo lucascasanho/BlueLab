@@ -251,10 +251,7 @@ export const focusCompose = (defaultText = '', caretStart = false) => (dispatch,
 
   ensureComposeIsVisible(getState, dispatch);
 
-  if (isRedesignEnabled()) {
-    const position = caretStart ? 0 : getState().getIn(['compose', 'text'], '').length;
-    dispatch(requestComposerFocus({ start: position, end: position }));
-  }
+  dispatch(initializeComposer({ noSelect: caretStart }));
 };
 
 export function mentionCompose(account) {
@@ -266,10 +263,7 @@ export function mentionCompose(account) {
 
     ensureComposeIsVisible(getState, dispatch);
 
-    if (isRedesignEnabled()) {
-      const position = getState().getIn(['compose', 'text'], '').length;
-      dispatch(requestComposerFocus({ start: position, end: position }));
-    }
+    dispatch(initializeComposer());
   };
 }
 
@@ -288,10 +282,7 @@ export function directCompose(account) {
 
     ensureComposeIsVisible(getState, dispatch);
 
-    if (isRedesignEnabled()) {
-      const position = getState().getIn(['compose', 'text'], '').length;
-      dispatch(requestComposerFocus({ start: position, end: position }));
-    }
+    dispatch(initializeComposer());
   };
 }
 

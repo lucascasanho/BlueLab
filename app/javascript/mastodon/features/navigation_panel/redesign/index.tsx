@@ -42,7 +42,11 @@ import {
   trendsEnabled,
 } from '@/mastodon/initial_state';
 import { transientSingleColumn } from '@/mastodon/is_mobile';
-import { canViewFeed } from '@/mastodon/permissions';
+import {
+  canManageReports,
+  canViewAdminDashboard,
+  canViewFeed,
+} from '@/mastodon/permissions';
 import { openNewComposer } from '@/mastodon/reducers/slices/composer';
 import { getOrderedLists } from '@/mastodon/selectors/lists';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
@@ -191,6 +195,9 @@ export const RedesignNavigationPanel: React.FC<{
     };
   }, [dispatch, isBlue2, signedIn]);
 
+  const isManager = canManageReports(permissions);
+  const isAdmin = canViewAdminDashboard(permissions);
+
   const openComposer = useCallback(() => {
     dispatch(closeNavigation());
     dispatch(openNewComposer({ type: 'post' }));
@@ -212,6 +219,7 @@ export const RedesignNavigationPanel: React.FC<{
     <nav
       className={classes.root}
       data-mode={mode}
+      data-scrollable={!isScrolledToTop || !isScrolledToBottom}
       aria-label={intl.formatMessage(messages.main)}
     >
       {topSensor}

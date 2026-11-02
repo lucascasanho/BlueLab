@@ -1,5 +1,8 @@
+import { useCallback } from 'react';
+
 import classNames from 'classnames';
 
+import { openAttachmentGallery } from '@/mastodon/actions/interactions_typed';
 import type {
   ApiGifvAttachmentJSON,
   ApiImageAttachmentJSON,
@@ -8,6 +11,10 @@ import type {
 import { Blurhash } from '@/mastodon/components/blurhash';
 import { GIFV } from '@/mastodon/components/gifv';
 import type { MediaAttachmentShape } from '@/mastodon/models/status';
+import { useAppDispatch } from '@/mastodon/store';
+import type { PolymorphicProps } from '@/types/polymorphic';
+
+import { AltTextBadge } from '../alt_text_badge';
 
 import classes from './content.module.scss';
 
@@ -43,6 +50,9 @@ export const StatusImage: React.FC<
     y = (focusY / -2 + 0.5) * 100;
   }
 
+  const width = attachment.meta?.original?.width;
+  const height = attachment.meta?.original?.height;
+
   const imgStyle = {
     backgroundImage:
       !sensitive &&
@@ -51,14 +61,12 @@ export const StatusImage: React.FC<
         ? `url(${attachment.preview_url})`
         : undefined,
     backgroundPosition: `${x}% ${y}%`,
-    '--aspect': attachment.meta
-      ? `${attachment.meta.original.width} / ${attachment.meta.original.height}`
-      : undefined,
+    '--aspect': width && height ? `${width} / ${height}` : undefined,
     ...style,
   };
 
   return (
-    <div
+    <Comp
       {...props}
       className={classNames(classes.image, className)}
       style={imgStyle}
@@ -71,10 +79,60 @@ export const StatusImage: React.FC<
       )}
 
       {sensitive && attachment.blurhash && (
-        <Blurhash hash={attachment.blurhash} className={classes.blurHash} />
+        <Blurhash
+          hash={attachment.blurhash}
+          className={classes.blurHash}
+          dummy={!useBlurhash}
+        />
       )}
 
       {children}
-    </div>
+
+      {attachment.description && showAlt && (
+        <AltTextBadge
+          description={attachment.description}
+          className={classes.imageAltBadge}
+        />
+      )}
+    </Comp>
+  );
+};
+
+export const StatusGalleryImage: React.FC<
+  StatusImageProps & { statusId: string }
+> = ({ statusId, attachment, ...props }) => {
+  const dispatch = useAppDispatch();
+  const handleClick: React.MouseEventHandler<HTMLAnchorElement> = useCallback(
+    (event) => {
+      if (
+        event.target instanceof HTMLElement &&
+        event.target !== event.currentTarget &&
+        event.target.closest('a, button, input')
+      ) {
+        event.preventDefault();
+        return;
+      }
+
+      if (event.button === 0 && !(event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        dispatch(
+          openAttachmentGallery({ statusId, attachmentId: attachment.id }),
+        );
+      }
+
+      event.stopPropagation();
+    },
+    [attachment.id, dispatch, statusId],
+  );
+  return (
+    <StatusImage
+      as='a'
+      href={attachment.remote_url ?? attachment.url}
+      attachment={attachment}
+      onClick={handleClick}
+      target='_blank'
+      rel='noopener'
+      {...props}
+    />
   );
 };

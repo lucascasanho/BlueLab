@@ -130,7 +130,7 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
       <div className={multiColClasses.navigationWrapper}>
         <RedesignNavigationPanel multiColumn />
       </div>
-      <ComposeRedesignButton />
+      <ComposeButton />
       <MultiColumnContent>{children}</MultiColumnContent>
       {/* Bird UI advanced interface intentionally has no scroll-to-top control. */}
     </main>

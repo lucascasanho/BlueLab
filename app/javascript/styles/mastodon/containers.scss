@@ -28,7 +28,7 @@
     text-decoration: none;
     outline: 0;
     line-height: 32px;
-    font-weight: 500;
+    font-weight: bold;
     font-size: 14px;
 
     &:focus-visible {
@@ -166,7 +166,7 @@ body[data-theme='default'] .logo-container .instance-auth-brand {
 
     a {
       color: var(--color-text-brand);
-      font-weight: 500;
+      font-weight: bold;
       text-decoration: none;
 
       &:hover,

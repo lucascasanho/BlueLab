@@ -19,7 +19,7 @@ import { useDrag } from '@use-gesture/react';
 import { closeNavigation, openNavigation } from '@/mastodon/actions/navigation';
 import { Avatar } from '@/mastodon/components/avatar';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
-import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { ComposeButton } from '@/mastodon/features/compose/trigger';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';

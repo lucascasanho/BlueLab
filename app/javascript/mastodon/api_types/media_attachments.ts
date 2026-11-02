@@ -25,8 +25,8 @@ export interface BaseApiMediaAttachmentJSON {
 export interface ApiImageAttachmentJSON extends BaseApiMediaAttachmentJSON {
   type: 'image';
   meta?: {
-    original: ApiImageAttachmentMetaJSON;
-    small: ApiImageAttachmentMetaJSON;
+    original?: ApiImageAttachmentMetaJSON;
+    small?: ApiImageAttachmentMetaJSON;
     focus?: ApiFocusAttachmentMetaJSON;
   };
 }
@@ -35,8 +35,8 @@ export interface ApiAudioAttachmentJSON extends BaseApiMediaAttachmentJSON {
   type: 'audio';
   meta?: {
     colors?: ApiColorsAttachmentMetaJSON;
-    original: ApiVideoAttachmentMetaJSON;
-    small: ApiImageAttachmentMetaJSON;
+    original?: ApiVideoAttachmentMetaJSON;
+    small?: ApiImageAttachmentMetaJSON;
   };
 }
 
@@ -44,8 +44,8 @@ export interface ApiVideoAttachmentJSON extends BaseApiMediaAttachmentJSON {
   type: 'video';
   meta?: {
     colors?: ApiColorsAttachmentMetaJSON;
-    original: ApiVideoAttachmentMetaJSON;
-    small: ApiImageAttachmentMetaJSON;
+    original?: ApiVideoAttachmentMetaJSON;
+    small?: ApiImageAttachmentMetaJSON;
     focus?: ApiFocusAttachmentMetaJSON;
   };
 }
@@ -53,8 +53,8 @@ export interface ApiVideoAttachmentJSON extends BaseApiMediaAttachmentJSON {
 export interface ApiGifvAttachmentJSON extends BaseApiMediaAttachmentJSON {
   type: 'gifv';
   meta?: {
-    original: ApiVideoAttachmentMetaJSON;
-    small: ApiImageAttachmentMetaJSON;
+    original?: ApiVideoAttachmentMetaJSON;
+    small?: ApiImageAttachmentMetaJSON;
     focus?: ApiFocusAttachmentMetaJSON;
   };
 }

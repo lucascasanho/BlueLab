@@ -1,0 +1,482 @@
+import type React from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
+import { createPortal } from 'react-dom';
+
+import { FormattedMessage } from 'react-intl';
+
+import classNames from 'classnames';
+import { useRouteMatch } from 'react-router';
+
+import { ChatCircleDotsIcon } from '@phosphor-icons/react';
+
+import type { IconButtonProps } from '@/mastodon/components/button/redesign';
+import { IconButton } from '@/mastodon/components/button/redesign';
+import { ComposeIcon } from '@/mastodon/components/compose_icon';
+import {
+  Menu,
+  MenuTrigger,
+  MenuList,
+  MenuItem,
+} from '@/mastodon/components/menu';
+import { MenuCard } from '@/mastodon/components/menu/card';
+import { useIdentity } from '@/mastodon/identity_context';
+import {
+  composerOriginFromElement,
+  openNewComposer,
+  openPreferredComposer,
+  minimizeComposerToggle,
+  selectComposerEditor,
+} from '@/mastodon/reducers/slices/composer';
+import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+
+import { useBreakpoint } from '../ui/hooks/useBreakpoint';
+
+import { ComposeFormHeader } from './header';
+import { RedesignComposeForm } from './index';
+import classes from './trigger.module.scss';
+
+interface VisualViewportMetrics {
+  height: number | null;
+  offsetTop: number;
+  bottomInset: number;
+  centerY: number | null;
+  keyboardOpen: boolean;
+}
+
+const emptyVisualViewportMetrics: VisualViewportMetrics = {
+  height: null,
+  offsetTop: 0,
+  bottomInset: 0,
+  centerY: null,
+  keyboardOpen: false,
+};
+
+export const useBlue2Theme = () => {
+  const [isBlue2, setIsBlue2] = useState(
+    () =>
+      typeof document !== 'undefined' &&
+      document.body.dataset.theme === 'blue-2',
+  );
+
+  useLayoutEffect(() => {
+    if (typeof document === 'undefined') return undefined;
+
+    const body = document.body;
+    const syncTheme = () => {
+      setIsBlue2(body.dataset.theme === 'blue-2');
+    };
+
+    syncTheme();
+
+    if (typeof MutationObserver === 'undefined') return undefined;
+
+    const observer = new MutationObserver(syncTheme);
+    observer.observe(body, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  return isBlue2;
+};
+
+export const shouldHideBlue2GlobalTrigger = (
+  isBlue2: boolean,
+  inline: boolean | undefined,
+  displayState: 'hidden' | 'showing' | 'minimized',
+) => isBlue2 && !inline && displayState !== 'showing';
+
+export const ComposerBackdrop: React.FC<{ onMinimize: () => void }> = ({
+  onMinimize,
+}) => (
+  <div
+    aria-hidden='true'
+    className={classes.composerBackdrop}
+    data-bluelab-composer-backdrop
+    onClick={onMinimize}
+  />
+);
+
+export const ComposerResumeButton: React.FC<{
+  onResume: () => void;
+  inline?: boolean;
+}> = ({ onResume, inline }) => (
+  <IconButton
+    icon={ComposeIcon}
+    variant='solid'
+    color='accent'
+    className={classNames(
+      classes.button,
+      inline && classes.buttonInline,
+      !inline && classes.blue2ResumeButton,
+    )}
+    size='lg'
+    data-blue2-compose-resume
+    data-blue2-compose-resume-inline={inline ? 'true' : undefined}
+    onClick={onResume}
+  >
+    <FormattedMessage id='compose.expand' defaultMessage='Show composer' />
+  </IconButton>
+);
+
+export const ComposeRedesignButton: React.FC<{
+  /**
+   * Render the button in regular document flow instead of fixed positioning for mobile layout
+   */
+  inline?: boolean;
+  /**
+   * Keep this component as a composer host without rendering its launcher button.
+   */
+  hostOnly?: boolean;
+}> = ({ inline, hostOnly = false }) => {
+  const displayState = useAppSelector((state) => state.composer.displayState);
+  const origin = useAppSelector((state) => state.composer.origin);
+  const editor = useAppSelector(selectComposerEditor);
+  const { signedIn } = useIdentity();
+  const composerRef = useRef<HTMLFormElement>(null);
+  const launcherOriginRef = useRef<ReturnType<
+    typeof composerOriginFromElement
+  > | null>(null);
+  const isBlue2 = useBlue2Theme();
+  const isMobile = useBreakpoint('openable');
+  const hasMobileFloatingActionButton = useHasMobileFloatingActionButton({
+    isMobile,
+  });
+  const portalBlue2InlineOverlay = (content: React.ReactNode) =>
+    isBlue2 && inline && typeof document !== 'undefined'
+      ? createPortal(content, document.body)
+      : content;
+
+  /*
+   * Keep VisualViewport metrics in React state instead of mutating the form from
+   * a layout effect. State keeps the metrics ready before the preloaded composer
+   * is mounted, so the form receives the correct visible height immediately and
+   * whenever the software keyboard changes it.
+   */
+  const [viewport, setViewport] = useState<VisualViewportMetrics>(
+    emptyVisualViewportMetrics,
+  );
+  useEffect(() => {
+    const updateViewport = () => {
+      const visualViewport = window.visualViewport;
+      const height = visualViewport?.height ?? window.innerHeight;
+      const offsetTop = visualViewport?.offsetTop ?? 0;
+      const bottomInset = Math.max(0, window.innerHeight - offsetTop - height);
+
+      setViewport({
+        height,
+        offsetTop,
+        bottomInset,
+        centerY: offsetTop + height / 2,
+        keyboardOpen: window.innerHeight - height > 150,
+      });
+    };
+
+    updateViewport();
+    window.visualViewport?.addEventListener('resize', updateViewport);
+    window.visualViewport?.addEventListener('scroll', updateViewport);
+    window.addEventListener('resize', updateViewport);
+
+    return () => {
+      window.visualViewport?.removeEventListener('resize', updateViewport);
+      window.visualViewport?.removeEventListener('scroll', updateViewport);
+      window.removeEventListener('resize', updateViewport);
+    };
+  }, []);
+
+  const dispatch = useAppDispatch();
+  const handleBackdropClick = useCallback(() => {
+    dispatch(minimizeComposerToggle());
+  }, [dispatch]);
+  const captureLauncherPointerOrigin: React.PointerEventHandler<HTMLButtonElement> =
+    useCallback((event) => {
+      launcherOriginRef.current = composerOriginFromElement(
+        event.currentTarget,
+      );
+    }, []);
+  const captureLauncherFocusOrigin: React.FocusEventHandler<HTMLButtonElement> =
+    useCallback((event) => {
+      launcherOriginRef.current = composerOriginFromElement(
+        event.currentTarget,
+      );
+    }, []);
+  const handleComposerOpen: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(
+      (event) => {
+        const {
+          currentTarget: { name },
+        } = event;
+        if (name === 'post' || name === 'message') {
+          dispatch(
+            openNewComposer({
+              type: name,
+              origin: launcherOriginRef.current ?? undefined,
+            }),
+          );
+        }
+      },
+      [dispatch],
+    );
+
+  const handleMastodonOpen: React.MouseEventHandler<HTMLButtonElement> =
+    useCallback(
+      (event) => {
+        dispatch(
+          openPreferredComposer({
+            origin: composerOriginFromElement(event.currentTarget),
+          }),
+        );
+      },
+      [dispatch],
+    );
+
+  useLayoutEffect(() => {
+    const composer = composerRef.current;
+    if (!composer || !origin) return;
+
+    const rect = composer.getBoundingClientRect();
+    composer.style.setProperty(
+      '--composer-origin-x',
+      `${origin.x - rect.left}px`,
+    );
+    composer.style.setProperty(
+      '--composer-origin-y',
+      `${origin.y - rect.top}px`,
+    );
+  }, [displayState, origin]);
+
+  if (!signedIn) return null;
+
+  // Some themes provide their own composer launcher but still need this component
+  // mounted as the host for the shared redesigned composer state.
+  if (hostOnly && displayState !== 'showing') return null;
+
+  // BLUE 2.0 owns its launcher UI elsewhere, so keep this global trigger hidden
+  // while idle/minimized. When the shared state changes to showing, however,
+  // this component must stay mounted because it is the desktop composer host.
+  if (
+    !hostOnly &&
+    shouldHideBlue2GlobalTrigger(isBlue2, inline, displayState)
+  ) {
+    return null;
+  }
+
+  // BLUE 2.0 always uses the redesigned composer so the theme can provide the
+  // Bluesky-like compose experience without changing the editor used by other themes.
+  if (editor === 'mastodon' && !isBlue2 && !hostOnly) {
+    return (
+      <IconButton
+        icon={ComposeIcon}
+        variant='solid'
+        color='accent'
+        className={classNames(
+          classes.button,
+          classes.mastodonButton,
+          inline && classes.buttonInline,
+        )}
+        size='lg'
+        onClick={handleMastodonOpen}
+      >
+        <FormattedMessage id='tabs_bar.publish' defaultMessage='New Post' />
+      </IconButton>
+    );
+  }
+
+  if (displayState === 'minimized') {
+    if (isBlue2) {
+      // Keep the minimized launcher inside RedesignMobileNavigation instead of
+      // portaling it to <body>. The Blue 2 navigation shell already owns the
+      // proven portrait behavior: above the bottom row while visible and down
+      // into the vacated row when mobile chrome auto-hides during scrolling.
+      return (
+        <ComposerResumeButton inline={inline} onResume={handleBackdropClick} />
+      );
+    }
+
+    return (
+      <MenuCard
+        popover={undefined}
+        className={classes.composerMinimized}
+        elevation={2}
+      >
+        <ComposeFormHeader />
+      </MenuCard>
+    );
+  }
+
+  if (displayState === 'showing') {
+    const style = {
+      '--viewport-height': viewport.height ? `${viewport.height}px` : undefined,
+      '--composer-visual-viewport-height': viewport.height
+        ? `${viewport.height}px`
+        : undefined,
+      '--composer-visual-viewport-offset-top': `${viewport.offsetTop}px`,
+      '--composer-visual-viewport-center-y': viewport.centerY
+        ? `${viewport.centerY}px`
+        : undefined,
+      '--composer-visual-viewport-bottom': `${viewport.bottomInset}px`,
+    } as React.CSSProperties;
+
+    return portalBlue2InlineOverlay(
+      <>
+        {isBlue2 && <ComposerBackdrop onMinimize={handleBackdropClick} />}
+        <RedesignComposeForm
+          ref={composerRef}
+          autoFocus
+          className={classes.composer}
+          style={style}
+          data-keyboard-open={viewport.keyboardOpen ? 'true' : undefined}
+        />
+      </>,
+    );
+  }
+
+  return (
+    <Menu>
+      <MenuTrigger
+        as={FloatingActionButton}
+        inline={inline ?? false}
+        hidden={isMobile && !hasMobileFloatingActionButton}
+        icon={ComposeIcon}
+        variant='solid'
+        color='accent'
+        className={classNames(classes.button, inline && classes.buttonInline)}
+        size='lg'
+        data-blue2-compose-fab={isBlue2 ? 'true' : undefined}
+        onPointerDown={captureLauncherPointerOrigin}
+        onFocus={captureLauncherFocusOrigin}
+      >
+        <FormattedMessage
+          id='compose.new'
+          defaultMessage='Write a new post or messsage'
+        />
+      </MenuTrigger>
+
+      <MenuList
+        portal
+        mobilePresentation='popover'
+        maxWidth={180}
+        placement='top-end'
+        strategy='fixed'
+        offset={8}
+        data-testid='blue2-compose-type-menu'
+      >
+        <MenuItem name='post' onClick={handleComposerOpen} icon={ComposeIcon}>
+          <FormattedMessage id='compose.new.post' defaultMessage='Post' />
+        </MenuItem>
+
+        <MenuItem
+          name='message'
+          onClick={handleComposerOpen}
+          icon={ChatCircleDotsIcon}
+        >
+          <FormattedMessage
+            id='compose.new.message'
+            defaultMessage='Message'
+            description='Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.'
+          />
+        </MenuItem>
+      </MenuList>
+    </Menu>
+  );
+};
+
+const FloatingActionButton: React.FC<
+  {
+    inline: boolean;
+    hidden: boolean;
+  } & IconButtonProps
+> = ({ inline, hidden, ...otherProps }) => {
+  return (
+    // This component uses a wrapper element to prevent its
+    // CSS transitions from messing with the button's own transitions
+    <div
+      className={classNames(
+        classes.buttonWrapper,
+        inline && classes.buttonWrapperInline,
+        hidden && classes.buttonWrapperHidden,
+      )}
+      inert={hidden}
+    >
+      <IconButton variant='solid' color='accent' size='lg' {...otherProps} />
+    </div>
+  );
+};
+
+const MOBILE_COMPOSE_BUTTON_ALLOW_ROUTES = includeMultiColumnPaths([
+  '/home',
+  '/public',
+  '/lists',
+  '/tags',
+]);
+const MOBILE_COMPOSE_BUTTON_BLOCK_ROUTES = includeMultiColumnPaths([
+  '/lists/new',
+]);
+
+function useHasMobileFloatingActionButton({ isMobile }: { isMobile: boolean }) {
+  const isRouteWithMobileComposeButton = !!useRouteMatch({
+    path: MOBILE_COMPOSE_BUTTON_ALLOW_ROUTES,
+    exact: false,
+  });
+
+  const isRouteWithoutMobileComposeButton = !!useRouteMatch({
+    path: MOBILE_COMPOSE_BUTTON_BLOCK_ROUTES,
+    exact: true,
+  });
+
+  const shouldHideMobileComposeButton =
+    !isMobile ||
+    !isRouteWithMobileComposeButton ||
+    isRouteWithoutMobileComposeButton;
+
+  return !shouldHideMobileComposeButton;
+}
+
+function useTrackComposerHeight() {
+  const [height, setHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    document.documentElement.style.setProperty(
+      '--current-composer-height',
+      height ? `${height}px` : null,
+    );
+  }, [height]);
+
+  const onResize: ResizeObserverCallback = useCallback((entries) => {
+    for (const { target } of entries) {
+      if (target instanceof HTMLElement) {
+        setHeight(target.offsetHeight);
+      }
+    }
+  }, []);
+
+  const observer = useResizeObserver(onResize);
+
+  const ref = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (node instanceof HTMLElement) {
+        observer.observe(node);
+        setHeight(node.offsetHeight);
+
+        return () => {
+          observer.unobserve(node);
+          setHeight(0);
+        };
+      }
+      return () => undefined;
+    },
+    [observer],
+  );
+
+  return ref;
+}

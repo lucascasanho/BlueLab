@@ -13,8 +13,6 @@ import {
   BookmarkSimpleIcon,
   UsersThreeIcon,
   ProhibitIcon,
-  GavelIcon,
-  ShieldStarIcon,
   SignOutIcon,
 } from '@phosphor-icons/react';
 
@@ -36,10 +34,6 @@ import { Popover } from '@/mastodon/components/popover';
 import { AccountSwitcherMenuSection } from '@/mastodon/features/account_switcher';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
-import {
-  canManageReports,
-  canViewAdminDashboard,
-} from '@/mastodon/permissions';
 import { useAppDispatch } from '@/mastodon/store';
 
 import classes from './account_card_and_menu.module.scss';
@@ -287,7 +281,7 @@ export const AccountMenuItems: React.FC<{
   context?: 'default' | 'mobile';
 }> = ({ context = 'default' }) => {
   const dispatch = useAppDispatch();
-  const { accountId, permissions } = useIdentity();
+  const { accountId } = useIdentity();
   const account = useAccount(accountId);
 
   const confirmLogout = useCallback(() => {
@@ -297,9 +291,6 @@ export const AccountMenuItems: React.FC<{
   if (!accountId) {
     return null;
   }
-
-  const isManager = canManageReports(permissions);
-  const isAdmin = canViewAdminDashboard(permissions);
 
   const accountBasePath = `/@${account?.acct}`;
   const FavouriteIcon =
@@ -375,30 +366,6 @@ export const AccountMenuItems: React.FC<{
           defaultMessage='Blocked users'
         />
       </MenuItemLink>
-
-      {(isManager || isAdmin) && (
-        <>
-          <MenuItemDivider />
-
-          {isAdmin && (
-            <MenuItemLink as='a' href='/admin/dashboard' icon={GavelIcon}>
-              <FormattedMessage
-                id='navigation_bar.administration'
-                defaultMessage='Administration'
-              />
-            </MenuItemLink>
-          )}
-
-          {isManager && (
-            <MenuItemLink as='a' href='/admin/reports' icon={ShieldStarIcon}>
-              <FormattedMessage
-                id='navigation_bar.moderation'
-                defaultMessage='Moderation'
-              />
-            </MenuItemLink>
-          )}
-        </>
-      )}
 
       <MenuItemDivider />
 

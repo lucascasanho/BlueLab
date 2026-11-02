@@ -1,0 +1,126 @@
+import { useCallback } from 'react';
+
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+
+import { MinusIcon, PencilSimpleIcon } from '@phosphor-icons/react';
+
+import { IconButton } from '@/mastodon/components/button/redesign';
+import {
+  closeComposer,
+  minimizeComposerToggle,
+  selectIsMinimized,
+} from '@/mastodon/reducers/slices/composer';
+import {
+  createAppSelector,
+  useAppDispatch,
+  useAppSelector,
+} from '@/mastodon/store';
+import CloseIcon from '@/material-icons/400-20px/close.svg?react';
+
+import classes from '../styles.module.scss';
+
+import { selectComposeType } from './selectors';
+
+const messages = defineMessages({
+  postNew: {
+    id: 'compose.post.title.new',
+    defaultMessage: 'New post',
+  },
+  postEdit: {
+    id: 'compose.post.title.edit',
+    defaultMessage: 'Edit post',
+  },
+  replyNew: {
+    id: 'compose.reply.title.new',
+    defaultMessage: 'New reply',
+  },
+  replyEdit: {
+    id: 'compose.reply.title.edit',
+    defaultMessage: 'Edit reply',
+  },
+  replyPrivateNew: {
+    id: 'compose.reply_private.title.new',
+    defaultMessage: 'New private reply',
+  },
+  replyPrivateEdit: {
+    id: 'compose.reply_private.title.edit',
+    defaultMessage: 'Edit private reply',
+  },
+  messageNew: {
+    id: 'compose_form.message.title.new',
+    defaultMessage: 'New message',
+    description:
+      'Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.',
+  },
+  messageEdit: {
+    id: 'compose_form.message.title.edit',
+    defaultMessage: 'Edit message',
+    description:
+      'Message refers to a direct message. For languages where this is confusing, "chat" or "direct message" can be used.',
+  },
+});
+
+const selectComposeFormTitle = createAppSelector(
+  [selectComposeType, (state) => state.compose.get('id') as null | string],
+  (type, id) => {
+    return messages[`${type}${id ? 'Edit' : 'New'}`];
+  },
+);
+
+export const ComposeFormHeader: React.FC<{
+  id?: string;
+  noClose?: boolean;
+  noMinimize?: boolean;
+}> = ({ id, noClose, noMinimize }) => {
+  const intl = useIntl();
+  const dispatch = useAppDispatch();
+  const titleMessage = useAppSelector(selectComposeFormTitle);
+  const isMinimized = useAppSelector(selectIsMinimized);
+
+  const onClose = useCallback(() => {
+    dispatch(closeComposer());
+  }, [dispatch]);
+
+  const onMinimize = useCallback(() => {
+    dispatch(minimizeComposerToggle());
+  }, [dispatch]);
+
+  return (
+    <header className={classes.header}>
+      <h2 id={id}>{intl.formatMessage(titleMessage)}</h2>
+
+      {!noMinimize && (
+        <IconButton
+          size='sm'
+          variant='ghost'
+          icon={isMinimized ? PencilSimpleIcon : MinusIcon}
+          onClick={onMinimize}
+          tooltipPlacement='top'
+        >
+          {isMinimized ? (
+            <FormattedMessage
+              id='compose.resume_draft'
+              defaultMessage='Resume draft'
+            />
+          ) : (
+            <FormattedMessage
+              id='compose.minimize'
+              defaultMessage='Minimize composer'
+            />
+          )}
+        </IconButton>
+      )}
+
+      {!noClose && (
+        <IconButton
+          icon={CloseIcon}
+          variant='ghost'
+          size='sm'
+          onClick={onClose}
+        >
+          <FormattedMessage id='lightbox.close' defaultMessage='Close' />
+        </IconButton>
+      )}
+    </header>
+  );
+};
