@@ -53,7 +53,7 @@ class FetchResourceService < BaseService
 
       return unless supported_context?(json) && (equals_or_includes_any?(json['type'], ActivityPub::FetchRemoteActorService::SUPPORTED_TYPES) || expected_type?(json))
 
-      if json['id'] != @url || json['id'] != response.uri.to_s
+      if json['id'] != @url || !same_http_resource?(json['id'], response.uri)
         return if terminal
 
         return process(json['id'], terminal: true)

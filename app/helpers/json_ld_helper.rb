@@ -105,6 +105,36 @@ module JsonLdHelper
     !haystack.casecmp(needle).zero?
   end
 
+  # Compare a fetched HTTP URI to the requested URI after Addressable normalization.
+  # ActivityPub identifiers keep exact string equality elsewhere.
+  def same_http_resource?(left, right)
+    a = canonicalize_http_uri(left)
+    b = canonicalize_http_uri(right)
+    a.present? && a == b
+  end
+
+  def canonicalize_http_uri(value)
+    return if value.nil?
+
+    uri = Addressable::URI.parse(value.to_s).normalize
+
+    return unless %w(http https).include?(uri.scheme)
+    return if uri.host.blank?
+    return unless uri.user.nil? && uri.password.nil?
+
+    {
+      scheme: uri.scheme,
+      host: uri.normalized_host,
+      port: uri.port || uri.default_port,
+      path: uri.path.presence || '/',
+      query: uri.query.presence,
+      fragment: uri.fragment.presence,
+    }
+  rescue Addressable::URI::InvalidURIError, TypeError
+    nil
+  end
+  private :canonicalize_http_uri
+
   def safe_prefetched_embed(account, object, context)
     return unless object.is_a?(Hash)
 
@@ -281,7 +311,7 @@ module JsonLdHelper
         (!response_error_unsalvageable?(response) && raise_on_error == :temporary)
       )
 
-      body_to_json(response.body_with_limit) if response.code == 200 && valid_activitypub_content_type?(response) && (allow_redirects || response.uri.to_s == uri)
+      body_to_json(response.body_with_limit) if response.code == 200 && valid_activitypub_content_type?(response) && (allow_redirects || same_http_resource?(response.uri, uri))
     end
   end
 
