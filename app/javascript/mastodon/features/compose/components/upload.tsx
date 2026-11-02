@@ -7,23 +7,34 @@ import classNames from 'classnames';
 
 import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import {
+  ArrowsLeftRightIcon,
+  PencilSimpleIcon,
+  TrashIcon,
+} from '@phosphor-icons/react';
+
 import { undoUploadCompose } from '@/mastodon/actions/compose';
 import { openModal } from '@/mastodon/actions/modal';
 import type { ApiAudioAttachmentJSON } from '@/mastodon/api_types/media_attachments';
 import { Button, IconButton } from '@/mastodon/components/button/redesign';
 import { StatusImage } from '@/mastodon/components/status/image';
-import { useAppDispatch, useAppSelector } from '@/mastodon/store';
-
+import { Blurhash } from '@/mastodon/components/blurhash';
+import { Icon } from '@/mastodon/components/icon';
 import { selectAccountAvatarUrl } from '@/mastodon/selectors/accounts';
+import { useAppDispatch, useAppSelector } from '@/mastodon/store';
+import type { MediaAttachment } from 'mastodon/models/media_attachment';
 import DeleteIcon from '@/material-icons/400-24px/delete.svg?react';
 import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 import SoundIcon from '@/material-icons/400-24px/graphic_eq.svg?react';
-import { undoUploadCompose } from 'mastodon/actions/compose';
-import { openModal } from 'mastodon/actions/modal';
-import { Blurhash } from 'mastodon/components/blurhash';
-import { Icon } from 'mastodon/components/icon';
-import type { MediaAttachment } from 'mastodon/models/media_attachment';
-import { useAppDispatch, useAppSelector } from 'mastodon/store';
+
+import { AudioVisualizer } from '../../audio/visualizer';
+
+import attachmentClasses from './attachments.module.scss';
+import classes from './upload.module.scss';
+import type { ComposeAttachment } from './selectors';
+import { selectComposeAttachment, selectComposeSensitive } from './selectors';
 
 export const ComposeUpload: React.FC<{
   id?: string;
@@ -35,7 +46,133 @@ export const ComposeUpload: React.FC<{
   );
   const { mediaSensitive } = useAppSelector(selectComposeSensitive);
 
-import classes from './upload.module.scss';
+  const dispatch = useAppDispatch();
+
+  const handleAltEdit = useCallback(() => {
+    dispatch(
+      openModal({ modalType: 'FOCAL_POINT', modalProps: { mediaId: id } }),
+    );
+  }, [dispatch, id]);
+
+  const handleRearrange = useCallback(() => {
+    dispatch(openModal({ modalType: 'COMPOSER_REARRANGE', modalProps: {} }));
+  }, [dispatch]);
+
+  const handleDelete = useCallback(() => {
+    dispatch(undoUploadCompose(id));
+  }, [dispatch, id]);
+
+  if (!attachment || attachment.type === 'unknown') {
+    return <div className={classNames(attachmentClasses.mediaUpload, className)} />;
+  }
+
+  if (attachment.type === 'audio') {
+    return <ComposeAudioUpload attachment={attachment} />;
+  }
+
+  return (
+    <StatusImage
+      attachment={attachment}
+      className={classNames(className, attachmentClasses.mediaUpload)}
+      sensitive={mediaSensitive}
+    >
+      <Button
+        contrastOnMedia
+        size='sm'
+        variant='solid'
+        onClick={handleAltEdit}
+        className={attachmentClasses.mediaMenuAltButton}
+        leadingIcon={PencilSimpleIcon}
+        tooltip={{
+          type: 'label',
+          text: (
+            <FormattedMessage
+              id='account_edit.image_alt_modal.edit_title'
+              defaultMessage='Edit alt text'
+            />
+          ),
+          placement: 'top',
+        }}
+      >
+        <span aria-hidden='true'>
+          <FormattedMessage id='alt_text_badge.label' defaultMessage='ALT' />
+        </span>
+      </Button>
+
+      <div className={attachmentClasses.mediaMenuButtons}>
+        {!single && (
+          <IconButton
+            onClick={handleRearrange}
+            icon={ArrowsLeftRightIcon}
+            contrastOnMedia
+            size='sm'
+            variant='solid'
+            tooltipPlacement='top'
+          >
+            <FormattedMessage
+              id='compose.upload.rearrange'
+              defaultMessage='Rearrange images'
+            />
+          </IconButton>
+        )}
+        <IconButton
+          onClick={handleDelete}
+          icon={TrashIcon}
+          contrastOnMedia
+          size='sm'
+          variant='solid'
+          tooltipPlacement='top'
+        >
+          <FormattedMessage
+            id='compose.upload.menu.delete'
+            defaultMessage='Remove image'
+          />
+        </IconButton>
+      </div>
+    </StatusImage>
+  );
+};
+
+const ComposeAudioUpload: React.FC<{
+  attachment: ComposeAttachment<ApiAudioAttachmentJSON>;
+}> = ({ attachment }) => {
+  const { id, preview_url } = attachment;
+  const sensitive = useAppSelector((state) => !!state.compose.get('spoiler'));
+
+  const dispatch = useAppDispatch();
+  const handleDelete = useCallback(() => {
+    dispatch(undoUploadCompose(id));
+  }, [dispatch, id]);
+
+  return (
+    <div className={attachmentClasses.audioWrapper}>
+      {!sensitive && preview_url && (
+        <img src={preview_url} alt='' className={attachmentClasses.audioCover} />
+      )}
+
+      <audio
+        src={attachment.url}
+        controls
+        className={attachmentClasses.audioControl}
+        controlsList='nodownload noplaybackrate'
+      />
+
+      <IconButton
+        size='md'
+        variant='ghost'
+        icon={TrashIcon}
+        color='destructive'
+        onClick={handleDelete}
+      >
+        <FormattedMessage
+          id='compose.upload.audio.delete'
+          defaultMessage='Remove audio'
+        />
+      </IconButton>
+    </div>
+  );
+};
+
 
 export const Upload: React.FC<{
   id: string;
@@ -46,8 +183,23 @@ export const Upload: React.FC<{
   wide?: boolean;
 }> = ({ id, dragging, draggable = true, overlay, tall, wide }) => {
   const dispatch = useAppDispatch();
+  const media = useAppSelector((state) =>
+    (
+      (state.compose as ImmutableMap<string, unknown>).get(
+        'media_attachments',
+      ) as ImmutableList<MediaAttachment>
+    ).find((item) => item.get('id') === id),
+  );
+  const sensitive = useAppSelector(
+    (state) => state.compose.get('spoiler') as boolean,
+  );
+  const userAvatar = useAppSelector(selectAccountAvatarUrl);
 
-  const handleAltEdit = useCallback(() => {
+  const handleUndoClick = useCallback(() => {
+    dispatch(undoUploadCompose(id));
+  }, [dispatch, id]);
+
+  const handleFocalPointClick = useCallback(() => {
     dispatch(
       openModal({ modalType: 'FOCAL_POINT', modalProps: { mediaId: id } }),
     );
@@ -60,12 +212,8 @@ export const Upload: React.FC<{
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
 
-  const handleDelete = useCallback(() => {
-    dispatch(undoUploadCompose(id));
-  }, [dispatch, id]);
-
-  if (!attachment || attachment.type === 'unknown') {
-    return <div className={classNames(classes.mediaUpload, className)} />;
+  if (!media) {
+    return null;
   }
 
   const focusX = media.getIn(['meta', 'focus', 'x']) as number;
@@ -84,10 +232,18 @@ export const Upload: React.FC<{
   const blurhash = media.get('blurhash') as string | null;
 
   return (
-    <StatusImage
-      attachment={attachment}
-      className={classNames(className, classes.mediaUpload)}
-      sensitive={mediaSensitive}
+    <div
+      className={classNames('compose-form__upload media-gallery__item', {
+        dragging,
+        draggable,
+        overlay,
+        'media-gallery__item--tall': tall,
+        'media-gallery__item--wide': wide,
+      })}
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
     >
       <div
         className={classNames(
@@ -175,46 +331,6 @@ export const Upload: React.FC<{
           </button>
         </div>
       </div>
-    </StatusImage>
-  );
-};
-
-const ComposeAudioUpload: React.FC<{
-  attachment: ComposeAttachment<ApiAudioAttachmentJSON>;
-}> = ({ attachment }) => {
-  const { id, preview_url } = attachment;
-  const sensitive = useAppSelector((state) => !!state.compose.get('spoiler'));
-
-  const dispatch = useAppDispatch();
-  const handleDelete = useCallback(() => {
-    dispatch(undoUploadCompose(id));
-  }, [dispatch, id]);
-
-  return (
-    <div className={classes.audioWrapper}>
-      {!sensitive && preview_url && (
-        <img src={preview_url} alt='' className={classes.audioCover} />
-      )}
-
-      <audio
-        src={attachment.url}
-        controls
-        className={classes.audioControl}
-        controlsList='nodownload noplaybackrate'
-      />
-
-      <IconButton
-        size='md'
-        variant='ghost'
-        icon={TrashIcon}
-        color='destructive'
-        onClick={handleDelete}
-      >
-        <FormattedMessage
-          id='compose.upload.audio.delete'
-          defaultMessage='Remove audio'
-        />
-      </IconButton>
     </div>
   );
 };
