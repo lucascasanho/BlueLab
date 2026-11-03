@@ -1,6 +1,6 @@
 import { useRouteMatch } from 'react-router';
 
-import { Search } from '@/mastodon/features/compose/components/search';
+import { Search } from '@/mastodon/components/search';
 import { VanillaFooterLinks } from '@/mastodon/features/navigation_panel/redesign/vanilla_footer_links';
 import { useIdentity } from '@/mastodon/identity_context';
 import { includeMultiColumnPaths } from '@/mastodon/utils/react_router';
