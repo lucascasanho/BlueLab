@@ -21,7 +21,10 @@ import { importFetchedAccounts, importFetchedStatus } from './importer';
 import { openModal } from './modal';
 import { updateTimeline } from './timelines';
 import { insertStatusIntoAccountTimelines } from './timelines_typed';
-import { requestComposerFocus } from '../reducers/slices/composer';
+import {
+  initializeComposer,
+  requestComposerFocus,
+} from '../reducers/slices/composer';
 import { isRedesignEnabled } from '../utils/environment';
 
 /** @type {AbortController | undefined} */
@@ -251,10 +254,7 @@ export const focusCompose = (defaultText = '', caretStart = false) => (dispatch,
 
   ensureComposeIsVisible(getState, dispatch);
 
-  if (isRedesignEnabled()) {
-    const position = caretStart ? 0 : getState().getIn(['compose', 'text'], '').length;
-    dispatch(requestComposerFocus({ start: position, end: position }));
-  }
+  dispatch(initializeComposer({ noSelect: caretStart }));
 };
 
 export function mentionCompose(account) {
@@ -266,10 +266,7 @@ export function mentionCompose(account) {
 
     ensureComposeIsVisible(getState, dispatch);
 
-    if (isRedesignEnabled()) {
-      const position = getState().getIn(['compose', 'text'], '').length;
-      dispatch(requestComposerFocus({ start: position, end: position }));
-    }
+    dispatch(initializeComposer());
   };
 }
 
@@ -288,10 +285,7 @@ export function directCompose(account) {
 
     ensureComposeIsVisible(getState, dispatch);
 
-    if (isRedesignEnabled()) {
-      const position = getState().getIn(['compose', 'text'], '').length;
-      dispatch(requestComposerFocus({ start: position, end: position }));
-    }
+    dispatch(initializeComposer());
   };
 }
 

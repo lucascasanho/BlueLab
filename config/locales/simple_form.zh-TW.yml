@@ -16,6 +16,7 @@ zh-TW:
       account_migration:
         acct: 指定欲移動至帳號之「使用者名稱@網域名稱」
       account_warning_preset:
+        action_category: 請選擇此回應適用之管理動作。若此回應適用多個動作，請選擇「所有動作」。
         text: 您可使用嘟文語法，例如網址、「#」標籤與提及功能
         title: 可選的。不會向收件者顯示
       admin_account_action:
@@ -152,7 +153,7 @@ zh-TW:
         arbitration_website: 能為網路表單，或「N/A」如使用 email。
         choice_of_law: 城市、區域、領土或州的內部實體法律應規範任何及所有權利。
         dmca_address: 位於美國的運營團隊，請使用於 DMCA 指定代理目錄中註冊之地址。可直接請求 PO Box 清單，使用 DMCA 指定代理郵局信箱豁免請求向版權局發送電子郵件，並描述您是一名在家工作之內容管理員，擔心您的行為將遭報復，需要使用 PO Box 保護您的私人住址。
-        dmca_email: 能使用上述用於「法律通知用途電子郵件」之相同電子郵件。
+        dmca_email: 能使用上述用於「法律通知用途電子郵件地址」之相同電子郵件。
         domain: 您所提供線上服務之唯一識別。
         jurisdiction: 列出帳單支付人之居住國家。若為公司或其他實體，請列出其註冊地所在的國家，及城市、地區、領土、或州別等。
         min_age: 不應低於您所屬司法管轄區要求之最低年齡。
@@ -192,6 +193,7 @@ zh-TW:
       account_migration:
         acct: 新帳號名稱
       account_warning_preset:
+        action_category: 指派管理動作
         text: 回應文字
         title: 標題
       admin_account_action:
@@ -200,6 +202,7 @@ zh-TW:
         text: 客製化回應
         type: 動作
         types:
+          all_actions: 所有動作
           disable: 停用
           none: 什麼也不做
           sensitive: 敏感内容
@@ -253,7 +256,6 @@ zh-TW:
         setting_default_sensitive: 總是將媒體標記為敏感內容
         setting_default_spoiler_field: 預設使用內容警告
         setting_delete_modal: 於刪除嘟文前警告我
-        setting_density: 介面緻密度
         setting_disable_hover_cards: 停用於滑鼠懸停時預覽個人檔案
         setting_disable_swiping: 停用滑動手勢
         setting_display_media: 媒體顯示
@@ -273,7 +275,6 @@ zh-TW:
         setting_system_scrollbars_ui: 使用系統預設捲動軸
         setting_theme: 佈景主題
         setting_theme_color: 佈景主題顏色
-        setting_trends: 顯示本日熱門趨勢
         setting_unfollow_modal: 取消跟隨某人前先詢問我
         setting_use_blurhash: 將隱藏媒體以彩色漸層圖樣表示
         setting_use_pending_items: 限速模式
@@ -352,7 +353,7 @@ zh-TW:
           sign_up_requires_approval: 限制註冊
         severity: 規則
       notification_emails:
-        appeal: 有人對管理員的決定提出上訴
+        appeal: 有人對管理員的決定提出申訴
         digest: 傳送摘要電子郵件
         end_of_support: 目前正在運行之 Mastodon 版本即將停止支援
         favourite: 當有使用者將您的嘟文加入最愛時，傳送電子郵件通知
@@ -388,7 +389,7 @@ zh-TW:
         effective_date: 生效日期
         text: 服務條款
       terms_of_service_generator:
-        admin_email: 法律通知用途電子郵件
+        admin_email: 法律通知用途電子郵件地址
         arbitration_address: 仲裁通知之實體地址
         arbitration_website: 提交仲裁通知之網站
         choice_of_law: 法律選擇

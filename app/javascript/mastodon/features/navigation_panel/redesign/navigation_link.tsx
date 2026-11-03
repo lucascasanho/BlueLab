@@ -18,6 +18,7 @@ type NavigationLinkProps = {
   badgeCount?: number;
 } & (
   | ({ as?: 'button' } & React.ComponentPropsWithRef<'button'>)
+  | ({ as?: 'a' } & React.ComponentPropsWithRef<'a'>)
   | ({ as?: 'link' } & NavLinkProps)
 );
 
@@ -53,10 +54,7 @@ export const NavigationLink: React.FC<NavigationLinkProps> = ({
       >
         {IconComp && (
           <span className={classes.icon}>
-            <IconComp
-              size={stacked ? 24 : 20}
-              weight={isActive ? 'fill' : undefined}
-            />
+            <IconComp size={20} weight={isActive ? 'fill' : undefined} />
           </span>
         )}
         <span className={classes.label}>{children}</span>

@@ -25,7 +25,8 @@ import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import { autoPlayGif } from '@/mastodon/initial_state';
 
 import { CharacterCounter } from '../character_counter';
-import { EmojiPickerButton } from '../emoji/picker_button';
+import type { OnEmojiPick } from '../emoji/picker';
+import { EmojiPickerButton, emojiToString } from '../emoji/picker';
 
 import { clearEmptyProfileEmojiEditorPlaceholder } from './blue2_emoji_field_dom';
 import {
@@ -271,8 +272,8 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     [activeToken, applyEmoji, suggestionCodes],
   );
 
-  const handlePickEmoji = useCallback(
-    (emoji: string) => {
+  const handlePickEmoji: OnEmojiPick = useCallback(
+    (emoji) => {
       const input = inputRef.current;
       const currentValue = input?.value ?? inputValue;
       const rememberedSelection = lastSelectionRef.current;
@@ -281,7 +282,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
         input?.selectionStart ??
         currentValue.length;
       const end = rememberedSelection?.end ?? input?.selectionEnd ?? start;
-      applyEmoji(emoji, start, end);
+      applyEmoji(emojiToString(emoji), start, end);
     },
     [applyEmoji, inputRef, inputValue],
   );

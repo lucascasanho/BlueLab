@@ -86,6 +86,25 @@ RSpec.describe FetchResourceService do
         it { is_expected.to eq ['http://example.com/foo', { prefetched_body: body }] }
       end
 
+      context 'when the requested URL has no trailing slash' do
+        let(:url) { 'https://host.test' }
+        let(:content_type) { 'application/activity+json; charset=utf-8' }
+        let(:json) do
+          {
+            id: 'https://host.test',
+            '@context': ActivityPub::TagManager::CONTEXT,
+            type: 'Person',
+          }.to_json
+        end
+        let(:body) { json }
+
+        before do
+          stub_request(:get, %r{\Ahttps://host\.test/?\z}).to_return(status: 200, body: body, headers: headers)
+        end
+
+        it { is_expected.to eq ['https://host.test', { prefetched_body: body }] }
+      end
+
       context 'when content type is ld+json with profile' do
         let(:content_type) { 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"' }
         let(:body) { json }

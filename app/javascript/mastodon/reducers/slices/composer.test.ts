@@ -4,13 +4,14 @@ import { vi } from 'vitest';
 
 import { quoteCompose } from '@/mastodon/actions/compose_typed';
 import { browserHistory } from '@/mastodon/components/router';
-import { resolveComposeScrollTarget } from '@/mastodon/features/compose/redesign/scroll';
+import { resolveComposeScrollTarget } from '@/mastodon/features/compose/bluelab/scroll';
 import type { Status } from '@/mastodon/models/status';
 
 import { composerOriginFromElement, normalizeComposerEditor } from './composer';
 
 interface TestState {
   composer: { displayState: 'hidden' | 'showing' };
+  compose: ImmutableMap<string, string>;
   getIn: (path: string[]) => unknown;
 }
 
@@ -24,6 +25,7 @@ const quoteWithEditor = (editor: 'bluelab' | 'mastodon') => {
   const dispatched: TestAction[] = [];
   const state: TestState = {
     composer: { displayState: 'hidden' },
+    compose: ImmutableMap({ text: '' }),
     getIn: (path) => {
       if (path.join('.') === 'compose.composer_editor') return editor;
       if (path.join('.') === 'compose.mounted') return false;

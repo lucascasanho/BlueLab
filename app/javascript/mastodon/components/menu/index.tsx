@@ -131,7 +131,7 @@ export const Menu: React.FC<MenuProps> = ({
       if (element && type === 'actions' && !skipInitialFocus) {
         const menuItems = getAllMenuItems(element);
         const elementToFocus = menuItems[0] ?? element;
-        elementToFocus.focus({ preventScroll: true });
+        elementToFocus.focus();
       }
     },
     [skipInitialFocus, type],
@@ -152,7 +152,7 @@ export const Menu: React.FC<MenuProps> = ({
 
     setIsMenuOpen(false);
     if (listElement?.contains(document.activeElement)) {
-      triggerElement?.focus({ preventScroll: true });
+      triggerElement?.focus();
     }
   }, [listElement, triggerElement, onClose]);
 
@@ -275,8 +275,8 @@ export const Menu: React.FC<MenuProps> = ({
     type,
     triggerId,
     listId,
-    handleTriggerClick,
     handleMenuNavigation,
+    handleTriggerClick,
     mountListElement,
   ]);
 

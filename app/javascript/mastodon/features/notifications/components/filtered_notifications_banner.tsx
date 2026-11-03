@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 
-import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { Link, useHistory } from 'react-router-dom';
 

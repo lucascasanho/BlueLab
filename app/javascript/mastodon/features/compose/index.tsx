@@ -12,7 +12,7 @@ import elephantUIPlane from '@/images/elephant_ui_plane.svg';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';
 import { ColumnHeader } from '@/mastodon/components/column_header';
-import { selectComposerEditor } from '@/mastodon/reducers/slices/composer';
+import { Search } from '@/mastodon/components/search';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import EditIcon from '@/material-icons/400-24px/edit_square.svg?react';
 import PeopleIcon from '@/material-icons/400-24px/group.svg?react';
@@ -34,9 +34,7 @@ import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
 import { messages as navbarMessages } from '../ui/components/navigation_bar';
 
-import { Search } from './components/search';
-import ComposeFormContainer from './containers/compose_form_container';
-import { RedesignComposeForm } from './redesign';
+import { ComposeForm } from './form';
 
 const messages = defineMessages({
   live_feed_public: {
@@ -62,14 +60,6 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
   const columns = useAppSelector(
     (state) => state.settings.get('columns') as ImmutableList<ColumnMap>,
   );
-  const composerEditor = useAppSelector(selectComposerEditor);
-  const isVanillaTheme =
-    typeof document !== 'undefined' &&
-    (!document.body.dataset.theme || document.body.dataset.theme === 'default');
-  const isBlue2 =
-    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
-  const useBlueLabComposer =
-    composerEditor === 'bluelab' && (isVanillaTheme || isBlue2);
 
   useEffect(() => {
     dispatch(mountCompose());
@@ -185,25 +175,11 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
           aria-label={intl.formatMessage(navbarMessages.publish)}
         >
           <div className='drawer__inner' onFocus={handleFocus}>
-            {useBlueLabComposer ? (
-              <RedesignComposeForm
-                className='drawer__bluelab-compose'
-                embedded
-                vanillaAppearance={isVanillaTheme}
-              />
-            ) : (
-              <>
-                <ComposeFormContainer />
+            <ComposeForm headless />
 
-                <div className='drawer__inner__mastodon with-zig-zag-decoration'>
-                  <img
-                    alt=''
-                    draggable='false'
-                    src={mascot ?? elephantUIPlane}
-                  />
-                </div>
-              </>
-            )}
+            <div className='drawer__inner__mastodon with-zig-zag-decoration'>
+              <img alt='' draggable='false' src={mascot ?? elephantUIPlane} />
+            </div>
           </div>
         </div>
       </div>
@@ -215,7 +191,7 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
       bindToDocument={!multiColumn}
       label={intl.formatMessage(navbarMessages.publish)}
     >
-      {isRedesignEnabled() || isBlue2 ? (
+      {isRedesignEnabled() ? (
         <ColumnHeader
           withBackButton
           title={intl.formatMessage(navbarMessages.publish)}
@@ -230,22 +206,8 @@ const Compose: React.FC<{ multiColumn: boolean }> = ({ multiColumn }) => {
         />
       )}
 
-      <div className='scrollable'>
-        {useBlueLabComposer ? (
-          <RedesignComposeForm
-            // This is a dedicated compose view.
-
-            autoFocus
-            embedded
-            vanillaAppearance={isVanillaTheme}
-          />
-        ) : (
-          <ComposeFormContainer
-            // This is fine on this single-purpose view
-
-            autoFocus
-          />
-        )}
+      <div className='scrollable scrollable--flex'>
+        <ComposeForm autoFocus headless />
       </div>
 
       <Helmet>

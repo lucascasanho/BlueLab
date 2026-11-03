@@ -18,9 +18,7 @@ export const EmbeddedStatusContent: React.FC<{
     [status],
   );
   const hrefToMention = useCallback(
-    (href: string) => {
-      return mentions.find((item) => item.url === href);
-    },
+    (href: string) => mentions.find((item) => item.url === href),
     [mentions],
   );
   const hrefToCollection = useCallback(

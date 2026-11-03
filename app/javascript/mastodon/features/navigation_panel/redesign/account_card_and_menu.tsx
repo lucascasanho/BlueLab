@@ -300,7 +300,6 @@ export const AccountMenuItems: React.FC<{
 
   const isManager = canManageReports(permissions);
   const isAdmin = canViewAdminDashboard(permissions);
-
   const accountBasePath = `/@${account?.acct}`;
   const FavouriteIcon =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2'

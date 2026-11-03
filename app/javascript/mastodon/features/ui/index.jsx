@@ -26,7 +26,7 @@ import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 import { checkAnnualReport } from '@/mastodon/reducers/slices/annual_report';
 import { openNewComposer, openPreferredComposer } from '@/mastodon/reducers/slices/composer';
 
-import { uploadCompose, resetCompose, changeComposeSpoilerness } from '../../actions/compose';
+import { uploadCompose, resetCompose } from '../../actions/compose';
 import { clearHeight } from '../../actions/height_cache';
 import { fetchServer, fetchServerTranslationLanguages } from '../../actions/server';
 import { expandHomeTimeline } from '../../actions/timelines';
@@ -98,6 +98,7 @@ import 'mastodon/features/bug_report/diagnostics';
 // Without this it ends up in ~8 very commonly used bundles.
 import '../../components/status/legacy/status';
 import { getNavigationSkipLinkId, SkipLinks } from './components/skip_links';
+import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 
 const isRedesignEnabled = () => {
   if (initialState?.features.includes('redesign')) {
@@ -681,10 +682,12 @@ class UI extends PureComponent {
   handleHotkeySearch = e => {
     e.preventDefault();
 
-    const element = this.node.querySelector('.search__input');
+    const searchField = this.node.querySelector('[data-main-search="true"]');
 
-    if (element) {
+    if (element?.checkVisibility()) {
       element.focus({ preventScroll: true });
+    } else {
+      this.props.history.push('/search', { focusTarget: FOCUS_TARGET.SEARCH });
     }
   };
 
@@ -699,7 +702,7 @@ class UI extends PureComponent {
 
   handleHotkeyToggleComposeSpoilers = e => {
     e.preventDefault();
-    this.props.dispatch(changeComposeSpoilerness());
+    this.props.dispatch(toggleContentWarning());
   };
 
   handleHotkeyFocusColumn = e => {

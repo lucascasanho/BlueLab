@@ -19,9 +19,11 @@ import { useDrag } from '@use-gesture/react';
 import { closeNavigation, openNavigation } from '@/mastodon/actions/navigation';
 import { Avatar } from '@/mastodon/components/avatar';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
-import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { ComposeRedesignButton as BlueLabComposeButton } from '@/mastodon/features/compose/bluelab/trigger';
+import { ComposeButton } from '@/mastodon/features/compose/trigger';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
+import { selectComposerEditor } from '@/mastodon/reducers/slices/composer';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
@@ -39,6 +41,8 @@ export const RedesignMobileNavigation: React.FC = () => {
   const isMessagesPage =
     blue2Pathname === '/conversations' ||
     blue2Pathname.startsWith('/conversations/');
+
+  const composerEditor = useAppSelector(selectComposerEditor);
 
   const notificationsCount = useAppSelector(
     selectUnreadNotificationGroupsCount,
@@ -107,7 +111,12 @@ export const RedesignMobileNavigation: React.FC = () => {
             <FormattedMessage id='tabs_bar.profile' defaultMessage='Profile' />
           </MobileNavLink>
         </ul>
-        {!isMessagesPage && <ComposeRedesignButton inline />}
+        {!isMessagesPage &&
+          (composerEditor === 'mastodon' ? (
+            <ComposeButton inline />
+          ) : (
+            <BlueLabComposeButton inline />
+          ))}
       </nav>
 
       <SlideOutNavigation />

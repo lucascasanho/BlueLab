@@ -12,7 +12,7 @@ import { Helmet } from '@unhead/react/helmet';
 
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader } from '@/mastodon/components/column_header';
-import { Scrollable } from '@/mastodon/components/scrollable_list/components';
+import { Search } from '@/mastodon/components/search';
 import { submitSearch, expandSearch } from 'mastodon/actions/search';
 import type { ApiSearchType } from 'mastodon/api_types/search';
 import { Account } from 'mastodon/components/account';
@@ -20,7 +20,6 @@ import { CompatibilityHashtag as Hashtag } from 'mastodon/components/hashtag';
 import { Icon } from 'mastodon/components/icon';
 import ScrollableList from 'mastodon/components/scrollable_list';
 import { Status } from 'mastodon/components/status';
-import { Search } from 'mastodon/features/compose/components/search';
 import { useSearchParam } from 'mastodon/hooks/useSearchParam';
 import type { Hashtag as HashtagType } from 'mastodon/models/tags';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
@@ -299,31 +298,30 @@ export const SearchResults: React.FC<{ multiColumn: boolean }> = ({
         extraStickyContent={extraStickyHeaderContent}
       />
 
-      <Scrollable data-nosnippet>
-        <ScrollableList
-          scrollKey='search-results'
-          isLoading={isLoading}
-          showLoading={isLoading && !results}
-          onLoadMore={handleLoadMore}
-          hasMore={hasMore}
-          emptyMessage={
-            trimmedValue.length > 0 ? (
-              <FormattedMessage
-                id='search_results.no_results'
-                defaultMessage='No results.'
-              />
-            ) : (
-              <FormattedMessage
-                id='search_results.no_search_yet'
-                defaultMessage='Try searching for posts, profiles or hashtags.'
-              />
-            )
-          }
-          bindToDocument
-        >
-          {filteredResults}
-        </ScrollableList>
-      </Scrollable>
+      <ScrollableList
+        noSnippet
+        scrollKey='search-results'
+        isLoading={isLoading}
+        showLoading={isLoading && !results}
+        onLoadMore={handleLoadMore}
+        hasMore={hasMore}
+        emptyMessage={
+          trimmedValue.length > 0 ? (
+            <FormattedMessage
+              id='search_results.no_results'
+              defaultMessage='No results.'
+            />
+          ) : (
+            <FormattedMessage
+              id='search_results.no_search_yet'
+              defaultMessage='Try searching for posts, profiles or hashtags.'
+            />
+          )
+        }
+        bindToDocument
+      >
+        {filteredResults}
+      </ScrollableList>
 
       <Helmet>
         <title>{pageTitle}</title>

@@ -42,7 +42,7 @@ import { LoadingIndicator } from '@/mastodon/components/loading_indicator';
 import { RelativeTimestamp } from '@/mastodon/components/relative_timestamp';
 import { browserHistory } from '@/mastodon/components/router';
 import StatusContent from '@/mastodon/components/status/legacy/content';
-import { RedesignComposeForm } from '@/mastodon/features/compose/redesign';
+import { RedesignComposeForm } from '@/mastodon/features/compose/bluelab';
 import { me } from '@/mastodon/initial_state';
 import type { Account } from '@/mastodon/models/account';
 import type { StatusShape } from '@/mastodon/models/status';

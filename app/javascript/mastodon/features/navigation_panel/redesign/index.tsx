@@ -212,6 +212,7 @@ export const RedesignNavigationPanel: React.FC<{
     <nav
       className={classes.root}
       data-mode={mode}
+      data-scrollable={!isScrolledToTop || !isScrolledToBottom}
       aria-label={intl.formatMessage(messages.main)}
     >
       {topSensor}

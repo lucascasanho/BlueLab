@@ -81,27 +81,152 @@ RSpec.describe JsonLdHelper do
     end
   end
 
+  describe '#same_http_resource?' do
+    def same?(left, right)
+      helper.same_http_resource?(left, right)
+    end
+
+    it 'treats an empty path as /' do
+      expect(same?('https://host.test', 'https://host.test/')).to be true
+    end
+
+    it 'treats hostnames as case-insensitive' do
+      expect(same?('https://Example.COM/foo', 'https://example.com/foo')).to be true
+    end
+
+    it 'treats the default HTTPS port as optional' do
+      expect(same?('https://host.test:443/foo', 'https://host.test/foo')).to be true
+    end
+
+    it 'treats percent-encoded tilde as ~' do
+      expect(same?('https://host.test/%7Ealice', 'https://host.test/~alice')).to be true
+    end
+
+    it 'treats an IDN hostname as its punycode form' do
+      expect(same?('https://münchen.example/foo', 'https://xn--mnchen-3ya.example/foo')).to be true
+    end
+
+    it 'accepts an unchanged canonical actor URI' do
+      expect(same?('https://example.com/users/alice', 'https://example.com/users/alice')).to be true
+    end
+
+    it 'preserves a key fragment' do
+      expect(same?('https://host.test/actor#main-key', 'https://host.test/actor#main-key')).to be true
+    end
+
+    it 'does not treat a fragment as optional' do
+      expect(same?('https://host.test/actor#main-key', 'https://host.test/actor')).to be false
+    end
+
+    it 'does not merge a non-empty path with a trailing slash' do
+      expect(same?('https://example.com/users/alice', 'https://example.com/users/alice/')).to be false
+    end
+
+    it 'does not equate HTTP and HTTPS' do
+      expect(same?('http://host.test/foo', 'https://host.test/foo')).to be false
+    end
+
+    it 'does not equate a non-default port with the default port' do
+      expect(same?('https://host.test:8443/foo', 'https://host.test/foo')).to be false
+    end
+
+    it 'does not equate different hosts' do
+      expect(same?('https://victim.test/users/alice', 'https://evil.test/users/alice')).to be false
+    end
+
+    it 'does not equate different query strings' do
+      expect(same?('https://host.test/foo?q=a', 'https://host.test/foo?q=b')).to be false
+      expect(same?('https://host.test/foo?q=a%20b', 'https://host.test/foo?q=a+b')).to be false
+    end
+
+    it 'rejects userinfo on either URI' do
+      expect(same?('https://evil.com@victim.test/x', 'https://victim.test/x')).to be false
+      expect(same?('https://victim.test@evil.test/x', 'https://evil.test/x')).to be false
+      expect(same?('https://user@host.test/x', 'https://user@host.test/x')).to be false
+    end
+
+    it 'rejects an invalid URI' do
+      expect(same?('http://[', 'https://host.test/foo')).to be false
+    end
+
+    it 'rejects a non-HTTP scheme' do
+      expect(same?('ftp://host.test/foo', 'ftp://host.test/foo')).to be false
+      expect(same?('ftp://host.test/foo', 'https://host.test/foo')).to be false
+    end
+
+    it 'rejects a URI without a hostname' do
+      expect(same?('https:///foo', 'https://host.test/foo')).to be false
+    end
+
+    it 'does not equate different fragments' do
+      expect(same?('https://host.test/actor#main-key', 'https://host.test/actor#other-key')).to be false
+    end
+  end
+
   describe '#fetch_resource' do
-    context 'when the second argument is false' do
+    context 'when allow_redirects is true' do
       it 'returns resource even if the retrieved ID and the given URI does not match' do
         stub_request(:get, 'https://bob.test/').to_return(body: '{"id": "https://alice.test/"}', headers: { 'Content-Type': 'application/activity+json' })
         stub_request(:get, 'https://alice.test/').to_return(body: '{"id": "https://alice.test/"}', headers: { 'Content-Type': 'application/activity+json' })
 
-        expect(fetch_resource('https://bob.test/', false)).to eq({ 'id' => 'https://alice.test/' })
+        expect(fetch_resource('https://bob.test/', allow_redirects: true)).to eq({ 'id' => 'https://alice.test/' })
       end
 
       it 'returns nil if the object identified by the given URI and the object identified by the retrieved ID does not match' do
         stub_request(:get, 'https://mallory.test/').to_return(body: '{"id": "https://marvin.test/"}', headers: { 'Content-Type': 'application/activity+json' })
         stub_request(:get, 'https://marvin.test/').to_return(body: '{"id": "https://alice.test/"}', headers: { 'Content-Type': 'application/activity+json' })
 
-        expect(fetch_resource('https://mallory.test/', false)).to be_nil
+        expect(fetch_resource('https://mallory.test/', allow_redirects: true)).to be_nil
       end
     end
 
-    context 'when the second argument is true' do
+    context 'when allow_redirects is false' do
       it 'returns nil if the retrieved ID and the given URI does not match' do
         stub_request(:get, 'https://mallory.test/').to_return(body: '{"id": "https://alice.test/"}', headers: { 'Content-Type': 'application/activity+json' })
-        expect(fetch_resource('https://mallory.test/', true)).to be_nil
+        expect(fetch_resource('https://mallory.test/', allow_redirects: false)).to be_nil
+      end
+
+      it 'returns the resource when response.uri is the normalized form of the requested URI' do
+        stub_request(:get, %r{\Ahttps://host\.test/?\z}).to_return(body: '{"id": "https://host.test"}', headers: { 'Content-Type': 'application/activity+json' })
+
+        expect(fetch_resource('https://host.test', allow_redirects: false)).to eq({ 'id' => 'https://host.test' })
+      end
+
+      it 'returns nil when json id differs from the requested URI even if they normalize equally' do
+        stub_request(:get, %r{\Ahttps://host\.test/?\z}).to_return(body: '{"id": "https://host.test/"}', headers: { 'Content-Type': 'application/activity+json' })
+
+        expect(fetch_resource('https://host.test', allow_redirects: false)).to be_nil
+      end
+
+      [301, 302, 307, 308].each do |status|
+        it "returns nil without following a cross-origin #{status}" do
+          stub_request(:get, 'https://victim.test/users/alice').to_return(
+            status: status,
+            headers: { 'Location' => 'https://evil.test/alice', 'Content-Type' => 'application/activity+json' }
+          )
+          stub_request(:get, 'https://evil.test/alice').to_return(
+            status: 200,
+            body: '{"id": "https://victim.test/users/alice"}',
+            headers: { 'Content-Type': 'application/activity+json' }
+          )
+
+          expect(fetch_resource('https://victim.test/users/alice', allow_redirects: false)).to be_nil
+          expect(a_request(:get, 'https://evil.test/alice')).to_not have_been_made
+        end
+      end
+
+      it 'returns nil without following a same-host redirect to another path' do
+        stub_request(:get, 'https://victim.test/users/alice').to_return(
+          status: 302,
+          headers: { 'Location' => 'https://victim.test/users/bob', 'Content-Type' => 'application/activity+json' }
+        )
+        stub_request(:get, 'https://victim.test/users/bob').to_return(
+          status: 200,
+          body: '{"id": "https://victim.test/users/alice"}',
+          headers: { 'Content-Type': 'application/activity+json' }
+        )
+        expect(fetch_resource('https://victim.test/users/alice', allow_redirects: false)).to be_nil
+        expect(a_request(:get, 'https://victim.test/users/bob')).to_not have_been_made
       end
     end
   end
@@ -120,6 +245,12 @@ RSpec.describe JsonLdHelper do
     it 'returns hash' do
       stub_request(:get, 'https://host.test/').to_return(status: 200, body: '{}', headers: { 'Content-Type': 'application/activity+json' })
       expect(fetch_resource_without_id_validation('https://host.test/')).to eq({})
+    end
+
+    it 'returns the body when redirects are disallowed and response.uri is normalized' do
+      stub_request(:get, %r{\Ahttps://host\.test/?\z}).to_return(status: 200, body: '{}', headers: { 'Content-Type': 'application/activity+json' })
+
+      expect(fetch_resource_without_id_validation('https://host.test', allow_redirects: false)).to eq({})
     end
   end
 
