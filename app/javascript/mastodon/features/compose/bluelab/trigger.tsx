@@ -37,7 +37,7 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { useBreakpoint } from '../../ui/hooks/useBreakpoint';
 
-import { ComposeFormHeader } from './header';
+import { ComposeFormHeader } from '../vanilla_redesign/header';
 import { RedesignComposeForm } from './index';
 import classes from './trigger.module.scss';
 
@@ -332,6 +332,7 @@ export const ComposeRedesignButton: React.FC<{
         {isBlue2 && <ComposerBackdrop onMinimize={handleBackdropClick} />}
         <RedesignComposeForm
           ref={composerRef}
+          vanillaAppearance
           autoFocus
           className={classes.composer}
           style={style}
