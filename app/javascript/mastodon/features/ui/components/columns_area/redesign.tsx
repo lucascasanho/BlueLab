@@ -724,7 +724,7 @@ export const ColumnsAreaRedesign: React.FC<{
       <MultiColumnContent>{children}</MultiColumnContent>
       {/* The Blue2 rail owns the launcher, while this hidden-until-open mount
           owns the shared compose dialog. */}
-      {useMastodonComposer ? <ComposeButton /> : <ComposeRedesignButton />}
+      {!useMastodonComposer && <ComposeRedesignButton />}
     </main>
   );
 };
