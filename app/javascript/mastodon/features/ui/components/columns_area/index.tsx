@@ -4,7 +4,8 @@ import classNames from 'classnames';
 
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
-import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { ComposeRedesignButton } from '@/mastodon/features/compose/bluelab/trigger';
+import { ComposeButton } from '@/mastodon/features/compose/trigger';
 import { ComposeRedesignButton as VanillaComposeRedesignButton } from '@/mastodon/features/compose/vanilla_redesign/trigger';
 import { Footer } from '@/mastodon/features/custom_homepage/components/footer';
 import { DiscoveryPanel } from '@/mastodon/features/discovery_panel';
@@ -95,14 +96,14 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
         </div>
         {isMobileViewport ? (
           <RedesignMobileNavigation />
-        ) : (
+        ) : useBlueLabComposer ? (
           <ComposeRedesignButton />
+        ) : (
+          <ComposeButton />
         )}
 
-        {isBirdUi ? (
+        {isBirdUi && useBlueLabComposer && (
           <ComposeRedesignButton hostOnly />
-        ) : (
-          useBlueLabComposer && <ComposeRedesignButton />
         )}
 
         <main className='columns-area__panels__main'>
@@ -130,7 +131,7 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
       <div className={multiColClasses.navigationWrapper}>
         <RedesignNavigationPanel multiColumn />
       </div>
-      <ComposeButton />
+      {useBlueLabComposer ? <ComposeRedesignButton /> : <ComposeButton />}
       <MultiColumnContent>{children}</MultiColumnContent>
       {/* Bird UI advanced interface intentionally has no scroll-to-top control. */}
     </main>
