@@ -98,6 +98,7 @@ import 'mastodon/features/bug_report/diagnostics';
 // Without this it ends up in ~8 very commonly used bundles.
 import '../../components/status/legacy/status';
 import { getNavigationSkipLinkId, SkipLinks } from './components/skip_links';
+import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
 
 const isRedesignEnabled = () => {
   if (initialState?.features.includes('redesign')) {
@@ -681,10 +682,12 @@ class UI extends PureComponent {
   handleHotkeySearch = e => {
     e.preventDefault();
 
-    const element = this.node.querySelector('[data-main-search="true"]');
+    const searchField = this.node.querySelector('[data-main-search="true"]');
 
-    if (element) {
+    if (element?.checkVisibility()) {
       element.focus({ preventScroll: true });
+    } else {
+      this.props.history.push('/search', { focusTarget: FOCUS_TARGET.SEARCH });
     }
   };
 
