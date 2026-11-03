@@ -55,6 +55,7 @@ type ComposeTextareaProps = Omit<
   | 'onDrop'
   | 'onChange'
   | 'onKeyDown'
+  | 'lang'
 > & { beforeTextArea?: React.ReactNode };
 
 const selectComposeTextState = createAppSelector(
