@@ -15,6 +15,7 @@ import { afterEach, vi } from 'vitest';
 
 import { reducerWithInitialState } from '@/mastodon/reducers';
 import {
+  closeComposer,
   minimizeComposerToggle,
   openPreferredComposer,
 } from '@/mastodon/reducers/slices/composer';
@@ -61,6 +62,46 @@ afterEach(() => {
 });
 
 describe('BlueLab composer trigger controls', () => {
+  test('closes the composer when there are no unsaved changes', () => {
+    const store = configureStore({
+      reducer: reducerWithInitialState({
+        composer: { displayState: 'showing' },
+        compose: { text: '' },
+      }),
+      middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware(defaultMiddleware),
+    });
+
+    act(() => {
+      store.dispatch(closeComposer());
+    });
+
+    expect(store.getState().composer.displayState).toBe('hidden');
+    expect(
+      store.getState().modal.get('stack').first()?.get('modalType'),
+    ).toBeUndefined();
+  });
+
+  test('asks for confirmation before closing a composer with unsaved changes', () => {
+    const store = configureStore({
+      reducer: reducerWithInitialState({
+        composer: { displayState: 'showing' },
+        compose: { text: 'Unsaved draft' },
+      }),
+      middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware(defaultMiddleware),
+    });
+
+    act(() => {
+      store.dispatch(closeComposer());
+    });
+
+    expect(store.getState().composer.displayState).toBe('showing');
+    expect(store.getState().modal.get('stack').first()?.get('modalType')).toBe(
+      'COMPOSER_DRAFT_DELETE',
+    );
+  });
+
   test('minimizes the composer when the backdrop is clicked', () => {
     const onMinimize = vi.fn();
     const { container } = renderWithoutAppContext(

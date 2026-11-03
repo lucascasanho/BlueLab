@@ -408,6 +408,8 @@ export const closeComposer = createAppThunk((_arg, { getState, dispatch }) => {
         modalProps: {},
       }),
     );
+  } else {
+    dispatch(dismissComposer());
   }
 });
 

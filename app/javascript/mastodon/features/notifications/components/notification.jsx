@@ -18,6 +18,7 @@ import PersonAddIcon from '@/material-icons/400-24px/person_add-fill.svg?react';
 import { Account } from 'mastodon/components/account';
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
 import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
+import { StatusLikeIcon } from '@/mastodon/components/status/icons';
 import { Icon }  from 'mastodon/components/icon';
 import { injectIntl } from '@/mastodon/components/intl';
 import { Hotkeys } from 'mastodon/components/hotkeys';
