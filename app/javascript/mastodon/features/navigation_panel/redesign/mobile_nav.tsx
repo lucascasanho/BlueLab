@@ -19,11 +19,11 @@ import { useDrag } from '@use-gesture/react';
 import { closeNavigation, openNavigation } from '@/mastodon/actions/navigation';
 import { Avatar } from '@/mastodon/components/avatar';
 import { FOCUS_TARGET } from '@/mastodon/components/navigation_focus_target';
-import { ComposeButton } from '@/mastodon/features/compose/trigger';
 import { ComposeRedesignButton as BlueLabComposeButton } from '@/mastodon/features/compose/bluelab/trigger';
-import { selectComposerEditor } from '@/mastodon/reducers/slices/composer';
+import { ComposeButton } from '@/mastodon/features/compose/trigger';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
+import { selectComposerEditor } from '@/mastodon/reducers/slices/composer';
 import { selectUnreadNotificationGroupsCount } from '@/mastodon/selectors/notifications';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 

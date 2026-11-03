@@ -19,7 +19,10 @@ import { length } from 'stringz';
 import { CharacterCounter } from '@/mastodon/components/character_counter';
 import { Tesseract as fetchTesseract } from '@/mastodon/features/ui/util/async-components';
 import { showAlertForError } from 'mastodon/actions/alerts';
-import { changeComposeThreadItem, uploadThumbnail } from 'mastodon/actions/compose';
+import {
+  changeComposeThreadItem,
+  uploadThumbnail,
+} from 'mastodon/actions/compose';
 import { changeUploadCompose } from 'mastodon/actions/compose_typed';
 import api from 'mastodon/api';
 import { Button } from 'mastodon/components/button';
@@ -137,7 +140,7 @@ const Preview: React.FC<{
       }
     }
     return (
-      (compose.get('media_attachments') as ImmutableList<MediaAttachment>)
+      compose.get('media_attachments') as ImmutableList<MediaAttachment>
     ).find((item) => item.get('id') === mediaId);
   });
   const account = useAppSelector((state) =>
@@ -218,9 +221,7 @@ const Preview: React.FC<{
         frameRate={media.getIn(['meta', 'original', 'frame_rate']) as string}
         aspectRatio={`${
           media.getIn(['meta', 'original', 'width']) as number
-        } / ${
-          media.getIn(['meta', 'original', 'height']) as number
-        }`}
+        } / ${media.getIn(['meta', 'original', 'height']) as number}`}
         blurhash={media.get('blurhash') as string}
         src={media.get('url') as string}
         detailed
@@ -272,10 +273,7 @@ export interface ModalRef {
   getCloseConfirmationMessage: () => null | ConfirmationMessage;
 }
 
-export const AltTextModal = forwardRef<
-  ModalRef,
-  Props & Partial<RestoreProps>
->(
+export const AltTextModal = forwardRef<ModalRef, Props & Partial<RestoreProps>>(
   (
     { mediaId, threadItemId, previousDescription, previousPosition, onClose },
     ref,
@@ -302,7 +300,7 @@ export const AltTextModal = forwardRef<
         }
       }
       return (
-        (compose.get('media_attachments') as ImmutableList<MediaAttachment>)
+        compose.get('media_attachments') as ImmutableList<MediaAttachment>
       ).find((item) => item.get('id') === mediaId);
     });
     const threadAttachments = useAppSelector((state) => {
@@ -546,16 +544,16 @@ export const AltTextModal = forwardRef<
             {(type === 'audio' || type === 'video') &&
               unattached &&
               !threadItemId && (
-              <UploadButton
-                onSelectFile={handleThumbnailChange}
-                mimeTypes='image/jpeg,image/png,image/gif,image/webp'
-              >
-                <FormattedMessage
-                  id='alt_text_modal.change_thumbnail'
-                  defaultMessage='Change thumbnail'
-                />
-              </UploadButton>
-            )}
+                <UploadButton
+                  onSelectFile={handleThumbnailChange}
+                  mimeTypes='image/jpeg,image/png,image/gif,image/webp'
+                >
+                  <FormattedMessage
+                    id='alt_text_modal.change_thumbnail'
+                    defaultMessage='Change thumbnail'
+                  />
+                </UploadButton>
+              )}
           </div>
 
           <form

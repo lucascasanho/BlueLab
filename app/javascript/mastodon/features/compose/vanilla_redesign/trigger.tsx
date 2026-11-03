@@ -29,10 +29,10 @@ import { isRedesignEnabled } from '@/mastodon/utils/environment';
 
 import { useBreakpoint } from '../../ui/hooks/useBreakpoint';
 import { RedesignComposeForm as BlueLabComposeForm } from '../bluelab';
-
-import { ComposeForm } from '../form';
 import { ComposeFormHeader } from '../components/header';
+import { ComposeForm } from '../form';
 import composerClasses from '../styles.module.scss';
+
 import classes from './trigger.module.scss';
 
 export const ComposeRedesignButton: React.FC<{

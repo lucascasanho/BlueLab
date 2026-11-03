@@ -36,11 +36,11 @@ export function DirectTimeline() {
 
 export function MessageConversation() {
   return import('../../direct_timeline/components/message_conversation').then(
-    module => ({ default: module.MessageConversation }),
+    (module) => ({ default: module.MessageConversation }),
   );
 }
 
-export function ListTimeline () {
+export function ListTimeline() {
   return import('../../list_timeline');
 }
 
@@ -134,19 +134,19 @@ export function BookmarkedStatuses() {
   return import('../../bookmarked_statuses');
 }
 
-export function ScheduledPublications () {
+export function ScheduledPublications() {
   return import('../../scheduled_publications');
 }
 
-export function Blocks () {
+export function Blocks() {
   return import('../../blocks');
 }
 
-export function DomainBlocks () {
+export function DomainBlocks() {
   return import('../../blocks/domains');
 }
 
-export function Mutes () {
+export function Mutes() {
   return import('../../mutes');
 }
 
@@ -166,14 +166,16 @@ export function ReportModal() {
   return import('../components/report_modal');
 }
 
-export function BugReportModal () {
-  return import('../../bug_report/bug_report_modal')
-    .then(module => ({ default: module.BugReportModal }));
+export function BugReportModal() {
+  return import('../../bug_report/bug_report_modal').then((module) => ({
+    default: module.BugReportModal,
+  }));
 }
 
-export function ReportCollectionModal () {
-  return import('../components/report_collection_modal')
-    .then((module) => ({ default: module.ReportCollectionModal }));;
+export function ReportCollectionModal() {
+  return import('../components/report_collection_modal').then((module) => ({
+    default: module.ReportCollectionModal,
+  }));
 }
 
 export function IgnoreNotificationsModal() {

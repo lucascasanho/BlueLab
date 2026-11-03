@@ -102,9 +102,7 @@ const ColumnsAreaLegacy: React.FC<ColumnsAreaProps> = ({
           <ComposeButton />
         )}
 
-        {isBirdUi && useBlueLabComposer && (
-          <ComposeRedesignButton hostOnly />
-        )}
+        {isBirdUi && useBlueLabComposer && <ComposeRedesignButton hostOnly />}
 
         <main className='columns-area__panels__main'>
           <div className='tabs-bar__wrapper'>

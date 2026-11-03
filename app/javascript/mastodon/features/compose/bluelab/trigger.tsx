@@ -36,8 +36,8 @@ import {
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import { useBreakpoint } from '../../ui/hooks/useBreakpoint';
-
 import { ComposeFormHeader } from '../vanilla_redesign/header';
+
 import { RedesignComposeForm } from './index';
 import classes from './trigger.module.scss';
 
