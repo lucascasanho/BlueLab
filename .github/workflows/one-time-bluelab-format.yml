@@ -1,0 +1,72 @@
+name: One-time BlueLab composer formatting
+
+on:
+  push:
+    branches:
+      - ops/20261102-mastodon-upstream-test
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout isolated update branch
+        uses: actions/checkout@v4
+        with:
+          ref: ops/20261102-mastodon-upstream-test
+          fetch-depth: 0
+
+      - name: Check explicit trigger
+        run: test -f .codex/trigger-bluelab-format
+
+      - name: Set up JavaScript
+        uses: ./.github/actions/setup-javascript
+
+      - name: Format files reported by CI
+        run: |
+          yarn format \
+            app/javascript/mastodon/components/menu/index.tsx \
+            app/javascript/mastodon/features/alt_text_modal/index.tsx \
+            app/javascript/mastodon/features/compose/bluelab/trigger.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/settings.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/trigger.tsx \
+            app/javascript/mastodon/features/navigation_panel/redesign/mobile_nav.tsx \
+            app/javascript/mastodon/features/ui/components/columns_area/index.tsx \
+            app/javascript/mastodon/features/ui/components/compose_panel.tsx \
+            app/javascript/mastodon/features/ui/util/async-components.ts
+
+      - name: Verify formatting
+        run: |
+          yarn format:check \
+            app/javascript/mastodon/components/menu/index.tsx \
+            app/javascript/mastodon/features/alt_text_modal/index.tsx \
+            app/javascript/mastodon/features/compose/bluelab/trigger.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/settings.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/trigger.tsx \
+            app/javascript/mastodon/features/navigation_panel/redesign/mobile_nav.tsx \
+            app/javascript/mastodon/features/ui/components/columns_area/index.tsx \
+            app/javascript/mastodon/features/ui/components/compose_panel.tsx \
+            app/javascript/mastodon/features/ui/util/async-components.ts
+
+      - name: Commit formatting without running repository hooks
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            app/javascript/mastodon/components/menu/index.tsx \
+            app/javascript/mastodon/features/alt_text_modal/index.tsx \
+            app/javascript/mastodon/features/compose/bluelab/trigger.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/settings.tsx \
+            app/javascript/mastodon/features/compose/vanilla_redesign/trigger.tsx \
+            app/javascript/mastodon/features/navigation_panel/redesign/mobile_nav.tsx \
+            app/javascript/mastodon/features/ui/components/columns_area/index.tsx \
+            app/javascript/mastodon/features/ui/components/compose_panel.tsx \
+            app/javascript/mastodon/features/ui/util/async-components.ts
+          git rm -f .codex/trigger-bluelab-format
+          git diff --cached --check
+          HUSKY=0 git commit -m "style: format BlueLab composer integration files"
+          git push origin "HEAD:ops/20261102-mastodon-upstream-test"
