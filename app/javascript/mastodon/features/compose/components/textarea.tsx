@@ -205,7 +205,6 @@ export const ComposeTextarea: React.FC<ComposeTextareaProps> = ({
         {...textAreaProps}
         dir='auto'
         id={COMPOSER_TEXTAREA_ID}
-        data-compose-scroll-zone='editor'
         className={classNames(className, classes.textarea)}
         autoSize={!VERTICAL_LANG_CODES.includes(lang)}
         ref={textAreaRef}

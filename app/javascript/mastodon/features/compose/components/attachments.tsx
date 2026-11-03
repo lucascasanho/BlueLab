@@ -23,12 +23,7 @@ export const ComposeAttachments: React.FC<{ className?: string }> = ({
   }
 
   return (
-    <div
-      className={className}
-      data-bluelab-compose-attachments
-      data-compose-scroll-zone='panel'
-      data-has-quote={quotedStatusId ? 'true' : 'false'}
-    >
+    <div className={className}>
       {hasPoll && <ComposePoll />}
       {hasAttachments && <ComposeMediaAttachments />}
       {quotedStatusId && <ComposeQuote id={quotedStatusId} />}
@@ -47,7 +42,7 @@ const ComposeMediaAttachments: React.FC = () => {
   if (totalAttachments === 1) {
     return (
       <div className={classes.mediaSingle}>
-        <ComposeUpload id={attachments.at(0)?.id} />
+        <ComposeUpload id={attachments.at(0)?.id} single />
       </div>
     );
   }

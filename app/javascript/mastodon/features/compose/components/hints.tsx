@@ -1,4 +1,3 @@
-import type React from 'react';
 import { useCallback } from 'react';
 
 import { FormattedMessage } from 'react-intl';
@@ -56,9 +55,7 @@ export const ComposeHints = (props: React.ComponentPropsWithRef<'div'>) => {
   const guess = useLanguageGuess();
   const isDifferentLanguage = lang && guess && lang !== guess;
 
-  const publishErrors = useAppSelector(
-    (state) => state.composer.publishErrors as string[],
-  );
+  const publishErrors = useAppSelector((state) => state.composer.publishErrors);
 
   const messages: React.ReactNode[] = [];
 

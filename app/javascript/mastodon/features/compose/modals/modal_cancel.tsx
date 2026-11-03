@@ -13,18 +13,16 @@ import {
   openNewComposer,
   requestComposerFocus,
   resetComposer,
-  resumeComposer,
 } from '@/mastodon/reducers/slices/composer';
-import type { ComposeNewPayload } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
-const ComposerModalCancelConfirm: React.FC<{ openNew?: ComposeNewPayload }> = ({
+const ComposerModalCancelConfirm: React.FC<{ openNew?: boolean }> = ({
   openNew,
 }) => {
   const dispatch = useAppDispatch();
   const handleDelete = useCallback(() => {
     if (openNew) {
-      dispatch(openNewComposer({ ...openNew, force: true }));
+      dispatch(openNewComposer({ force: true }));
     } else {
       dispatch(resetComposer());
     }
@@ -36,12 +34,8 @@ const ComposerModalCancelConfirm: React.FC<{ openNew?: ComposeNewPayload }> = ({
     dispatch(
       closeModal({ modalType: 'COMPOSER_DRAFT_DELETE', ignoreFocus: false }),
     );
-    if (openNew) {
-      dispatch(resumeComposer(openNew.origin));
-    } else {
-      dispatch(requestComposerFocus());
-    }
-  }, [dispatch, openNew]);
+    dispatch(requestComposerFocus());
+  }, [dispatch]);
 
   const isEditing = useAppSelector((state) => !!state.compose.get('id'));
 

@@ -3,7 +3,6 @@ import { length } from 'stringz';
 import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
 import type { ApiQuotePolicy } from '@/mastodon/api_types/quotes';
 import { immutableListToSuggestions } from '@/mastodon/components/autosuggest/utils';
-import { statusMaxCharacters } from '@/mastodon/initial_state';
 import type { StatusVisibility } from '@/mastodon/models/status';
 import type { ComposeType } from '@/mastodon/reducers/slices/composer';
 import { createAppSelector } from '@/mastodon/store';
@@ -55,9 +54,6 @@ export const selectComposeType = createAppSelector(
   },
 );
 
-export const isMessageComposeType = (type: ComposeType) =>
-  type === 'message' || type === 'replyPrivate';
-
 export const selectComposeCharsCount = createAppSelector(
   [
     (state) => state.server.server.item?.configuration.statuses.max_characters,
@@ -72,7 +68,7 @@ export const selectComposeCharsCount = createAppSelector(
     return {
       text,
       allText,
-      max: statusMaxCharacters ?? maxChars ?? 500,
+      max: maxChars ?? 500,
       current: length(allText),
     };
   },
@@ -113,36 +109,19 @@ export const selectComposeCanSubmit = createAppSelector(
     (state) => !!state.compose.get('is_changing_upload'),
     selectComposeHasAttachments,
     selectComposeCharsCount,
-    (state) =>
-      state.compose.get('thread_items') as unknown as Immutable.List<
-        Immutable.Map<string, unknown>
-      >,
   ],
   (
     isSubmitting,
     isUploading,
     isChangingUpload,
     { hasAttachments, hasPoll, quotedStatusId },
-    { text, current, max },
-    threadItems,
+    { text, max },
   ) =>
     !isSubmitting &&
     !isUploading &&
     !isChangingUpload &&
-    current <= max &&
-    (text.trim().length > 0 || hasAttachments || hasPoll || !!quotedStatusId) &&
-    threadItems.every((item) => {
-      const itemText = item.get('text') as string;
-      const spoilerText = item.get('spoiler_text') as string;
-      const attachments = item.get(
-        'media_attachments',
-      ) as Immutable.List<unknown>;
-      const itemCurrent = length(`${countableText(itemText)}${spoilerText}`);
-      return (
-        itemCurrent <= max &&
-        (itemText.trim().length > 0 || attachments.size > 0)
-      );
-    }),
+    text.trim().length <= max &&
+    (hasAttachments || hasPoll || quotedStatusId || text.trim().length > 0),
 );
 
 export const selectComposeMentions = createAppSelector(

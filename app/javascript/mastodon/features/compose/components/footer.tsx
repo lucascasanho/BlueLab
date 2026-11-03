@@ -1,77 +1,40 @@
 import type React from 'react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 
-import { defineMessages, FormattedMessage, FormattedNumber } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
 import classNames from 'classnames';
-
-import type { List as ImmutableList, Map as ImmutableMap } from 'immutable';
 
 import {
   ImageSquareIcon,
   ChartBarHorizontalIcon,
   WarningCircleIcon,
-  PlusIcon,
 } from '@phosphor-icons/react';
-import { length } from 'stringz';
 
-import {
-  addPoll,
-  uploadCompose,
-  addComposeThreadItem,
-  addComposeThreadMedia,
-} from '@/mastodon/actions/compose';
-import api from '@/mastodon/api';
-import type { ApiMediaAttachmentJSON } from '@/mastodon/api_types/media_attachments';
+import { addPoll, uploadCompose } from '@/mastodon/actions/compose';
 import { Button, IconButton } from '@/mastodon/components/button/redesign';
 import type { OnEmojiPick } from '@/mastodon/components/emoji/picker';
 import { EmojiPickerButton } from '@/mastodon/components/emoji/picker';
-import {
-  hideStatusCharacterCounter,
-  statusMaxCharacters,
-} from '@/mastodon/initial_state';
 import {
   createAppSelector,
   useAppDispatch,
   useAppSelector,
 } from '@/mastodon/store';
 
-import { shouldShowCharacterCounter } from '../components/character_counter';
-import { countableText } from '../util/counter';
+import classes from '../styles.module.scss';
 
-import type { OnEmojiPick } from './emoji';
-import { ComposeEmojiButton } from './emoji';
-import { ComposeGifButton } from './gif_picker';
-import { ComposeSchedule } from './schedule';
 import {
   selectComposeAttachments,
   selectComposeCharsCount,
-  isMessageComposeType,
   selectComposeHasAttachments,
   selectComposeType,
-  selectComposeCanSubmit,
 } from './selectors';
 
-const messages = defineMessages({
-  addThreadItem: {
-    id: 'compose.thread.add',
-    defaultMessage: 'Add another post to this thread',
-  },
-});
-
-export const ComposeFooter: React.FC<{
-  onEmojiPick: OnEmojiPick;
-  activeThreadItemId?: string | null;
-  vanillaAppearance?: boolean;
-}> = ({
+export const ComposeFooter: React.FC<{ onEmojiPick: OnEmojiPick }> = ({
   onEmojiPick,
-  activeThreadItemId = null,
-  vanillaAppearance = false,
 }) => {
   const type = useAppSelector(selectComposeType);
-  const isEditing = useAppSelector((state) => !!state.compose.get('id'));
-  const isMessage = isMessageComposeType(type);
-  const rootCounter = useAppSelector(selectComposeCharsCount);
+  const { current, max } = useAppSelector(selectComposeCharsCount);
   const { hasPoll, quotedStatusId } = useAppSelector(
     selectComposeHasAttachments,
   );
@@ -79,52 +42,11 @@ export const ComposeFooter: React.FC<{
   const isSubmitting = useAppSelector(
     (state) => !!state.compose.get('is_submitting'),
   );
-  const canSubmit = useAppSelector(selectComposeCanSubmit);
-  const activeThreadItem = useAppSelector((state) => {
-    if (!activeThreadItemId) return null;
-    return (
-      (
-        state.compose.get('thread_items') as ImmutableList<
-          ImmutableMap<string, unknown>
-        >
-      ).find((item) => item.get('id') === activeThreadItemId) ?? null
-    );
-  });
-  const threadMax = useAppSelector(
-    (state) =>
-      state.server.server.item?.configuration.statuses.max_characters ??
-      statusMaxCharacters ??
-      500,
-  );
-  const activeText = activeThreadItem?.get('text');
-  const activeSpoiler = activeThreadItem?.get('spoiler_text');
-  const current = activeThreadItem
-    ? length(
-        `${countableText(typeof activeText === 'string' ? activeText : '')}${typeof activeSpoiler === 'string' ? activeSpoiler : ''}`,
-      )
-    : rootCounter.current;
-  const max = activeThreadItem ? threadMax : rootCounter.max;
+  const isEditing = useAppSelector((state) => !!state.compose.get('id'));
+
   const dispatch = useAppDispatch();
-  const scheduledAt = useAppSelector(
-    (state) => state.compose.get('scheduled_at') as string | null,
-  );
-  const threadItemCount = useAppSelector(
-    (state) =>
-      (state.compose.get('thread_items') as unknown as { size: number }).size,
-  );
-  const hasPublishedThreadItems = useAppSelector(
-    (state) =>
-      !(
-        state.compose.get('thread_published_ids') as unknown as {
-          isEmpty: () => boolean;
-        }
-      ).isEmpty(),
-  );
   const handlePoll = useCallback(() => {
     dispatch(addPoll());
-  }, [dispatch]);
-  const handleAddThreadItem = useCallback(() => {
-    dispatch(addComposeThreadItem());
   }, [dispatch]);
 
   let publishText = (
@@ -139,95 +61,46 @@ export const ComposeFooter: React.FC<{
   }
 
   return (
-    <footer
-      className={classes.footer}
-      data-bluelab-compose-footer
-      data-vanilla-appearance={vanillaAppearance ? 'true' : undefined}
-    >
-      <div className={classes.secondaryActions} data-compose-media-actions>
-        <ComposeUploadButton
-          activeThreadItemId={activeThreadItemId}
-          disabled={!activeThreadItemId && hasQuote}
+    <footer className={classes.footer}>
+      <ComposeUploadButton disabled={hasQuote} />
+
+      <EmojiPickerButton onPick={onEmojiPick} />
+
+      <IconButton
+        size='sm'
+        icon={ChartBarHorizontalIcon}
+        disabled={hasQuote || hasPoll}
+        onClick={handlePoll}
+      >
+        <FormattedMessage
+          id='poll_button.add_poll'
+          defaultMessage='Add a poll'
         />
+      </IconButton>
 
-        <ComposeGifButton
-          activeThreadItemId={activeThreadItemId}
-          disabled={!activeThreadItemId && hasQuote}
-        />
-
-        <ComposeEmojiButton onPick={onEmojiPick} />
-
-        {!isMessage && (
-          <IconButton
-            size='sm'
-            icon={ChartBarHorizontalIcon}
-            className={classes.pollButton}
-            disabled={hasQuote || hasPoll || !!activeThreadItemId}
-            onClick={handlePoll}
-          >
-            <FormattedMessage
-              id='poll_button.add_poll'
-              defaultMessage='Add a poll'
-            />
-          </IconButton>
-        )}
-        <ComposeSchedule />
-      </div>
-
-      <div className={classes.flexGrowWrap} data-compose-footer-controls>
-        {shouldShowCharacterCounter(
-          hideStatusCharacterCounter,
-          current,
-          max,
-        ) && (
-          <span
-            className={classNames(
-              classes.counter,
-              current > max && classes.counterError,
-            )}
-          >
-            {current > max && <WarningCircleIcon weight='fill' />}
-            <FormattedNumber value={max - current} />
-          </span>
-        )}
-
-        <div className={classes.primaryActions} data-compose-primary-actions>
-          {!isMessage && (
-            <IconButton
-              as='button'
-              type='button'
-              size='sm'
-              icon={PlusIcon}
-              className={classes.threadAddButton}
-              disabled={threadItemCount >= 24 || hasPublishedThreadItems}
-              onClick={handleAddThreadItem}
-            >
-              <FormattedMessage {...messages.addThreadItem} />
-            </IconButton>
+      <div className={classes.flexGrowWrap}>
+        <span
+          className={classNames(
+            classes.counter,
+            current > max && classes.counterError,
           )}
-          <Button
-            variant='solid'
-            color='accent'
-            type='submit'
-            className={classes.submitButton}
-            disabled={!canSubmit}
-            loading={isSubmitting}
-          >
-            {!isMessage && !scheduledAt && publishText}
-            {!isMessage && scheduledAt && (
-              <FormattedMessage
-                id='compose.schedule.submit'
-                defaultMessage='Schedule'
-              />
-            )}
-            {isMessage && (
-              <FormattedMessage
-                id='compose.message.publish'
-                defaultMessage='Send'
-              />
-            )}
-          </Button>
-        </div>
+        >
+          {current > max && <WarningCircleIcon weight='fill' />}
+          <FormattedMessage
+            id='compose.counter'
+            defaultMessage='{current, number}/{max, number}'
+            values={{ current, max }}
+          />
+        </span>
+
+        <Button
+          variant='solid'
+          color='accent'
+          type='submit'
+          loading={isSubmitting}
+        >
+          {publishText}
+        </Button>
       </div>
     </footer>
   );
@@ -237,7 +110,7 @@ const selectUpload = createAppSelector(
   [
     (state) =>
       state.media_attachments.get('accept_content_types') as
-        | ImmutableList<string>
+        | Immutable.List<string>
         | undefined,
     (state) => !!state.compose.get('is_uploading'),
     selectComposeAttachments,
@@ -276,56 +149,11 @@ const selectUpload = createAppSelector(
   },
 );
 
-const ComposeUploadButton: React.FC<{
-  disabled?: boolean;
-  activeThreadItemId?: string | null;
-}> = ({ disabled: disabledProp, activeThreadItemId = null }) => {
-  const rootUpload = useAppSelector(selectUpload);
-  const threadMedia = useAppSelector((state) => {
-    if (!activeThreadItemId) return null;
-    const item = (
-      state.compose.get('thread_items') as ImmutableList<
-        ImmutableMap<string, unknown>
-      >
-    ).find((candidate) => candidate.get('id') === activeThreadItemId);
-    return (
-      (item?.get('media_attachments') as
-        | ImmutableList<ImmutableMap<string, unknown>>
-        | undefined) ?? null
-    );
-  });
-  const fileTypesList = useAppSelector(
-    (state) =>
-      state.media_attachments.get('accept_content_types') as
-        | ImmutableList<string>
-        | undefined,
-  );
-  const maxAttachments = useAppSelector(
-    (state) =>
-      state.server.server.item?.configuration.statuses.max_media_attachments ??
-      4,
-  );
-  const [threadUploading, setThreadUploading] = useState(false);
-  const isThreadTarget = !!activeThreadItemId && !!threadMedia;
-  const threadHasVideoOrAudio =
-    threadMedia?.some((attachment) => {
-      const type = attachment.get('type');
-      return type === 'audio' || type === 'video';
-    }) ?? false;
-  const threadHasImages =
-    threadMedia?.some((attachment) => {
-      const type = attachment.get('type');
-      return type === 'image' || type === 'gifv';
-    }) ?? false;
-  const accepted = isThreadTarget
-    ? (fileTypesList?.toArray() ?? [])
-        .filter((fileType) => !threadHasImages || fileType.startsWith('image/'))
-        .join(',')
-    : rootUpload.accepted;
-  const disabled = isThreadTarget
-    ? threadMedia.size >= maxAttachments || threadHasVideoOrAudio
-    : rootUpload.disabled;
-  const loading = isThreadTarget ? threadUploading : rootUpload.loading;
+const ComposeUploadButton: React.FC<{ disabled?: boolean }> = ({
+  disabled: disabledProp,
+}) => {
+  const { accepted, disabled, loading, resetFileKey } =
+    useAppSelector(selectUpload);
 
   const ref = useRef<HTMLInputElement>(null);
   const handleClick = useCallback(() => {
@@ -333,48 +161,14 @@ const ComposeUploadButton: React.FC<{
   }, []);
 
   const dispatch = useAppDispatch();
-  const uploadThread = useCallback(
-    async (files: FileList) => {
-      if (!activeThreadItemId || !threadMedia) return;
-      setThreadUploading(true);
-      try {
-        for (const file of Array.from(files).slice(
-          0,
-          Math.max(0, maxAttachments - threadMedia.size),
-        )) {
-          const form = new FormData();
-          form.append('file', file);
-          let response = await api().post<ApiMediaAttachmentJSON>(
-            '/api/v2/media',
-            form,
-          );
-          while (response.status !== 200) {
-            await new Promise((resolve) => window.setTimeout(resolve, 1_000));
-            response = await api().get<ApiMediaAttachmentJSON>(
-              `/api/v1/media/${response.data.id}`,
-            );
-          }
-          dispatch(addComposeThreadMedia(activeThreadItemId, response.data));
-        }
-      } finally {
-        setThreadUploading(false);
-        if (ref.current) ref.current.value = '';
-      }
-    },
-    [activeThreadItemId, dispatch, maxAttachments, threadMedia],
-  );
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
     (event) => {
       const files = event.target.files;
-      if (!files?.length) return;
-
-      if (isThreadTarget) {
-        void uploadThread(files);
-      } else {
-        void dispatch(uploadCompose(files));
+      if (files?.length) {
+        dispatch(uploadCompose(files));
       }
     },
-    [dispatch, isThreadTarget, uploadThread],
+    [dispatch],
   );
 
   return (
@@ -397,8 +191,8 @@ const ComposeUploadButton: React.FC<{
         type='file'
         multiple
         accept={accepted}
-        disabled={disabled || disabledProp}
-        key={isThreadTarget ? activeThreadItemId : rootUpload.resetFileKey}
+        disabled={disabled}
+        key={resetFileKey}
         onChange={handleChange}
       />
     </>
