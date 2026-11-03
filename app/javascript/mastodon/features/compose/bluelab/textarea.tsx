@@ -181,7 +181,6 @@ export const ComposeTextarea: React.FC<ComposeTextareaProps> = ({
         autoSize
         ref={textAreaRef}
         value={text}
-        lang={lang}
         placeholder={intl.formatMessage(
           type === 'message'
             ? messages.messagePlaceholder
@@ -192,6 +191,7 @@ export const ComposeTextarea: React.FC<ComposeTextareaProps> = ({
         onPaste={onPasteOrDrop}
         onChange={onChange}
         {...sourceProps}
+        lang={lang}
       />
 
       {mirror}

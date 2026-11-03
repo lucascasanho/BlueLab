@@ -132,6 +132,49 @@ RSpec.describe ActivityPub::SynchronizeFollowersService do
       it_behaves_like 'synchronizes followers'
     end
 
+    context 'when a subsequent collection page is on another host' do
+      before do
+        stub_request(:get, 'https://example.com/partial-followers')
+          .to_return(status: 200, headers: { 'Content-Type': 'application/activity+json' }, body: {
+            '@context': 'https://www.w3.org/ns/activitystreams',
+            type: 'Collection',
+            id: 'https://example.com/partial-followers',
+            first: 'https://example.com/partial-followers/1',
+          }.to_json)
+
+        stub_request(:get, 'https://example.com/partial-followers/1')
+          .to_return(status: 200, headers: { 'Content-Type': 'application/activity+json' }, body: {
+            '@context': 'https://www.w3.org/ns/activitystreams',
+            type: 'CollectionPage',
+            id: 'https://example.com/partial-followers/1',
+            partOf: 'https://example.com/partial-followers',
+            next: 'https://evil.test/followers/2',
+            items: [alice, eve].map { |account| ActivityPub::TagManager.instance.uri_for(account) },
+          }.to_json)
+
+        stub_request(:get, 'https://evil.test/followers/2')
+          .to_return(status: 200, headers: { 'Content-Type': 'application/activity+json' }, body: {
+            '@context': 'https://www.w3.org/ns/activitystreams',
+            type: 'CollectionPage',
+            id: 'https://evil.test/followers/2',
+            partOf: 'https://example.com/partial-followers',
+            items: ActivityPub::TagManager.instance.uri_for(mallory),
+          }.to_json)
+      end
+
+      it 'does not fetch the off-host page or remove extra followers' do
+        previous_follower_ids = actor.followers.pluck(:id)
+
+        subject.call(actor, collection_uri)
+
+        expect(a_request(:get, 'https://evil.test/followers/2')).to_not have_been_made
+        expect(previous_follower_ids - actor.followers.reload.pluck(:id)).to be_empty
+        expect(alice).to be_following(actor)
+        expect(bob).to be_following(actor)
+        expect(mallory).to_not be_following(actor)
+      end
+    end
+
     context 'when the endpoint is a paginated Collection of actor URIs split across, but one page errors out' do
       before do
         stub_request(:get, 'https://example.com/partial-followers')

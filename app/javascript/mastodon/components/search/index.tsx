@@ -200,10 +200,9 @@ export const Search: React.FC<{
   const handleAfterNavigationFocus = useCallback(() => {
     setShouldOpenOnFocus(true);
   }, []);
-  const focusAfterNavigation = useFocusAfterNavigation(
-    FOCUS_TARGET.SEARCH,
-    handleAfterNavigationFocus,
-  );
+  const focusAfterNavigation = useFocusAfterNavigation(FOCUS_TARGET.SEARCH, {
+    onAfterFocus: handleAfterNavigationFocus,
+  });
   const setSearchInputRef = useCallback(
     (element: HTMLInputElement | null) => {
       searchInputRef.current = element;

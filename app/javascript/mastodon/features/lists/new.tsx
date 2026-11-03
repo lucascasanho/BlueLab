@@ -10,10 +10,13 @@ import { Helmet } from '@unhead/react/helmet';
 
 import { Button } from '@/mastodon/components/button/redesign';
 import { Column } from '@/mastodon/components/column';
+import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';
 import { ColumnHeader } from '@/mastodon/components/column_header';
 import { NotSignedInIndicator } from '@/mastodon/components/not_signed_in_indicator';
 import { useIdentity } from '@/mastodon/identity_context';
+import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import ChevronRightIcon from '@/material-icons/400-24px/chevron_right.svg?react';
+import ListAltIcon from '@/material-icons/400-24px/list_alt.svg?react';
 import { fetchList } from 'mastodon/actions/lists';
 import { createList, updateList } from 'mastodon/actions/lists_typed';
 import { apiGetListAccounts } from 'mastodon/api/lists';
@@ -269,9 +272,7 @@ const NewListWrapper: React.FC<{
   }, [dispatch, signedIn, id]);
 
   const isLoading = id && !list;
-  const title = intl.formatMessage(
-    id ? messages.edit : isBlue2 ? messagesLegacy.create : messages.create,
-  );
+  const title = intl.formatMessage(id ? messages.edit : messages.create);
 
   return (
     <Column bindToDocument={!multiColumn} label={title}>

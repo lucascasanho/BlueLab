@@ -21,7 +21,10 @@ import { importFetchedAccounts, importFetchedStatus } from './importer';
 import { openModal } from './modal';
 import { updateTimeline } from './timelines';
 import { insertStatusIntoAccountTimelines } from './timelines_typed';
-import { requestComposerFocus } from '../reducers/slices/composer';
+import {
+  initializeComposer,
+  requestComposerFocus,
+} from '../reducers/slices/composer';
 import { isRedesignEnabled } from '../utils/environment';
 
 /** @type {AbortController | undefined} */

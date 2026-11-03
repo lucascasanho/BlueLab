@@ -44,6 +44,7 @@ export const AltTextBadge: React.FC<{
   return (
     <>
       <Button
+        as='button'
         contrastOnMedia
         size='xs'
         type='button'
@@ -112,14 +113,7 @@ export const AltTextBadge: React.FC<{
                 })}
               </IconButton>
 
-              <p>
-                {description || (
-                  <FormattedMessage
-                    id='alt_text_badge.no_description'
-                    defaultMessage='No alt text is available for this image.'
-                  />
-                )}
-              </p>
+              <p>{description}</p>
             </div>
           </div>
         )}

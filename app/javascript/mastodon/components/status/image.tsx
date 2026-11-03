@@ -10,6 +10,7 @@ import type {
 } from '@/mastodon/api_types/media_attachments';
 import { Blurhash } from '@/mastodon/components/blurhash';
 import { GIFV } from '@/mastodon/components/gifv';
+import { useBlurhash } from '@/mastodon/initial_state';
 import type { MediaAttachmentShape } from '@/mastodon/models/status';
 import { useAppDispatch } from '@/mastodon/store';
 import type { PolymorphicProps } from '@/types/polymorphic';
@@ -23,24 +24,30 @@ type StatusImageAttachmentJSON =
   | ApiGifvAttachmentJSON
   | ApiVideoAttachmentJSON;
 
-export const StatusImage: React.FC<
-  {
-    attachment:
-      | StatusImageAttachmentJSON
-      | MediaAttachmentShape<StatusImageAttachmentJSON>;
-    children?: React.ReactNode;
-    sensitive?: boolean;
-    animateGifv?: boolean;
-  } & React.ComponentPropsWithRef<'div'>
-> = ({
+interface StatusImageProps {
+  attachment:
+    | StatusImageAttachmentJSON
+    | MediaAttachmentShape<StatusImageAttachmentJSON>;
+  children?: React.ReactNode;
+  sensitive?: boolean;
+  animateGifv?: boolean;
+  showAlt?: boolean;
+  style?: React.CSSProperties;
+  className?: string;
+}
+
+export const StatusImage = <As extends React.ElementType = 'div'>({
+  as: asComp,
   attachment,
   children,
   sensitive,
   animateGifv = false,
+  showAlt = false,
   className,
   style,
   ...props
-}) => {
+}: PolymorphicProps<StatusImageProps, As>) => {
+  const Comp = asComp ?? 'div';
   let x = 50;
   let y = 50;
   const focusX = attachment.meta?.focus?.x;

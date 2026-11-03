@@ -44,6 +44,7 @@ export const LanguageButton: React.FC = () => {
   return (
     <>
       <Button
+        as='button'
         ref={setTriggerElement}
         size='sm'
         leadingIcon={TranslateIcon}

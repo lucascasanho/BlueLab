@@ -15,7 +15,7 @@ import { Popover } from '@/mastodon/components/popover';
 import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
-import AutosuggestAccountContainer from '../containers/autosuggest_account_container';
+import AutosuggestAccountContainer from './containers/autosuggest_account_container';
 
 const SEARCH_TOKENS = ['@', '＠', ':'];
 const ACCOUNT_TOKENS = new Set(['@', '＠']);

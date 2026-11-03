@@ -27,13 +27,10 @@ import {
 import { MenuCard } from '@/mastodon/components/menu/card';
 import type { PopoverChildProps } from '@/mastodon/components/popover';
 import { Popover } from '@/mastodon/components/popover';
-import { waitForCustomEmojiImages } from '@/mastodon/features/emoji';
 import { useToggle } from '@/mastodon/hooks/useToggle';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
-import { captureComposerSelectionOffset } from './emoji_selection';
-import { PER_LINE, selectFrequentlyUsedEmoji } from './selectors';
-import classes from './styles.module.scss';
+import classes from './picker.module.scss';
 
 export type OnEmojiPick = (emoji: EmojiData) => void;
 
@@ -65,32 +62,13 @@ const messages = defineMessages({
   flags: { id: 'emoji_button.flags', defaultMessage: 'Flags' },
 });
 
-// Start fetching the shared picker bundle with the compose UI instead of on
-// the first click. React.lazy reuses this promise when the picker is rendered.
-const emojiPickerModule = import('@/mastodon/features/emoji/emoji_picker');
-
-export const ComposeEmojiButton: React.FC<{ onPick: OnEmojiPick }> = ({
-  onPick,
-}) => {
-  const [open, { onTrue, onFalse }] = useToggle();
+export const EmojiPickerButton: React.FC<{
+  onPick: OnEmojiPick;
+  disabled?: boolean;
+  placement?: Placement;
+}> = ({ onPick, disabled, placement = 'top-start' }) => {
+  const [open, { onToggle, onFalse }] = useToggle();
   const [target, setTarget] = useState<HTMLButtonElement | null>(null);
-  const handleEmojiButtonMouseDown = useCallback(() => {
-    captureComposerSelectionOffset();
-  }, []);
-  const handleEmojiButtonClick = useCallback(() => {
-    if (open) {
-      onFalse();
-      return;
-    }
-
-    // Opening the picker must never wait for every custom emoji image to warm.
-    // The picker bundle is already requested when this module loads, and
-    // Suspense can cover the rare case where it is still being evaluated.
-    // Continue warming custom emoji images concurrently after the popover is
-    // visible so first-open latency is independent of emoji count or network.
-    onTrue();
-    void waitForCustomEmojiImages().catch(() => undefined);
-  }, [onFalse, onTrue, open]);
 
   return (
     <>
@@ -98,9 +76,7 @@ export const ComposeEmojiButton: React.FC<{ onPick: OnEmojiPick }> = ({
         size='sm'
         icon={SmileyIcon}
         ref={setTarget}
-        onPointerDown={handleEmojiButtonMouseDown}
-        onMouseDown={handleEmojiButtonMouseDown}
-        onClick={handleEmojiButtonClick}
+        onClick={onToggle}
         aria-expanded={open}
       >
         <FormattedMessage
@@ -115,7 +91,6 @@ export const ComposeEmojiButton: React.FC<{ onPick: OnEmojiPick }> = ({
         reference={target}
         placement={placement}
         offset={4}
-        closeOnClickOutside
       >
         {({ props, placement }) => (
           <EmojiDropdown
@@ -132,12 +107,12 @@ export const ComposeEmojiButton: React.FC<{ onPick: OnEmojiPick }> = ({
 };
 
 const EmojiPicker = lazy(() =>
-  emojiPickerModule.then(({ Picker }) => ({
+  import('@/mastodon/features/emoji/emoji_picker').then(({ Picker }) => ({
     default: Picker,
   })),
 );
 const Emoji = lazy(() =>
-  emojiPickerModule.then(({ Emoji }) => ({
+  import('@/mastodon/features/emoji/emoji_picker').then(({ Emoji }) => ({
     default: Emoji,
   })),
 );
@@ -183,19 +158,13 @@ export const EmojiDropdown: React.FC<
         native: 'native' in rawEmoji ? rawEmoji.native : `:${rawEmoji.id}:`,
       };
 
-      const isCustomEmoji = 'custom' in rawEmoji && rawEmoji.custom === true;
-
-      // The caret was captured before the picker opened. While the picker owns
-      // focus, keep using that saved logical offset instead of re-reading a
-      // stale DOM selection that may point before the last rendered emoji.
-      if (!isCustomEmoji && !(event.ctrlKey || event.metaKey)) {
-        // Keep the picker open so it can stay usable until the user clicks
-        // outside or toggles it closed explicitly.
+      if (!(event.ctrlKey || event.metaKey)) {
+        onClose();
       }
       dispatch(emojiUse(emoji));
       onPick(emoji);
     },
-    [dispatch, onPick],
+    [dispatch, onPick, onClose],
   );
 
   // Close modifier window if it's not clicked in.
@@ -263,6 +232,7 @@ export const EmojiDropdown: React.FC<
           showSkinTones={false}
           // We need to cast as unknown as this requires a legacy class component.
           notFound={NotFound as unknown as () => React.Component}
+          autoFocus={autoFocus}
           emojiTooltip
         />
 

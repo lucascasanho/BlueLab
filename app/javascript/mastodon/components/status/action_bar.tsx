@@ -219,10 +219,6 @@ const StatusReblogButton: React.FC<{
     [boost],
   );
 
-  const preventMenuOpenOnShiftClick = useCallback((e?: React.MouseEvent) => {
-    return !e?.shiftKey;
-  }, []);
-
   if (quickBoosting) {
     return (
       <Tooltip text={boost.title}>

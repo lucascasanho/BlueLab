@@ -400,8 +400,9 @@ class ActivityPub::ProcessAccountService < BaseService
       key_id = value
       next if non_matching_uri_hosts?(@account.uri, key_id)
 
-      # Key is fetched without ID validation because of a GoToSocial bug
-      value = fetch_resource_without_id_validation(key_id)
+      # Key is fetched without ID validation because of a GoToSocial bug.
+      # Redirects are not followed: the GTS quirk is a JSON id mismatch, not HTTP redirection.
+      value = fetch_resource_without_id_validation(key_id, allow_redirects: false)
       next if value.blank?
 
       # Special handling for GoToSocial which returns the whole actor for the key ID

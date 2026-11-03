@@ -34,7 +34,6 @@ import {
   useAppSelector,
 } from '@/mastodon/store';
 
-import { shouldShowCharacterCounter } from '../components/character_counter';
 import { countableText } from '../util/counter';
 
 import type { OnEmojiPick } from './emoji';
@@ -174,11 +173,7 @@ export const ComposeFooter: React.FC<{
       </div>
 
       <div className={classes.flexGrowWrap} data-compose-footer-controls>
-        {shouldShowCharacterCounter(
-          hideStatusCharacterCounter,
-          current,
-          max,
-        ) && (
+        {(!hideStatusCharacterCounter || current > max) && (
           <span
             className={classNames(
               classes.counter,

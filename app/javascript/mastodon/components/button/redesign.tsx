@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 import type { LinkProps } from 'react-router-dom';
 
+import type { Placement } from '@floating-ui/react-dom';
 import { CaretDownIcon } from '@phosphor-icons/react';
 
 import { CircularProgress } from '../circular_progress';
@@ -119,10 +120,17 @@ const BaseButton: React.FC<BaseButtonProps> = ({
   );
 };
 
+interface ButtonTooltip {
+  type: 'label' | 'description';
+  text: React.ReactNode;
+  placement?: Placement;
+}
+
 export type ButtonProps = BaseButtonProps & {
   leadingIcon?: IconProp;
   trailingIcon?: IconProp;
   leadingIconWrapperClassName?: string;
+  tooltip?: ButtonTooltip;
 };
 
 export const Button: React.FC<ButtonProps> = ({
@@ -130,25 +138,51 @@ export const Button: React.FC<ButtonProps> = ({
   leadingIcon,
   trailingIcon,
   leadingIconWrapperClassName,
+  tooltip,
   ...props
-}) => (
-  <BaseButton {...props}>
-    {leadingIcon &&
-      !props.loading &&
-      (leadingIconWrapperClassName ? (
-        <span className={leadingIconWrapperClassName}>
+}) => {
+  const buttonContent = (
+    <>
+      {leadingIcon &&
+        !props.loading &&
+        (leadingIconWrapperClassName ? (
+          <span className={leadingIconWrapperClassName}>
+            <Icon id='leading' icon={leadingIcon} className={classes.icon} />
+          </span>
+        ) : (
           <Icon id='leading' icon={leadingIcon} className={classes.icon} />
-        </span>
-      ) : (
-        <Icon id='leading' icon={leadingIcon} className={classes.icon} />
-      ))}
-    {props.loading && <LoadingIcon />}
-    {children}
-    {trailingIcon && (
-      <Icon id='trailing' icon={trailingIcon} className={classes.icon} />
-    )}
-  </BaseButton>
-);
+        ))}
+      {props.loading && <LoadingIcon />}
+      <span className={classes.label}>{children}</span>
+      {trailingIcon && (
+        <Icon id='trailing' icon={trailingIcon} className={classes.icon} />
+      )}
+    </>
+  );
+
+  if (!tooltip?.text) {
+    return <BaseButton {...props}>{buttonContent}</BaseButton>;
+  }
+  return (
+    <Tooltip
+      text={tooltip.text}
+      placement={tooltip.placement}
+      renderTextWhenClosed
+    >
+      {({ getTooltipProps, tooltipId }) => (
+        <BaseButton
+          {...getTooltipProps(props)}
+          aria-labelledby={tooltip.type === 'label' ? tooltipId : undefined}
+          aria-describedby={
+            tooltip.type === 'description' ? tooltipId : undefined
+          }
+        >
+          {buttonContent}
+        </BaseButton>
+      )}
+    </Tooltip>
+  );
+};
 
 export type IconButtonProps = BaseButtonProps & {
   icon: IconProp;

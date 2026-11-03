@@ -33,7 +33,6 @@ import { Skeleton } from 'mastodon/components/skeleton';
 import { Audio } from 'mastodon/features/audio';
 import { Video, getPointerPosition } from 'mastodon/features/video';
 import { me } from 'mastodon/initial_state';
-import type { MediaAttachment } from 'mastodon/models/media_attachment';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
 import { assetHost } from 'mastodon/utils/config';
 
@@ -136,11 +135,13 @@ const Preview: React.FC<{
         (item) => item.get('id') === mediaId,
       );
       if (matchingThreadMedia) {
-        return matchingThreadMedia as MediaAttachment;
+        return matchingThreadMedia;
       }
     }
     return (
-      compose.get('media_attachments') as ImmutableList<MediaAttachment>
+      compose.get('media_attachments') as ImmutableList<
+        ImmutableMap<string, unknown>
+      >
     ).find((item) => item.get('id') === mediaId);
   });
   const account = useAppSelector((state) =>
@@ -296,11 +297,13 @@ export const AltTextModal = forwardRef<ModalRef, Props & Partial<RestoreProps>>(
           (item) => item.get('id') === mediaId,
         );
         if (matchingThreadMedia) {
-          return matchingThreadMedia as MediaAttachment;
+          return matchingThreadMedia;
         }
       }
       return (
-        compose.get('media_attachments') as ImmutableList<MediaAttachment>
+        compose.get('media_attachments') as ImmutableList<
+          ImmutableMap<string, unknown>
+        >
       ).find((item) => item.get('id') === mediaId);
     });
     const threadAttachments = useAppSelector((state) => {

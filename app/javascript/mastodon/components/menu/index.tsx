@@ -131,7 +131,7 @@ export const Menu: React.FC<MenuProps> = ({
       if (element && type === 'actions' && !skipInitialFocus) {
         const menuItems = getAllMenuItems(element);
         const elementToFocus = menuItems[0] ?? element;
-        elementToFocus.focus({ preventScroll: true });
+        elementToFocus.focus();
       }
     },
     [skipInitialFocus, type],
@@ -139,28 +139,22 @@ export const Menu: React.FC<MenuProps> = ({
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const openMenu = useCallback(
-    (e?: React.MouseEvent) => {
-      const shouldOpen = onOpen?.(e);
-      if (shouldOpen === false) return;
+  const openMenu = useCallback(() => {
+    const shouldOpen = onOpen?.();
+    if (shouldOpen === false) return;
 
-      setIsMenuOpen(true);
-    },
-    [onOpen],
-  );
+    setIsMenuOpen(true);
+  }, [onOpen]);
 
-  const closeMenu = useCallback(
-    (e?: React.MouseEvent) => {
-      const shouldClose = onClose?.(e);
-      if (shouldClose === false) return;
+  const closeMenu = useCallback(() => {
+    const shouldClose = onClose?.();
+    if (shouldClose === false) return;
 
-      setIsMenuOpen(false);
-      if (listElement?.contains(document.activeElement)) {
-        triggerElement?.focus({ preventScroll: true });
-      }
-    },
-    [listElement, triggerElement, onClose],
-  );
+    setIsMenuOpen(false);
+    if (listElement?.contains(document.activeElement)) {
+      triggerElement?.focus();
+    }
+  }, [listElement, triggerElement, onClose]);
 
   const toggleMenu = isMenuOpen ? closeMenu : openMenu;
 
@@ -170,10 +164,8 @@ export const Menu: React.FC<MenuProps> = ({
         toggleMenu();
       }
     },
-    [listElement, triggerElement, onClose],
+    [toggleMenu],
   );
-
-  const toggleMenu = isMenuOpen ? closeMenu : openMenu;
 
   const handleMenuNavigation = useCallback(
     (event: React.KeyboardEvent<HTMLElement>) => {
@@ -254,7 +246,7 @@ export const Menu: React.FC<MenuProps> = ({
       'aria-haspopup': role,
       'aria-expanded': isMenuOpen,
       'aria-controls': listElement ? listId : undefined,
-      onClick: toggleMenu,
+      onClick: handleTriggerClick,
       onKeyDown: handleMenuNavigation,
     };
 
@@ -284,6 +276,7 @@ export const Menu: React.FC<MenuProps> = ({
     triggerId,
     listId,
     handleMenuNavigation,
+    handleTriggerClick,
     mountListElement,
   ]);
 

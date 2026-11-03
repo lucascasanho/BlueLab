@@ -1,5 +1,7 @@
 import { IntlProvider } from 'react-intl';
 
+import { MemoryRouter } from 'react-router-dom';
+
 import { configureStore } from '@reduxjs/toolkit';
 import { fromJS } from 'immutable';
 import { Provider } from 'react-redux';
@@ -43,11 +45,13 @@ const renderUpload = (type: 'image' | 'video' = 'image') => {
   });
 
   const view = render(
-    <Provider store={store}>
-      <IntlProvider locale='en'>
-        <ComposeUpload id='media-1' />
-      </IntlProvider>
-    </Provider>,
+    <MemoryRouter>
+      <Provider store={store}>
+        <IntlProvider locale='en'>
+          <ComposeUpload id='media-1' />
+        </IntlProvider>
+      </Provider>
+    </MemoryRouter>,
   );
 
   return { ...view, store };
@@ -85,11 +89,13 @@ describe('ComposeUpload', () => {
     );
 
     render(
-      <Provider store={store}>
-        <IntlProvider locale='en'>
-          <AltTextModal mediaId='media-1' onClose={onClose} />
-        </IntlProvider>
-      </Provider>,
+      <MemoryRouter>
+        <Provider store={store}>
+          <IntlProvider locale='en'>
+            <AltTextModal mediaId='media-1' onClose={onClose} />
+          </IntlProvider>
+        </Provider>
+      </MemoryRouter>,
     );
 
     const description = screen.getByPlaceholderText(

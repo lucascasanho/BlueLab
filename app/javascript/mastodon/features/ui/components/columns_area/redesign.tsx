@@ -25,7 +25,6 @@ import {
 import { Blue2RightRail } from '@/mastodon/features/blue2/right_rail';
 import { Blue2ScrollToTop } from '@/mastodon/features/blue2/scroll_to_top';
 import { ComposeRedesignButton } from '@/mastodon/features/compose/bluelab/trigger';
-import { ComposeButton } from '@/mastodon/features/compose/trigger';
 import { HomeColumnSettings } from '@/mastodon/features/home_timeline/components/column_settings_redesign';
 import { RedesignNavigationPanel } from '@/mastodon/features/navigation_panel/redesign';
 import { RedesignMobileNavigation } from '@/mastodon/features/navigation_panel/redesign/mobile_nav';

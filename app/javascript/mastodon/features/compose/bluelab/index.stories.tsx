@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { RedesignComposeForm } from '.';
 
 const meta = {
-  title: 'Redesign/Compose',
+  title: 'BlueLab/Compose',
   component: RedesignComposeForm,
   render() {
     return (

@@ -21,7 +21,6 @@ export const Blue2ComposeLauncher: React.FC = () => {
     (event: React.MouseEvent<HTMLButtonElement>) => {
       dispatch(
         openPreferredComposer({
-          type: 'post',
           origin: composerOriginFromElement(event.currentTarget),
         }),
       );
