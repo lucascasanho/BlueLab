@@ -28,11 +28,11 @@ import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 import { isRedesignEnabled } from '@/mastodon/utils/environment';
 
 import { useBreakpoint } from '../../ui/hooks/useBreakpoint';
-import { RedesignComposeForm as BlueLabComposeForm } from '../redesign';
+import { RedesignComposeForm as BlueLabComposeForm } from '../bluelab';
 
-import { ComposeFormHeader } from './header';
-import { RedesignComposeForm as VanillaComposeForm } from './index';
-import composerClasses from './styles.module.scss';
+import { ComposeForm } from '../form';
+import { ComposeFormHeader } from '../components/header';
+import composerClasses from '../styles.module.scss';
 import classes from './trigger.module.scss';
 
 export const ComposeRedesignButton: React.FC<{
@@ -195,7 +195,7 @@ export const ComposeRedesignButton: React.FC<{
         data-keyboard-open={viewport.keyboardOpen ? 'true' : undefined}
       >
         {composerEditor === 'mastodon' ? (
-          <VanillaComposeForm
+          <ComposeForm
             autoFocus
             className={classes.composer}
             data-keyboard-open={viewport.keyboardOpen ? 'true' : undefined}
