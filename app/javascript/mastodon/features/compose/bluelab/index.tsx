@@ -85,7 +85,7 @@ export const RedesignComposeForm: React.FC<
   headless = false,
   embedded = false,
   compact = false,
-  vanillaAppearance = false,
+  vanillaAppearance = true,
   noMinimize,
   redirectOnSuccess,
   onSuccess,
