@@ -533,6 +533,8 @@ export const ComposeAutocomplete = ({ children }) => {
 
       <LocalCustomEmojiProvider>
         <Popover
+          placement='top-start'
+          offset={4}
           isOpen={
             !!editorElement &&
             !suggestionsHidden &&

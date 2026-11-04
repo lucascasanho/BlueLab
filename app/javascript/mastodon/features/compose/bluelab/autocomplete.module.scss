@@ -4,9 +4,8 @@
 
 .suggestions {
   box-sizing: border-box;
-  width: max-content;
-  min-width: 180px;
-  max-width: min(320px, calc(100vw - 24px));
+  width: min(280px, calc(100vw - 24px));
+  max-width: 100%;
   max-height: min(320px, 45vh);
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -40,6 +39,37 @@
   overflow: hidden;
 }
 
+.item :global(.autosuggest-emoji) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.item :global(.autosuggest-emoji > :first-child) {
+  display: flex;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: var(--color-bg-highlight);
+}
+
+.item :global(.autosuggest-emoji > :first-child img) {
+  width: 20px;
+  height: 20px;
+}
+
+.item :global(.autosuggest-emoji__name) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .item :global(.display-name) {
   display: block;
   min-width: 0;
@@ -49,11 +79,7 @@
 }
 
 :global(body[data-theme='blue-2']) .suggestions {
-  background-color: color-mix(
-    in srgb,
-    var(--blue2-surface) 88%,
-    var(--blue2-text) 12%
-  );
+  background-color: var(--blue2-surface);
   border-color: var(--blue2-border-soft);
   color: var(--blue2-text);
 }
