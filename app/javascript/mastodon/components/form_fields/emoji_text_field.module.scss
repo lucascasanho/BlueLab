@@ -45,6 +45,11 @@
     margin: 0;
   }
 
+  :global([data-input] > button) {
+    position: relative;
+    z-index: 2;
+  }
+
   :global([data-input] > span) {
     grid-column: 1 / -1;
     grid-row: 2;
