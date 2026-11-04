@@ -16,6 +16,7 @@ import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import AutosuggestAccountContainer from './containers/autosuggest_account_container';
+import classes from './autocomplete.module.scss';
 
 const SEARCH_TOKENS = ['@', '＠', ':'];
 const ACCOUNT_TOKENS = new Set(['@', '＠']);
@@ -507,9 +508,11 @@ export const ComposeAutocomplete = ({ children }) => {
           tabIndex={0}
           key={key}
           data-index={index}
-          className={classNames('autosuggest-textarea__suggestions__item', {
-            selected: index === selectedSuggestion,
-          })}
+          className={classNames(
+            'autosuggest-textarea__suggestions__item',
+            classes.item,
+            index === selectedSuggestion && classes.selected,
+          )}
           onMouseDown={handleSuggestionMouseDown}
         >
           {content}
@@ -540,9 +543,12 @@ export const ComposeAutocomplete = ({ children }) => {
           reference={editorElement}
         >
           {({ props }) => (
-            <div {...props}>
+            <div {...props} className={classes.popover}>
               <div
-                className='autosuggest-textarea__suggestions'
+                className={classNames(
+                  'autosuggest-textarea__suggestions',
+                  classes.suggestions,
+                )}
                 style={{ width: editorElement?.clientWidth }}
               >
                 {visibleSuggestions.map(renderSuggestion)}

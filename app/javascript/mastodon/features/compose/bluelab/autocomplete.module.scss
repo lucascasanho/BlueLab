@@ -1,0 +1,35 @@
+.popover {
+  z-index: 10000;
+}
+
+.suggestions {
+  box-sizing: border-box;
+  max-height: min(320px, 45vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 32%);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 12px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.item.selected {
+  background: var(--color-bg-highlight);
+}
+
+.item :global(.autosuggest-account) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
