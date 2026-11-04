@@ -67,3 +67,24 @@
     border-color: var(--color-border);
   }
 }
+
+// The custom emoji shortcode autocomplete is rendered through a body-level
+// Popover portal. Keep its surface styling outside the layout wrappers above,
+// otherwise the menu becomes transparent when the composer is opened in a modal.
+body[data-theme='mastodon-bird-ui-auto'] {
+  .autosuggest-textarea__suggestions {
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-md);
+    color: var(--color-light-text);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 28%);
+  }
+
+  .autosuggest-textarea__suggestions__item {
+    color: var(--color-light-text);
+  }
+
+  .autosuggest-textarea__suggestions__item.selected {
+    background-color: var(--color-bg-highlight);
+  }
+}
