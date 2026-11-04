@@ -139,7 +139,11 @@
       white-space: pre;
       cursor: text;
     }
-  
+
+    &.pickerInline .blue2Editor {
+      inset-inline-end: 40px;
+    }
+
     [data-input]:has(> textarea) .blue2Editor {
       overflow-y: auto;
       padding-block-end: 19px;
@@ -239,6 +243,10 @@
     color: var(--color-text-primary);
     white-space: pre;
     cursor: text;
+  }
+
+  &.pickerInline .blue2Editor {
+    inset-inline-end: 40px;
   }
 
   [data-input]:has(> textarea) .blue2Editor {
