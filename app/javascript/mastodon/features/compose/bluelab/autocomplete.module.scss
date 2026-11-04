@@ -4,10 +4,13 @@
 
 .suggestions {
   box-sizing: border-box;
+  width: max-content;
+  min-width: 180px;
+  max-width: min(320px, calc(100vw - 24px));
   max-height: min(320px, 45vh);
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: var(--color-bg-elevated);
+  background-color: var(--color-bg-elevated);
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-md);
   color: var(--color-text-primary);
@@ -17,6 +20,7 @@
 .item {
   display: flex;
   align-items: center;
+  min-width: 0;
   min-height: 40px;
   padding: 8px 12px;
   color: var(--color-text-primary);
@@ -31,5 +35,33 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
   min-width: 0;
+  overflow: hidden;
+}
+
+.item :global(.display-name) {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:global(body[data-theme='blue-2']) .suggestions {
+  background-color: color-mix(
+    in srgb,
+    var(--blue2-surface) 88%,
+    var(--blue2-text) 12%
+  );
+  border-color: var(--blue2-border-soft);
+  color: var(--blue2-text);
+}
+
+:global(body[data-theme='blue-2']) .item {
+  color: var(--blue2-text);
+}
+
+:global(body[data-theme='blue-2']) .item.selected {
+  background-color: var(--blue2-hover);
 }

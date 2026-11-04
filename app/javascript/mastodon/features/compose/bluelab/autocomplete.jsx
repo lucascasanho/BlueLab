@@ -533,7 +533,6 @@ export const ComposeAutocomplete = ({ children }) => {
 
       <LocalCustomEmojiProvider>
         <Popover
-          matchReferenceWidth
           isOpen={
             !!editorElement &&
             !suggestionsHidden &&
@@ -549,7 +548,6 @@ export const ComposeAutocomplete = ({ children }) => {
                   'autosuggest-textarea__suggestions',
                   classes.suggestions,
                 )}
-                style={{ width: editorElement?.clientWidth }}
               >
                 {visibleSuggestions.map(renderSuggestion)}
               </div>
