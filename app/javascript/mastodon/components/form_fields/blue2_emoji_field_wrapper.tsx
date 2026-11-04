@@ -25,7 +25,8 @@ import { useCustomEmojis } from '@/mastodon/hooks/useCustomEmojis';
 import { autoPlayGif } from '@/mastodon/initial_state';
 
 import { CharacterCounter } from '../character_counter';
-import { EmojiPickerButton } from '../emoji/picker_button';
+import type { OnEmojiPick } from '../emoji/picker';
+import { EmojiPickerButton, emojiToString } from '../emoji/picker';
 
 import { clearEmptyProfileEmojiEditorPlaceholder } from './blue2_emoji_field_dom';
 import {
@@ -51,6 +52,10 @@ export const isBlue2Theme = () =>
 export const isBirdUiTheme = () =>
   typeof document !== 'undefined' &&
   document.body.dataset.theme === 'mastodon-bird-ui-auto';
+
+export const isVanillaTheme = () =>
+  typeof document !== 'undefined' &&
+  (!document.body.dataset.theme || document.body.dataset.theme === 'default');
 
 const escapeHtml = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -101,6 +106,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   maxLength,
   blue2EmojiEditor: _blue2EmojiEditor,
   mastodon5EmojiEditor: _mastodon5EmojiEditor,
+  emojiPickerInline,
   ...otherProps
 }) => {
   const counterId = useId();
@@ -267,8 +273,8 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
     [activeToken, applyEmoji, suggestionCodes],
   );
 
-  const handlePickEmoji = useCallback(
-    (emoji: string) => {
+  const handlePickEmoji: OnEmojiPick = useCallback(
+    (emoji) => {
       const input = inputRef.current;
       const currentValue = input?.value ?? inputValue;
       const rememberedSelection = lastSelectionRef.current;
@@ -277,7 +283,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
         input?.selectionStart ??
         currentValue.length;
       const end = rememberedSelection?.end ?? input?.selectionEnd ?? start;
-      applyEmoji(emoji, start, end);
+      applyEmoji(emojiToString(emoji), start, end);
     },
     [applyEmoji, inputRef, inputValue],
   );
@@ -550,6 +556,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
           className={classNames(
             classes.fieldWrapper,
             classes.blue2FieldWrapper,
+            emojiPickerInline && classes.pickerInline,
           )}
           describedById={counterId}
           {...otherProps}

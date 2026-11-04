@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddLastReadStatusIdToAccountConversations < ActiveRecord::Migration[8.1]
   def up
     add_column :account_conversations, :last_read_status_id, :bigint

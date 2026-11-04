@@ -7,6 +7,8 @@ import { isRedesignEnabled } from '@/mastodon/utils/environment';
 import type { NotificationGroupFavourite } from 'mastodon/models/notification_group';
 import { useAppSelector } from 'mastodon/store';
 
+import classes from '../styles.module.scss';
+
 import type { LabelRenderer } from './notification_group_with_status';
 import { NotificationGroupWithStatus } from './notification_group_with_status';
 
@@ -119,6 +121,7 @@ export const NotificationFavourite: React.FC<{
       type='favourite'
       icon={StatusLikeActiveIcon}
       iconId='star'
+      iconClassName={classes.favouriteIcon}
       accountIds={notification.sampleAccountIds}
       statusId={notification.statusId}
       timestamp={notification.latest_page_notification_at}

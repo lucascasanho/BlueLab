@@ -8,9 +8,10 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 
 import { FormattedMessage } from 'react-intl';
 
-import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
+
+import { ChatCircleDotsIcon } from '@phosphor-icons/react';
 
 import StatusContent from '@/mastodon/components/status/legacy/content';
 import { ContentWarning } from '@/mastodon/components/status/legacy/content_warning';
@@ -37,7 +38,7 @@ import type { CollectionAttachment } from 'mastodon/models/status';
 import { compareUrls } from 'mastodon/utils/compare_urls';
 import { isRedesignEnabled } from 'mastodon/utils/environment';
 
-import Card from './card';
+import { Card } from './card';
 
 interface VideoModalOptions {
   startTime: number;

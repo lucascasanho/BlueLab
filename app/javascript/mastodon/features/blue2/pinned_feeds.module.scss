@@ -18,7 +18,7 @@
   line-height: 1.35;
 }
 
-@media (max-width: 700px) {
+@media (width <= 700px) {
   .addButton {
     margin-inline-end: 4px;
   }

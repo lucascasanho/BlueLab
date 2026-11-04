@@ -1,4 +1,5 @@
 import { List as ImmutableList, Map as ImmutableMap } from 'immutable';
+
 import { describe, expect, test } from 'vitest';
 
 import {
@@ -62,9 +63,13 @@ describe('direct conversation grouping', () => {
     const first = conversation('1', '100', ['alice'], '10');
     const second = conversation('2', '100', ['alice', 'carol'], '20', true);
 
-    const [representative] = groupedConversationRepresentatives(
+    const representative = groupedConversationRepresentatives(
       ImmutableList([first, second]),
-    );
+    )[0] as unknown as ImmutableMap<string, unknown> | undefined;
+
+    if (!representative) {
+      throw new Error('Expected a grouped representative for the thread');
+    }
 
     expect(representative.get('id')).toBe('2');
     expect(representative.get('accounts')).toEqual(

@@ -4,12 +4,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import classNames from 'classnames';
 
-import { useSelectableClick } from '@/mastodon/hooks/useSelectableClick';
-import { isRedesignEnabled } from '@/mastodon/utils/environment';
-import CloseIcon from '@/material-icons/400-24px/close.svg?react';
+import { XIcon } from '@phosphor-icons/react';
 
-import { Button } from '../button/redesign';
-import { IconButton } from '../icon_button';
+import { useSelectableClick } from '@/mastodon/hooks/useSelectableClick';
+
+import { Button, IconButton } from '../button/redesign';
 import { Popover } from '../popover';
 
 import classes from './styles.module.scss';
@@ -42,11 +41,11 @@ export const AltTextBadge: React.FC<{
 
   const [handleMouseDown, handleMouseUp] = useSelectableClick(handleClose);
 
-  const ButtonComp = isRedesignEnabled() ? Button : 'button';
-
   return (
     <>
-      <ButtonComp
+      <Button
+        as='button'
+        contrastOnMedia
         size='xs'
         type='button'
         variant='solid'
@@ -56,9 +55,19 @@ export const AltTextBadge: React.FC<{
         aria-expanded={open}
         aria-controls={popoverId}
         aria-haspopup='dialog'
+        tooltip={{
+          type: 'description',
+          text: (
+            <FormattedMessage
+              id='alt_text_badge.title'
+              defaultMessage='Image description'
+            />
+          ),
+        }}
       >
         ALT
-      </ButtonComp>
+        {/* Not translatable so it stays compact, like an icon */}
+      </Button>
 
       <Popover
         isOpen={open}
@@ -73,7 +82,7 @@ export const AltTextBadge: React.FC<{
               className={classNames(
                 'info-tooltip',
                 'dropdown-animation',
-                isRedesignEnabled() && classes.redesignPopover,
+                classes.redesignPopover,
               )}
               role='dialog'
               aria-labelledby={titleId}
@@ -87,20 +96,22 @@ export const AltTextBadge: React.FC<{
               <h4 id={titleId}>
                 <FormattedMessage
                   id='alt_text_badge.title'
-                  defaultMessage='Alt text'
+                  defaultMessage='Image description'
                 />
               </h4>
 
               <IconButton
-                title={intl.formatMessage({
+                icon={XIcon}
+                onClick={handleClose}
+                variant='ghost'
+                className={classes.closeButton}
+                tooltipPlacement='top'
+              >
+                {intl.formatMessage({
                   id: 'lightbox.close',
                   defaultMessage: 'Close',
                 })}
-                icon='close'
-                iconComponent={CloseIcon}
-                onClick={handleClose}
-                className={classes.closeButton}
-              />
+              </IconButton>
 
               <p>{description}</p>
             </div>

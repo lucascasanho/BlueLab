@@ -154,8 +154,11 @@ export const Popover: React.FC<PopoverProps> = ({
       flip ? flipMiddleware() : null,
       matchReferenceWidth || constrainToViewport
         ? size({
-            apply({ rects, elements, availableHeight }) {
-              const styles: Record<string, string> = {};
+            apply({ rects, elements, availableWidth, availableHeight }) {
+              const styles: Record<string, string> = {
+                '--popover-width-available': `${Math.max(0, availableWidth)}px`,
+                '--popover-height-available': `${Math.max(0, availableHeight)}px`,
+              };
 
               if (matchReferenceWidth) {
                 styles.minWidth = `${rects.reference.width}px`;

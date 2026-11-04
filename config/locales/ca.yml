@@ -830,10 +830,8 @@ ca:
         title: Exclou per defecte els usuaris de la indexació dels motors de cerca
       discovery:
         follow_recommendations: Seguir les recomanacions
-        privacy: Privacitat
         profile_directory: Directori de perfils
         public_timelines: Línies de temps públiques
-        publish_statistics: Publica estadístiques
         title: Descobriment
         trends: Tendències
         wrapstodon: Wrapstodon
@@ -1108,9 +1106,6 @@ ca:
     warning_presets:
       add_new: Afegir-ne un de nou
       delete: Elimina
-      edit_preset: Edita l'avís predeterminat
-      empty: Encara no has definit cap preavís.
-      title: Predefinicions d'avís
     webhooks:
       add_new: Afegir extrem
       delete: Elimina
@@ -1178,7 +1173,6 @@ ca:
     remove: Desvincula l'àlies
   appearance:
     animations_and_accessibility: Animacions i accessibilitat
-    discovery: Descobriment
     localization:
       body: Mastodon és traduït per voluntaris.
       guide_link: https://crowdin.com/project/mastodon

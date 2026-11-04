@@ -1,10 +1,12 @@
-import { useMemo, type MouseEvent } from 'react';
-import type { JSX } from 'react';
+import { useCallback, useMemo } from 'react';
+import type { JSX, KeyboardEvent, MouseEvent } from 'react';
 
 import classNames from 'classnames';
 
+import { replyComposeById } from '@/mastodon/actions/compose_typed';
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
-import { replyComposeById } from 'mastodon/actions/compose';
+import { StatusContext } from '@/mastodon/components/status/hooks';
+import { QuotedStatus } from '@/mastodon/components/status/quote';
 import { openConversationForStatus } from 'mastodon/actions/conversations';
 import { navigateToStatus } from 'mastodon/actions/statuses';
 import { Avatar } from 'mastodon/components/avatar';
@@ -15,8 +17,6 @@ import { Icon } from 'mastodon/components/icon';
 import { RelativeTimestamp } from 'mastodon/components/relative_timestamp';
 import { NOTIFICATIONS_GROUP_MAX_AVATARS } from 'mastodon/models/notification_group';
 import { useAppSelector, useAppDispatch } from 'mastodon/store';
-
-import { EmbeddedStatus } from './embedded_status';
 
 const AVATAR_SIZE = 28;
 
@@ -37,6 +37,7 @@ export type LabelRenderer = (
 export const NotificationGroupWithStatus: React.FC<{
   icon: IconProp;
   iconId: string;
+  iconClassName?: string;
   statusId?: string;
   actions?: JSX.Element;
   count: number;
@@ -50,6 +51,7 @@ export const NotificationGroupWithStatus: React.FC<{
 }> = ({
   icon,
   iconId,
+  iconClassName,
   timestamp,
   accountIds,
   actions,
@@ -80,9 +82,7 @@ export const NotificationGroupWithStatus: React.FC<{
     (state) => state.statuses.getIn([statusId, 'visibility']) === 'direct',
   );
 
-  const handleCardClick = (event: MouseEvent<HTMLDivElement>) => {
-    if (!(event.target instanceof Element)) return;
-    if (event.target.closest('a,button,input,textarea,select,[role="link"]')) return;
+  const openCard = useCallback(() => {
     if (!statusId) return;
 
     if (isPrivateMention) {
@@ -90,7 +90,72 @@ export const NotificationGroupWithStatus: React.FC<{
     } else {
       dispatch(navigateToStatus(statusId));
     }
-  };
+  }, [dispatch, isPrivateMention, statusId]);
+
+  const handlePrivateStatusClickCapture = useCallback(
+    (event: MouseEvent<HTMLDivElement>) => {
+      if (
+        !isPrivateMention ||
+        !statusId ||
+        !(event.target instanceof Element)
+      ) {
+        return;
+      }
+
+      const target = event.target;
+
+      if (
+        target.closest(
+          'button,input,textarea,select,[role="switch"],[role="checkbox"],[contenteditable="true"]',
+        )
+      ) {
+        return;
+      }
+
+      const link = target.closest<HTMLAnchorElement>('a[href]');
+      if (link) {
+        const destination = new URL(link.href, window.location.href);
+        const path = destination.pathname.replace(/\/+$/, '');
+        // Preserve profile/external links, but route the message permalink to its conversation.
+        if (!path.endsWith(`/${statusId}`)) return;
+      }
+
+      // Intercept direct-message preview activation before the status permalink
+      // handler runs. Profile links and interactive controls remain unaffected.
+      event.preventDefault();
+      event.stopPropagation();
+      dispatch(openConversationForStatus(statusId));
+    },
+    [dispatch, isPrivateMention, statusId],
+  );
+
+  const handleCardClick = useCallback(
+    (event: MouseEvent<HTMLDivElement>) => {
+      if (!(event.target instanceof Element)) return;
+      if (
+        event.target.closest(
+          'a,button,input,textarea,select,[role="link"],[role="button"]',
+        )
+      ) {
+        return;
+      }
+
+      openCard();
+    },
+    [openCard],
+  );
+
+  const handleCardKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      if (event.target !== event.currentTarget) return;
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      openCard();
+    },
+    [openCard],
+  );
 
   const handlers = useMemo(
     () => ({
@@ -103,19 +168,11 @@ export const NotificationGroupWithStatus: React.FC<{
       },
 
       reply: () => {
-        dispatch(replyComposeById(statusId));
+        dispatch(replyComposeById({ statusId }));
       },
     }),
     [dispatch, isPrivateMention, statusId],
   );
-
-  const handleStatusOpen = () => {
-    if (isPrivateMention) {
-      dispatch(openConversationForStatus(statusId));
-    } else {
-      dispatch(navigateToStatus(statusId));
-    }
-  };
 
   return (
     <Hotkeys handlers={handlers}>
@@ -129,10 +186,12 @@ export const NotificationGroupWithStatus: React.FC<{
           },
         )}
         tabIndex={0}
+        onClickCapture={handlePrivateStatusClickCapture}
         onClick={handleCardClick}
+        onKeyDown={handleCardKeyDown}
       >
         <div className='notification-group__icon'>
-          <Icon icon={icon} id={iconId} />
+          <Icon icon={icon} id={iconId} className={iconClassName} />
         </div>
 
         <div className='notification-group__main'>
@@ -165,12 +224,11 @@ export const NotificationGroupWithStatus: React.FC<{
           </div>
 
           {statusId && (
-            <div
-              className='notification-group__main__status'
-              onClick={(event) => event.stopPropagation()}
+            <StatusContext.Provider
+              value={{ id: statusId, contextType: 'notifications' }}
             >
-              <EmbeddedStatus statusId={statusId} onOpen={handleStatusOpen} />
-            </div>
+              <QuotedStatus id={statusId} clamp />
+            </StatusContext.Provider>
           )}
 
           {additionalContent && (

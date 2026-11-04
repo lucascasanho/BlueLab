@@ -133,7 +133,7 @@ class ListTimeline extends PureComponent {
         {isRedesignEnabled() ? (
           <ColumnHeader
             title={title}
-            withBackButton={multiColumn && !pinned && 'auto'}
+            withBackButton={!multiColumn ? true : !pinned ? 'auto' : false}
             extraButtons={
               <ColumnSettingsMenu
                 label={
@@ -166,6 +166,7 @@ class ListTimeline extends PureComponent {
             iconComponent={ListAltIcon}
             active={hasUnread}
             title={title}
+            showBackButton={!multiColumn || !pinned}
             onPin={this.handlePin}
             onMove={this.handleMove}
             pinned={pinned}

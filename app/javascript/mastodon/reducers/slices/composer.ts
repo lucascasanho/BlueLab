@@ -1,10 +1,13 @@
 import { createSlice, isAction } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { isList } from 'immutable';
 
 import { length } from 'stringz';
 
 import {
   changeCompose,
+  changeComposeSpoilerness,
+  changeComposeSpoilerText,
   clearComposeSuggestions,
   COMPOSE_SUBMIT_SUCCESS,
   COMPOSE_DIRECT,
@@ -12,14 +15,15 @@ import {
   COMPOSE_MENTION,
   COMPOSE_REPLY,
   COMPOSE_SET_STATUS,
+  COMPOSE_UPLOAD_REQUEST,
   directCompose,
-  replyComposeById,
   resetCompose,
   submitCompose,
 } from '@/mastodon/actions/compose';
 import {
   changeComposeVisibility,
   PRIVATE_QUOTE_MODAL_ID,
+  replyComposeById,
 } from '@/mastodon/actions/compose_typed';
 import { openModal } from '@/mastodon/actions/modal';
 import { REDRAFT } from '@/mastodon/actions/statuses';
@@ -28,6 +32,7 @@ import type {
   StatusVisibility,
 } from '@/mastodon/api_types/statuses';
 import { browserHistory } from '@/mastodon/components/router';
+import { countableText } from '@/mastodon/features/compose/util/counter';
 import {
   createAppSelector,
   createAppThunk,
@@ -77,6 +82,11 @@ type DisplayState = 'hidden' | 'showing' | 'minimized';
 
 export type ComposeType = 'post' | 'message' | 'reply' | 'replyPrivate';
 
+export type ComposerPublishError =
+  | 'empty'
+  | 'too-long'
+  | 'missing-content-warning';
+
 export type ComposerEditor = 'bluelab' | 'mastodon';
 
 export interface ComposerOrigin {
@@ -90,6 +100,7 @@ interface ComposerState {
   closeOnSubmitSuccess: boolean;
   pendingFocus: PendingFocus | null;
   publishErrors: ComposerPublishError[];
+  initialText: string;
 }
 
 const initialState: ComposerState = {
@@ -98,6 +109,7 @@ const initialState: ComposerState = {
   closeOnSubmitSuccess: false,
   pendingFocus: null,
   publishErrors: [],
+  initialText: '',
 };
 
 const composerSlice = createSlice({
@@ -140,9 +152,35 @@ const composerSlice = createSlice({
       if (!state.publishErrors.includes(action.payload)) {
         state.publishErrors.push(action.payload);
       }
+      state.pendingFocus = { selection: null };
     },
-    clearErrors(state) {
+    clearErrors(
+      state,
+      action: PayloadAction<ComposerPublishError[] | undefined>,
+    ) {
+      const errorsToClear = action.payload;
+      if (errorsToClear) {
+        state.publishErrors = state.publishErrors.filter(
+          (existingError) => !errorsToClear.includes(existingError),
+        );
+      } else {
+        state.publishErrors = [];
+      }
+    },
+    setInitialText(
+      state,
+      action: PayloadAction<
+        { text: string } & Partial<ComposerTextareaSelection>
+      >,
+    ) {
+      const { text, start = text.length, end = text.length } = action.payload;
+      state.initialText = text;
+      state.pendingFocus = { selection: { start, end } };
+    },
+    reset(state) {
+      state.pendingFocus = null;
       state.publishErrors = [];
+      state.initialText = '';
     },
   },
   extraReducers: (builder) => {
@@ -163,6 +201,7 @@ const composerSlice = createSlice({
           COMPOSE_MENTION,
           COMPOSE_DIRECT,
           COMPOSE_SET_STATUS,
+          COMPOSE_UPLOAD_REQUEST,
           REDRAFT,
         ].includes(action.type),
       (state) => {
@@ -180,6 +219,29 @@ export const {
   clearPendingFocus: clearComposerFocusRequest,
   clearErrors: clearComposerErrors,
 } = composerSlice.actions;
+
+export const initializeComposer = createAppThunk(
+  (
+    arg:
+      | { noSelect?: boolean; selectAfterFirstSpace?: boolean }
+      | undefined = {},
+    { getState, dispatch },
+  ) => {
+    const text = getState().compose.get('text', '') as string;
+
+    let start = text.length;
+    let end = text.length;
+    if (arg.noSelect) {
+      start = 0;
+      end = 0;
+    }
+    if (arg.selectAfterFirstSpace) {
+      start = text.search(/\s/) + 1;
+    }
+
+    dispatch(composerSlice.actions.setInitialText({ text, start, end }));
+  },
+);
 
 export const minimizeComposerToggle = createAppThunk(
   (_arg, { dispatch, getState }) => {
@@ -260,11 +322,12 @@ export const composerOriginFromElement = (element: Element): ComposerOrigin => {
 };
 
 export const openNewComposer = createAppThunk(
-  (payload: ComposeNewPayload, { dispatch, getState }) => {
+  (payload: ComposeNewPayload | undefined = {}, { dispatch, getState }) => {
     // Always show the composer if it is closed or minimized.
     dispatch(composerSlice.actions.showComposer());
 
-    if (!payload.force && selectComposerIsChanged(getState())) {
+    const isChanged = selectComposerIsChanged(getState());
+    if (!payload.force && isChanged) {
       dispatch(
         openModal({
           modalType: 'COMPOSER_DRAFT_DELETE',
@@ -276,8 +339,11 @@ export const openNewComposer = createAppThunk(
       return;
     }
 
+    // Reset but don't hide.
+    dispatch(composerSlice.actions.reset());
     dispatch(resetCompose());
-    dispatch(composerSlice.actions.clearErrors());
+    dispatch(clearComposeSuggestions());
+
     if (payload.type === 'message') {
       const account =
         !!payload.toAccountId && getState().accounts.get(payload.toAccountId);
@@ -288,7 +354,7 @@ export const openNewComposer = createAppThunk(
         dispatch(requestComposerFocus());
       }
     } else if (payload.type === 'reply') {
-      dispatch(replyComposeById(payload.toStatusId));
+      dispatch(replyComposeById({ statusId: payload.toStatusId }));
     } else {
       dispatch(requestComposerFocus());
     }
@@ -301,8 +367,15 @@ export const openNewComposer = createAppThunk(
 export const openPreferredComposer = createAppThunk(
   (payload: Pick<ComposeNewPayload, 'origin'>, { dispatch, getState }) => {
     const preferredEditor = selectComposerEditor(getState());
+    const isVanillaTheme =
+      typeof document !== 'undefined' &&
+      (!document.body.dataset.theme ||
+        document.body.dataset.theme === 'default');
 
-    if (preferredEditor === 'mastodon') {
+    // Vanilla 5.0 now hosts either editor in its redesigned compose surface.
+    // Keep the native editor inside that surface instead of redirecting to the
+    // legacy /publish page. Other themes retain their existing route behavior.
+    if (preferredEditor === 'mastodon' && !isVanillaTheme) {
       browserHistory.push('/publish', { focusTarget: false });
       return;
     }
@@ -319,8 +392,8 @@ export const resumeComposer = createAppThunk(
 );
 
 export const resetComposer = createAppThunk((_arg, { dispatch }) => {
+  dispatch(composerSlice.actions.reset());
   dispatch(composerSlice.actions.hideComposer());
-  dispatch(composerSlice.actions.clearErrors());
   dispatch(resetCompose());
   dispatch(clearComposeSuggestions());
 });
@@ -328,15 +401,15 @@ export const resetComposer = createAppThunk((_arg, { dispatch }) => {
 export const closeComposer = createAppThunk((_arg, { getState, dispatch }) => {
   const isChanged = selectComposerIsChanged(getState());
 
-  if (!isChanged) {
-    dispatch(resetComposer());
-  } else {
+  if (isChanged) {
     dispatch(
       openModal({
         modalType: 'COMPOSER_DRAFT_DELETE',
         modalProps: {},
       }),
     );
+  } else {
+    dispatch(dismissComposer());
   }
 });
 
@@ -351,12 +424,7 @@ export const newComposer = createAppThunk((_arg, { getState, dispatch }) => {
   if (!isChanged) {
     dispatch(resetComposer());
   } else {
-    dispatch(
-      openModal({
-        modalType: 'COMPOSER_DRAFT_DELETE',
-        modalProps: {},
-      }),
-    );
+    dispatch(resetComposer());
   }
 });
 
@@ -384,16 +452,39 @@ export const submitComposer = createAppThunk(
       dispatch(changeCompose(textareaValue));
     }
 
-    const { compose, meta, statuses, server, settings } = getState();
+    const { compose, composer, meta, statuses, server, settings } = getState();
+
+    let text = compose.get('text') as string;
+
+    const attachments = compose.get('media_attachments');
+    const spoilerText = compose.get('spoiler_text') as string;
+    if (
+      (!text.trim() || text === composer.initialText) &&
+      isList(attachments) &&
+      attachments.isEmpty()
+    ) {
+      dispatch(composerSlice.actions.addError('empty'));
+    }
+
+    if (!!compose.get('spoiler') && !spoilerText.trim()) {
+      dispatch(composerSlice.actions.addError('missing-content-warning'));
+    }
 
     const maxChars =
       server.server.item?.configuration.statuses.max_characters ?? 500;
-    const textLength = length(compose.get('text') as string);
-    if (textLength === 0) {
-      dispatch(composerSlice.actions.addError('empty'));
-      return;
-    } else if (textLength > maxChars) {
+    if (compose.get('spoiler') && typeof spoilerText === 'string') {
+      text += spoilerText;
+    }
+    const textLength = length(countableText(text));
+    if (textLength > maxChars) {
       dispatch(composerSlice.actions.addError('too-long'));
+    }
+
+    // We need to get a fresh state to detect the dispatched errors.
+    const {
+      composer: { publishErrors },
+    } = getState();
+    if (publishErrors.length > 0) {
       return;
     }
 
@@ -440,15 +531,6 @@ export const submitComposer = createAppThunk(
           modalProps: {},
         }),
       );
-    } else if (!!compose.get('spoiler') && !compose.get('spoiler_text')) {
-      dispatch(
-        openModal({
-          modalType: 'COMPOSER_ADD_CONTENT_WARNING',
-          modalProps: {
-            redirectOnSuccess,
-          },
-        }),
-      );
     } else {
       dispatch(
         submitCompose((status: ApiStatusJSON) => {
@@ -458,10 +540,21 @@ export const submitComposer = createAppThunk(
             window.location.assign(status.url);
           }
 
-          // Hide composer on successful publish
-          dispatch(composerSlice.actions.hideComposer());
+          dispatch(resetComposer());
         }),
       );
+    }
+  },
+);
+
+export const toggleContentWarning = createAppThunk(
+  (_arg, { dispatch, getState }) => {
+    dispatch(changeComposeSpoilerText(''));
+    dispatch(changeComposeSpoilerness());
+    dispatch(clearComposerErrors(['missing-content-warning']));
+
+    if (!getState().compose.get('spoiler')) {
+      dispatch(requestComposerFocus());
     }
   },
 );

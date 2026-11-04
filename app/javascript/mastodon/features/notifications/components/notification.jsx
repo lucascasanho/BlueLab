@@ -8,6 +8,7 @@ import { withRouter } from 'react-router-dom';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { ImmutablePureComponent } from 'react-immutable-pure-component';
 
+import BugReportIcon from '@/material-icons/400-24px/bug_report.svg?react';
 import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 import FlagIcon from '@/material-icons/400-24px/flag-fill.svg?react';
 import HomeIcon from '@/material-icons/400-24px/home-fill.svg?react';
@@ -17,6 +18,7 @@ import PersonAddIcon from '@/material-icons/400-24px/person_add-fill.svg?react';
 import { Account } from 'mastodon/components/account';
 import { LinkedDisplayName } from '@/mastodon/components/display_name';
 import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
+import { StatusLikeIcon } from '@/mastodon/components/status/icons';
 import { Icon }  from 'mastodon/components/icon';
 import { injectIntl } from '@/mastodon/components/intl';
 import { Hotkeys } from 'mastodon/components/hotkeys';
@@ -95,6 +97,41 @@ class Notification extends ImmutablePureComponent {
     } else {
       this.handleOpenProfile();
     }
+  };
+
+  handlePrivateStatusClickCapture = event => {
+    const { notification, status, onOpenConversation } = this.props;
+    const statusId = notification.get('status');
+
+    if (
+      status?.get('visibility') !== 'direct' ||
+      !statusId ||
+      !(event.target instanceof Element)
+    ) {
+      return;
+    }
+
+    const target = event.target;
+
+    if (
+      target.closest(
+        'button,input,textarea,select,[role="switch"],[role="checkbox"],[contenteditable="true"]',
+      )
+    ) {
+      return;
+    }
+
+    const link = target.closest('a[href]');
+    if (link) {
+      const destination = new URL(link.href, window.location.href);
+      const path = destination.pathname.replace(/\/+$/, '');
+      // Preserve profile/external links, but route the message permalink to its conversation.
+      if (!path.endsWith('/' + statusId)) return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    onOpenConversation(statusId);
   };
 
   handleOpenProfile = () => {
@@ -200,7 +237,7 @@ class Notification extends ImmutablePureComponent {
 
     return (
       <Hotkeys handlers={this.getHandlers()}>
-        <div className={classNames('notification notification-favourite focusable', { unread })} tabIndex={0} aria-label={notificationForScreenReader(intl, intl.formatMessage(likeMessage, { name: notification.getIn(['account', 'acct']) }), notification.get('created_at'))}>
+        <div className={classNames('notification notification-favourite focusable', { unread })} tabIndex={0} onClickCapture={this.handlePrivateStatusClickCapture} aria-label={notificationForScreenReader(intl, intl.formatMessage(likeMessage, { name: notification.getIn(['account', 'acct']) }), notification.get('created_at'))}>
           <div className='notification__message'>
             <Icon id='star' icon={StatusLikeIcon} className='star-icon' />
 
@@ -213,6 +250,7 @@ class Notification extends ImmutablePureComponent {
             id={notification.get('status')}
             account={notification.get('account')}
             muted
+            onOpen={this.handleOpen}
             withDismiss
             hidden={!!this.props.hidden}
             getScrollPosition={this.props.getScrollPosition}
@@ -475,6 +513,35 @@ class Notification extends ImmutablePureComponent {
     );
   }
 
+  renderAdminBugReport (notification) {
+    const { intl, unread } = this.props;
+    const message = intl.formatMessage({
+      id: 'notification.admin.bug_report',
+      defaultMessage: 'A new bug report was submitted',
+    });
+
+    return (
+      <a
+        href={`/admin/bug_reports/${notification.get('bug_report_id')}`}
+        target='_blank'
+        rel='noopener noreferrer'
+        className={classNames('notification notification-admin-bug-report focusable', { unread })}
+        tabIndex={0}
+        aria-label={notificationForScreenReader(intl, message, notification.get('created_at'))}
+      >
+        <div className='notification__message'>
+          <Icon id='bug-report' icon={BugReportIcon} />
+          <span title={notification.get('created_at')}>
+            <FormattedMessage
+              id='notification.admin.bug_report'
+              defaultMessage='A new bug report was submitted'
+            />
+          </span>
+        </div>
+      </a>
+    );
+  }
+
   renderAdminSignUp (notification, account, link) {
     const { intl, unread } = this.props;
 
@@ -546,10 +613,12 @@ class Notification extends ImmutablePureComponent {
     }
 
     const targetAccount = report.get('target_account');
-    const targetLink = <LinkedDisplayName
-      className='notification__display-name'
-      displayProps={{account:targetAccount, variant: 'simple'}}
-    />;
+    const targetLink = (
+      <LinkedDisplayName
+        className='notification__display-name'
+        displayProps={{account:targetAccount, variant: 'simple'}}
+      />
+    );
 
     return (
       <Hotkeys handlers={this.getHandlers()}>
@@ -602,6 +671,8 @@ class Notification extends ImmutablePureComponent {
       return this.renderAdminSignUp(notification, account, link);
     case 'admin.report':
       return this.renderAdminReport(notification, account, link);
+    case 'admin.bug_report':
+      return this.renderAdminBugReport(notification);
     case 'verification_request':
     case 'verification_approved':
       return this.renderVerification(notification);

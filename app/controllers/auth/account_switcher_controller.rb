@@ -14,9 +14,7 @@ class Auth::AccountSwitcherController < ApplicationController
     end
 
     if target_user.two_factor_enabled?
-      if target_user.otp_required_for_login? && params.dig(:user, :otp_attempt).present?
-        return complete_otp_authentication(target_user)
-      end
+      return complete_otp_authentication(target_user) if target_user.otp_required_for_login? && params.dig(:user, :otp_attempt).present?
 
       if target_user.otp_required_for_login?
         session[:account_switcher_attempt_user_id] = target_user.id
@@ -32,7 +30,7 @@ class Auth::AccountSwitcherController < ApplicationController
     end
 
     activate_account_session(target_user)
-    set_warden_user(target_user)
+    assign_warden_user(target_user)
     redirect_to root_path
   end
 
@@ -51,9 +49,9 @@ class Auth::AccountSwitcherController < ApplicationController
   def switch
     activation = SessionActivation.includes(:user).find_by(session_id: params[:session_id].to_s)
 
-    return head :not_found unless activation
-    return head :forbidden unless activation.user&.active_for_authentication?
-    return head :forbidden unless activation.user&.functional?
+    return head 404 unless activation
+    return head 403 unless activation.user&.active_for_authentication?
+    return head 403 unless activation.user&.functional?
 
     cookies.signed['_session_id'] = {
       value: activation.session_id,
@@ -62,7 +60,7 @@ class Auth::AccountSwitcherController < ApplicationController
       same_site: :lax,
     }
 
-    set_warden_user(activation.user)
+    assign_warden_user(activation.user)
 
     render json: {
       ok: true,
@@ -124,7 +122,7 @@ class Auth::AccountSwitcherController < ApplicationController
     session.delete(:account_switcher_attempt_user_updated_at)
 
     activate_account_session(user)
-    set_warden_user(user)
+    assign_warden_user(user)
     redirect_to root_path
   rescue OpenSSL::Cipher::CipherError
     redirect_to auth_account_switcher_two_factor_path, alert: I18n.t('users.invalid_otp_token')
@@ -141,7 +139,7 @@ class Auth::AccountSwitcherController < ApplicationController
     }
   end
 
-  def set_warden_user(user)
+  def assign_warden_user(user)
     warden.set_user(user, scope: :user)
   end
 end

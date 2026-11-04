@@ -2,10 +2,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Link } from 'react-router-dom';
 
+import { MastodonLogoIcon } from '@phosphor-icons/react';
+
 // BLUELAB_INTEGRATION: BlueLab-owned labels for the optional BlueLab theme.
 import { blue2Text } from '@/bluelab/i18n/blue2';
 import InstanceLogo from '@/images/logo-symbol-icon.svg?react';
-import { IconLogo } from '@/mastodon/components/logo';
 import {
   customAppIcon,
   customFavicon,
@@ -55,7 +56,7 @@ export const NavigationHeader: React.FC<{
                 id='navigation_bar.powered_by_mastodon'
                 defaultMessage='powered by {logo}Mastodon'
                 values={{
-                  logo: <IconLogo role='presentation' />,
+                  logo: <MastodonLogoIcon aria-hidden='true' />,
                 }}
               />
             )}

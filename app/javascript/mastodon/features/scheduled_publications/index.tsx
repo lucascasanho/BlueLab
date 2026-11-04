@@ -218,7 +218,7 @@ export const ScheduledPublications: React.FC = () => {
     <Column bindToDocument label={intl.formatMessage(messages.heading)}>
       <ColumnHeader
         title={intl.formatMessage(messages.heading)}
-        withBackButton='auto'
+        withBackButton
       />
       <div className={classes.root}>
         <p className={classes.intro}>

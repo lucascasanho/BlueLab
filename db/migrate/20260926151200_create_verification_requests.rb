@@ -16,7 +16,7 @@ class CreateVerificationRequests < ActiveRecord::Migration[8.1]
     add_index :verification_requests,
               :account_id,
               unique: true,
-              where: "status = 0",
+              where: 'status = 0',
               name: 'index_verification_requests_on_account_id_pending'
   end
 end

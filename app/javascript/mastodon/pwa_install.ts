@@ -1,3 +1,5 @@
+import '@/styles/mastodon/pwa_install.scss';
+
 type BeforeInstallPromptOutcome = 'accepted' | 'dismissed';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -29,7 +31,10 @@ function registerServiceWorker() {
 }
 
 function isStandalone() {
-  return window.matchMedia('(display-mode: standalone)').matches;
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (navigator as Navigator & { standalone?: boolean }).standalone === true
+  );
 }
 
 function isMobileViewport() {
@@ -41,13 +46,33 @@ function removeInstallPromotion() {
   installPromotion = null;
 }
 
+function configureInstanceInstallColors() {
+  if (window.location.hostname === 'espelunca.social') {
+    document.documentElement.style.setProperty(
+      '--pwa-install-accent',
+      '#b4148c',
+    );
+    document.documentElement.style.setProperty(
+      '--pwa-install-accent-hover',
+      '#951071',
+    );
+  }
+}
+
+function getInstanceInstallName() {
+  return window.location.hostname === 'espelunca.social'
+    ? 'Espelunca'
+    : window.location.hostname;
+}
+
 function getInstallCopy() {
   const language = document.documentElement.lang.toLowerCase();
+  const instanceName = getInstanceInstallName();
 
   if (language.startsWith('es')) {
     return {
-      title: 'Instala .blue como aplicación',
-      message: 'Accede rápidamente a .blue desde tu pantalla de inicio.',
+      title: `Instala ${instanceName} como aplicación`,
+      message: `Accede rápidamente a ${instanceName} desde tu pantalla de inicio.`,
       install: 'Instalar',
       dismiss: 'Ahora no',
     };
@@ -55,8 +80,8 @@ function getInstallCopy() {
 
   if (language.startsWith('fr')) {
     return {
-      title: 'Installez .blue comme application',
-      message: 'Accédez rapidement à .blue depuis votre écran d’accueil.',
+      title: `Installez ${instanceName} comme application`,
+      message: `Accédez rapidement à ${instanceName} depuis votre écran d’accueil.`,
       install: 'Installer',
       dismiss: 'Pas maintenant',
     };
@@ -64,21 +89,20 @@ function getInstallCopy() {
 
   if (language.startsWith('en')) {
     return {
-      title: 'Install .blue as an app',
-      message: 'Get quick access to .blue from your home screen.',
+      title: `Install ${instanceName} as an app`,
+      message: `Get quick access to ${instanceName} from your home screen.`,
       install: 'Install',
       dismiss: 'Not now',
     };
   }
 
   return {
-    title: 'Instale o .blue como aplicativo',
-    message: 'Tenha acesso rápido ao .blue pela tela inicial.',
+    title: `Instale ${instanceName} como aplicativo`,
+    message: `Tenha acesso rápido a ${instanceName} pela tela inicial.`,
     install: 'Instalar',
     dismiss: 'Agora não',
   };
 }
-
 function showInstallPromotion() {
   if (
     !deferredInstallPrompt ||
@@ -95,6 +119,7 @@ function showInstallPromotion() {
   promotion.className = 'pwa-install-promotion';
   promotion.setAttribute('role', 'region');
   promotion.setAttribute('aria-label', copy.title);
+  promotion.setAttribute('aria-live', 'polite');
 
   const content = document.createElement('div');
   content.className = 'pwa-install-promotion__content';
@@ -113,12 +138,12 @@ function showInstallPromotion() {
   actions.className = 'pwa-install-promotion__actions';
 
   const installButton = document.createElement('button');
-  installButton.className = 'button button--compact';
+  installButton.className = 'pwa-install-promotion__install';
   installButton.type = 'button';
   installButton.textContent = copy.install;
 
   const dismissButton = document.createElement('button');
-  dismissButton.className = 'button button--plain button--compact';
+  dismissButton.className = 'pwa-install-promotion__dismiss';
   dismissButton.type = 'button';
   dismissButton.textContent = copy.dismiss;
 
@@ -162,6 +187,8 @@ function handleBeforeInstallPrompt(event: Event) {
 export function setupPwaInstallability() {
   if (isSetup) return;
   isSetup = true;
+
+  configureInstanceInstallColors();
 
   // Keep the browser's own installation UI on desktop. On mobile, take
   // control of beforeinstallprompt and expose a discoverable in-app action.

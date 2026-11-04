@@ -84,6 +84,22 @@ describe('Hotkeys', () => {
     },
   );
 
+  test('does not handle shortcuts when an editable keeps focus but the event target differs', () => {
+    const onMoveToTop = vi.fn();
+
+    render(
+      <Hotkeys global handlers={{ moveToTop: onMoveToTop }}>
+        <input aria-label='Search' />
+        <div data-testid='outside'>outside</div>
+      </Hotkeys>,
+    );
+
+    screen.getByRole('textbox', { name: 'Search' }).focus();
+    fireEvent.keyDown(screen.getByTestId('outside'), { key: '0' });
+
+    expect(onMoveToTop).not.toHaveBeenCalled();
+  });
+
   test('does not handle shortcuts from controls inside the BlueLab composer', () => {
     const onNew = vi.fn();
 

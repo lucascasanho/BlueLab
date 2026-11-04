@@ -60,12 +60,12 @@ export const NameModal: FC<BaseConfirmationModalProps> = ({ onClose }) => {
       <EmojiTextInputField
         blue2EmojiEditor
         mastodon5EmojiEditor
+        emojiPickerInline
         value={newName}
         onChange={setNewName}
         aria-labelledby={titleId}
         counterMax={maxLength}
         label=''
-        // eslint-disable-next-line jsx-a11y/no-autofocus -- This is a modal, it's fine.
         autoFocus
       />
     </ConfirmationModal>

@@ -6,7 +6,7 @@ import { AvatarById } from '@/mastodon/components/avatar';
 import { useIdentity } from '@/mastodon/identity_context';
 import {
   composerOriginFromElement,
-  openNewComposer,
+  openPreferredComposer,
 } from '@/mastodon/reducers/slices/composer';
 import { useAppDispatch } from '@/mastodon/store';
 
@@ -20,8 +20,7 @@ export const Blue2ComposeLauncher: React.FC = () => {
   const openComposer = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       dispatch(
-        openNewComposer({
-          type: 'post',
+        openPreferredComposer({
           origin: composerOriginFromElement(event.currentTarget),
         }),
       );

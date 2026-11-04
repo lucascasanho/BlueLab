@@ -8,17 +8,21 @@ import type {
 } from 'react';
 import { useCallback, useId, useRef } from 'react';
 
+import classNames from 'classnames';
+
 import type { Merge } from 'type-fest';
 
 import { insertEmojiAtPosition } from '@/mastodon/features/emoji/utils';
 
 import { CharacterCounter } from '../character_counter';
-import { EmojiPickerButton } from '../emoji/picker_button';
+import type { OnEmojiPick } from '../emoji/picker';
+import { EmojiPickerButton, emojiToString } from '../emoji/picker';
 
 import {
   Blue2EmojiFieldWrapper,
   isBirdUiTheme,
   isBlue2Theme,
+  isVanillaTheme,
 } from './blue2_emoji_field_wrapper';
 import classes from './emoji_text_field.module.scss';
 import type { CommonFieldWrapperProps, InputProps } from './form_field_wrapper';
@@ -34,6 +38,7 @@ export type EmojiInputProps = {
   recommended?: boolean;
   blue2EmojiEditor?: boolean;
   mastodon5EmojiEditor?: boolean;
+  emojiPickerInline?: boolean;
 } & Omit<CommonFieldWrapperProps, 'wrapperClassName'>;
 
 export const EmojiTextInputField: FC<
@@ -50,6 +55,7 @@ export const EmojiTextInputField: FC<
   disabled,
   blue2EmojiEditor = false,
   mastodon5EmojiEditor = false,
+  emojiPickerInline = false,
   ...otherProps
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -64,6 +70,7 @@ export const EmojiTextInputField: FC<
     disabled,
     blue2EmojiEditor,
     mastodon5EmojiEditor,
+    emojiPickerInline,
     inputRef,
     value,
     onChange,
@@ -151,7 +158,8 @@ const EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = (props) => {
     document.body.dataset.theme === 'mastodon-5';
 
   if (
-    (props.blue2EmojiEditor && (isBlue2Theme() || isBirdUiTheme())) ||
+    (props.blue2EmojiEditor &&
+      (isBlue2Theme() || isBirdUiTheme() || isVanillaTheme())) ||
     (props.mastodon5EmojiEditor && isMastodon5Theme)
   ) {
     return <Blue2EmojiFieldWrapper {...props} />;
@@ -171,18 +179,23 @@ const DefaultEmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   maxLength: _maxLength,
   blue2EmojiEditor: _blue2EmojiEditor,
   mastodon5EmojiEditor: _mastodon5EmojiEditor,
+  emojiPickerInline,
   ...otherProps
 }) => {
   const counterId = useId();
 
-  const handlePickEmoji = useCallback(
-    (emoji: string) => {
+  const handlePickEmoji: OnEmojiPick = useCallback(
+    (emoji) => {
       if (!value) {
         onChange?.('');
         return;
       }
       const position = inputRef.current?.selectionStart ?? value.length;
-      const newValue = insertEmojiAtPosition(value, emoji, position);
+      const newValue = insertEmojiAtPosition(
+        value,
+        emojiToString(emoji),
+        position,
+      );
       onChange?.(newValue);
     },
     [inputRef, value, onChange],
@@ -197,7 +210,10 @@ const DefaultEmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
 
   return (
     <FormFieldWrapper
-      className={classes.fieldWrapper}
+      className={classNames(
+        classes.fieldWrapper,
+        emojiPickerInline && classes.pickerInline,
+      )}
       describedById={counterId}
       {...otherProps}
     >

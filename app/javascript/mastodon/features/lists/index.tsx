@@ -138,7 +138,9 @@ const Lists: React.FC<{
   );
 
   const title = intl.formatMessage(
-    isRedesignEnabled() || isBlue2 ? messages.heading_redesign : messages.heading,
+    isRedesignEnabled() || isBlue2
+      ? messages.heading_redesign
+      : messages.heading,
   );
   const createLabel = intl.formatMessage(
     isBlue2 ? messages.create_blue2 : messages.create_redesign,

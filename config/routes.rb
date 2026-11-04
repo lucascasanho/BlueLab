@@ -183,7 +183,7 @@ Rails.application.routes.draw do
     get '/@:account_username/wrapstodon/:year/:share_key', to: 'wrapstodon#show', as: :public_wrapstodon
   end
 
-  get '/@:username_with_domain/(*any)', to: 'home#index', constraints: { username_with_domain: %r{([^/])+?} }, as: :account_with_domain, format: false
+  get '/@:username_with_domain/(*any)', to: 'remote_accounts#index', constraints: { username_with_domain: %r{([^/])+?} }, as: :account_with_domain, format: false
   get '/settings', to: redirect('/settings/profile')
 
   # Public bug reporting must be registered before the settings and catch-all

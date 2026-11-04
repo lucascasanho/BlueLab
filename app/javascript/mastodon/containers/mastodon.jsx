@@ -18,7 +18,7 @@ import { store } from 'mastodon/store';
 import { isProduction } from 'mastodon/utils/environment';
 import { BodyScrollLock } from 'mastodon/features/ui/components/body_scroll_lock';
 import { AccountSwitcherSync } from 'mastodon/features/account_switcher';
-import { startComposeDraftPersistence } from 'mastodon/features/compose/redesign/draft_persistence';
+import { startComposeDraftPersistence } from 'mastodon/features/compose/bluelab/draft_persistence';
 
 import { ScrollContext } from './scroll_container/scroll_context';
 

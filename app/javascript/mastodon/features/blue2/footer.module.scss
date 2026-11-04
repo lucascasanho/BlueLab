@@ -49,3 +49,10 @@
     }
   }
 }
+
+@media (width <= 1024px), (hover: none) and (pointer: coarse) {
+  .keyboardShortcuts,
+  .keyboardShortcutsSeparator {
+    display: none;
+  }
+}

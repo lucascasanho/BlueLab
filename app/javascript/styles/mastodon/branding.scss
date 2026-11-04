@@ -3,3 +3,123 @@
 .logo {
   color: var(--color-text-primary);
 }
+
+/*
+ * The Rails layout injects the instance's uploaded auth logo (or its favicon)
+ * through --instance-logo. Keep the upstream logo element dimensions so
+ * existing layouts do not shift, but replace the Mastodon artwork everywhere.
+ */
+svg.logo {
+  background-image: var(--instance-logo, none);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+
+  use {
+    opacity: 0;
+  }
+}
+
+.instance-auth-brand,
+.instance-admin-brand {
+  align-items: center;
+  color: var(--color-text-primary);
+  display: inline-flex;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  gap: 0.65rem;
+  max-width: 100%;
+  text-decoration: none;
+
+  img {
+    display: block;
+    flex: 0 0 auto;
+    object-fit: contain;
+  }
+
+  span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+}
+
+.logo-container .instance-auth-brand {
+  font-size: clamp(1.15rem, 3vw, 2.25rem);
+  line-height: 1.2;
+
+  img {
+    height: 3.25rem;
+    width: 3.25rem;
+  }
+}
+
+.admin-wrapper .instance-admin-brand {
+  box-sizing: border-box;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  padding: 1rem;
+  width: 100%;
+
+  img {
+    height: 2.75rem;
+    width: 2.75rem;
+  }
+}
+
+@media screen and (width <= 890px) {
+  .admin-wrapper .sidebar__toggle__logo--page-title {
+    a.instance-admin-brand {
+      align-items: center;
+      display: flex;
+      font-size: 1rem;
+      line-height: 1.4;
+      padding: 0;
+      width: auto;
+
+      &::before {
+        content: none;
+      }
+
+      img {
+        height: 2rem;
+        width: 2rem;
+      }
+    }
+
+    .logo {
+      display: none;
+    }
+  }
+}
+
+.instance-wordmark-brand {
+  align-items: center;
+  color: var(--color-text-primary);
+  display: inline-flex;
+  font-family: var(--font-heading);
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 600;
+  gap: 0.65rem;
+  line-height: 1.2;
+  max-width: 100%;
+  text-decoration: none;
+
+  img {
+    display: block;
+    flex: 0 0 auto;
+    height: 2.75rem;
+    object-fit: contain;
+    width: 2.75rem;
+  }
+
+  span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}

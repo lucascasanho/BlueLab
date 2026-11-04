@@ -52,18 +52,20 @@ class ManifestSerializer < ActiveModel::Serializer
 
   def screenshots
     screenshot_set = object.domain == 'espelunca.social' ? 'espelunca-social' : 'mastodon-blue'
+    narrow_size = screenshot_set == 'espelunca-social' ? '471x939' : '473x936'
+    wide_size = screenshot_set == 'espelunca-social' ? '1890x940' : '1891x936'
 
     [
       {
         src: "/pwa-screenshots/#{screenshot_set}-narrow.png",
-        sizes: '473x936',
+        sizes: narrow_size,
         type: 'image/png',
         form_factor: 'narrow',
         label: "Tela de entrada de #{object.title} em celular",
       },
       {
         src: "/pwa-screenshots/#{screenshot_set}-wide.png",
-        sizes: '1891x936',
+        sizes: wide_size,
         type: 'image/png',
         form_factor: 'wide',
         label: "Tela de entrada de #{object.title} em computador",

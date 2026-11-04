@@ -42,6 +42,22 @@ RSpec.describe REST::AccountSerializer do
     end
   end
 
+  describe '#verified_badge_visible' do
+    context 'when the account has a verified role' do
+      let(:role) { Fabricate(:user_role, name: 'Verificado', highlighted: false) }
+
+      it 'marks the verification badge as visible' do
+        expect(subject['verified_badge_visible']).to be true
+      end
+    end
+
+    context 'when the account role is not verified' do
+      it 'does not display the verification badge' do
+        expect(subject['verified_badge_visible']).to be false
+      end
+    end
+  end
+
   describe '#verified_by_role' do
     context 'when the account role is Verificado but is not highlighted' do
       let(:role) { Fabricate(:user_role, name: 'Verificado', highlighted: false) }

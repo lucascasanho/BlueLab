@@ -19,6 +19,7 @@ import {
   stringToEmojiState,
   tokenizeText,
 } from '@/mastodon/features/emoji/render';
+import { useToggle } from '@/mastodon/hooks/useToggle';
 
 import { AnimateEmojiContext, CustomEmojiContext } from './context';
 
@@ -49,6 +50,8 @@ export const Emoji: FC<EmojiProps> = ({
   }, [appState.currentLocale, state]);
 
   const animate = useContext(AnimateEmojiContext);
+
+  const [error, { onTrue: handleError }] = useToggle();
 
   const fallback = showFallback ? code : null;
 
@@ -83,10 +86,11 @@ export const Emoji: FC<EmojiProps> = ({
     const shortcode = `:${state.code}:`;
     return (
       <img
-        src={animate ? state.data.url : state.data.static_url}
+        src={animate && !error ? state.data.url : state.data.static_url}
         alt={shortcode}
         className='emojione custom-emoji'
         loading='lazy'
+        onError={handleError}
       />
     );
   }
@@ -96,8 +100,7 @@ export const Emoji: FC<EmojiProps> = ({
     ...appState,
   });
   const isBlue2 =
-    typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'blue-2';
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
 
   return (
     <img

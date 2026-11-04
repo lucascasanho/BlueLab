@@ -53,6 +53,9 @@ export const CustomHomepage: React.FC = () => {
   const isAboutRoute = pathname === `${path}/about`;
   const isBlue2 =
     typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
+  const isVanillaTheme =
+    typeof document !== 'undefined' &&
+    document.body.dataset.theme === 'default';
   const blue2Brand = customInstanceLogo ?? customFavicon ?? '/favicon.ico';
   const [showBlue2Welcome, setShowBlue2Welcome] = useState(
     isBlue2 && !signedIn,
@@ -304,6 +307,7 @@ export const CustomHomepage: React.FC = () => {
               `${server.item?.thumbnail.versions?.[key]} ${key.replace('@', '')}`,
           )
           .join(', ')}
+        withAltBadge={isVanillaTheme}
         className={classes.header}
       />
 
@@ -313,7 +317,7 @@ export const CustomHomepage: React.FC = () => {
         </NavigationFocusTarget>
         <p>{server.item?.description}</p>
 
-        {!isBlue2 && !signedIn && (
+        {!isBlue2 && !isVanillaTheme && !signedIn && (
           <div className={classes.guestActions}>
             {registrationsOpen && (
               <a href={signupUrl} className='button'>

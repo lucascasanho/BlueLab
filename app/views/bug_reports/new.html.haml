@@ -35,6 +35,12 @@
       %span.hint= t('bug_reports.attachment_hint')
       = file_field_tag 'files[]', id: 'bug-report-files', multiple: true, accept: 'image/*,video/*,audio/*'
 
+    .fields-group
+      %label.button.button-secondary.bug-report-page__anonymous-toggle{ for: 'bug-report-anonymous' }
+        = check_box_tag :anonymous, 'true', false, id: 'bug-report-anonymous'
+        = t('bug_reports.anonymous')
+      %span.hint= t('bug_reports.anonymous_hint')
+
     .bug-report-page__notice
       = t('bug_reports.diagnostic_notice')
 

@@ -23,7 +23,6 @@ import { LoadingIndicator } from '../loading_indicator';
 import { Scrollable, ItemList } from './components';
 
 const MOUSE_IDLE_DELAY = 300;
-const TOP_THRESHOLD = 100;
 const BLUE2_SCROLL_SETTLE_DELAY = 180;
 const PULL_REFRESH_ACTIVATION_DISTANCE = 20;
 const PULL_REFRESH_THRESHOLD = 72;
@@ -35,7 +34,7 @@ const listenerOptions = supportsPassiveEvents ? { passive: true } : false;
 /**
  *
  * @param {import('mastodon/store').RootState} state
- * @param {*} props
+ * @param {{ scrollKey: string }} props
  */
 const mapStateToProps = (state, { scrollKey }) => {
   return {
@@ -89,6 +88,7 @@ class ScrollableList extends PureComponent {
     children: PropTypes.node,
     bindToDocument: PropTypes.bool,
     preventScroll: PropTypes.bool,
+    noSnippet: PropTypes.bool,
     footer: PropTypes.node,
     className: PropTypes.string,
   };
@@ -272,8 +272,7 @@ class ScrollableList extends PureComponent {
       Children.count(prevProps.children) < Children.count(this.props.children) &&
       this.getFirstChildKey(prevProps) !== this.getFirstChildKey(this.props);
     const pendingChanged = (prevProps.numPending > 0) !== (this.props.numPending > 0);
-    const shouldPreservePosition = pendingChanged || someItemInserted &&
-      (this.getScrollTop() >= TOP_THRESHOLD || this.props.preventScroll);
+    const shouldPreservePosition = pendingChanged || someItemInserted;
 
     if (!shouldPreservePosition) {
       return null;
@@ -560,7 +559,7 @@ class ScrollableList extends PureComponent {
   };
 
   render () {
-    const { children, scrollKey, className, trackScroll, showLoading, isLoading, hasMore, numPending, prepend, alwaysPrepend, append, footer, emptyMessage, onLoadMore } = this.props;
+    const { children, scrollKey, className, trackScroll, showLoading, isLoading, hasMore, numPending, prepend, alwaysPrepend, append, footer, emptyMessage, onLoadMore, noSnippet } = this.props;
     const { fullscreen } = this.state;
     const childrenCount = Children.count(children);
     const pullToRefreshEnabled = this.isBlueLabPullToRefreshEnabled();

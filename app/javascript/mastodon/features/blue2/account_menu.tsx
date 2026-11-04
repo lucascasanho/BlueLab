@@ -19,12 +19,12 @@ import {
   UsersThreeIcon,
 } from '@phosphor-icons/react';
 
-import { AccountSwitcherMenuSection } from '@/mastodon/features/account_switcher';
 import { openModal } from '@/mastodon/actions/modal';
 import { Avatar } from '@/mastodon/components/avatar';
 import { VerifiedBadge } from '@/mastodon/components/display_name/verified_badge';
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { Popover } from '@/mastodon/components/popover';
+import { AccountSwitcherMenuSection } from '@/mastodon/features/account_switcher';
 import { cleanExtraEmojis } from '@/mastodon/features/emoji/normalize';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useAccount } from '@/mastodon/hooks/useAccount';
@@ -153,19 +153,6 @@ export const Blue2AccountMenu: React.FC<{
       </NavLink>
 
       <NavLink
-        to='/scheduled'
-        className={classes.menuItem}
-        onClick={closeMenu}
-        role='menuitem'
-      >
-        <CalendarDotsIcon />
-        <FormattedMessage
-          id='navigation_bar.scheduled_publications'
-          defaultMessage='Scheduled publications'
-        />
-      </NavLink>
-
-      <NavLink
         to='/favourites'
         className={classes.menuItem}
         onClick={closeMenu}
@@ -175,6 +162,19 @@ export const Blue2AccountMenu: React.FC<{
         <FormattedMessage
           id='navigation_bar.favourites'
           defaultMessage='Favorites'
+        />
+      </NavLink>
+
+      <NavLink
+        to='/scheduled'
+        className={classes.menuItem}
+        onClick={closeMenu}
+        role='menuitem'
+      >
+        <CalendarDotsIcon />
+        <FormattedMessage
+          id='navigation_bar.scheduled_publications'
+          defaultMessage='Scheduled publications'
         />
       </NavLink>
 

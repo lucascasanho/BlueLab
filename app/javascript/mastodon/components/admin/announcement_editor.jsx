@@ -3,12 +3,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Provider } from 'react-redux';
 
 import api from '@/mastodon/api';
-import { ComposeEmojiButton } from '@/mastodon/features/compose/redesign/emoji';
+import { ComposeEmojiButton } from '@/mastodon/features/compose/bluelab/emoji';
 import {
   getSavedComposerSelectionOffset,
   setSavedComposerSelectionOffset,
-} from '@/mastodon/features/compose/redesign/emoji_selection';
-import { RichComposeEditor } from '@/mastodon/features/compose/redesign/rich_editor';
+} from '@/mastodon/features/compose/bluelab/emoji_selection';
+import { RichComposeEditor } from '@/mastodon/features/compose/bluelab/rich_editor';
 import { initializeEmoji } from '@/mastodon/features/emoji';
 import { store } from '@/mastodon/store';
 

@@ -2,8 +2,8 @@ import {
   readStoredAccounts,
   removeStoredAccount,
   upsertStoredAccount,
-  type StoredAccount,
 } from './index';
+import type { StoredAccount } from './index';
 
 const account = (id: string, lastUsedAt = 0): StoredAccount => ({
   id,
@@ -21,7 +21,7 @@ const account = (id: string, lastUsedAt = 0): StoredAccount => ({
       url: 'https://example.social/emoji/test_custom.gif',
       category: '',
       featured: false,
-        visible_in_picker: true,
+      visible_in_picker: true,
     },
   ],
   instanceVerification: {
@@ -54,13 +54,13 @@ describe('account switcher storage', () => {
     );
 
     expect(refreshed.map((item) => item.id)).toEqual(['alice', 'bob']);
-    expect(readStoredAccounts()[0].sessionId).toBe('session-alice-new');
-    expect(readStoredAccounts()[0].emojis?.[0]).toMatchObject({
+    expect(readStoredAccounts()[0]?.sessionId).toBe('session-alice-new');
+    expect(readStoredAccounts()[0]?.emojis?.[0]).toMatchObject({
       shortcode: 'test_custom',
       static_url: 'https://example.social/emoji/test_custom.png',
       url: 'https://example.social/emoji/test_custom.gif',
     });
-    expect(readStoredAccounts()[0].instanceVerification?.badge).toEqual({
+    expect(readStoredAccounts()[0]?.instanceVerification?.badge).toEqual({
       view_box: '0 0 24 24',
       path: 'M1 1L23 23Z',
       colors: ['#60a5fa', '#1d9bf0', '#1d4ed8'],
@@ -69,12 +69,12 @@ describe('account switcher storage', () => {
 
   it('keeps the browser vault within the default ten-session server capacity', () => {
     for (let index = 0; index < 12; index += 1) {
-      upsertStoredAccount(account('account-' + index), index);
+      upsertStoredAccount(account(`account-${index}`), index);
     }
 
     const stored = readStoredAccounts();
     expect(stored).toHaveLength(10);
-    expect(stored[0].id).toBe('account-11');
+    expect(stored[0]?.id).toBe('account-11');
     expect(stored.at(-1)?.id).toBe('account-2');
   });
 

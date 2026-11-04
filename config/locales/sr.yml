@@ -773,7 +773,6 @@ sr:
         follow_recommendations: Препоруке за праћење
         profile_directory: Директоријум профилâ
         public_timelines: Јавне временске линије
-        publish_statistics: Објави статистику
         title: Откривање
         trends: Трендови
       domain_blocks:
@@ -955,9 +954,6 @@ sr:
     warning_presets:
       add_new: Додај нови
       delete: Избриши
-      edit_preset: Уреди предефинисана упозорења
-      empty: Још увек нисте дефинисали ниједно упозорење.
-      title: Предефинисна упозорења
     webhooks:
       add_new: Додај крајњу тачку
       delete: Избриши
@@ -1026,7 +1022,6 @@ sr:
     remove: Одвежи псеудоним
   appearance:
     animations_and_accessibility: Анимације и приступачност
-    discovery: Откривање
     localization:
       body: Mastodon преводе добровољци.
       guide_link: https://crowdin.com/project/mastodon

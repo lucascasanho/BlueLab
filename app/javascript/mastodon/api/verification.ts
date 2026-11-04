@@ -1,8 +1,4 @@
-import {
-  apiRequestGet,
-  apiRequestPatch,
-  apiRequestPost,
-} from 'mastodon/api';
+import { apiRequestGet, apiRequestPatch, apiRequestPost } from 'mastodon/api';
 
 export interface ApiVerificationRequestStatus {
   can_request: boolean;
@@ -37,7 +33,6 @@ export const apiSubmitVerificationRequest = (text: string) =>
   );
 
 export const apiUpdateVerificationBadge = (visible: boolean) =>
-  apiRequestPatch<ApiVerificationBadgeResult>(
-    'v1/profile/verification_badge',
-    { visible },
-  );
+  apiRequestPatch<ApiVerificationBadgeResult>('v1/profile/verification_badge', {
+    visible,
+  });

@@ -4,15 +4,16 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Link, NavLink } from 'react-router-dom';
 
+import { HashIcon, RssSimpleIcon } from '@phosphor-icons/react';
+
 import { blue2Text } from '@/bluelab/i18n/blue2';
+import { Search } from '@/mastodon/components/search';
 import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
 import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
-import { Search } from '@/mastodon/features/compose/components/search';
 import { useIdentity } from '@/mastodon/identity_context';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
-import { HashIcon, RssSimpleIcon } from '@phosphor-icons/react';
 
 import { Blue2HomeIcon } from './icons';
 import { useBlue2PinnedFeeds } from './pinned_feeds';

@@ -78,11 +78,7 @@ export const EmbeddedStatus: React.FC<{
           account &&
           (button === 1 || (button === 0 && (ctrlKey || metaKey)))
         ) {
-          window.open(
-            `/@${account.acct}/${statusId}`,
-            '_blank',
-            'noopener',
-          );
+          window.open(`/@${account.acct}/${statusId}`, '_blank', 'noopener');
         }
       }
 

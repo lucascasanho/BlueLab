@@ -3,17 +3,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import api from '@/mastodon/api';
+import type { ApiInstanceVerificationJSON } from '@/mastodon/api_types/accounts';
+import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
 import { EmojiHTML } from '@/mastodon/components/emoji/html';
 import { MenuItemGroup } from '@/mastodon/components/menu';
 import { useAccount } from '@/mastodon/hooks/useAccount';
 import { useIdentity } from '@/mastodon/identity_context';
-import type { ApiInstanceVerificationJSON } from '@/mastodon/api_types/accounts';
-import { VerifiedMark } from '@/mastodon/components/display_name/verified_badge';
-import type { CustomEmojiShape } from '@/mastodon/models/custom_emoji';
 import {
   getAccountSwitcherSessionId,
   registrationsOpen,
 } from '@/mastodon/initial_state';
+import type { CustomEmojiShape } from '@/mastodon/models/custom_emoji';
 
 import classes from './styles.module.scss';
 
@@ -145,6 +145,21 @@ interface AccountSwitcherState {
   removeAccount: (event: React.MouseEvent, accountId: string) => void;
 }
 
+const createSwitchAccountClickHandler =
+  (
+    switchAccount: AccountSwitcherState['switchAccount'],
+    account: StoredAccount,
+  ) =>
+  () => {
+    void switchAccount(account);
+  };
+
+const createRemoveAccountClickHandler =
+  (removeAccount: AccountSwitcherState['removeAccount'], accountId: string) =>
+  (event: React.MouseEvent<HTMLButtonElement>) => {
+    removeAccount(event, accountId);
+  };
+
 const useCurrentAccountSession = () => {
   const { signedIn, accountId } = useIdentity();
   const account = useAccount(accountId);
@@ -161,7 +176,7 @@ const useCurrentAccountSession = () => {
       username: account.username,
       displayName: account.display_name.trim() || account.username,
       avatar: account.avatar,
-      url: account.url ?? '',
+      url: account.url,
       sessionId: accountSwitcherSessionId,
       lastUsedAt: Date.now(),
       emojis: account.emojis.toJS(),
@@ -197,9 +212,8 @@ export const useAccountSwitcher = (): AccountSwitcherState => {
       try {
         await switchToStoredAccount(target);
       } catch (switchError) {
-        const status =
-          (switchError as { response?: { status?: number } }).response
-            ?.status;
+        const status = (switchError as { response?: { status?: number } })
+          .response?.status;
 
         if (status === 404 || status === 403) {
           setStoredAccounts(removeStoredAccount(target.id));
@@ -226,7 +240,7 @@ export const useAccountSwitcher = (): AccountSwitcherState => {
   );
 
   return {
-    signedIn: !!signedIn,
+    signedIn,
     accountId: accountId ?? null,
     storedAccounts,
     switchingId,
@@ -240,8 +254,13 @@ const AccountList: React.FC<{
   variant: 'blue2' | 'navigation';
   state: AccountSwitcherState;
 }> = ({ variant, state }) => {
-  const { accountId, storedAccounts, switchingId, switchAccount, removeAccount } =
-    state;
+  const {
+    accountId,
+    storedAccounts,
+    switchingId,
+    switchAccount,
+    removeAccount,
+  } = state;
   const intl = useIntl();
 
   return (
@@ -269,9 +288,10 @@ const AccountList: React.FC<{
               data-menu-item={variant === 'navigation' ? true : undefined}
               aria-current={active ? 'page' : undefined}
               disabled={active || switchingId !== null}
-              onClick={() => {
-                void switchAccount(storedAccount);
-              }}
+              onClick={createSwitchAccountClickHandler(
+                switchAccount,
+                storedAccount,
+              )}
             >
               <img
                 src={storedAccount.avatar}
@@ -282,7 +302,9 @@ const AccountList: React.FC<{
                 <span className={classes.accountName}>
                   <EmojiHTML
                     as='strong'
-                    htmlString={storedAccount.displayName || storedAccount.username}
+                    htmlString={
+                      storedAccount.displayName || storedAccount.username
+                    }
                     extraEmojis={storedAccount.emojis}
                   />
                   {storedAccount.instanceVerification?.badge && (
@@ -317,12 +339,14 @@ const AccountList: React.FC<{
                 aria-label={intl.formatMessage(
                   {
                     id: 'account_switcher.remove',
-                    defaultMessage:
-                      'Remove {account} from this device',
+                    defaultMessage: 'Remove {account} from this device',
                   },
                   { account: label },
                 )}
-                onClick={(event) => removeAccount(event, storedAccount.id)}
+                onClick={createRemoveAccountClickHandler(
+                  removeAccount,
+                  storedAccount.id,
+                )}
               >
                 ×
               </button>
@@ -399,10 +423,7 @@ export const AccountSwitcherMenuSection: React.FC<{
 
   if (variant === 'navigation') {
     return (
-      <MenuItemGroup
-        label={sectionLabel}
-        className={classes.navigationSection}
-      >
+      <MenuItemGroup label={sectionLabel} className={classes.navigationSection}>
         <AccountList variant='navigation' state={state} />
         {error && (
           <li className={classes.navigationError} role='alert'>

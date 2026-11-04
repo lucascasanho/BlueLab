@@ -1,3 +1,5 @@
+import { List as ImmutableList } from 'immutable';
+
 import { fireEvent } from '@testing-library/react';
 
 import { useAccount } from '@/mastodon/hooks/useAccount';
@@ -53,11 +55,13 @@ vi.mock('@/mastodon/store', async () => {
       selector: (state: {
         followedTags: { tags: never[]; stale: boolean };
         meta: { get: () => string };
+        conversations: { get: (key: string) => unknown };
       }) => unknown,
     ) =>
       selector({
         followedTags: { tags: [], stale: false },
         meta: { get: () => 'native' },
+        conversations: { get: () => ImmutableList() },
       }),
   };
 });

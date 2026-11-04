@@ -27,9 +27,9 @@ RSpec.describe 'Profile verification request API' do
     let(:scopes) { 'write:accounts' }
 
     it 'accepts an empty optional message' do
-      expect {
+      expect do
         post '/api/v1/profile/verification_request', headers: headers, params: { text: '' }
-      }.to change(VerificationRequest, :count).by(1)
+      end.to change(VerificationRequest, :count).by(1)
 
       expect(response).to have_http_status(201)
     end

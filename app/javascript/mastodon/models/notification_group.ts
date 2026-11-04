@@ -50,7 +50,11 @@ export type NotificationGroupQuotedUpdate =
 export type NotificationGroupFollow = BaseNotification<'follow'>;
 export type NotificationGroupFollowRequest = BaseNotification<'follow_request'>;
 export type NotificationGroupAdminSignUp = BaseNotification<'admin.sign_up'>;
-export type NotificationGroupVerification = BaseNotification<'verification_request' | 'verification_approved'>;
+export type NotificationGroupAdminVerificationRequest =
+  BaseNotification<'admin.verification_request'>;
+export type NotificationGroupVerification = BaseNotification<
+  'verification_request' | 'verification_approved'
+>;
 
 export type AccountWarningAction =
   | 'none'
@@ -90,6 +94,10 @@ export interface NotificationGroupAdminReport extends BaseNotification<'admin.re
   report: Report;
 }
 
+export interface NotificationGroupAdminBugReport extends BaseNotification<'admin.bug_report'> {
+  bugReportId: string;
+}
+
 type Collection = ApiCollectionJSON;
 export interface NotificationGroupAddedToCollection extends BaseNotification<'added_to_collection'> {
   collection: Collection | null;
@@ -113,7 +121,9 @@ export type NotificationGroup =
   | NotificationGroupModerationWarning
   | NotificationGroupSeveredRelationships
   | NotificationGroupAdminSignUp
+  | NotificationGroupAdminVerificationRequest
   | NotificationGroupAdminReport
+  | NotificationGroupAdminBugReport
   | NotificationGroupVerification
   | NotificationGroupAnnualReport
   | NotificationGroupAddedToCollection
@@ -169,6 +179,15 @@ export function createNotificationGroupFromJSON(
         sampleAccountIds,
         partial: false,
         ...groupWithoutStatus,
+      };
+    }
+    case 'admin.bug_report': {
+      const { bug_report_id: bugReportId, ...groupWithoutBugReportId } = group;
+      return {
+        ...groupWithoutBugReportId,
+        bugReportId,
+        sampleAccountIds,
+        partial: false,
       };
     }
     case 'admin.report': {
@@ -247,6 +266,12 @@ export function createNotificationGroupFromNotificationJSON(
         ...group,
         type: notification.type,
         report: createReportFromJSON(notification.report),
+      };
+    case 'admin.bug_report':
+      return {
+        ...group,
+        type: notification.type,
+        bugReportId: notification.bug_report_id,
       };
     case 'severed_relationships':
       return {

@@ -241,9 +241,17 @@ export const ColumnHeader: React.FC<ColumnHeaderProps> = ({
     );
   }
 
+  const isSingleColumnSubpage =
+    typeof document !== 'undefined' &&
+    document.body.classList.contains('layout-single-column') &&
+    history.location.pathname !== '/' &&
+    history.location.pathname !== '/home';
+
   if (
     !effectivePinned &&
-    ((multiColumn && history.location.state?.fromMastodon) || showBackButton)
+    ((multiColumn && history.location.state?.fromMastodon) ||
+      showBackButton ||
+      isSingleColumnSubpage)
   ) {
     backButton = <BackButton hasTitle={!!title} />;
   }

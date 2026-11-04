@@ -106,7 +106,7 @@ RSpec.describe UserRole do
 
     it 'does not treat similar role names as verification roles' do
       role = Fabricate(:user_role, name: 'verified', permissions: UserRole::Flags::NONE)
-      expect(role).not_to be_verified_by_instance
+      expect(role).to_not be_verified_by_instance
     end
 
     it 'supports both verification role names together' do

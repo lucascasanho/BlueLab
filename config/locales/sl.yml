@@ -850,10 +850,8 @@ sl:
         title: Privzeto izvzemi uporabnike iz indeksiranja iskalnika
       discovery:
         follow_recommendations: Sledi priporočilom
-        privacy: Zasebnost
         profile_directory: Imenik profilov
         public_timelines: Javne časovnice
-        publish_statistics: Objavi statistiko
         title: Razkrivanje
         trends: Trendi
         wrapstodon: Wrapstodon
@@ -1135,9 +1133,6 @@ sl:
     warning_presets:
       add_new: Dodaj novo
       delete: Izbriši
-      edit_preset: Uredi prednastavitev opozoril
-      empty: Zaenkrat še niste določili nobenih opozorilnih prednastavitev.
-      title: Pred-nastavitve opozoril
     webhooks:
       add_new: Dodaj končno točko
       delete: Izbriši
@@ -1208,7 +1203,6 @@ sl:
   appearance:
     advanced_settings: Napredne nastavitve
     animations_and_accessibility: Animacije in dostopnost
-    discovery: Odkrito
     localization:
       body: Mastodon prevajamo prostovoljci.
       guide_link: https://crowdin.com/project/mastodon

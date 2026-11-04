@@ -21,7 +21,10 @@ import { importFetchedAccounts, importFetchedStatus } from './importer';
 import { openModal } from './modal';
 import { updateTimeline } from './timelines';
 import { insertStatusIntoAccountTimelines } from './timelines_typed';
-import { requestComposerFocus } from '../reducers/slices/composer';
+import {
+  initializeComposer,
+  requestComposerFocus,
+} from '../reducers/slices/composer';
 import { isRedesignEnabled } from '../utils/environment';
 
 /** @type {AbortController | undefined} */
@@ -119,8 +122,17 @@ const messages = defineMessages({
 
 export const ensureComposeIsVisible = (getState, dispatch) => {
   const state = getState();
+  const isVanillaTheme =
+    typeof document !== 'undefined' &&
+    (!document.body.dataset.theme ||
+      document.body.dataset.theme === 'default');
 
-  if (state.getIn(['compose', 'composer_editor']) !== 'mastodon') {
+  // Vanilla 5.0 hosts both composer preferences in its redesigned compose
+  // surface. Do not send its Mastodon preference to the legacy /publish page.
+  if (
+    state.getIn(['compose', 'composer_editor']) !== 'mastodon' ||
+    isVanillaTheme
+  ) {
     if (state.composer.displayState !== 'showing') {
       dispatch({ type: 'composer/showComposer' });
     }
@@ -242,10 +254,7 @@ export const focusCompose = (defaultText = '', caretStart = false) => (dispatch,
 
   ensureComposeIsVisible(getState, dispatch);
 
-  if (isRedesignEnabled()) {
-    const position = caretStart ? 0 : getState().getIn(['compose', 'text'], '').length;
-    dispatch(requestComposerFocus({ start: position, end: position }));
-  }
+  dispatch(initializeComposer({ noSelect: caretStart }));
 };
 
 export function mentionCompose(account) {
@@ -257,10 +266,7 @@ export function mentionCompose(account) {
 
     ensureComposeIsVisible(getState, dispatch);
 
-    if (isRedesignEnabled()) {
-      const position = getState().getIn(['compose', 'text'], '').length;
-      dispatch(requestComposerFocus({ start: position, end: position }));
-    }
+    dispatch(initializeComposer());
   };
 }
 
@@ -279,10 +285,7 @@ export function directCompose(account) {
 
     ensureComposeIsVisible(getState, dispatch);
 
-    if (isRedesignEnabled()) {
-      const position = getState().getIn(['compose', 'text'], '').length;
-      dispatch(requestComposerFocus({ start: position, end: position }));
-    }
+    dispatch(initializeComposer());
   };
 }
 
@@ -596,7 +599,7 @@ export function uploadCompose(files) {
 
         dispatch(uploadComposeSuccess(uploadedMedia, file));
       } catch (error) {
-        if (axios.isCancel(error) || error?.name === 'AbortError') {
+        if (isCancel(error) || error?.name === 'AbortError') {
           dispatch(uploadComposeCancel());
           return;
         } else {

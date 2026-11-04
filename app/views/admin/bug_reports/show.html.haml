@@ -132,10 +132,10 @@
         %strong= attachment.file_file_name
         = link_to attachment.file_file_name, url, target: '_blank', rel: 'noopener'
       - if attachment.gifv? || attachment.video?
-        %video{ src: url, controls: true, preload: 'metadata', style: 'max-width: 100%; height: auto;' }
+        %video.report-card__media{ src: url, controls: true, preload: 'metadata' }
       - elsif attachment.audio?
         %audio{ src: url, controls: true, preload: 'metadata' }
       - else
-        = image_tag url, alt: attachment.file_file_name, loading: 'lazy', style: 'max-width: 100%; height: auto;'
+        = image_tag url, alt: attachment.file_file_name, loading: 'lazy', class: 'report-card__media'
 - else
   %p= t('admin.bug_reports.no_attachments')

@@ -29,14 +29,14 @@
 }
 
 .dropdown-menu {
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-4);
   overflow: hidden;
 }
 
 .dropdown-menu__item {
   a,
   button {
-    border-radius: calc(var(--radius-md) - 2px);
+    border-radius: calc(var(--radius-4) - 2px);
   }
 
   :is(a, button):is(:hover, :focus, :active):where(

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
-import { closeNavigation } from '@/mastodon/actions/navigation';
 import { openModal } from '@/mastodon/actions/modal';
+import { closeNavigation } from '@/mastodon/actions/navigation';
 import { useAppDispatch } from '@/mastodon/store';
 
 export const useOpenBugReport = () => {

@@ -65,7 +65,7 @@ RSpec.describe UserMailer do
         .and match(Rails.configuration.x.local_domain)
     end
 
-    it 'uses customized light and dark colors in the HTML layout' do
+    it 'uses customized light colors and keeps the HTML layout light-only' do
       Setting.instance_light_background_color = '#123456'
       Setting.instance_light_surface_color = '#234567'
       Setting.instance_light_text_color = '#345678'
@@ -75,8 +75,9 @@ RSpec.describe UserMailer do
 
       html = mail.html_part.body.decoded
 
-      expect(html).to include('#123456', '#234567', '#345678', '#102030', '#203040', '#f0f1f2')
-      expect(html).to include('@media (prefers-color-scheme: dark)')
+      expect(html).to include('#123456', '#234567', '#345678')
+      expect(html).to include('color-scheme: light', 'supported-color-schemes: light')
+      expect(html).to_not include('#102030', '#203040', '#f0f1f2', 'prefers-color-scheme: dark')
     end
 
     context 'when the user needs to reconfirm' do
@@ -396,5 +397,21 @@ RSpec.describe UserMailer do
     end
 
     it_behaves_like 'optional bulk mailer settings'
+  end
+
+  describe '#sign_in_token' do
+    let(:ip) { '192.168.0.1' }
+    let(:agent) { 'NCSA_Mosaic/2.0 (Windows 3.1)' }
+    let(:timestamp) { Time.now.utc }
+    let(:mail) { described_class.sign_in_token(receiver, ip, agent, timestamp) }
+
+    it 'renders security code notification' do
+      receiver.update!(locale: nil)
+
+      expect(mail.text_part.body)
+        .to match(I18n.t('user_mailer.sign_in_token.explanation'))
+    end
+
+    it_behaves_like 'localized subject', 'user_mailer.sign_in_token.subject'
   end
 end

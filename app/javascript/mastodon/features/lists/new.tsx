@@ -8,6 +8,7 @@ import { isFulfilled } from '@reduxjs/toolkit';
 
 import { Helmet } from '@unhead/react/helmet';
 
+import { Button } from '@/mastodon/components/button/redesign';
 import { Column } from '@/mastodon/components/column';
 import { ColumnHeader as LegacyColumnHeader } from '@/mastodon/components/column/header';
 import { ColumnHeader } from '@/mastodon/components/column_header';
@@ -26,37 +27,14 @@ import { AvatarGroup } from 'mastodon/components/avatar_group';
 import {
   SelectField,
   TextInputField,
-  Toggle,
+  ToggleField,
 } from 'mastodon/components/form_fields';
 import { Icon } from 'mastodon/components/icon';
 import { LoadingIndicator } from 'mastodon/components/loading_indicator';
 import type { List } from 'mastodon/models/list';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
-const messagesLegacy = defineMessages({
-  edit: { id: 'column.edit_list', defaultMessage: 'Edit list' },
-  create: { id: 'column.create_list', defaultMessage: 'Create list' },
-  manageMembers: {
-    id: 'column.list_members',
-    defaultMessage: 'Manage list members',
-  },
-  nameFieldLabel: { id: 'lists.list_name', defaultMessage: 'List name' },
-  showRepliesTo: {
-    id: 'lists.show_replies_to',
-    defaultMessage: 'Include replies from list members to',
-  },
-  replyPolicyList: {
-    id: 'lists.replies_policy.list',
-    defaultMessage: 'Members of the list',
-  },
-  exclusiveHint: {
-    id: 'lists.exclusive_hint',
-    defaultMessage:
-      'If someone is on this list, hide them in your Home feed to avoid seeing their posts twice.',
-  },
-});
-
-const messagesRedesign = defineMessages({
+const messages = defineMessages({
   edit: { id: 'column.edit_custom_feed', defaultMessage: 'Edit Custom Feed' },
   create: {
     id: 'column.create_custom_feed',
@@ -81,8 +59,6 @@ const messagesRedesign = defineMessages({
       'If someone is in this custom feed, hide them in your Home feed to avoid seeing their posts twice.',
   },
 });
-
-const messages = isRedesignEnabled() ? messagesRedesign : messagesLegacy;
 
 const MembersLink: React.FC<{
   id: string;
@@ -244,38 +220,32 @@ const NewList: React.FC<{ list?: List | null }> = ({ list }) => {
       )}
 
       <div className='fields-group'>
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-        <label className='app-form__toggle'>
-          <div className='app-form__toggle__label'>
-            <strong>
-              <FormattedMessage
-                id='lists.exclusive'
-                defaultMessage='Hide members in Home'
-              />
-            </strong>
-            <span className='hint'>
-              {intl.formatMessage(messages.exclusiveHint)}
-            </span>
-          </div>
-
-          <div className='app-form__toggle__toggle'>
-            <div>
-              <Toggle checked={exclusive} onChange={handleExclusiveChange} />
-            </div>
-          </div>
-        </label>
+        <ToggleField
+          label={
+            <FormattedMessage
+              id='lists.exclusive'
+              defaultMessage='Hide members in Home'
+            />
+          }
+          hint={intl.formatMessage(messages.exclusiveHint)}
+          checked={exclusive}
+          onChange={handleExclusiveChange}
+        />
       </div>
 
       <div className='actions'>
-        <button className='button' type='submit'>
-          {submitting ? (
-            <LoadingIndicator />
-          ) : id ? (
+        <Button
+          type='submit'
+          loading={submitting}
+          color='accent'
+          variant='solid'
+        >
+          {id ? (
             <FormattedMessage id='lists.save' defaultMessage='Save' />
           ) : (
             <FormattedMessage id='lists.create' defaultMessage='Create' />
           )}
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -288,8 +258,7 @@ const NewListWrapper: React.FC<{
   const dispatch = useAppDispatch();
   const history = useHistory();
   const isBlue2 =
-    typeof document !== 'undefined' &&
-    document.body.dataset.theme === 'blue-2';
+    typeof document !== 'undefined' && document.body.dataset.theme === 'blue-2';
   const { signedIn } = useIdentity();
   const { id } = useParams<{ id?: string }>();
   const list = useAppSelector((state) =>
@@ -303,9 +272,7 @@ const NewListWrapper: React.FC<{
   }, [dispatch, signedIn, id]);
 
   const isLoading = id && !list;
-  const title = intl.formatMessage(
-    id ? messages.edit : isBlue2 ? messagesLegacy.create : messages.create,
-  );
+  const title = intl.formatMessage(id ? messages.edit : messages.create);
 
   return (
     <Column bindToDocument={!multiColumn} label={title}>
@@ -313,7 +280,11 @@ const NewListWrapper: React.FC<{
         <ColumnHeader
           withBackButton
           {...(isBlue2
-            ? { onBackButtonClick: () => history.push('/lists') }
+            ? {
+                onBackButtonClick: () => {
+                  history.push('/lists');
+                },
+              }
             : {})}
           title={title}
         />

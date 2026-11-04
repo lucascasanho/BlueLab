@@ -378,9 +378,7 @@ br:
       content_retention:
         danger_zone: Takad dañjer
       discovery:
-        privacy: Buhez prevez
         profile_directory: Kavlec'h ar profiloù
-        publish_statistics: Embann ar stadegoù
         title: Dizoloadur
         trends: Luskadoù
       domain_blocks:
@@ -503,7 +501,6 @@ br:
     empty: N'ho peus alias ebet.
     remove: Dilemel an alias
   appearance:
-    discovery: Dizoloadur
     localization:
       body: Gant tud a-youl vat eo troet Mastodon.
       guide_link: https://crowdin.com/project/mastodon

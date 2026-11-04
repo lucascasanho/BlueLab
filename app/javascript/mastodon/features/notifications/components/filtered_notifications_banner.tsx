@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 
-import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { Link, useHistory } from 'react-router-dom';
 
@@ -129,7 +129,11 @@ export const LinkBanner: React.FC<LinkBannerProps> = ({
   if (isRedesignEnabled()) {
     return (
       <LockupWrapper icon={icon} className={classes.lockup}>
-        <LockupLink to={to} subtitle={subtitle}>
+        <LockupLink
+          to={to}
+          subtitle={subtitle}
+          isHotkeyNavigationTarget={false}
+        >
           {title}
         </LockupLink>
       </LockupWrapper>

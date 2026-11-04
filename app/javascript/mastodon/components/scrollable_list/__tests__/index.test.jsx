@@ -72,15 +72,21 @@ describe('ScrollableList visual scroll anchoring', () => {
     expect(node.scrollTop).toBe(1_100);
   });
 
-  test('does not compensate live insertions near the top', () => {
-    const { list } = buildList({ scrollTop: 50 });
+  test('preserves the visible status when new posts arrive near the top', () => {
+    const { list, node, articles } = buildList({ scrollTop: 50 });
 
     const snapshot = list.getSnapshotBeforeUpdate({
       children: ['a', 'b', 'c'].map(status),
       numPending: 0,
     });
 
-    expect(snapshot).toBeNull();
+    expect(snapshot).not.toBeNull();
+
+    node.scrollHeight = 2_240;
+    setRect(articles[1], 320, 520);
+    list.componentDidUpdate(null, null, snapshot);
+
+    expect(node.scrollTop).toBe(290);
   });
 
   test('does not fight native anchoring when the item is already stable', () => {

@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { HashIcon, PlusIcon, RssSimpleIcon } from '@phosphor-icons/react';
 
-import { changeSetting } from '@/mastodon/actions/settings';
 import { fetchLists } from '@/mastodon/actions/lists';
+import { changeSetting } from '@/mastodon/actions/settings';
+import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
 import { Button } from '@/mastodon/components/button/redesign';
 import {
   Menu,
@@ -15,13 +16,23 @@ import {
   MenuList,
   MenuTrigger,
 } from '@/mastodon/components/menu';
-import { fetchFollowedHashtags } from '@/mastodon/actions/tags_typed';
 import { useCurrentAccountId } from '@/mastodon/hooks/useAccountId';
 import { useIdentity } from '@/mastodon/identity_context';
 import { getOrderedLists } from '@/mastodon/selectors/lists';
 import { useAppDispatch, useAppSelector } from '@/mastodon/store';
 
 import classes from './pinned_feeds.module.scss';
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  !!value && typeof value === 'object';
+
+const isBlue2PinnedFeed = (value: unknown): value is Blue2PinnedFeed =>
+  isRecord(value) &&
+  typeof value.key === 'string' &&
+  (value.type === 'list' || value.type === 'hashtag') &&
+  typeof value.id === 'string' &&
+  typeof value.title === 'string' &&
+  typeof value.path === 'string';
 
 export interface Blue2PinnedFeed {
   key: string;
@@ -48,21 +59,7 @@ const readPinnedFeeds = (
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
 
-    return parsed.filter(
-      (feed): feed is Blue2PinnedFeed =>
-        !!feed &&
-        typeof feed === 'object' &&
-        'key' in feed &&
-        'type' in feed &&
-        'id' in feed &&
-        'title' in feed &&
-        'path' in feed &&
-        (feed.type === 'list' || feed.type === 'hashtag') &&
-        typeof feed.key === 'string' &&
-        typeof feed.id === 'string' &&
-        typeof feed.title === 'string' &&
-        typeof feed.path === 'string',
-    );
+    return parsed.filter(isBlue2PinnedFeed);
   } catch {
     return [];
   }
@@ -71,34 +68,14 @@ const readPinnedFeeds = (
 const parsePinnedFeeds = (value: unknown): Blue2PinnedFeed[] => {
   let parsed: unknown = value;
 
-  if (
-    parsed &&
-    typeof parsed === 'object' &&
-    'toJS' in parsed &&
-    typeof parsed.toJS === 'function'
-  ) {
-    parsed = parsed.toJS();
+  if (isRecord(parsed) && typeof parsed.toJS === 'function') {
+    parsed = (parsed.toJS as () => unknown).call(parsed);
   }
 
   if (!Array.isArray(parsed)) return [];
 
-  return parsed.filter(
-    (feed): feed is Blue2PinnedFeed =>
-      !!feed &&
-      typeof feed === 'object' &&
-      'key' in feed &&
-      'type' in feed &&
-      'id' in feed &&
-      'title' in feed &&
-      'path' in feed &&
-      (feed.type === 'list' || feed.type === 'hashtag') &&
-      typeof feed.key === 'string' &&
-      typeof feed.id === 'string' &&
-      typeof feed.title === 'string' &&
-      typeof feed.path === 'string',
-  );
+  return parsed.filter(isBlue2PinnedFeed);
 };
-
 
 export const useBlue2PinnedFeeds = () => {
   const { signedIn } = useIdentity();
@@ -108,13 +85,7 @@ export const useBlue2PinnedFeeds = () => {
     state.settings.getIn(['blue2', 'pinned_feeds']),
   );
 
-  const [legacyFeeds, setLegacyFeeds] = useState<Blue2PinnedFeed[]>(() =>
-    readPinnedFeeds(accountId),
-  );
-
-  useEffect(() => {
-    setLegacyFeeds(readPinnedFeeds(accountId));
-  }, [accountId]);
+  const legacyFeeds = useMemo(() => readPinnedFeeds(accountId), [accountId]);
 
   const serverValueExists =
     serverPinnedFeeds !== undefined && serverPinnedFeeds !== null;
@@ -124,7 +95,12 @@ export const useBlue2PinnedFeeds = () => {
     : legacyFeeds;
 
   useEffect(() => {
-    if (!signedIn || !accountId || serverValueExists || legacyFeeds.length === 0) {
+    if (
+      !signedIn ||
+      !accountId ||
+      serverValueExists ||
+      legacyFeeds.length === 0
+    ) {
       return;
     }
 
@@ -132,13 +108,7 @@ export const useBlue2PinnedFeeds = () => {
     // migrates them into Mastodon's per-user Web::Setting. Subsequent devices
     // receive the same list from the server.
     dispatch(changeSetting(['blue2', 'pinned_feeds'], legacyFeeds));
-  }, [
-    accountId,
-    dispatch,
-    legacyFeeds,
-    serverValueExists,
-    signedIn,
-  ]);
+  }, [accountId, dispatch, legacyFeeds, serverValueExists, signedIn]);
 
   const updateFeeds = useCallback(
     (next: Blue2PinnedFeed[]) => {
@@ -190,6 +160,31 @@ export const createPinnedHashtagFeed = (tag: string): Blue2PinnedFeed => {
   };
 };
 
+const createAddListClickHandler =
+  (
+    addFeed: (feed: Blue2PinnedFeed) => void,
+    listId: string,
+    listTitle: string,
+  ) =>
+  () => {
+    addFeed(createPinnedListFeed(listId, listTitle));
+  };
+
+const createAddHashtagClickHandler =
+  (addFeed: (feed: Blue2PinnedFeed) => void, tagName: string) => () => {
+    addFeed(createPinnedHashtagFeed(tagName));
+  };
+
+const createRemoveFeedClickHandler =
+  (removeFeed: (key: string) => void, key: string) => () => {
+    removeFeed(key);
+  };
+
+const createSelectFeedClickHandler =
+  (onSelect: (key: string) => void, key: string) => () => {
+    onSelect(key);
+  };
+
 interface Blue2PinnedFeedMenuProps {
   showRemoveSection?: boolean;
 }
@@ -230,7 +225,7 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
     if (!value?.trim()) return;
 
     const feed = createPinnedHashtagFeed(value);
-    if (!feed.id || /\\s/.test(feed.id)) return;
+    if (!feed.id || feed.id.includes('\\s')) return;
 
     addFeed(feed);
   }, [addFeed, intl]);
@@ -278,7 +273,11 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
               <MenuItem
                 key={list.id}
                 icon={RssSimpleIcon}
-                onClick={() => addFeed(createPinnedListFeed(list.id, list.title))}
+                onClick={createAddListClickHandler(
+                  addFeed,
+                  list.id,
+                  list.title,
+                )}
               >
                 {list.title}
               </MenuItem>
@@ -308,7 +307,7 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
               <MenuItem
                 key={tag.name}
                 icon={HashIcon}
-                onClick={() => addFeed(createPinnedHashtagFeed(tag.name))}
+                onClick={createAddHashtagClickHandler(addFeed, tag.name)}
               >
                 #{tag.name}
               </MenuItem>
@@ -322,10 +321,7 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
             </div>
           )}
 
-          <MenuItem
-            icon={HashIcon}
-            onClick={handleAddHashtag}
-          >
+          <MenuItem icon={HashIcon} onClick={handleAddHashtag}>
             <FormattedMessage
               id='blue2.pinned_feeds.add_hashtag'
               defaultMessage='Pin another hashtag…'
@@ -345,7 +341,10 @@ export const Blue2PinnedFeedMenu: React.FC<Blue2PinnedFeedMenuProps> = ({
               }
             >
               {feeds.map((feed) => (
-                <MenuItem key={`remove:${feed.key}`} onClick={() => removeFeed(feed.key)}>
+                <MenuItem
+                  key={`remove:${feed.key}`}
+                  onClick={createRemoveFeedClickHandler(removeFeed, feed.key)}
+                >
                   {feed.title}
                 </MenuItem>
               ))}
@@ -378,14 +377,10 @@ export const Blue2PinnedFeedTabs: React.FC<{
         <button
           key={feed.key}
           type='button'
-          className={
-            activeKey === feed.key ? activeTabClassName : tabClassName
-          }
-          onClick={() => onSelect(feed.key)}
+          className={activeKey === feed.key ? activeTabClassName : tabClassName}
+          onClick={createSelectFeedClickHandler(onSelect, feed.key)}
         >
-          {showIcons && feed.type === 'list' && (
-            <RssSimpleIcon size={15} />
-          )}
+          {showIcons && feed.type === 'list' && <RssSimpleIcon size={15} />}
           {feed.title}
         </button>
       ))}

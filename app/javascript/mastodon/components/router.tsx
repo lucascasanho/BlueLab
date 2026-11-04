@@ -28,6 +28,8 @@ interface MastodonLocationState {
   preventMultiColumnAutoScroll?: string;
   // Used to track where a follow is coming from
   reference?: string;
+  // Used by the BlueLab direct-message view to recover the source status.
+  statusId?: string;
 }
 
 export type LocationState = MastodonLocationState | null | undefined;

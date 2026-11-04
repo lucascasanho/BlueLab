@@ -3,6 +3,18 @@
   flex: 1 1 auto;
   flex-direction: column;
   width: 100%;
+  height: 100%;
+  max-height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.columnContent {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
@@ -10,24 +22,8 @@
 
 :global(body.layout-multiple-columns) .column:not(.inlineColumn) {
   box-sizing: border-box;
-  flex: 0 0 clamp(
-    360px,
-    calc(
-      (
-        100vw - 76px - (var(--space-2) * 5)
-      ) / 4
-    ),
-    400px
-  );
-  width: clamp(
-    360px,
-    calc(
-      (
-        100vw - 76px - (var(--space-2) * 5)
-      ) / 4
-    ),
-    400px
-  );
+  flex: 0 0 clamp(360px, calc((100vw - 76px - (var(--space-2) * 5)) / 4), 400px);
+  width: clamp(360px, calc((100vw - 76px - (var(--space-2) * 5)) / 4), 400px);
   max-width: 400px;
 }
 
@@ -37,10 +33,10 @@
   width: 100%;
   min-width: 0;
   min-height: 0;
-  height: auto;
+  height: 0;
   box-sizing: border-box;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--space-2);
   padding: var(--space-4);
   overflow: hidden;
 }
@@ -51,23 +47,29 @@
   flex: 1 1 auto;
   min-height: 0;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--space-2);
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scrollbar-width: thin;
-  padding: var(--space-2xs) var(--space-2xs) var(--space-xs);
+  padding: var(--space-1) var(--space-1) var(--space-2);
 }
 
-:global(body[data-theme='blue-2']) .messageListContent {
+:global(body[data-theme='blue-2']) .messageListContent,
+:global(body[data-theme='default']) .messageListContent,
+:global(body[data-theme='']) .messageListContent,
+:global(body:not([data-theme])) .messageListContent {
   display: flex;
   flex-direction: column;
   min-width: 0;
   min-height: 100%;
   margin-top: auto;
-  gap: var(--space-sm);
+  gap: var(--space-3);
 }
 
-:global(body[data-theme='blue-2']) .replyComposer {
+:global(body[data-theme='blue-2']) .replyComposer,
+:global(body[data-theme='default']) .replyComposer,
+:global(body[data-theme='']) .replyComposer,
+:global(body:not([data-theme])) .replyComposer {
   position: relative;
   z-index: 2;
   flex: 0 0 auto;
@@ -104,9 +106,9 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--space-2xs);
+  gap: var(--space-1);
   min-height: 20px;
-  margin-block-end: var(--space-2xs);
+  margin-block-end: var(--space-1);
   color: var(--color-text-tertiary);
 }
 
@@ -115,7 +117,6 @@
   max-width: 100%;
   color: var(--color-text-primary);
   overflow-wrap: anywhere;
-  word-break: break-word;
 }
 
 .messageBody {
@@ -123,7 +124,7 @@
   z-index: 0;
   min-width: 0;
   max-width: 100%;
-  padding-block-start: var(--space-3xs);
+  padding-block-start: var(--space-half);
   overflow-wrap: anywhere;
 }
 
@@ -135,11 +136,11 @@
   display: block;
   box-sizing: border-box;
   width: 100%;
-  margin-block-end: var(--space-xs);
-  padding: var(--space-2xs) var(--space-xs);
+  margin-block-end: var(--space-2);
+  padding: var(--space-1) var(--space-2);
   border: 1px solid var(--color-border-primary);
   border-inline-start: 3px solid var(--color-border-brand);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-3);
   background: var(--color-bg-tertiary);
   color: var(--color-text-secondary);
   font-size: 0.82em;
@@ -159,7 +160,7 @@
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: var(--space-3xs);
+  gap: var(--space-half);
   color: var(--color-text-secondary);
   font-size: 0.95em;
   font-weight: 650;
@@ -175,13 +176,52 @@
 
 .replyContextText {
   display: -webkit-box;
-  margin-block-start: var(--space-3xs);
+  margin-block-start: var(--space-half);
   color: var(--color-text-primary);
   line-height: 1.35;
   overflow: hidden;
   overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+
+  :global(p) {
+    display: inline;
+    margin: 0;
+  }
+
+  :global(a) {
+    color: inherit;
+    text-decoration: underline;
+  }
+}
+
+.messageFavouriteVanilla {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+:global(body:not([data-theme])) .messageFavouriteVanilla[aria-pressed='true'],
+:global(body[data-theme='']) .messageFavouriteVanilla[aria-pressed='true'],
+:global(body[data-theme='default'])
+  .messageFavouriteVanilla[aria-pressed='true'] {
+  color: #dc2626 !important;
+
+  svg {
+    color: #dc2626 !important;
+    fill: #dc2626 !important;
+    stroke: #dc2626 !important;
+  }
+}
+
+.messageFavouriteVanilla:focus-visible {
+  outline: var(--outline-focus-default);
+  outline-offset: 2px;
 }
 
 :global(body[data-theme='blue-2']) .message {
@@ -227,14 +267,16 @@
 .replyComposer {
   flex: 0 0 auto;
   min-height: 0;
+  align-self: stretch;
+  margin-top: auto;
 }
 
 .messageActions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--space-2xs);
-  margin-block-start: var(--space-2xs);
+  gap: var(--space-1);
+  margin-block-start: var(--space-1);
 }
 
 .messageAction {
@@ -243,13 +285,16 @@
   border-radius: 50%;
 }
 
-:global(body[data-theme='blue-2']) .replyComposer {
+:global(body[data-theme='blue-2']) .replyComposer,
+:global(body[data-theme='default']) .replyComposer,
+:global(body[data-theme='']) .replyComposer,
+:global(body:not([data-theme])) .replyComposer {
   width: 100%;
   min-width: 0;
   flex: 0 0 auto;
   margin-top: 0;
   padding: 0;
-  gap: var(--space-3xs);
+  gap: var(--space-half);
   border: 0;
   outline: none;
   box-shadow: none;
@@ -264,9 +309,9 @@
     box-sizing: border-box;
     min-height: 0;
     max-height: none;
-    padding: var(--space-xs) var(--space-sm);
+    padding: var(--space-2) var(--space-3);
     border: 1px solid rgb(from var(--color-border-primary) r g b / 55%);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-4);
     background: var(--color-bg-primary);
   }
 
@@ -295,13 +340,17 @@
   }
 
   [data-bluelab-compose-footer] .submitButton {
-    margin-inline-start: var(--space-xs);
+    margin-inline-start: var(--space-2);
+  }
+
+  [data-bluelab-compose-footer][data-vanilla-appearance='true'] .submitButton {
+    margin-inline-start: 0;
   }
 
   :global(.autosuggest-textarea__suggestions) {
     max-height: min(280px, 40vh);
     overflow-y: auto;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-4);
   }
 
   :global(.autosuggest-textarea__suggestions__item) {
@@ -334,18 +383,25 @@
   color: var(--color-text-secondary);
   text-align: center;
 }
+
 /*
  * BlueLab message conversations have their own layout contract. Only this
  * theme/component uses these rules: the column fills its host, the history
  * owns scrolling, and the composer stays outside that scroll region.
  */
-:global(body[data-theme='blue-2']) .column {
+:global(body[data-theme='blue-2']) .column,
+:global(body[data-theme='default']) .column,
+:global(body[data-theme='']) .column,
+:global(body:not([data-theme])) .column {
   box-sizing: border-box;
   min-width: 0;
   min-height: 0;
 }
 
-:global(body[data-theme='blue-2']) .inlineColumn {
+:global(body[data-theme='blue-2']) .inlineColumn,
+:global(body[data-theme='default']) .inlineColumn,
+:global(body[data-theme='']) .inlineColumn,
+:global(body:not([data-theme])) .inlineColumn {
   flex: 1 1 auto;
   width: 100%;
   min-width: 0;
@@ -354,29 +410,41 @@
   max-width: none;
 }
 
-:global(body[data-theme='blue-2']) .page {
+:global(body[data-theme='blue-2']) .page,
+:global(body[data-theme='default']) .page,
+:global(body[data-theme='']) .page,
+:global(body:not([data-theme])) .page {
   min-width: 0;
   min-height: 0;
   flex: 1 1 auto;
   overflow: hidden;
 }
 
-:global(body[data-theme='blue-2']) .messageList {
+:global(body[data-theme='blue-2']) .messageList,
+:global(body[data-theme='default']) .messageList,
+:global(body[data-theme='']) .messageList,
+:global(body:not([data-theme])) .messageList {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
 }
 
-:global(body[data-theme='blue-2']) .messageListContent {
+:global(body[data-theme='blue-2']) .messageListContent,
+:global(body[data-theme='default']) .messageListContent,
+:global(body[data-theme='']) .messageListContent,
+:global(body:not([data-theme])) .messageListContent {
   display: flex;
   flex-direction: column;
   min-width: 0;
   min-height: 100%;
   margin-top: auto;
-  gap: var(--space-sm);
+  gap: var(--space-3);
 }
 
-:global(body[data-theme='blue-2']) .replyComposer {
+:global(body[data-theme='blue-2']) .replyComposer,
+:global(body[data-theme='default']) .replyComposer,
+:global(body[data-theme='']) .replyComposer,
+:global(body:not([data-theme])) .replyComposer {
   position: relative;
   z-index: 2;
   flex: 0 0 auto;
@@ -388,13 +456,31 @@
 
 :global(body[data-theme='blue-2'])
   .replyComposer[data-bluelab-composer-compact='true']
+  [data-compose-scroll-container],
+:global(body[data-theme='default'])
+  .replyComposer[data-bluelab-composer-compact='true']
+  [data-compose-scroll-container],
+:global(body[data-theme=''])
+  .replyComposer[data-bluelab-composer-compact='true']
+  [data-compose-scroll-container],
+:global(body:not([data-theme]))
+  .replyComposer[data-bluelab-composer-compact='true']
   [data-compose-scroll-container] {
   overflow: hidden;
 }
 
 :global(body[data-theme='blue-2'])
   .replyComposer[data-bluelab-composer-compact='true']
-  .richEditor {
+  :global([data-bluelab-rich-editor-input]),
+:global(body[data-theme='default'])
+  .replyComposer[data-bluelab-composer-compact='true']
+  :global([data-bluelab-rich-editor-input]),
+:global(body[data-theme=''])
+  .replyComposer[data-bluelab-composer-compact='true']
+  :global([data-bluelab-rich-editor-input]),
+:global(body:not([data-theme]))
+  .replyComposer[data-bluelab-composer-compact='true']
+  :global([data-bluelab-rich-editor-input]) {
   max-height: 7rem;
 }
 
@@ -403,14 +489,30 @@
   // navigation remains outside it, so the composer stays in normal flex flow
   // exactly above the navigation and moves to the viewport bottom when the
   // navigation chrome is hidden.
-  :global(body[data-theme='blue-2']) .column {
+  :global(body[data-theme='blue-2']) .column,
+  :global(body[data-theme='default']) .column,
+  :global(body[data-theme='']) .column,
+  :global(body:not([data-theme])) .column {
     height: 100%;
     max-height: 100%;
   }
 
+  // Let the messages list shrink inside the viewport and own scrolling.
+  :global(body[data-theme='blue-2']) .columnContent,
+  :global(body[data-theme='default']) .columnContent,
+  :global(body[data-theme='']) .columnContent,
+  :global(body:not([data-theme])) .columnContent {
+    flex: 1 1 0;
+    height: 0;
+    min-height: 0;
+  }
+
   // Reserve the mobile navigation's occupied height inside the message page
   // so the fixed bottom bar cannot overlap the composer.
-  :global(body[data-theme='blue-2']) .page {
+  :global(body[data-theme='blue-2']) .page,
+  :global(body[data-theme='default']) .page,
+  :global(body[data-theme='']) .page,
+  :global(body:not([data-theme])) .page {
     padding-bottom: calc(56px + env(safe-area-inset-bottom));
   }
 
@@ -422,18 +524,51 @@
 
   :global(body[data-theme='blue-2'])
     .replyComposer[data-bluelab-composer-compact='true']
-    .richEditor {
-    max-height: 7rem;
+    :global([data-bluelab-rich-editor-input]),
+  :global(body[data-theme='default'])
+    .replyComposer[data-bluelab-composer-compact='true']
+    :global([data-bluelab-rich-editor-input]),
+  :global(body[data-theme=''])
+    .replyComposer[data-bluelab-composer-compact='true']
+    :global([data-bluelab-rich-editor-input]),
+  :global(body:not([data-theme]))
+    .replyComposer[data-bluelab-composer-compact='true']
+    :global([data-bluelab-rich-editor-input]) {
+    min-height: min(5.5rem, 16dvh);
+    max-height: min(7rem, 22dvh);
+    flex: 0 1 auto;
+  }
+
+  // Keep mobile browsers from zooming the viewport when the message editor
+  // receives focus. Scope the font-size fix to Vanilla's appearance.
+  :global(body[data-theme='default'])
+    .replyComposer[data-bluelab-composer-compact='true']
+    :global([data-bluelab-rich-editor-input]),
+  :global(body[data-theme=''])
+    .replyComposer[data-bluelab-composer-compact='true']
+    :global([data-bluelab-rich-editor-input]),
+  :global(body:not([data-theme]))
+    .replyComposer[data-bluelab-composer-compact='true']
+    :global([data-bluelab-rich-editor-input]) {
+    // Use a fixed 16px size so iOS does not zoom when focusing the
+    // message editor, even when theme typography tokens change.
+    font-size: 16px !important;
   }
 }
 @media (width >= 1175px) {
-  :global(body[data-theme='blue-2']) .advancedColumn {
+  :global(body[data-theme='blue-2']) .advancedColumn,
+  :global(body[data-theme='default']) .advancedColumn,
+  :global(body[data-theme='']) .advancedColumn,
+  :global(body:not([data-theme])) .advancedColumn {
     height: 100dvh;
     max-height: 100dvh;
     min-height: 0;
   }
 
-  :global(body[data-theme='blue-2']) .page {
+  :global(body[data-theme='blue-2']) .page,
+  :global(body[data-theme='default']) .page,
+  :global(body[data-theme='']) .page,
+  :global(body:not([data-theme])) .page {
     min-height: 0;
   }
 }

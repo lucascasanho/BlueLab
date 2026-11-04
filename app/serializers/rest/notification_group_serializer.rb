@@ -16,6 +16,7 @@ class REST::NotificationGroupSerializer < ActiveModel::Serializer
 
   attribute :sample_account_ids
   attribute :status_id, if: :status_type?
+  attribute :bug_report_id, if: :bug_report_type?
   belongs_to :report, if: :report_type?, serializer: REST::ReportSerializer
   belongs_to :account_relationship_severance_event, key: :event, if: :relationship_severance_event?, serializer: REST::AccountRelationshipSeveranceEventSerializer
   belongs_to :account_warning, key: :moderation_warning, if: :moderation_warning_event?, serializer: REST::AccountWarningSerializer
@@ -28,6 +29,14 @@ class REST::NotificationGroupSerializer < ActiveModel::Serializer
 
   def status_id
     object.target_status&.id&.to_s
+  end
+
+  def bug_report_id
+    object.notification.activity_id.to_s
+  end
+
+  def bug_report_type?
+    object.type == :'admin.bug_report'
   end
 
   def status_type?

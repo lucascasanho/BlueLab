@@ -712,7 +712,6 @@ ms:
         follow_recommendations: Ikut cadangan
         profile_directory: Direktori profil
         public_timelines: Garis masa awam
-        publish_statistics: Terbitkan statistik
         title: Penemuan
         trends: Sohor kini
       domain_blocks:
@@ -886,8 +885,6 @@ ms:
     warning_presets:
       add_new: Tambah baharu
       delete: Padam
-      edit_preset: Edit pratetap amaran
-      empty: Anda belum menentukan sebarang pratetap amaran lagi.
     webhooks:
       add_new: Tambah titik akhir
       delete: Padam
@@ -951,7 +948,6 @@ ms:
     remove: Nyahpaut alias
   appearance:
     animations_and_accessibility: Animasi dan kebolehaksesan
-    discovery: Penemuan
     localization:
       body: Mastodon diterjemahkan oleh sukarelawan.
       guide_link: https://crowdin.com/project/mastodon

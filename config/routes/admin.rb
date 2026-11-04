@@ -3,6 +3,11 @@
 namespace :admin do
   get '/dashboard', to: 'dashboard#index'
 
+  resources :server_checks, only: [:index]
+  get '/server_health', to: redirect('/admin/server_checks')
+  post '/ignored_server_checks/:key', to: 'ignored_server_checks#create', as: 'ignored_server_check'
+  delete '/ignored_server_checks/:key', to: 'ignored_server_checks#destroy'
+
   concern :batch do
     collection { post :batch }
   end
@@ -114,6 +119,18 @@ namespace :admin do
     resources :moderation_notes, module: :instances, only: [:create, :destroy]
   end
 
+  resources :moderation_subscriptions do
+    collection do
+      get :logs
+    end
+  end
+
+  resources :moderation_suggestions do
+    member do
+      post :apply
+    end
+  end
+
   resources :rules, only: [:index, :new, :create, :edit, :update, :destroy] do
     member do
       post :move_up
@@ -207,6 +224,7 @@ namespace :admin do
   resources :users, only: [] do
     scope module: :users do
       resource :two_factor_authentication, only: [:destroy]
+      resource :sign_in_token_authentication, only: [:create, :destroy]
       resource :role, only: [:show, :update]
     end
   end

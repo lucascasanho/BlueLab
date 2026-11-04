@@ -13,15 +13,18 @@ import classes from './navigation_link.module.scss';
 
 type NavigationLinkProps = {
   stacked?: boolean;
+  withSpaceAfter?: boolean;
   iconComponent?: Icon | React.FC<SVGProps<SVGSVGElement>>;
   badgeCount?: number;
 } & (
   | ({ as?: 'button' } & React.ComponentPropsWithRef<'button'>)
+  | ({ as?: 'a' } & React.ComponentPropsWithRef<'a'>)
   | ({ as?: 'link' } & NavLinkProps)
 );
 
 export const NavigationLink: React.FC<NavigationLinkProps> = ({
   stacked = false,
+  withSpaceAfter = false,
   as = 'link',
   iconComponent: IconComp,
   badgeCount = 0,
@@ -38,7 +41,12 @@ export const NavigationLink: React.FC<NavigationLinkProps> = ({
   );
 
   return (
-    <li className={classes.wrapper}>
+    <li
+      className={classNames(
+        classes.wrapper,
+        withSpaceAfter && classes.wrapperSpaced,
+      )}
+    >
       <Comp
         {...otherProps}
         type={as === 'button' ? 'button' : undefined}
@@ -46,10 +54,7 @@ export const NavigationLink: React.FC<NavigationLinkProps> = ({
       >
         {IconComp && (
           <span className={classes.icon}>
-            <IconComp
-              size={stacked ? 24 : 20}
-              weight={isActive ? 'fill' : undefined}
-            />
+            <IconComp size={20} weight={isActive ? 'fill' : undefined} />
           </span>
         )}
         <span className={classes.label}>{children}</span>

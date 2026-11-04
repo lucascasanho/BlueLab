@@ -258,10 +258,32 @@ instalar_dependencias() {
   echo "Yarn: checksums atualizados e instalação immutable validada."
 }
 
+sincronizar_dominios_descartaveis() {
+  # A sincronização depende de fontes HTTP externas. Uma indisponibilidade
+  # (por exemplo HTTP 503 em todas as fontes) não deve interromper migrations,
+  # compilação e recuperação do serviço; registrar aviso e tentar novamente
+  # na próxima atualização. Não altera nem apaga bloqueios já existentes.
+  local tentativa
+  for tentativa in 1 2 3; do
+    echo "Sincronizando domínios descartáveis (tentativa $tentativa/3)..."
+    if env RAILS_ENV=production bin/tootctl email_domain_blocks sync_disposable; then
+      echo "Domínios descartáveis sincronizados."
+      return 0
+    fi
+    if [[ "$tentativa" -lt 3 ]]; then
+      echo "Aviso: a sincronização falhou; nova tentativa em 5 segundos." >&2
+      sleep 5
+    fi
+  done
+  echo "AVISO: todas as tentativas de sincronizar domínios descartáveis falharam." >&2
+  echo "A atualização continuará; os bloqueios atuais serão mantidos e a sincronização será tentada na próxima execução." >&2
+  return 0
+}
+
 aplicar_migrations() {
   executar env RAILS_ENV=production bundle exec rails db:migrate
   if [[ "$ALVO" == blue ]]; then
-    executar env RAILS_ENV=production bin/tootctl email_domain_blocks sync_disposable
+    sincronizar_dominios_descartaveis
   fi
 }
 

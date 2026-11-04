@@ -24,6 +24,23 @@ class BugReport < ApplicationRecord
   scope :unresolved, -> { where(status: :open) }
   scope :resolved, -> { where(status: :resolved) }
 
+  def notify_moderation_staff!
+    role_ids = UserRole.that_can(:manage_reports).map(&:id)
+    return if role_ids.empty?
+
+    User.where(role_id: role_ids).includes(:account).find_each do |user|
+      recipient = user.account
+      next unless recipient
+
+      NotifyService.new.call(
+        recipient,
+        :'admin.bug_report',
+        self,
+        from_account: recipient
+      )
+    end
+  end
+
   def resolve!(account)
     update!(
       status: :resolved,

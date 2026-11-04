@@ -45,10 +45,10 @@ export const HashtagColumnMenu: React.FC<{
     dispatch(
       openModal({
         modalType: 'HASHTAG_SETTINGS',
-        modalProps: { columnId, tagId },
+        modalProps: { columnId },
       }),
     );
-  }, [columnId, dispatch, tagId]);
+  }, [columnId, dispatch]);
 
   if (!tag || !signedIn) {
     return null;
@@ -97,7 +97,6 @@ export const HashtagColumnMenu: React.FC<{
             <FormattedMessage
               id='hashtags.add_more_tags'
               defaultMessage='Add more tags to this column…'
-              values={{ tag: tagId }}
             />
           </MenuItem>
         </>

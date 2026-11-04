@@ -20,6 +20,7 @@ export const allNotificationTypes: NotificationType[] = [
   'update',
   'admin.sign_up',
   'admin.report',
+  'admin.bug_report',
   'admin.verification_request',
   'verification_request',
   'verification_approved',
@@ -48,6 +49,7 @@ export type NotificationType =
   | 'severed_relationships'
   | 'admin.sign_up'
   | 'admin.report'
+  | 'admin.bug_report'
   | 'admin.verification_request'
   | 'verification_request'
   | 'verification_approved'
@@ -84,6 +86,16 @@ interface NotificationWithStatusJSON extends BaseNotificationJSON {
   status: ApiStatusJSON | null;
 }
 
+interface BugReportNotificationGroupJSON extends BaseNotificationGroupJSON {
+  type: 'admin.bug_report';
+  bug_report_id: string;
+}
+
+interface BugReportNotificationJSON extends BaseNotificationJSON {
+  type: 'admin.bug_report';
+  bug_report_id: string;
+}
+
 interface ReportNotificationGroupJSON extends BaseNotificationGroupJSON {
   type: 'admin.report';
   report: ApiReportJSON;
@@ -114,7 +126,13 @@ interface CollectionUpdateNotificationJSON extends BaseNotificationJSON {
   collection: ApiCollectionJSON | null;
 }
 
-type SimpleNotificationTypes = 'follow' | 'follow_request' | 'admin.sign_up' | 'admin.verification_request' | 'verification_request' | 'verification_approved';
+type SimpleNotificationTypes =
+  | 'follow'
+  | 'follow_request'
+  | 'admin.sign_up'
+  | 'admin.verification_request'
+  | 'verification_request'
+  | 'verification_approved';
 interface SimpleNotificationGroupJSON extends BaseNotificationGroupJSON {
   type: SimpleNotificationTypes;
 }
@@ -174,6 +192,7 @@ interface AnnualReportNotificationGroupJSON extends BaseNotificationGroupJSON {
 
 export type ApiNotificationJSON =
   | SimpleNotificationJSON
+  | BugReportNotificationJSON
   | ReportNotificationJSON
   | AccountRelationshipSeveranceNotificationJSON
   | NotificationWithStatusJSON
@@ -183,6 +202,7 @@ export type ApiNotificationJSON =
 
 export type ApiNotificationGroupJSON =
   | SimpleNotificationGroupJSON
+  | BugReportNotificationGroupJSON
   | ReportNotificationGroupJSON
   | AccountRelationshipSeveranceNotificationGroupJSON
   | NotificationGroupWithStatusJSON

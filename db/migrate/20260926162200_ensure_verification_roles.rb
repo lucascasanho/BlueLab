@@ -4,6 +4,8 @@ class EnsureVerificationRoles < ActiveRecord::Migration[8.1]
   VERIFICATION_ROLE_NAMES = %w(Verificado Verified).freeze
 
   def up
+    UserRole.reset_column_information
+
     VERIFICATION_ROLE_NAMES.each do |name|
       UserRole.find_or_create_by!(name:) do |role|
         role.permissions = UserRole::Flags::NONE

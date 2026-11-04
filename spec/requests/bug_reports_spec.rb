@@ -7,7 +7,7 @@ RSpec.describe 'Public bug reports' do
     it 'renders for anonymous visitors' do
       get '/bug_reports/new'
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(200)
       expect(response.body).to include('bug-report-form')
       expect(response.body).to include('data-turbo="false"')
     end
@@ -15,7 +15,7 @@ RSpec.describe 'Public bug reports' do
     it 'renders with error-page context when reached from an error page' do
       get new_bug_report_path(error_page: '200', current_path: '')
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(200)
       expect(response.body).to include('bug-report-form')
       expect(response.body).to include('Este relato foi iniciado na página de erro')
     end
@@ -23,7 +23,7 @@ RSpec.describe 'Public bug reports' do
     it 'renders when reached from the login page' do
       get new_bug_report_path(current_path: '/auth/sign_in')
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(200)
       expect(response.body).to include('bug-report-form')
     end
   end
@@ -33,10 +33,10 @@ RSpec.describe 'Public bug reports' do
       it "exposes the direct bug-report link on #{path}" do
         get path
 
-        expect(response).to have_http_status(:ok)
+        expect(response).to have_http_status(200)
         expect(response.parsed_body)
           .to have_css('form.bug-report-shortcut[action^="/bug_reports/new"]')
-          .and have_css('button.bug-report-shortcut__button', text: I18n.t('bug_reports.link'))
+          .and have_button(I18n.t('bug_reports.link'))
       end
     end
 
@@ -44,10 +44,10 @@ RSpec.describe 'Public bug reports' do
       Setting.registrations_mode = 'open'
     end
 
-    include_examples 'an auth page with a bug-report shortcut', '/auth/sign_in'
-    include_examples 'an auth page with a bug-report shortcut', '/auth/password/new'
-    include_examples 'an auth page with a bug-report shortcut', '/auth/confirmation/new'
-    include_examples 'an auth page with a bug-report shortcut', '/auth/sign_up'
+    it_behaves_like 'an auth page with a bug-report shortcut', '/auth/sign_in'
+    it_behaves_like 'an auth page with a bug-report shortcut', '/auth/password/new'
+    it_behaves_like 'an auth page with a bug-report shortcut', '/auth/confirmation/new'
+    it_behaves_like 'an auth page with a bug-report shortcut', '/auth/sign_up'
   end
 
   describe 'POST /bug_reports' do
@@ -60,18 +60,20 @@ RSpec.describe 'Public bug reports' do
         theme: 'blue-2',
         interface_layout: 'auth',
         viewport: '1280x720@1',
-        client_errors: [].to_json
+        client_errors: [].to_json,
       }
     end
 
     it 'creates a report without an account' do
       post '/bug_reports', params: params
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(200)
       expect(BugReport.last).to have_attributes(
         account: nil,
         error_page: '500',
-        current_path: '/auth/password/new'
+        current_path: '/auth/password/new',
+        request_id: nil,
+        user_agent: nil
       )
     end
   end

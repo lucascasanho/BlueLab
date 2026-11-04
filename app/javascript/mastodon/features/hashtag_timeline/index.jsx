@@ -46,6 +46,8 @@ class HashtagTimeline extends PureComponent {
     columnId: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
     hasUnread: PropTypes.bool,
+    local: PropTypes.bool,
+    hasFeedAccess: PropTypes.bool,
     multiColumn: PropTypes.bool,
   };
 
@@ -179,7 +181,7 @@ class HashtagTimeline extends PureComponent {
           <ColumnHeader
             title={title}
             withUnreadMarker={hasUnread}
-            withBackButton={multiColumn && !pinned && 'auto'}
+            withBackButton={!multiColumn ? true : !pinned ? 'auto' : false}
             extraButtons={
               <HashtagColumnMenu
                 tagId={id}

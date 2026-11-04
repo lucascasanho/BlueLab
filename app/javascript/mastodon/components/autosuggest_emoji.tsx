@@ -11,6 +11,7 @@ interface LegacyEmoji {
 
 export const AutosuggestEmoji: FC<{ emoji: LegacyEmoji }> = ({ emoji }) => {
   const colons = `:${emoji.id}:`;
+
   return (
     <div className='autosuggest-emoji'>
       <Emoji code={emoji.native ?? colons} />

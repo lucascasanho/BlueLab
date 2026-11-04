@@ -1,0 +1,341 @@
+@use '@/styles/mastodon/mixins';
+@use '@/styles/mastodon/variables';
+
+.buttonWrapper {
+  position: relative;
+
+  @media (prefers-reduced-motion: no-preference) {
+    transition: all 200ms ease-out;
+  }
+
+  &:not(.buttonWrapperInline) {
+    position: fixed;
+    bottom: var(--space-4);
+    right: var(--space-4);
+    z-index: 2;
+  }
+}
+
+.buttonWrapperHidden {
+  transform: translateX(calc(100% + var(--space-4)));
+  opacity: 0;
+  transition-timing-function: ease-in;
+}
+
+.root {
+  box-sizing: border-box;
+  position: fixed;
+  z-index: 300;
+  inset: 0;
+  top: calc(
+    var(--composer-visual-viewport-offset-top, 0) + env(safe-area-inset-top)
+  );
+  bottom: var(--composer-visual-viewport-bottom, 0);
+  transition:
+    top 160ms ease-out,
+    bottom 160ms ease-out,
+    height 160ms ease-out;
+
+  @media (width < #{variables.$mobile-menu-breakpoint}) {
+    // Add a backdrop for the mobile composer to cover up the page
+    // behind the composer that can be visible on Safari iOS
+    &::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-color: var(--color-bg-primary);
+    }
+  }
+
+  @media (width >= #{variables.$mobile-menu-breakpoint}) {
+    top: auto;
+    display: grid;
+    grid-template-columns: var(--columns-area-grid-columns);
+    bottom: 0;
+    pointer-events: none;
+  }
+}
+
+.composer,
+.composerMinimized {
+  @media (width >= #{variables.$mobile-menu-breakpoint}) {
+    box-sizing: border-box;
+    grid-column: 2;
+    pointer-events: auto;
+  }
+}
+
+.composer {
+  @media (width < #{variables.$mobile-menu-breakpoint}) {
+    // Fill the visible screen with the keyboard closed; compact mode follows the
+    // visible viewport above the keyboard.
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  @media (width >= #{variables.$mobile-menu-breakpoint}) {
+    min-height: 270px;
+    max-height: calc(100vh - (var(--space-4) * 2));
+  }
+}
+
+.composerMinimized {
+  cursor: pointer;
+}
+
+@media (width < #{variables.$mobile-menu-breakpoint}) {
+  .root[data-keyboard-open='true'] {
+    top: auto;
+    height: min(48dvh, var(--viewport-height, 100dvh));
+    max-height: var(--viewport-height, 100dvh);
+    min-height: min(220px, var(--viewport-height, 100dvh));
+  }
+
+  :global(body:not([data-theme])) .root[data-keyboard-open='true'],
+  :global(body[data-theme='']) .root[data-keyboard-open='true'],
+  :global(body[data-theme='default']) .root[data-keyboard-open='true'],
+  :global(body[data-theme='vanilla']) .root[data-keyboard-open='true'] {
+    // Anchor to the measured visible viewport. Let top and bottom determine
+    // the height so no reserved blank area remains above the keyboard.
+    top: calc(
+      var(--composer-visual-viewport-offset-top, 0) + env(safe-area-inset-top)
+    );
+    bottom: var(--composer-visual-viewport-bottom, 0);
+    height: auto;
+    max-height: none;
+    min-height: 0;
+  }
+}
+
+/* Use the Vanilla 5.0 compose surface for the BlueLab editor too.
+ * The content editor and enhanced actions come from BlueLab, while this
+ * theme-scoped rule preserves Vanilla's own panel treatment. */
+:global(body:not([data-theme])) .blueLabComposer,
+:global(body[data-theme='']) .blueLabComposer,
+:global(body[data-theme='default']) .blueLabComposer,
+:global(body[data-theme='vanilla']) .blueLabComposer {
+  background: var(--color-bg-primary);
+  border: 0;
+  box-shadow: none;
+
+  @media (width >= #{variables.$mobile-menu-breakpoint}) {
+    @include mixins.elevation-2;
+
+    border: 0;
+    border-bottom: none;
+    border-radius: var(--radius-6) var(--radius-6) 0 0;
+    overflow: hidden;
+  }
+
+  :global([data-compose-scroll-container]) {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    flex-direction: column;
+    gap: var(--space-2);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+    touch-action: pan-y;
+  }
+
+  :global([data-bluelab-compose-toolbar]) {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    background: var(--color-bg-primary);
+
+    label {
+      font-weight: inherit;
+    }
+  }
+
+  :global([data-bluelab-rich-editor-wrapper]) {
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    min-height: 0;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  :global([data-bluelab-rich-editor-toolbar]) {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  :global([data-bluelab-rich-editor-input]) {
+    @include mixins.type-body;
+
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    min-height: 9rem;
+    max-height: min(22rem, 32vh);
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: var(--space-2);
+    border: 0;
+    border-radius: var(--radius-2);
+    outline: none;
+    background: none;
+    color: var(--color-text-primary);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    cursor: text;
+
+    // Prevent the mobile browser from zooming when the editor is focused.
+    @media (width < #{variables.$mobile-menu-breakpoint}) {
+      font-size: var(--fs-16);
+    }
+
+    b,
+    strong {
+      font-weight: 700;
+    }
+
+    em,
+    i {
+      font-style: italic;
+    }
+
+    u {
+      text-decoration: underline;
+    }
+
+    code,
+    pre {
+      font-family: var(--font-monospace, monospace);
+    }
+
+    code {
+      padding: var(--space-1);
+      border-radius: var(--radius-2);
+      background: var(--color-bg-secondary);
+    }
+
+    pre,
+    blockquote,
+    ul,
+    ol {
+      display: block;
+      margin-block: var(--space-2);
+    }
+
+    pre {
+      padding: var(--space-2);
+      border-radius: var(--radius-2);
+      background: var(--color-bg-secondary);
+      white-space: pre-wrap;
+    }
+
+    blockquote {
+      padding-inline-start: var(--space-3);
+      border-inline-start: 2px solid var(--color-border-brand);
+      color: var(--color-text-secondary);
+    }
+
+    ul,
+    ol {
+      padding-inline-start: var(--space-5);
+    }
+
+    ul {
+      list-style-type: disc;
+    }
+
+    ol {
+      list-style-type: decimal;
+    }
+
+    [data-emoji-shortcode] {
+      display: inline-flex;
+      vertical-align: middle;
+      user-select: none;
+
+      img {
+        width: 1.25em;
+        height: 1.25em;
+        object-fit: contain;
+        vertical-align: middle;
+      }
+    }
+
+    &:focus {
+      outline: var(--outline-focus-default);
+      outline-offset: -2px;
+    }
+
+    &:empty::before {
+      content: attr(data-placeholder);
+      color: var(--color-text-tertiary);
+      pointer-events: none;
+    }
+  }
+
+  :global([data-bluelab-rich-editor-transport]) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  :global([data-bluelab-compose-attachments]) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-height: min(18rem, 28vh);
+    overflow-y: auto;
+
+    &[data-has-quote='true'] {
+      max-height: none;
+      overflow: visible;
+    }
+  }
+
+  :global([data-bluelab-compose-message-notice]) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text-secondary);
+
+    svg {
+      flex: 0 0 auto;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  :global([data-compose-primary-actions]) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  :global([data-bluelab-compose-toolbar]) {
+    background: var(--color-bg-primary);
+  }
+
+  @media (width < #{variables.$mobile-menu-breakpoint}), (height <= 800px) {
+    :global([data-bluelab-rich-editor-input]) {
+      min-height: 5.5rem;
+      max-height: 10rem;
+    }
+  }
+}

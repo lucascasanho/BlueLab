@@ -107,6 +107,7 @@ const initialState = ImmutableMap({
   suggestions: ImmutableList(),
   default_privacy: 'public',
   default_sensitive: false,
+  default_spoiler_field: false,
   default_language: 'en',
   default_content_type: 'text/markdown',
   composer_editor: initialStateData?.compose?.composer_editor || 'bluelab',
@@ -158,6 +159,7 @@ function clearAll(state) {
     map.set('in_reply_to', null);
     map.set('privacy', state.get('default_privacy'));
     map.set('sensitive', state.get('default_sensitive'));
+    map.set('spoiler', state.get('default_spoiler_field', false));
     map.set('language', state.get('default_language'));
     map.update('media_attachments', list => list.clear());
     map.set('progress', 0);
@@ -511,20 +513,13 @@ export const composeReducer = (state = initialState, action) => {
       );
   case COMPOSE_SENSITIVITY_CHANGE:
     return state.withMutations(map => {
-      if (!state.get('spoiler')) {
-        map.set('sensitive', !state.get('sensitive'));
-      }
-
+      map.set('sensitive', !state.get('sensitive'));
       map.set('idempotencyKey', uuid());
     });
   case COMPOSE_SPOILERNESS_CHANGE:
     return state.withMutations(map => {
       map.set('spoiler', !state.get('spoiler'));
       map.set('idempotencyKey', uuid());
-
-      if (state.get('media_attachments').size >= 1) {
-        map.set('sensitive', !state.get('spoiler'));
-      }
     });
   case COMPOSE_SPOILER_TEXT_CHANGE:
     if (!state.get('spoiler')) return state;
@@ -692,9 +687,6 @@ export const composeReducer = (state = initialState, action) => {
       if (action.status.get('spoiler_text').length > 0) {
         map.set('spoiler', true);
         map.set('spoiler_text', action.status.get('spoiler_text'));
-      } else {
-        map.set('spoiler', action.status.get('sensitive') && action.status.get('media_attachments').size > 0);
-        map.set('spoiler_text', '');
       }
 
       if (action.status.get('poll')) {
@@ -730,9 +722,6 @@ export const composeReducer = (state = initialState, action) => {
       if (action.spoiler_text.length > 0) {
         map.set('spoiler', true);
         map.set('spoiler_text', action.spoiler_text);
-      } else {
-        map.set('spoiler', action.status.get('sensitive') && action.status.get('media_attachments').size > 0);
-        map.set('spoiler_text', '');
       }
 
       if (action.status.get('poll')) {

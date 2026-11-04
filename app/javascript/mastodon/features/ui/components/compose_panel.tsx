@@ -8,11 +8,11 @@ import {
   unmountCompose,
 } from 'mastodon/actions/compose';
 import { useAppHistory } from 'mastodon/components/router';
+import { Search } from 'mastodon/components/search';
 import ServerBanner from 'mastodon/components/server_banner';
-import { NavigationBar } from 'mastodon/features/compose/components/navigation_bar';
-import { Search } from 'mastodon/features/compose/components/search';
-import ComposeFormContainer from 'mastodon/features/compose/containers/compose_form_container';
+import { ComposeForm } from 'mastodon/features/compose/form';
 import { LinkFooter } from 'mastodon/features/ui/components/link_footer';
+import { NavigationBar } from 'mastodon/features/ui/components/navigation_bar';
 import { useIdentity } from 'mastodon/identity_context';
 
 export const ComposePanel: React.FC<{ showComposer?: boolean }> = ({
@@ -58,9 +58,7 @@ export const ComposePanel: React.FC<{ showComposer?: boolean }> = ({
         </>
       )}
 
-      {signedIn && showComposer && !hideComposer && (
-        <ComposeFormContainer singleColumn />
-      )}
+      {signedIn && showComposer && !hideComposer && <ComposeForm headless />}
       {signedIn && showComposer && hideComposer && (
         <div className='compose-form' />
       )}

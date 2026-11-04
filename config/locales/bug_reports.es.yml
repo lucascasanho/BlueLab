@@ -58,6 +58,8 @@ es:
     attachment_hint: Imágenes, GIF, audio y vídeo. Hasta 5 archivos.
     diagnostic_notice: El navegador, sistema operativo, idioma, tema, modo de interfaz, ventana y errores recientes del cliente pueden incluirse automáticamente.
     error_page: Este informe se inició desde la página de error %{code}.
+    anonymous: "Prefiero no identificarme"
+    anonymous_hint: "El informe seguirá incluyendo la página donde ocurrió el problema y los diagnósticos técnicos, pero no se vinculará a tu cuenta."
     submit: Enviar informe
     back: Cancelar
     success_title: Informe enviado

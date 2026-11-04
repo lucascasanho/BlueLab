@@ -13,7 +13,7 @@ import { DisplayName } from '@/mastodon/components/display_name';
 import { useAccountHandle } from '@/mastodon/components/display_name/default';
 import { BugReportLabel } from '@/mastodon/features/bug_report/bug_report_label';
 import { useOpenBugReport } from '@/mastodon/features/bug_report/use_bug_report';
-import { ComposeRedesignButton } from '@/mastodon/features/compose/redesign/trigger';
+import { ComposeRedesignButton } from '@/mastodon/features/compose/bluelab/trigger';
 import { useBreakpoint } from '@/mastodon/features/ui/hooks/useBreakpoint';
 import { useColumnsContext } from '@/mastodon/features/ui/util/columns_context';
 import { useAccount } from '@/mastodon/hooks/useAccount';
@@ -59,10 +59,7 @@ const Mastodon5Footer: React.FC = () => {
   return (
     <footer className={classes.desktopFooter}>
       <Link to='/about'>
-        <FormattedMessage
-          id='custom_homepage.about'
-          defaultMessage='About'
-        />
+        <FormattedMessage id='custom_homepage.about' defaultMessage='About' />
       </Link>
       <span>·</span>
       <Link to='/privacy-policy'>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import type React from 'react';
 
 import { FormattedMessage } from 'react-intl';
@@ -41,12 +41,12 @@ export const Blue2InternalFeed: React.FC<Blue2InternalFeedProps> = ({
 
   useEffect(() => {
     if (type === 'home') {
-      dispatch(expandHomeTimeline());
+      void dispatch(expandHomeTimeline());
       return dispatch(connectUserStream());
     }
 
     if (type === 'global') {
-      dispatch(expandPublicTimeline());
+      void dispatch(expandPublicTimeline());
       return dispatch(connectPublicStream());
     }
 
@@ -55,25 +55,28 @@ export const Blue2InternalFeed: React.FC<Blue2InternalFeedProps> = ({
     }
 
     if (type === 'list') {
-      dispatch(expandListTimeline(id));
+      void dispatch(expandListTimeline(id));
       return dispatch(connectListStream(id));
     }
 
-    dispatch(expandHashtagTimeline(id, { local: false }));
-    return dispatch(connectHashtagStream(id, id, false));
+    void dispatch(expandHashtagTimeline(id, { local: false }));
+    return dispatch(connectHashtagStream(id, id, false, () => true));
   }, [dispatch, id, type]);
 
-  const handleLoadMore = (maxId: number) => {
-    if (type === 'global') {
-      dispatch(expandPublicTimeline({ maxId }));
-    } else if (type === 'home') {
-      dispatch(expandHomeTimeline({ maxId }));
-    } else if (type === 'list' && id) {
-      dispatch(expandListTimeline(id, { maxId }));
-    } else if (type === 'hashtag' && id) {
-      dispatch(expandHashtagTimeline(id, { maxId, local: false }));
-    }
-  };
+  const handleLoadMore = useCallback(
+    (maxId: number) => {
+      if (type === 'global') {
+        void dispatch(expandPublicTimeline({ maxId }));
+      } else if (type === 'home') {
+        void dispatch(expandHomeTimeline({ maxId }));
+      } else if (type === 'list' && id) {
+        void dispatch(expandListTimeline(id, { maxId }));
+      } else if (type === 'hashtag' && id) {
+        void dispatch(expandHashtagTimeline(id, { maxId, local: false }));
+      }
+    },
+    [dispatch, id, type],
+  );
 
   return (
     <Column bindToDocument>

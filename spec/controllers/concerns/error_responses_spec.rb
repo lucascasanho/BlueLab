@@ -148,7 +148,7 @@ RSpec.describe ErrorResponses do
     it 'uses the standard Mastodon error page for that user' do
       get 'show'
 
-      expect(response).to have_http_status(:not_found)
+      expect(response).to have_http_status(404)
       expect(response.parsed_body)
         .to have_css('body.error')
         .and have_no_css('body.error--bluelab')
@@ -160,7 +160,7 @@ RSpec.describe ErrorResponses do
   context 'when the BlueLab error layout is rendered with a 200 response' do
     controller(ApplicationController) do
       def show
-        render 'errors/500', layout: 'error', formats: [:html], status: :ok
+        render 'errors/500', layout: 'error', formats: [:html], status: 200
       end
     end
 
@@ -172,7 +172,7 @@ RSpec.describe ErrorResponses do
     it 'keeps the bug-report shortcut as a direct link' do
       get 'show'
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(200)
       expect(response.parsed_body)
         .to have_css('body.error--bluelab[data-theme="blue-2"]')
         .and have_css('.error-page__code', text: '200')
