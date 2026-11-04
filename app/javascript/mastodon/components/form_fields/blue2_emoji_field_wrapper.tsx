@@ -106,6 +106,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   maxLength,
   blue2EmojiEditor: _blue2EmojiEditor,
   mastodon5EmojiEditor: _mastodon5EmojiEditor,
+  emojiPickerInline,
   ...otherProps
 }) => {
   const counterId = useId();
@@ -555,6 +556,7 @@ export const Blue2EmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
           className={classNames(
             classes.fieldWrapper,
             classes.blue2FieldWrapper,
+            emojiPickerInline && classes.pickerInline,
           )}
           describedById={counterId}
           {...otherProps}

@@ -8,6 +8,8 @@ import type {
 } from 'react';
 import { useCallback, useId, useRef } from 'react';
 
+import classNames from 'classnames';
+
 import type { Merge } from 'type-fest';
 
 import { insertEmojiAtPosition } from '@/mastodon/features/emoji/utils';
@@ -36,6 +38,7 @@ export type EmojiInputProps = {
   recommended?: boolean;
   blue2EmojiEditor?: boolean;
   mastodon5EmojiEditor?: boolean;
+  emojiPickerInline?: boolean;
 } & Omit<CommonFieldWrapperProps, 'wrapperClassName'>;
 
 export const EmojiTextInputField: FC<
@@ -52,6 +55,7 @@ export const EmojiTextInputField: FC<
   disabled,
   blue2EmojiEditor = false,
   mastodon5EmojiEditor = false,
+  emojiPickerInline = false,
   ...otherProps
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -66,6 +70,7 @@ export const EmojiTextInputField: FC<
     disabled,
     blue2EmojiEditor,
     mastodon5EmojiEditor,
+    emojiPickerInline,
     inputRef,
     value,
     onChange,
@@ -174,6 +179,7 @@ const DefaultEmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
   maxLength: _maxLength,
   blue2EmojiEditor: _blue2EmojiEditor,
   mastodon5EmojiEditor: _mastodon5EmojiEditor,
+  emojiPickerInline,
   ...otherProps
 }) => {
   const counterId = useId();
@@ -204,7 +210,10 @@ const DefaultEmojiFieldWrapper: FC<EmojiFieldWrapperProps> = ({
 
   return (
     <FormFieldWrapper
-      className={classes.fieldWrapper}
+      className={classNames(
+        classes.fieldWrapper,
+        emojiPickerInline && classes.pickerInline,
+      )}
       describedById={counterId}
       {...otherProps}
     >

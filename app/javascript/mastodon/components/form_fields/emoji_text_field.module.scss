@@ -1,4 +1,4 @@
-.fieldWrapper div:has(:global(.emoji-picker-dropdown)) {
+.fieldWrapper:not(.pickerInline) div:has(:global(.emoji-picker-dropdown)) {
   position: relative;
 
   > input,
@@ -11,7 +11,7 @@
   }
 }
 
-.fieldWrapper :global(.emoji-picker-dropdown) {
+.fieldWrapper:not(.pickerInline) :global(.emoji-picker-dropdown) {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -23,11 +23,45 @@
   }
 }
 
+.pickerInline {
+  :global([data-input]) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 8px;
+    width: 100%;
+  }
+
+  :global([data-input] > input) {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  :global([data-input] > .emoji-picker-dropdown) {
+    position: static;
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+  }
+
+  :global([data-input] > span) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin-top: 0;
+  }
+
+  .blue2Editor {
+    padding-inline-end: 15px;
+  }
+}
+
 /* BlueLab-only overrides. The upstream stylesheet above remains active for Vanilla and other themes. */
 
 /* prettier-ignore */
 :global(body[data-theme='blue-2']) {
-  .fieldWrapper div:has(:global(.emoji-picker-dropdown)) {
+  .fieldWrapper:not(.pickerInline)
+    div:has(:global(.emoji-picker-dropdown)) {
     position: relative;
   
     > input,
@@ -40,7 +74,7 @@
     }
   }
   
-  .fieldWrapper :global(.emoji-picker-dropdown) {
+  .fieldWrapper:not(.pickerInline) :global(.emoji-picker-dropdown) {
     position: absolute;
     top: 8px;
     right: 8px;

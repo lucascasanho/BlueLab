@@ -60,6 +60,7 @@ export const NameModal: FC<BaseConfirmationModalProps> = ({ onClose }) => {
       <EmojiTextInputField
         blue2EmojiEditor
         mastodon5EmojiEditor
+        emojiPickerInline
         value={newName}
         onChange={setNewName}
         aria-labelledby={titleId}
