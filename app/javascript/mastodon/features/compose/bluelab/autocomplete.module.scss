@@ -10,7 +10,10 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   isolation: isolate;
-  background-color: var(--color-bg-elevated, #16151d) !important;
+  background-color: var(
+    --color-bg-elevated,
+    var(--color-bg-primary, #16151d)
+  ) !important;
   background-image: none !important;
   border: 1px solid var(--color-border-primary, #34313e) !important;
   border-radius: var(--radius-xl, 16px) !important;
