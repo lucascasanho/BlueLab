@@ -59,6 +59,15 @@
   .blue2Editor {
     inset-inline-end: 40px;
     padding-inline-end: 15px;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  :global([data-input]:has(> span)) .blue2Editor {
+    inset-block-end: 21px;
   }
 }
 
@@ -142,6 +151,10 @@
 
     &.pickerInline .blue2Editor {
       inset-inline-end: 40px;
+    }
+
+    &.pickerInline:has([data-input] > span) .blue2Editor {
+      inset-block-end: 21px;
     }
 
     [data-input]:has(> textarea) .blue2Editor {
@@ -247,6 +260,10 @@
 
   &.pickerInline .blue2Editor {
     inset-inline-end: 40px;
+  }
+
+  &.pickerInline:has([data-input] > span) .blue2Editor {
+    inset-block-end: 21px;
   }
 
   [data-input]:has(> textarea) .blue2Editor {
