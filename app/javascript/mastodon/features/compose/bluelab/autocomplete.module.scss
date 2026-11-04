@@ -9,11 +9,13 @@
   max-height: min(320px, 45vh);
   overflow-y: auto;
   overscroll-behavior: contain;
-  background-color: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-primary);
-  border-radius: var(--radius-md);
-  color: var(--color-text-primary);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 32%);
+  isolation: isolate;
+  background-color: var(--color-bg-elevated, #16151d) !important;
+  background-image: none !important;
+  border: 1px solid var(--color-border-primary, #34313e) !important;
+  border-radius: var(--radius-xl, 16px) !important;
+  color: var(--color-text-primary, #f7f7f8) !important;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 32%) !important;
 }
 
 .item {
@@ -79,9 +81,12 @@
 }
 
 :global(body[data-theme='blue-2']) .suggestions {
-  background-color: var(--blue2-surface);
-  border-color: var(--blue2-border-soft);
-  color: var(--blue2-text);
+  background-color: var(
+    --blue2-surface-raised,
+    var(--blue2-surface, #16151d)
+  ) !important;
+  border-color: var(--blue2-border-soft, #34313e) !important;
+  color: var(--blue2-text, #f7f7f8) !important;
 }
 
 :global(body[data-theme='blue-2']) .item {
