@@ -68,23 +68,63 @@
   }
 }
 
-// The custom emoji shortcode autocomplete is rendered through a body-level
-// Popover portal. Keep its surface styling outside the layout wrappers above,
-// otherwise the menu becomes transparent when the composer is opened in a modal.
-body[data-theme='mastodon-bird-ui-auto'] {
+// BlueLab's composer autocomplete is rendered in a Popover portal directly
+// under <body>, outside the layout wrappers above. Target that portal explicitly
+// and use !important because legacy Bird-UI layout rules also style this menu.
+body[data-theme='mastodon-bird-ui-auto'] > [data-popover-placement] {
+  z-index: 10000;
+
   .autosuggest-textarea__suggestions {
-    background-color: var(--color-bg-elevated);
-    border: 1px solid var(--color-border-primary);
+    box-sizing: border-box;
+    max-height: min(320px, 45vh);
+    overflow-y: auto;
+    background: var(--color-bg-elevated) !important;
+    border: 1px solid var(--color-border-primary) !important;
     border-radius: var(--radius-md);
-    color: var(--color-light-text);
-    box-shadow: 0 8px 24px rgb(0 0 0 / 28%);
+    color: var(--color-light-text) !important;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 32%);
   }
 
   .autosuggest-textarea__suggestions__item {
-    color: var(--color-light-text);
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 8px 12px;
+    color: var(--color-light-text) !important;
+    cursor: pointer;
   }
 
   .autosuggest-textarea__suggestions__item.selected {
-    background-color: var(--color-bg-highlight);
+    background: var(--color-bg-highlight) !important;
+  }
+}
+
+// The BlueLab theme uses the same portal, but maps its surface to the editable
+// BlueLab palette rather than Bird-UI's elevated-surface token.
+body[data-theme='blue-2'] > [data-popover-placement] {
+  z-index: 10000;
+
+  .autosuggest-textarea__suggestions {
+    box-sizing: border-box;
+    max-height: min(320px, 45vh);
+    overflow-y: auto;
+    background: var(--blue2-surface) !important;
+    border: 1px solid var(--blue2-border) !important;
+    border-radius: var(--radius-md);
+    color: var(--blue2-text) !important;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 32%);
+  }
+
+  .autosuggest-textarea__suggestions__item {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 8px 12px;
+    color: var(--blue2-text) !important;
+    cursor: pointer;
+  }
+
+  .autosuggest-textarea__suggestions__item.selected {
+    background: var(--blue2-hover) !important;
   }
 }
