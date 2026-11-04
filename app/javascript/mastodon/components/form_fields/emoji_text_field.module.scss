@@ -57,8 +57,7 @@
   }
 
   .blue2Editor {
-    grid-column: 1;
-    grid-row: 1;
+    inset-inline-end: 40px;
     padding-inline-end: 15px;
   }
 }
