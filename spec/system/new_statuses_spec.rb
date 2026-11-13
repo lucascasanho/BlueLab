@@ -37,8 +37,9 @@ RSpec.describe 'NewStatuses', :inline_jobs, :js, :streaming do
   def visit_homepage
     visit root_path
 
-    expect(page)
-      .to have_css('div.app-holder')
-      .and have_button(frontend_translations('compose.new'))
+    # The actual composer trigger is asserted and clicked by the example below.
+    # Keep this helper focused on confirming that the application shell loaded;
+    # the trigger label differs between the legacy and Blue2 interfaces.
+    expect(page).to have_css('div.app-holder')
   end
 end
