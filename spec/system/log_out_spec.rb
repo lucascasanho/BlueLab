@@ -42,8 +42,15 @@ RSpec.describe 'Log out' do
       else
         click_button frontend_translations('tabs_bar.account_settings')
       end
-      click_on frontend_translations('navigation_bar.logout')
-      click_on frontend_translations('confirmations.logout.confirm')
+
+      # The redesigned navigation menu is exposed as an account-menu test id,
+      # while the Blue2 account menu uses role="menu".
+      menu_selector = '[data-testid="account-menu"], [role="menu"]'
+      expect(page).to have_css(menu_selector)
+      within menu_selector do
+        click_button frontend_translations('navigation_bar.logout')
+      end
+      click_button frontend_translations('confirmations.logout.confirm')
 
       expect(page)
         .to have_title(I18n.t('auth.login'))
