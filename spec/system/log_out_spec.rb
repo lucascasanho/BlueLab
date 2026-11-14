@@ -34,8 +34,8 @@ RSpec.describe 'Log out' do
       expect(page)
         .to have_css('body', class: 'app-body')
 
-      # In Blue2 the account menu is an icon-only button named via aria-label.
-      # The default redesigned shell exposes the label as visible button text.
+      # Blue2 uses an icon-only account button; the redesigned navigation uses
+      # a labelled menu trigger. Both expose the same account-settings action.
       account_settings_selector = 'button[aria-label="Account settings"]'
       if page.has_css?(account_settings_selector)
         find(account_settings_selector).click
@@ -43,11 +43,15 @@ RSpec.describe 'Log out' do
         click_button frontend_translations('tabs_bar.account_settings')
       end
 
-      # The redesigned navigation menu is exposed as an account-menu test id,
-      # while the Blue2 account menu uses role="menu".
-      menu_selector = '[data-testid="account-menu"], [role="menu"]'
-      expect(page).to have_css(menu_selector)
-      within menu_selector do
+      # Desktop navigation, the mobile slide-out, and Blue2 render different
+      # menu containers. Select the visible menu instead of assuming one layout.
+      menu_selector = [
+        '[data-testid="account-menu"]',
+        '[data-testid="slide-out-account-menu"]',
+        '[role="menu"]',
+      ].join(', ')
+      menu = find(menu_selector, visible: true)
+      within menu do
         click_button frontend_translations('navigation_bar.logout')
       end
       click_button frontend_translations('confirmations.logout.confirm')
