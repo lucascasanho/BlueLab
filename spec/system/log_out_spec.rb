@@ -43,17 +43,10 @@ RSpec.describe 'Log out' do
         click_button frontend_translations('tabs_bar.account_settings')
       end
 
-      # Desktop navigation, the mobile slide-out, and Blue2 render different
-      # menu containers. Select the visible menu instead of assuming one layout.
-      menu_selector = [
-        '[data-testid="account-menu"]',
-        '[data-testid="slide-out-account-menu"]',
-        '[role="menu"]',
-      ].join(', ')
-      menu = find(menu_selector, visible: true)
-      within menu do
-        click_button frontend_translations('navigation_bar.logout')
-      end
+      # The account menu markup differs across themes. Its logout action is
+      # exposed as a visible text link/button rather than a shared container.
+      click_on(/Sign Out|Logout/)
+
       click_button frontend_translations('confirmations.logout.confirm')
 
       expect(page)
