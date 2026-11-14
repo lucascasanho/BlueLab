@@ -35,8 +35,9 @@ RSpec.describe 'NewStatuses', :inline_jobs, :js, :streaming do
 
     click_on frontend_translations('compose.published.open')
 
-    expect(page)
-      .to have_css('.status__content__text', text: status_text)
+    # Blue2 and the redesigned status detail view do not share the legacy
+    # .status__content__text class, so assert the rendered post text itself.
+    expect(page).to have_text(status_text)
   end
 
   def visit_homepage
