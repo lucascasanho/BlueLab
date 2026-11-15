@@ -79,6 +79,7 @@ export const NavigationAccountCardAndMenu: React.FC<{
           icon={DotsThreeIcon}
           variant='ghost'
           size='sm'
+          data-testid='account-menu-trigger'
         >
           <FormattedMessage
             id='tabs_bar.account_settings'
