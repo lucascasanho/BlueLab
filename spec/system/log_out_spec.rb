@@ -48,7 +48,7 @@ RSpec.describe 'Log out' do
     # The redesigned navigation has an explicit trigger; use it before the
     # legacy Blue2 aria-label fallback to avoid clicking another account menu.
     if page.has_css?('[data-testid="account-menu-trigger"]')
-      trigger = find('[data-testid="account-menu-trigger]')
+      trigger = find('[data-testid="account-menu-trigger"]')
       trigger.click
       expect(trigger).to have_attribute('aria-expanded', 'true')
     elsif page.has_css?('button[aria-label="Account settings"]')
