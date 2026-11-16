@@ -50,7 +50,7 @@ RSpec.describe 'Log out' do
     if page.has_css?('[data-testid="account-menu-trigger"]')
       trigger = find('[data-testid="account-menu-trigger"]')
       trigger.click
-      expect(trigger).to have_attribute('aria-expanded', 'true')
+      expect(page).to have_css('[data-testid="account-menu-trigger"][aria-expanded="true"]')
     elsif page.has_css?('button[aria-label="Account settings"]')
       find('button[aria-label="Account settings"]').click
     else
