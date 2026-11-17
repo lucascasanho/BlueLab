@@ -38,7 +38,7 @@ RSpec.describe 'Log out' do
       if page.has_css?('[data-testid="account-menu-logout"]')
         find('[data-testid="account-menu-logout"]').click
       else
-        click_on frontend_translations('navigation_bar.logout')
+        click_on(/Sign Out|Logout/)
       end
       click_button frontend_translations('confirmations.logout.confirm')
 
