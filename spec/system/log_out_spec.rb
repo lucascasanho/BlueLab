@@ -39,7 +39,7 @@ RSpec.describe 'Log out' do
         find('[data-testid="account-menu-logout"]').click
       else
         # Match the rendered action across English and Portuguese labels.
-        find('button', text: /Sign Out|Logout|Sair/).click
+        click_button(/Sign Out|Logout|Sair/)
       end
       click_button frontend_translations('confirmations.logout.confirm')
 
