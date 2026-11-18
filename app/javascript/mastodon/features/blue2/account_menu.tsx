@@ -249,7 +249,6 @@ export const Blue2AccountMenu: React.FC<{
         className={classes.menuItem}
         onClick={confirmLogout}
         role='menuitem'
-        data-testid='account-menu-logout'
       >
         <SignOutIcon />
         <FormattedMessage id='navigation_bar.logout' defaultMessage='Logout' />
