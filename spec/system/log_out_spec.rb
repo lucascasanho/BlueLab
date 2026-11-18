@@ -34,15 +34,14 @@ RSpec.describe 'Log out' do
       expect(page)
         .to have_css('body', class: 'app-body')
 
-      # In Blue2 the account menu is an icon-only button named via aria-label.
-      # The default redesigned shell exposes the label as visible button text.
+      # Open the account menu and use the visible action from the redesigned menu.
       account_settings_selector = 'button[aria-label="Account settings"]'
       if page.has_css?(account_settings_selector)
         find(account_settings_selector).click
       else
         click_button frontend_translations('tabs_bar.account_settings')
       end
-      find('[role="menuitem"]', text: /sign out|logout/i).click
+      click_on 'Sign Out'
       click_on frontend_translations('confirmations.logout.confirm')
 
       expect(page)
