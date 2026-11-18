@@ -79,7 +79,6 @@ export const NavigationAccountCardAndMenu: React.FC<{
           icon={DotsThreeIcon}
           variant='ghost'
           size='sm'
-          data-testid='account-menu-trigger'
         >
           <FormattedMessage
             id='tabs_bar.account_settings'
@@ -405,7 +404,6 @@ export const AccountMenuItems: React.FC<{
       <MenuItem
         onClick={confirmLogout}
         icon={SignOutIcon}
-        data-testid='account-menu-logout'
       >
         <FormattedMessage id='navigation_bar.logout' defaultMessage='Logout' />
       </MenuItem>
