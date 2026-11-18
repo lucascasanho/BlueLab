@@ -38,8 +38,8 @@ RSpec.describe 'Log out' do
       if page.has_css?('[data-testid="account-menu-logout"]')
         find('[data-testid="account-menu-logout"]').click
       else
-        # Use the localized label: the app may run in pt-BR or another locale.
-        click_on frontend_translations('navigation_bar.logout')
+        # Match the rendered action across English and Portuguese labels.
+        find('button', text: /Sign Out|Logout|Sair/).click
       end
       click_button frontend_translations('confirmations.logout.confirm')
 
