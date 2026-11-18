@@ -42,7 +42,7 @@ RSpec.describe 'Log out' do
       else
         click_button frontend_translations('tabs_bar.account_settings')
       end
-      click_on frontend_translations('navigation_bar.logout')
+      find('[role="menuitem"]', text: /sign out|logout/i).click
       click_on frontend_translations('confirmations.logout.confirm')
 
       expect(page)
