@@ -1315,6 +1315,23 @@ body > [data-popover-placement] {
       .display-name strong {
         display: block;
       }
+
+      // Keep the verification mark beside the display name in the logged-out
+      // About page, where the redesigned display-name layout is not active.
+      .display-name__name {
+        display: inline-flex;
+        align-items: center;
+        max-width: 100%;
+        min-width: 0;
+        vertical-align: bottom;
+      }
+
+      .display-name__html {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
   }
 
