@@ -361,7 +361,7 @@ jobs:
 
       - name: Set up Ruby environment
         uses: ./.github/actions/setup-ruby
-        timeout-minutes: 15
+        timeout-minutes: 25
         with:
           ruby-version: ${{ matrix.ruby-version}}
           additional-system-dependencies: ffmpeg
