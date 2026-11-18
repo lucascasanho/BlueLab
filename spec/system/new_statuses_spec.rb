@@ -19,7 +19,7 @@ RSpec.describe 'NewStatuses', :inline_jobs, :js, :streaming do
     if page.has_css?('body[data-theme="blue-2"]')
       click_button frontend_translations('compose_form.placeholder')
     else
-      click_button frontend_translations('compose.new')
+      click_button frontend_translations('tabs_bar.publish')
       click_button frontend_translations('compose.new.post')
     end
 
@@ -39,6 +39,6 @@ RSpec.describe 'NewStatuses', :inline_jobs, :js, :streaming do
 
     expect(page)
       .to have_css('div.app-holder')
-      .and have_button(frontend_translations('compose.new'))
+      .and have_button(frontend_translations('tabs_bar.publish'))
   end
 end
