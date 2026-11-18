@@ -34,33 +34,20 @@ RSpec.describe 'Log out' do
       expect(page)
         .to have_css('body', class: 'app-body')
 
-      open_account_menu
-      if page.has_css?('[data-testid="account-menu-logout"]')
-        find('[data-testid="account-menu-logout"]').click
+      # In Blue2 the account menu is an icon-only button named via aria-label.
+      # The default redesigned shell exposes the label as visible button text.
+      account_settings_selector = 'button[aria-label="Account settings"]'
+      if page.has_css?(account_settings_selector)
+        find(account_settings_selector).click
       else
-        # Some legacy menu implementations expose the action as a menuitem
-        # rather than a native button. Match its localized accessible text.
-        find('[role="menuitem"]', text: frontend_translations('navigation_bar.logout')).click
+        click_button frontend_translations('tabs_bar.account_settings')
       end
-      click_button frontend_translations('confirmations.logout.confirm')
+      click_on frontend_translations('navigation_bar.logout')
+      click_on frontend_translations('confirmations.logout.confirm')
 
       expect(page)
         .to have_title(I18n.t('auth.login'))
         .and have_current_path('/auth/sign_in')
-    end
-  end
-
-  def open_account_menu
-    # The redesigned navigation has an explicit trigger; use it before the
-    # legacy Blue2 aria-label fallback to avoid clicking another account menu.
-    if page.has_css?('[data-testid="account-menu-trigger"]')
-      trigger = find('[data-testid="account-menu-trigger"]')
-      trigger.click
-      expect(page).to have_css('[data-testid="account-menu-trigger"][aria-expanded="true"]')
-    elsif page.has_css?('button[aria-label="Account settings"]')
-      find('button[aria-label="Account settings"]').click
-    else
-      click_button frontend_translations('tabs_bar.account_settings')
     end
   end
 end
