@@ -401,10 +401,7 @@ export const AccountMenuItems: React.FC<{
 
       <MenuItemDivider />
 
-      <MenuItem
-        onClick={confirmLogout}
-        icon={SignOutIcon}
-      >
+      <MenuItem onClick={confirmLogout} icon={SignOutIcon}>
         <FormattedMessage id='navigation_bar.logout' defaultMessage='Logout' />
       </MenuItem>
     </>
