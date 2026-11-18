@@ -1,0 +1,2 @@
+= form_tag new_bug_report_path(current_path: request.path), method: :get, class: 'bug-report-shortcut', data: { turbo: false } do
+  = button_tag t('bug_reports.link'), type: 'submit', class: 'button button-secondary bug-report-shortcut__button'

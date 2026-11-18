@@ -34,6 +34,8 @@
         %main.form-container
           = render 'flashes'
           = yield
+          - unless controller_path == 'bug_reports'
+            = render 'shared/bug_report_shortcut'
   - else
     .container-alt
       %header.logo-container{ class: ('logo-container--sign-in' if custom_auth_brand) }
@@ -44,5 +46,7 @@
       %main.form-container
         = render 'flashes'
         = yield
+        - unless controller_path == 'bug_reports'
+          = render 'shared/bug_report_shortcut'
 
 = render template: 'layouts/application'
