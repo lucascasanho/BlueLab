@@ -2,6 +2,7 @@
 
 class Settings::Preferences::AppearanceController < Settings::Preferences::BaseController
   def update
+    return bad_request if params.key?(:user) && !params[:user].respond_to?(:key?)
     return bad_request if theme_submitted? && Themes.instance.selectable_names.exclude?(user_theme)
 
     super
@@ -10,12 +11,20 @@ class Settings::Preferences::AppearanceController < Settings::Preferences::BaseC
   private
 
   def user_theme
-    params.dig(:user, :settings_attributes, :bluelab_theme).to_s
+    settings_attributes_params&.[](:bluelab_theme).to_s
   end
 
   def theme_submitted?
-    settings = params.dig(:user, :settings_attributes)
+    settings = settings_attributes_params
     settings.respond_to?(:key?) && (settings.key?(:bluelab_theme) || settings.key?('bluelab_theme'))
+  end
+
+  def settings_attributes_params
+    user_params = params[:user]
+    return unless user_params.respond_to?(:key?)
+
+    settings = user_params[:settings_attributes]
+    settings if settings.respond_to?(:key?)
   end
 
   def user_params
