@@ -2,7 +2,7 @@
 
 class Settings::Preferences::AppearanceController < Settings::Preferences::BaseController
   def update
-    return bad_request if params.key?(:user) && !params[:user].is_a?(ActionController::Parameters)
+    return bad_request if params.key?(:user) && !params[:user].respond_to?(:key?)
     return bad_request if theme_submitted? && Themes.instance.selectable_names.exclude?(user_theme)
 
     super
@@ -21,10 +21,10 @@ class Settings::Preferences::AppearanceController < Settings::Preferences::BaseC
 
   def settings_attributes_params
     user_params = params[:user]
-    return unless user_params.is_a?(ActionController::Parameters)
+    return unless user_params.respond_to?(:key?)
 
     settings = user_params[:settings_attributes]
-    settings if settings.is_a?(ActionController::Parameters)
+    settings if settings.respond_to?(:key?)
   end
 
   def user_params
